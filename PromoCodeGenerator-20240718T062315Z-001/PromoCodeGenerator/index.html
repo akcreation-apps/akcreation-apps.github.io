@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promocode Generator</title>
+<style>
+    body {
+        background-color: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        margin: 0;
+    }
+    .container {
+        max-width: 400px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .input-field {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        outline: none;
+        margin-bottom: 10px;
+        position: relative;
+    }
+    .eye-icon {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        width: 24px;
+        height: 24px;
+    }
+    .button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 24px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin-top: 10px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+    }
+    .button:disabled {
+        background-color: #888; /* Change background color when disabled */
+        cursor: not-allowed; /* Change cursor style when disabled */
+    }
+    .promocode-container {
+        display: none; /* Initially hide the promocode container */
+        background-color: #222;
+        border: 1px solid #444;
+        padding: 20px;
+        margin-top: 20px;
+        position: relative;
+    }
+    .promocode {
+        color: #4CAF50;
+        font-size: 18px;
+        display: inline-block; /* Ensure promocode and copy icon are in the same line */
+        max-width: calc(100% - 30px); /* Adjust based on the container width and copy icon width */
+    }
+    .copy-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        width: 24px; /* Adjust size of the copy icon */
+        height: 24px; /* Adjust size of the copy icon */
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Promocode Generator</h2>
+    <input type="number" id="registrationNo" class="input-field" placeholder="Enter Registration No" required><br>
+    <input type="number" id="amount" class="input-field" placeholder="Enter Amount" required><br>
+    <div style="position: relative;">
+        <input type="password" id="adminPassword" class="input-field" placeholder="Enter Admin Password" required>
+        <img src="eye-icon.png" id="togglePassword" class="eye-icon" alt="Toggle Password Visibility">
+    </div>
+    <button class="button" onclick="generatePromocode()" id="getPromocodeBtn" disabled>Get Promocode</button>
+    <div id="promocodeContainer" class="promocode-container">
+        <span id="promocodeText" class="promocode"></span>
+        <img src="copy-icon.png" id="copyIcon" class="copy-icon" alt="Copy to Clipboard" onclick="copyPromocode()">
+    </div>
+</div>
+
+<script>
+    const passwordField = document.getElementById('adminPassword');
+    const togglePassword = document.getElementById('togglePassword');
+    togglePassword.addEventListener('click', function () {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        // Change the eye icon
+        this.src = type === 'password' ? 'eye-icon.png' : 'eye-icon-open.png'; // Replace with the appropriate icon paths
+    });
+
+    function generatePromocode() {
+        var registrationNo = document.getElementById('registrationNo').value;
+        var amount = document.getElementById('amount').value;
+        var adminPassword = document.getElementById('adminPassword').value;
+
+        // Check if admin password is correct
+        if (adminPassword === 'MKDKAK@2015') {
+            var currentDate = new Date();
+            var currentMonth = currentDate.getMonth() + 1; // Get current month (1-12)
+            var currentDay = currentDate.getDate(); // Get current day of the month
+
+            // Generate random numbers from 1 to 9
+            var random1 = getRandomNumber();
+            var random2 = getRandomNumber();
+            var random3 = getRandomNumber();
+
+            // Calculate xx, yy, zz, qq based on specified criteria
+            var xx = (random1 * 13) + currentMonth;
+            var yy = getMultiplier(registrationNo);
+            var zz = 19 * ((parseInt(amount)*3)-currentDay+3);
+            var qq = (random3 * 32) + currentDay;
+
+            // Generate promocode in format xx-yy-zz-qq
+            var promocode = `${xx}-${yy}-${zz}-${qq}`;
+
+            // Display promocode and show the promocode container
+            document.getElementById('promocodeText').textContent = promocode;
+            document.getElementById('promocodeContainer').style.display = 'block';
+        } else {
+            alert('Invalid admin password. Please try again.');
+        }
+    }
+
+    function enableButton() {
+        var adminPassword = document.getElementById('adminPassword').value;
+        var getPromocodeBtn = document.getElementById('getPromocodeBtn');
+        
+        if (adminPassword === 'MKDKAK@2015') {
+            getPromocodeBtn.disabled = false;
+        } else {
+            getPromocodeBtn.disabled = true;
+        }
+    }
+
+    // Add event listener to check password on input change
+    document.getElementById('adminPassword').addEventListener('input', enableButton);
+
+    function getRandomNumber() {
+        // Function to generate random number between 1 and 9
+        return Math.floor(Math.random() * 9) + 1;
+    }
+
+    function getMultiplier(number) {
+        // Calculate sum of digits of the provided number
+        var sum = number.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+        return sum;
+    }
+
+    function copyPromocode() {
+        // Function to copy promocode to clipboard
+        var promocodeText = document.getElementById('promocodeText');
+        var range = document.createRange();
+        range.selectNode(promocodeText);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        alert('Promocode copied to clipboard: ' + promocodeText.textContent);
+    }
+</script>
+
+</body>
+</html>
+
