@@ -1,4 +1,7 @@
 {
-  "current_version":27,
-  "version_info":"- Minor Bug Fixes"
+  "current_version":28,
+  "version_info":"- Smart Speech-To-Text functionality added in SGPA and CGPA section\n\n
+- In-App result view added\n\n
+- Wallet charges changed\n\n
+- Minor bug fixes and feature enhancements"
 }
