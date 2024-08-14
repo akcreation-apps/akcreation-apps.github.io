@@ -1,7 +1,6 @@
 {
-  "current_version":28,
-  "version_info":"- Smart Speech-To-Text functionality added in SGPA and CGPA section\n\n
-- In-App result view added\n\n
-- Wallet charges changed\n\n
+  "current_version":30,
+  "version_info":"- All Result merged in new result page.\n\n
+- New result demo grade-sheet added\n\n
 - Minor bug fixes and feature enhancements"
 }
