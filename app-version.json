@@ -1,7 +1,7 @@
 {
-  "current_version":29,
-  "version_info":"- Smart Speech-To-Text functionality added in SGPA and CGPA section\n\n
-- In-App result view added\n\n
-- Wallet charges changed\n\n
-- Minor bug fixes and feature enhancements"
+  "current_version":30,
+  "version_info":"- All result merged in 'BPUT Results'.\n\n
+- New result demo 'Grade Sheet' added.\n\n
+- Charges changed for edit fields in 'Grade Sheet'.\n\n
+- Minor bug fixes and feature enhancements."
 }
