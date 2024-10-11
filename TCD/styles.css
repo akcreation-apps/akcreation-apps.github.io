@@ -120,6 +120,7 @@ h1 {
 .category-block {
     margin-bottom: 50px;
     display: flex;
+    border-bottom: 1px solid #ddd; /* Visual separation between categories */
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
@@ -146,7 +147,8 @@ h1 {
 .category-block h3 {
     font-size: 2rem;
     color: #ff7043;
-    margin-bottom: 20px;
+    margin: 20px 0; /* Space above and below the category title */
+    text-align: center;
 }
 
 /* Subcategory Styling */
@@ -162,6 +164,7 @@ h1 {
     font-size: 1.5rem;
     color: #333;
     margin-bottom: 15px;
+    margin: 10px 0; /* Space above and below the subcategory title */
 }
 
 /* Grid Layout for Dishes - 2 items per row */
@@ -210,12 +213,17 @@ h1 {
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
+    text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+    width: 100%; /* Take full available width of the container */
+    max-width: 200px; /* Set maximum width to keep consistent card sizes */
+    margin: auto; /* Center the card horizontally */
+
 }
 
 .menu-item:hover {
-    transform: translateY(-10px);
+    transform: scale(1.05);
 }
 
 .menu-item img {
@@ -547,5 +555,8 @@ display: block;
     
     .hero-content .btn {
         font-size: 1rem;
+    }
+    .menu-item {
+        width: 100%; /* Full width for smaller screens */
     }
 }
