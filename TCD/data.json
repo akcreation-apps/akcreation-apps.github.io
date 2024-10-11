@@ -175,8 +175,8 @@
         {
           "name": "Coffee",
           "dishes": [
-            { "id": 80, "name": "Cold coffee", "price": 99 },
-            { "id": 81, "name": "Hot coffee", "price": 30 }
+            { "id": 80, "name": "Cold Coffee", "price": 99 },
+            { "id": 81, "name": "Hot Coffee", "price": 30 }
           ]
         }
       ]
