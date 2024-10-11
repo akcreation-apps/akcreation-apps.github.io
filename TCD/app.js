@@ -55,6 +55,21 @@ const scrollToCategory = (categoryId) => {
 
 // Load menu data and create "Add to Cart" buttons
 document.addEventListener('DOMContentLoaded', () => {
+    fetch_data();
+
+    // Set WhatsApp number if not already set in localStorage
+    if (localStorage.getItem('whatsapp_no') === undefined) {
+        localStorage.setItem('whatsapp_no', "+917749984274");
+    }
+
+    // Get disabled item ids from localStorage
+    let disable_ids = localStorage.getItem('disable_item_ids');
+    if (disable_ids === null) {
+        disable_ids = [];
+    } else {
+        disable_ids = JSON.parse(disable_ids);
+    }
+
     const menuContainer = document.getElementById('menu-container');
     const shortcutsContainer = document.querySelector('.shortcuts-grid'); // Get the shortcuts container
 
@@ -66,6 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderMenu = () => {
         menuContainer.innerHTML = ''; // Clear previous content
+
+        showLoader(); // Show loader before starting the fetch request
+
         fetch('data.json')
             .then(response => response.json())
             .then(data => {
@@ -101,11 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         subcategoryBlock.classList.add('subcategory-block');
 
                         const subcategoryTitle = document.createElement('h4');
-                        let type=''
+                        let type = '';
                         if (subcategory.type !== undefined) {
-                            type=`${subcategory.name} (${subcategory.type})`;
+                            type = `${subcategory.name} (${subcategory.type})`;
                         } else {
-                            type=`${subcategory.name}`;
+                            type = `${subcategory.name}`;
                         }
                         subcategoryTitle.textContent = subcategory.name
                             ? type
@@ -116,21 +134,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         dishGrid.classList.add('dish-grid');
 
                         subcategory.dishes.forEach(dish => {
-                            // Filter logic: Show items with no subcategory type or based on filters
-                            if ((onlyVegCheckbox.checked && onlyNonVegCheckbox.checked) ||
-                            (!onlyVegCheckbox.checked && !onlyNonVegCheckbox.checked)) {
-                            // Both checkboxes are checked (or none), show all items
-                            } else if (onlyVegCheckbox.checked && subcategory.type !== 'Veg' && subcategory.type) {
-                            return; // Filter out non-Veg items if Veg is checked
-                            } else if (onlyNonVegCheckbox.checked && subcategory.type !== 'NonVeg' && subcategory.type) {
-                            return; // Filter out Veg items if Non-Veg is checked
+                            // Skip rendering the dish if its id is in disable_ids
+                            if (disable_ids.includes(dish.id)) {
+                                return; // Skip the disabled dish
                             }
 
+                            // Filter logic: Show items with no subcategory type or based on filters
+                            if ((onlyVegCheckbox.checked && onlyNonVegCheckbox.checked) ||
+                                (!onlyVegCheckbox.checked && !onlyNonVegCheckbox.checked)) {
+                                // Both checkboxes are checked (or none), show all items
+                            } else if (onlyVegCheckbox.checked && subcategory.type !== 'Veg' && subcategory.type) {
+                                return; // Filter out non-Veg items if Veg is checked
+                            } else if (onlyNonVegCheckbox.checked && subcategory.type !== 'NonVeg' && subcategory.type) {
+                                return; // Filter out Veg items if Non-Veg is checked
+                            }
 
                             const menuItem = document.createElement('div');
                             menuItem.classList.add('menu-item');
-                            const url = get_dish_url(dish.name)
-                            console.log(url)
+                            const url = get_dish_url(dish.name);
                             menuItem.innerHTML = `
                                 <div class="menu-item-container" style="text-align: center;">
                                     <img src="${url}" alt="${dish.name}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto 10px auto;">
@@ -141,8 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </button>
                                 </div>
                             `;
-
-
 
                             // Add event listener to "Add to Cart" button
                             const addToCartButton = menuItem.querySelector('.add-to-cart-btn');
@@ -178,6 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Update cart count on page load
                 updateCartCount();
+            })
+            .catch(error => {
+                console.error('Error fetching menu data:', error);
+            })
+            .finally(() => {
+                hideLoader(); // Hide the loader once the data is fetched or on error
             });
     };
 
@@ -203,29 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-async function get_credentials() {
-    try {
-        // Fetch the JSON file
-        const response = await fetch('credentials.json');
-
-        // Check if the fetch was successful
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-
-        // Parse the JSON data
-        const data = await response.json();
-
-        // Log the JSON data
-        console.log(data);
-
-        return data; // Return the data
-    } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-        return null; // Return null or handle the error as needed
-    }
-}
-
 function decrypt_values(value, key){
     const decryptedBytes = CryptoJS.AES.decrypt(value, key);
     return decryptedBytes.toString(CryptoJS.enc.Utf8);
@@ -233,22 +235,33 @@ function decrypt_values(value, key){
 
 function fetch_data(){
     get_credentials().then(credentials => {
-        console.log('Credentials:', credentials);
         const firebaseConfig = {
             apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-            authDomain: decrypt_values(credentials.API_KEY, credentials.KEY),
-            projectId: decrypt_values(credentials.API_KEY, credentials.KEY),
-            storageBucket: decrypt_values(credentials.API_KEY, credentials.KEY),
-            messagingSenderId: decrypt_values(credentials.API_KEY, credentials.KEY),
-            appId: decrypt_values(credentials.API_KEY, credentials.KEY),
-            measurementId: decrypt_values(credentials.API_KEY, credentials.KEY)
+            authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+            projectId: decrypt_values(credentials.ID, credentials.KEY),
+            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+            appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+            measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
           };
+          console.log(firebaseConfig)
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-//        const querySnapshot = await getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY)));
-        querySnapshot.forEach((doc) => {
-            console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-        });
+        // Step 4: Fetch data from Firestore
+        getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY)))  // Replace 'users' with your collection name
+            .then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    if (doc.data().whatsapp_no !== undefined) {
+                        localStorage.setItem('whatsapp_no', doc.data().whatsapp_no);
+                    }
+                    if (doc.data().disabled_items !== undefined) {
+                        localStorage.setItem('disable_item_ids', doc.data().disabled_items);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching Firestore data:", error);
+            });
     });
 }
 
@@ -274,9 +287,8 @@ function get_Local_storage_data() {
 
 
 
-
 // Example CRUD operations
-//async function addFoodItem(item) {
+// async function addFoodItem(item) {
 //    try {
 //        const docRef = await addDoc(collection(db, 'foodItems'), item);
 //        console.log("Document written with ID: ", docRef.id);

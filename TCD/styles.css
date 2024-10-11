@@ -231,6 +231,7 @@ h1 {
     transition: background-color 0.3s ease;
     width: 100%; /* Make the button take the full width */
     text-align: center; /* Center text inside the button */
+    margin-top: auto;          /* Push button to the bottom of the container */
 }
 
 .add-to-cart-btn.added-to-cart {
@@ -426,10 +427,38 @@ input[type="checkbox"] {
 }
 
   
-  .shortcut-card a {
-    text-decoration: none;
-    color: #333;
-    font-size: 18px;
-    display: block;
-  }
-  
+.shortcut-card a {
+text-decoration: none;
+color: #333;
+font-size: 18px;
+display: block;
+}
+
+
+/* Full-screen loader */
+.loader-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 1000; /* Make sure it's above other content */
+    justify-content: center; /* Center the loader horizontally */
+    align-items: center; /* Center the loader vertically */
+}
+
+.loader {
+    border: 8px solid #f3f3f3; /* Light gray border */
+    border-radius: 50%; /* Circular loader */
+    border-top: 8px solid #28a745; /* Green top border */
+    width: 50px; /* Width of the loader */
+    height: 50px; /* Height of the loader */
+    animation: spin 1s linear infinite; /* Animation for spinning */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); } /* Starting point */
+    100% { transform: rotate(360deg); } /* Ending point */
+}

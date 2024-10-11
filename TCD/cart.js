@@ -80,3 +80,60 @@ const updateCartStorage = () => {
 document.addEventListener('DOMContentLoaded', () => {
     renderCartItems();
 });
+
+
+// common.js
+
+// Function to get cart items from local storage
+function getCartItems() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    return cart;
+}
+
+// Function to create the order message string
+function createOrderMessage(cartItems) {
+    let message = "Hello, I would like to place an order for the following items:\n\n";
+    message += "Ordered Items:\n";
+
+    cartItems.forEach(item => {
+        message += `${item.name} (${item.quantity}x)\n`; // Update the message format
+    });
+
+    message += `\nTotal Price: ₹${calculateTotal(cartItems).toFixed(2)}/-`; // Update total price format
+    return encodeURIComponent(message); // Encode message for URL
+}
+
+// Function to calculate total amount
+function calculateTotal(cartItems) {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+}
+
+// Function to send message via WhatsApp
+function sendWhatsAppMessage(message, phoneNumber) {
+    const url = `http://api.whatsapp.com/send?phone=${phoneNumber}?text=${message}`;
+    window.open(url, '_blank'); // Open WhatsApp with the message
+}
+
+// Event listener for the "Place Order" button
+document.addEventListener('DOMContentLoaded', () => {
+    const placeOrderButton = document.getElementById('place-order-btn');
+
+    placeOrderButton.addEventListener('click', () => {
+        const cartItems = getCartItems(); // Get cart items
+        if (cartItems.length === 0) {
+            alert("Your cart is empty!"); // Alert if the cart is empty
+            return;
+        }
+        const orderMessage = createOrderMessage(cartItems); 
+        console.log(orderMessage);
+        let phoneNo = ''
+        if (localStorage.getItem('whatsapp_no') === undefined) {
+            phoneNo = "+917749984274";
+        } else{
+            phoneNo = localStorage.getItem('whatsapp_no');
+        }
+        // Create order message
+        // localStorage.setItem('cart', JSON.stringify(cartItems)); // Store cart in local storage
+        sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
+    });
+});
