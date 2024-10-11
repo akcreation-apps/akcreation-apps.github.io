@@ -100,7 +100,7 @@ function createOrderMessage(cartItems) {
     });
 
     message += `\nTotal Price: ₹${calculateTotal(cartItems).toFixed(2)}/-`; // Update total price format
-    return encodeURIComponent(message); // Encode message for URL
+    return message; // Encode message for URL
 }
 
 // Function to calculate total amount
