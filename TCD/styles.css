@@ -40,6 +40,11 @@ body {
     position: relative;
     cursor: pointer;
 }
+.home-icon {
+    font-size: 1.5rem; /* Adjust font size for cart icon */
+    position: relative;
+    cursor: pointer;
+}
 
 .cart-icon .cart-count {
     background-color: red;
@@ -80,28 +85,10 @@ body {
     margin-bottom: 20px;
 }
 
-/* Hero Section */
-.hero {
-    padding: 120px 20px; /* Increase padding for better spacing */
-    background-size: cover;
-    background-position: center;
-    text-align: center;
-    background-color: #f2cabd;
-}
-
 h1 {
     text-align: center;
     color: #5A5A5A;
     margin-bottom: 20px;
-}
-
-.hero h1 {
-    font-size: 3rem;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    margin-top: 20px;
 }
 
 .btn {
@@ -147,7 +134,9 @@ h1 {
     cursor: pointer;
     text-align: center;
     transition: transform 0.3s ease;
-    width: 200px;
+    flex: 1 1 200px; /* Flex-grow, flex-shrink, flex-basis */
+    max-width: 250px; /* Optional: Limits max width */
+    min-width: 180px; /* Ensures a minimum size on smaller screens */
 }
 
 .category-card:hover {
@@ -163,6 +152,10 @@ h1 {
 /* Subcategory Styling */
 .subcategory-block {
     margin-bottom: 40px; /* Increased margin between subcategories */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
 }
 
 .subcategory-block h4 {
@@ -176,6 +169,29 @@ h1 {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Always 2 items per row */
     gap: 20px;
+}
+/* Responsive Design for smaller screens */
+@media (max-width: 1200px) {
+    .category-card {
+        flex: 1 1 180px; /* Shrink cards to fit smaller screens */
+    }
+    .subcategory-block {
+        flex-direction: column; /* Stack subcategories vertically */
+    }
+}
+
+@media (max-width: 576px) {
+    .category-card {
+        flex: 1 1 100%; /* Full width for mobile screens */
+    }
+
+    .category-block h3 {
+        font-size: 1.5rem;
+    }
+
+    .subcategory-block h4 {
+        font-size: 1.2rem;
+    }
 }
 
 @media (max-width: 600px) {
@@ -320,6 +336,7 @@ h1 {
     font-size: 24px;
     border: none;
     background: none;
+    margin-left: 10px;          /* Add left margin for spacing */
     transition: color 0.2s;
 }
 
@@ -461,4 +478,74 @@ display: block;
 @keyframes spin {
     0% { transform: rotate(0deg); } /* Starting point */
     100% { transform: rotate(360deg); } /* Ending point */
+}
+
+
+/* Add the following styles for the hero section */
+.hero {
+    position: relative;
+    min-height: auto; /* Will fit content but expand to full viewport height if needed */
+    background: url('src/hero-background.png') center center/cover no-repeat;
+    display: flex;
+    align-items: center;    /* Vertically center */
+    justify-content: center; /* Horizontally center */
+    padding: 150px 100px; /* Added padding to ensure space around content */
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+}
+
+.hero h1 span {
+    color: #e74c3c;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+}
+
+.hero-content .btn {
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+}
+
+.hero-content .btn:hover {
+    background-color: #c0392b;
+}
+
+/* Responsive design for small screens */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-content p {
+        font-size: 1.2rem;
+    }
+    
+    .hero-content .btn {
+        font-size: 1rem;
+    }
 }

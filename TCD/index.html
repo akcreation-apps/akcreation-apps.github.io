@@ -16,7 +16,7 @@
     </div>
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo">The Cafe Darbar (TCD)</div>
+        <div class="logo" onclick="redirect_to_home()">The Cafe Darbar (TCD)</div>
 
         <div class="cart-icon">
             <i class="fas fa-shopping-cart"></i>
@@ -41,12 +41,15 @@
         </label>
     </div>
     </div>    
-
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <h1>The Cafe Darbar</h1>
-        <p>Grateful to serve you the finest flavours, every day.</p>
-        <a href="#menu" class="btn">Explore Menu</a>
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <h1>Welcome to <span>The Cafe Darbar</span></h1>
+                <p>Grateful to serve you the finest flavours, every day.</p>
+                <a href="#menu" class="btn">Explore Menu</a>
+            </div>
+        </div>
     </section>
 
     <!-- Menu Section -->

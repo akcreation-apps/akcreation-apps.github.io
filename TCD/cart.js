@@ -30,8 +30,9 @@ const renderCartItems = () => {
                 <span class="quantity">${item.quantity}</span>
                 <button class="increase-quantity" data-index="${index}">+</button>
             </div>
-            <button class="delete-item" data-index="${index}">🗑️</button>
-        `;
+            <button class="delete-item" data-index="${index}">
+                <i class="fas fa-trash"></i>
+            </button>        `;
 
         // Append event listeners for increase, decrease, and delete buttons
         cartItem.querySelector('.increase-quantity').addEventListener('click', () => {
@@ -49,9 +50,22 @@ const renderCartItems = () => {
         });
 
         cartItem.querySelector('.delete-item').addEventListener('click', () => {
-            cart.splice(index, 1); // Remove item from cart
-            updateCartStorage();
-            renderCartItems(); // Re-render cart items to reflect changes
+
+            Swal.fire({
+                title: 'Confirm Delete!',
+                html: 'Want to remove from your cart ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cart.splice(index, 1); // Remove item from cart
+                    updateCartStorage();
+                    renderCartItems(); // Re-render cart items to reflect changes
+                }
+            });
+
         });
 
         cartItemsContainer.appendChild(cartItem);

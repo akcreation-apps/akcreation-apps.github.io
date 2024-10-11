@@ -46,3 +46,7 @@ function store_data(){
         window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname;
     }
 }
+
+function redirect_to_home(){
+    window.location.href = 'index.html';
+}

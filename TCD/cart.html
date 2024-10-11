@@ -14,10 +14,10 @@
         </div>
     <!-- Navbar with Home Link -->
     <nav class="navbar">
-        <div class="logo">The Cafe Darbar (TCD)</div>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-        </ul>
+        <div class="logo" onclick="redirect_to_home()">The Cafe Darbar (TCD)</div>
+        <div class="home-icon" onclick="redirect_to_home()">
+            <i class="fas fa-home"></i>
+        </div>
     </nav>
 
     <!-- Cart Section -->
@@ -35,5 +35,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </body>
 </html>
