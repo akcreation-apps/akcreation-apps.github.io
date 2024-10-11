@@ -111,7 +111,7 @@ function calculateTotal(cartItems) {
 // Function to send message via WhatsApp
 function sendWhatsAppMessage(message, phoneNumber) {
     const url = `http://api.whatsapp.com/send?phone=${phoneNumber}?text=${message}`;
-    window.open(url, '_blank'); // Open WhatsApp with the message
+    window.open(url); // Open WhatsApp with the message
 }
 
 // Event listener for the "Place Order" button
@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else{
             phoneNo = localStorage.getItem('whatsapp_no');
         }
+        console.log(phoneNo)
         // Create order message
         // localStorage.setItem('cart', JSON.stringify(cartItems)); // Store cart in local storage
         sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
