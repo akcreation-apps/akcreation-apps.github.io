@@ -560,3 +560,38 @@ display: block;
         width: 100%; /* Full width for smaller screens */
     }
 }
+
+/* Search Bar Styles */
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0; /* Margin above and below the search bar */
+}
+
+.search-container input[type="text"] {
+    padding: 12px 30px; /* Increased padding for a spacious feel */
+    border-radius: 30px; /* More rounded corners for a pill shape */
+    border: 1px solid #e74c3c; /* Red border */
+    width: 350px; /* Slightly wider for better usability */
+    font-size: 16px; /* Font size for the input */
+    font-family: Arial, sans-serif; /* Clean font family */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Transition effects */
+}
+
+.search-container input[type="text"]:focus {
+    outline: none; /* Remove default outline */
+    border-color: #ff7043; /* Change border color on focus */
+    box-shadow: 0 0 8px rgba(255, 112, 67, 0.5); /* Shadow effect on focus */
+}
+
+.search-container input[type="text"]::placeholder {
+    color: #999; /* Placeholder color */
+    font-style: italic; /* Italicize placeholder text */
+    transition: color 0.3s; /* Transition for placeholder color */
+}
+
+.search-container input[type="text"]:focus::placeholder {
+    color: transparent; /* Hide placeholder on focus */
+}
+

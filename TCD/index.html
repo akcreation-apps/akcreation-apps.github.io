@@ -24,23 +24,7 @@
         </div>
     </nav>
 
-    <div class="shortcuts-container">
-        <div class="shortcuts-grid">
-          <!-- Categories will be dynamically generated here as cards -->
-        </div>
-    </div>
-      
-    <!-- Filter options below categories -->
-    <div class="filter-container">
-    <div class="filter-card">
-        <label class="filter-label">
-        <input type="checkbox" id="vegFilter" /> Veg
-        </label>
-        <label class="filter-label">
-        <input type="checkbox" id="nonVegFilter" /> Non-Veg
-        </label>
-    </div>
-    </div>    
+    
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-overlay">
@@ -55,6 +39,26 @@
     <!-- Menu Section -->
     <section class="menu" id="menu">
         <h2>Our Menu</h2>
+        <div class="shortcuts-container">
+            <div class="shortcuts-grid">
+              <!-- Categories will be dynamically generated here as cards -->
+            </div>
+        </div>
+          
+        <!-- Filter options below categories -->
+        <div class="filter-container">
+            <div class="filter-card">
+                <label class="filter-label">
+                <input type="checkbox" id="vegFilter" /> Veg
+                </label>
+                <label class="filter-label">
+                <input type="checkbox" id="nonVegFilter" /> Non-Veg
+                </label>
+            </div>
+        </div>    
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Search for dishes..." />
+        </div>
         <div class="menu-container" id="menu-container">
             <!-- Dynamic Menu Content will be inserted here -->
         </div>

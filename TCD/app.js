@@ -267,21 +267,57 @@ function fetch_data(){
 }
 
 
+// Search functionality
+searchBar.addEventListener('input', function () {
+    const searchTerm = searchBar.value.toLowerCase(); // Get the input value
+
+    // Get all category blocks
+    const categoryBlocks = document.querySelectorAll('.category-block');
+
+    // Iterate through each category block
+    categoryBlocks.forEach(categoryBlock => {
+        const subcategoryBlocks = categoryBlock.querySelectorAll('.subcategory-block'); // Get subcategory blocks
+        let hasVisibleDishesInCategory = false; // Track if any visible dishes in this category
+
+        // Iterate through each subcategory
+        subcategoryBlocks.forEach(subcategoryBlock => {
+            const dishGrid = subcategoryBlock.querySelector('.dish-grid');
+            const dishes = dishGrid.querySelectorAll('.menu-item');
+
+            let hasVisibleDishesInSubcategory = false; // Track if any visible dishes in this subcategory
+
+            // Iterate through each dish
+            dishes.forEach(dish => {
+                const dishName = dish.querySelector('h5').textContent.toLowerCase(); // Get dish name
+                if (dishName.includes(searchTerm)) {
+                    dish.style.display = ''; // Show item if it matches
+                    hasVisibleDishesInSubcategory = true; // Mark that there's a visible dish
+                } else {
+                    dish.style.display = 'none'; // Hide item if it doesn't match
+                }
+            });
+
+            // If no dishes are found in this subcategory, hide the subcategory block
+            if (hasVisibleDishesInSubcategory) {
+                subcategoryBlock.style.display = ''; // Show subcategory if it has visible dishes
+                hasVisibleDishesInCategory = true; // Mark that there's at least one visible dish in the category
+            } else {
+                subcategoryBlock.style.display = 'none'; // Hide subcategory if no dishes are visible
+            }
+        });
+
+        // If no subcategories are visible, hide the category block
+        if (hasVisibleDishesInCategory) {
+            categoryBlock.style.display = ''; // Show category block if it has visible dishes
+        } else {
+            categoryBlock.style.display = 'none'; // Hide category block if no subcategories are visible
+        }
+    });
+});
 
 
 
 
-
-function get_Local_storage_data() {
-    let data = [];
-    data=JSON.parse(localStorage.getItem('cart'));
-    if(data && data.length > 0){
-        console.log('cart_data');
-    } else{
-        data = []
-    }
-    return data
-}
 
 //console.log("-----", get_Local_storage_data())
 //console.log("---creds--", fetch_data())
