@@ -110,7 +110,7 @@ function calculateTotal(cartItems) {
 
 // Function to send message via WhatsApp
 function sendWhatsAppMessage(message, phoneNumber) {
-    const url = `http://api.whatsapp.com/send?phone=${phoneNumber}?text=${message}`;
+    const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
     window.open(url); // Open WhatsApp with the message
 }
 
