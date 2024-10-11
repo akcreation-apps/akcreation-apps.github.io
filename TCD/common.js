@@ -35,3 +35,14 @@ function hideLoader() {
     console.log("pppooo")
     document.getElementById('loaderOverlay').style.display = 'none';
 }
+
+function store_data(){
+    const urlParams = new URLSearchParams(window.location.search);
+    const table_no = urlParams.get('table');
+    if(table_no){
+        localStorage.setItem('table', table_no)
+        const expirationTime = Date.now() + 30 * 60 * 1000; // 30 minutes from now
+        localStorage.setItem('urlExpiration', expirationTime);
+        window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    }
+}

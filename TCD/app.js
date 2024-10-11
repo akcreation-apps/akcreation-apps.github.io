@@ -55,6 +55,7 @@ const scrollToCategory = (categoryId) => {
 
 // Load menu data and create "Add to Cart" buttons
 document.addEventListener('DOMContentLoaded', () => {
+    store_data();
     fetch_data();
 
     // Set WhatsApp number if not already set in localStorage

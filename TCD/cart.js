@@ -78,7 +78,9 @@ const updateCartStorage = () => {
 
 // Load the cart items when the cart page is opened
 document.addEventListener('DOMContentLoaded', () => {
+    showLoader();
     renderCartItems();
+    hideLoader();
 });
 
 
@@ -93,13 +95,13 @@ function getCartItems() {
 // Function to create the order message string
 function createOrderMessage(cartItems) {
     let message = "Hello, I would like to place an order for the following items:\n\n";
-    message += "Ordered Items:\n";
+    message += "Ordered Items:\n\n";
 
     cartItems.forEach(item => {
         message += `${item.name} (${item.quantity}x)\n`; // Update the message format
     });
 
-    message += `\nTotal Price: ₹${calculateTotal(cartItems).toFixed(2)}/-`; // Update total price format
+    message += `\nTotal Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nTable Number: ${localStorage.getItem('table')}`; // Update total price format
     return message; // Encode message for URL
 }
 
@@ -111,32 +113,40 @@ function calculateTotal(cartItems) {
 // Function to send message via WhatsApp
 function sendWhatsAppMessage(message, phoneNumber) {
     const formattedMessage = message.replace(/\n/g, '%0A');  // Replace line breaks with %0A
-    // const url = `https://wa.me/${phoneNumber}&text=${formattedMessage}`;
     const url = `https://wa.me/${phoneNumber}?text=${formattedMessage}`;
     window.location.href = url; // Navigate to WhatsApp in the same tab
 }
 
 // Event listener for the "Place Order" button
-document.addEventListener('DOMContentLoaded', () => {
-    const placeOrderButton = document.getElementById('place-order-btn');
+const placeOrderButton = document.getElementById('place-order-btn');
 
-    placeOrderButton.addEventListener('click', () => {
-        const cartItems = getCartItems(); // Get cart items
-        if (cartItems.length === 0) {
-            alert("Your cart is empty!"); // Alert if the cart is empty
+placeOrderButton.addEventListener('click', () => {
+    showLoader();
+    const cartItems = getCartItems(); // Get cart items
+    const storedExpirationTime = localStorage.getItem('urlExpiration');
+    if (storedExpirationTime) {
+        const currentTime = Date.now();
+        console.log(storedExpirationTime, currentTime)
+        if (currentTime >= storedExpirationTime) {
+            Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error');
+            hideLoader();
             return;
         }
-        const orderMessage = createOrderMessage(cartItems); 
-        console.log(orderMessage);
-        let phoneNo = ''
-        if (localStorage.getItem('whatsapp_no') === undefined) {
-            phoneNo = "+917749984274";
-        } else{
-            phoneNo = localStorage.getItem('whatsapp_no');
-        }
-        console.log(phoneNo)
-        // Create order message
-        // localStorage.setItem('cart', JSON.stringify(cartItems)); // Store cart in local storage
-        sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
-    });
+    } 
+    if (cartItems.length === 0) {
+        Swal.fire('Error', 'Your cart is empty.', 'error');
+        hideLoader();
+        return;
+    }
+    const orderMessage = createOrderMessage(cartItems); 
+    let phoneNo = ''
+    if (localStorage.getItem('whatsapp_no') === undefined) {
+        phoneNo = "+917749984274";
+    } else{
+        phoneNo = localStorage.getItem('whatsapp_no');
+    }
+    // Create order message
+    // localStorage.setItem('cart', JSON.stringify(cartItems)); // Store cart in local storage
+    sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
+    hideLoader();
 });
