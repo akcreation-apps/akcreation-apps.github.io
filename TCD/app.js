@@ -5,6 +5,9 @@ import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } 
 // Initialize cart array to store selected items
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+const searchBar = document.getElementById('searchBar');
+const clearSearchButton = document.getElementById('clearSearch');
+
 // Function to check if an item is in the cart
 const isItemInCart = (itemName) => {
     return cart.some(item => item.name === itemName);
@@ -246,7 +249,6 @@ function fetch_data(){
             appId: decrypt_values(credentials.APP_ID, credentials.KEY),
             measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
           };
-          console.log(firebaseConfig)
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         // Step 4: Fetch data from Firestore
@@ -269,6 +271,15 @@ function fetch_data(){
 
 // Search functionality
 searchBar.addEventListener('input', function () {
+    
+    if (searchBar.value) {
+        console.log("if")
+        clearSearchButton.style.display = 'block'; // Show clear button
+    } else {
+        console.log("else")
+        clearSearchButton.style.display = 'none'; // Hide clear button
+    }
+
     const searchTerm = searchBar.value.toLowerCase(); // Get the input value
 
     // Get all category blocks
@@ -333,8 +344,48 @@ searchIcon.addEventListener('click', function () {
     const searchIcon = document.getElementById('searchIcon');
     const searchBar = document.getElementById('searchBar');
     searchBar.focus(); // Focus on the search bar when the icon is clicked
+     // Scroll the search bar to the top of the viewport
+     const searchBarRect = searchBar.getBoundingClientRect(); // Get the position of the search bar
+
+     // Scroll to the top position of the search bar
+     window.scrollTo({
+         top: searchBarRect.top + window.scrollY-70, // Adjust for current scroll position
+         behavior: 'smooth' // Smooth scroll
+     });
 });
 
+function resetFilter() {
+    const categoryBlocks = document.querySelectorAll('.category-block'); // Get all category blocks
+
+    // Show all category blocks
+    categoryBlocks.forEach(categoryBlock => {
+        categoryBlock.style.display = ''; // Reset display to show all categories
+        const subcategoryBlocks = categoryBlock.querySelectorAll('.subcategory-block');
+
+        // Show all subcategory blocks and their dishes
+        subcategoryBlocks.forEach(subcategoryBlock => {
+            subcategoryBlock.style.display = ''; // Show all subcategories
+            const dishes = subcategoryBlock.querySelectorAll('.menu-item');
+
+            // Show all dishes
+            dishes.forEach(dish => {
+                dish.style.display = ''; // Show all dishes
+            });
+        });
+    });
+}
+
+// Clear the search bar when the clear button is clicked
+clearSearchButton.addEventListener('click', function() {
+    searchBar.value = ''; // Clear the search bar value
+    clearSearchButton.style.display = 'none'; // Hide the clear button
+    resetFilter(); // Reset the filter to show all items
+});
+
+// Optional: Focus on the search bar when the clear button is clicked
+clearSearchButton.addEventListener('click', function() {
+    searchBar.focus(); // Optionally, refocus on the search bar
+});
 
 
 //console.log("-----", get_Local_storage_data())

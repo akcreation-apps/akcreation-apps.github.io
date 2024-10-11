@@ -16,9 +16,6 @@ async function get_credentials() {
         // Parse the JSON data
         const data = await response.json();
 
-        // Log the JSON data
-        console.log(data);
-
         return data; // Return the data
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
@@ -27,12 +24,10 @@ async function get_credentials() {
 }
 
 function showLoader() {
-    console.log("ppp")
     document.getElementById('loaderOverlay').style.display = 'flex';
 }
 
 function hideLoader() {
-    console.log("pppooo")
     document.getElementById('loaderOverlay').style.display = 'none';
 }
 

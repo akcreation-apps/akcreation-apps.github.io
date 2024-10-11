@@ -39,6 +39,7 @@ body {
     font-size: 1.5rem; /* Adjust font size for cart icon */
     position: relative;
     cursor: pointer;
+    margin-right: 10px; /* Adjust margin to reduce space */
 }
 .home-icon {
     font-size: 1.5rem; /* Adjust font size for cart icon */
@@ -147,7 +148,6 @@ h1 {
 .category-block h3 {
     font-size: 2rem;
     color: #ff7043;
-    margin: 20px 0; /* Space above and below the category title */
     text-align: center;
 }
 
@@ -163,8 +163,6 @@ h1 {
 .subcategory-block h4 {
     font-size: 1.5rem;
     color: #333;
-    margin-bottom: 15px;
-    margin: 10px 0; /* Space above and below the subcategory title */
 }
 
 /* Grid Layout for Dishes - 2 items per row */
@@ -563,7 +561,8 @@ display: block;
 
 /* Search Bar Styles */
 .search-container {
-    display: flex;
+    position: relative; /* Make the container relative for absolute positioning of the button */
+    display: inline-block; /* Aligns with the navbar elements */
     justify-content: center;
     margin: 20px 0; /* Margin above and below the search bar */
 }
@@ -606,4 +605,22 @@ display: block;
     margin-right: 10px; /* Adjust margin to reduce space */
     display: flex; /* Align icon vertically */
     align-items: center; /* Center the icon vertically */
+}
+
+.clear-button {
+    position: absolute;
+    right: 20px; /* Position it inside the input */
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
+    border: none;
+    background: none;
+    color: #888; /* Color for the cross button */
+    font-size: 1.2rem; /* Font size */
+    cursor: pointer;
+    display: none; /* Initially hidden */
+    outline: none; /* Remove outline on focus */
+}
+
+.clear-button:hover {
+    color: #e74c3c; /* Change color on hover */
 }
