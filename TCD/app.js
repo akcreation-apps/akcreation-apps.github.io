@@ -266,7 +266,6 @@ function fetch_data(){
     });
 }
 
-
 // Search functionality
 searchBar.addEventListener('input', function () {
     const searchTerm = searchBar.value.toLowerCase(); // Get the input value
@@ -286,18 +285,28 @@ searchBar.addEventListener('input', function () {
 
             let hasVisibleDishesInSubcategory = false; // Track if any visible dishes in this subcategory
 
-            // Iterate through each dish
-            dishes.forEach(dish => {
-                const dishName = dish.querySelector('h5').textContent.toLowerCase(); // Get dish name
-                if (dishName.includes(searchTerm)) {
-                    dish.style.display = ''; // Show item if it matches
+            // Check if the subcategory name matches the search term
+            const subcategoryName = subcategoryBlock.querySelector('h4').textContent.toLowerCase();
+            if (subcategoryName.includes(searchTerm)) {
+                // If subcategory matches, show all dishes in this subcategory
+                dishes.forEach(dish => {
+                    dish.style.display = ''; // Show all dishes
                     hasVisibleDishesInSubcategory = true; // Mark that there's a visible dish
-                } else {
-                    dish.style.display = 'none'; // Hide item if it doesn't match
-                }
-            });
+                });
+            } else {
+                // Iterate through each dish
+                dishes.forEach(dish => {
+                    const dishName = dish.querySelector('h5').textContent.toLowerCase(); // Get dish name
+                    if (dishName.includes(searchTerm)) {
+                        dish.style.display = ''; // Show item if it matches
+                        hasVisibleDishesInSubcategory = true; // Mark that there's a visible dish
+                    } else {
+                        dish.style.display = 'none'; // Hide item if it doesn't match
+                    }
+                });
+            }
 
-            // If no dishes are found in this subcategory, hide the subcategory block
+            // If any dishes are found in this subcategory, show the subcategory block
             if (hasVisibleDishesInSubcategory) {
                 subcategoryBlock.style.display = ''; // Show subcategory if it has visible dishes
                 hasVisibleDishesInCategory = true; // Mark that there's at least one visible dish in the category
