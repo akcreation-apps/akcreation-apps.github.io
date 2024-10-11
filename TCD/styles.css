@@ -624,3 +624,18 @@ display: block;
 .clear-button:hover {
     color: #e74c3c; /* Change color on hover */
 }
+
+.no-results {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-results img {
+    max-width: 200px; /* Adjust as necessary */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.no-results p {
+    color: #888; /* Adjust text color */
+    font-size: 1.2rem; /* Adjust font size */
+}

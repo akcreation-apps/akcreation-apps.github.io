@@ -269,18 +269,24 @@ function fetch_data(){
     });
 }
 
-// Search functionality
 searchBar.addEventListener('input', function () {
-    
+    const searchBarRect = searchBar.getBoundingClientRect(); // Get the position of the search bar
+
+    // Scroll to the top position of the search bar
+    window.scrollTo({
+        top: searchBarRect.top + window.scrollY-70, // Adjust for current scroll position
+        behavior: 'smooth' // Smooth scroll
+    });
+
     if (searchBar.value) {
-        console.log("if")
         clearSearchButton.style.display = 'block'; // Show clear button
     } else {
-        console.log("else")
         clearSearchButton.style.display = 'none'; // Hide clear button
     }
 
     const searchTerm = searchBar.value.toLowerCase(); // Get the input value
+    const noResultsDiv = document.getElementById('noResults'); // Get the no results div
+    let anyVisibleDish = false; // Flag to track if any dish is visible
 
     // Get all category blocks
     const categoryBlocks = document.querySelectorAll('.category-block');
@@ -304,6 +310,7 @@ searchBar.addEventListener('input', function () {
                 dishes.forEach(dish => {
                     dish.style.display = ''; // Show all dishes
                     hasVisibleDishesInSubcategory = true; // Mark that there's a visible dish
+                    anyVisibleDish = true; // Set flag to true
                 });
             } else {
                 // Iterate through each dish
@@ -312,6 +319,7 @@ searchBar.addEventListener('input', function () {
                     if (dishName.includes(searchTerm)) {
                         dish.style.display = ''; // Show item if it matches
                         hasVisibleDishesInSubcategory = true; // Mark that there's a visible dish
+                        anyVisibleDish = true; // Set flag to true
                     } else {
                         dish.style.display = 'none'; // Hide item if it doesn't match
                     }
@@ -334,6 +342,13 @@ searchBar.addEventListener('input', function () {
             categoryBlock.style.display = 'none'; // Hide category block if no subcategories are visible
         }
     });
+
+    // Show or hide no results image based on visibility of dishes
+    if (anyVisibleDish) {
+        noResultsDiv.style.display = 'none'; // Hide no results message
+    } else {
+        noResultsDiv.style.display = 'block'; // Show no results message
+    }
 });
 
 
