@@ -1,0 +1,428 @@
+{
+  "menu": [
+    {
+      "category": "Chinese",
+      "subcategories": [
+        {
+          "name": "Starter",
+          "type": "Veg",
+          "dishes": [
+            {
+              "name": "Veg Manchurian",
+              "price": 120
+            },
+            {
+              "name": "Paneer Chilli",
+              "price": 130
+            },
+            {
+              "name": "Paneer 65",
+              "price": 130
+            },
+            {
+              "name": "Mashroom Chilli",
+              "price": 130
+            },
+            {
+              "name": "Mashroom 65",
+              "price": 130
+            },
+            {
+              "name": "Paneer Manchurian",
+              "price": 140
+            },
+            {
+              "name": "Crispy Corn",
+              "price": 120
+            },
+            {
+              "name": "Crispy Chilli Babyorn",
+              "price": 130
+            },
+            {
+              "name": "Veg Kolhapani Chilli",
+              "price": 120
+            },
+            {
+              "name": "Crispy Golden Babycorn",
+              "price": 140
+            }
+          ]
+        },
+        {
+          "name": "Starter",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "name": "Chicken Drumstick",
+              "price": 150
+            },
+            {
+              "name": "Spicy Chicken Wings",
+              "price": 140
+            },
+            {
+                "name": "Chicken Manchurian",
+                "price": 130
+            },
+            {
+                "name": "Chicken 65",
+                "price": 140
+            },
+            {
+                "name": "Chilli Chicken",
+                "price": 140
+            },
+            {
+                "name": "Chicken 555",
+                "price": 150
+            },
+            {
+                "name": "Dragon Chicken",
+                "price": 160
+            },
+            {
+                "name": "Chicken Majestic",
+                "price": 160
+            },
+            {
+                "name": "Hunan Chicken",
+                "price": 160
+            },
+            {
+                "name": "Google Chicken",
+                "price": 160
+            },
+            {
+                "name": "Chicken Hongkong",
+                "price": 160
+            },
+            {
+                "name": "Chicken Lollypop",
+                "price": 150
+            },
+            {
+                "name": "Apollo Fish",
+                "price": 160
+            },
+            {
+                "name": "Chilli Fish",
+                "price": 150
+            },
+            {
+                "name": "Chilli Prawn",
+                "price": 170
+            },
+            {
+                "name": "Golden Prawn",
+                "price": 170
+            },
+            {
+                "name": "Chilli Egg",
+                "price": 120
+            },
+            {
+                "name": "Egg 65",
+                "price": 120
+            },
+            {
+                "name": "Egg Manchurian",
+                "price": 120
+            }
+          ]
+        },
+        {
+          "name": "MainCourse",
+          "type": "Veg",
+          "dishes": [
+            {
+              "name": "Sezwan Fried Rice",
+              "price": 99
+            },
+            {
+              "name": "Paneer Fried Rice",
+              "price": 120
+            },
+            {
+              "name": "Kaju Fried Rice",
+              "price": 120
+            },
+            {
+              "name": "Hakka Noodles",
+              "price": 110
+            },
+            {
+              "name": "Sezwan Noodles",
+              "price": 110
+            },
+            {
+              "name": "Singapore Noodles",
+              "price": 110
+            }
+          ]
+        },
+        {
+          "name": "MainCourse",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "name": "Chicken Sezwan Fried Rice",
+              "price": 120
+            },
+            {
+              "name": "Chicken Fried Rice",
+              "price": 120
+            },
+            {
+              "name": "Egg Fried Rice",
+              "price": 110
+            },
+            {
+              "name": "Chicken Hakka Noodles",
+              "price": 120
+            },
+            {
+              "name": "Chicken Sezwan Noodles",
+              "price": 120
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Continental",
+      "subcategories": [
+        {
+          "name": "Burger",
+          "type": "Veg",
+          "dishes": [
+            {
+              "name": "Mix Veg Burger",
+              "price": 79
+            },
+            {
+              "name": "Crispy Paneer Burger",
+              "price": 99
+            }
+          ]
+        },
+        {
+          "name": "Burger",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "name": "Chicken Burger",
+              "price": 120
+            },
+            {
+              "name": "Fish Grilled Burger",
+              "price": 120
+            }
+          ]
+        },
+        {
+          "name": "Sandwich",
+          "type": "Veg",
+          "dishes": [
+            {
+              "name": "Veg Grilled",
+              "price": 79
+            },
+            {
+              "name": "Peri Peri Paneer",
+              "price": 99
+            }
+          ]
+        },
+        {
+          "name": "Sandwich",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "name": "Chicken Grilled",
+              "price": 120
+            },
+            {
+              "name": "Fish Grilled",
+              "price": 120
+            }
+          ]
+        },
+        {
+          "name": "Pizza",
+          "type": "Veg",
+          "dishes": [
+            {
+              "name": "Margarita(6 inch)",
+              "price": 99
+            },
+            {
+              "name": "Margarita(9 inch)",
+              "price": 149
+            },
+            {
+              "name": "Farm House(6 inch)",
+              "price": 120
+            },
+            {
+              "name": "Farm House(9 inch)",
+              "price": 179
+            },
+            {
+              "name": "Caizone(6 inch)",
+              "price": 129
+            },
+            {
+              "name": "Caizone(9 inch)",
+              "price": 179
+            }
+          ]
+        },
+        {
+          "name": "Pizza",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "name": "Pimento Chicken(6 inch)",
+              "price": 130
+            },
+            {
+              "name": "Pimento Chicken(9 inch)",
+              "price": 195
+            },
+            {
+              "name": "Calzone Chicken(6 inch)",
+              "price": 130
+            },
+            {
+              "name": "Calzone Chicken(9 inch)",
+              "price": 195
+            },
+            {
+              "name": "Bombay Prawn(6 inch)",
+              "price": 149
+            },
+            {
+              "name": "Bombay Prawn(9 inch)",
+              "price": 220
+            },
+            {
+              "name": "Italian Chicken(6 inch)",
+              "price": 130
+            },
+            {
+              "name": "Italian Chicken(9 inch)",
+              "price": 195
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Drinks",
+      "subcategories": [
+        {
+          "name": "Smoothies",
+          "dishes": [
+            {
+              "name": "Kit Kat",
+              "price": 99
+            },
+            {
+              "name": "Mix Fruit",
+              "price": 99
+            },
+            {
+              "name": "Pineapple",
+              "price": 99
+            },
+            {
+              "name": "Kiwi",
+              "price": 99
+            }
+          ]
+        },
+        {
+          "name": "Lassi",
+          "dishes": [
+            {
+              "name": "Sweet Lassi",
+              "price": 99
+            },
+            {
+              "name": "Salted Lassi",
+              "price": 99
+            }
+          ]
+        },
+        {
+          "name": "Mocktails",
+          "dishes": [
+            {
+              "name": "Virgin Mojito",
+              "price": 79
+            },
+            {
+              "name": "Blue Lagoon",
+              "price": 79
+            },
+            {
+              "name": "Fresh Lime Soda",
+              "price": 69
+            },
+            {
+              "name": "Pineapple Mojito",
+              "price": 79
+            },
+            {
+              "name": "Kiwi Cooler",
+              "price": 79
+            },
+            {
+              "name": "Mango Cooler",
+              "price": 79
+            }
+          ]
+        },
+        {
+          "name": "Shake",
+          "dishes": [
+            {
+              "name": "Classic Vanila Milk Shake",
+              "price": 99
+            },
+            {
+              "name": "Kit Kat Milk Shake",
+              "price": 99
+            },
+            {
+              "name": "Chocolate Milk Shake",
+              "price": 99
+            },
+            {
+              "name": "Mango Milk Shake",
+              "price": 99
+            },
+            {
+              "name": "Mix Fruit Milk Shake",
+              "price": 99
+            }
+          ]
+        },
+        {
+          "name": "Coffee",
+          "dishes": [
+            {
+              "name": "Cold coffee",
+              "price": 99
+            },
+            {
+              "name": "Hot coffee",
+              "price": 30
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
