@@ -595,3 +595,15 @@ display: block;
     color: transparent; /* Hide placeholder on focus */
 }
 
+.icon-container {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center icons vertically */
+}
+
+.search-icon {
+    font-size: 1.5rem; /* Same font size as cart icon */
+    cursor: pointer;
+    margin-right: 10px; /* Adjust margin to reduce space */
+    display: flex; /* Align icon vertically */
+    align-items: center; /* Center the icon vertically */
+}

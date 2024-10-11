@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveCheckboxState = () => {
         localStorage.setItem('onlyVeg', onlyVegCheckbox.checked);
         localStorage.setItem('onlyNonVeg', onlyNonVegCheckbox.checked);
+        searchBar.value = ''; // Set the search bar value to empty
         renderMenu(); // Re-render menu when checkbox state changes
     };
 
@@ -325,6 +326,14 @@ searchBar.addEventListener('input', function () {
 });
 
 
+
+// Add click event listener to the search icon
+searchIcon.addEventListener('click', function () {
+    // Get the search icon and search bar input
+    const searchIcon = document.getElementById('searchIcon');
+    const searchBar = document.getElementById('searchBar');
+    searchBar.focus(); // Focus on the search bar when the icon is clicked
+});
 
 
 
