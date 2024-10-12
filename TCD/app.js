@@ -10,13 +10,15 @@ const clearSearchButton = document.getElementById('clearSearch');
 
 // Function to check if an item is in the cart
 const isItemInCart = (categoryName, dishName) => {
-    // Find the category in the cart
-    const categoryInCart = cart.find(item => item.category.name === categoryName);
+    if (cart && Array.isArray(cart)) {
+            // Find the category in the cart
+        const categoryInCart = cart.find(item => item.category.name === categoryName);
 
-    // If the category exists, check for the dish in that category
-    if (categoryInCart) {
-        const dishInCart = categoryInCart.category.dish_details.find(dishItem => dishItem.name === dishName);
-        return !!dishInCart; // Return true if dish is found, otherwise false
+        // If the category exists, check for the dish in that category
+        if (categoryInCart) {
+            const dishInCart = categoryInCart.category.dish_details.find(dishItem => dishItem.name === dishName);
+            return !!dishInCart; // Return true if dish is found, otherwise false
+        }
     }
 
     return false; // Return false if category or dish is not found
