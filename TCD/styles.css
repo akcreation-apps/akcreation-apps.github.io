@@ -276,6 +276,11 @@ h1 {
 .cart-page h2 {
     margin-bottom: 40px;
 }
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between quantity controls and delete button */
+}
 
 .cart-item {
     display: flex;
@@ -577,7 +582,7 @@ display: block;
     
     .cart-item {
         flex-direction: row; /* Ensure they are aligned in a row */
-        justify-content: space-between; /* Space between items */
+        justify-content: flex-end; /* Space between items */
     }
     .cart-item img {
         width: 60px; /* Reduce image size */

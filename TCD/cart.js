@@ -32,14 +32,16 @@ const renderCartItems = () => {
                         <h5>${dishItem.name} (${categoryItem.category.name})</h5>
                         <p class="cart-item-price">₹${dishItem.price.toFixed(2)}/-</p>
                     </div>
-                    <div class="cart-item-quantity">
-                        <button class="decrease-quantity" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">-</button>
-                        <span class="quantity">${dishItem.quantity}</span>
-                        <button class="increase-quantity" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">+</button>
+                    <div class="cart-item-controls">
+                        <div class="cart-item-quantity">
+                            <button class="decrease-quantity" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">-</button>
+                            <span class="quantity">${dishItem.quantity}</span>
+                            <button class="increase-quantity" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">+</button>
+                        </div>
+                        <button class="delete-item" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                    <button class="delete-item" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">
-                        <i class="fas fa-trash"></i>
-                    </button>
                 `;
 
                 // Append event listeners for increase, decrease, and delete buttons

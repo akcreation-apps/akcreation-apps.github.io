@@ -24,11 +24,33 @@ const isItemInCart = (categoryName, dishName) => {
     return false; // Return false if category or dish is not found
 };
 
-// Update the cart count in the navbar
+// Update the cart count in the navbar to show the total quantity of dishes in the cart
 const updateCartCount = () => {
     const cartCount = document.querySelector('.cart-count');
-    cartCount.textContent = cart.length;
+    
+    // Ensure cart is not undefined or empty
+    if (!cart || cart.length === 0) {
+        cartCount.textContent = 0;
+        return;
+    }
+
+    // Calculate the total quantity of all dishes across categories in the cart
+    const totalItems = cart.reduce((sum, categoryItem) => {
+        // Check if categoryItem and dish_details exist
+        if (categoryItem.category && Array.isArray(categoryItem.category.dish_details)) {
+            // Sum up the quantities of dishes within the category's dish_details array
+            const categoryTotal = categoryItem.category.dish_details.reduce((categorySum, dish) => {
+                return categorySum + (dish.quantity || 0); // Default to 0 if quantity is missing
+            }, 0);
+            return sum + categoryTotal;
+        }
+        return sum;
+    }, 0);
+
+    // Update cart count with the total quantity of dishes
+    cartCount.textContent = totalItems;
 };
+
 
 // Add to Cart button functionality
 const addToCart = (dishCategory, dishName, dishPrice, src, button) => {
