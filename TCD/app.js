@@ -138,6 +138,11 @@ document.addEventListener('DOMContentLoaded', async() => {
         if (currentTime <= storedExpirationTime) {
             await fetch_data();
         }
+        else{
+            localStorage.removeItem('disable_item_ids')
+        }
+    } else{
+        localStorage.removeItem('disable_item_ids')
     }
 
     // Get disabled item ids from localStorage
