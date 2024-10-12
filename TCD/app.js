@@ -24,7 +24,7 @@ const isItemInCart = (categoryName, dishName) => {
     return false; // Return false if category or dish is not found
 };
 
-// Update the cart count in the navbar to show the total quantity of dishes in the cart
+// Update the cart count in the navbar to show the total number of unique dishes in the cart
 const updateCartCount = () => {
     const cartCount = document.querySelector('.cart-count');
     
@@ -34,22 +34,21 @@ const updateCartCount = () => {
         return;
     }
 
-    // Calculate the total quantity of all dishes across categories in the cart
-    const totalItems = cart.reduce((sum, categoryItem) => {
+    // Calculate the total number of unique dishes across categories in the cart
+    const totalDishes = cart.reduce((sum, categoryItem) => {
         // Check if categoryItem and dish_details exist
         if (categoryItem.category && Array.isArray(categoryItem.category.dish_details)) {
-            // Sum up the quantities of dishes within the category's dish_details array
-            const categoryTotal = categoryItem.category.dish_details.reduce((categorySum, dish) => {
-                return categorySum + (dish.quantity || 0); // Default to 0 if quantity is missing
-            }, 0);
-            return sum + categoryTotal;
+            // Count the number of unique dishes within the category's dish_details array
+            const uniqueDishesCount = categoryItem.category.dish_details.length; // Simply count the length of the dish_details array
+            return sum + uniqueDishesCount; // Add the count of unique dishes
         }
         return sum;
     }, 0);
 
-    // Update cart count with the total quantity of dishes
-    cartCount.textContent = totalItems;
+    // Update cart count with the total number of unique dishes
+    cartCount.textContent = totalDishes;
 };
+
 
 
 // Add to Cart button functionality
