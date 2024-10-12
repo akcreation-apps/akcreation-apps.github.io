@@ -254,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Error fetching menu data:', error);
+                localStorage.removeItem('cart')
             })
             .finally(() => {
                 hideLoader(); // Hide the loader once the data is fetched or on error
