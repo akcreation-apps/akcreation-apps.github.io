@@ -319,11 +319,6 @@ document.addEventListener('DOMContentLoaded', async() => {
     });
 });
 
-function decrypt_values(value, key){
-    const decryptedBytes = CryptoJS.AES.decrypt(value, key);
-    return decryptedBytes.toString(CryptoJS.enc.Utf8);
-}
-
 function fetch_data(){
     return get_credentials().then(credentials => {  // Return the promise here
         const firebaseConfig = {

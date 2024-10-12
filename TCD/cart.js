@@ -1,3 +1,6 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+
 // Retrieve the cart from localStorage
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -233,9 +236,31 @@ placeOrderButton.addEventListener('click', () => {
     } else{
         phoneNo = localStorage.getItem('whatsapp_no');
     }
-    // Create order message
-    // localStorage.setItem('cart', JSON.stringify(cartItems)); // Store cart in local storage
-    localStorage.removeItem('cart')
+    collect_data()
     sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
     hideLoader();
 });
+
+function collect_data(){
+    get_credentials().then(credentials => {  // Return the promise here
+        const firebaseConfig = {
+            apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
+            authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+            projectId: decrypt_values(credentials.ID, credentials.KEY),
+            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+            appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+            measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const cartTotalValue = document.getElementById('cart-total').textContent
+        const cartTotalNumber = parseFloat(cartTotalValue.replace(/[^0-9.-]+/g,"")); // Removes currency symbols, etc.
+        let data = {'order_details':getCartItems(), 'total_cart_value':cartTotalNumber, 'created_at':Timestamp.now()}
+        
+        console.log(data)
+        addDoc(collection(db, decrypt_values(credentials.ORDER_DB_NAME, credentials.KEY)), data);
+        localStorage.removeItem('cart')
+
+    });
+}
