@@ -207,7 +207,6 @@ placeOrderButton.addEventListener('click', () => {
     const storedExpirationTime = localStorage.getItem('urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
-        console.log(storedExpirationTime, currentTime)
         if (currentTime >= storedExpirationTime) {
             Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error');
             hideLoader();
@@ -221,8 +220,13 @@ placeOrderButton.addEventListener('click', () => {
     }
     const orderMessage = createOrderMessage(cartItems); 
     let phoneNo = ''
-    if (localStorage.getItem('whatsapp_no') === undefined) {
-        phoneNo = "+917749984274";
+    if (localStorage.getItem('whatsapp_no') === undefined ||
+        localStorage.getItem('whatsapp_no')==null || 
+        localStorage.getItem('whatsapp_no')==''
+    ) {
+        Swal.fire('Error', 'Order Couldn\'t place right now.', 'error');
+        hideLoader();
+        return;
     } else{
         phoneNo = localStorage.getItem('whatsapp_no');
     }

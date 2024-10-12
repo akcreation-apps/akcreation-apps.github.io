@@ -92,7 +92,7 @@ const addToCart = (dishCategory, dishName, dishPrice, src, button) => {
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCount();
     } catch(e){
-        localStorage.removeItem('cart');
+        console.log(e)
     }
 
     // Change button text and style if item added for the first time
@@ -121,13 +121,11 @@ const scrollToCategory = (categoryId) => {
 
 // Load menu data and create "Add to Cart" buttons
 document.addEventListener('DOMContentLoaded', () => {
-    store_data();
-    fetch_data();
+    showLoader(); // Show loader before starting the fetch request
 
-    // Set WhatsApp number if not already set in localStorage
-    if (localStorage.getItem('whatsapp_no') === undefined) {
-        localStorage.setItem('whatsapp_no', "+917749984274");
-    }
+    store_data();
+
+    fetch_data();
 
     // Get disabled item ids from localStorage
     let disable_ids = localStorage.getItem('disable_item_ids');
@@ -148,9 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderMenu = () => {
         menuContainer.innerHTML = ''; // Clear previous content
-
-        showLoader(); // Show loader before starting the fetch request
-
         fetch('data.json')
             .then(response => response.json())
             .then(data => {
@@ -277,7 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Error fetching menu data:', error);
-                localStorage.removeItem('cart')
             })
             .finally(() => {
                 hideLoader(); // Hide the loader once the data is fetched or on error
