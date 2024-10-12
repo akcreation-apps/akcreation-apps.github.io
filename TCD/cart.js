@@ -6,7 +6,9 @@ const renderCartItems = () => {
     const cartItemsContainer = document.getElementById('cart-items');
     const cartTotalContainer = document.getElementById('cart-total-container');
     const emptyCartBanner = document.getElementById('empty-cart-banner');
+    
     cartItemsContainer.innerHTML = ''; // Clear the container before rendering
+
     if (cart.length === 0) {
         // Show the empty cart banner
         emptyCartBanner.style.display = 'block';
@@ -15,75 +17,95 @@ const renderCartItems = () => {
         // Hide the empty cart banner
         emptyCartBanner.style.display = 'none';
         cartTotalContainer.style.display = 'block'; // Show total and button
-        cart.forEach((item, index) => {
-        const cartItem = document.createElement('div');
-        cartItem.classList.add('cart-item');
-        const url = get_dish_url(item.name)
-        cartItem.innerHTML = `
-            <img src="${url}" alt="${item.name}">
-            <div class="cart-item-info">
-                <h5>${item.name}</h5>
-                <p class="cart-item-price">₹${item.price.toFixed(2)}/-</p>
-            </div>
-            <div class="cart-item-quantity">
-                <button class="decrease-quantity" data-index="${index}">-</button>
-                <span class="quantity">${item.quantity}</span>
-                <button class="increase-quantity" data-index="${index}">+</button>
-            </div>
-            <button class="delete-item" data-index="${index}">
-                <i class="fas fa-trash"></i>
-            </button>        `;
 
-        // Append event listeners for increase, decrease, and delete buttons
-        cartItem.querySelector('.increase-quantity').addEventListener('click', () => {
-            item.quantity += 1;
-            updateCartStorage();
-            renderCartItems(); // Re-render cart items to reflect changes
-        });
+        // Loop through each category in the cart
+        cart.forEach((categoryItem, categoryIndex) => {
+            // Loop through each dish in the category
+            categoryItem.category.dish_details.forEach((dishItem, dishIndex) => {
+                const cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+                const url = get_dish_url(dishItem.name);
 
-        cartItem.querySelector('.decrease-quantity').addEventListener('click', () => {
-            if (item.quantity > 1) {
-                item.quantity -= 1;
-                updateCartStorage();
-                renderCartItems(); // Re-render cart items to reflect changes
-            }
-        });
+                cartItem.innerHTML = `
+                    <img src="${url}" alt="${dishItem.name}">
+                    <div class="cart-item-info">
+                        <h5>${dishItem.name} (${categoryItem.category.name})</h5>
+                        <p class="cart-item-price">₹${dishItem.price.toFixed(2)}/-</p>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button class="decrease-quantity" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">-</button>
+                        <span class="quantity">${dishItem.quantity}</span>
+                        <button class="increase-quantity" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">+</button>
+                    </div>
+                    <button class="delete-item" data-category-index="${categoryIndex}" data-dish-index="${dishIndex}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
 
-        cartItem.querySelector('.delete-item').addEventListener('click', () => {
-
-            Swal.fire({
-                title: 'Confirm Delete!',
-                html: 'Want to remove from your cart ?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    cart.splice(index, 1); // Remove item from cart
+                // Append event listeners for increase, decrease, and delete buttons
+                cartItem.querySelector('.increase-quantity').addEventListener('click', () => {
+                    dishItem.quantity += 1;
                     updateCartStorage();
                     renderCartItems(); // Re-render cart items to reflect changes
-                }
+                });
+
+                cartItem.querySelector('.decrease-quantity').addEventListener('click', () => {
+                    if (dishItem.quantity > 1) {
+                        dishItem.quantity -= 1;
+                        updateCartStorage();
+                        renderCartItems(); // Re-render cart items to reflect changes
+                    }
+                });
+
+                cartItem.querySelector('.delete-item').addEventListener('click', () => {
+                    Swal.fire({
+                        title: 'Confirm Delete!',
+                        html: 'Want to remove this item from your cart?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'No',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Remove the dish from the category
+                            categoryItem.category.dish_details.splice(dishIndex, 1);
+
+                            // If the category becomes empty, remove the category
+                            if (categoryItem.category.dish_details.length === 0) {
+                                cart.splice(categoryIndex, 1);
+                            }
+
+                            updateCartStorage();
+                            renderCartItems(); // Re-render cart items to reflect changes
+                        }
+                    });
+                });
+
+                cartItemsContainer.appendChild(cartItem);
             });
-
         });
-
-        cartItemsContainer.appendChild(cartItem);
-    });
     }
+
     updateTotalPrice();
 };
 
-// Update the total price dynamically
-const updateTotalPrice = () => {
-    let totalPrice = 0;
 
-    cart.forEach(item => {
-        totalPrice += item.price * item.quantity;
+// Calculate and update the total price
+const updateTotalPrice = () => {
+    const totalPriceElement = document.getElementById('cart-total');
+    let total = 0;
+
+    // Iterate through each category and dish to calculate the total price
+    cart.forEach(categoryItem => {
+        categoryItem.category.dish_details.forEach(dishItem => {
+            total += dishItem.price * dishItem.quantity;
+        });
     });
 
-    document.getElementById('cart-total').textContent = totalPrice.toFixed(2)+'/-';
+    // Update the displayed total price
+    totalPriceElement.textContent = `₹${total.toFixed(2)}`;
 };
+
 
 // Update session storage whenever cart changes
 const updateCartStorage = () => {
@@ -111,17 +133,60 @@ function createOrderMessage(cartItems) {
     let message = "Hello, I would like to place an order for the following items:\n\n";
     message += "Ordered Items:\n\n";
 
+    // Create an object to group items by category
+    const categoryMap = {};
+
     cartItems.forEach(item => {
-        message += `${item.name} (${item.quantity}x)\n`; // Update the message format
+        const categoryName = item.category.name; // Get the category name
+        
+        // Initialize the category in the map if it doesn't exist
+        if (!categoryMap[categoryName]) {
+            categoryMap[categoryName] = [];
+        }
+        
+        // Iterate through the dish details to add dishes to the corresponding category
+        item.category.dish_details.forEach(dish => {
+            const dishName = dish.name; // Get the dish name
+            const quantity = dish.quantity; // Get the quantity
+
+            // Find if the dish already exists in this category
+            const existingDish = categoryMap[categoryName].find(d => d.name === dishName);
+            
+            if (existingDish) {
+                // If it exists, update the quantity
+                existingDish.quantity += quantity;
+            } else {
+                // If it doesn't exist, add it to the category
+                categoryMap[categoryName].push({ name: dishName, quantity: quantity });
+            }
+        });
     });
 
-    message += `\nTotal Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nTable Number: ${localStorage.getItem('table')}`; // Update total price format
-    return message; // Encode message for URL
+    // Build the message with categories and their dishes
+    for (const category in categoryMap) {
+        message += `*${category}:*\n`; // Add category header
+
+        categoryMap[category].forEach(dish => {
+            message += `  - ${dish.name} (${dish.quantity}x)\n`; // List each dish under the category
+        });
+
+        message += '\n'; // Add a new line after each category
+    }
+
+    message += `Total Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nTable Number: ${localStorage.getItem('table')}`;
+    return message; // Return the constructed message
 }
+
 
 // Function to calculate total amount
 function calculateTotal(cartItems) {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, categoryItem) => {
+        // Iterate through each dish detail in the category
+        return total + categoryItem.category.dish_details.reduce((categoryTotal, dish) => {
+            // Sum up the price of each dish multiplied by its quantity
+            return categoryTotal + (dish.price * dish.quantity);
+        }, 0);
+    }, 0);
 }
 
 // Function to send message via WhatsApp

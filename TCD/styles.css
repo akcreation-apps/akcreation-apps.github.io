@@ -22,7 +22,7 @@ body {
     width: 100%;
     z-index: 1000;
     background-color: #ff7043;
-    padding: 10px 20px; /* Reduced padding */
+    padding: 5px 5px; /* Reduced padding */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow */
     display: flex;
     justify-content: space-between;
@@ -82,10 +82,6 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-#cart-items {
-    margin-bottom: 20px;
-}
-
 h1 {
     text-align: center;
     color: #5A5A5A;
@@ -108,7 +104,7 @@ h1 {
 
 /* Menu Section */
 .menu {
-    padding: 60px 20px;
+    padding: 60px 0px;
     text-align: center;
 }
 
@@ -153,16 +149,16 @@ h1 {
 
 /* Subcategory Styling */
 .subcategory-block {
-    margin-bottom: 40px; /* Increased margin between subcategories */
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    padding: 10px;
 }
 
 .subcategory-block h4 {
     font-size: 1.5rem;
     color: #333;
+    margin: 0; /* Ensure no extra margin on headings */
 }
 
 /* Grid Layout for Dishes - 2 items per row */
@@ -200,6 +196,13 @@ h1 {
     .dish-grid {
         gap: 10px;
         grid-template-columns: repeat(2, 1fr); /* Force 2 items per row even on small screens */
+    }
+    .shortcuts-container {
+        padding: 0 20px; /* Increase padding on smaller screens */
+    }
+
+    .shortcut-card {
+        margin: 0 8px; /* Slightly reduce the gap between shortcut cards on smaller screens */
     }
 }
 
@@ -278,9 +281,11 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
     transition: background-color 0.2s;
+    margin-bottom: 10px; /* Add space between cart items */
 }
 
 .cart-item:hover {
@@ -291,36 +296,46 @@ h1 {
     width: 80px;
     height: 80px;
     border-radius: 4px;
-    object-fit: cover;
+    align-self: center; /* Center the image vertically */
+    margin-right: 20px; /* Add space between image and text */
 }
 
 .cart-item-info {
     flex-grow: 1;
-    margin-left: 20px;
+    max-width: 45%; /* Limit the width */
+    font-size: 14px; /* Smaller font for better fit */
 }
 
 .cart-item-info h5 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
+    line-height: 1.4;
     color: #333;
 }
 
-.cart-item-price {
-    font-size: 16px;
-    color: #777;
-}
-
+/* Price and Quantity */
+.cart-item-price,
 .cart-item-quantity {
     display: flex;
     align-items: center;
+    font-size: 14px;
+}
+
+/* Quantity Container */
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: auto; /* Push quantity section to the right */
 }
 
 .cart-item-quantity button {
     background-color: #007bff;
+    width: 30px;
+    height: 30px;
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 5px 10px;
     cursor: pointer;
     font-size: 16px;
     margin: 0 5px;
@@ -413,9 +428,10 @@ input[type="checkbox"] {
   /* Shortcuts Grid */
 .shortcuts-container {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
     margin-bottom: 20px;
+    overflow-x: hidden; /* Prevent vertical scrollbar if needed */
 }
   
 .shortcuts-container h2 {
@@ -443,6 +459,7 @@ input[type="checkbox"] {
     text-align: center; /* Center text */
     min-width: 120px; /* Minimum width for cards */
     transition: transform 0.3s; /* Add transition for hover effect */
+    user-select: none; /* Prevent text selection on click */
 }
 
 .shortcut-card:hover {
@@ -557,12 +574,36 @@ display: block;
     .menu-item {
         width: 100%; /* Full width for smaller screens */
     }
+    
+    .cart-item {
+        flex-direction: row; /* Ensure they are aligned in a row */
+        justify-content: space-between; /* Space between items */
+    }
+    .cart-item img {
+        width: 60px; /* Reduce image size */
+        height: 60px; /* Reduce image size */
+        margin-bottom: 10px; /* Add space below the image */
+    }
+
+    .cart-item-info {
+        max-width: 100%; /* Allow full width */
+        margin-bottom: 10px; /* Add spacing for better readability */
+    }
+
+    .cart-item-quantity {
+        margin-left: auto; /* Keep quantity on the right */
+        justify-content: flex-start; /* Align to the left */
+    }
+
+    .delete-item {
+        margin-left: 20; /* Remove margin for smaller screens */
+    }
 }
 
 /* Search Bar Styles */
 .search-container {
     position: relative; /* Make the container relative for absolute positioning of the button */
-    display: inline-block; /* Aligns with the navbar elements */
+    display: flex; /* Aligns with the navbar elements */
     justify-content: center;
     margin: 20px 0; /* Margin above and below the search bar */
 }
