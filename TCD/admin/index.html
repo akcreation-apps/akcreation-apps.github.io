@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Chart & Access Control</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <!-- Password Popup -->
+    <div id="passwordPopup" class="popup">
+        <div class="popup-content">
+            <h2>Enter Password</h2>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <button id="submitPassword">Submit</button>
+            <p id="passwordError"></p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="mainContent" style="display:none;">
+        <nav>
+            <ul>
+                <li id="chartTab" class="active">Chart</li>
+                <li id="accessTab">Access Control</li>
+            </ul>
+        </nav>
+
+        <!-- Chart Section -->
+        <div id="chartSection">
+            <h2>Chart View</h2>
+            <p>No data available for the chart.</p>
+        </div>
+
+        <!-- Access Control Section -->
+        <div id="accessControlSection" style="display:none;">
+            <h2>Access Control</h2>
+            <input type="number" id="inputNumber" placeholder="Enter a number">
+            <button id="validateButton">Validate</button>
+            <div class="search-container">
+                <input type="text" id="searchBar" placeholder="Search dishes...">
+                <button id="clearSearch" class="clear-button" style="display:none;">&times;</button>
+            </div>
+            <h3>List of Dishes</h3>
+            <div id="dishesListAccess">
+                <!-- Dynamically loaded dishes with toggles will go here -->
+            </div>
+            <div id="noResultsContainer" style="display:none;">
+                <img id="noResultsImage" src="../src/no-results.png" alt="No Results Found" />
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
