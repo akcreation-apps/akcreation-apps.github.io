@@ -212,18 +212,21 @@ placeOrderButton.addEventListener('click', () => {
             hideLoader();
             return;
         }
-    } 
+    } else if(!storedExpirationTime){
+        Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error');
+        hideLoader();
+            return;
+    }
     if (cartItems.length === 0) {
-        Swal.fire('Error', 'Your cart is empty.', 'error');
+        Swal.fire('Error', 'Your cart is empty.', 'error').then(() => {
+            location.reload(); // Reload the page after clicking OK
+        });
         hideLoader();
         return;
     }
     const orderMessage = createOrderMessage(cartItems); 
     let phoneNo = ''
-    if (localStorage.getItem('whatsapp_no') === undefined ||
-        localStorage.getItem('whatsapp_no')==null || 
-        localStorage.getItem('whatsapp_no')==''
-    ) {
+    if (!localStorage.getItem('whatsapp_no')) {
         Swal.fire('Error', 'Order Couldn\'t place right now.', 'error');
         hideLoader();
         return;
@@ -232,6 +235,8 @@ placeOrderButton.addEventListener('click', () => {
     }
     // Create order message
     // localStorage.setItem('cart', JSON.stringify(cartItems)); // Store cart in local storage
+    localStorage.removeItem('table')
+    localStorage.removeItem('cart')
     sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
     hideLoader();
 });

@@ -120,12 +120,13 @@ const scrollToCategory = (categoryId) => {
 };
 
 // Load menu data and create "Add to Cart" buttons
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async() => {
     showLoader(); // Show loader before starting the fetch request
 
     store_data();
-
-    fetch_data();
+    if (localStorage.getItem('table')){
+        fetch_data();
+    }
 
     // Get disabled item ids from localStorage
     let disable_ids = localStorage.getItem('disable_item_ids');
