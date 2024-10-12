@@ -235,7 +235,6 @@ placeOrderButton.addEventListener('click', () => {
     }
     // Create order message
     // localStorage.setItem('cart', JSON.stringify(cartItems)); // Store cart in local storage
-    localStorage.removeItem('table')
     localStorage.removeItem('cart')
     sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
     hideLoader();

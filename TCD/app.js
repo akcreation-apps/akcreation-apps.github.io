@@ -132,8 +132,12 @@ document.addEventListener('DOMContentLoaded', async() => {
     showLoader(); // Show loader before starting the fetch request
 
     store_data();
-    if (localStorage.getItem('table')){
-        await fetch_data();
+    const storedExpirationTime = localStorage.getItem('urlExpiration');
+    if (storedExpirationTime) {
+        const currentTime = Date.now();
+        if (currentTime <= storedExpirationTime) {
+            await fetch_data();
+        }
     }
 
     // Get disabled item ids from localStorage
