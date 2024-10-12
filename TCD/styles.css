@@ -293,8 +293,9 @@ h1 {
     margin-bottom: 10px; /* Add space between cart items */
 }
 
-.cart-item:hover {
-    background-color: #f1f1f1;
+.cart-item:hover, .cart-item:active, .cart-item:focus {
+    background-color: #fff; /* Ensure background stays white on hover or click */
+    outline: none; /* Remove any focus outline */
 }
 
 .cart-item img {
