@@ -256,7 +256,11 @@ function collect_data(){
         const db = getFirestore(app);
         const cartTotalValue = document.getElementById('cart-total').textContent
         const cartTotalNumber = parseFloat(cartTotalValue.replace(/[^0-9.-]+/g,"")); // Removes currency symbols, etc.
-        let data = {'order_details':getCartItems(), 'total_cart_value':cartTotalNumber, 'created_at':Timestamp.now()}
+        let data = {
+            'order_details':getCartItems(),
+            'triggered_to':localStorage.getItem('whatsapp_no'),
+            'total_cart_value':cartTotalNumber,
+            'created_at':Timestamp.now()}
         
         console.log(data)
         addDoc(collection(db, decrypt_values(credentials.ORDER_DB_NAME, credentials.KEY)), data);
