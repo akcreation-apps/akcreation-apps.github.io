@@ -52,8 +52,13 @@ const updateCartCount = () => {
 
 
 // Add to Cart button functionality
-const addToCart = (dishCategory, dishName, dishPrice, src, button) => {
+const addToCart = (dishCategory, dishObject, button) => {
+    showLoader();
     try {
+        let dishId = dishObject.id;
+        let dishName = dishObject.name;
+        let dishPrice = dishObject.price;
+        let src = dishObject.image_url;
         // Check if the category already exists in the cart
         let existingCategoryItem = cart.find(item => item.category.name === dishCategory);
 
@@ -67,6 +72,7 @@ const addToCart = (dishCategory, dishName, dishPrice, src, button) => {
             } else {
                 // If the dish doesn't exist, add the new dish to the category
                 existingCategoryItem.category.dish_details.push({
+                    id: dishId,
                     name: dishName,
                     price: dishPrice,
                     quantity: 1,
@@ -80,6 +86,7 @@ const addToCart = (dishCategory, dishName, dishPrice, src, button) => {
                     name: dishCategory,
                     dish_details: [
                         {
+                            id: dishId,
                             name: dishName,
                             price: dishPrice,
                             quantity: 1,
@@ -94,6 +101,7 @@ const addToCart = (dishCategory, dishName, dishPrice, src, button) => {
     } catch(e){
         console.log(e)
     }
+    hideLoader();
 
     // Change button text and style if item added for the first time
     button.textContent = 'Go to Cart';
@@ -125,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
     store_data();
     if (localStorage.getItem('table')){
-        fetch_data();
+        await fetch_data();
     }
 
     // Get disabled item ids from localStorage
@@ -245,11 +253,11 @@ document.addEventListener('DOMContentLoaded', async() => {
                                         // If the dish is already in the cart, go to cart
                                         window.location.href = 'cart.html';
                                     } else {
-                                        addToCart(subcategory.name, dish.name, dish.price, dish.image_url, addToCartButton);
+                                        addToCart(subcategory.name, dish, addToCartButton);
                                     }
                                 } else {
                                     // If the category doesn't exist, add a new category with the dish
-                                    addToCart(subcategory.name, dish.name, dish.price, dish.image_url, addToCartButton);
+                                    addToCart(subcategory.name, dish, addToCartButton);
                                 }
                             });
 
@@ -308,7 +316,7 @@ function decrypt_values(value, key){
 }
 
 function fetch_data(){
-    get_credentials().then(credentials => {
+    return get_credentials().then(credentials => {  // Return the promise here
         const firebaseConfig = {
             apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
             authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
@@ -317,11 +325,10 @@ function fetch_data(){
             messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
             appId: decrypt_values(credentials.APP_ID, credentials.KEY),
             measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
-          };
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        // Step 4: Fetch data from Firestore
-        getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY)))  // Replace 'users' with your collection name
+        return getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY))) // Return this promise
             .then(querySnapshot => {
                 querySnapshot.forEach(doc => {
                     if (doc.data().whatsapp_no !== undefined) {
@@ -331,6 +338,17 @@ function fetch_data(){
                         localStorage.setItem('disable_item_ids', doc.data().disabled_items);
                     }
                 });
+               
+                // Remove disabled dishes from the cart
+                cart.forEach(category => {
+                    category.category.dish_details = category.category.dish_details.filter(dish => !JSON.parse(localStorage.getItem('disable_item_ids')).includes(dish.id));
+                });
+                console.log(cart)
+
+                // Update the cart in localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                updateCartCount(); // Update cart count after cleaning up
             })
             .catch(error => {
                 console.error("Error fetching Firestore data:", error);
