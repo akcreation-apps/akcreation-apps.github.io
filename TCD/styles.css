@@ -609,9 +609,9 @@ display: block;
 /* Search Bar Styles */
 .search-container {
     position: relative; /* Make the container relative for absolute positioning of the button */
-    display: flex; /* Aligns with the navbar elements */
+    display: inline-block; /* Aligns with the navbar elements */
     justify-content: center;
-    margin: 20px 0; /* Margin above and below the search bar */
+    margin: 20px 10; /* Margin above and below the search bar */
 }
 
 .search-container input[type="text"] {
