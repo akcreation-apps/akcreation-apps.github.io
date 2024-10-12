@@ -22,7 +22,7 @@ body {
     width: 100%;
     z-index: 1000;
     background-color: #ff7043;
-    padding: 5px 5px; /* Reduced padding */
+    padding: 20px 20px; /* Reduced padding */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow */
     display: flex;
     justify-content: space-between;
@@ -648,7 +648,7 @@ display: block;
 .search-icon {
     font-size: 1.5rem; /* Same font size as cart icon */
     cursor: pointer;
-    margin-right: 10px; /* Adjust margin to reduce space */
+    margin-right: 30px; /* Adjust margin to reduce space */
     display: flex; /* Align icon vertically */
     align-items: center; /* Center the icon vertically */
 }
