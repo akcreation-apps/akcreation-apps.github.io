@@ -260,6 +260,7 @@ function collect_data(){
             'order_details':getCartItems(),
             'triggered_to':localStorage.getItem('whatsapp_no'),
             'total_cart_value':cartTotalNumber,
+            'table_no':localStorage.getItem('table'),
             'created_at':Timestamp.now()}
         
         console.log(data)

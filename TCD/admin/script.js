@@ -228,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const expirationTime = currentTime + sessionTime;
             localStorage.setItem('sessionExpiration', expirationTime);
             console.log("Password accepted. Setting session expiration to:", expirationTime);
+            document.body.style.zoom = '100%'; // Reset zoom
             showMainContent();
             passwordPopup.style.display = 'none';
         } else {
