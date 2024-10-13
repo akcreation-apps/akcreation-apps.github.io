@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Chart & Access Control</title>
     <link rel="stylesheet" href="styles.css">
-    <script defer src="script.js"></script>
+    <script src="script.js" type="module"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -37,13 +38,16 @@
 
         <!-- Access Control Section -->
         <div id="accessControlSection" style="display:none;">
-            <input type="number" id="inputNumber" placeholder="Enter a number">
-            <button id="validateButton">Validate</button>
-           <div class="search-container">
-            <input type="text" id="searchBar" placeholder="Search dishes...">
-            <span id="clearSearch" class="clear-icon" style="display:none;">&times;</span>
-        </div>
+            <button id="submitButton">Submit</button>
+           <div class="number-container">
+                <input type="number" id="inputNumber" placeholder="Enter a number">
+                <button id="validateButton">Validate</button>
+           </div>
             <h3>List of Dishes</h3>
+           <div class="search-container">
+                <input type="text" id="searchBar" placeholder="Search dishes...">
+                <span id="clearSearch" class="clear-icon" style="display:none;">&times;</span>
+            </div>
             <div id="dishesListAccess">
                 <!-- Dynamically loaded dishes with toggles will go here -->
             </div>

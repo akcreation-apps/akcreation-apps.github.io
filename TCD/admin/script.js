@@ -1,3 +1,7 @@
+// Import the necessary Firebase services
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const passwordPopup = document.getElementById('passwordPopup');
     const submitPasswordButton = document.getElementById('submitPassword');
@@ -13,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const noResultsContainer = document.getElementById('noResultsContainer');
     const noResultsImage = document.getElementById('noResultsImage');
     const passwordInput = document.getElementById('password');
+    const numberInput = document.getElementById('inputNumber');
 
     let sessionTime = 30 * 60 * 1000; // 30 minutes in milliseconds
     let password = '12'; // Example password
@@ -28,6 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sessionExpiration && currentTime < sessionExpiration) {
         // Session is still valid; show the main content
         console.log("Session is valid. Showing main content.");
+        get_credentials().then(credentials => {  // Return the promise here
+            const firebaseConfig = {
+                apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
+                authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+                projectId: decrypt_values(credentials.ID, credentials.KEY),
+                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+                appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+                measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+            };
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY))) // Return this promise
+                .then(querySnapshot => {
+                    querySnapshot.forEach(doc => {
+                        if (doc.data().whatsapp_no !== undefined) {
+                            localStorage.setItem('whatsapp_no', doc.data().whatsapp_no);
+                        }
+                        if (doc.data().disabled_items !== undefined) {
+                            localStorage.setItem('disable_item_ids', doc.data().disabled_items);
+                        }
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Session Timeout',
+                        text: 'Your session has expired. Please log in again.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        localStorage.removeItem('sessionExpiration'); // Clear session on timeout
+                        location.reload(); // Reload the page to prompt for the password again
+                    });
+                });
+        });
         showMainContent();
     } else {
         // Session expired or not set; show the password popup
@@ -94,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
+                numberInput.value = localStorage.getItem('whatsapp_no').slice(3)
                 renderDishes(data); // Call the function to render dishes
             })
             .catch(error => {
@@ -235,3 +276,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
+async function get_credentials() {
+    try {
+        // Fetch the JSON file
+        const response = await fetch('../credentials.json');
+
+        // Check if the fetch was successful
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+
+        // Parse the JSON data
+        const data = await response.json();
+
+        return data; // Return the data
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        return null; // Return null or handle the error as needed
+    }
+}
+
+function decrypt_values(value, key){
+    const decryptedBytes = CryptoJS.AES.decrypt(value, key);
+    return decryptedBytes.toString(CryptoJS.enc.Utf8);
+}

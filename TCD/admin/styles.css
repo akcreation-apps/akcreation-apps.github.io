@@ -93,7 +93,17 @@ nav ul li:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-button {
+#submitButton {
+   position: absolute; /* Absolute positioning within the relative container */
+    right: 20px; /* 20px from the right side of the container */
+    padding: 10px 20px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#validateButton, #submitPassword {
     background-color: #4a90e2;
     color: white;
     border: none;
@@ -102,7 +112,7 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+#validateButton:hover {
     background-color: #357abd;
 }
 
@@ -229,8 +239,8 @@ input:checked + .slider:before {
 /* Input field styles */
 /* Input Styles */
 #inputNumber {
-    width: auto;
     padding: 10px;
+    width: auto;
     margin: 10px 0; /* Margin around the input */
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -255,7 +265,7 @@ input:checked + .slider:before {
 
 /* Title for List of Dishes */
 #accessControlSection h3 {
-    margin-top: 20px;
+    margin-top: 40px;
     font-size: 1.5rem;
     color: #333;
 }
@@ -355,15 +365,27 @@ input:checked + .slider:before {
     margin-left: 10px; /* Space between dish item and toggle */
 }
 
-/* Search container */
-.search-container {
-    top: 0; /* Sticks to the top of the viewport */
+/* Number container */
+.number-container {
+    display: inline-block;
     background-color: #fff; /* White background for a clean look */
-    z-index: 10; /* Ensure it sits above other elements */
-    display: flex; /* Use flexbox for layout */
+    z-index: 10;/* Use flexbox for layout */
+    top: 35px;  /* 20px from the top of the container */
     align-items: center; /* Center items vertically */
     margin: 20px 10px; /* Margin above and below */
     padding: 12px 15px; /* Add padding around the container */
+    border-radius: 25px; /* Rounded corners for a modern look */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
+    position: relative; /* Set position to relative for positioning the clear icon */
+    border: 1px solid #ddd; /* Subtle border */
+}
+
+/* Search container */
+.search-container {
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center items vertically */
+    margin: 0px 10px; /* Margin above and below */
+    padding: 10px 10px; /* Add padding around the container */
     border-radius: 25px; /* Rounded corners for a modern look */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
     position: relative; /* Set position to relative for positioning the clear icon */
@@ -374,7 +396,7 @@ input:checked + .slider:before {
 /* Search input styles */
 #searchBar {
     flex: 1; /* Make the search input fill available space */
-    padding: 12px; /* Padding for better usability */
+    padding: 10px; /* Padding for better usability */
     border: none; /* Remove default border */
     font-size: 1rem; /* Font size */
     border-radius: 25px; /* Rounded corners */
@@ -386,7 +408,7 @@ input:checked + .slider:before {
 /* Clear icon styles */
 .clear-icon {
     position: absolute; /* Position the clear icon relative to the container */
-    right: 20px; /* Align it to the right inside the search container */
+    right: 30px; /* Align it to the right inside the search container */
     top: 50%; /* Center it vertically */
     transform: translateY(-50%); /* Adjust vertical alignment */
     font-size: 1.5rem; /* Size of the cross icon */
