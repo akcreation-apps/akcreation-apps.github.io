@@ -14,7 +14,6 @@ body {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 40px;
     width: 100%;
     text-align: center;
 }
@@ -360,46 +359,57 @@ input:checked + .slider:before {
 .dish-item label {
     margin-left: 10px; /* Space between dish item and toggle */
 }
-/* Search container */
+
 /* Search container */
 .search-container {
     position: sticky; /* Makes the search container stick to the top of its container */
     top: 0; /* Sticks to the top of the viewport */
-    background-color: #f4f4f4; /* Background color to match body */
+    background-color: #fff; /* White background for a clean look */
     z-index: 10; /* Ensure it sits above other elements */
     display: flex; /* Use flexbox for layout */
     align-items: center; /* Center items vertically */
     margin: 20px 0; /* Margin above and below */
-    padding: 10px; /* Add padding around the container */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for separation */
+    padding: 12px 15px; /* Add padding around the container */
+    border-radius: 25px; /* Rounded corners for a modern look */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
+    position: relative; /* Set position to relative for positioning the clear icon */
+    border: 1px solid #ddd; /* Subtle border */
 }
 
 
 /* Search input styles */
 #searchBar {
     flex: 1; /* Make the search input fill available space */
-    padding: 10px; /* Padding for better usability */
-    border: 1px solid #ccc; /* Border for input */
-    border-radius: 5px; /* Rounded corners */
+    padding: 12px; /* Padding for better usability */
+    border: none; /* Remove default border */
     font-size: 1rem; /* Font size */
+    border-radius: 25px; /* Rounded corners */
+    outline: none; /* Remove outline on focus */
+    background-color: #f4f4f4; /* Light grey background for input */
+    padding-right: 40px; /* Add extra space on the right to avoid overlap with the clear icon */
 }
 
-/* Clear button styles */
-.clear-button {
-    margin-left: 10px; /* Space between input and button */
-    padding: 10px; /* Padding for the button */
-    background-color: #e74c3c; /* Red background for clear button */
-    color: white; /* White text */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Rounded corners */
+/* Clear icon styles */
+.clear-icon {
+    position: absolute; /* Position the clear icon relative to the container */
+    right: 20px; /* Align it to the right inside the search container */
+    top: 50%; /* Center it vertically */
+    transform: translateY(-50%); /* Adjust vertical alignment */
+    font-size: 1.5rem; /* Size of the cross icon */
+    color: #e74c3c; /* Red color for the cross icon */
     cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition */
     display: none; /* Initially hidden */
+    transition: color 0.3s ease; /* Smooth transition for color change */
 }
 
-.clear-button:hover {
-    background-color: #c0392b; /* Darker red on hover */
+.clear-icon:hover {
+    color: #c0392b; /* Darker red on hover */
+}
+
+/* Focus state for input */
+#searchBar:focus {
+    border: 2px solid #3498db; /* Blue border when focused for a modern touch */
+    background-color: #fff; /* White background when focused */
 }
 
 
