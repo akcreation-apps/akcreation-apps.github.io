@@ -227,9 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set the session expiration time (30 minutes from now)
             const expirationTime = currentTime + sessionTime;
             localStorage.setItem('sessionExpiration', expirationTime);
-            console.log("Password accepted. Setting session expiration to:", expirationTime);
-            document.body.style.zoom = '100%'; // Reset zoom
-            showMainContent();
+            location.reload();
             passwordPopup.style.display = 'none';
         } else {
             passwordError.textContent = 'Incorrect password, please try again.';
