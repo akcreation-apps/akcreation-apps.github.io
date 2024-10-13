@@ -226,14 +226,8 @@ input:checked + .slider:before {
     position: relative; /* Ensure it positions correctly in the flow */
 }
 
-/* Access Control Heading */
-#accessControlSection h2 {
-    font-size: 2rem;
-    color: #4a90e2;
-    margin-bottom: 20px;
-}
-
 /* Input field styles */
+/* Input Styles */
 #inputNumber {
     width: auto;
     padding: 10px;
@@ -241,6 +235,7 @@ input:checked + .slider:before {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
+    margin-right: 10px;
 }
 
 /* Button styles */
@@ -362,13 +357,12 @@ input:checked + .slider:before {
 
 /* Search container */
 .search-container {
-    position: sticky; /* Makes the search container stick to the top of its container */
     top: 0; /* Sticks to the top of the viewport */
     background-color: #fff; /* White background for a clean look */
     z-index: 10; /* Ensure it sits above other elements */
     display: flex; /* Use flexbox for layout */
     align-items: center; /* Center items vertically */
-    margin: 20px 0; /* Margin above and below */
+    margin: 20px 10px; /* Margin above and below */
     padding: 12px 15px; /* Add padding around the container */
     border-radius: 25px; /* Rounded corners for a modern look */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
