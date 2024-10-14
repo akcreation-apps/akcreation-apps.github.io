@@ -38,10 +38,13 @@
 
         <!-- Access Control Section -->
         <div id="accessControlSection" style="display:none;">
-            <button id="submitButton">Submit</button>
+            <div class="save-container" id="saveContainer" style="display:none;">
+                <h5>Your changes haven't saved yet.</h5>
+                <button id="submitButton">Save Changes</button>
+            </div>
            <div class="number-container">
                 <input type="number" id="inputNumber" placeholder="Enter a number">
-                <button id="validateButton">Validate</button>
+                <button id="validateButton" style="display:none;">Verify</button>
            </div>
             <h3>List of Dishes</h3>
            <div class="search-container">

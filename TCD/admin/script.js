@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const noResultsImage = document.getElementById('noResultsImage');
     const passwordInput = document.getElementById('password');
     const numberInput = document.getElementById('inputNumber');
+    const savedContainer = document.getElementById('saveContainer');
+    const validateButton = document.getElementById('validateButton');
 
     let sessionTime = 30 * 60 * 1000; // 30 minutes in milliseconds
     let password = '12'; // Example password
@@ -33,41 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sessionExpiration && currentTime < sessionExpiration) {
         // Session is still valid; show the main content
         console.log("Session is valid. Showing main content.");
-        get_credentials().then(credentials => {  // Return the promise here
-            const firebaseConfig = {
-                apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-                authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-                projectId: decrypt_values(credentials.ID, credentials.KEY),
-                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-                appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-                measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
-            };
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-            getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY))) // Return this promise
-                .then(querySnapshot => {
-                    querySnapshot.forEach(doc => {
-                        if (doc.data().whatsapp_no !== undefined) {
-                            localStorage.setItem('whatsapp_no', doc.data().whatsapp_no);
-                        }
-                        if (doc.data().disabled_items !== undefined) {
-                            localStorage.setItem('disable_item_ids', doc.data().disabled_items);
-                        }
-                    });
-                })
-                .catch(error => {
-                    Swal.fire({
-                        title: 'Session Timeout',
-                        text: 'Your session has expired. Please log in again.',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        localStorage.removeItem('sessionExpiration'); // Clear session on timeout
-                        location.reload(); // Reload the page to prompt for the password again
-                    });
-                });
-        });
         showMainContent();
     } else {
         // Session expired or not set; show the password popup
@@ -121,6 +88,41 @@ document.addEventListener('DOMContentLoaded', () => {
         chartTab.classList.remove('active');
         chartSection.style.display = 'none';
         accessControlSection.style.display = 'block';
+        get_credentials().then(credentials => {  // Return the promise here
+        try {
+            const firebaseConfig = {
+                apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
+                authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+                projectId: decrypt_values(credentials.ID, credentials.KEY),
+                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+                appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+                measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+            };
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY))) // Return this promise
+                .then(querySnapshot => {
+                    querySnapshot.forEach(doc => {
+                    if (doc.data().whatsapp_no !== undefined) {
+                        localStorage.setItem('whatsapp_no', doc.data().whatsapp_no);
+                    }
+                    if (doc.data().disabled_items !== undefined) {
+                        localStorage.setItem('disable_item_ids', doc.data().disabled_items);
+                    }
+                });
+            });
+        } catch (e){
+             Swal.fire({
+                title: 'Connection Error',
+                text: 'Please connect with developer.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+             }).then((result) => {
+                location.reload(); // Reload the page to prompt for the password again
+             });
+        }
+        });
         loadAccessControlData(); // Load data when Access Control tab is clicked
     });
 
@@ -145,30 +147,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render dishes function
     function renderDishes(menuData) {
-        dishesListAccess.innerHTML = ''; // Clear existing content
+    dishesListAccess.innerHTML = ''; // Clear existing content
 
-        menuData.menu.forEach(category => {
-            category.subcategories.forEach(subcategory => {
-                // Create subcategory title
-                const subcategoryTitle = document.createElement('h4');
-                subcategoryTitle.textContent = `${subcategory.name} (${subcategory.type})`;
-                dishesListAccess.appendChild(subcategoryTitle);
+    // Retrieve disabled item IDs from localStorage
+    let disable_items = JSON.parse(localStorage.getItem('disable_item_ids')) || [];
+    let copy_disable_items = [];
+    if(disable_items){
+        copy_disable_items = disable_items.slice();
+    }
 
-                subcategory.dishes.forEach(dish => {
-                    const dishElement = document.createElement('div');
-                    dishElement.classList.add('dish-item');
-                    dishElement.innerHTML = `
-                        <span>${dish.name} - ₹${dish.price}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="toggle-${dish.id}">
-                            <span class="slider round"></span>
-                        </label>
-                    `;
-                    dishesListAccess.appendChild(dishElement);
+    menuData.menu.forEach(category => {
+        category.subcategories.forEach(subcategory => {
+            // Create subcategory title
+            const subcategoryTitle = document.createElement('h4');
+            subcategoryTitle.textContent = `${subcategory.name} (${subcategory.type})`;
+            dishesListAccess.appendChild(subcategoryTitle);
+
+            subcategory.dishes.forEach(dish => {
+                const dishElement = document.createElement('div');
+                dishElement.classList.add('dish-item');
+
+                // Check if dish is in disable_items and set the toggle accordingly
+                const isDisabled = disable_items.includes(dish.id);
+
+                dishElement.innerHTML = `
+                    <span>${dish.name} - ₹${dish.price}</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-${dish.id}" ${isDisabled ? '' : 'checked'}>
+                        <span class="slider round"></span>
+                    </label>
+                `;
+
+                dishesListAccess.appendChild(dishElement);
+
+                // Add event listener to toggle button to update localStorage
+                const toggleButton = dishElement.querySelector(`#toggle-${dish.id}`);
+                toggleButton.addEventListener('change', function () {
+                    if (toggleButton.checked) {
+                        // Remove dish ID from disable_items if unchecked
+                        disable_items = disable_items.filter(id => id !== dish.id);
+                    } else {
+                        // Add dish ID to disable_items if unchecked
+                        if (!disable_items.includes(dish.id)) {
+                            disable_items.push(dish.id);
+                        }
+                    }
+
+                    // Update disable_item_ids in localStorage
+                    localStorage.setItem('disable_item_ids', JSON.stringify(disable_items));
+                    
+                    // Show submit button if any changes
+                    const updated_disable_items = JSON.parse(localStorage.getItem('disable_item_ids'))
+                    console.log(updated_disable_items, copy_disable_items)
+                    if(updated_disable_items.every(element => copy_disable_items.includes(element)) && copy_disable_items.every(element => updated_disable_items.includes(element))){
+                        savedContainer.style.display = 'none';
+                    }else{
+                        savedContainer.style.display = 'inline-grid';
+                    }
                 });
             });
         });
-    }
+    });
+}
 
     // Search functionality
     searchBar.addEventListener('input', function () {
@@ -274,6 +314,19 @@ document.addEventListener('DOMContentLoaded', () => {
             passwordError.textContent = 'Incorrect password, please try again.';
         }
     }
+
+    // Add an event listener for the 'input' event to capture each key press
+    numberInput.addEventListener('input', function() {
+        const savedNumber = localStorage.getItem('whatsapp_no').slice(3)
+        console.log(numberInput.value, savedNumber); // Logs the current value of the input field
+        if(numberInput.value === savedNumber){
+            savedContainer.style.display = 'none';
+            validateButton.style.display = 'none';
+        }else{
+            savedContainer.style.display = 'inline-grid';
+            validateButton.style.display = 'block';
+        }
+    });
 
 });
 

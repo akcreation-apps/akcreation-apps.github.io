@@ -94,17 +94,16 @@ nav ul li:hover {
 }
 
 #submitButton {
-   position: absolute; /* Absolute positioning within the relative container */
-    right: 20px; /* 20px from the right side of the container */
-    padding: 10px 20px;
-    background-color: #4a90e2;
+    background-color: #3eb637;
     color: white;
     border: none;
+    padding: 10px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
 #validateButton, #submitPassword {
-    background-color: #4a90e2;
+    background-color: #dd922f;
     color: white;
     border: none;
     padding: 10px;
@@ -245,27 +244,13 @@ input:checked + .slider:before {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
+    text-align: center;
     margin-right: 10px;
-}
-
-/* Button styles */
-#validateButton {
-    background-color: #4a90e2;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#validateButton:hover {
-    background-color: #357abd; /* Darker blue on hover */
 }
 
 /* Title for List of Dishes */
 #accessControlSection h3 {
-    margin-top: 40px;
+    margin-top: 20px;
     font-size: 1.5rem;
     color: #333;
 }
@@ -365,12 +350,33 @@ input:checked + .slider:before {
     margin-left: 10px; /* Space between dish item and toggle */
 }
 
+/* Subcategory title styles */
+.save-container h5 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Save container */
+.save-container {
+    display: inline-grid;
+    background-color: #d2ffd1; /* White background for a clean look */
+    align-items: center; /* Center items vertically */
+    margin: 20px 10px; /* Margin above and below */
+    padding: 15px 15px; /* Add padding around the container */
+    padding-top: 0px;
+    border-radius: 25px; /* Rounded corners for a modern look */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
+    position: relative; /* Set position to relative for positioning the clear icon */
+    border: 1px solid #ddd; /* Subtle border */
+}
+
 /* Number container */
 .number-container {
-    display: inline-block;
+    display: inline-flex;
     background-color: #fff; /* White background for a clean look */
-    z-index: 10;/* Use flexbox for layout */
-    top: 35px;  /* 20px from the top of the container */
+    top: 22px;  /* 20px from the top of the container */
+    height: 65px;
     align-items: center; /* Center items vertically */
     margin: 20px 10px; /* Margin above and below */
     padding: 12px 15px; /* Add padding around the container */
