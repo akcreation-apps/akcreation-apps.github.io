@@ -31,7 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const validateButton = document.getElementById('validateButton');
 
     let sessionTime = 30 * 60 * 1000; // 30 minutes in milliseconds
-    let password = '12'; // Example password
+    let password = ''
+    get_credentials().then(credentials => {
+        password = decrypt_values(credentials.PASS_KEY, credentials.KEY); // Example password
+    });
     const sessionExpiration = localStorage.getItem('sessionExpiration');
     const currentTime = new Date().getTime();
 
