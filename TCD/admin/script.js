@@ -19,7 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     const numberInput = document.getElementById('inputNumber');
     const savedContainer = document.getElementById('saveContainer');
+    const numberContainer = document.getElementById('numberContainer');
     const validateButton = document.getElementById('validateButton');
+    let db_disable_ids = []
+    let whatsapp_no = ''
 
     let sessionTime = 30 * 60 * 1000; // 30 minutes in milliseconds
     let password = '12'; // Example password
@@ -105,11 +108,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(querySnapshot => {
                     querySnapshot.forEach(doc => {
                     if (doc.data().whatsapp_no !== undefined) {
-                        localStorage.setItem('whatsapp_no', doc.data().whatsapp_no);
+                        whatsapp_no = doc.data().whatsapp_no;
+                        if(!localStorage.getItem('whatsapp_no')){
+                            localStorage.setItem('whatsapp_no', whatsapp_no);
+                        } else{
+                            if(localStorage.getItem('whatsapp_no') !== whatsapp_no){
+                                numberContainer.style.backgroundColor = 'antiquewhite';
+                                validateButton.style.display = 'block';
+                            }
+                        }
                     }
                     if (doc.data().disabled_items !== undefined) {
-                        localStorage.setItem('disable_item_ids', doc.data().disabled_items);
+                        db_disable_ids = JSON.parse(doc.data().disabled_items)
+                        if(!localStorage.getItem('disable_item_ids')){
+                            localStorage.setItem('disable_item_ids', doc.data().disabled_items);
+                        } else{
+                            update_save_container()
+                        }
                     }
+                    loadAccessControlData(); // Load data when Access Control tab is clicked
                 });
             });
         } catch (e){
@@ -123,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
              });
         }
         });
-        loadAccessControlData(); // Load data when Access Control tab is clicked
     });
 
     // Load access control data from external JSON file
@@ -151,10 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Retrieve disabled item IDs from localStorage
     let disable_items = JSON.parse(localStorage.getItem('disable_item_ids')) || [];
-    let copy_disable_items = [];
-    if(disable_items){
-        copy_disable_items = disable_items.slice();
-    }
 
     menuData.menu.forEach(category => {
         category.subcategories.forEach(subcategory => {
@@ -169,6 +181,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Check if dish is in disable_items and set the toggle accordingly
                 const isDisabled = disable_items.includes(dish.id);
+                let backgroundColor = 'azure'
+                if(!db_disable_ids.includes(dish.id)){
+                    backgroundColor = 'antiquewhite'; // You can change this dynamically based on your logic
+                }else if (!db_disable_ids.includes(dish.id) && toggleButton.checked){
+                    backgroundColor = 'azure'; // You can change this dynamically based on your logic
+                }
+                if(db_disable_ids.includes(dish.id) && isDisabled){
+                    backgroundColor = 'azure'; // You can change this dynamically based on your logic
+                }else if (!db_disable_ids.includes(dish.id) && !isDisabled){
+                    backgroundColor = 'azure'; // You can change this dynamically based on your logic
+                }else{
+                    backgroundColor = 'antiquewhite'; // You can change this dynamically based on your logic
+                }
+
+                dishElement.style.backgroundColor = backgroundColor; // Dynamically setting background color
 
                 dishElement.innerHTML = `
                     <span>${dish.name} - ₹${dish.price}</span>
@@ -177,8 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="slider round"></span>
                     </label>
                 `;
-
-                dishesListAccess.appendChild(dishElement);
 
                 // Add event listener to toggle button to update localStorage
                 const toggleButton = dishElement.querySelector(`#toggle-${dish.id}`);
@@ -192,19 +217,23 @@ document.addEventListener('DOMContentLoaded', () => {
                             disable_items.push(dish.id);
                         }
                     }
+                    if(db_disable_ids.includes(dish.id) && !toggleButton.checked){
+                        console.log("--")
+                        backgroundColor = 'azure'; // You can change this dynamically based on your logic
+                    }else if (!db_disable_ids.includes(dish.id) && toggleButton.checked){
+                        backgroundColor = 'azure'; // You can change this dynamically based on your logic
+                    }else{
+                        console.log(db_disable_ids.includes(dish.id), toggleButton.checked)
+                        backgroundColor = 'antiquewhite'; // You can change this dynamically based on your logic
+                    }
+                    dishElement.style.backgroundColor = backgroundColor;
 
                     // Update disable_item_ids in localStorage
                     localStorage.setItem('disable_item_ids', JSON.stringify(disable_items));
-                    
-                    // Show submit button if any changes
-                    const updated_disable_items = JSON.parse(localStorage.getItem('disable_item_ids'))
-                    console.log(updated_disable_items, copy_disable_items)
-                    if(updated_disable_items.every(element => copy_disable_items.includes(element)) && copy_disable_items.every(element => updated_disable_items.includes(element))){
-                        savedContainer.style.display = 'none';
-                    }else{
-                        savedContainer.style.display = 'inline-grid';
-                    }
+
+                    update_save_container()
                 });
+                dishesListAccess.appendChild(dishElement);
             });
         });
     });
@@ -317,17 +346,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add an event listener for the 'input' event to capture each key press
     numberInput.addEventListener('input', function() {
-        const savedNumber = localStorage.getItem('whatsapp_no').slice(3)
-        console.log(numberInput.value, savedNumber); // Logs the current value of the input field
-        if(numberInput.value === savedNumber){
-            savedContainer.style.display = 'none';
+        console.log(whatsapp_no, numberInput.value)
+        if(numberInput.value === whatsapp_no.slice(3)){
             validateButton.style.display = 'none';
+            numberContainer.style.backgroundColor = 'azure';
         }else{
-            savedContainer.style.display = 'inline-grid';
             validateButton.style.display = 'block';
+            numberContainer.style.backgroundColor = 'antiquewhite';
         }
+        localStorage.setItem('whatsapp_no', "+91"+numberInput.value)
+        update_save_container()
     });
 
+    function update_save_container(){
+        // Show submit button if any changes
+        const updated_disable_items = JSON.parse(localStorage.getItem('disable_item_ids'))
+        console.log(updated_disable_items, db_disable_ids, db_disable_ids)
+        if(updated_disable_items.every(element => db_disable_ids.includes(element)) && db_disable_ids.every(element => updated_disable_items.includes(element)) && localStorage.getItem('whatsapp_no') === whatsapp_no){
+            savedContainer.style.display = 'none';
+        }else{
+            savedContainer.style.display = 'inline-grid';
+        }
+    }
 });
 
 async function get_credentials() {

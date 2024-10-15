@@ -154,7 +154,6 @@ input[type="password"], input[type="number"] {
     align-items: center;
     padding: 10px;
     margin: 5px 0; /* Space between dish items */
-    background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s; /* Smooth hover effect */
@@ -360,7 +359,7 @@ input:checked + .slider:before {
 /* Save container */
 .save-container {
     display: inline-grid;
-    background-color: #d2ffd1; /* White background for a clean look */
+    background-color: #ffd1d1; /* White background for a clean look */
     align-items: center; /* Center items vertically */
     margin: 20px 10px; /* Margin above and below */
     padding: 15px 15px; /* Add padding around the container */
