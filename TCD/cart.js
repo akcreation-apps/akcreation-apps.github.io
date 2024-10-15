@@ -263,8 +263,7 @@ function collect_data(){
             'table_no':localStorage.getItem('table'),
             'created_at':Timestamp.now()}
         
-        console.log(data)
-        addDoc(collection(db, decrypt_values(credentials.ORDER_DB_NAME, credentials.KEY)), data);
+        addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)), data);
         localStorage.removeItem('cart')
 
     });

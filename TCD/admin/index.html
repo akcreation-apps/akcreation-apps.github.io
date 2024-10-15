@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Chart & Access Control</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js" type="module"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -40,11 +39,11 @@
         <div id="accessControlSection" style="display:none;">
             <div class="save-container" id="saveContainer" style="display:none;">
                 <h5>Your changes haven't saved yet.</h5>
-                <button id="submitButton">Save Changes</button>
+                <button id="submitButton" onclick="save_changes()">Save Changes</button>
             </div>
            <div class="number-container" id="numberContainer">
                 <input type="number" id="inputNumber" placeholder="Enter a number">
-                <button id="validateButton" style="display:none;">Verify</button>
+                <button id="validateButton" style="display:none;" onclick="verify_number()">Verify</button>
            </div>
             <h3>List of Dishes</h3>
            <div class="search-container">
@@ -59,6 +58,6 @@
             </div>
         </div>
     </div>
-
+    <script src="script.js" type="module"></script>
 </body>
 </html>

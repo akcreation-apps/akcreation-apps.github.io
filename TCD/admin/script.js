@@ -1,6 +1,13 @@
 // Import the necessary Firebase services
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+
+
+window.doc_id = '';
+window.doc_whatsapp_no = '';
+window.doc_disable_item_ids = '';
+window.verify_number = verify_number;
+window.save_changes = save_changes;
 
 document.addEventListener('DOMContentLoaded', () => {
     const passwordPopup = document.getElementById('passwordPopup');
@@ -21,8 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedContainer = document.getElementById('saveContainer');
     const numberContainer = document.getElementById('numberContainer');
     const validateButton = document.getElementById('validateButton');
-    let db_disable_ids = []
-    let whatsapp_no = ''
 
     let sessionTime = 30 * 60 * 1000; // 30 minutes in milliseconds
     let password = '12'; // Example password
@@ -107,19 +112,20 @@ document.addEventListener('DOMContentLoaded', () => {
             getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY))) // Return this promise
                 .then(querySnapshot => {
                     querySnapshot.forEach(doc => {
+                    window.doc_id = doc.id;
                     if (doc.data().whatsapp_no !== undefined) {
-                        whatsapp_no = doc.data().whatsapp_no;
+                        window.doc_whatsapp_no = doc.data().whatsapp_no;
                         if(!localStorage.getItem('whatsapp_no')){
-                            localStorage.setItem('whatsapp_no', whatsapp_no);
+                            localStorage.setItem('whatsapp_no', window.doc_whatsapp_no);
                         } else{
-                            if(localStorage.getItem('whatsapp_no') !== whatsapp_no){
+                            if(localStorage.getItem('whatsapp_no') !== window.doc_whatsapp_no){
                                 numberContainer.style.backgroundColor = 'antiquewhite';
                                 validateButton.style.display = 'block';
                             }
                         }
                     }
                     if (doc.data().disabled_items !== undefined) {
-                        db_disable_ids = JSON.parse(doc.data().disabled_items)
+                        window.doc_disable_item_ids = JSON.parse(doc.data().disabled_items)
                         if(!localStorage.getItem('disable_item_ids')){
                             localStorage.setItem('disable_item_ids', doc.data().disabled_items);
                         } else{
@@ -144,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load access control data from external JSON file
     function loadAccessControlData() {
-        fetch('../data.json') // Ensure the path to your JSON file is correct
+        fetch(`../data.json?v=${new Date().getTime()}`) // Ensure the path to your JSON file is correct
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load data');
@@ -163,12 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render dishes function
     function renderDishes(menuData) {
-    dishesListAccess.innerHTML = ''; // Clear existing content
+        dishesListAccess.innerHTML = ''; // Clear existing content
 
-    // Retrieve disabled item IDs from localStorage
-    let disable_items = JSON.parse(localStorage.getItem('disable_item_ids')) || [];
+        // Retrieve disabled item IDs from localStorage
+        let disable_items = JSON.parse(localStorage.getItem('disable_item_ids')) || [];
 
-    menuData.menu.forEach(category => {
+        menuData.menu.forEach(category => {
         category.subcategories.forEach(subcategory => {
             // Create subcategory title
             const subcategoryTitle = document.createElement('h4');
@@ -182,14 +188,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Check if dish is in disable_items and set the toggle accordingly
                 const isDisabled = disable_items.includes(dish.id);
                 let backgroundColor = 'azure'
-                if(!db_disable_ids.includes(dish.id)){
+                if(!window.doc_disable_item_ids.includes(dish.id)){
                     backgroundColor = 'antiquewhite'; // You can change this dynamically based on your logic
-                }else if (!db_disable_ids.includes(dish.id) && toggleButton.checked){
+                }else if (!window.doc_disable_item_ids.includes(dish.id) && toggleButton.checked){
                     backgroundColor = 'azure'; // You can change this dynamically based on your logic
                 }
-                if(db_disable_ids.includes(dish.id) && isDisabled){
+                if(window.doc_disable_item_ids.includes(dish.id) && isDisabled){
                     backgroundColor = 'azure'; // You can change this dynamically based on your logic
-                }else if (!db_disable_ids.includes(dish.id) && !isDisabled){
+                }else if (!window.doc_disable_item_ids.includes(dish.id) && !isDisabled){
                     backgroundColor = 'azure'; // You can change this dynamically based on your logic
                 }else{
                     backgroundColor = 'antiquewhite'; // You can change this dynamically based on your logic
@@ -217,13 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             disable_items.push(dish.id);
                         }
                     }
-                    if(db_disable_ids.includes(dish.id) && !toggleButton.checked){
-                        console.log("--")
+                    if(window.doc_disable_item_ids.includes(dish.id) && !toggleButton.checked){
                         backgroundColor = 'azure'; // You can change this dynamically based on your logic
-                    }else if (!db_disable_ids.includes(dish.id) && toggleButton.checked){
+                    }else if (!window.doc_disable_item_ids.includes(dish.id) && toggleButton.checked){
                         backgroundColor = 'azure'; // You can change this dynamically based on your logic
                     }else{
-                        console.log(db_disable_ids.includes(dish.id), toggleButton.checked)
                         backgroundColor = 'antiquewhite'; // You can change this dynamically based on your logic
                     }
                     dishElement.style.backgroundColor = backgroundColor;
@@ -346,8 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add an event listener for the 'input' event to capture each key press
     numberInput.addEventListener('input', function() {
-        console.log(whatsapp_no, numberInput.value)
-        if(numberInput.value === whatsapp_no.slice(3)){
+        if(numberInput.value === window.doc_whatsapp_no.slice(3)){
             validateButton.style.display = 'none';
             numberContainer.style.backgroundColor = 'azure';
         }else{
@@ -361,8 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function update_save_container(){
         // Show submit button if any changes
         const updated_disable_items = JSON.parse(localStorage.getItem('disable_item_ids'))
-        console.log(updated_disable_items, db_disable_ids, db_disable_ids)
-        if(updated_disable_items.every(element => db_disable_ids.includes(element)) && db_disable_ids.every(element => updated_disable_items.includes(element)) && localStorage.getItem('whatsapp_no') === whatsapp_no){
+        if(updated_disable_items.every(element => window.doc_disable_item_ids.includes(element)) && window.doc_disable_item_ids.every(element => updated_disable_items.includes(element)) && localStorage.getItem('whatsapp_no') === window.doc_whatsapp_no){
             savedContainer.style.display = 'none';
         }else{
             savedContainer.style.display = 'inline-grid';
@@ -373,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function get_credentials() {
     try {
         // Fetch the JSON file
-        const response = await fetch('../credentials.json');
+        const response = await fetch(`../credentials.json?v=${new Date().getTime()}`);
 
         // Check if the fetch was successful
         if (!response.ok) {
@@ -394,3 +396,97 @@ function decrypt_values(value, key){
     const decryptedBytes = CryptoJS.AES.decrypt(value, key);
     return decryptedBytes.toString(CryptoJS.enc.Utf8);
 }
+
+// Function to send message via WhatsApp
+function verify_number() {
+    const message = "Your dining order will be delivered to this WhatsApp number.\nSave your modifications to begin receiving orders."
+    const phoneNumber = localStorage.getItem('whatsapp_no')
+    console.log(phoneNumber)
+    const formattedMessage = message.replace(/\n/g, '%0A');  // Replace line breaks with %0A
+    const url = `https://wa.me/${phoneNumber}?text=${formattedMessage}`;
+    window.location.href = url; // Navigate to WhatsApp in the same tab
+}
+
+// Save changes in db
+async function update_changes() {
+    let success = false;
+
+    try {
+        // Await for the credentials to be fetched
+        const credentials = await get_credentials();
+
+        // Ensure credentials were fetched successfully
+        if (!credentials) {
+            console.log('Failed to get credentials.');
+            return false; // Return false if credentials fetch failed
+        }
+
+        const firebaseConfig = {
+            apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
+            authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+            projectId: decrypt_values(credentials.ID, credentials.KEY),
+            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+            appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+            measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let updatedData = {
+            'disabled_items': localStorage.getItem('disable_item_ids'),
+            'whatsapp_no': localStorage.getItem('whatsapp_no')
+        };
+
+        console.log(credentials);
+        const foodItemRef = doc(db, decrypt_values(credentials.ADMIN_TABLE_NAME, credentials.KEY), window.doc_id);
+
+        // Await for the updateDoc operation to complete
+        await updateDoc(foodItemRef, updatedData);
+
+        let data = {
+            'disabled_items_changes':{'old_data':JSON.stringify(window.doc_disable_item_ids), 'new_data':localStorage.getItem('disable_item_ids')},
+            'whatsapp_no_changes':{'old_data':window.doc_whatsapp_no, 'new_data':localStorage.getItem('whatsapp_no')},
+            'created_at':Timestamp.now()
+        }
+        await addDoc(collection(db, decrypt_values(credentials.ADMIN_HISTORY_TABLE_NAME, credentials.KEY)), data);
+
+        return true; // Set success to true only after updateDoc completes successfully
+    } catch (error) {
+        console.error("Error updating document:", error);
+        return false;
+    }
+}
+
+async function save_changes() {
+    const success = await update_changes();  // Wait for update_changes() to complete
+    console.log(success)
+    // Check the return value of update_changes
+    if (success) {
+        // Show SweetAlert message on success
+        Swal.fire({
+            title: 'Success',
+            text: 'Changes saved successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            localStorage.removeItem('sessionExpiration'); // Clear session on timeout
+            localStorage.removeItem('disable_item_ids'); // Clear session on timeout
+            localStorage.removeItem('whatsapp_no'); // Clear session on timeout
+            location.reload(); // Reload the page to prompt for the password again
+        });
+    } else {
+        // Show error message if update_changes failed
+        Swal.fire({
+            title: 'Connection Error',
+            text: 'Please connect with developer.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+         }).then((result) => {
+            location.reload(); // Reload the page to prompt for the password again
+         });
+    }
+}
+
+

@@ -6,7 +6,7 @@ function get_dish_url(dish_name) {
 async function get_credentials() {
     try {
         // Fetch the JSON file
-        const response = await fetch('credentials.json');
+        const response = await fetch(`credentials.json?v=${new Date().getTime()}`);
 
         // Check if the fetch was successful
         if (!response.ok) {

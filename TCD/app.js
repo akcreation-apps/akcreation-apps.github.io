@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
     const renderMenu = () => {
         menuContainer.innerHTML = ''; // Clear previous content
-        fetch('data.json')
+        fetch(`data.json?v=${new Date().getTime()}`)
             .then(response => response.json())
             .then(data => {
                 // Reset shortcuts
