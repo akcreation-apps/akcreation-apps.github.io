@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chartTab = document.getElementById('chartTab');
     const accessTab = document.getElementById('accessTab');
     const chartSection = document.getElementById('chartSection');
+    const togglePassword = document.getElementById('togglePassword');
     const accessControlSection = document.getElementById('accessControlSection');
     const passwordError = document.getElementById('passwordError');
     const dishesListAccess = document.getElementById('dishesListAccess'); // Accessing the element here
@@ -33,6 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let password = '12'; // Example password
     const sessionExpiration = localStorage.getItem('sessionExpiration');
     const currentTime = new Date().getTime();
+
+    togglePassword.addEventListener('change', function () {
+        // Toggle the password visibility
+        if (this.checked) {
+            passwordInput.type = 'text'; // Show the password
+        } else {
+            passwordInput.type = 'password'; // Hide the password
+        }
+    });
 
     // Function to show the main content
     function showMainContent() {

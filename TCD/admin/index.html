@@ -14,9 +14,14 @@
     <div id="passwordPopup" class="popup">
         <div class="popup-content">
             <h2>Enter Password</h2>
-            <input type="password" id="password" placeholder="Enter your password" required>
-            <button id="submitPassword">Submit</button>
-            <p id="passwordError"></p>
+            <input type="password" id="password" class="password-input" placeholder="Enter your password" required>
+            <div class="password-toggle">
+                <label>
+                    <input type="checkbox" id="togglePassword"> Show Password
+                </label>
+            </div>
+            <button id="submitPassword" class="submit-button">Submit</button>
+            <p id="passwordError" class="error-message"></p>
         </div>
     </div>
 
