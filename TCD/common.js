@@ -46,6 +46,10 @@ function redirect_to_home(){
     window.location.href = 'index.html';
 }
 
+function redirect_to_invoice(){
+    window.location.href = 'invoice.html';
+}
+
 function decrypt_values(value, key){
     const decryptedBytes = CryptoJS.AES.decrypt(value, key);
     return decryptedBytes.toString(CryptoJS.enc.Utf8);

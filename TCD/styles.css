@@ -43,7 +43,7 @@ body {
     margin-right: 10px; /* Adjust margin to reduce space */
 }
 .home-icon {
-    font-size: 1.5rem; /* Adjust font size for cart icon */
+    font-size: 1.3rem; /* Adjust font size for cart icon */
     position: relative;
     cursor: pointer;
 }
