@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-const BACKUP_WP_NO = "+917749984274"
+const BACKUP_WP_NO = "+918920042482"
 // Retrieve the cart from localStorage
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
