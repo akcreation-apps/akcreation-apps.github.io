@@ -237,6 +237,9 @@ placeOrderButton.addEventListener('click', () => {
     collect_data()
     sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
     hideLoader();
+    Swal.fire('Success', 'Order Placed Successfully.', 'success').then(() => {
+        location.reload(); // Reload the page after clicking OK
+    });
 });
 
 function collect_data(){
@@ -259,6 +262,7 @@ function collect_data(){
             'triggered_to':localStorage.getItem('whatsapp_no'),
             'total_cart_value':cartTotalNumber,
             'table_no':localStorage.getItem('table'),
+            'status':'In Progress',
             'created_at':Timestamp.now()}
         
         addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)), data);
