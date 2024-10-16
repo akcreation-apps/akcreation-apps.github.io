@@ -21,10 +21,10 @@
             <div class="search-icon" id="searchIcon">
                 <i class="fas fa-search"></i>
             </div>
-            <div class="invoice-icon" id="invoiceIcon" onclick="redirect_to_invoice()">
+            <div class="invoice-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()">
                 <i class="fas  fa-bars"></i>
             </div>
-            <div class="cart-icon">
+            <div class="cart-icon" onclick="redirect_to_cart()">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count">0</span>
             </div>
@@ -73,7 +73,7 @@
         </div>
     </section>
     <div class="no-results" id="noResults" style="display: none;">
-        <img src="src/no-results.png" alt="No Results Found" />
+        <img src="../food_order_src/no-results.png" alt="No Results Found" />
     </div>
     <div id="menu-container">
     <!-- Menu items will be dynamically generated here -->

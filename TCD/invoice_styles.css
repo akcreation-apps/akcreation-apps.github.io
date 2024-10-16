@@ -1,0 +1,151 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f4f8;
+    padding: 20px;
+}
+.order-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.order-container:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.order-header h2 {
+    margin: 0;
+    color: #4a90e2;
+}
+.order-header p {
+    margin: 0;
+    color: #333;
+}
+.order-total {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #27ae60;
+}
+.order-details {
+    display: none;
+    margin-top: 20px;
+}
+.dish-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+.dish-item:last-child {
+    border-bottom: none;
+}
+.dish-name {
+    font-weight: bold;
+}
+.icons {
+    display: flex;
+    gap: 10px;
+}
+.icons i {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+.icons i:hover {
+    background-color: #e0e0e0;
+}
+.delete-icon {
+    color: #e74c3c;
+}
+.preview-icon {
+    color: #4a90e2;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .order-container {
+        padding: 20px; /* Add more padding */
+        font-size: 0.9rem; /* Reduce font size */
+        margin: 10px; /* Add margin around the order container */
+    }
+
+    .order-header h2 {
+        font-size: 1.2rem; /* Reduce table number font size */
+        margin-bottom: 10px; /* Add space between table number and date */
+    }
+
+    .order-header p {
+        font-size: 0.9rem; /* Reduce date font size */
+        margin-bottom: 10px; /* Add space between date and order details */
+    }
+
+    .order-total {
+        font-size: 1rem; /* Reduce total price font size */
+        margin-top: 10px; /* Add space above the total */
+    }
+
+    .dish-item {
+        padding: 8px 0; /* Increase padding between dish items */
+        font-size: 0.9rem; /* Reduce dish item font size */
+        line-height: 1.5; /* Add line-height for better readability */
+    }
+
+    .icons i {
+        font-size: 0.9rem; /* Reduce icon size */
+        padding: 7px; /* Adjust padding around icons */
+    }
+
+    .icons {
+        margin-top: 15px; /* Add more space between dishes and icons */
+    }
+}
+
+/* For very small devices (mobile) */
+@media (max-width: 480px) {
+    .order-container {
+        padding: 15px; /* Increase padding slightly */
+        font-size: 0.8rem;
+        margin: 10px; /* Add margin for smaller screens */
+    }
+
+    .order-header h2 {
+        font-size: 1rem;
+        margin-bottom: 10px; /* Add more space below table number */
+    }
+
+    .order-header p {
+        font-size: 0.85rem;
+        margin-bottom: 8px; /* Add more space between date and other elements */
+    }
+
+    .order-total {
+        font-size: 0.9rem;
+        margin-top: 10px; /* Add space above the total */
+    }
+
+    .dish-item {
+        font-size: 0.8rem;
+        padding: 7px 0; /* Adjust padding for mobile */
+        line-height: 1.5; /* Better readability */
+    }
+
+    .icons i {
+        font-size: 0.8rem;
+        padding: 6px; /* Adjust padding around icons */
+    }
+
+    .icons {
+        margin-top: 15px; /* Add space between dishes and icons */
+    }
+}

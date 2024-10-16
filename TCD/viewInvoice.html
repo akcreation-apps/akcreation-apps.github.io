@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate and Share Bill</title>
+    <link rel="stylesheet" href="viewInvoice_styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div id="billContainer" class="bill-container">
+        <h2 class="bill-title">The Cafe Darbar (TCD)</h2>
+        <div class="restaurant-info">
+            <p> BJP party office side</p>
+            <p>Banki College Road, Towards Sunadei</p>
+            <p>Banki, Cuttack 754008</p>
+            <p>TEL: 089200 42482</p>
+        </div>
+        <div class="table-info">
+            <p id="tableNo">Table - 06</p>
+            <p id="billDate"></p>
+        </div>
+        <hr class="separator">
+        <ul id="billItems" class="bill-items">
+            <!-- Bill items will be generated here -->
+        </ul>
+        <hr class="separator">
+        <p id="billTotal" class="bill-total">Total: ₹0</p>
+        <button class="download-button" id="generateImageButton">Download Bill</button>
+    </div>
+
+    <script>
+    // Sample JSON data - Replace with actual data as needed
+    let orders = JSON.parse(localStorage.getItem('order_history')) || [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order_id');
+    orders = orders.filter(order => order.order_id === orderId);
+    console.log(orders, "/////", orderId);
+
+    // Populate bill items on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const billItemsElement = document.getElementById('billItems');
+        let total = 0;
+
+        // Get the first order details to display in the bill
+        const order = orders[0]; // Assuming we are displaying the first order
+        console.log(order);
+        // Set the table number
+        document.getElementById('tableNo').textContent = `Table - ${order.order_details.table_no}`;
+
+        // Format date and time
+        const createdAtSeconds = order.order_details.created_at.seconds;
+        const date = new Date(createdAtSeconds * 1000);
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        document.getElementById('billDate').textContent = `Date: ${formattedDate}`;
+
+        // Build the bill content
+        order.order_details.order_details.forEach(cat => {
+            const liCategory = document.createElement('li');
+            liCategory.classList.add('bill-item');
+            liCategory.innerHTML = `<strong>${cat.category.name}</strong>`;
+            billItemsElement.appendChild(liCategory); // Append category heading
+
+            cat.category.dish_details.forEach(dish => {
+                const liDish = document.createElement('li');
+                liDish.classList.add('bill-item');
+                liDish.textContent = `${dish.quantity} x ${dish.name} - ₹${(dish.price * dish.quantity).toFixed(2)}`;
+                billItemsElement.appendChild(liDish);
+                total += dish.price * dish.quantity; // Calculate total
+            });
+        });
+
+        document.getElementById('billTotal').textContent = `Total: ₹${total.toFixed(2)}`;
+    });
+
+    // Generate an image from the bill container
+    document.getElementById('generateImageButton').addEventListener('click', function() {
+        this.style.display = 'none'; // Hide button
+        const billContainer = document.getElementById('billContainer');
+        html2canvas(billContainer, { useCORS: true }).then(canvas => {
+            const link = document.createElement('a');
+
+            // Get the current date and time for filename
+            const now = new Date();
+            const tableNo = orders[0].order_details.table_no; // Getting the table number from the first order
+            const hour = String(now.getHours()).padStart(2, '0');
+            const minute = String(now.getMinutes()).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = String(now.getFullYear()).slice(-2);
+
+            // Create filename in the specified format
+            const filename = `${tableNo}_${hour}${minute}_${day}${month}${year}_Bill.png`;
+
+            link.href = canvas.toDataURL("image/png");
+            link.download = filename; // Set the dynamic filename
+            link.click();
+            this.style.display = 'block'; // Show button again
+        });
+    });
+</script>
+</body>
+</html>

@@ -2,9 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="invoice_styles.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="invoice_scripts.js" type="module"></script>
+    <script src="common.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
 </head>
 <body>
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader"></div>
+    </div>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="redirect_to_home()">The Cafe Darbar (TCD)</div>
+        <div class="icon-container"> <!-- Add this container -->
+
+            <div class="cart-icon">
+                <i class="fas fa-shopping-cart" onclick="redirect_to_cart()"></i>
+                <span class="cart-count">0</span>
+            </div>
+
+        </div>
+    </nav>
+
+    <header class="header">
+        <h1>Order History</h1>
+    </header>
+
+    <div id="empty-invoice-banner" style="display: none; color: #ff7043; font-size: 1.5rem; text-align: center; margin-bottom: 20px;">
+        <img src="../food_order_src/no_invoice_generated.jpg" alt="Empty Cart" style="width: 300px; height: auto;">
+    </div>
+
+    <div class="order-container" id="orderList">
+        <!-- Dynamic orders will be populated here -->
+    </div>
+
 
 </body>
 </html>

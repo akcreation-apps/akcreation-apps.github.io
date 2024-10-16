@@ -120,6 +120,13 @@ const updateCartStorage = () => {
 // Load the cart items when the cart page is opened
 document.addEventListener('DOMContentLoaded', () => {
     showLoader();
+    const storedExpirationTime = localStorage.getItem('urlExpiration');
+    if (storedExpirationTime) {
+        const currentTime = Date.now();
+        if (currentTime < storedExpirationTime) {
+            document.getElementById('invoiceIcon').style.display = 'flex';
+        }
+    }
     renderCartItems();
     hideLoader();
 });

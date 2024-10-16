@@ -1,6 +1,6 @@
 function get_dish_url(dish_name) {
     // Split the string into words by spaces, then join with an underscore
-    return 'src/'+dish_name.split(' ').join('_')+'.png';
+    return '../food_order_src/'+dish_name.split(' ').join('_')+'.png';
 }
 
 async function get_credentials() {
@@ -48,6 +48,10 @@ function redirect_to_home(){
 
 function redirect_to_invoice(){
     window.location.href = 'invoice.html';
+}
+
+function redirect_to_cart(){
+    window.location.href = 'cart.html';
 }
 
 function decrypt_values(value, key){

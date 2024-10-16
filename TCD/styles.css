@@ -42,11 +42,6 @@ body {
     cursor: pointer;
     margin-right: 10px; /* Adjust margin to reduce space */
 }
-.home-icon {
-    font-size: 1.3rem; /* Adjust font size for cart icon */
-    position: relative;
-    cursor: pointer;
-}
 
 .cart-icon .cart-count {
     background-color: red;
@@ -515,7 +510,7 @@ display: block;
 .hero {
     position: relative;
     min-height: auto; /* Will fit content but expand to full viewport height if needed */
-    background: url('src/hero-background.png') center center/cover no-repeat;
+    background: url('../food_order_src/hero-background.png') center center/cover no-repeat;
     display: flex;
     align-items: center;    /* Vertically center */
     justify-content: center; /* Horizontally center */

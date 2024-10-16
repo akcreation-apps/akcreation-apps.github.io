@@ -113,12 +113,6 @@ const addToCart = (dishCategory, dishObject, button) => {
     });
 };
 
-// Navigate to cart page on clicking the cart icon
-const cartIcon = document.querySelector('.cart-icon');
-cartIcon.addEventListener('click', () => {
-    window.location.href = 'cart.html';
-});
-
 // Function to scroll to the category
 const scrollToCategory = (categoryId) => {
     const categoryElement = document.getElementById(categoryId);
@@ -136,6 +130,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     if (storedExpirationTime) {
         const currentTime = Date.now();
         if (currentTime <= storedExpirationTime) {
+            document.getElementById('invoiceIcon').style.display = 'flex';
             await fetch_data();
         }
         else{
