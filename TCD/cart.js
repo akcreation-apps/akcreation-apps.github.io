@@ -243,6 +243,7 @@ placeOrderButton.addEventListener('click', () => {
 });
 
 function collect_data(){
+    let order_history = JSON.parse(localStorage.getItem('order_history')) || [];
     get_credentials().then(credentials => {  // Return the promise here
         const firebaseConfig = {
             apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
@@ -265,7 +266,20 @@ function collect_data(){
             'status':'In Progress',
             'created_at':Timestamp.now()}
         
-        addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)), data);
+        // Add the document to Firestore
+        addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)), data)
+            .then(docRef => {
+                console.log("Document written with ID: ", docRef.id);
+                // Add order details to localStorage
+                order_history.push({
+                    'order_id': docRef.id,
+                    'order_details': data // Instead of fetching it again, use the data you just sent
+                });
+                localStorage.setItem('order_history', JSON.stringify(order_history)); // Store as string
+            })
+            .catch(error => {
+                console.error("Error adding document: ", error);
+            });
         localStorage.removeItem('cart')
 
     });
