@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const numberContainer = document.getElementById('numberContainer');
     const validateButton = document.getElementById('validateButton');
 
-    let sessionTime = 30 * 60 * 1000; // 30 minutes in milliseconds
+    let sessionTime = 60 * 60 * 1000; // 30 minutes in milliseconds
     let password = ''
     get_credentials().then(credentials => {
         password = decrypt_values(credentials.PASS_KEY, credentials.KEY); // Example password
@@ -484,9 +484,6 @@ async function save_changes() {
             icon: 'success',
             confirmButtonText: 'OK'
         }).then((result) => {
-            localStorage.removeItem('sessionExpiration'); // Clear session on timeout
-            localStorage.removeItem('disable_item_ids'); // Clear session on timeout
-            localStorage.removeItem('whatsapp_no'); // Clear session on timeout
             location.reload(); // Reload the page to prompt for the password again
         });
     } else {

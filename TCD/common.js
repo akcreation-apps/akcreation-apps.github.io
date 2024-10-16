@@ -36,7 +36,7 @@ function store_data(){
     const table_no = urlParams.get('table');
     if(table_no){
         localStorage.setItem('table', table_no)
-        const expirationTime = Date.now() + 30 * 60 * 1000; // 30 minutes from now
+        const expirationTime = Date.now() + 60 * 60 * 1000; // 30 minutes from now
         localStorage.setItem('urlExpiration', expirationTime);
         window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname;
     }
