@@ -33,10 +33,11 @@ body {
 .logo {
     font-size: 1.2rem; /* Reduced font size for smaller logo */
     font-weight: bold;
+    margin-right: 20px; /* Adjust margin to reduce space */
 }
 
 .cart-icon {
-    font-size: 1.5rem; /* Adjust font size for cart icon */
+    font-size: 1.3rem; /* Adjust font size for cart icon */
     position: relative;
     cursor: pointer;
     margin-right: 10px; /* Adjust margin to reduce space */
@@ -647,9 +648,17 @@ display: block;
 }
 
 .search-icon {
-    font-size: 1.5rem; /* Same font size as cart icon */
+    font-size: 1.3rem; /* Same font size as cart icon */
     cursor: pointer;
-    margin-right: 30px; /* Adjust margin to reduce space */
+    margin-right: 20px; /* Adjust margin to reduce space */
+    display: flex; /* Align icon vertically */
+    align-items: center; /* Center the icon vertically */
+}
+
+.invoice-icon {
+    font-size: 1.3rem; /* Same font size as cart icon */
+    cursor: pointer;
+    margin-right: 20px; /* Adjust margin to reduce space */
     display: flex; /* Align icon vertically */
     align-items: center; /* Center the icon vertically */
 }
