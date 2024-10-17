@@ -2,6 +2,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebas
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 let table_name = ''
+let admin_id = ''
+
 // Initialize Firebase
 function initializeFirebase() {
     return get_credentials().then(credentials => {
@@ -15,6 +17,7 @@ function initializeFirebase() {
             measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
         };
         table_name = decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)
+        admin_id = credentials.KEY
         return initializeApp(firebaseConfig);
     });
 }
@@ -42,13 +45,17 @@ async function fetchOrders() {
 
     showLoader(); // Show loader while fetching data
     if(orders && orders.length > 0){
-        console.log(orders)
+        let data_available = false;
         for (const order of orders) {
             const orderData = await fetchOrderDetails(order.order_id);
-            if (orderData) {
+            if (orderData && order.admin_id === admin_id) {
                 const orderElement = createOrderElement(orderData, order.order_id);
                 orderList.appendChild(orderElement);
+                data_available = true
             }
+        }
+        if(!data_available){
+            document.getElementById('empty-invoice-banner').style.display = 'block';
         }
     }
     else{
