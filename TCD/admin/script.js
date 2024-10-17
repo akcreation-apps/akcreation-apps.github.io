@@ -1,6 +1,6 @@
 // Import the necessary Firebase services
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, Timestamp, orderBy, query, where } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 
 window.doc_id = '';
@@ -15,7 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainContent = document.getElementById('mainContent');
     const chartTab = document.getElementById('chartTab');
     const accessTab = document.getElementById('accessTab');
+    const actionTab = document.getElementById('actionTab');
     const chartSection = document.getElementById('chartSection');
+    const actionControlSection = document.getElementById('actionControlSection');
     const togglePassword = document.getElementById('togglePassword');
     const accessControlSection = document.getElementById('accessControlSection');
     const passwordError = document.getElementById('passwordError');
@@ -99,15 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tab navigation
     chartTab.addEventListener('click', () => {
         chartTab.classList.add('active');
+        actionTab.classList.remove('active');
         accessTab.classList.remove('active');
         chartSection.style.display = 'block';
         accessControlSection.style.display = 'none';
+        actionControlSection.style.display = 'none';
     });
 
     accessTab.addEventListener('click', () => {
         accessTab.classList.add('active');
+        actionTab.classList.remove('active');
         chartTab.classList.remove('active');
         chartSection.style.display = 'none';
+        actionControlSection.style.display = 'none';
         accessControlSection.style.display = 'block';
         get_credentials().then(credentials => {  // Return the promise here
         try {
@@ -261,13 +267,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchTerm = searchBar.value.toLowerCase(); // Get the search term
         const dishItems = dishesListAccess.getElementsByClassName('dish-item'); // Get all dish items
         const subcategoryTitles = dishesListAccess.getElementsByTagName('h4'); // Get all subcategory titles
-    
+
         let anyVisibleDish = false; // Flag to track if any dish is visible
-    
+
         // Iterate through each subcategory title
         Array.from(subcategoryTitles).forEach(subcategoryTitle => {
             const subcategoryName = subcategoryTitle.textContent.toLowerCase(); // Get subcategory name
-    
+
             // Get the related dish items by finding the next sibling elements until the next subcategory title
             let relatedDishItems = [];
             let nextSibling = subcategoryTitle.nextElementSibling;
@@ -277,9 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 nextSibling = nextSibling.nextElementSibling;
             }
-    
+
             let subcategoryMatch = false;
-    
+
             // If the search term matches the subcategory name, show all related dishes
             if (subcategoryName.includes(searchTerm)) {
                 subcategoryMatch = true;
@@ -292,11 +298,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Initially hide the subcategory title until we check individual dishes
                 subcategoryTitle.style.display = 'none';
             }
-    
+
             // Iterate through each related dish item for individual dish name match
             relatedDishItems.forEach(dishItem => {
                 const dishName = dishItem.querySelector('span').textContent.toLowerCase(); // Get dish name
-    
+
                 // If the search term matches the dish name, show the dish
                 if (dishName.includes(searchTerm)) {
                     dishItem.style.display = ''; // Show item if name matches
@@ -307,32 +313,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     dishItem.style.display = 'none';
                 }
             });
-    
+
             // Show or hide the subcategory title based on whether it or any of its dishes are visible
             const hasVisibleDishes = relatedDishItems.some(item => item.style.display !== 'none');
             if (hasVisibleDishes) {
                 subcategoryTitle.style.display = ''; // Show subcategory title if any dish is visible
             }
         });
-    
+
         // Show or hide no results message based on whether any dish is visible
         if (anyVisibleDish) {
             noResultsContainer.style.display = 'none'; // Hide the no results image
         } else {
             noResultsContainer.style.display = 'block'; // Show the no results image
         }
-    
+
         // Scroll to the top position of the search bar
         const searchBarRect = searchBar.getBoundingClientRect(); // Get the position of the search bar
         window.scrollTo({
             top: searchBarRect.top + window.scrollY - 10, // Adjust for current scroll position
             behavior: 'smooth' // Smooth scroll
         });
-    
+
         // Show or hide clear button based on search input
         clearSearchButton.style.display = searchTerm ? 'block' : 'none'; // Show or hide the clear button based on the input
     });
-    
+
 
     // Clear search functionality
     clearSearchButton.addEventListener('click', function () {
@@ -383,6 +389,196 @@ document.addEventListener('DOMContentLoaded', () => {
             savedContainer.style.display = 'inline-grid';
         }
     }
+
+    function logOrderId(action, orderId) {
+        console.log(`Action: ${action}, Order ID: ${orderId}`);
+        get_credentials().then(credentials => {
+            try {
+                const firebaseConfig = {
+                    apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
+                    authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+                    projectId: decrypt_values(credentials.ID, credentials.KEY),
+                    storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+                    messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+                    appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+                    measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+                };
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                let db_action = "Rejected"
+                let alert_message = "Action can't be changed once you reject!"
+                if(action == "correct"){
+                    db_action = "Approved"
+                    alert_message = "Action can't be changed once you approve!<br><br>Invoice will be access by customer."
+                }
+
+                const orderRef = doc(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY), orderId);
+                Swal.fire({
+                    title: 'Are you sure?',
+                    html: alert_message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Proceed',
+                    cancelButtonText: 'Cancel'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await updateDoc(orderRef, {
+                            status: db_action
+                        });
+                        // Reload the page or remove the element dynamically
+                        location.reload(); // or dynamically remove the deleted order from DOM
+                    }
+                });
+
+            } catch (e) {
+                Swal.fire({
+                    title: 'Connection Error',
+                    text: 'Please connect with the developer.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    location.reload(); // Reload the page to prompt for the password again
+                });
+            }
+        })
+    }
+
+    function loadPreviousOrders() {
+    const actionControlSection = document.getElementById('actionControlSection');
+    let orders = []; // Initialize orders array
+
+    // Start by getting credentials
+    get_credentials().then(credentials => {
+        try {
+            const firebaseConfig = {
+                apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
+                authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+                projectId: decrypt_values(credentials.ID, credentials.KEY),
+                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+                appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+                measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            // Create a query that filters by 'status' and orders by 'created_at' in descending order
+            const ordersQuery = query(
+                collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)),
+                where('status', '==', 'In Progress'), // Filter where 'status' is 'In Progress'
+                orderBy('created_at', 'desc') // Order by 'created_at' field in descending order
+            );
+
+            // Get documents based on the query
+            return getDocs(ordersQuery); // Return this promise
+        } catch (e) {
+            Swal.fire({
+                title: 'Connection Error',
+                text: 'Please connect with the developer.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                location.reload(); // Reload the page to prompt for the password again
+            });
+        }
+    }).then(querySnapshot => {
+        if (!querySnapshot) return; // Handle case where query fails
+
+        // Process the query results
+        querySnapshot.forEach(doc => {
+            orders.push({
+                'order_id': doc.id,
+                'order_details': doc.data(),
+            });
+        });
+
+        // Check if orders are available
+        if (orders.length === 0) {
+            actionControlSection.innerHTML = '<p>No previous orders found.</p>';
+            return;
+        }
+
+        let orderListHTML = '<h3>Pending Orders</h3><ul>';
+
+        // Generate HTML for each order
+        orders.forEach(order => {
+            const orderDetails = order.order_details;
+            const tableNo = orderDetails.table_no;
+            const totalAmount = orderDetails.total_cart_value;
+            const orderId = order.order_id; // Assuming order_id exists
+            const date = new Date(orderDetails.created_at.seconds * 1000)
+            const orderDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`; // Assuming order_date is stored in a valid date format
+            orderListHTML += `
+                <li class="order-item">
+                    <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1); margin-bottom: 10px; cursor: pointer;">
+                        <div style="display: flex; flex-direction: column;">
+                            <p style="margin: 0; font-size: 16px;"><strong style="color: #007bff;">Table No: ${tableNo}</strong></p>
+                            <p style="margin: 0; font-size: 14px; color: #28a745;"><strong>Total: ₹${totalAmount}</strong></p>
+                        </div>
+                        <p style="margin: 0; font-size: 14px; color: #6c757d;">${orderDate}</p>
+                    </div>
+                    <div class="order-details" style="display: none; margin-left: 20px; margin-top: 10px;">
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            ${orderDetails.order_details.map(cat => `
+                                <li><strong>${cat.category.name}</strong></li>
+                                ${cat.category.dish_details.map(dish => `
+                                    <li>${dish.quantity} x ${dish.name} - ₹${(dish.price * dish.quantity).toFixed(2)}</li>
+                                `).join('')}
+                            `).join('')}
+                        </ul>
+                        <div class="order-actions" style="display: flex; justify-content: space-between; margin-top: 10px;">
+                            <button class="cross-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" data-action="cross">
+                                <i class="fas fa-times" style="font-size: 20px; color: red;"></i>
+                            </button>
+                            <button class="correct-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" data-action="correct">
+                                <i class="fas fa-check" style="font-size: 20px; color: green;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </li>
+            `;
+        });
+
+        orderListHTML += '</ul>';
+        actionControlSection.innerHTML = orderListHTML;
+
+        // Attach event listeners dynamically after rendering the list
+        document.querySelectorAll('.order-header').forEach(orderHeader => {
+            orderHeader.addEventListener('click', function () {
+                const orderDetails = this.nextElementSibling;
+                orderDetails.style.display = (orderDetails.style.display === 'none' || orderDetails.style.display === '') ? 'block' : 'none';
+            });
+        });
+
+        // Add event listeners to the cross and correct icons
+        document.querySelectorAll('.cross-icon, .correct-icon').forEach(icon => {
+            icon.addEventListener('click', function () {
+                const action = this.getAttribute('data-action');
+                const orderId = this.getAttribute('data-order-id');
+                logOrderId(action, orderId); // Call the logging function
+            });
+        });
+    });
+}
+
+
+
+    // Call loadPreviousOrders when the Action Control Section is opened
+    actionTab.addEventListener('click', function() {
+        actionTab.classList.add('active');
+        accessTab.classList.remove('active');
+        chartTab.classList.remove('active');
+        chartSection.style.display = 'none';
+        accessControlSection.style.display = 'none';
+        actionControlSection.style.display = 'block';
+        loadPreviousOrders();
+    });
+
+
 });
 
 async function get_credentials() {

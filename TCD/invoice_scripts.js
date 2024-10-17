@@ -27,14 +27,23 @@ async function fetchOrderDetails(orderId) {
     const app = await initializeFirebase();
     const db = getFirestore(app);
 
-    const docRef = doc(db, table_name, orderId); // Assuming collection name is 'orders'
-    const docSnap = await getDoc(docRef);
+    // Reference to the document using its ID
+    const orderRef = doc(db, table_name, orderId); // `table_name` is your collection name
+
+    // Get the document snapshot
+    const docSnap = await getDoc(orderRef);
 
     if (docSnap.exists()) {
-        return docSnap.data(); // Return order data
+        const orderData = docSnap.data(); // Get the data from the snapshot
+
+        // Check if the status is 'Approved'
+        if (orderData.status === 'Approved') {
+            return orderData; // Return the order data if status is approved
+        } else {
+            return null; // Or handle it as per your logic
+        }
     } else {
-        console.log('No such document!');
-        return null;
+        return null; // Handle document not found
     }
 }
 
@@ -68,7 +77,7 @@ async function fetchOrders() {
 // Format date utility function
 function formatDate(seconds) {
     const date = new Date(seconds * 1000);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
 // Create order element dynamically
@@ -194,12 +203,6 @@ function handleDelete(orderId) {
             // Reload the page or remove the element dynamically
             location.reload(); // or dynamically remove the deleted order from DOM
 
-            // Show success message after deletion
-            Swal.fire(
-                'Deleted!',
-                'The order has been deleted.',
-                'success'
-            );
         }
     });
 }

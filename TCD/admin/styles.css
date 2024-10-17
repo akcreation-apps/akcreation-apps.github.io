@@ -500,3 +500,59 @@ input:checked + .slider:before {
     max-width: 200px; /* Adjust as necessary */
     height: auto; /* Maintain aspect ratio */
 }
+
+/* Styles for previous orders list */
+#actionControlSection {
+    max-height: 400px; /* Set maximum height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    padding: 10px;     /* Optional padding */
+    border: 1px solid #ccc; /* Optional border for clarity */
+    border-radius: 8px; /* Optional rounded corners */
+}
+
+.order-item {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.order-header:hover {
+    background-color: #e0e0e0;
+}
+
+.order-details {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.order-details ul {
+    padding-left: 20px;
+}
+
+.order-details ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-details ul li:last-child {
+    border-bottom: none;
+}
+
+.order-details ul li strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
