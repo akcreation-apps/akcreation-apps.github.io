@@ -197,7 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
         category.subcategories.forEach(subcategory => {
             // Create subcategory title
             const subcategoryTitle = document.createElement('h4');
-            subcategoryTitle.textContent = `${subcategory.name} (${subcategory.type})`;
+
+            if (subcategory.type !== undefined) {
+                subcategoryTitle.textContent = `${subcategory.name} (${subcategory.type})`;
+            } else {
+                subcategoryTitle.textContent = `${subcategory.name}`;
+            }
+
             dishesListAccess.appendChild(subcategoryTitle);
 
             subcategory.dishes.forEach(dish => {
