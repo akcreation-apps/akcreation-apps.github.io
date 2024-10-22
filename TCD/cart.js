@@ -120,7 +120,7 @@ const updateCartStorage = () => {
 // Load the cart items when the cart page is opened
 document.addEventListener('DOMContentLoaded', () => {
     showLoader();
-    const storedExpirationTime = localStorage.getItem('urlExpiration');
+    const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
         if (currentTime < storedExpirationTime) {
@@ -214,7 +214,7 @@ const placeOrderButton = document.getElementById('place-order-btn');
 placeOrderButton.addEventListener('click', () => {
     showLoader();
     const cartItems = getCartItems(); // Get cart items
-    const storedExpirationTime = localStorage.getItem('urlExpiration');
+    const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
         if (currentTime >= storedExpirationTime) {

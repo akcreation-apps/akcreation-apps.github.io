@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     get_credentials().then(credentials => {
         password = decrypt_values(credentials.PASS_KEY, credentials.KEY); // Example password
     });
-    const sessionExpiration = localStorage.getItem('sessionExpiration');
+    const sessionExpiration = localStorage.getItem('tcd_sessionExpiration');
     const currentTime = new Date().getTime();
 
     togglePassword.addEventListener('change', function () {
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let sessionExpired = false; // Flag to track if session has already expired
 
     setInterval(() => {
-        const storedExpirationTime = localStorage.getItem('sessionExpiration');
+        const storedExpirationTime = localStorage.getItem('tcd_sessionExpiration');
         const currentTime = new Date().getTime(); // Get current time inside the interval
 
         // If the session has expired and hasn't been handled yet
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon: 'warning',
                 confirmButtonText: 'OK'
             }).then((result) => {
-                localStorage.removeItem('sessionExpiration'); // Clear session on timeout
+                localStorage.removeItem('tcd_sessionExpiration'); // Clear session on timeout
                 location.reload(); // Reload the page to prompt for the password again
             });
         }
@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (enteredPassword === password) {
             // Set the session expiration time (30 minutes from now)
             const expirationTime = currentTime + sessionTime;
-            localStorage.setItem('sessionExpiration', expirationTime);
+            localStorage.setItem('tcd_sessionExpiration', expirationTime);
             location.reload();
             passwordPopup.style.display = 'none';
         } else {

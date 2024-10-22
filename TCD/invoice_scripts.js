@@ -133,7 +133,7 @@ function createOrderElement(order, order_id) {
 
 // Call function on page load
 document.addEventListener('DOMContentLoaded', () => {
-    const storedExpirationTime = localStorage.getItem('urlExpiration');
+    const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
         console.log(currentTime)
