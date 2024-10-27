@@ -180,6 +180,43 @@
           ]
         }
       ]
+    },
+    {
+      "category": "Combo",
+      "subcategories": [
+        {
+          "name": "Continental",
+          "type": "Veg",
+          "dishes": [
+            { "id": 1601, "name": "Burger + Fries + Mocktail", "price": 149 }
+          ]
+        },
+        {
+          "name": "Continental",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 1701, "name": "Chicken Burger + Fries + Mocktail", "price": 199 }
+          ]
+        },
+        {
+          "name": "Chinese",
+          "type": "Veg",
+          "dishes": [
+            { "id": 1801, "name": "Fried Rice + Chilli Paneer + Mocktail", "price": 149 },
+            { "id": 1802, "name": "Fried Rice + Chilli Mashroom + Mocktail", "price": 149 },
+            { "id": 1803, "name": "Fried Rice + Veg Manchurian + Mocktail", "price": 149 },
+            { "id": 1804, "name": "Noodles + Veg Manchurian + Mocktail", "price": 149 }
+          ]
+        },
+        {
+          "name": "Chinese",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 1901, "name": "Fried Rice + Chilli Chicken + Mocktail", "price": 199 },
+            { "id": 1902, "name": "Noodles + Chilli Chicken + Mocktail", "price": 199 }
+          ]
+        }
+      ]
     }
   ]
 }
