@@ -226,6 +226,16 @@ input[type="number"] {
     color: #4a4a4a;
 }
 
+.dish-item .description {
+    flex: 1;
+    font-size: 1rem;
+    color: #333;
+}
+
+.dish-item .switch {
+    flex-shrink: 0;
+}
+
 /* Toggle switch styles */
 .switch {
     position: relative;

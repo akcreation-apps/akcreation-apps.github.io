@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dishElement.style.backgroundColor = backgroundColor; // Dynamically setting background color
 
                 dishElement.innerHTML = `
-                    <span>${dish.name} - ₹${dish.price}</span>
+                    <span class="description">${dish.name} - ₹${dish.price}</span>
                     <label class="switch">
                         <input type="checkbox" id="toggle-${dish.id}" ${isDisabled ? '' : 'checked'}>
                         <span class="slider round"></span>
