@@ -185,21 +185,21 @@
       "category": "Combo",
       "subcategories": [
         {
-          "name": "Continental (Combo)",
+          "name": "Continental-Combo",
           "type": "Veg",
           "dishes": [
             { "id": 1601, "name": "Burger + Fries + Mocktail", "price": 149 }
           ]
         },
         {
-          "name": "Continental (Combo)",
+          "name": "Continental-Combo",
           "type": "NonVeg",
           "dishes": [
             { "id": 1701, "name": "Chicken Burger + Fries + Mocktail", "price": 199 }
           ]
         },
         {
-          "name": "Chinese (Combo)",
+          "name": "Chinese-Combo",
           "type": "Veg",
           "dishes": [
             { "id": 1801, "name": "Fried Rice + Chilli Paneer + Mocktail", "price": 149 },
@@ -209,7 +209,7 @@
           ]
         },
         {
-          "name": "Chinese (Combo)",
+          "name": "Chinese-Combo",
           "type": "NonVeg",
           "dishes": [
             { "id": 1901, "name": "Fried Rice + Chilli Chicken + Mocktail", "price": 199 },
