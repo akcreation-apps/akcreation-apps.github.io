@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypt/Decrypt Data with CryptoJS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #4a90e2;
+            color: #fff;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        h3 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        #result {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            word-wrap: break-word;
+            font-family: monospace;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .toggle-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Encrypt/Decrypt Data</h2>
+
+        <label for="inputText">Enter Text:</label>
+        <input type="text" id="inputText" placeholder="Enter text to encrypt/decrypt">
+
+        <label for="key">Encryption Key:</label>
+        <input type="text" id="key" placeholder="Enter secret key">
+
+        <div class="toggle-container">
+            <input type="checkbox" id="toggle" />
+            <label for="toggle">Decrypt Mode</label>
+        </div>
+
+        <button onclick="processData()">Submit</button>
+
+        <h3>Result:</h3>
+        <p id="result"></p>
+
+        <div class="footer">
+            &copy; 2024 Data Encryptor
+        </div>
+    </div>
+
+    <script>
+        function processData() {
+            var text = document.getElementById("inputText").value;
+            var key = document.getElementById("key").value;
+            var isDecryptMode = document.getElementById("toggle").checked;
+
+            if (text && key) {
+                if (isDecryptMode) {
+                    try {
+                        // Decrypt mode
+                        var decryptedBytes = CryptoJS.AES.decrypt(text, key);
+                        var decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
+                        if (!decryptedText) {
+                            throw new Error("Invalid decryption.");
+                        }
+                        document.getElementById("result").innerText = decryptedText;
+                    } catch (e) {
+                        document.getElementById("result").innerText = "Decryption failed. Please check your input.";
+                    }
+                } else {
+                    // Encrypt mode
+                    var encrypted = CryptoJS.AES.encrypt(text, key).toString();
+                    document.getElementById("result").innerText = encrypted;
+                }
+            } else {
+                document.getElementById("result").innerText = "Please enter both text and key.";
+            }
+        }
+    </script>
+
+</body>
+</html>
