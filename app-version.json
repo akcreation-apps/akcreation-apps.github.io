@@ -1,7 +1,5 @@
 {
-  "current_version":31,
-  "version_info":"- All result merged in 'BPUT Results'.\n\n
-- New result demo 'Grade Sheet' added.\n\n
-- Charges changed for edit fields in 'Grade Sheet'.\n\n
-- Minor bug fixes and feature enhancements."
+  "current_version":32,
+  "version_info":"- Modified Wallet UI\n\n
+- Bug fixes and feature enhancements."
 }
