@@ -4,67 +4,77 @@
       "category": "Chinese",
       "subcategories": [
         {
+          "name": "Soup",
+          "type": "Veg",
+          "dishes": [
+            { "id": 71, "name": "Hot & Sour", "price": 30 },
+            { "id": 72, "name": "Manchow", "price": 30 },
+            { "id": 73, "name": "Clear", "price": 30 }
+          ]
+        },
+        {
+          "name": "Soup",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 91, "name": "Hot & Sour", "price": 50 },
+            { "id": 92, "name": "Manchow", "price": 50 },
+            { "id": 93, "name": "Clear", "price": 50 }
+          ]
+        },
+        {
           "name": "Starter",
           "type": "Veg",
           "dishes": [
-            { "id": 101, "name": "Veg Manchurian", "price": 120 },
-            { "id": 102, "name": "Paneer Chilli", "price": 130 },
-            { "id": 103, "name": "Paneer 65", "price": 130 },
-            { "id": 104, "name": "Mashroom Chilli", "price": 130 },
-            { "id": 105, "name": "Mashroom 65", "price": 130 },
+            { "id": 101, "name": "Crispy Corn", "price": 120 },
+            { "id": 102, "name": "Veg Salt & Pepper", "price": 130 },
+            { "id": 103, "name": "Stir Fried Baby Corn", "price": 130 },
+            { "id": 104, "name": "Veg Manchurian", "price": 140 },
+            { "id": 105, "name": "Paneer Chilli", "price": 140 },
             { "id": 106, "name": "Paneer Manchurian", "price": 140 },
-            { "id": 107, "name": "Crispy Corn", "price": 120 },
-            { "id": 108, "name": "Crispy Chilli Babycorn", "price": 130 },
-            { "id": 109, "name": "Veg Kolhapani Chilli", "price": 120 },
-            { "id": 110, "name": "Crispy Golden Babycorn", "price": 140 }
+            { "id": 107, "name": "Hot Chilli Potato", "price": 140 },
+            { "id": 108, "name": "Mashroom 65", "price": 140 },
+            { "id": 109, "name": "Mashroom Manchurian", "price": 140 },
+            { "id": 110, "name": "Mashroom Chilli", "price": 140 }
           ]
         },
         {
           "name": "Starter",
           "type": "NonVeg",
           "dishes": [
-            { "id": 201, "name": "Chicken Drumstick", "price": 150 },
-            { "id": 202, "name": "Spicy Chicken Wings", "price": 140 },
-            { "id": 203, "name": "Chicken Manchurian", "price": 130 },
-            { "id": 204, "name": "Chicken 65", "price": 140 },
-            { "id": 205, "name": "Chilli Chicken", "price": 140 },
+            { "id": 201, "name": "Chilli Chicken", "price": 140 },
+            { "id": 202, "name": "Chicken 65", "price": 140 },
+            { "id": 203, "name": "Chicken Majestic", "price": 140 },
+            { "id": 204, "name": "Chicken Lollipop", "price": 180 },
+            { "id": 205, "name": "Crispy Chicken Wings", "price": 140 },
             { "id": 206, "name": "Chicken 555", "price": 150 },
-            { "id": 207, "name": "Dragon Chicken", "price": 160 },
-            { "id": 208, "name": "Chicken Majestic", "price": 160 },
-            { "id": 209, "name": "Hunan Chicken", "price": 160 },
-            { "id": 210, "name": "Google Chicken", "price": 160 },
-            { "id": 211, "name": "Chicken Hongkong", "price": 160 },
-            { "id": 212, "name": "Chicken Lollypop", "price": 150 },
-            { "id": 213, "name": "Apollo Fish", "price": 160 },
-            { "id": 214, "name": "Chilli Fish", "price": 150 },
-            { "id": 215, "name": "Chilli Prawn", "price": 170 },
-            { "id": 216, "name": "Golden Prawn", "price": 170 },
-            { "id": 217, "name": "Chilli Egg", "price": 120 },
-            { "id": 218, "name": "Egg 65", "price": 120 },
-            { "id": 219, "name": "Egg Manchurian", "price": 120 }
+            { "id": 207, "name": "Chilli Fish", "price": 180 },
+            { "id": 208, "name": "Garlic Chicken", "price": 140 },
+            { "id": 209, "name": "Loose Prawns", "price": 170 }
           ]
         },
         {
           "name": "MainCourse",
           "type": "Veg",
           "dishes": [
-            { "id": 301, "name": "Sezwan Fried Rice", "price": 99 },
-            { "id": 302, "name": "Paneer Fried Rice", "price": 120 },
-            { "id": 303, "name": "Kaju Fried Rice", "price": 120 },
-            { "id": 304, "name": "Hakka Noodles", "price": 110 },
-            { "id": 305, "name": "Sezwan Noodles", "price": 110 },
-            { "id": 306, "name": "Singapore Noodles", "price": 110 }
+            { "id": 301, "name": "Hakka Noodles", "price": 110 },
+            { "id": 302, "name": "Sezwan Noodles", "price": 110 },
+            { "id": 303, "name": "Singapore Noodles", "price": 110 },
+            { "id": 304, "name": "Sezwan Fried Rice", "price": 110 },
+            { "id": 305, "name": "Paneer Fried Rice", "price": 120 },
+            { "id": 306, "name": "Kaju Fried Rice", "price": 130 },
+            { "id": 307, "name": "Mix Veg Fried Rice", "price": 140 }
           ]
         },
         {
           "name": "MainCourse",
           "type": "NonVeg",
           "dishes": [
-            { "id": 401, "name": "Chicken Sezwan Fried Rice", "price": 120 },
-            { "id": 402, "name": "Chicken Fried Rice", "price": 120 },
-            { "id": 403, "name": "Egg Fried Rice", "price": 110 },
-            { "id": 404, "name": "Chicken Hakka Noodles", "price": 120 },
-            { "id": 405, "name": "Chicken Sezwan Noodles", "price": 120 }
+            { "id": 401, "name": "Chicken Hakka Noodles", "price": 120 },
+            { "id": 402, "name": "Chicken Sezwan Noodles", "price": 120 },
+            { "id": 403, "name": "Egg Fried Rice", "price": 120 },
+            { "id": 404, "name": "Chicken Sezwan Fried Rice", "price": 120 },
+            { "id": 405, "name": "Chicken Fried Rice", "price": 120 },
+            { "id": 406, "name": "NonVeg Mix Fried Rice", "price": 140 }
           ]
         }
       ]
@@ -76,32 +86,50 @@
           "name": "Burger",
           "type": "Veg",
           "dishes": [
-            { "id": 501, "name": "Mix Veg Burger", "price": 79 },
-            { "id": 502, "name": "Crispy Paneer Burger", "price": 99 }
+            { "id": 501, "name": "Mix Veg Burger", "price": 49 },
+            { "id": 502, "name": "Paneer Burger", "price": 120 }
           ]
         },
         {
           "name": "Burger",
           "type": "NonVeg",
           "dishes": [
-            { "id": 601, "name": "Chicken Burger", "price": 120 },
-            { "id": 602, "name": "Fish Grilled Burger", "price": 120 }
+            { "id": 601, "name": "Egg Burger", "price": 49 },
+            { "id": 602, "name": "Chicken Burger", "price": 130 }
           ]
         },
         {
           "name": "Sandwich",
           "type": "Veg",
           "dishes": [
-            { "id": 701, "name": "Veg Grilled", "price": 79 },
-            { "id": 702, "name": "Peri Peri Paneer", "price": 99 }
+            { "id": 701, "name": "Mix Veg", "price": 49 },
+            { "id": 702, "name": "Corn Cheese", "price": 99 },
+            { "id": 703, "name": "Peri Peri Paneer", "price": 120 }
           ]
         },
         {
           "name": "Sandwich",
           "type": "NonVeg",
           "dishes": [
-            { "id": 801, "name": "Chicken Grilled", "price": 120 },
-            { "id": 802, "name": "Fish Grilled", "price": 120 }
+            { "id": 801, "name": "Chicken Grilled", "price": 130 }
+          ]
+        },
+        {
+          "name": "Pasta",
+          "type": "Veg",
+          "dishes": [
+            { "id": 831, "name": "Red Sauce", "price": 120 },
+            { "id": 832, "name": "White Sauce", "price": 120 },
+            { "id": 833, "name": "Pink Sauce", "price": 120 }
+          ]
+        },
+        {
+          "name": "Pasta",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 851, "name": "Red Sauce", "price": 140 },
+            { "id": 852, "name": "White Sauce", "price": 140 },
+            { "id": 853, "name": "Pink Sauce", "price": 140 }
           ]
         },
         {
@@ -109,25 +137,21 @@
           "type": "Veg",
           "dishes": [
             { "id": 901, "name": "Margarita(6 inch)", "price": 99 },
-            { "id": 902, "name": "Margarita(9 inch)", "price": 149 },
+            { "id": 902, "name": "Margarita(9 inch)", "price": 169 },
             { "id": 903, "name": "Farm House(6 inch)", "price": 120 },
-            { "id": 904, "name": "Farm House(9 inch)", "price": 179 },
-            { "id": 905, "name": "Caizone(6 inch)", "price": 129 },
-            { "id": 906, "name": "Caizone(9 inch)", "price": 179 }
+            { "id": 904, "name": "Farm House(9 inch)", "price": 180 },
+            { "id": 905, "name": "Corn Paneer(6 inch)", "price": 130 },
+            { "id": 906, "name": "Corn Paneer(9 inch)", "price": 195 }
           ]
         },
         {
           "name": "Pizza",
           "type": "NonVeg",
           "dishes": [
-            { "id": 1001, "name": "Pimento Chicken(6 inch)", "price": 130 },
-            { "id": 1002, "name": "Pimento Chicken(9 inch)", "price": 195 },
-            { "id": 1003, "name": "Calzone Chicken(6 inch)", "price": 130 },
-            { "id": 1004, "name": "Calzone Chicken(9 inch)", "price": 195 },
-            { "id": 1005, "name": "Bombay Prawn(6 inch)", "price": 149 },
-            { "id": 1006, "name": "Bombay Prawn(9 inch)", "price": 220 },
-            { "id": 1007, "name": "Italian Chicken(6 inch)", "price": 130 },
-            { "id": 1008, "name": "Italian Chicken(9 inch)", "price": 195 }
+            { "id": 1001, "name": "Italian Chicken(6 inch)", "price": 149 },
+            { "id": 1002, "name": "Italian Chicken(9 inch)", "price": 195 },
+            { "id": 1003, "name": "Bombay Prawn(6 inch)", "price": 159 },
+            { "id": 1004, "name": "Bombay Prawn(9 inch)", "price": 220 }
           ]
         }
       ]
@@ -138,10 +162,10 @@
         {
           "name": "Smoothies",
           "dishes": [
-            { "id": 1101, "name": "Kit Kat", "price": 99 },
-            { "id": 1102, "name": "Mix Fruit", "price": 99 },
-            { "id": 1103, "name": "Pineapple", "price": 99 },
-            { "id": 1104, "name": "Kiwi", "price": 99 }
+            { "id": 1101, "name": "Kit Kat", "price": 79 },
+            { "id": 1102, "name": "Mix Fruit", "price": 79 },
+            { "id": 1103, "name": "Pineapple", "price": 79 },
+            { "id": 1104, "name": "Kiwi", "price": 79 }
           ]
         },
         {
@@ -154,66 +178,252 @@
         {
           "name": "Mocktails",
           "dishes": [
-            { "id": 1301, "name": "Virgin Mojito", "price": 79 },
-            { "id": 1302, "name": "Blue Lagoon", "price": 79 },
-            { "id": 1303, "name": "Fresh Lime Soda", "price": 69 },
-            { "id": 1304, "name": "Pineapple Mojito", "price": 79 },
-            { "id": 1305, "name": "Kiwi Cooler", "price": 79 },
-            { "id": 1306, "name": "Mango Cooler", "price": 79 }
+            { "id": 1301, "name": "Virgin Mojito", "price": 49 },
+            { "id": 1302, "name": "Blue Lagoon", "price": 49 },
+            { "id": 1303, "name": "Fresh Lime Soda", "price": 49 },
+            { "id": 1304, "name": "Pineapple Mojito", "price": 49 },
+            { "id": 1305, "name": "Kiwi Cooler", "price": 49 },
+            { "id": 1306, "name": "Mango Cooler", "price": 49 },
+            { "id": 1307, "name": "Green Apple Mojito", "price": 49 },
+            { "id": 1308, "name": "Orange Mojito", "price": 49 },
+            { "id": 1309, "name": "TCD Special Guava Lagoon", "price": 49 }
           ]
         },
         {
           "name": "Shake",
           "dishes": [
-            { "id": 1401, "name": "Classic Vanila Milk Shake", "price": 99 },
-            { "id": 1402, "name": "Kit Kat Milk Shake", "price": 99 },
-            { "id": 1403, "name": "Chocolate Milk Shake", "price": 99 },
-            { "id": 1404, "name": "Mango Milk Shake", "price": 99 },
-            { "id": 1405, "name": "Mix Fruit Milk Shake", "price": 99 }
+            { "id": 1401, "name": "Vanila Milk Shake", "price": 79 },
+            { "id": 1402, "name": "Kit Kat Milk Shake", "price": 79 },
+            { "id": 1403, "name": "Chocolate Milk Shake", "price": 79 },
+            { "id": 1404, "name": "Mango Milk Shake", "price": 79 },
+            { "id": 1405, "name": "Mix Fruit Milk Shake", "price": 79 },
+            { "id": 1406, "name": "Banana Milk Shake", "price": 79 },
+            { "id": 1407, "name": "Guava Milk Shake", "price": 79 }
           ]
         },
         {
-          "name": "Coffee",
+          "name": "Refreshment",
           "dishes": [
-            { "id": 1501, "name": "Cold Coffee", "price": 99 },
-            { "id": 1502, "name": "Hot Coffee", "price": 30 }
+            { "id": 1501, "name": "Hot Coffee", "price": 30 },
+            { "id": 1502, "name": "Hot Chocolate", "price": 40 },
+            { "id": 1503, "name": "Cold Coffee", "price": 79 }
           ]
         }
       ]
     },
     {
-      "category": "Combo",
+      "category": "Mandi",
       "subcategories": [
         {
-          "name": "Continental-Combo",
+          "name": "Mandi",
           "type": "Veg",
           "dishes": [
-            { "id": 1601, "name": "Burger + Fries + Mocktail", "price": 149 }
+            { "id": 2001, "name": "Small Veg Mandi", "price": 159 },
+            { "id": 2002, "name": "Jumbo Veg Mandi", "price": 349 }
           ]
         },
         {
-          "name": "Continental-Combo",
+          "name": "Mandi",
           "type": "NonVeg",
           "dishes": [
-            { "id": 1701, "name": "Chicken Burger + Fries + Mocktail", "price": 199 }
+            { "id": 2101, "name": "Small NonVeg Mandi", "price": 180 },
+            { "id": 2102, "name": "Jumbo NonVeg Mandi", "price": 399 }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "category": "Ice Cream",
+      "subcategories": [
         {
-          "name": "Chinese-Combo",
+          "name": "Ice Cream",
+          "dishes": [
+            { "id": 2201, "name": "Vanilla 2scoop", "price": 50 },
+            { "id": 2202, "name": "Mango Tango", "price": 120 },
+            { "id": 2203, "name": "Pink Berry", "price": 120 },
+            { "id": 2204, "name": "Magic Fruit", "price": 120 },
+            { "id": 2205, "name": "Brownie Smashed", "price": 130 }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Tandoor",
+      "subcategories": [
+        {
+          "name": "Starter",
           "type": "Veg",
           "dishes": [
-            { "id": 1801, "name": "Fried Rice + Chilli Paneer + Mocktail", "price": 149 },
-            { "id": 1802, "name": "Fried Rice + Chilli Mashroom + Mocktail", "price": 149 },
-            { "id": 1803, "name": "Fried Rice + Veg Manchurian + Mocktail", "price": 149 },
-            { "id": 1804, "name": "Noodles + Veg Manchurian + Mocktail", "price": 149 }
+            { "id": 2301, "name": "Hara Bhara Kabab", "price": 130 },
+            { "id": 2302, "name": "Paneer Tikka", "price": 130 },
+            { "id": 2303, "name": "Achari Paneer Tikka", "price": 130 },
+            { "id": 2304, "name": "Malai Paneer Tikka", "price": 130 },
+            { "id": 2305, "name": "Mushroom Tikka", "price": 130 },
+            { "id": 2306, "name": "Mushroom Achari Tikka", "price": 130 },
+            { "id": 2307, "name": "TCD Special Fruit Chat Tikka", "price": 130 }
           ]
         },
         {
-          "name": "Chinese-Combo",
+          "name": "Starter",
           "type": "NonVeg",
           "dishes": [
-            { "id": 1901, "name": "Fried Rice + Chilli Chicken + Mocktail", "price": 199 },
-            { "id": 1902, "name": "Noodles + Chilli Chicken + Mocktail", "price": 199 }
+            { "id": 2401, "name": "Red Tangdi (Half)", "price": 140 },
+            { "id": 2402, "name": "Red Tangdi (Full)", "price": 199 },
+            { "id": 2403, "name": "Achari Tangdi (Half)", "price": 140 },
+            { "id": 2404, "name": "Achari Tangdi (Full)", "price": 199 },
+            { "id": 2405, "name": "Malai Tangdi (Half)", "price": 140 },
+            { "id": 2406, "name": "Malai Tangdi (Full)", "price": 199 },
+            { "id": 2407, "name": "Red Chicken Tikka (Half)", "price": 150 },
+            { "id": 2408, "name": "Red Chicken Tikka (Full)", "price": 299 },
+            { "id": 2409, "name": "Achari Tikka (Half)", "price": 150 },
+            { "id": 2410, "name": "Achari Tikka (Full)", "price": 299 },
+            { "id": 2411, "name": "Malai Tikka (Half)", "price": 150 },
+            { "id": 2412, "name": "Malai Tikka (Full)", "price": 299 },
+            { "id": 2413, "name": "Red Rose Tikka (Half)", "price": 150 },
+            { "id": 2414, "name": "Red Rose Tikka (Full)", "price": 299 },
+            { "id": 2415, "name": "Mint Tikka (Half)", "price": 150 },
+            { "id": 2416, "name": "Mint Tikka (Full)", "price": 299 },
+            { "id": 2417, "name": "Hariyali Chiken Tikka (Half)", "price": 150 },
+            { "id": 2418, "name": "Hariyali Chiken Tikka (Full)", "price": 299 },
+            { "id": 2419, "name": "Malai Reshmi Kabab (Half)", "price": 150 },
+            { "id": 2420, "name": "Malai Reshmi Kabab (Full)", "price": 299 },
+            { "id": 2421, "name": "Tandoori Chicken (Half)", "price": 150 },
+            { "id": 2422, "name": "Tandoori Chicken (Full)", "price": 299 },
+            { "id": 2423, "name": "Mint Charcoal Chicken (Half)", "price": 150 },
+            { "id": 2424, "name": "Mint Charcoal Chicken (Full)", "price": 299 },
+            { "id": 2425, "name": "TCD Special Pubg Chicken (Half)", "price": 150 },
+            { "id": 2426, "name": "TCD Special Pubg Chicken (Full)", "price": 299 }
+          ]
+        },
+        {
+          "name": "Indian Breads / Roti",
+          "dishes": [
+            { "id": 2501, "name": "Roti", "price": 7 },
+            { "id": 2502, "name": "Tandoori Roti", "price": 10 },
+            { "id": 2503, "name": "Tandoori Butter Roti", "price": 15 },
+            { "id": 2504, "name": "Plain Naan", "price": 15 },
+            { "id": 2505, "name": "Butter Naan", "price": 20 },
+            { "id": 2506, "name": "Plain Kulcha", "price": 20 },
+            { "id": 2507, "name": "Veg Kulcha", "price": 25 },
+            { "id": 2508, "name": "Chilli Garlic Naan", "price": 30 },
+            { "id": 2509, "name": "Lachha Paratha", "price": 30 },
+            { "id": 2510, "name": "Mushroom Kulcha", "price": 40 },
+            { "id": 2511, "name": "Paneer Kulcha", "price": 45 },
+            { "id": 2512, "name": "Cheese Kulcha", "price": 50 }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Indian",
+      "subcategories": [
+        {
+          "name": "Rice & Pulao",
+          "dishes": [
+            { "id": 2601, "name": "Steam Rice", "price": 30 },
+            { "id": 2602, "name": "Basmati Rice", "price": 50 },
+            { "id": 2603, "name": "Tomato Rice", "price": 70 },
+            { "id": 2604, "name": "Lemon Rice", "price": 70 },
+            { "id": 2605, "name": "Peas Pulao", "price": 70 },
+            { "id": 2606, "name": "Peas Corn Pulao", "price": 70 },
+            { "id": 2607, "name": "Veg Pulao", "price": 80 }
+          ]
+        },
+        {
+          "name": "Biryani",
+          "type": "Veg",
+          "dishes": [
+            { "id": 2701, "name": "Veg Biryani (Half)", "price": 120 },
+            { "id": 2702, "name": "Veg Biryani (Full)", "price": 180 }
+          ]
+        },
+        {
+          "name": "Biryani",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 2801, "name": "Chicken Biryani (Mini)", "price": 99 },
+            { "id": 2802, "name": "Chicken Biryani (Half)", "price": 140 },
+            { "id": 2803, "name": "Chicken Biryani (Full)", "price": 200 },
+            { "id": 2804, "name": "Mutton Biryani", "price": 200 }
+          ]
+        },
+        {
+          "name": "Curry",
+          "type": "Veg",
+          "dishes": [
+            { "id": 2901, "name": "Dal Tadka", "price": 50 },
+            { "id": 2902, "name": "Dal Fry", "price": 50 },
+            { "id": 2903, "name": "Dal Lasooni", "price": 60 },
+            { "id": 2904, "name": "Dal Palak", "price": 60 },
+            { "id": 2905, "name": "TCD Special Maa Ki Dal", "price": 60 },
+            { "id": 2906, "name": "Veg Hydrabadi", "price": 120 },
+            { "id": 2907, "name": "Mili Jhuli Veg", "price": 120 },
+            { "id": 2908, "name": "Mili Jhuli Veg", "price": 120 },
+            { "id": 2909, "name": "Kadai Paneer", "price": 140 },
+            { "id": 2910, "name": "Methi Paneer", "price": 140 },
+            { "id": 2911, "name": "Mushroom Do Pyaja", "price": 150 },
+            { "id": 2912, "name": "Sunheri Veg", "price": 150 },
+            { "id": 2913, "name": "Paneer Lababdar", "price": 150 },
+            { "id": 2914, "name": "Mushroom Masala", "price": 150 },
+            { "id": 2915, "name": "Mushroom Butter Masala", "price": 150 },
+            { "id": 2916, "name": "Paneer Tikka Masala", "price": 150 }
+          ]
+        },
+        {
+          "name": "Curry",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 3001, "name": "Fish Masala", "price": 80 },
+            { "id": 3001, "name": "Fish Masala", "price": 80 },
+            { "id": 3001, "name": "Fish Masala", "price": 80 },
+            { "id": 3001, "name": "Fish Masala", "price": 80 },
+            { "id": 3002, "name": "Fish Besar", "price": 80 },
+            { "id": 3003, "name": "Fish Kalia", "price": 80 },
+            { "id": 3004, "name": "Chicken Kasa", "price": 130 },
+            { "id": 3005, "name": "Kadai Chicken", "price": 160 },
+            { "id": 3006, "name": "Chicken Jelfrezi", "price": 160 },
+            { "id": 3007, "name": "Chicken Butter Masala", "price": 170 },
+            { "id": 3008, "name": "TCD Special Chicken Rawa Punjabi", "price": 170 },
+            { "id": 3009, "name": "Chicken Tikka Masala", "price": 180 },
+            { "id": 3010, "name": "Mutton Rogan Josh", "price": 200 },
+            { "id": 3011, "name": "TCD Special Mutton Masala", "price": 200 },
+            { "id": 3012, "name": "Prawns Masala", "price": 200 },
+            { "id": 3013, "name": "Spicy Prawns", "price": 200 },
+            { "id": 3014, "name": "Malai Prawns", "price": 220 }
+          ]
+        },
+        {
+          "name": "Dhaba Special",
+          "type": "Veg",
+          "dishes": [
+            { "id": 3101, "name": "Plain Tadka", "price": 50 },
+            { "id": 3102, "name": "Rosted Chana", "price": 50 },
+            { "id": 3103, "name": "Chana Masala", "price": 60 }
+          ]
+        },
+        {
+          "name": "Dhaba Special",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 3201, "name": "Anda Tadka", "price": 60 },
+            { "id": 3202, "name": "Anda Bhurj Khalia", "price": 60 },
+            { "id": 3203, "name": "Macha Mucda Ghanta", "price": 80 }
+          ]
+        },
+        {
+          "name": "Others",
+          "dishes": [
+            { "id": 3301, "name": "Mix Veg Raita", "price": 30 },
+            { "id": 3302, "name": "Bundi Raita", "price": 30 },
+            { "id": 3303, "name": "Burhani Raita", "price": 30 },
+            { "id": 3304, "name": "Masala Pampad", "price": 35 }
+          ]
+        },
+        {
+          "name": "Others",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 3401, "name": "Egg Omlet", "price": 50 }
           ]
         }
       ]
