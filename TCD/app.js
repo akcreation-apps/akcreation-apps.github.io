@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
-        if (currentTime <= storedExpirationTime) {
+        if (currentTime <= storedExpirationTime || localStorage.getItem('table')==="COD") {
             document.getElementById('invoiceIcon').style.display = 'flex';
             await fetch_data();
         }

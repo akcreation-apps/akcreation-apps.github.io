@@ -90,7 +90,7 @@ function createOrderElement(order, order_id) {
 
     orderElement.innerHTML = `
         <div class="order-header">
-            <h2>Table No: ${order.table_no}</h2>
+            <h2>${order.table_no === 'COD' ? 'Payment Mode: COD' : `Table No: ${order.table_no}`}</h2>
             <p>${orderTime}</p>
         </div>
         <p class="order-total">Total: ₹${order.total_cart_value}</p>
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedExpirationTime) {
         const currentTime = Date.now();
         console.log(currentTime)
-        if (currentTime >= storedExpirationTime) {
+        if (currentTime >= storedExpirationTime && localStorage.getItem('table')!=="COD") {
             Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error').then(() => {
                 window.location.href = 'index.html'; // Replace 'index.html' with your home page URL
             });

@@ -46,7 +46,11 @@
         const order = orders[0]; // Assuming we are displaying the first order
         console.log(order);
         // Set the table number
-        document.getElementById('tableNo').textContent = `Table - ${order.order_details.table_no}`;
+        document.getElementById('tableNo').textContent =
+          order.order_details.table_no === 'COD'
+            ? 'Payment Mode: COD'
+            : `Table - ${order.order_details.table_no}`;
+
 
         // Format date and time
         const createdAtSeconds = order.order_details.created_at.seconds;

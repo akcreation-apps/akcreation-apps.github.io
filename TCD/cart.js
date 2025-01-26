@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
-        if (currentTime < storedExpirationTime) {
+        if (currentTime < storedExpirationTime || localStorage.getItem('table')==="COD") {
             document.getElementById('invoiceIcon').style.display = 'flex';
         }
     }
@@ -185,7 +185,12 @@ function createOrderMessage(cartItems) {
         message += '\n'; // Add a new line after each category
     }
 
-    message += `Total Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nTable Number: ${localStorage.getItem('table')}`;
+    const table = localStorage.getItem('table');
+    if (table === 'COD') {
+        message += `Total Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nPayment Mode: Cash On Delivery`;
+    } else {
+        message += `Total Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nTable Number: ${table}`;
+    }
     return message; // Return the constructed message
 }
 
@@ -215,7 +220,7 @@ placeOrderButton.addEventListener('click', () => {
     showLoader();
     const cartItems = getCartItems(); // Get cart items
     const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
-    if (storedExpirationTime) {
+    if (storedExpirationTime && localStorage.getItem('table')!=="COD") {
         const currentTime = Date.now();
         if (currentTime >= storedExpirationTime) {
             Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error');

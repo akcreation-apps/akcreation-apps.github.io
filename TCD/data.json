@@ -7,7 +7,7 @@
           "name": "Soup",
           "type": "Veg",
           "dishes": [
-            { "id": 71, "name": "Hot & Sour", "price": 30 },
+            { "id": 71, "name": "Hot And Sour", "price": 30 },
             { "id": 72, "name": "Manchow", "price": 30 },
             { "id": 73, "name": "Clear", "price": 30 }
           ]
@@ -16,7 +16,7 @@
           "name": "Soup",
           "type": "NonVeg",
           "dishes": [
-            { "id": 91, "name": "Hot & Sour", "price": 50 },
+            { "id": 91, "name": "Hot And Sour", "price": 50 },
             { "id": 92, "name": "Manchow", "price": 50 },
             { "id": 93, "name": "Clear", "price": 50 }
           ]
@@ -26,7 +26,7 @@
           "type": "Veg",
           "dishes": [
             { "id": 101, "name": "Crispy Corn", "price": 120 },
-            { "id": 102, "name": "Veg Salt & Pepper", "price": 130 },
+            { "id": 102, "name": "Veg Salt And Pepper", "price": 130 },
             { "id": 103, "name": "Stir Fried Baby Corn", "price": 130 },
             { "id": 104, "name": "Veg Manchurian", "price": 140 },
             { "id": 105, "name": "Paneer Chilli", "price": 140 },

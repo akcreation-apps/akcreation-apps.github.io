@@ -522,7 +522,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <li class="order-item">
                     <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1); margin-bottom: 10px; cursor: pointer;">
                         <div style="display: flex; flex-direction: column;">
-                            <p style="margin: 0; font-size: 16px;"><strong style="color: #007bff;">Table No: ${tableNo}</strong></p>
+                            <p style="margin: 0; font-size: 16px;">
+                              <strong style="color: #007bff;">
+                                ${tableNo === 'COD' ? 'Payment Mode: COD' : `Table No: ${tableNo}`}
+                              </strong>
+                            </p>
                             <p style="margin: 0; font-size: 14px; color: #28a745;"><strong>Total: ₹${totalAmount}</strong></p>
                         </div>
                         <p style="margin: 0; font-size: 14px; color: #6c757d;">${orderDate}</p>
