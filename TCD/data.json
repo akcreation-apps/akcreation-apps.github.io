@@ -102,7 +102,7 @@
           "name": "Sandwich",
           "type": "Veg",
           "dishes": [
-            { "id": 701, "name": "Mix Veg", "price": 49 },
+            { "id": 701, "name": "Mix Veg", "price": 69 },
             { "id": 702, "name": "Corn Cheese", "price": 99 },
             { "id": 703, "name": "Peri Peri Paneer", "price": 120 }
           ]
@@ -169,6 +169,15 @@
           ]
         },
         {
+          "name": "Smoothies (350ml)",
+          "dishes": [
+            { "id": 1105, "name": "Kit Kat", "price": 99 },
+            { "id": 1106, "name": "Mix Fruit", "price": 99 },
+            { "id": 1107, "name": "Pineapple", "price": 99 },
+            { "id": 1108, "name": "Kiwi", "price": 99 }
+          ]
+        },
+        {
           "name": "Lassi (100ml)",
           "dishes": [
             { "id": 1201, "name": "Sweet Lassi", "price": 79 },
@@ -197,6 +206,20 @@
           ]
         },
         {
+          "name": "Mocktails (350ml)",
+          "dishes": [
+            { "id": 1310, "name": "Virgin Mojito", "price": 79 },
+            { "id": 1311, "name": "Blue Lagoon", "price": 79 },
+            { "id": 1312, "name": "Fresh Lime Soda", "price": 79 },
+            { "id": 1313, "name": "Pineapple Mojito", "price": 79 },
+            { "id": 1314, "name": "Kiwi Cooler", "price": 79 },
+            { "id": 1315, "name": "Mango Cooler", "price": 79 },
+            { "id": 1316, "name": "Green Apple Mojito", "price": 79 },
+            { "id": 1317, "name": "Orange Mojito", "price": 79 },
+            { "id": 1318, "name": "TCD Special Guava Lagoon", "price": 79 }
+          ]
+        },
+        {
           "name": "Shake (200ml)",
           "dishes": [
             { "id": 1401, "name": "Vanila Milk Shake", "price": 79 },
@@ -206,6 +229,18 @@
             { "id": 1405, "name": "Mix Fruit Milk Shake", "price": 79 },
             { "id": 1406, "name": "Banana Milk Shake", "price": 79 },
             { "id": 1407, "name": "Guava Milk Shake", "price": 79 }
+          ]
+        },
+        {
+          "name": "Shake (350ml)",
+          "dishes": [
+            { "id": 1408, "name": "Vanila Milk Shake", "price": 99 },
+            { "id": 1409, "name": "Kit Kat Milk Shake", "price": 99 },
+            { "id": 1410, "name": "Chocolate Milk Shake", "price": 99 },
+            { "id": 1411, "name": "Mango Milk Shake", "price": 99 },
+            { "id": 1412, "name": "Mix Fruit Milk Shake", "price": 99 },
+            { "id": 1413, "name": "Banana Milk Shake", "price": 99 },
+            { "id": 1414, "name": "Guava Milk Shake", "price": 99 }
           ]
         },
         {
