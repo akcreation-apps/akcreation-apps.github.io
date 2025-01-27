@@ -160,87 +160,67 @@
       "category": "Drinks",
       "subcategories": [
         {
-          "name": "Smoothies (200ml)",
+          "name": "Smoothies",
           "dishes": [
-            { "id": 1101, "name": "Kit Kat", "price": 79 },
-            { "id": 1102, "name": "Mix Fruit", "price": 79 },
-            { "id": 1103, "name": "Pineapple", "price": 79 },
-            { "id": 1104, "name": "Kiwi", "price": 79 }
+            { "id": 1101, "name": "Kit Kat (200ml)", "price": 79 },
+            { "id": 1102, "name": "Kit Kat (350ml)", "price": 99 },
+            { "id": 1103, "name": "Mix Fruit (200ml)", "price": 79 },
+            { "id": 1104, "name": "Mix Fruit (350ml)", "price": 99 },
+            { "id": 1105, "name": "Pineapple (200ml)", "price": 79 },
+            { "id": 1106, "name": "Pineapple (350ml)", "price": 99 },
+            { "id": 1107, "name": "Kiwi (200ml)", "price": 79 },
+            { "id": 1108, "name": "Kiwi (350ml)", "price": 99 }
           ]
         },
         {
-          "name": "Smoothies (350ml)",
+          "name": "Lassi",
           "dishes": [
-            { "id": 1105, "name": "Kit Kat", "price": 99 },
-            { "id": 1106, "name": "Mix Fruit", "price": 99 },
-            { "id": 1107, "name": "Pineapple", "price": 99 },
-            { "id": 1108, "name": "Kiwi", "price": 99 }
+            { "id": 1201, "name": "Sweet Lassi (100ml)", "price": 79 },
+            { "id": 1202, "name": "Sweet Lassi (200ml)", "price": 99 },
+            { "id": 1203, "name": "Salted Lassi (100ml)", "price": 79 },
+            { "id": 1204, "name": "Salted Lassi (200ml)", "price": 99 }
           ]
         },
         {
-          "name": "Lassi (100ml)",
+          "name": "Mocktails",
           "dishes": [
-            { "id": 1201, "name": "Sweet Lassi", "price": 79 },
-            { "id": 1202, "name": "Salted Lassi", "price": 79 }
+            { "id": 1301, "name": "Virgin Mojito (200ml)", "price": 49 },
+            { "id": 1302, "name": "Virgin Mojito (350ml)", "price": 79 },
+            { "id": 1303, "name": "Blue Lagoon (200ml)", "price": 49 },
+            { "id": 1304, "name": "Blue Lagoon (350ml)", "price": 79 },
+            { "id": 1305, "name": "Fresh Lime Soda (200ml)", "price": 49 },
+            { "id": 1306, "name": "Fresh Lime Soda (350ml)", "price": 79 },
+            { "id": 1307, "name": "Pineapple Mojito (200ml)", "price": 49 },
+            { "id": 1308, "name": "Pineapple Mojito (350ml)", "price": 79 },
+            { "id": 1309, "name": "Kiwi Cooler (200ml)", "price": 49 },
+            { "id": 1310, "name": "Kiwi Cooler (350ml)", "price": 79 },
+            { "id": 1311, "name": "Mango Cooler (200ml)", "price": 49 },
+            { "id": 1312, "name": "Mango Cooler (350ml)", "price": 79 },
+            { "id": 1313, "name": "Green Apple Mojito (200ml)", "price": 49 },
+            { "id": 1314, "name": "Green Apple Mojito (350ml)", "price": 79 },
+            { "id": 1315, "name": "Orange Mojito (200ml)", "price": 49 },
+            { "id": 1316, "name": "Orange Mojito (350ml)", "price": 79 },
+            { "id": 1317, "name": "TCD Special Guava Lagoon (200ml)", "price": 49 },
+            { "id": 1318, "name": "TCD Special Guava Lagoon (350ml)", "price": 79 }
           ]
         },
         {
-          "name": "Lassi (200ml)",
+          "name": "Shake",
           "dishes": [
-            { "id": 1221, "name": "Sweet Lassi", "price": 99 },
-            { "id": 1222, "name": "Salted Lassi", "price": 99 }
-          ]
-        },
-        {
-          "name": "Mocktails (200ml)",
-          "dishes": [
-            { "id": 1301, "name": "Virgin Mojito", "price": 49 },
-            { "id": 1302, "name": "Blue Lagoon", "price": 49 },
-            { "id": 1303, "name": "Fresh Lime Soda", "price": 49 },
-            { "id": 1304, "name": "Pineapple Mojito", "price": 49 },
-            { "id": 1305, "name": "Kiwi Cooler", "price": 49 },
-            { "id": 1306, "name": "Mango Cooler", "price": 49 },
-            { "id": 1307, "name": "Green Apple Mojito", "price": 49 },
-            { "id": 1308, "name": "Orange Mojito", "price": 49 },
-            { "id": 1309, "name": "TCD Special Guava Lagoon", "price": 49 }
-          ]
-        },
-        {
-          "name": "Mocktails (350ml)",
-          "dishes": [
-            { "id": 1310, "name": "Virgin Mojito", "price": 79 },
-            { "id": 1311, "name": "Blue Lagoon", "price": 79 },
-            { "id": 1312, "name": "Fresh Lime Soda", "price": 79 },
-            { "id": 1313, "name": "Pineapple Mojito", "price": 79 },
-            { "id": 1314, "name": "Kiwi Cooler", "price": 79 },
-            { "id": 1315, "name": "Mango Cooler", "price": 79 },
-            { "id": 1316, "name": "Green Apple Mojito", "price": 79 },
-            { "id": 1317, "name": "Orange Mojito", "price": 79 },
-            { "id": 1318, "name": "TCD Special Guava Lagoon", "price": 79 }
-          ]
-        },
-        {
-          "name": "Shake (200ml)",
-          "dishes": [
-            { "id": 1401, "name": "Vanila Milk Shake", "price": 79 },
-            { "id": 1402, "name": "Kit Kat Milk Shake", "price": 79 },
-            { "id": 1403, "name": "Chocolate Milk Shake", "price": 79 },
-            { "id": 1404, "name": "Mango Milk Shake", "price": 79 },
-            { "id": 1405, "name": "Mix Fruit Milk Shake", "price": 79 },
-            { "id": 1406, "name": "Banana Milk Shake", "price": 79 },
-            { "id": 1407, "name": "Guava Milk Shake", "price": 79 }
-          ]
-        },
-        {
-          "name": "Shake (350ml)",
-          "dishes": [
-            { "id": 1408, "name": "Vanila Milk Shake", "price": 99 },
-            { "id": 1409, "name": "Kit Kat Milk Shake", "price": 99 },
-            { "id": 1410, "name": "Chocolate Milk Shake", "price": 99 },
-            { "id": 1411, "name": "Mango Milk Shake", "price": 99 },
-            { "id": 1412, "name": "Mix Fruit Milk Shake", "price": 99 },
-            { "id": 1413, "name": "Banana Milk Shake", "price": 99 },
-            { "id": 1414, "name": "Guava Milk Shake", "price": 99 }
+            { "id": 1401, "name": "Vanila Milk Shake (200ml)", "price": 79 },
+            { "id": 1402, "name": "Vanila Milk Shake (350ml)", "price": 99 },
+            { "id": 1403, "name": "Kit Kat Milk Shake (200ml)", "price": 79 },
+            { "id": 1404, "name": "Kit Kat Milk Shake (350ml)", "price": 99 },
+            { "id": 1405, "name": "Chocolate Milk Shake (200ml)", "price": 79 },
+            { "id": 1406, "name": "Chocolate Milk Shake (350ml)", "price": 99 },
+            { "id": 1407, "name": "Mango Milk Shake (200ml)", "price": 79 },
+            { "id": 1408, "name": "Mango Milk Shake (350ml)", "price": 99 },
+            { "id": 1409, "name": "Mix Fruit Milk Shake (200ml)", "price": 79 },
+            { "id": 1410, "name": "Mix Fruit Milk Shake (350ml)", "price": 99 },
+            { "id": 1411, "name": "Banana Milk Shake (200ml)", "price": 79 },
+            { "id": 1412, "name": "Banana Milk Shake (350ml)", "price": 99 },
+            { "id": 1413, "name": "Guava Milk Shake (200ml)", "price": 79 },
+            { "id": 1414, "name": "Guava Milk Shake (350ml)", "price": 99 }
           ]
         },
         {
