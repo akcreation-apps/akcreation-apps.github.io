@@ -728,45 +728,62 @@ function loadChartsFromJson(filteredData) {
     const statusCounts = { 'In Progress': 0, 'Approved': 0, 'Rejected': 0 }; // Order status breakdown
     const deliveryVsDineIn = { 'Delivery': 0, 'Dine-in': 0 }; // Delivery vs Dine-in breakdown
 
-    function parseCustomDate(dateString) {
-        const parts = dateString.split('/');
-        if (parts.length === 3) {
-            return new Date(parts[2], parts[1] - 1, parts[0]); // YYYY, MM, DD
-        }
-        return new Date(dateString); // Fallback
-    }
-
     // Process filtered data for analytics
     for (const orderId in filteredData.firestore) {
         const order = filteredData.firestore[orderId];
-        const formattedDate = formatDate(order.created_at);
-        const orderTime = new Date(order.created_at).getHours(); // Extract hour separately
-        
-        // Sum total cart values per day
-        totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] ?? 0) + order.total_cart_value;
-        
-        // Track order times for peak hours
-        orderTimes[orderTime] = (orderTimes[orderTime] ?? 0) + 1;
-        
-        // Date Formatting Function
-        function formatDate(dateString) {
-            if (!dateString) return "N/A"; // Handle missing dates
-        
-            let orderDate = new Date(dateString);
-            
-            if (isNaN(orderDate)) orderDate = new Date(dateString.replace(/-/g, '/'));
-            
-            if (isNaN(orderDate)) orderDate = parseCustomDate(dateString);
-        
-            return !isNaN(orderDate) ? orderDate.toLocaleDateString() : "Invalid Date";
+        const orderDate = parseCustomDate(order.created_at);
+
+        if (!orderDate || isNaN(orderDate.getTime())) {
+            console.error("Invalid date:", order.created_at);
+        } else {
+            const formattedDate = formatToReadableDate(orderDate);
+            console.log(formattedDate)
+
+            // Sum total cart values per day
+            totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
+
+            // Track order times for peak hours
+            const orderTime = orderDate.getHours();
+            orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
         }
-        
-        // Handle Custom Date Formats
+
+        /**
+         * Parses an ISO date string robustly, ensuring it works in all browsers.
+         */
         function parseCustomDate(dateString) {
-            const parts = dateString.split('/');
-            return parts.length === 3 ? new Date(parts[2], parts[1] - 1, parts[0]) : new Date(dateString);
+            if (!dateString) return null;
+
+            // Remove microseconds and timezone offset if present
+            const cleanedDateString = dateString.replace(/\.\d+|\+\d{2}:\d{2}$/g, '');
+
+            // Parse with Date object
+            const parsedDate = new Date(cleanedDateString);
+            
+            return isNaN(parsedDate.getTime()) ? null : parsedDate;
         }
-        
+
+        /**
+         * Converts a Date object into "12th Dec, 2024" format.
+         */
+        function formatToReadableDate(dateObj) {
+            if (!dateObj || isNaN(dateObj.getTime())) return "Invalid Date";
+
+            const day = dateObj.getDate();
+            const month = dateObj.toLocaleString('en-US', { month: 'short' });
+            const year = dateObj.getFullYear();
+
+            return `${day}${getDaySuffix(day)} ${month}, ${year}`;
+        }
+
+        /**
+         * Returns the appropriate suffix for a given day (e.g., 1st, 2nd, 3rd, 4th).
+         */
+        function getDaySuffix(day) {
+            if (day > 3 && day < 21) return "th"; // Covers 11th to 20th
+            const lastDigit = day % 10;
+            return lastDigit === 1 ? "st" : lastDigit === 2 ? "nd" : lastDigit === 3 ? "rd" : "th";
+        }
+
 
         // Category-wise data
         order.order_details.forEach(detail => {
@@ -799,10 +816,7 @@ function loadChartsFromJson(filteredData) {
     }
 
     // Convert objects to arrays for charting
-    const orderDatesArray = Object.keys(totalCartValuesMap)
-    .map(date => new Date(date)) // Convert string dates to Date objects
-    .sort((a, b) => a - b) // Sort the Date objects in ascending order
-    .map(date => date.toLocaleDateString()); // Convert back to string format for charting
+    const orderDatesArray = Object.keys(totalCartValuesMap);
     const totalCartValuesArray = Object.values(totalCartValuesMap);
 
     // 1. Total Cart Value Over Time (Line Chart)
