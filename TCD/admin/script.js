@@ -739,15 +739,34 @@ function loadChartsFromJson(filteredData) {
     // Process filtered data for analytics
     for (const orderId in filteredData.firestore) {
         const order = filteredData.firestore[orderId];
-        const orderDate = parseCustomDate(order.created_at);
-        const formattedDate = orderDate.toLocaleDateString();
-
+        const formattedDate = formatDate(order.created_at);
+        const orderTime = new Date(order.created_at).getHours(); // Extract hour separately
+        
         // Sum total cart values per day
-        totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
-
+        totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] ?? 0) + order.total_cart_value;
+        
         // Track order times for peak hours
-        const orderTime = orderDate.getHours();
-        orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
+        orderTimes[orderTime] = (orderTimes[orderTime] ?? 0) + 1;
+        
+        // Date Formatting Function
+        function formatDate(dateString) {
+            if (!dateString) return "N/A"; // Handle missing dates
+        
+            let orderDate = new Date(dateString);
+            
+            if (isNaN(orderDate)) orderDate = new Date(dateString.replace(/-/g, '/'));
+            
+            if (isNaN(orderDate)) orderDate = parseCustomDate(dateString);
+        
+            return !isNaN(orderDate) ? orderDate.toLocaleDateString() : "Invalid Date";
+        }
+        
+        // Handle Custom Date Formats
+        function parseCustomDate(dateString) {
+            const parts = dateString.split('/');
+            return parts.length === 3 ? new Date(parts[2], parts[1] - 1, parts[0]) : new Date(dateString);
+        }
+        
 
         // Category-wise data
         order.order_details.forEach(detail => {
