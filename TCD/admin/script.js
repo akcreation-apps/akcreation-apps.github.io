@@ -802,11 +802,11 @@ function loadChartsFromJson(filteredData) {
     chartsContainer.appendChild(cartValueChart);
 
     // 2. Category-wise Order Value (Pie Chart)
-    const categoryChart = createChart('pie', categoryNames, Object.values(categoryValues), 'Total Order');
+    const categoryChart = createChart('pie', categoryNames, Object.values(categoryValues), 'Total Amount');
     chartsContainer.appendChild(categoryChart);
 
     // 3. Orders by Table Number (Bar Chart)
-    const tableOrdersChart = createChart('bar', Object.keys(tableOrders), Object.values(tableOrders), 'Orders per Table');
+    const tableOrdersChart = createChart('bar', Object.keys(tableOrders), Object.values(tableOrders), 'Orders Per Table');
     chartsContainer.appendChild(tableOrdersChart);
 
     // 4. Dish Quantity Ordered (Bar Chart)
@@ -827,7 +827,7 @@ function loadChartsFromJson(filteredData) {
         .sort((a, b) => a - b) // Sort in ascending order
         .map(hour => `${hour % 12 === 0 ? 12 : hour % 12} ${hour < 12 ? 'AM' : 'PM'}`); // Convert to 12-hour format
 
-    const peakTimesChart = createChart('bar', formattedHours, Object.values(orderTimes), 'Peak Order Times');
+    const peakTimesChart = createChart('bar', formattedHours, Object.values(orderTimes), 'Total Ordered');
     chartsContainer.appendChild(peakTimesChart);
 
     // Enable interactivity for clicking and hover tooltips
