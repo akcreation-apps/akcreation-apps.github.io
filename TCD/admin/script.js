@@ -731,59 +731,37 @@ function loadChartsFromJson(filteredData) {
     // Process filtered data for analytics
     for (const orderId in filteredData.firestore) {
         const order = filteredData.firestore[orderId];
-        const orderDate = parseCustomDate(order.created_at);
-
-        if (!orderDate || isNaN(orderDate.getTime())) {
-            console.error("Invalid date:", order.created_at);
-        } else {
-            const formattedDate = formatToReadableDate(orderDate);
-            console.log(formattedDate)
-
-            // Sum total cart values per day
-            totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
-
-            // Track order times for peak hours
-            const orderTime = orderDate.getHours();
-            orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
-        }
-
-        /**
-         * Parses an ISO date string robustly, ensuring it works in all browsers.
-         */
-        function parseCustomDate(dateString) {
-            if (!dateString) return null;
-
-            // Remove microseconds and timezone offset if present
-            const cleanedDateString = dateString.replace(/\.\d+|\+\d{2}:\d{2}$/g, '');
-
-            // Parse with Date object
-            const parsedDate = new Date(cleanedDateString);
+        function formatDateCustom(date) {
+            const day = date.getDate();
+            const month = date.toLocaleString('default', { month: 'short' }); // Get abbreviated month name (e.g., "Jan")
+            const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
             
-            return isNaN(parsedDate.getTime()) ? null : parsedDate;
+            // Determine the suffix for the day (e.g., "st", "nd", "rd", "th")
+            const suffix = (day) => {
+                if (day > 3 && day < 21) return 'th'; // For numbers 4 to 20
+                switch (day % 10) {
+                    case 1: return 'st';
+                    case 2: return 'nd';
+                    case 3: return 'rd';
+                    default: return 'th';
+                }
+            };
+            
+            return `${day}${suffix(day)} ${month}, ${year}`;
         }
+        
+        const orderDate = new Date(order.created_at);
+        const formattedDate = formatDateCustom(orderDate);
+        
+        // Sum total cart values per day
+        totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
+        console.log(totalCartValuesMap)
+        
+        // Track order times for peak hours
+        const orderTime = orderDate.getHours();
+        orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
 
-        /**
-         * Converts a Date object into "12th Dec, 2024" format.
-         */
-        function formatToReadableDate(dateObj) {
-            if (!dateObj || isNaN(dateObj.getTime())) return "Invalid Date";
-
-            const day = dateObj.getDate();
-            const month = dateObj.toLocaleString('en-US', { month: 'short' });
-            const year = dateObj.getFullYear().toString().slice(-2); // Get last two digits of the year
-
-            return `${day}${getDaySuffix(day)} ${month}, ${year}`;
-        }
-
-        /**
-         * Returns the appropriate suffix for a given day (e.g., 1st, 2nd, 3rd, 4th).
-         */
-        function getDaySuffix(day) {
-            if (day > 3 && day < 21) return "th"; // Covers 11th to 20th
-            const lastDigit = day % 10;
-            return lastDigit === 1 ? "st" : lastDigit === 2 ? "nd" : lastDigit === 3 ? "rd" : "th";
-        }
-
+        
 
         // Category-wise data
         order.order_details.forEach(detail => {
@@ -816,7 +794,7 @@ function loadChartsFromJson(filteredData) {
     }
 
     // Convert objects to arrays for charting
-    const orderDatesArray = Object.keys(totalCartValuesMap);
+    const orderDatesArray = Object.keys(totalCartValuesMap)
     const totalCartValuesArray = Object.values(totalCartValuesMap);
 
     // 1. Total Cart Value Over Time (Line Chart)
