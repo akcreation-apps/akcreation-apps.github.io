@@ -714,28 +714,32 @@ async function save_changes() {
 
 // Function to load charts from JSON data
 // Function to create charts based on data with filters
-function loadChartsFromJson(jsonData) {
+function loadChartsFromJson(filteredData) {
     const chartsContainer = document.getElementById('chartSection');
     chartsContainer.innerHTML = ''; // Clear previous charts
 
-    // Filter data by date range (last 3 months by default)
-    const filteredData = filterDataByDate(jsonData, 3); // Filter data for the last 3 months
-
-    // Get data for charts
-    const orderDates = [];
-    const totalCartValues = [];
+    // Initialize data structures
+    const totalCartValuesMap = {}; // Store sums by date
     const categoryNames = [];
     const categoryValues = {};
     const tableOrders = {};
     const dishQuantity = {};
+    const orderTimes = {}; // For peak order times
+    const statusCounts = { 'In Progress': 0, 'Approved': 0, 'Rejected': 0 }; // Order status breakdown
+    const deliveryVsDineIn = { 'Delivery': 0, 'Dine-in': 0 }; // Delivery vs Dine-in breakdown
 
     // Process filtered data for analytics
     for (const orderId in filteredData.firestore) {
         const order = filteredData.firestore[orderId];
         const orderDate = new Date(order.created_at);
         const formattedDate = orderDate.toLocaleDateString();
-        orderDates.push(formattedDate);
-        totalCartValues.push(order.total_cart_value);
+
+        // Sum total cart values per day
+        totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
+
+        // Track order times for peak hours
+        const orderTime = orderDate.getHours();
+        orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
 
         // Category-wise data
         order.order_details.forEach(detail => {
@@ -747,162 +751,174 @@ function loadChartsFromJson(jsonData) {
                 categoryValues[detail.category_name] += dish.price * dish.quantity;
 
                 // Dish quantity data
-                if (!dishQuantity[dish.name]) {
-                    dishQuantity[dish.name] = 0;
-                }
-                dishQuantity[dish.name] += dish.quantity;
+                dishQuantity[dish.name] = (dishQuantity[dish.name] || 0) + dish.quantity;
             });
         });
 
         // Table-wise data
-        if (!tableOrders[order.table_no]) {
-            tableOrders[order.table_no] = 0;
+        if (order.table_no !== 'COD') {
+            tableOrders[order.table_no] = (tableOrders[order.table_no] || 0) + 1;
         }
-        tableOrders[order.table_no] += 1;
+
+        // Track order status counts
+        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+
+        // Delivery vs Dine-in breakdown
+        if (order.table_no === 'COD') {
+            deliveryVsDineIn['Delivery'] += 1;
+        } else {
+            deliveryVsDineIn['Dine-in'] += 1;
+        }
     }
 
-    // 1. Total Cart Value Over Time (Bar chart)
-    const cartValueChart = document.createElement('canvas');
-    cartValueChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
-    cartValueChart.height = 400;
-    chartsContainer.appendChild(cartValueChart);
-    new Chart(cartValueChart, {
-        type: 'bar',
-        data: {
-            labels: orderDates,
-            datasets: [{
-                label: 'Total Cart Value',
-                data: totalCartValues,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+    // Convert objects to arrays for charting
+    const orderDatesArray = Object.keys(totalCartValuesMap)
+    .map(date => new Date(date)) // Convert string dates to Date objects
+    .sort((a, b) => a - b) // Sort the Date objects in ascending order
+    .map(date => date.toLocaleDateString()); // Convert back to string format for charting
+    const totalCartValuesArray = Object.values(totalCartValuesMap);
 
-    // 2. Category-wise Order Value (Stacked Bar Chart)
-    const categoryChart = document.createElement('canvas');
-    categoryChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
-    categoryChart.height = 400; 
+    // 1. Total Cart Value Over Time (Line Chart)
+    const cartValueChart = createChart('line', orderDatesArray, totalCartValuesArray, 'Total Sales');
+    chartsContainer.appendChild(cartValueChart);
+
+    // 2. Category-wise Order Value (Pie Chart)
+    const categoryChart = createChart('pie', categoryNames, Object.values(categoryValues), 'Total Order');
     chartsContainer.appendChild(categoryChart);
-    new Chart(categoryChart, {
-        type: 'bar',
-        data: {
-            labels: categoryNames,
-            datasets: [{
-                label: 'Category Revenue',
-                data: Object.values(categoryValues),
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                borderColor: 'rgba(153, 102, 255, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
 
     // 3. Orders by Table Number (Bar Chart)
-    const tableOrdersChart = document.createElement('canvas');
-    tableOrdersChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
-    tableOrdersChart.height = 400; 
+    const tableOrdersChart = createChart('bar', Object.keys(tableOrders), Object.values(tableOrders), 'Orders per Table');
     chartsContainer.appendChild(tableOrdersChart);
-    new Chart(tableOrdersChart, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(tableOrders),
-            datasets: [{
-                label: 'Orders per Table',
-                data: Object.values(tableOrders),
-                backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                borderColor: 'rgba(255, 159, 64, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
 
     // 4. Dish Quantity Ordered (Bar Chart)
-    const dishQuantityChart = document.createElement('canvas');
-    dishQuantityChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
-    dishQuantityChart.height = 400; 
+    const dishQuantityChart = createChart('bar', Object.keys(dishQuantity), Object.values(dishQuantity), 'Total Ordered');
     chartsContainer.appendChild(dishQuantityChart);
-    new Chart(dishQuantityChart, {
-        type: 'bar',
+
+    // 5. Order Status Distribution (Pie Chart)
+    const orderStatusChart = createChart('pie', Object.keys(statusCounts), Object.values(statusCounts), 'Total');
+    chartsContainer.appendChild(orderStatusChart);
+
+    // 6. Delivery vs Dine-in (Bar Chart)
+    const deliveryVsDineInChart = createChart('bar', Object.keys(deliveryVsDineIn), Object.values(deliveryVsDineIn), 'Total');
+    chartsContainer.appendChild(deliveryVsDineInChart);
+
+    // 7. Peak Order Times (Bar Chart)
+    const formattedHours = Object.keys(orderTimes)
+        .map(hour => parseInt(hour)) // Convert to numbers
+        .sort((a, b) => a - b) // Sort in ascending order
+        .map(hour => `${hour % 12 === 0 ? 12 : hour % 12} ${hour < 12 ? 'AM' : 'PM'}`); // Convert to 12-hour format
+
+    const peakTimesChart = createChart('bar', formattedHours, Object.values(orderTimes), 'Peak Order Times');
+    chartsContainer.appendChild(peakTimesChart);
+
+    // Enable interactivity for clicking and hover tooltips
+    enableInteractivity();
+}
+
+// Helper function to create charts
+function createChart(type, labels, data, label) {
+    const chartCanvas = document.createElement('canvas');
+    chartCanvas.width = window.innerWidth * 0.9; // Adjust for smaller screens
+    chartCanvas.height = 400;
+
+    new Chart(chartCanvas, {
+        type: type,
         data: {
-            labels: Object.keys(dishQuantity),
+            labels: labels,
             datasets: [{
-                label: 'Quantity of Dishes Ordered',
-                data: Object.values(dishQuantity),
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
+                label: label,
+                data: data,
+                backgroundColor: generateRandomColors(data.length),
+                borderColor: generateRandomColors(data.length),
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
-            scales: {
-                x: {
-                    ticks: {
-                        autoSkip: true,
-                        maxRotation: 90,
-                        minRotation: 45
-                    },
-                    barThickness: 30 // Reduce bar thickness for more space
-                },
-                y: {
-                    beginAtZero: true
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItem) {
+                        return `${tooltipItem.dataset.label}: ${tooltipItem.yLabel}`;
+                    }
                 }
             }
         }
     });
 
-    // 5. Order Status Distribution (Pie Chart)
-    const orderStatusChart = document.createElement('canvas');
-    orderStatusChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
-    orderStatusChart.height = 400;
-    chartsContainer.appendChild(orderStatusChart);
-    const statusCounts = { 'In Progress': 0, 'Completed': 0, 'Canceled': 0 }; // Modify based on possible statuses
-    for (const orderId in filteredData.firestore) {
-        const order = filteredData.firestore[orderId];
-        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+    return chartCanvas;
+}
+
+// Helper function to generate random colors for charts
+function generateRandomColors(count) {
+    const predefinedColors = [
+        'rgba(255, 99, 132, 0.7)',  // Red
+        'rgba(54, 162, 235, 0.7)',  // Blue
+        'rgba(255, 206, 86, 0.7)',  // Yellow
+        'rgba(75, 192, 192, 0.7)',  // Teal
+        'rgba(153, 102, 255, 0.7)', // Purple
+        'rgba(255, 159, 64, 0.7)',  // Orange
+        'rgba(0, 204, 102, 0.7)',   // Green
+        'rgba(255, 51, 153, 0.7)',  // Pink
+        'rgba(0, 102, 255, 0.7)',   // Deep Blue
+        'rgba(204, 0, 204, 0.7)',   // Magenta
+        'rgba(255, 69, 0, 0.7)',    // Red-Orange
+        'rgba(255, 105, 180, 0.7)', // Hot Pink
+        'rgba(100, 149, 237, 0.7)', // Cornflower Blue
+        'rgba(138, 43, 226, 0.7)',  // Blue Violet
+        'rgba(255, 215, 0, 0.7)',   // Gold
+        'rgba(64, 224, 208, 0.7)',  // Turquoise
+        'rgba(255, 99, 71, 0.7)',   // Tomato
+        'rgba(218, 165, 32, 0.7)',  // Goldenrod
+        'rgba(32, 178, 170, 0.7)',  // Light Sea Green
+        'rgba(255, 105, 180, 0.7)', // Deep Pink
+    ];
+    
+
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+        colors.push(predefinedColors[i % predefinedColors.length]); // Cycle through colors
     }
-    new Chart(orderStatusChart, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(statusCounts),
-            datasets: [{
-                data: Object.values(statusCounts),
-                backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'],
-                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true
-        }
+    return colors;
+}
+
+
+// Helper function to enable data point interactivity
+function enableInteractivity() {
+    const charts = document.querySelectorAll('canvas');
+
+    charts.forEach(chart => {
+        chart.addEventListener('mousemove', function (event) {
+            const chartInstance = Chart.getChart(chart); // Ensure it's correctly fetched
+            if (!chartInstance) return; // Prevent errors if chart is undefined
+
+            const points = chartInstance.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+            if (points.length) {
+                const firstPoint = points[0];
+                const dataset = chartInstance.data.datasets[firstPoint.datasetIndex];
+                const label = chartInstance.data.labels[firstPoint.index];
+                const value = dataset.data[firstPoint.index];
+
+                // Set tooltip manually
+                chartInstance.tooltip.setActiveElements([{ datasetIndex: firstPoint.datasetIndex, index: firstPoint.index }], {
+                    x: event.offsetX,
+                    y: event.offsetY
+                });
+
+                // Update the tooltip
+                chartInstance.update('none'); // 'none' prevents full chart re-render
+            }
+        });
+
+        chart.addEventListener('mouseleave', function () {
+            const chartInstance = Chart.getChart(chart);
+            if (chartInstance) {
+                chartInstance.tooltip.setActiveElements([], {});
+                chartInstance.update('none');
+            }
+        });
     });
 }
+
 
 // Date Range Filter (last X months)
 function filterDataByDate(jsonData, months) {
