@@ -106,6 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
         chartSection.style.display = 'block';
         accessControlSection.style.display = 'none';
         actionControlSection.style.display = 'none';
+        // Fetch JSON data from the file (replace 'data.json' with your actual file URL)
+        fetchJsonData('tcd_order_data.json')
+        .then(jsonData => {
+            // Once the data is fetched, load the charts
+            loadChartsFromJson(jsonData);
+        });
     });
 
     accessTab.addEventListener('click', () => {
@@ -706,4 +712,218 @@ async function save_changes() {
     }
 }
 
+// Function to load charts from JSON data
+// Function to create charts based on data with filters
+function loadChartsFromJson(jsonData) {
+    const chartsContainer = document.getElementById('chartSection');
+    chartsContainer.innerHTML = ''; // Clear previous charts
 
+    // Filter data by date range (last 3 months by default)
+    const filteredData = filterDataByDate(jsonData, 3); // Filter data for the last 3 months
+
+    // Get data for charts
+    const orderDates = [];
+    const totalCartValues = [];
+    const categoryNames = [];
+    const categoryValues = {};
+    const tableOrders = {};
+    const dishQuantity = {};
+
+    // Process filtered data for analytics
+    for (const orderId in filteredData.firestore) {
+        const order = filteredData.firestore[orderId];
+        const orderDate = new Date(order.created_at);
+        const formattedDate = orderDate.toLocaleDateString();
+        orderDates.push(formattedDate);
+        totalCartValues.push(order.total_cart_value);
+
+        // Category-wise data
+        order.order_details.forEach(detail => {
+            if (!categoryNames.includes(detail.category_name)) {
+                categoryNames.push(detail.category_name);
+                categoryValues[detail.category_name] = 0;
+            }
+            detail.dishes.forEach(dish => {
+                categoryValues[detail.category_name] += dish.price * dish.quantity;
+
+                // Dish quantity data
+                if (!dishQuantity[dish.name]) {
+                    dishQuantity[dish.name] = 0;
+                }
+                dishQuantity[dish.name] += dish.quantity;
+            });
+        });
+
+        // Table-wise data
+        if (!tableOrders[order.table_no]) {
+            tableOrders[order.table_no] = 0;
+        }
+        tableOrders[order.table_no] += 1;
+    }
+
+    // 1. Total Cart Value Over Time (Bar chart)
+    const cartValueChart = document.createElement('canvas');
+    cartValueChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
+    cartValueChart.height = 400;
+    chartsContainer.appendChild(cartValueChart);
+    new Chart(cartValueChart, {
+        type: 'bar',
+        data: {
+            labels: orderDates,
+            datasets: [{
+                label: 'Total Cart Value',
+                data: totalCartValues,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // 2. Category-wise Order Value (Stacked Bar Chart)
+    const categoryChart = document.createElement('canvas');
+    categoryChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
+    categoryChart.height = 400; 
+    chartsContainer.appendChild(categoryChart);
+    new Chart(categoryChart, {
+        type: 'bar',
+        data: {
+            labels: categoryNames,
+            datasets: [{
+                label: 'Category Revenue',
+                data: Object.values(categoryValues),
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // 3. Orders by Table Number (Bar Chart)
+    const tableOrdersChart = document.createElement('canvas');
+    tableOrdersChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
+    tableOrdersChart.height = 400; 
+    chartsContainer.appendChild(tableOrdersChart);
+    new Chart(tableOrdersChart, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(tableOrders),
+            datasets: [{
+                label: 'Orders per Table',
+                data: Object.values(tableOrders),
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // 4. Dish Quantity Ordered (Bar Chart)
+    const dishQuantityChart = document.createElement('canvas');
+    dishQuantityChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
+    dishQuantityChart.height = 400; 
+    chartsContainer.appendChild(dishQuantityChart);
+    new Chart(dishQuantityChart, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(dishQuantity),
+            datasets: [{
+                label: 'Quantity of Dishes Ordered',
+                data: Object.values(dishQuantity),
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxRotation: 90,
+                        minRotation: 45
+                    },
+                    barThickness: 30 // Reduce bar thickness for more space
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // 5. Order Status Distribution (Pie Chart)
+    const orderStatusChart = document.createElement('canvas');
+    orderStatusChart.width = window.innerWidth * 0.9; // Adjust for smaller screens
+    orderStatusChart.height = 400;
+    chartsContainer.appendChild(orderStatusChart);
+    const statusCounts = { 'In Progress': 0, 'Completed': 0, 'Canceled': 0 }; // Modify based on possible statuses
+    for (const orderId in filteredData.firestore) {
+        const order = filteredData.firestore[orderId];
+        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+    }
+    new Chart(orderStatusChart, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(statusCounts),
+            datasets: [{
+                data: Object.values(statusCounts),
+                backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+}
+
+// Date Range Filter (last X months)
+function filterDataByDate(jsonData, months) {
+    const filteredData = { firestore: {} };
+    const currentDate = new Date();
+    const pastDate = new Date();
+    pastDate.setMonth(currentDate.getMonth() - months);
+
+    for (const orderId in jsonData.firestore) {
+        const order = jsonData.firestore[orderId];
+        const orderDate = new Date(order.created_at);
+        if (orderDate >= pastDate && orderDate <= currentDate) {
+            filteredData.firestore[orderId] = order;
+        }
+    }
+    return filteredData;
+}
+
+// Function to fetch JSON data from a file
+function fetchJsonData(url) {
+    return fetch(url)
+        .then(response => response.json())
+        .catch(error => console.error('Error fetching JSON data:', error));
+}

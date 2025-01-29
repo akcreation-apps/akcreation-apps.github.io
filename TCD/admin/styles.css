@@ -6,7 +6,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100%;
     overflow-y: auto; /* Allow vertical scrolling if needed */
 }
 
@@ -566,3 +566,53 @@ input:checked + .slider:before {
     margin-bottom: 5px;
 }
 
+#chartSection h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Charts container should adapt to the screen size */
+#chartSection {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.chart {
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+/* Chart title and chart area */
+.chart canvas {
+    width: 100% !important; /* Make sure the canvas stretches to full container width */
+    height: auto !important; /* Keep aspect ratio */
+}
+
+/* Ensure charts don't overflow on small screens */
+@media (max-width: 768px) {
+    #chartsContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .chart {
+        max-width: 100%;
+    }
+
+    #chartSection h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Responsive typography for smaller devices */
+@media (max-width: 480px) {
+    #chartSection h2 {
+        font-size: 1.2rem;
+    }
+}

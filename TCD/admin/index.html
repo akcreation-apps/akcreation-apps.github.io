@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -38,7 +39,8 @@
         <!-- Chart Section -->
         <div id="chartSection" style="display:none;">
             <h2>Chart View</h2>
-            <p>No data available for the chart.</p>
+             <!-- Charts -->
+            <canvas id="orderStatusChart" width="400" height="200"></canvas>
         </div>
         <div id="actionControlSection">
         </div>
