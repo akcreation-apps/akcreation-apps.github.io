@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const numberContainer = document.getElementById('numberContainer');
     const validateButton = document.getElementById('validateButton');
 
-    let sessionTime = 60 * 60 * 1000; // 30 minutes in milliseconds
+    let sessionTime = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
     let password = ''
     get_credentials().then(credentials => {
         password = decrypt_values(credentials.PASS_KEY, credentials.KEY); // Example password
@@ -577,17 +577,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    // Call loadPreviousOrders when the Action Control Section is opened
-    actionTab.addEventListener('click', function() {
-        actionTab.classList.add('active');
-        accessTab.classList.remove('active');
-        chartTab.classList.remove('active');
-        chartSection.style.display = 'none';
-        accessControlSection.style.display = 'none';
-        actionControlSection.style.display = 'block';
-        loadPreviousOrders();
-    });
+// Call loadPreviousOrders when the Action Control Section is opened
+actionTab.addEventListener('click', function() {
+    actionTab.classList.add('active');
+    accessTab.classList.remove('active');
+    chartTab.classList.remove('active');
+    chartSection.style.display = 'none';
+    accessControlSection.style.display = 'none';
+    actionControlSection.style.display = 'block';
+    loadPreviousOrders();
+});
 
+loadPreviousOrders();
 
 });
 
