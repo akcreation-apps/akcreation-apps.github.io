@@ -779,7 +779,7 @@ function loadChartsFromJson(filteredData) {
     const totalCartValuesArray = Object.values(totalCartValuesMap);
 
     // 1. Total Cart Value Over Time (Line Chart)
-    const cartValueChart = createChart('line', orderDatesArray, totalCartValuesArray, 'Total Sales');
+    const cartValueChart = createChart('bar', orderDatesArray, totalCartValuesArray, 'Total Sales');
     chartsContainer.appendChild(cartValueChart);
 
     // 2. Category-wise Order Value (Pie Chart)
