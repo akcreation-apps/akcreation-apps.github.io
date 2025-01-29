@@ -770,7 +770,7 @@ function loadChartsFromJson(filteredData) {
 
             const day = dateObj.getDate();
             const month = dateObj.toLocaleString('en-US', { month: 'short' });
-            const year = dateObj.getFullYear();
+            const year = dateObj.getFullYear().toString().slice(-2); // Get last two digits of the year
 
             return `${day}${getDaySuffix(day)} ${month}, ${year}`;
         }
