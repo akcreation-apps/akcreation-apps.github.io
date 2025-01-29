@@ -728,10 +728,18 @@ function loadChartsFromJson(filteredData) {
     const statusCounts = { 'In Progress': 0, 'Approved': 0, 'Rejected': 0 }; // Order status breakdown
     const deliveryVsDineIn = { 'Delivery': 0, 'Dine-in': 0 }; // Delivery vs Dine-in breakdown
 
+    function parseCustomDate(dateString) {
+        const parts = dateString.split('/');
+        if (parts.length === 3) {
+            return new Date(parts[2], parts[1] - 1, parts[0]); // YYYY, MM, DD
+        }
+        return new Date(dateString); // Fallback
+    }
+
     // Process filtered data for analytics
     for (const orderId in filteredData.firestore) {
         const order = filteredData.firestore[orderId];
-        const orderDate = new Date(order.created_at);
+        const orderDate = parseCustomDate(order.created_at);
         const formattedDate = orderDate.toLocaleDateString();
 
         // Sum total cart values per day
