@@ -107,11 +107,55 @@ document.addEventListener('DOMContentLoaded', () => {
         accessControlSection.style.display = 'none';
         actionControlSection.style.display = 'none';
         // Fetch JSON data from the file (replace 'data.json' with your actual file URL)
-        fetchJsonData('tcd_order_data.json')
-        .then(jsonData => {
-            // Once the data is fetched, load the charts
-            loadChartsFromJson(jsonData);
-        });
+        // fetchJsonData('tcd_order_data.json')
+        // .then(jsonData => {
+        //     // Once the data is fetched, load the charts
+        //     loadChartsFromJson(jsonData);
+        // });
+
+        get_credentials().then(credentials => {  // Return the promise here
+            try {
+                const firebaseConfig = {
+                    apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
+                    authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
+                    projectId: decrypt_values(credentials.ID, credentials.KEY),
+                    storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
+                    messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
+                    appId: decrypt_values(credentials.APP_ID, credentials.KEY),
+                    measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+                };
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const currentDate = new Date();
+                const analysis_days = new Date(currentDate.setDate(currentDate.getDate() - 150));
+
+                const ordersQuery = query(
+                collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)),
+                where('created_at', '>=', analysis_days), // Filter orders created after 60 days ago
+                orderBy('created_at', 'desc') // Order by 'created_at' field in descending order
+                );
+
+            // Get documents based on the query
+            return getDocs(ordersQuery);
+            } catch (e){
+                console.log(e)
+                 Swal.fire({
+                    title: 'Connection Error',
+                    text: 'Please connect with developer.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                 }).then((result) => {
+                    location.reload(); // Reload the page to prompt for the password again
+                 });
+            }
+            }).then(querySnapshot => {
+                if (!querySnapshot) return; // Handle case where query fails
+                const firestoreData = [];
+                querySnapshot.forEach(doc => {
+                    firestoreData.push({ id: doc.id, ...doc.data() });
+                });
+                loadChartsFromJson(firestoreData);
+            });
     });
 
     accessTab.addEventListener('click', () => {
@@ -726,16 +770,15 @@ function loadChartsFromJson(filteredData) {
     const orderTimes = {}; // For peak order times
     const statusCounts = { 'In Progress': 0, 'Approved': 0, 'Rejected': 0 }; // Order status breakdown
     const deliveryVsDineIn = { 'Delivery': 0, 'Dine-in': 0 }; // Delivery vs Dine-in breakdown
-
     // Process filtered data for analytics
-    for (const orderId in filteredData.firestore) {
-        const order = filteredData.firestore[orderId];
-
+    filteredData.forEach(order => {
+        // console.log(orderId,"??aa")
+        // const order = filteredData.firestore[orderId];
         function formatDateCustom(date) {
             const day = date.getDate();
             const month = date.toLocaleString('default', { month: 'short' }); // Get abbreviated month name (e.g., "Jan")
             const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
-
+        
             const suffix = (day) => {
                 if (day > 3 && day < 21) return 'th';
                 switch (day % 10) {
@@ -745,11 +788,11 @@ function loadChartsFromJson(filteredData) {
                     default: return 'th';
                 }
             };
-
+        
             return `${day}${suffix(day)} ${month}, ${year}`;
         }
-
-        const orderDate = new Date(order.created_at);
+        
+        const orderDate = new Date(order.created_at * 1000); // Convert seconds to milliseconds
         const formattedDate = formatDateCustom(orderDate);
 
         // Sum total cart values per day
@@ -761,12 +804,12 @@ function loadChartsFromJson(filteredData) {
 
         // Category-wise data
         order.order_details.forEach(detail => {
-            if (!categoryNames.includes(detail.category_name)) {
-                categoryNames.push(detail.category_name);
-                categoryValues[detail.category_name] = 0;
+            if (!categoryNames.includes(detail.category.name)) {
+                categoryNames.push(detail.category.name);
+                categoryValues[detail.category.name] = 0;
             }
-            detail.dishes.forEach(dish => {
-                categoryValues[detail.category_name] += dish.price * dish.quantity;
+            detail.category.dish_details.forEach(dish => {
+                categoryValues[detail.category.name] += dish.price * dish.quantity;
 
                 // Dish quantity data
                 dishQuantity[dish.name] = (dishQuantity[dish.name] || 0) + dish.quantity;
@@ -787,7 +830,7 @@ function loadChartsFromJson(filteredData) {
         } else {
             deliveryVsDineIn['Dine-in'] += 1;
         }
-    }
+    })
 
     // Convert objects to arrays for charting
     const orderDatesArray = Object.keys(totalCartValuesMap);
