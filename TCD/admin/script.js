@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const numberContainer = document.getElementById('numberContainer');
     const validateButton = document.getElementById('validateButton');
 
+    let analyticsData = [];
     let sessionTime = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
     let password = ''
     get_credentials().then(credentials => {
@@ -106,56 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
         chartSection.style.display = 'block';
         accessControlSection.style.display = 'none';
         actionControlSection.style.display = 'none';
-        // Fetch JSON data from the file (replace 'data.json' with your actual file URL)
-        // fetchJsonData('tcd_order_data.json')
-        // .then(jsonData => {
-        //     // Once the data is fetched, load the charts
-        //     loadChartsFromJson(jsonData);
-        // });
+        loadChartsFromJson(analyticsData);
 
-        get_credentials().then(credentials => {  // Return the promise here
-            try {
-                const firebaseConfig = {
-                    apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-                    authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-                    projectId: decrypt_values(credentials.ID, credentials.KEY),
-                    storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-                    messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-                    appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-                    measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
-                };
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-                const currentDate = new Date();
-                const analysis_days = new Date(currentDate.setDate(currentDate.getDate() - 150));
-
-                const ordersQuery = query(
-                collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)),
-                where('created_at', '>=', analysis_days), // Filter orders created after 60 days ago
-                orderBy('created_at', 'desc') // Order by 'created_at' field in descending order
-                );
-
-            // Get documents based on the query
-            return getDocs(ordersQuery);
-            } catch (e){
-                console.log(e)
-                 Swal.fire({
-                    title: 'Connection Error',
-                    text: 'Please connect with developer.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                 }).then((result) => {
-                    location.reload(); // Reload the page to prompt for the password again
-                 });
-            }
-            }).then(querySnapshot => {
-                if (!querySnapshot) return; // Handle case where query fails
-                const firestoreData = [];
-                querySnapshot.forEach(doc => {
-                    firestoreData.push({ id: doc.id, ...doc.data() });
-                });
-                loadChartsFromJson(firestoreData);
-            });
     });
 
     accessTab.addEventListener('click', () => {
@@ -525,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create a query that filters by 'status' and orders by 'created_at' in descending order
             const ordersQuery = query(
                 collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)),
-                where('status', '==', 'In Progress'), // Filter where 'status' is 'In Progress'
                 orderBy('created_at', 'desc') // Order by 'created_at' field in descending order
             );
 
@@ -543,13 +495,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }).then(querySnapshot => {
         if (!querySnapshot) return; // Handle case where query fails
+        const allOrders = querySnapshot.docs.map(doc => ({
+            id: doc.id, 
+            ...doc.data()
+        }));  
+        analyticsData = []
+        const analysisDays = new Date();  
+        analysisDays.setDate(analysisDays.getDate() - 150); // Get the date 150 days ago  
+        
+        allOrders.forEach(order => {
+            let createdAt;
+        
+            // 🔹 Check if `created_at` is a Firestore Timestamp
+            if (order.created_at && typeof order.created_at.toDate === 'function') {
+                createdAt = order.created_at.toDate(); // Convert Firestore Timestamp to JS Date
+            } else {
+                createdAt = new Date(order.created_at); // If it's a string or number
+            }
+        
+            // 🔹 Ensure `createdAt` is a valid date before filtering
+            if (createdAt && createdAt >= analysisDays) {
+                analyticsData.push(order);
+            }
+        });
+        
+        
 
         // Process the query results
         querySnapshot.forEach(doc => {
-            orders.push({
-                'order_id': doc.id,
-                'order_details': doc.data(),
-            });
+            const orderData = doc.data();
+            if (orderData.status === "In Progress") {
+                orders.push({
+                    'order_id': doc.id,
+                    'order_details': orderData,
+                });
+            }
         });
 
         // Check if orders are available
@@ -638,7 +618,7 @@ actionTab.addEventListener('click', function() {
     loadPreviousOrders();
 });
 
-loadPreviousOrders();
+actionTab.click();
 
 });
 
@@ -901,8 +881,8 @@ function createChart(type, labels, data, label) {
     }
 
     // Apply label shortening for the x-axis labels (limit to 10 characters)
-    const shortenedLabels = labels.map((label, index) => {
-        return index <= 2 ? shortenLabel(label) : label;  // Shorten only the first label
+    const shortenedLabels = labels.map((innerLabel, index) => {
+        return (index <= 2 && label === "Total Ordered") ? shortenLabel(innerLabel) : innerLabel;  // Shorten only the first label
     });
 
     new Chart(chartCanvas, {
