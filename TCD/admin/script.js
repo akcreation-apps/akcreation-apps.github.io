@@ -792,7 +792,7 @@ function loadChartsFromJson(filteredData) {
             return `${day}${suffix(day)} ${month}, ${year}`;
         }
         
-        const orderDate = new Date(order.created_at * 1000); // Convert seconds to milliseconds
+        const orderDate = new Date(order.created_at.seconds * 1000); // Convert seconds to milliseconds
         const formattedDate = formatDateCustom(orderDate);
 
         // Sum total cart values per day
