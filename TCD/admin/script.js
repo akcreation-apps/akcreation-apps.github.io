@@ -883,13 +883,33 @@ function loadChartsFromJson(filteredData) {
 
 function createChart(type, labels, data, label) {
     const chartCanvas = document.createElement('canvas');
-    chartCanvas.width = window.innerWidth * 0.9;
-    chartCanvas.height = 400;
+    const chartWrapper = document.createElement('div');
+    chartWrapper.classList.add('chart');
+
+    if (type === 'pie' || type === 'doughnut') {
+        chartWrapper.classList.add('pie-chart'); // Add class for styling
+    } else {
+        chartCanvas.width = window.innerWidth * 0.9;
+        chartCanvas.height = 400;
+    }
+
+    chartWrapper.appendChild(chartCanvas);
+
+    // Function to shorten labels to a max length of 10 characters
+    function shortenLabel(text, maxLength = 10) {
+        return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+    }
+    
+
+    // Apply label shortening for the x-axis labels (limit to 10 characters)
+    const shortenedLabels = labels.map((label, index) => {
+        return index <=2 ? shortenLabel(label) : label;  // Shorten only the first label
+    });
 
     new Chart(chartCanvas, {
         type: type,
         data: {
-            labels: labels,
+            labels: shortenedLabels,
             datasets: [{
                 label: label,
                 data: data,
@@ -900,17 +920,15 @@ function createChart(type, labels, data, label) {
         },
         options: {
             responsive: true,
-            tooltips: {
-                callbacks: {
-                    label: function (tooltipItem) {
-                        return `${tooltipItem.dataset.label}: ${tooltipItem.yLabel}`;
-                    }
+            plugins: {
+                legend: {
+                    position: 'bottom'
                 }
             }
-        }
+        },
     });
 
-    return chartCanvas;
+    return chartWrapper;
 }
 
 // Helper function to generate random colors for charts

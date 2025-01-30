@@ -575,21 +575,35 @@ input:checked + .slider:before {
 /* Charts container should adapt to the screen size */
 #chartSection {
     max-height: 90vh;
-    overflow-y: auto;
+    width: auto;
+    overflow-x: hidden;
     border: 1px solid;
+    display: flex;
     border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap; /* Wrap charts if needed */
+    justify-content: center; /* Center charts in the available space */
+    padding-right: 20px; /* Adjust padding as needed */
 }
 
 .chart {
     width: 100%;
+    max-width: 800px; /* Set a max width for charts in web view */
     margin: 0 auto;
     border-radius: 8px;
     padding: 10px;
     background-color: #ffffff;
 }
 
+.pie-chart canvas, .doughnut-chart canvas {
+    max-width: 500px !important; /* Reduce size in web view */
+    max-height: 500px !important;
+    display: block;
+    margin: 0 auto;
+}
+
 /* Chart title and chart area */
-.chart canvas {
+#chartSection canvas {
     width: 100% !important; /* Make sure the canvas stretches to full container width */
     height: auto !important; /* Keep aspect ratio */
 }
@@ -608,11 +622,19 @@ input:checked + .slider:before {
     #chartSection h2 {
         font-size: 1.5rem;
     }
+    .pie-chart canvas, .doughnut-chart canvas {
+        max-width: 100% !important; /* Allow full width in mobile */
+        max-height: auto !important;
+    }
 }
 
 /* Responsive typography for smaller devices */
 @media (max-width: 480px) {
     #chartSection h2 {
         font-size: 1.2rem;
+    }
+    .chart canvas text {
+        transform: rotate(-45deg); /* Rotate x-axis labels */
+        text-anchor: end;
     }
 }
