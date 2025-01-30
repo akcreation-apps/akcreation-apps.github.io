@@ -821,7 +821,7 @@ function loadChartsFromJson(filteredData) {
     appendChart("Most Ordered Dishes", createChart('bar', Object.keys(dishQuantity), Object.values(dishQuantity), 'Total Ordered'));
 
     // 5. Order Status Distribution (Pie Chart)
-    appendChart("Order Status Breakdown", createChart('pie', Object.keys(statusCounts), Object.values(statusCounts), 'Total'));
+    appendChart("Order Status Breakdown", createChart('doughnut', Object.keys(statusCounts), Object.values(statusCounts), 'Total'));
 
     // 6. Delivery vs Dine-in (Bar Chart)
     appendChart("Delivery vs Dine-in", createChart('bar', Object.keys(deliveryVsDineIn), Object.values(deliveryVsDineIn), 'Total'));
@@ -857,25 +857,6 @@ function createChart(type, labels, data, label) {
         },
         options: {
             responsive: true,
-            plugins: {
-                zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: 'x', // Enable horizontal panning
-                        speed: 10,
-                        threshold: 10
-                    },
-                    zoom: {
-                        wheel: {
-                            enabled: true, // Enable zooming using mouse scroll
-                        },
-                        pinch: {
-                            enabled: true // Enable zooming using touch gestures
-                        },
-                        mode: 'x', // Zoom only in the x-axis (time-based charts)
-                    }
-                }
-            },
             tooltips: {
                 callbacks: {
                     label: function (tooltipItem) {
