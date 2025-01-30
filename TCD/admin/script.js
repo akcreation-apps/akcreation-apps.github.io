@@ -875,11 +875,30 @@ function createChart(type, labels, data, label) {
 // Helper function to generate random colors for charts
 function generateRandomColors(count) {
     const predefinedColors = [
-        'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)',
-        'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)',
-        'rgba(0, 204, 102, 0.7)', 'rgba(255, 51, 153, 0.7)', 'rgba(0, 102, 255, 0.7)',
-        'rgba(204, 0, 204, 0.7)', 'rgba(255, 69, 0, 0.7)', 'rgba(255, 105, 180, 0.7)'
+        'rgba(255, 140, 0, 0.7)',   // Dark Orange
+        'rgba(0, 204, 102, 0.7)',   // Green
+        'rgba(255, 69, 0, 0.7)',    // Red-Orange
+        'rgba(106, 90, 205, 0.7)',  // Slate Blue
+        'rgba(218, 165, 32, 0.7)',  // Goldenrod
+        'rgba(255, 99, 132, 0.7)',  // Red
+        'rgba(138, 43, 226, 0.7)',  // Blue Violet
+        'rgba(64, 224, 208, 0.7)',  // Turquoise
+        'rgba(255, 0, 127, 0.7)',   // Deep Pink
+        'rgba(153, 102, 255, 0.7)', // Purple
+        'rgba(0, 250, 154, 0.7)',   // Medium Spring Green
+        'rgba(54, 162, 235, 0.7)',  // Blue
+        'rgba(128, 0, 128, 0.7)',   // Dark Purple
+        'rgba(255, 215, 0, 0.7)',   // Gold
+        'rgba(75, 192, 192, 0.7)',  // Teal
+        'rgba(32, 178, 170, 0.7)',  // Light Sea Green
+        'rgba(255, 105, 180, 0.7)', // Hot Pink
+        'rgba(46, 139, 87, 0.7)',   // Sea Green
+        'rgba(255, 206, 86, 0.7)',  // Yellow
+        'rgba(255, 159, 64, 0.7)',  // Orange
+        'rgba(0, 102, 255, 0.7)',   // Deep Blue
+        'rgba(204, 0, 204, 0.7)'    // Magenta
     ];
+    
     
     return Array.from({ length: count }, (_, i) => predefinedColors[i % predefinedColors.length]);
 }
