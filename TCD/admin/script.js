@@ -899,11 +899,10 @@ function createChart(type, labels, data, label) {
     function shortenLabel(text, maxLength = 10) {
         return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
     }
-    
 
     // Apply label shortening for the x-axis labels (limit to 10 characters)
     const shortenedLabels = labels.map((label, index) => {
-        return index <=2 ? shortenLabel(label) : label;  // Shorten only the first label
+        return index <= 2 ? shortenLabel(label) : label;  // Shorten only the first label
     });
 
     new Chart(chartCanvas, {
@@ -925,7 +924,7 @@ function createChart(type, labels, data, label) {
                     position: 'bottom'
                 }
             }
-        },
+        }
     });
 
     return chartWrapper;

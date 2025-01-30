@@ -580,7 +580,6 @@ input:checked + .slider:before {
     border: 1px solid;
     display: flex;
     border-radius: 8px;
-    display: flex;
     flex-wrap: wrap; /* Wrap charts if needed */
     justify-content: center; /* Center charts in the available space */
     padding-right: 20px; /* Adjust padding as needed */
@@ -596,8 +595,8 @@ input:checked + .slider:before {
 }
 
 .pie-chart canvas, .doughnut-chart canvas {
-    max-width: 500px !important; /* Reduce size in web view */
-    max-height: 500px !important;
+    max-width: 500px; /* Limit size in web view */
+    max-height: 500px;
     display: block;
     margin: 0 auto;
 }
@@ -605,12 +604,12 @@ input:checked + .slider:before {
 /* Chart title and chart area */
 #chartSection canvas {
     width: 100% !important; /* Make sure the canvas stretches to full container width */
-    height: auto !important; /* Keep aspect ratio */
+    height: auto; /* Maintain aspect ratio */
 }
 
 /* Ensure charts don't overflow on small screens */
 @media (max-width: 768px) {
-    #chartsContainer {
+    #chartSection {
         flex-direction: column;
         align-items: center;
     }
@@ -623,8 +622,8 @@ input:checked + .slider:before {
         font-size: 1.5rem;
     }
     .pie-chart canvas, .doughnut-chart canvas {
-        max-width: 100% !important; /* Allow full width in mobile */
-        max-height: auto !important;
+        max-width: 100%; /* Allow full width on smaller screens */
+        max-height: auto;
     }
 }
 
