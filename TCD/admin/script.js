@@ -713,7 +713,6 @@ async function save_changes() {
 }
 
 // Function to create charts based on data with filters
-// Function to create charts based on data with filters
 function loadChartsFromJson(filteredData) {
     const chartsContainer = document.getElementById('chartSection');
     chartsContainer.innerHTML = ''; // Clear previous charts
@@ -839,7 +838,6 @@ function loadChartsFromJson(filteredData) {
     enableInteractivity();
 }
 
-// Helper function to create charts
 function createChart(type, labels, data, label) {
     const chartCanvas = document.createElement('canvas');
     chartCanvas.width = window.innerWidth * 0.9;
@@ -859,6 +857,25 @@ function createChart(type, labels, data, label) {
         },
         options: {
             responsive: true,
+            plugins: {
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x', // Enable horizontal panning
+                        speed: 10,
+                        threshold: 10
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true, // Enable zooming using mouse scroll
+                        },
+                        pinch: {
+                            enabled: true // Enable zooming using touch gestures
+                        },
+                        mode: 'x', // Zoom only in the x-axis (time-based charts)
+                    }
+                }
+            },
             tooltips: {
                 callbacks: {
                     label: function (tooltipItem) {
@@ -903,7 +920,6 @@ function generateRandomColors(count) {
     return Array.from({ length: count }, (_, i) => predefinedColors[i % predefinedColors.length]);
 }
 
-// Helper function to enable interactivity
 function enableInteractivity() {
     const charts = document.querySelectorAll('canvas');
 
