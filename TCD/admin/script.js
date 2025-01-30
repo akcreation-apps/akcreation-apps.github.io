@@ -10,6 +10,7 @@ window.verify_number = verify_number;
 window.save_changes = save_changes;
 
 document.addEventListener('DOMContentLoaded', () => {
+    const DAYS_RANGE = 150
     const passwordPopup = document.getElementById('passwordPopup');
     const submitPasswordButton = document.getElementById('submitPassword');
     const mainContent = document.getElementById('mainContent');
@@ -501,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }));  
         analyticsData = []
         const analysisDays = new Date();  
-        analysisDays.setDate(analysisDays.getDate() - 150); // Get the date 150 days ago  
+        analysisDays.setDate(analysisDays.getDate() - DAYS_RANGE); // Get the date 150 days ago
         
         allOrders.forEach(order => {
             let createdAt;
