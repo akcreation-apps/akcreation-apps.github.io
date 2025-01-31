@@ -281,12 +281,11 @@ function collect_data(){
         // Add the document to Firestore
         addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)), data)
             .then(docRef => {
-                console.log("Document written with ID: ", docRef.id);
                 // Add order details to localStorage
                 order_history.push({
                     'order_id': docRef.id,
                     'admin_id': credentials.KEY,
-                    'api_call':'Initiated',
+                    'api_call': 'Initiated',
                     'order_details': data // Instead of fetching it again, use the data you just sent
                 });
                 localStorage.setItem('order_history', JSON.stringify(order_history)); // Store as string

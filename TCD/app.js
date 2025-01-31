@@ -487,3 +487,15 @@ clearSearchButton.addEventListener('click', function() {
 clearSearchButton.addEventListener('click', function() {
     searchBar.focus(); // Optionally, refocus on the search bar
 });
+
+async function getPincodeUsingOSM(lat, lon) {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Pincode:", data.address.postcode);
+    alert("Your Pincode: "+data.address.postcode)
+}
+
+navigator.geolocation.getCurrentPosition((position) => {
+    getPincodeUsingOSM(position.coords.latitude, position.coords.longitude);
+});
