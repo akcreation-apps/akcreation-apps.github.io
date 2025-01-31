@@ -23,7 +23,7 @@ function initializeFirebase() {
 }
 
 // Fetch order details from Firebase
-async function fetchOrderDetails(orderId) {
+async function fetchOrderDetails(orderId, allOrders) {
     const app = await initializeFirebase();
     const db = getFirestore(app);
 
@@ -32,17 +32,35 @@ async function fetchOrderDetails(orderId) {
 
     // Get the document snapshot
     const docSnap = await getDoc(orderRef);
-
+    let updatedOrders = allOrders.map(order =>
+        order.order_id === orderId ? { ...order, api_call: order.api_call || "Initiated" } : order
+    );
+    
     if (docSnap.exists()) {
         const orderData = docSnap.data(); // Get the data from the snapshot
 
         // Check if the status is 'Approved'
         if (orderData.status === 'Approved') {
+            updatedOrders = updatedOrders.map(order =>
+                order.order_id === orderId ? { ...order, api_call: "Approved" } : order
+            );
+            localStorage.setItem("order_history", JSON.stringify(updatedOrders));
             return orderData; // Return the order data if status is approved
-        } else {
+        } else if(orderData.status === 'Rejected'){
+            updatedOrders = updatedOrders.map(order =>
+                order.order_id === orderId ? { ...order, api_call: "Rejected" } : order
+            );
+            localStorage.setItem("order_history", JSON.stringify(updatedOrders));
+            return null;
+        }
+        else {
             return null; // Or handle it as per your logic
         }
     } else {
+        updatedOrders = updatedOrders.map(order =>
+            order.order_id === orderId ? { ...order, api_call: "Deleted" } : order
+        );
+        localStorage.setItem("order_history", JSON.stringify(updatedOrders));
         return null; // Handle document not found
     }
 }
@@ -51,16 +69,23 @@ async function fetchOrderDetails(orderId) {
 async function fetchOrders() {
     const orders = JSON.parse(localStorage.getItem('order_history')) || [];
     const orderList = document.getElementById('orderList');
-
+    await initializeFirebase()
     showLoader(); // Show loader while fetching data
     if(orders && orders.length > 0){
         let data_available = false;
         for (const order of orders) {
-            const orderData = await fetchOrderDetails(order.order_id);
-            if (orderData && order.admin_id === admin_id) {
-                const orderElement = createOrderElement(orderData, order.order_id);
-                orderList.appendChild(orderElement);
-                data_available = true
+            if(!order.api_call || order.api_call === "Initiated"){
+                const allOrders = JSON.parse(localStorage.getItem('order_history')) || [];
+                const orderData = await fetchOrderDetails(order.order_id, allOrders);
+                if (orderData && order.admin_id === admin_id) {
+                    const orderElement = createOrderElement(order, order.order_id);
+                    orderList.appendChild(orderElement);
+                    data_available = true
+                }
+            } else if (order.admin_id === admin_id && order.api_call === "Approved"){
+                const orderElement = createOrderElement(order, order.order_id);
+                    orderList.appendChild(orderElement);
+                    data_available = true
             }
         }
         if(!data_available){
@@ -86,16 +111,16 @@ function createOrderElement(order, order_id) {
     orderElement.classList.add('order-container');
 
     const orderDetails = order.order_details;
-    const orderTime = formatDate(order.created_at.seconds);
+    const orderTime = formatDate(orderDetails.created_at.seconds);
 
     orderElement.innerHTML = `
         <div class="order-header">
-            <h2>${order.table_no === 'COD' ? 'Payment Mode: COD' : `Table No: ${order.table_no}`}</h2>
+            <h2>${orderDetails.table_no === 'COD' ? 'Payment Mode: COD' : `Table No: ${orderDetails.table_no}`}</h2>
             <p>${orderTime}</p>
         </div>
-        <p class="order-total">Total: ₹${order.total_cart_value}</p>
+        <p class="order-total">Total: ₹${orderDetails.total_cart_value}</p>
         <div class="order-details">
-            ${order.order_details.map(cat => `
+            ${orderDetails.order_details.map(cat => `
                 <h3>${cat.category.name}</h3>
                 ${cat.category.dish_details.map(dish => `
                     <div class="dish-item">
@@ -136,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
-        console.log(currentTime)
         if (currentTime >= storedExpirationTime && localStorage.getItem('table')!=="COD") {
             Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error').then(() => {
                 window.location.href = 'index.html'; // Replace 'index.html' with your home page URL

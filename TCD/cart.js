@@ -286,6 +286,7 @@ function collect_data(){
                 order_history.push({
                     'order_id': docRef.id,
                     'admin_id': credentials.KEY,
+                    'api_call':'Initiated',
                     'order_details': data // Instead of fetching it again, use the data you just sent
                 });
                 localStorage.setItem('order_history', JSON.stringify(order_history)); // Store as string
