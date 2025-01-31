@@ -108,8 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
         chartSection.style.display = 'block';
         accessControlSection.style.display = 'none';
         actionControlSection.style.display = 'none';
-        loadChartsFromJson(analyticsData);
-
+        fetchJsonData('tcd_order_data.json')
+        .then(jsonData => {
+            // Once the data is fetched, load the charts
+            loadChartsFromJson(jsonData);
+        });
     });
 
     accessTab.addEventListener('click', () => {
@@ -479,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create a query that filters by 'status' and orders by 'created_at' in descending order
             const ordersQuery = query(
                 collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)),
+                where('status', '==', 'In Progress'), // Filter where 'status' is 'In Progress'
                 orderBy('created_at', 'desc') // Order by 'created_at' field in descending order
             );
 
@@ -496,41 +500,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }).then(querySnapshot => {
         if (!querySnapshot) return; // Handle case where query fails
-        const allOrders = querySnapshot.docs.map(doc => ({
-            id: doc.id, 
-            ...doc.data()
-        }));  
-        analyticsData = []
-        const analysisDays = new Date();  
-        analysisDays.setDate(analysisDays.getDate() - DAYS_RANGE); // Get the date 150 days ago
-        
-        allOrders.forEach(order => {
-            let createdAt;
-        
-            // 🔹 Check if `created_at` is a Firestore Timestamp
-            if (order.created_at && typeof order.created_at.toDate === 'function') {
-                createdAt = order.created_at.toDate(); // Convert Firestore Timestamp to JS Date
-            } else {
-                createdAt = new Date(order.created_at); // If it's a string or number
-            }
-        
-            // 🔹 Ensure `createdAt` is a valid date before filtering
-            if (createdAt && createdAt >= analysisDays) {
-                analyticsData.push(order);
-            }
-        });
-        
-        
 
-        // Process the query results
         querySnapshot.forEach(doc => {
-            const orderData = doc.data();
-            if (orderData.status === "In Progress") {
-                orders.push({
-                    'order_id': doc.id,
-                    'order_details': orderData,
-                });
-            }
+            orders.push({
+                'order_id': doc.id,
+                'order_details': doc.data(),
+            });
         });
 
         // Check if orders are available
@@ -752,16 +727,17 @@ function loadChartsFromJson(filteredData) {
     const statusCounts = { 'In Progress': 0, 'Approved': 0, 'Rejected': 0 }; // Order status breakdown
     const deliveryVsDineIn = { 'Delivery': 0, 'Dine-in': 0 }; // Delivery vs Dine-in breakdown
     // Process filtered data for analytics
-    filteredData.forEach(order => {
+    for (const orderId in filteredData) {
         // console.log(orderId,"??aa")
-        // const order = filteredData.firestore[orderId];
-        function formatDateCustom(date) {
+         const order = filteredData[orderId];
+     function formatDateCustom(date) {
             const day = date.getDate();
             const month = date.toLocaleString('default', { month: 'short' }); // Get abbreviated month name (e.g., "Jan")
             const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
-        
+
+            // Determine the suffix for the day (e.g., "st", "nd", "rd", "th")
             const suffix = (day) => {
-                if (day > 3 && day < 21) return 'th';
+                if (day > 3 && day < 21) return 'th'; // For numbers 4 to 20
                 switch (day % 10) {
                     case 1: return 'st';
                     case 2: return 'nd';
@@ -771,9 +747,9 @@ function loadChartsFromJson(filteredData) {
             };
         
             return `${day}${suffix(day)} ${month}, ${year}`;
-        }
-        
-        const orderDate = new Date(order.created_at.seconds * 1000); // Convert seconds to milliseconds
+     }
+
+        const orderDate = new Date(order.created_at);
         const formattedDate = formatDateCustom(orderDate);
 
         // Sum total cart values per day
@@ -811,7 +787,7 @@ function loadChartsFromJson(filteredData) {
         } else {
             deliveryVsDineIn['Dine-in'] += 1;
         }
-    })
+    }
 
     // Convert objects to arrays for charting
     const orderDatesArray = Object.keys(totalCartValuesMap);
