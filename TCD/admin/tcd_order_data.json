@@ -720,5 +720,374 @@
         "triggered_to": "+917077410424",
         "status": "Rejected",
         "table_no": "COD"
+    },
+    "boYwehAR8msFr2dYOM1T": {
+        "total_cart_value": 1476,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 49,
+                            "quantity": 1,
+                            "id": 1307,
+                            "name": "Green Apple Mojito"
+                        },
+                        {
+                            "price": 49,
+                            "quantity": 1,
+                            "id": 1305,
+                            "name": "Kiwi Cooler"
+                        }
+                    ],
+                    "name": "Mocktails (200ml)"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "quantity": 1,
+                            "id": 702,
+                            "name": "Corn Cheese"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 107,
+                            "name": "Hot Chilli Potato"
+                        },
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 110,
+                            "name": "Mashroom Chilli"
+                        },
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 2306,
+                            "name": "Mushroom Achari Tikka"
+                        },
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 2307,
+                            "name": "TCD Special Fruit Chat Tikka"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 349,
+                            "quantity": 1,
+                            "id": 2002,
+                            "name": "Jumbo Veg Mandi"
+                        }
+                    ],
+                    "name": "Mandi"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 180,
+                            "quantity": 1,
+                            "id": 2702,
+                            "name": "Veg Biryani (Full)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 60,
+                            "quantity": 1,
+                            "id": 2904,
+                            "name": "Dal Palak"
+                        },
+                        {
+                            "price": 150,
+                            "quantity": 1,
+                            "id": 2910,
+                            "name": "Mushroom Do Pyaja"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "created_at": "2025-01-27T04:07:30.346000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Rejected",
+        "table_no": "COD"
+    },
+    "hzQQcH7N3ECAq2bXEM0y": {
+        "total_cart_value": 30,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 30,
+                            "quantity": 1,
+                            "id": 1501,
+                            "name": "Hot Coffee"
+                        }
+                    ],
+                    "name": "Refreshment"
+                }
+            }
+        ],
+        "created_at": "2025-01-27T02:02:59.764000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Rejected",
+        "table_no": "COD"
+    },
+    "kNAedZwWkX0hGwBKkhoR": {
+        "total_cart_value": 478,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 204,
+                            "name": "Chicken 65"
+                        },
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Spicy Chicken Wings"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "quantity": 1,
+                            "id": 1102,
+                            "name": "Mix Fruit"
+                        }
+                    ],
+                    "name": "Smoothies"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "quantity": 1,
+                            "id": 1202,
+                            "name": "Salted Lassi"
+                        }
+                    ],
+                    "name": "Lassi"
+                }
+            }
+        ],
+        "created_at": "2025-01-26T07:40:05.588000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Rejected",
+        "table_no": "2"
+    },
+    "JXzfsZqHnrAAmrtmylhb": {
+        "total_cart_value": 120,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Chicken Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "created_at": "2025-01-24T07:01:08.362000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Rejected",
+        "table_no": "2"
+    },
+    "3KjIAQqRl4nWnvVs1zfe": {
+        "total_cart_value": 120,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 107,
+                            "name": "Crispy Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "created_at": "2024-12-28T16:56:22.701000+00:00",
+        "triggered_to": null,
+        "status": "Rejected",
+        "table_no": "2"
+    },
+    "9EbKYL7SvHff6u8XCeCv": {
+        "total_cart_value": 198,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "quantity": 2,
+                            "id": 1403,
+                            "name": "Chocolate Milk Shake"
+                        }
+                    ],
+                    "name": "Shake"
+                }
+            }
+        ],
+        "created_at": "2024-12-28T09:04:25.753000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Rejected",
+        "table_no": "3"
+    },
+    "6zU9nmtsWfKuIM8bWxX3": {
+        "total_cart_value": 149,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "quantity": 1,
+                            "id": 1801,
+                            "name": "Fried Rice + Chilli Paneer + Mocktail"
+                        }
+                    ],
+                    "name": "Chinese-Combo"
+                }
+            }
+        ],
+        "created_at": "2024-12-15T12:33:59.016000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "2"
+    },
+    "osMN1zTfhRNPviordiTa": {
+        "total_cart_value": 310,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 160,
+                            "quantity": 1,
+                            "id": 207,
+                            "name": "Dragon Chicken"
+                        },
+                        {
+                            "price": 150,
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken Drumstick"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "created_at": "2024-12-08T09:34:57.216000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "4"
+    },
+    "BMIWzsFxu222O2vKqypK": {
+        "total_cart_value": 797,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 302,
+                            "name": "Paneer Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "quantity": 1,
+                            "id": 1801,
+                            "name": "Fried Rice + Chilli Paneer + Mocktail"
+                        },
+                        {
+                            "price": 199,
+                            "quantity": 1,
+                            "id": 1901,
+                            "name": "Fried Rice + Chilli Chicken + Mocktail"
+                        },
+                        {
+                            "price": 199,
+                            "quantity": 1,
+                            "id": 1902,
+                            "name": "Noodles + Chilli Chicken + Mocktail"
+                        }
+                    ],
+                    "name": "Chinese-Combo"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 1007,
+                            "name": "Italian Chicken(6 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "created_at": "2024-12-08T09:16:36.971000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "2"
     }
 }
