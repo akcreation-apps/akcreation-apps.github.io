@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chartSection.style.display = 'block';
         accessControlSection.style.display = 'none';
         actionControlSection.style.display = 'none';
-        fetchJsonData('tcd_order_data.json')
+        fetchJsonData(`tcd_order_data.json?v=${new Date().getTime()}`)
         .then(jsonData => {
             // Once the data is fetched, load the charts
             loadChartsFromJson(jsonData);
