@@ -753,40 +753,41 @@ function loadChartsFromJson(filteredData) {
         const formattedDate = formatDateCustom(orderDate);
 
         // Sum total cart values per day
-        totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
+       if(order.status == "Approved"){
+            totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
 
-        // Track order times for peak hours
-        const orderTime = orderDate.getHours();
-        orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
+            // Track order times for peak hours
+            const orderTime = orderDate.getHours();
+            orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
 
-        // Category-wise data
-        order.order_details.forEach(detail => {
-            if (!categoryNames.includes(detail.category.name)) {
-                categoryNames.push(detail.category.name);
-                categoryValues[detail.category.name] = 0;
-            }
-            detail.category.dish_details.forEach(dish => {
-                categoryValues[detail.category.name] += dish.price * dish.quantity;
+            // Category-wise data
+            order.order_details.forEach(detail => {
+                if (!categoryNames.includes(detail.category.name)) {
+                    categoryNames.push(detail.category.name);
+                    categoryValues[detail.category.name] = 0;
+                }
+                detail.category.dish_details.forEach(dish => {
+                    categoryValues[detail.category.name] += dish.price * dish.quantity;
 
-                // Dish quantity data
-                dishQuantity[dish.name] = (dishQuantity[dish.name] || 0) + dish.quantity;
+                    // Dish quantity data
+                    dishQuantity[dish.name] = (dishQuantity[dish.name] || 0) + dish.quantity;
+                });
             });
-        });
 
-        // Table-wise data
-        if (order.table_no !== 'COD') {
-            tableOrders[order.table_no] = (tableOrders[order.table_no] || 0) + 1;
-        }
+            // Table-wise data
+            if (order.table_no !== 'COD') {
+                tableOrders[order.table_no] = (tableOrders[order.table_no] || 0) + 1;
+            }
 
+            // Delivery vs Dine-in breakdown
+            if (order.table_no === 'COD') {
+                deliveryVsDineIn['Delivery'] += 1;
+            } else {
+                deliveryVsDineIn['Dine-in'] += 1;
+            }
+       }
         // Track order status counts
         statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
-
-        // Delivery vs Dine-in breakdown
-        if (order.table_no === 'COD') {
-            deliveryVsDineIn['Delivery'] += 1;
-        } else {
-            deliveryVsDineIn['Dine-in'] += 1;
-        }
     }
 
     // Convert objects to arrays for charting
