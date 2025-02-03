@@ -1,4 +1,26 @@
 {
+    "JztPlSUHSR7I8S1HhQvM": {
+        "total_cart_value": 120,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 703,
+                            "name": "Peri Peri Paneer"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "created_at": "2025-02-03T13:26:44.528000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Approved",
+        "table_no": "COD"
+    },
     "TkfHcNpUV0uZix3JA3Sd": {
         "total_cart_value": 60,
         "order_details": [
