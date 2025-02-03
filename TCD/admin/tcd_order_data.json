@@ -1089,5 +1089,441 @@
         "triggered_to": "+917077410424",
         "status": "In Progress",
         "table_no": "2"
+    },
+    "fR4BWQ1QygTlfK9aZHgG": {
+        "total_cart_value": 650,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 160,
+                            "quantity": 1,
+                            "id": 207,
+                            "name": "Dragon Chicken"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 3,
+                            "id": 401,
+                            "name": "Chicken Sezwan Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 1003,
+                            "name": "Calzone Chicken(6 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "created_at": "2024-12-01T15:40:12.626000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "2"
+    },
+    "FYClssoHFK9RxhdjsyA1": {
+        "total_cart_value": 149,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "quantity": 1,
+                            "id": 1804,
+                            "name": "Noodles + Veg Manchurian + Mocktail"
+                        }
+                    ],
+                    "name": "Chinese-Combo"
+                }
+            }
+        ],
+        "created_at": "2024-11-12T12:31:26.657000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "1"
+    },
+    "XAxA7QjUVHtSBP57Lkwz": {
+        "total_cart_value": 149,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "quantity": 1,
+                            "id": 1802,
+                            "name": "Fried Rice + Chilli Mashroom + Mocktail"
+                        }
+                    ],
+                    "name": "Chinese-Combo"
+                }
+            }
+        ],
+        "created_at": "2024-11-12T12:29:37.124000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "1"
+    },
+    "jbcWM6Dn7gxn2khZyXTS": {
+        "total_cart_value": 380,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Spicy Chicken Wings"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 2,
+                            "id": 401,
+                            "name": "Chicken Sezwan Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            }
+        ],
+        "created_at": "2024-11-08T13:16:49.534000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "3"
+    },
+    "wl8shabwCloTDvWpihAp": {
+        "total_cart_value": 430,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 150,
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken Drumstick"
+                        },
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Spicy Chicken Wings"
+                        },
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 204,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "created_at": "2024-10-29T04:22:23.054000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "5"
+    },
+    "tVu882AYUqaJHvEuaMkt": {
+        "total_cart_value": 356,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "quantity": 1,
+                            "name": "Crispy Paneer Burger"
+                        },
+                        {
+                            "price": 79,
+                            "quantity": 1,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "quantity": 1,
+                            "name": "Peri Peri Paneer"
+                        },
+                        {
+                            "price": 79,
+                            "quantity": 1,
+                            "name": "Veg Grilled"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "created_at": "2024-10-28T16:52:00.999000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Approved",
+        "table_no": "6"
+    },
+    "9dFV5MPIAR2PQhhEipes": {
+        "total_cart_value": 278,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 79,
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        },
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Chicken Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 79,
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Veg Grilled"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "created_at": "2024-10-28T16:26:28.093000+00:00",
+        "triggered_to": null,
+        "status": "In Progress",
+        "table_no": "2"
+    },
+    "Di3CdXibgwGDnglwXMie": {
+        "total_cart_value": 260,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 204,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 302,
+                            "name": "Paneer Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            }
+        ],
+        "created_at": "2024-10-28T15:13:31.781000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "2"
+    },
+    "WTCc9wuuJnd9C5x1fv3u": {
+        "total_cart_value": 490,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Veg Manchurian"
+                        },
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Paneer Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Chicken Burger"
+                        },
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 602,
+                            "name": "Fish Grilled Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "created_at": "2024-10-28T10:23:19.960000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "4"
+    },
+    "IFkpXJsZvXJy7Mr7azSC": {
+        "total_cart_value": 290,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 150,
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken Drumstick"
+                        },
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Spicy Chicken Wings"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "created_at": "2024-10-27T13:22:39.444000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Approved",
+        "table_no": "4"
+    },
+    "7iPH0yng3Ec5T6mPeWcQ": {
+        "total_cart_value": 700,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 160,
+                            "quantity": 1,
+                            "id": 211,
+                            "name": "Chicken Hongkong"
+                        },
+                        {
+                            "price": 150,
+                            "quantity": 1,
+                            "id": 212,
+                            "name": "Chicken Lollypop"
+                        },
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 108,
+                            "name": "Crispy Chilli Babycorn"
+                        },
+                        {
+                            "price": 140,
+                            "quantity": 1,
+                            "id": 110,
+                            "name": "Crispy Golden Babycorn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 302,
+                            "name": "Paneer Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            }
+        ],
+        "created_at": "2024-10-27T10:09:48.741000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Approved",
+        "table_no": "3"
+    },
+    "KXOjn5GsBEhAVPX9TAxv": {
+        "total_cart_value": 250,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Veg Manchurian"
+                        },
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 105,
+                            "name": "Mashroom 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "created_at": "2024-10-27T09:52:40.548000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Approved",
+        "table_no": "3"
     }
 }
