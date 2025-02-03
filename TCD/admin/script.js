@@ -719,161 +719,125 @@ function loadChartsFromJson(filteredData) {
 
     // Initialize data structures
     const totalCartValuesMap = {}; // Store sums by date
-    const categoryNames = [];
     const categoryValues = {};
     const tableOrders = {};
     const dishQuantity = {};
     const orderTimes = {}; // For peak order times
-    const statusCounts = { 'In Progress': 0, 'Approved': 0, 'Rejected': 0 }; // Order status breakdown
-    const deliveryVsDineIn = { 'Delivery': 0, 'Dine-in': 0 }; // Delivery vs Dine-in breakdown
+    const statusCounts = { 'In Progress': 0, 'Approved': 0, 'Rejected': 0 };
+    const deliveryVsDineIn = { 'Delivery': 0, 'Dine-in': 0 };
+
+    // Helper function to format date to '3rd Feb, 25'
+    function formatDateCustom(date) {
+        const day = date.getDate();
+        const suffix = (day % 10 === 1 && day !== 11) ? 'st' :
+                       (day % 10 === 2 && day !== 12) ? 'nd' :
+                       (day % 10 === 3 && day !== 13) ? 'rd' : 'th';
+        const month = date.toLocaleString('default', { month: 'short' });
+        const year = date.getFullYear().toString().slice(-2);
+        return `${day}${suffix} ${month}, ${year}`;
+    }
+
     // Process filtered data for analytics
-    for (const orderId in filteredData) {
-        // console.log(orderId,"??aa")
-         const order = filteredData[orderId];
-     function formatDateCustom(date) {
-            const day = date.getDate();
-            const month = date.toLocaleString('default', { month: 'short' }); // Get abbreviated month name (e.g., "Jan")
-            const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
-
-            // Determine the suffix for the day (e.g., "st", "nd", "rd", "th")
-            const suffix = (day) => {
-                if (day > 3 && day < 21) return 'th'; // For numbers 4 to 20
-                switch (day % 10) {
-                    case 1: return 'st';
-                    case 2: return 'nd';
-                    case 3: return 'rd';
-                    default: return 'th';
-                }
-            };
-        
-            return `${day}${suffix(day)} ${month}, ${year}`;
-     }
-
+    Object.values(filteredData).forEach(order => {
         const orderDate = new Date(order.created_at);
         const formattedDate = formatDateCustom(orderDate);
 
-        // Sum total cart values per day
-       if(order.status == "Approved"){
+        // Track order status counts
+        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+
+        if (order.status === "Approved") {
             totalCartValuesMap[formattedDate] = (totalCartValuesMap[formattedDate] || 0) + order.total_cart_value;
 
-            // Track order times for peak hours
+            // Track peak order times
             const orderTime = orderDate.getHours();
             orderTimes[orderTime] = (orderTimes[orderTime] || 0) + 1;
 
-            // Category-wise data
+            // Process category-wise data
             order.order_details.forEach(detail => {
-                if (!categoryNames.includes(detail.category.name)) {
-                    categoryNames.push(detail.category.name);
-                    categoryValues[detail.category.name] = 0;
-                }
-                detail.category.dish_details.forEach(dish => {
-                    categoryValues[detail.category.name] += dish.price * dish.quantity;
-
-                    // Dish quantity data
-                    dishQuantity[dish.name] = (dishQuantity[dish.name] || 0) + dish.quantity;
-                });
+                const categoryName = detail.category.name;
+                categoryValues[categoryName] = (categoryValues[categoryName] || 0) +
+                    detail.category.dish_details.reduce((sum, dish) => {
+                        dishQuantity[dish.name] = (dishQuantity[dish.name] || 0) + dish.quantity;
+                        return sum + (dish.price * dish.quantity);
+                    }, 0);
             });
 
-            // Table-wise data
-            if (order.table_no !== 'COD') {
-                tableOrders[order.table_no] = (tableOrders[order.table_no] || 0) + 1;
-            }
-
-            // Delivery vs Dine-in breakdown
+            // Table-wise data & Delivery vs Dine-in
             if (order.table_no === 'COD') {
-                deliveryVsDineIn['Delivery'] += 1;
+                deliveryVsDineIn['Delivery']++;
             } else {
-                deliveryVsDineIn['Dine-in'] += 1;
+                tableOrders[order.table_no] = (tableOrders[order.table_no] || 0) + 1;
+                deliveryVsDineIn['Dine-in']++;
             }
-       }
-        // Track order status counts
-        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
-    }
+        }
+    });
 
     // Convert objects to arrays for charting
     const orderDatesArray = Object.keys(totalCartValuesMap);
     const totalCartValuesArray = Object.values(totalCartValuesMap);
 
-    // Helper function to append chart with a header and spacing
+    // Append a chart with a title
     function appendChart(title, chartElement) {
         const chartWrapper = document.createElement('div');
-        chartWrapper.style.marginBottom = '30px'; // Space between charts
+        chartWrapper.style.marginBottom = '30px';
         chartWrapper.style.textAlign = 'center';
 
         const header = document.createElement('h3');
         header.innerText = title;
         header.style.marginBottom = '10px';
 
-        chartWrapper.appendChild(header);
-        chartWrapper.appendChild(chartElement);
+        chartWrapper.append(header, chartElement);
         chartsContainer.appendChild(chartWrapper);
     }
 
     // Helper function to parse '3rd Feb, 25' to a Date object
     function parseCustomDate(dateStr) {
-        const dateParts = dateStr.split(' '); // Split into [ '3rd', 'Feb,', '25' ]
-        const day = parseInt(dateParts[0]); // Extract day (removing 'rd', 'st', 'nd', 'th')
-        const month = new Date(Date.parse(dateParts[1].replace(',', '') + " 1")).getMonth(); // Convert 'Feb,' to 'Feb' then get month index
-        const year = 2000 + parseInt(dateParts[2]); // Assuming '25' means 2025
-
-        return new Date(year, month, day);
+        const [dayWithSuffix, monthWithComma, year] = dateStr.split(' ');
+        const day = parseInt(dayWithSuffix);
+        const month = new Date(Date.parse(monthWithComma.replace(',', '') + " 1")).getMonth();
+        const yearFull = 2000 + parseInt(year);
+        return new Date(yearFull, month, day);
     }
 
     // Calculate last month and current month sales
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
-    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const lastMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
     const currentYear = currentDate.getFullYear();
-    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const lastMonthYear = (currentMonth === 0) ? currentYear - 1 : currentYear;
+    const formattedTableLabels = Object.keys(tableOrders).map(num => `Table ${num}`);
 
-    let lastMonthSales = 0;
-    let currentMonthSales = 0;
+    let lastMonthSales = 0, currentMonthSales = 0;
 
-    Object.keys(totalCartValuesMap).forEach(dateStr => {
+    Object.entries(totalCartValuesMap).forEach(([dateStr, value]) => {
         const date = parseCustomDate(dateStr);
         const month = date.getMonth();
         const year = date.getFullYear();
 
         if (month === currentMonth && year === currentYear) {
-            currentMonthSales += totalCartValuesMap[dateStr];
+            currentMonthSales += value;
         } else if (month === lastMonth && year === lastMonthYear) {
-            lastMonthSales += totalCartValuesMap[dateStr];
+            lastMonthSales += value;
         }
     });
 
-    // 1. Add a bar chart for Sales Comparison
-    appendChart("Monthly Sales Comparison",
-        createChart('bar', ["Last Month", "Current Month"], [lastMonthSales, currentMonthSales], "Total Sales")
-    );
-
-
-    // 2. Total Cart Value Over Time (Bar Chart)
+    // Append Charts
+    appendChart("Monthly Sales Comparison", createChart('bar', ["Last Month", "Current Month"], [lastMonthSales, currentMonthSales], "Total Sales"));
     appendChart("Total Sales Over Time", createChart('bar', orderDatesArray, totalCartValuesArray, 'Total Sales'));
-
-    // 3. Category-wise Order Value (Pie Chart)
-    appendChart("Category-wise Sales", createChart('pie', categoryNames, Object.values(categoryValues), 'Total Amount'));
-
-    // 4. Orders by Table Number (Bar Chart)
-    appendChart("Orders Per Table", createChart('bar', Object.keys(tableOrders), Object.values(tableOrders), 'Orders Per Table'));
-
-    // 5. Dish Quantity Ordered (Bar Chart)
+    appendChart("Category-wise Sales", createChart('pie', Object.keys(categoryValues), Object.values(categoryValues), 'Total Amount'));
+    appendChart("Orders Per Table", createChart('bar', formattedTableLabels, Object.values(tableOrders), 'Total Orders'));
     appendChart("Most Ordered Dishes", createChart('bar', Object.keys(dishQuantity), Object.values(dishQuantity), 'Total Ordered'));
-
-    // 6. Order Status Distribution (Pie Chart)
     appendChart("Order Status Breakdown", createChart('doughnut', Object.keys(statusCounts), Object.values(statusCounts), 'Total'));
-
-    // 7. Delivery vs Dine-in (Bar Chart)
     appendChart("Delivery vs Dine-in", createChart('bar', Object.keys(deliveryVsDineIn), Object.values(deliveryVsDineIn), 'Total'));
 
-    // 8. Peak Order Times (Bar Chart)
+    // Peak Order Times Chart
     const formattedHours = Object.keys(orderTimes)
         .map(hour => parseInt(hour))
         .sort((a, b) => a - b)
-        .map(hour => `${hour % 12 === 0 ? 12 : hour % 12} ${hour < 12 ? 'AM' : 'PM'}`);
+        .map(hour => `${hour % 12 || 12} ${hour < 12 ? 'AM' : 'PM'}`);
 
     appendChart("Peak Order Times", createChart('bar', formattedHours, Object.values(orderTimes), 'Total Ordered'));
 
-    // Enable interactivity for clicking and hover tooltips
     enableInteractivity();
 }
 
