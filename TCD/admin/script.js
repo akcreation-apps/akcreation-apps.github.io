@@ -809,25 +809,63 @@ function loadChartsFromJson(filteredData) {
         chartsContainer.appendChild(chartWrapper);
     }
 
-    // 1. Total Cart Value Over Time (Bar Chart)
+    // Helper function to parse '3rd Feb, 25' to a Date object
+    function parseCustomDate(dateStr) {
+        const dateParts = dateStr.split(' '); // Split into [ '3rd', 'Feb,', '25' ]
+        const day = parseInt(dateParts[0]); // Extract day (removing 'rd', 'st', 'nd', 'th')
+        const month = new Date(Date.parse(dateParts[1].replace(',', '') + " 1")).getMonth(); // Convert 'Feb,' to 'Feb' then get month index
+        const year = 2000 + parseInt(dateParts[2]); // Assuming '25' means 2025
+
+        return new Date(year, month, day);
+    }
+
+    // Calculate last month and current month sales
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const currentYear = currentDate.getFullYear();
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    let lastMonthSales = 0;
+    let currentMonthSales = 0;
+
+    Object.keys(totalCartValuesMap).forEach(dateStr => {
+        const date = parseCustomDate(dateStr);
+        const month = date.getMonth();
+        const year = date.getFullYear();
+
+        if (month === currentMonth && year === currentYear) {
+            currentMonthSales += totalCartValuesMap[dateStr];
+        } else if (month === lastMonth && year === lastMonthYear) {
+            lastMonthSales += totalCartValuesMap[dateStr];
+        }
+    });
+
+    // 1. Add a bar chart for Sales Comparison
+    appendChart("Monthly Sales Comparison",
+        createChart('bar', ["Last Month", "Current Month"], [lastMonthSales, currentMonthSales], "Total Sales")
+    );
+
+
+    // 2. Total Cart Value Over Time (Bar Chart)
     appendChart("Total Sales Over Time", createChart('bar', orderDatesArray, totalCartValuesArray, 'Total Sales'));
 
-    // 2. Category-wise Order Value (Pie Chart)
+    // 3. Category-wise Order Value (Pie Chart)
     appendChart("Category-wise Sales", createChart('pie', categoryNames, Object.values(categoryValues), 'Total Amount'));
 
-    // 3. Orders by Table Number (Bar Chart)
+    // 4. Orders by Table Number (Bar Chart)
     appendChart("Orders Per Table", createChart('bar', Object.keys(tableOrders), Object.values(tableOrders), 'Orders Per Table'));
 
-    // 4. Dish Quantity Ordered (Bar Chart)
+    // 5. Dish Quantity Ordered (Bar Chart)
     appendChart("Most Ordered Dishes", createChart('bar', Object.keys(dishQuantity), Object.values(dishQuantity), 'Total Ordered'));
 
-    // 5. Order Status Distribution (Pie Chart)
+    // 6. Order Status Distribution (Pie Chart)
     appendChart("Order Status Breakdown", createChart('doughnut', Object.keys(statusCounts), Object.values(statusCounts), 'Total'));
 
-    // 6. Delivery vs Dine-in (Bar Chart)
+    // 7. Delivery vs Dine-in (Bar Chart)
     appendChart("Delivery vs Dine-in", createChart('bar', Object.keys(deliveryVsDineIn), Object.values(deliveryVsDineIn), 'Total'));
 
-    // 7. Peak Order Times (Bar Chart)
+    // 8. Peak Order Times (Bar Chart)
     const formattedHours = Object.keys(orderTimes)
         .map(hour => parseInt(hour))
         .sort((a, b) => a - b)
