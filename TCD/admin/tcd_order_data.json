@@ -1,4 +1,86 @@
 {
+    "IKZmgJe6vUzkBnlNc6Zy": {
+        "total_cart_value": 220,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 30,
+                            "quantity": 1,
+                            "id": 71,
+                            "name": "Hot And Sour"
+                        },
+                        {
+                            "price": 30,
+                            "quantity": 1,
+                            "id": 72,
+                            "name": "Manchow"
+                        },
+                        {
+                            "price": 30,
+                            "quantity": 1,
+                            "id": 73,
+                            "name": "Clear"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 130,
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Veg Salt And Pepper"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "created_at": "2025-02-04T06:56:49.010000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "6LlPeCfoLYeTmCmYqiCL": {
+        "total_cart_value": 150,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 30,
+                            "quantity": 1,
+                            "id": 72,
+                            "name": "Manchow"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 120,
+                            "quantity": 1,
+                            "id": 2701,
+                            "name": "Veg Biryani (Half)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "created_at": "2025-02-04T06:52:02.244000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "Approved",
+        "table_no": "COD"
+    },
     "JztPlSUHSR7I8S1HhQvM": {
         "total_cart_value": 120,
         "order_details": [
@@ -1021,7 +1103,7 @@
         ],
         "created_at": "2024-12-15T12:33:59.016000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Approved",
         "table_no": "2"
     },
     "osMN1zTfhRNPviordiTa": {
@@ -1049,7 +1131,7 @@
         ],
         "created_at": "2024-12-08T09:34:57.216000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "4"
     },
     "BMIWzsFxu222O2vKqypK": {
@@ -1109,7 +1191,7 @@
         ],
         "created_at": "2024-12-08T09:16:36.971000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "2"
     },
     "fR4BWQ1QygTlfK9aZHgG": {
@@ -1157,7 +1239,7 @@
         ],
         "created_at": "2024-12-01T15:40:12.626000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "2"
     },
     "FYClssoHFK9RxhdjsyA1": {
@@ -1179,7 +1261,7 @@
         ],
         "created_at": "2024-11-12T12:31:26.657000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "1"
     },
     "XAxA7QjUVHtSBP57Lkwz": {
@@ -1201,7 +1283,7 @@
         ],
         "created_at": "2024-11-12T12:29:37.124000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "1"
     },
     "jbcWM6Dn7gxn2khZyXTS": {
@@ -1236,7 +1318,7 @@
         ],
         "created_at": "2024-11-08T13:16:49.534000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "3"
     },
     "wl8shabwCloTDvWpihAp": {
@@ -1270,7 +1352,7 @@
         ],
         "created_at": "2024-10-29T04:22:23.054000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "5"
     },
     "tVu882AYUqaJHvEuaMkt": {
@@ -1354,7 +1436,7 @@
         ],
         "created_at": "2024-10-28T16:26:28.093000+00:00",
         "triggered_to": null,
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "2"
     },
     "Di3CdXibgwGDnglwXMie": {
@@ -1389,7 +1471,7 @@
         ],
         "created_at": "2024-10-28T15:13:31.781000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "2"
     },
     "WTCc9wuuJnd9C5x1fv3u": {
@@ -1436,7 +1518,7 @@
         ],
         "created_at": "2024-10-28T10:23:19.960000+00:00",
         "triggered_to": "+917077410424",
-        "status": "In Progress",
+        "status": "Rejected",
         "table_no": "4"
     },
     "IFkpXJsZvXJy7Mr7azSC": {
