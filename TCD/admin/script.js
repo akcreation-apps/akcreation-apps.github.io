@@ -822,7 +822,7 @@ function loadChartsFromJson(filteredData) {
     });
 
     // Append Charts
-    appendChart("Monthly Sales Comparison", createChart('bar', ["Last Month", "Current Month"], [lastMonthSales, currentMonthSales], "Total Sales"));
+    appendChart("Monthly Sales Comparison", createChart('bar', ["Last Month", "Current Month"], [lastMonthSales, currentMonthSales], "Total Sales", true));
     appendChart("Total Sales Over Time", createChart('bar', orderDatesArray, totalCartValuesArray, 'Total Sales'));
     appendChart("Category-wise Sales", createChart('pie', Object.keys(categoryValues), Object.values(categoryValues), 'Total Amount'));
     appendChart("Orders Per Table", createChart('bar', formattedTableLabels, Object.values(tableOrders), 'Total Orders'));
@@ -841,7 +841,7 @@ function loadChartsFromJson(filteredData) {
     enableInteractivity();
 }
 
-function createChart(type, labels, data, label) {
+function createChart(type, labels, data, label, showPercentage = false) {
     const chartCanvas = document.createElement('canvas');
     const chartWrapper = document.createElement('div');
     chartWrapper.classList.add('chart');
@@ -865,6 +865,14 @@ function createChart(type, labels, data, label) {
         return (index <= 2 && label === "Total Ordered") ? shortenLabel(innerLabel) : innerLabel;  // Shorten only the first label
     });
 
+     // Calculate percentage change ONLY for "Monthly Sales Comparison"
+     let percentText = "";
+     let percentageChange = 0;
+     if (showPercentage && data.length === 2 && data[0] !== 0) {
+         percentageChange = ((data[1] - data[0]) / data[0]) * 100;
+         percentText = percentageChange > 0 ? `📈 +${percentageChange.toFixed(2)}%` : `📉 ${percentageChange.toFixed(2)}%`;
+     }
+
     new Chart(chartCanvas, {
         type: type,
         data: {
@@ -882,6 +890,12 @@ function createChart(type, labels, data, label) {
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                subtitle: {
+                    display:label,
+                    text: showPercentage ? `Sales Growth: ${percentText}` : "",
+                    font: { size: 15, weight: 'bold' },
+                    color: percentageChange > 0 ? 'green' : 'red'
                 }
             }
         }
