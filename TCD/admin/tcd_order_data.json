@@ -1,4 +1,26 @@
 {
+    "kt2XpwcrFcZsXIrnH0Jh": {
+        "total_cart_value": 200,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 200,
+                            "quantity": 1,
+                            "id": 2804,
+                            "name": "Mutton Biryani"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "created_at": "2025-02-21T13:29:49.271000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "COD"
+    },
     "6joboSa0iGZzsYrfCjJ0": {
         "total_cart_value": 250,
         "order_details": [
