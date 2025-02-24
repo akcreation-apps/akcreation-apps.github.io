@@ -1,0 +1,140 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1e272e;
+    color: white;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.tagline {
+    font-size: 1.2em;
+    font-weight: 300;
+}
+
+.contact {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+.contact li {
+    display: inline;
+    margin-right: 15px;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+section {
+    background: #2c3e50;
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+h2 {
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+}
+
+.job, .project {
+    margin-bottom: 15px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background: #0f172a;
+    color: white;
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.soft-skills {
+    background: #34495e;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.soft-skills h2 {
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+}
+
+/* Header Styling */
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.profile img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #3498db;
+    margin-bottom: 10px;
+}
+
+.header-text {
+    text-align: center;
+}
+
+.contact-container {
+    display: flex;
+    justify-content: space-between;
+    background: #2c3e50;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.contact-left, .contact-right {
+    width: 48%;
+}
+
+.contact-left p, .contact-right p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.contact-right a {
+    color: #f1c40f;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.contact-right a:hover {
+    text-decoration: underline;
+}
