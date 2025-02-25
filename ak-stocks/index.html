@@ -11,6 +11,7 @@
         <h1>AK Stocks – Smart Investing for Passive Income!</h1>
         <p>We help you identify profitable stocks for dividend-based passive income.</p>
     </header>
+
     <section id="legal" class="legal-section">
         <h3>Disclaimer</h3>
         <p>- This website provides stock alerts based on logical analysis only.</p>
@@ -37,7 +38,42 @@
         <div id="stocks" class="hidden"></div>
         <p>Weekly review of NIFTY50 stocks and daily Buy/Sell alerts.</p>
     </section>
-    
+
+    <section id="orderHistory">
+        <h3>Recent Orders</h3>
+
+        <div class="order-container">
+            <div class="order-box">
+                <h4>Recent Buy Orders</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Datetime</th>
+                            <th>Stock Name</th>
+                            <th>Buy Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="buyOrders"></tbody>
+                </table>
+            </div>
+
+            <div class="order-box">
+                <h4>Recent Sell Orders</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Datetime</th>
+                            <th>Stock Name</th>
+                            <th>Sell Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sellOrders"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+
     <section id="why-join">
         <h2>Why Join AK Stocks?</h2>
         <ul>

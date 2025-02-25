@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    fetch("https://githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
+    fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -11,8 +11,19 @@ document.addEventListener("DOMContentLoaded", function () {
         displayLastFetchedTime(data);
       })
       .catch(error => console.error("Error fetching JSON:", error));
+
+    fetchOrders("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/buy_stock_details.json", "buyOrders");
+    fetchOrders("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/sell_stock_details.json", "sellOrders");
 });
 
+function fetchOrders(url, tableId) {
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            displayOrders(data, tableId);
+        })
+        .catch(error => console.error(`Error fetching ${tableId} data:`, error));
+}
 
 function toggleStockList() {
     const stockList = document.getElementById("stocks");
@@ -71,4 +82,16 @@ function displayLastFetchedTime(stocks) {
         const formattedTime = lastUpdated.toLocaleString(); // Format date to readable form
         lastFetchedSpan.textContent = `Last Fetched: ${formattedTime}`;
     }
+}
+
+function displayOrders(data, tableId) {
+    const tableBody = document.getElementById(tableId);
+    tableBody.innerHTML = "";
+
+    // Get last 5 Orders
+    const lastOrders = data.slice(-5).reverse();
+    lastOrders.forEach(order => {
+        const row = `<tr><td>${new Date(order.Time).toLocaleDateString()}</td><td>${order.Name}</td><td>Rs. ${order['Current Price']}/-</td></tr>`;
+        tableBody.innerHTML += row;
+    });
 }
