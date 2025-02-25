@@ -138,3 +138,14 @@ footer {
 .contact-right a:hover {
     text-decoration: underline;
 }
+
+/* Further Fix for Ultra-Small Screens (375px) */
+@media (max-width: 400px) {
+    .contact-right a {
+        font-size: 12px; /* Reduce font size for extra small screens */
+    }
+
+    .contact-left p, .contact-right p {
+        font-size: 12px;
+    }
+}
