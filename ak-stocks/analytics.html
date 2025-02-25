@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Analytics Dashboard</title>
+    <title>AK Stocks Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@3.9.0"></script>
 
@@ -21,12 +21,70 @@
             .chart-title { font-size: 16px; }
             .chart-description { font-size: 12px; }
         }
+        /* Navigation Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+.navbar img {
+    height: 40px;
+}
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 8px 15px;
+}
+.navbar a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+/* Logo and Text Styling */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-container img {
+    height: 40px;
+    margin-right: 10px; /* Space between logo and text */
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    transition: color 0.3s ease-in-out;
+}
+/* Hover Effect */
+.logo-container a:hover .logo-text {
+    color: #f4b400; /* Highlight color on hover */
+}
     </style>
 </head>
 <body>
-    <div class="container">
+    <header>
+         <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="logo-container">
+                <a class="logo-container" href="index.html">
+                    <img src="logo.png" alt="AK Stocks Logo">
+                    <span class="logo-text">AK Stocks</span>
+                </a>
+            </div>
+        </nav>
         <h1>Analytics Dashboard</h1>
+    </header>
 
+    <div class="container">
         <div class="chart-container">
             <canvas id="dividendROEChart"></canvas>
             <p class="chart-title">Dividend Yield vs ROE</p>
