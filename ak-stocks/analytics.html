@@ -10,7 +10,7 @@
     <style>
         body { background-color: #121212; color: white; font-family: Arial, sans-serif; text-align: center; }
         .container { max-width: 900px; margin: auto; padding: 20px; }
-        .chart-container { width: 100%; margin: 20px auto; }
+        .chart-container { width: 100%; max-width: 100%; height: auto; min-height: 250px; overflow: hidden; }
         .chart-title { margin-top: 10px; font-weight: bold; font-size: 18px; }
         .chart-description { font-size: 14px; color: #bbb; margin-bottom: 20px; }
         canvas { width: 100% !important; height: auto !important; max-height: 400px; }
@@ -76,10 +76,79 @@
             new Chart(ctx2, {
                 type: "scatter",
                 data: { datasets: [{ label: "Dividend Yield vs ROE", data: dividends.map((y, i) => ({ x: roe[i], y, label: labels[i] })), backgroundColor: "lime" }] },
-                options: { plugins: { tooltip: { callbacks: { label: function(tooltipItem) { return labels[tooltipItem.dataIndex] + ': ROE ' + tooltipItem.raw.x + ', Yield ' + tooltipItem.raw.y; } } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: function(tooltipItem) { return labels[tooltipItem.dataIndex] + ': ROE ' + tooltipItem.raw.x + ', Yield ' + tooltipItem.raw.y; } } } } }
             });
-            new Chart(ctx4, { type: "bar", data: { labels, datasets: [{ label: "Total Returns", data: totalReturns, backgroundColor: "orange" }] } });
-            new Chart(ctx5, { type: "bar", data: { labels, datasets: [{ label: "Debt to Equity Ratio", data: debtEquity, backgroundColor: "pink" }] } });
+            new Chart(ctx4, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: "Total Returns",
+                        data: totalReturns,
+                        backgroundColor: "orange",
+                        barPercentage: 0.6, // Adjust bar width
+                        categoryPercentage: 0.8 // Adjust category spacing
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allows chart to adjust height freely
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: "white",
+                                callback: function(value) {
+                                    let label = labels[value] || "";
+                                    return label.length > 10 ? label.substring(0, 10) + "..." : label;
+                                }
+                             }
+                        },
+                        y: {
+                            ticks: { color: "white" },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: "white" } }
+                    }
+                }
+            });
+            new Chart(ctx5, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: "Debt to Equity Ratio",
+                        data: debtEquity,
+                        backgroundColor: "pink",
+                        barPercentage: 0.6, // Adjusts bar width for better visibility
+                        categoryPercentage: 0.8 // Ensures spacing between bars is consistent
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allows chart to dynamically adjust height
+                    scales: {
+                        x: {
+                            ticks: {
+                            color: "white",
+                            callback: function(value) {
+                                    let label = labels[value] || "";
+                                    return label.length > 10 ? label.substring(0, 10) + "..." : label;
+                                }
+                            }
+                        },
+                        y: {
+                            ticks: { color: "white" },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: "white" } }
+                    }
+                }
+            });
+
         }
     </script>
 </body>
