@@ -33,10 +33,12 @@ header {
 
 section {
     padding: 20px;
-    margin: 20px;
+    margin: 20px auto;
     background: #1e1e1e;
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+    max-width: 800px;
+    text-align: left;
 }
 
 button {
@@ -61,16 +63,67 @@ ul {
     list-style: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
     justify-content: center;
+    text-align: center;
 }
 
 li {
     background: #333;
     margin: 5px 0;
-    padding: 10px;
+    padding: 12px;
     border-radius: 6px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-    text-align: center;
+}
+
+/* Chat with Admin Section */
+.chat-section {
+    padding: 20px;
+    background: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-input-container input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    width: 100%;
+}
+
+.chat-input-container button {
+    padding: 10px 20px;
+    background: #03dac6;
+    color: #121212;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.chat-input-container button:hover {
+    background: #018786;
+}
+
+.error-message {
+    color: #ff5252;
+    font-size: 14px;
+    display: none;
 }
