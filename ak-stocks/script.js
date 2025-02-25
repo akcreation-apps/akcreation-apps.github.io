@@ -1,8 +1,18 @@
 document.addEventListener("DOMContentLoaded", function () {
-    fetch("stocks.json")
-        .then(response => response.json())
-        .then(data => displayStocks(data));
+    fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Return the parsed JSON
+      })
+      .then(data => {
+        displayStocks(data); // Now `data` is available
+        displayLastFetchedTime(data);
+      })
+      .catch(error => console.error("Error fetching JSON:", error));
 });
+
 
 function toggleStockList() {
     const stockList = document.getElementById("stocks");
@@ -11,7 +21,7 @@ function toggleStockList() {
 
 function displayStocks(stocks) {
     const stockListDiv = document.getElementById("stocks");
-    stockListDiv.innerHTML = "<h3>Tracked Stocks</h3>";
+    stockListDiv.innerHTML = "<h3>Tracked Stocks</h3><p id='lastFetched'></p>";
 
     const ul = document.createElement("ul");
     const stockUrls = new Set(); // To avoid duplicates
@@ -21,7 +31,7 @@ function displayStocks(stocks) {
             stockUrls.add(stock.Url);
 
             const li = document.createElement("li");
-            li.textContent = `${stock.Name} - Rs. ${stock["Current Price"]}/-`;
+            li.textContent = `${stock.Name} (Rs. ${stock["Current Price"]}/-)`;
             li.style.cursor = "pointer";
             li.onclick = () => window.open(stock.Url, "_blank");
             ul.appendChild(li);
@@ -52,3 +62,13 @@ document.getElementById("chatMessage").addEventListener("input", function () {
     document.getElementById("error-message").style.display = "none";
 });
 
+// Function to display last fetched time
+function displayLastFetchedTime(stocks) {
+    if (stocks.length > 0 && stocks[0].hasOwnProperty("Time")) {
+        const lastFetchedSpan = document.getElementById("lastFetched");
+        const lastUpdated = new Date(stocks[0]["Time"]); // Convert to date
+
+        const formattedTime = lastUpdated.toLocaleString(); // Format date to readable form
+        lastFetchedSpan.textContent = `Last Fetched: ${formattedTime}`;
+    }
+}
