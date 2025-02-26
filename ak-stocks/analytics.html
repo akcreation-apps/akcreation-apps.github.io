@@ -3,76 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AK Stocks provides smart stock alerts for passive income through dividend investing. Get real-time analytics and investment strategies.">
+    <meta name="keywords" content="stocks, passive income, dividend, investing, financial freedom, stock alerts">
     <title>AK Stocks Analytics Dashboard</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@3.9.0"></script>
-
     <style>
         body { background-color: #121212; color: white; font-family: Arial, sans-serif; text-align: center; }
         .container { max-width: 900px; margin: auto; padding: 20px; }
-        .chart-container { width: 100%; max-width: 100%; height: auto; min-height: 250px; overflow: hidden; }
+        .chart-container { width: 100%; max-width: 100%; height: auto; min-height: 250px; overflow: hidden; position: relative; }
         .chart-title { margin-top: 10px; font-weight: bold; font-size: 18px; }
         .chart-description { font-size: 14px; color: #bbb; margin-bottom: 20px; }
+        .loading { color: #f4b400; font-size: 14px; }
         canvas { width: 100% !important; height: auto !important; max-height: 400px; }
-        @media (max-width: 600px) {
-            .container { padding: 10px; }
-            .chart-container { margin: 10px auto; }
-            canvas { max-height: 250px; }
-            .chart-title { font-size: 16px; }
-            .chart-description { font-size: 12px; }
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.1); padding: 15px 20px;
+            position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px);
         }
-        /* Navigation Bar */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 15px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    backdrop-filter: blur(10px);
-}
-.navbar img {
-    height: 40px;
-}
-.navbar a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 8px 15px;
-}
-.navbar a:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-}
-
-/* Logo and Text Styling */
-.logo-container {
-    display: flex;
-    align-items: center;
-}
-
-.logo-container img {
-    height: 40px;
-    margin-right: 10px; /* Space between logo and text */
-}
-
-.logo-text {
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    transition: color 0.3s ease-in-out;
-}
-/* Hover Effect */
-.logo-container a:hover .logo-text {
-    color: #f4b400; /* Highlight color on hover */
-}
+        .navbar a { color: white; text-decoration: none; font-size: 18px; padding: 8px 15px; }
+        .navbar a:hover { background: rgba(255, 255, 255, 0.2); border-radius: 5px; }
+        .logo-container { display: flex; align-items: center; }
+        .logo-container img { height: 40px; margin-right: 10px; }
+        .logo-text { font-size: 20px; font-weight: bold; color: white; transition: color 0.3s ease-in-out; }
+        .logo-container a:hover .logo-text { color: #f4b400; }
     </style>
 </head>
 <body>
     <header>
-         <!-- Navigation Bar -->
         <nav class="navbar">
             <div class="logo-container">
                 <a class="logo-container" href="index.html">
@@ -80,133 +39,65 @@
                     <span class="logo-text">AK Stocks</span>
                 </a>
             </div>
+            <a href="index.html">Home</a>
         </nav>
         <h1>Analytics Dashboard</h1>
     </header>
-
     <div class="container">
         <div class="chart-container">
+            <span class="loading">Loading...</span>
             <canvas id="dividendROEChart"></canvas>
             <p class="chart-title">Dividend Yield vs ROE</p>
-            <p class="chart-description">A scatter plot showing the relationship between Return on Equity (ROE) and Dividend Yield. High ROE with a stable dividend yield can indicate a strong company.</p>
+            <p class="chart-description">Relationship between Return on Equity (ROE) and Dividend Yield.</p>
         </div>
-
         <div class="chart-container">
+            <span class="loading">Loading...</span>
             <canvas id="performanceChart"></canvas>
             <p class="chart-title">Total Returns</p>
-            <p class="chart-description">Compare the total returns of different stocks to identify the most profitable investments over time.</p>
+            <p class="chart-description">Compare total returns of different stocks.</p>
         </div>
-
         <div class="chart-container">
+            <span class="loading">Loading...</span>
             <canvas id="debtEquityChart"></canvas>
             <p class="chart-title">Debt-to-Equity Ratio</p>
-            <p class="chart-description">A high Debt-to-Equity ratio may indicate financial risk, whereas a low ratio suggests stability. Balance is key.</p>
+            <p class="chart-description">Financial stability assessment.</p>
         </div>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-              })
+              .then(response => response.json())
               .then(data => {
                 const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
                 renderCharts(uniqueStocks);
               })
               .catch(error => console.error("Error fetching JSON:", error));
         });
-
         function renderCharts(stocks) {
+            document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
             const ctx2 = document.getElementById("dividendROEChart").getContext("2d");
             const ctx4 = document.getElementById("performanceChart").getContext("2d");
             const ctx5 = document.getElementById("debtEquityChart").getContext("2d");
-
             const labels = stocks.map(stock => stock.Name);
             const dividends = stocks.map(stock => stock["Dividend Yield"]);
             const roe = stocks.map(stock => stock["ROE"]);
             const totalReturns = stocks.map(stock => stock["Total Returns"]);
             const debtEquity = stocks.map(stock => stock["Debt to Equity"]);
-
             new Chart(ctx2, {
                 type: "scatter",
                 data: { datasets: [{ label: "Dividend Yield vs ROE", data: dividends.map((y, i) => ({ x: roe[i], y, label: labels[i] })), backgroundColor: "lime" }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: function(tooltipItem) { return labels[tooltipItem.dataIndex] + ': ROE ' + tooltipItem.raw.x + ', Yield ' + tooltipItem.raw.y; } } } } }
+                options: { responsive: true, maintainAspectRatio: false }
             });
             new Chart(ctx4, {
                 type: "bar",
-                data: {
-                    labels,
-                    datasets: [{
-                        label: "Total Returns",
-                        data: totalReturns,
-                        backgroundColor: "orange",
-                        barPercentage: 0.6, // Adjust bar width
-                        categoryPercentage: 0.8 // Adjust category spacing
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // Allows chart to adjust height freely
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: "white",
-                                callback: function(value) {
-                                    let label = labels[value] || "";
-                                    return label.length > 10 ? label.substring(0, 10) + "..." : label;
-                                }
-                             }
-                        },
-                        y: {
-                            ticks: { color: "white" },
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: "white" } }
-                    }
-                }
+                data: { labels, datasets: [{ label: "Total Returns", data: totalReturns, backgroundColor: "orange" }] },
+                options: { responsive: true, maintainAspectRatio: false }
             });
             new Chart(ctx5, {
                 type: "bar",
-                data: {
-                    labels,
-                    datasets: [{
-                        label: "Debt to Equity Ratio",
-                        data: debtEquity,
-                        backgroundColor: "pink",
-                        barPercentage: 0.6, // Adjusts bar width for better visibility
-                        categoryPercentage: 0.8 // Ensures spacing between bars is consistent
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // Allows chart to dynamically adjust height
-                    scales: {
-                        x: {
-                            ticks: {
-                            color: "white",
-                            callback: function(value) {
-                                    let label = labels[value] || "";
-                                    return label.length > 10 ? label.substring(0, 10) + "..." : label;
-                                }
-                            }
-                        },
-                        y: {
-                            ticks: { color: "white" },
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: "white" } }
-                    }
-                }
+                data: { labels, datasets: [{ label: "Debt to Equity Ratio", data: debtEquity, backgroundColor: "pink" }] },
+                options: { responsive: true, maintainAspectRatio: false }
             });
-
         }
     </script>
 </body>
