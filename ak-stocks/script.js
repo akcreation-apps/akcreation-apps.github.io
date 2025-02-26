@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json(); // Return the parsed JSON
       })
       .then(data => {
-        displayStocks(data); // Now `data` is available
-        displayLastFetchedTime(data);
+        const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
+        renderCharts(uniqueStocks);
       })
       .catch(error => console.error("Error fetching JSON:", error));
 
@@ -23,32 +23,6 @@ function fetchOrders(url, tableId) {
             displayOrders(data, tableId);
         })
         .catch(error => console.error(`Error fetching ${tableId} data:`, error));
-}
-
-function toggleStockList() {
-    const stockList = document.getElementById("stocks");
-    stockList.classList.toggle("hidden");
-}
-
-function displayStocks(stocks) {
-    const stockListDiv = document.getElementById("stocks");
-    stockListDiv.innerHTML = "<h3>Tracked Stocks</h3><p id='lastFetched'></p>";
-
-    const ul = document.createElement("ul");
-    const stockUrls = new Set(); // To avoid duplicates
-
-    stocks.forEach(stock => {
-        if (!stockUrls.has(stock.Url)) {
-            stockUrls.add(stock.Url);
-
-            const li = document.createElement("li");
-            li.textContent = `${stock.Name} (Rs. ${stock["Current Price"]}/-)`;
-            li.style.cursor = "pointer";
-            li.onclick = () => window.open(stock.Url, "_blank");
-            ul.appendChild(li);
-        }
-    });
-    stockListDiv.appendChild(ul);
 }
 
 function sendMessage() {
@@ -73,17 +47,6 @@ document.getElementById("chatMessage").addEventListener("input", function () {
     document.getElementById("error-message").style.display = "none";
 });
 
-// Function to display last fetched time
-function displayLastFetchedTime(stocks) {
-    if (stocks.length > 0 && stocks[0].hasOwnProperty("Time")) {
-        const lastFetchedSpan = document.getElementById("lastFetched");
-        const lastUpdated = new Date(stocks[0]["Time"]); // Convert to date
-
-        const formattedTime = lastUpdated.toLocaleString(); // Format date to readable form
-        lastFetchedSpan.textContent = `Last Fetched: ${formattedTime}`;
-    }
-}
-
 function displayOrders(data, tableId) {
     const tableBody = document.getElementById(tableId);
     tableBody.innerHTML = "";
@@ -93,5 +56,40 @@ function displayOrders(data, tableId) {
     lastOrders.forEach(order => {
         const row = `<tr><td>${new Date(order.Time).toLocaleDateString()}</td><td>${order.Name}</td><td>Rs. ${order['Current Price']}/-</td></tr>`;
         tableBody.innerHTML += row;
+    });
+}
+function truncateLabel(label, maxLength = 20) {
+    return label.length > maxLength ? label.substring(0, maxLength) + "…" : label;
+}
+function renderCharts(stocks) {
+    document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
+    const ctx2 = document.getElementById("dividendROEChart").getContext("2d");
+    const ctx5 = document.getElementById("debtEquityChart").getContext("2d");
+
+    const labels = stocks.map(stock => truncateLabel(stock.Name));
+    const dividends = stocks.map(stock => stock["Dividend Yield"]);
+    const roe = stocks.map(stock => stock["ROE"]);
+    const debtEquity = stocks.map(stock => stock["Debt to Equity"]);
+
+    new Chart(ctx2, {
+        type: "scatter",
+        data: {
+            datasets: [{
+                label: "Dividend Yield vs ROE",
+                data: dividends.map((y, i) => ({ x: roe[i], y, label: labels[i] })),
+                backgroundColor: "lime"
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false,  plugins: { tooltip: { callbacks: { label: function(tooltipItem) { return labels[tooltipItem.dataIndex] + ': ROE ' + tooltipItem.raw.x + ', Yield ' + tooltipItem.raw.y; } } } } }
+    });
+
+    new Chart(ctx5, {
+        type: "bar",
+        data: { labels, datasets: [{ label: "Debt to Equity Ratio", data: debtEquity, backgroundColor: "pink" }] },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { x: { ticks: { callback: (value) => truncateLabel(value) } } }
+        }
     });
 }

@@ -105,43 +105,25 @@
 </head>
 <body>
     <header>
-        <nav class="navbar">
-            <div class="logo-container">
-                <a class="logo-container" href="index.html">
-                    <img src="logo.png" alt="📊 AK Stocks Logo">
-                    <span class="logo-text">AK Stocks</span>
-                </a>
-            </div>
-            <a href="index.html">🏠 Home</a>
-        </nav>
+<!--        <nav class="navbar">-->
+<!--            <div class="logo-container">-->
+<!--                <a class="logo-container" href="index.html">-->
+<!--                    <img src="logo.png" alt="📊 AK Stocks Logo">-->
+<!--                    <span class="logo-text">AK Stocks</span>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--            <a href="index.html">🏠 Home</a>-->
+<!--        </nav>-->
         <h1>📊 Analytics Dashboard</h1>
     </header>
 
     <div class="container">
-        <div class="chart-section">
-            <p class="chart-title">💰 Dividend Yield vs ROE</p>
-            <p class="chart-description">📊 High ROE with a stable dividend yield can indicate a strong company.</p>
-            <div class="chart-container">
-                <span class="loading">⏳ Loading...</span>
-                <canvas id="dividendROEChart"></canvas>
-            </div>
-        </div>
-
         <div class="chart-section">
             <p class="chart-title">📈 Total Returns</p>
             <p class="chart-description">📊 Compare total returns of different stocks.</p>
             <div class="chart-container">
                 <span class="loading">⏳ Loading...</span>
                 <canvas id="performanceChart"></canvas>
-            </div>
-        </div>
-
-        <div class="chart-section">
-            <p class="chart-title">⚖️ Debt-to-Equity Ratio</p>
-            <p class="chart-description">🔍 A high Debt-to-Equity ratio may indicate financial risk, whereas a low ratio suggests stability.</p>
-            <div class="chart-container">
-                <span class="loading">⏳ Loading...</span>
-                <canvas id="debtEquityChart"></canvas>
             </div>
         </div>
     </div>
@@ -163,41 +145,14 @@
 
         function renderCharts(stocks) {
             document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
-            const ctx2 = document.getElementById("dividendROEChart").getContext("2d");
             const ctx4 = document.getElementById("performanceChart").getContext("2d");
-            const ctx5 = document.getElementById("debtEquityChart").getContext("2d");
 
             const labels = stocks.map(stock => truncateLabel(stock.Name));
-            const dividends = stocks.map(stock => stock["Dividend Yield"]);
-            const roe = stocks.map(stock => stock["ROE"]);
             const totalReturns = stocks.map(stock => stock["Total Returns"]);
-            const debtEquity = stocks.map(stock => stock["Debt to Equity"]);
-
-            new Chart(ctx2, {
-                type: "scatter",
-                data: {
-                    datasets: [{
-                        label: "Dividend Yield vs ROE",
-                        data: dividends.map((y, i) => ({ x: roe[i], y, label: labels[i] })),
-                        backgroundColor: "lime"
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false,  plugins: { tooltip: { callbacks: { label: function(tooltipItem) { return labels[tooltipItem.dataIndex] + ': ROE ' + tooltipItem.raw.x + ', Yield ' + tooltipItem.raw.y; } } } } }
-            });
 
             new Chart(ctx4, {
                 type: "bar",
                 data: { labels, datasets: [{ label: "Total Returns", data: totalReturns, backgroundColor: "orange" }] },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { ticks: { callback: (value) => truncateLabel(value) } } }
-                }
-            });
-
-            new Chart(ctx5, {
-                type: "bar",
-                data: { labels, datasets: [{ label: "Debt to Equity Ratio", data: debtEquity, backgroundColor: "pink" }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,

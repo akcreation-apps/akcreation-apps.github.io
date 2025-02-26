@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="📜 View the complete list of stocks with key financial metrics.">
+    <meta name="keywords" content="stocks, stock list, financial data, investing">
+    <title>📜 Stock List - AK Stocks</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 10px;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 8px 15px;
+        }
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo-container img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            transition: color 0.3s ease-in-out;
+        }
+        .logo-container a:hover .logo-text {
+            color: #f4b400;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .note {
+            font-size: 14px;
+            margin-top: -10px;
+            color: #f4b400;
+        }
+        input {
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: #222;
+            color: white;
+            font-size: 16px;
+        }
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            min-width: 600px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #333;
+            color: #f4b400;
+            font-size: 14px;
+        }
+        td {
+            font-size: 14px;
+        }
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            input {
+                font-size: 14px;
+                padding: 10px;
+            }
+            table {
+                min-width: 100%;
+            }
+            th, td {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 18px;
+            }
+            input {
+                font-size: 14px;
+            }
+            th, td {
+                font-size: 11px;
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <a class="logo-container" href="index.html">
+                    <img onclick="window.location.href=''" src="logo.png" alt="📊 AK Stocks Logo">
+                    <span onclick="window.location.href=''" class="logo-text">AK Stocks</span>
+                </a>
+            </div>
+            <div>
+                <a href="index.html">Home</a>
+            </div>
+        </nav>
+        <h1>📜 List of Stocks</h1>
+        <p class="note">🔗 Click on a stock to view it on Groww.</p>
+        <input type="text" id="searchBox" placeholder="🔍 Search stocks..." onkeyup="searchStocks()">
+    </header>
+    <div class="container">
+        <div class="table-container">
+            <table id="stockTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Current Value</th>
+                        <th>Dividend Yield</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
+              .then(response => response.json())
+              .then(data => {
+                  const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
+                  renderStockList(uniqueStocks);
+              })
+              .catch(error => console.error("❌ Error fetching JSON:", error));
+        });
+
+        function renderStockList(stocks) {
+            const tbody = document.querySelector("#stockTable tbody");
+            tbody.innerHTML = "";
+            stocks.forEach(stock => {
+                const row = document.createElement("tr");
+                const stockUrl = stock.Url;
+                row.innerHTML = `
+                    <td>${stock.Name}</td>
+                    <td>₹ ${stock["Current Price"]}/-</td>
+                    <td>${stock["Dividend Yield"]}</td>
+                `;
+                row.onclick = () => window.open(stockUrl, "_blank"); // Open in new tab
+                tbody.appendChild(row);
+            });
+        }
+
+        function searchStocks() {
+            const filter = document.getElementById("searchBox").value.toLowerCase();
+            const rows = document.querySelectorAll("#stockTable tbody tr");
+            rows.forEach(row => {
+                const stockName = row.cells[0].innerText.toLowerCase();
+                row.style.display = stockName.includes(filter) ? "" : "none";
+            });
+        }
+    </script>
+</body>
+</html>
