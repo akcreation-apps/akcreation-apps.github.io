@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AK Stocks provides smart stock alerts for passive income through dividend investing. Get real-time analytics and investment strategies.">
-    <meta name="keywords" content="stocks, passive income, dividend, investing, financial freedom, stock alerts">
-    <title>AK Stocks Analytics Dashboard</title>
+    <meta name="description" content="📊 AK Stocks provides smart stock alerts for passive income through dividend investing. Get real-time analytics and investment strategies.">
+    <meta name="keywords" content="📈 stocks, passive income, dividend, investing, financial freedom, stock alerts">
+    <title>📊 AK Stocks Analytics Dashboard</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@3.9.0"></script>
@@ -35,32 +35,32 @@
         <nav class="navbar">
             <div class="logo-container">
                 <a class="logo-container" href="index.html">
-                    <img src="logo.png" alt="AK Stocks Logo">
+                    <img src="logo.png" alt="📊 AK Stocks Logo">
                     <span class="logo-text">AK Stocks</span>
                 </a>
             </div>
-            <a href="index.html">Home</a>
+            <a href="index.html">🏠 Home</a>
         </nav>
-        <h1>Analytics Dashboard</h1>
+        <h1>📊 Analytics Dashboard</h1>
     </header>
     <div class="container">
         <div class="chart-container">
-            <span class="loading">Loading...</span>
+            <span class="loading">⏳ Loading...</span>
             <canvas id="dividendROEChart"></canvas>
-            <p class="chart-title">Dividend Yield vs ROE</p>
-            <p class="chart-description">Relationship between Return on Equity (ROE) and Dividend Yield.</p>
+            <p class="chart-title">💰 Dividend Yield vs ROE</p>
+            <p class="chart-description">📊 High ROE with a stable dividend yield can indicate a strong company..</p>
         </div>
         <div class="chart-container">
-            <span class="loading">Loading...</span>
+            <span class="loading">⏳ Loading...</span>
             <canvas id="performanceChart"></canvas>
-            <p class="chart-title">Total Returns</p>
-            <p class="chart-description">Compare total returns of different stocks.</p>
+            <p class="chart-title">📈 Total Returns</p>
+            <p class="chart-description">📊 Compare total returns of different stocks.</p>
         </div>
         <div class="chart-container">
-            <span class="loading">Loading...</span>
+            <span class="loading">⏳ Loading...</span>
             <canvas id="debtEquityChart"></canvas>
-            <p class="chart-title">Debt-to-Equity Ratio</p>
-            <p class="chart-description">Financial stability assessment.</p>
+            <p class="chart-title">⚖️ Debt-to-Equity Ratio</p>
+            <p class="chart-description">🔍 A high Debt-to-Equity ratio may indicate financial risk, whereas a low ratio suggests stability.</p>
         </div>
     </div>
     <script>
@@ -71,7 +71,7 @@
                 const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
                 renderCharts(uniqueStocks);
               })
-              .catch(error => console.error("Error fetching JSON:", error));
+              .catch(error => console.error("❌ Error fetching JSON:", error));
         });
         function renderCharts(stocks) {
             document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
