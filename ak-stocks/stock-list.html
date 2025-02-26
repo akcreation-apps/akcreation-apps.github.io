@@ -67,6 +67,11 @@
             margin-top: -10px;
             color: #f4b400;
         }
+        .timestamp {
+            font-size: 12px;
+            color: #bbb;
+            margin-top: 5px;
+        }
         input {
             padding: 12px;
             margin: 10px 0;
@@ -159,6 +164,7 @@
         <h1>📜 List of Stocks</h1>
         <p class="note">🔗 Click on a stock to view it on Groww.</p>
         <input type="text" id="searchBox" placeholder="🔍 Search stocks..." onkeyup="searchStocks()">
+        <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
     </header>
     <div class="container">
         <div class="table-container">
@@ -182,8 +188,12 @@
               .then(data => {
                   const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
                   renderStockList(uniqueStocks);
+                  updateLastFetchedTime(uniqueStocks[0]?.["Time"]);
               })
-              .catch(error => console.error("❌ Error fetching JSON:", error));
+              .catch(error => {
+                  console.error("❌ Error fetching JSON:", error);
+                  document.getElementById("lastFetchedTime").textContent = "❌ Failed to fetch data";
+              });
         });
 
         function renderStockList(stocks) {
@@ -209,6 +219,22 @@
                 const stockName = row.cells[0].innerText.toLowerCase();
                 row.style.display = stockName.includes(filter) ? "" : "none";
             });
+        }
+
+        function updateLastFetchedTime(timestamp) {
+            if (!timestamp) {
+                document.getElementById("lastFetchedTime").textContent = "⏳ Last fetched time: Unknown";
+                return;
+            }
+
+            const date = new Date(timestamp);
+            if (isNaN(date.getTime())) {
+                document.getElementById("lastFetchedTime").textContent = "⏳ Last fetched time: Invalid Date";
+                return;
+            }
+
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById("lastFetchedTime").textContent = `⏳ Last fetched at: ${date.toLocaleString('en-IN', options)}`;
         }
     </script>
 </body>
