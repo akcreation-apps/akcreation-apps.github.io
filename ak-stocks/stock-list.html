@@ -159,7 +159,7 @@
             </div>
         </nav>
         <h1>📜 List of Stocks</h1>
-        <p class="note">🔗 Click on a stock to view it on Groww.</p>
+        <p class="note">🔗 Click on a stock name to view it on Groww.</p>
         <input type="text" id="searchBox" placeholder="🔍 Search stocks..." onkeyup="searchStocks()">
         <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
     </header>
@@ -201,11 +201,10 @@
                 const row = document.createElement("tr");
                 const stockUrl = stock.Url;
                 row.innerHTML = `
-                    <td>${stock.Name}</td>
+                    <td><a href="${stockUrl}" target="_blank" style="text-decoration: none; color: inherit;">${stock.Name}</a></td>
                     <td>₹ ${stock["Current Price"]}/-</td>
                     <td>${stock["Dividend Yield"]}</td>
                 `;
-                row.onclick = () => window.open(stockUrl, "_blank");
                 tbody.appendChild(row);
             });
         }
