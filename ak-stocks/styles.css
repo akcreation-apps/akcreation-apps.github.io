@@ -257,3 +257,8 @@ th {
 tr:hover {
     background: #333;
 }
+@media (max-width: 768px) {
+    header {
+        padding: 10px;
+    }
+}
