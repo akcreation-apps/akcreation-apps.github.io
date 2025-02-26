@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="📜 View the complete list of stocks with key financial metrics.">
     <meta name="keywords" content="stocks, stock list, financial data, investing">
-    <title>📜 Stock List - AK Stocks</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Stock List - AK Stocks</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <style>
         body {
             background-color: #121212;
@@ -26,7 +26,6 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(255, 255, 255, 0.1);
-            padding: 0px 20px;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -64,7 +63,6 @@
         }
         .note {
             font-size: 14px;
-            margin-top: -10px;
             color: #f4b400;
         }
         .timestamp {
@@ -73,17 +71,16 @@
             margin-top: 5px;
         }
         input {
+            width: 100%;
+            max-width: 400px; /* Prevents it from becoming too wide on large screens */
             padding: 12px;
-            margin: 10px 0;
+            margin: 10px auto; /* Centers the input */
+            display: block; /* Ensures it's centered */
             border: none;
             border-radius: 5px;
             background: #222;
             color: white;
             font-size: 16px;
-        }
-        .table-container {
-            overflow-x: auto;
-            border-radius: 8px;
         }
         table {
             width: 100%;
@@ -91,26 +88,24 @@
             margin-top: 10px;
             background: #1e1e1e;
             border-radius: 8px;
-            overflow: hidden;
             min-width: 600px;
         }
         th, td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #444;
-            white-space: nowrap;
+            cursor: pointer;
         }
         th {
             background-color: #333;
             color: #f4b400;
             font-size: 14px;
         }
-        td {
-            font-size: 14px;
+        th:hover {
+            background-color: #444;
         }
         tr:hover {
             background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
         }
 
         /* Responsive Styles */
@@ -139,7 +134,9 @@
                 font-size: 18px;
             }
             input {
+                width: 90%; /* Makes it fit small screens */
                 font-size: 14px;
+                padding: 10px;
             }
             th, td {
                 font-size: 11px;
@@ -167,28 +164,29 @@
         <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
     </header>
     <div class="container">
-        <div class="table-container">
-            <table id="stockTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Current Value</th>
-                        <th>Dividend Yield</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <table id="stockTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable('Name', 0)">Name <span id="icon-0">⬆️⬇️</span></th>
+                    <th onclick="sortTable('Current Price', 1)">Current Value <span id="icon-1">⬆️⬇️</span></th>
+                    <th onclick="sortTable('Dividend Yield', 2)">Dividend Yield <span id="icon-2">⬆️⬇️</span></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
     <script>
+        let stockData = [];
+        let sortOrder = [true, true, true]; // Track sort order (true = ascending)
+
         document.addEventListener("DOMContentLoaded", function () {
             fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
               .then(response => response.json())
               .then(data => {
-                  const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
-                  renderStockList(uniqueStocks);
-                  updateLastFetchedTime(uniqueStocks[0]?.["Time"]);
+                  stockData = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
+                  renderStockList(stockData);
+                  updateLastFetchedTime(stockData[0]?.["Time"]);
               })
               .catch(error => {
                   console.error("❌ Error fetching JSON:", error);
@@ -207,7 +205,7 @@
                     <td>₹ ${stock["Current Price"]}/-</td>
                     <td>${stock["Dividend Yield"]}</td>
                 `;
-                row.onclick = () => window.open(stockUrl, "_blank"); // Open in new tab
+                row.onclick = () => window.open(stockUrl, "_blank");
                 tbody.appendChild(row);
             });
         }
@@ -235,6 +233,40 @@
 
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
             document.getElementById("lastFetchedTime").textContent = `⏳ Last fetched at: ${date.toLocaleString('en-IN', options)}`;
+        }
+
+        function sortTable(columnName, columnIndex) {
+            document.getElementById("searchBox").value = "";
+            sortOrder[columnIndex] = !sortOrder[columnIndex]; // Toggle sort order
+            stockData.sort((a, b) => {
+                let valA = a[columnName];
+                let valB = b[columnName];
+
+                if (columnIndex === 0) {
+                    // ✅ Name Sorting (String)
+                    valA = valA.toLowerCase();
+                    valB = valB.toLowerCase();
+                    return sortOrder[columnIndex] ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    // ✅ Numeric Sorting (Current Price, Dividend Yield)
+                    valA = parseFloat(valA) || 0;
+                    valB = parseFloat(valB) || 0;
+                    return sortOrder[columnIndex] ? valA - valB : valB - valA;
+                }
+            });
+
+            updateSortIcons(columnIndex);
+            renderStockList(stockData);
+        }
+
+
+        function updateSortIcons(activeIndex) {
+            const icons = ["icon-0", "icon-1", "icon-2"];
+            icons.forEach((id, index) => {
+                document.getElementById(id).textContent = (index === activeIndex)
+                    ? (sortOrder[index] ? "⬆️" : "⬇️")
+                    : "⬆️⬇️";
+            });
         }
     </script>
 </body>
