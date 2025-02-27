@@ -70,6 +70,10 @@
             color: #bbb;
             margin-top: 5px;
         }
+        .low-value {
+            background-color: rgba(255, 0, 0, 0.2) !important;
+            color: #ff4d4d;
+        }
         input {
             width: 100%;
             max-width: 400px; /* Prevents it from becoming too wide on large screens */
@@ -163,6 +167,9 @@
         <input type="text" id="searchBox" placeholder="🔍 Search stocks..." onkeyup="searchStocks()">
         <p id="stockCount" class="timestamp">Total Stocks: 0</p>
         <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
+        <p id="redFlagNote" class="note" style="display: none; color: red;">
+            ⚠️ Red Flag Stocks are ready to sell once they achieve 13% profit!
+        </p>
     </header>
     <div class="container">
         <table id="stockTable">
@@ -171,6 +178,7 @@
                     <th onclick="sortTable('Name', 0)">Name <span id="icon-0">⬆️⬇️</span></th>
                     <th onclick="sortTable('Current Price', 1)">Current Value <span id="icon-1">⬆️⬇️</span></th>
                     <th onclick="sortTable('Dividend Yield', 2)">Dividend Yield <span id="icon-2">⬆️⬇️</span></th>
+                    <th onclick="sortTable('ROE', 3)">ROE <span id="icon-3">⬆️⬇️</span></th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -199,16 +207,30 @@
             const tbody = document.querySelector("#stockTable tbody");
             tbody.innerHTML = "";
             stocks.forEach(stock => {
-                const row = document.createElement("tr");
                 const stockUrl = stock.Url;
+                const dividendYield = parseFloat(stock["Dividend Yield"]) || 0;
+                const roe = parseFloat(stock["ROE"]) || 0;
+                const isLowValue  = dividendYield < 2 || roe < 10;
+                const row = document.createElement("tr");
+                if (isLowValue) hasRedFlag = true;
+                if (isLowValue) {
+                    row.classList.add("low-value"); // ✅ Only add if condition matches
+                }
                 row.innerHTML = `
                     <td><a href="${stockUrl}" target="_blank" style="text-decoration: none; color: inherit;">${stock.Name}</a></td>
                     <td>₹ ${stock["Current Price"]}/-</td>
                     <td>${stock["Dividend Yield"]}</td>
+                    <td>${stock["ROE"]}</td>
                 `;
                 tbody.appendChild(row);
             });
             document.getElementById("stockCount").textContent = `📊 Total Stocks: ${stocks.length}`;
+            const redFlagNote = document.getElementById("redFlagNote");
+            if (hasRedFlag) {
+                redFlagNote.style.display = "block";
+            } else {
+                redFlagNote.style.display = "none";
+            }
         }
 
         function searchStocks() {
