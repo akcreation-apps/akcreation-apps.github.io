@@ -71,28 +71,6 @@
         <p>📲 Get <strong>WhatsApp Notifications</strong> for a weekly review if we add or remove any new stocks.</p>
         <p>📲 Get <strong>WhatsApp Notifications</strong> for daily Buy/Sell alerts.</p>
     </section>
-    <section>
-        <h2 style="text-align: center;">📊 Stock Analytics</h2>
-        <div class="container">
-            <div class="chart-section">
-                <p class="chart-title">💰 Dividend Yield vs ROE</p>
-                <p class="chart-description">📊 High ROE with a stable dividend yield can indicate a strong company.</p>
-                <div class="chart-container">
-                    <span class="loading">⏳ Loading...</span>
-                    <canvas id="dividendROEChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-section">
-                <p class="chart-title">⚖️ Debt-to-Equity Ratio</p>
-                <p class="chart-description">🔍 A high Debt-to-Equity ratio may indicate financial risk, whereas a low ratio suggests stability.</p>
-                <div class="chart-container">
-                    <span class="loading">⏳ Loading...</span>
-                    <canvas id="debtEquityChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </section>
     <section id="upcoming-dividends" >
         <h2>📅 Upcoming Dividends</h2>
         <table class="order-box">
@@ -135,6 +113,29 @@
                     </thead>
                     <tbody id="sellOrders"></tbody>
                 </table>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 style="text-align: center;">📊 Stock Analytics</h2>
+        <div class="container">
+            <div class="chart-section">
+                <p class="chart-title">💰 Dividend Yield vs ROE</p>
+                <p class="chart-description">📊 High ROE with a stable dividend yield can indicate a strong company.</p>
+                <div class="chart-container">
+                    <span class="loading">⏳ Loading...</span>
+                    <canvas id="dividendROEChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <p class="chart-title">⚖️ Debt-to-Equity Ratio</p>
+                <p class="chart-description">🔍 A high Debt-to-Equity ratio may indicate financial risk, whereas a low ratio suggests stability.</p>
+                <div class="chart-container">
+                    <span class="loading">⏳ Loading...</span>
+                    <canvas id="debtEquityChart"></canvas>
+                </div>
             </div>
         </div>
     </section>
