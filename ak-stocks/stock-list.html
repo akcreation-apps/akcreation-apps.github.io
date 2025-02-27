@@ -161,6 +161,7 @@
         <h1>📜 List of Stocks</h1>
         <p class="note">🔗 Click on a stock name to view it on Groww.</p>
         <input type="text" id="searchBox" placeholder="🔍 Search stocks..." onkeyup="searchStocks()">
+        <p id="stockCount" class="timestamp">Total Stocks: 0</p>
         <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
     </header>
     <div class="container">
@@ -207,15 +208,23 @@
                 `;
                 tbody.appendChild(row);
             });
+            document.getElementById("stockCount").textContent = `📊 Total Stocks: ${stocks.length}`;
         }
 
         function searchStocks() {
             const filter = document.getElementById("searchBox").value.toLowerCase();
             const rows = document.querySelectorAll("#stockTable tbody tr");
+            let visibleCount = 0;
             rows.forEach(row => {
                 const stockName = row.cells[0].innerText.toLowerCase();
-                row.style.display = stockName.includes(filter) ? "" : "none";
+                if (stockName.includes(filter)) {
+                    row.style.display = "";
+                    visibleCount++; // ✅ Count only visible stocks
+                } else {
+                    row.style.display = "none";
+                }
             });
+            document.getElementById("stockCount").textContent = `📊 Total Stocks: ${visibleCount}`;
         }
 
         function updateLastFetchedTime(timestamp) {
