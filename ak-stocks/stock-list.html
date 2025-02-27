@@ -162,14 +162,12 @@
                 <a href="index.html">Home</a>
             </div>
         </nav>
-        <h1>📜 List of Stocks</h1>
-        <p class="note">🔗 Click on a stock name to view it on Groww.</p>
-        <p id="stockCount" class="timestamp">Total Stocks: 0</p>
-        <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
-        <p id="redFlagNote" class="note" style="display: none; color: red;">
-            ⚠️ Red Flag Stocks are ready to sell once they achieve 13% profit!
-        </p>
+        <h1 id="stockCount">📜 Stocks On Tracking</h1>
         <input type="text" id="searchBox" placeholder="🔍 Search stocks..." onkeyup="searchStocks()">
+        <p id="redFlagNote" class="note" style="display: none; color: red;">
+            ⚠️ Red Flag Stocks (Ready to Sell @ 13% Profit)
+        </p>
+        <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
     </header>
     <div class="container">
         <table id="stockTable">
@@ -224,7 +222,7 @@
                 `;
                 tbody.appendChild(row);
             });
-            document.getElementById("stockCount").textContent = `📊 Total Stocks: ${stocks.length}`;
+            document.getElementById("stockCount").textContent = `📜 Stocks On Tracking (${stocks.length})`;
             const redFlagNote = document.getElementById("redFlagNote");
             if (hasRedFlag) {
                 redFlagNote.style.display = "block";
