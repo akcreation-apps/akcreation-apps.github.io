@@ -36,10 +36,10 @@
             text-align: left;
         }
         .profit {
-            color: #00c853; /* Green for profit */
+            color: #00c853;
         }
         .loss {
-            color: #ff5252; /* Red for loss */
+            color: #ff5252;
         }
         .chart-section {
             background: #242424;
@@ -49,7 +49,7 @@
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
         .chart-container {
-            height: 300px;
+            height: 350px;
         }
     </style>
 </head>
@@ -65,9 +65,16 @@
         </div>
 
         <div class="chart-section">
-            <h3>📈 Stock Performance</h3>
+            <h3>📈 Stock Price Comparison</h3>
             <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
+                <canvas id="priceComparisonChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <h3>📊 Total Profit/Loss</h3>
+            <div class="chart-container">
+                <canvas id="profitLossChart"></canvas>
             </div>
         </div>
     </div>
@@ -109,24 +116,59 @@
             return Array.from(stockMap.values());
         }
 
-        function renderCharts(stocks) {
-            const ctx = document.getElementById("performanceChart").getContext("2d");
-            const labels = stocks.map(stock => stock.Name);
-            const totalReturns = stocks.map(stock => stock.totalReturns);
+        function truncateLabel(label, maxLength = 10) {
+            return label.length > maxLength ? label.substring(0, maxLength) + "…" : label;
+        }
 
-            new Chart(ctx, {
+        function renderCharts(stocks) {
+            const priceCtx = document.getElementById("priceComparisonChart").getContext("2d");
+            const profitCtx = document.getElementById("profitLossChart").getContext("2d");
+
+            const labels = stocks.map(stock => truncateLabel(stock.Name));
+            const avgPrices = stocks.map(stock => stock["Stock Average Value"]);
+            const currentPrices = stocks.map(stock => stock["Current Price"]);
+
+            const totalProfits = stocks.map(stock => stock.totalCurrentValue - stock.totalInvestment);
+            const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
+            const profitPercentage = stocks.map(stock => ((stock.totalCurrentValue - stock.totalInvestment) / stock.totalInvestment * 100).toFixed(2));
+
+            new Chart(priceCtx, {
                 type: "bar",
                 data: {
                     labels,
-                    datasets: [{
-                        label: "Total Returns",
-                        data: totalReturns,
-                        backgroundColor: "orange"
-                    }]
+                    datasets: [
+                        { label: "Avg Price", data: avgPrices, backgroundColor: "blue" },
+                        { label: "Current Price", data: currentPrices, backgroundColor: "orange" }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false
+                }
+            });
+
+            new Chart(profitCtx, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: "Profit/Loss (₹)",
+                        data: totalProfits,
+                        backgroundColor: profitColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `₹${context.raw.toLocaleString("en-IN", { minimumFractionDigits: 2 })} (${profitPercentage[context.dataIndex]}%)`;
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
