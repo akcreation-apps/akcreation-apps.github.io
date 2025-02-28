@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="📊 AK Stocks provides smart stock alerts for passive income through dividend investing. Get real-time analytics and investment strategies.">
-    <meta name="keywords" content="📈 stocks, passive income, dividend, investing, financial freedom, stock alerts">
-    <title>📊 AK Stocks Analytics Dashboard</title>
+    <title>📊 AK Stocks Dashboard</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@3.9.0"></script>
     <style>
         body {
-            background-color: #121212;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
+            background-color: #181818;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
         }
@@ -22,143 +18,124 @@
             max-width: 900px;
             margin: auto;
             padding: 20px;
+            text-align: center;
         }
-        .chart-section {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-            height: 400px; /* Fixed height for charts */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .chart-container {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            min-height: 250px;
-            overflow: hidden;
-            position: relative;
-        }
-        .chart-title {
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 20px;
-            color: #f4b400;
-        }
-        .chart-description {
-            font-size: 14px;
-            color: #bbb;
-            margin-bottom: 20px;
-        }
-        .loading {
-            color: #f4b400;
-            font-size: 14px;
-        }
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-            max-height: 350px; /* Limit max height */
-        }
-        .navbar {
+        .summary {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
+            background: #242424;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            padding: 8px 15px;
-        }
-        .navbar a:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-        }
-        .logo-container {
-            display: flex;
-            align-items: center;
-        }
-        .logo-container img {
-            height: 40px;
-            margin-right: 10px;
-        }
-        .logo-text {
-            font-size: 20px;
+        .summary-item {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
             font-weight: bold;
-            color: white;
-            transition: color 0.3s ease-in-out;
-        }
-        .logo-container a:hover .logo-text {
             color: #f4b400;
+        }
+        .chart-section {
+            background: #242424;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        .chart-container {
+            height: 300px;
         }
     </style>
 </head>
 <body>
-    <header>
-<!--        <nav class="navbar">-->
-<!--            <div class="logo-container">-->
-<!--                <a class="logo-container" href="index.html">-->
-<!--                    <img src="logo.png" alt="📊 AK Stocks Logo">-->
-<!--                    <span class="logo-text">AK Stocks</span>-->
-<!--                </a>-->
-<!--            </div>-->
-<!--            <a href="index.html">🏠 Home</a>-->
-<!--        </nav>-->
-        <h1>📊 Analytics Dashboard</h1>
-    </header>
 
     <div class="container">
+        <h2>📊 Stock Analytics Dashboard</h2>
+
+        <div class="summary">
+            <div class="summary-item">💰 Investment: <span id="totalInvestment">⏳</span></div>
+            <div class="summary-item">📈 Profit/Loss: <span id="totalProfitLoss">⏳</span></div>
+            <div class="summary-item">🔄 ROI: <span id="roi">⏳</span></div>
+        </div>
+
         <div class="chart-section">
-            <p class="chart-title">📈 Total Returns</p>
-            <p class="chart-description">📊 Compare total returns of different stocks.</p>
+            <h3>📈 Stock Performance</h3>
             <div class="chart-container">
-                <span class="loading">⏳ Loading...</span>
                 <canvas id="performanceChart"></canvas>
             </div>
         </div>
     </div>
 
     <script>
-        function truncateLabel(label, maxLength = 20) {
-            return label.length > maxLength ? label.substring(0, maxLength) + "…" : label;
-        }
-
         document.addEventListener("DOMContentLoaded", function () {
             fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
-              .then(response => response.json())
-              .then(data => {
-                const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
-                renderCharts(uniqueStocks);
-              })
-              .catch(error => console.error("❌ Error fetching JSON:", error));
+                .then(response => response.json())
+                .then(data => {
+                    const aggregatedData = aggregateStockData(data);
+                    renderCharts(aggregatedData);
+                    renderSummary(aggregatedData);
+                })
+                .catch(error => console.error("❌ Error fetching JSON:", error));
         });
 
-        function renderCharts(stocks) {
-            document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
-            const ctx4 = document.getElementById("performanceChart").getContext("2d");
-
-            const labels = stocks.map(stock => truncateLabel(stock.Name));
-            const totalReturns = stocks.map(stock => stock["Total Returns"]);
-
-            new Chart(ctx4, {
-                type: "bar",
-                data: { labels, datasets: [{ label: "Total Returns", data: totalReturns, backgroundColor: "orange" }] },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { ticks: { callback: (value) => truncateLabel(value) } } }
+        function aggregateStockData(stocks) {
+            const stockMap = new Map();
+            stocks.forEach(stock => {
+                const name = stock.Name;
+                if (!stockMap.has(name)) {
+                    stockMap.set(name, {
+                        ...stock,
+                        totalQty: stock.Qty,
+                        totalInvestment: stock["Stock Average Value"] * stock.Qty,
+                        totalReturns: stock["Total Returns"]
+                    });
+                } else {
+                    let existing = stockMap.get(name);
+                    existing.totalQty += stock.Qty;
+                    existing.totalInvestment += stock["Stock Average Value"] * stock.Qty;
+                    existing.totalReturns += stock["Total Returns"];
+                    existing["Stock Average Value"] = existing.totalInvestment / existing.totalQty;
+                    stockMap.set(name, existing);
                 }
             });
+            return Array.from(stockMap.values());
+        }
+
+        function renderCharts(stocks) {
+            const ctx = document.getElementById("performanceChart").getContext("2d");
+            const labels = stocks.map(stock => stock.Name);
+            const totalReturns = stocks.map(stock => stock.totalReturns);
+
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: "Total Returns",
+                        data: totalReturns,
+                        backgroundColor: "orange"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function renderSummary(stocks) {
+            let totalInvestment = 0, totalProfitLoss = 0;
+
+            stocks.forEach(stock => {
+                totalInvestment += stock.totalInvestment;
+                totalProfitLoss += (stock["Current Price"] * stock.totalQty) - stock.totalInvestment;
+            });
+
+            const roi = ((totalProfitLoss / totalInvestment) * 100).toFixed(2);
+
+            document.getElementById("totalInvestment").innerText = `₹${totalInvestment.toFixed(2)}`;
+            document.getElementById("totalProfitLoss").innerText = `₹${totalProfitLoss.toFixed(2)}`;
+            document.getElementById("roi").innerText = `${roi}%`;
         }
     </script>
 </body>

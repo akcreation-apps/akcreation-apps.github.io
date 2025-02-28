@@ -299,7 +299,7 @@
 
 
         function updateSortIcons(activeIndex) {
-            const icons = ["icon-0", "icon-1", "icon-2"];
+            const icons = ["icon-0", "icon-1", "icon-2", "icon-3"];
             icons.forEach((id, index) => {
                 document.getElementById(id).textContent = (index === activeIndex)
                     ? (sortOrder[index] ? "⬆️" : "⬇️")
