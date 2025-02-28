@@ -21,19 +21,25 @@
             text-align: center;
         }
         .summary {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             background: #242424;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
         .summary-item {
-            flex: 1;
             padding: 10px;
             font-size: 16px;
             font-weight: bold;
-            color: #f4b400;
+            text-align: left;
+        }
+        .profit {
+            color: #00c853; /* Green for profit */
+        }
+        .loss {
+            color: #ff5252; /* Red for loss */
         }
         .chart-section {
             background: #242424;
@@ -54,8 +60,8 @@
 
         <div class="summary">
             <div class="summary-item">💰 Investment: <span id="totalInvestment">⏳</span></div>
-            <div class="summary-item">📈 Profit/Loss: <span id="totalProfitLoss">⏳</span></div>
-            <div class="summary-item">🔄 ROI: <span id="roi">⏳</span></div>
+            <div class="summary-item">📊 Current Value: <span id="currentValue">⏳</span></div>
+            <div class="summary-item">📈 Profit/Loss (ROI): <span id="totalProfitLoss">⏳</span></div>
         </div>
 
         <div class="chart-section">
@@ -87,12 +93,14 @@
                         ...stock,
                         totalQty: stock.Qty,
                         totalInvestment: stock["Stock Average Value"] * stock.Qty,
+                        totalCurrentValue: stock["Current Price"] * stock.Qty,
                         totalReturns: stock["Total Returns"]
                     });
                 } else {
                     let existing = stockMap.get(name);
                     existing.totalQty += stock.Qty;
                     existing.totalInvestment += stock["Stock Average Value"] * stock.Qty;
+                    existing.totalCurrentValue += stock["Current Price"] * stock.Qty;
                     existing.totalReturns += stock["Total Returns"];
                     existing["Stock Average Value"] = existing.totalInvestment / existing.totalQty;
                     stockMap.set(name, existing);
@@ -123,19 +131,27 @@
             });
         }
 
+        function formatRupees(value) {
+            return "₹" + value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         function renderSummary(stocks) {
-            let totalInvestment = 0, totalProfitLoss = 0;
+            let totalInvestment = 0, totalCurrentValue = 0, totalProfitLoss = 0;
 
             stocks.forEach(stock => {
                 totalInvestment += stock.totalInvestment;
-                totalProfitLoss += (stock["Current Price"] * stock.totalQty) - stock.totalInvestment;
+                totalCurrentValue += stock.totalCurrentValue;
+                totalProfitLoss += stock.totalCurrentValue - stock.totalInvestment;
             });
 
             const roi = ((totalProfitLoss / totalInvestment) * 100).toFixed(2);
 
-            document.getElementById("totalInvestment").innerText = `₹${totalInvestment.toFixed(2)}`;
-            document.getElementById("totalProfitLoss").innerText = `₹${totalProfitLoss.toFixed(2)}`;
-            document.getElementById("roi").innerText = `${roi}%`;
+            document.getElementById("totalInvestment").innerText = formatRupees(totalInvestment);
+            document.getElementById("currentValue").innerText = formatRupees(totalCurrentValue);
+            document.getElementById("totalProfitLoss").innerHTML = `
+                <span class="${totalProfitLoss >= 0 ? "profit" : "loss"}">
+                    ${formatRupees(totalProfitLoss)} (${roi}%)
+                </span>`;
         }
     </script>
 </body>
