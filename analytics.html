@@ -94,6 +94,7 @@
         function aggregateStockData(stocks) {
             const stockMap = new Map();
             stocks.forEach(stock => {
+                if (stock["Stock Average Value"] === 0) return; // Ignore stocks with average cost 0
                 const name = stock.Name;
                 if (!stockMap.has(name)) {
                     stockMap.set(name, {
@@ -129,8 +130,13 @@
             const currentPrices = stocks.map(stock => stock["Current Price"]);
 
             const totalProfits = stocks.map(stock => stock.totalCurrentValue - stock.totalInvestment);
+            const profitPercentage = stocks.map(stock =>
+                stock["Stock Average Value"] > 0
+                    ? ((stock["Current Price"] - stock["Stock Average Value"]) / stock["Stock Average Value"] * 100).toFixed(2)
+                    : 0
+            );
+
             const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
-            const profitPercentage = stocks.map(stock => ((stock.totalCurrentValue - stock.totalInvestment) / stock.totalInvestment * 100).toFixed(2));
 
             new Chart(priceCtx, {
                 type: "bar",
@@ -164,7 +170,9 @@
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    return `₹${context.raw.toLocaleString("en-IN", { minimumFractionDigits: 2 })} (${profitPercentage[context.dataIndex]}%)`;
+                                    let amount = totalProfits[context.dataIndex].toLocaleString("en-IN", { minimumFractionDigits: 2 });
+                                    let percent = profitPercentage[context.dataIndex];
+                                    return `₹${amount} (${percent}%)`;
                                 }
                             }
                         }
@@ -174,7 +182,7 @@
         }
 
         function formatRupees(value) {
-            return "₹" + value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return "₹" + value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })+"/-";
         }
 
         function renderSummary(stocks) {
