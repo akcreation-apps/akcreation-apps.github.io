@@ -1,0 +1,114 @@
+/* Black & Gold Theme - Modern UI */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0d0d0d;
+    color: #f8f8f8;
+    line-height: 1.6;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #1a1a1a, #222);
+    color: #ffcc00;
+    padding: 25px;
+    text-align: center;
+    border-bottom: 3px solid #ffcc00;
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.4rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+header p {
+    font-size: 1.2rem;
+    color: #ddd;
+    margin-top: 5px;
+}
+
+/* Main Content */
+main {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 25px;
+    background: #151515;
+    box-shadow: 0 6px 15px rgba(255, 204, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Sections */
+h2 {
+    color: #ffcc00;
+    border-bottom: 2px solid #ffcc00;
+    padding-bottom: 6px;
+    text-transform: uppercase;
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+}
+
+/* Links & Lists */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    background: #222;
+    margin: 12px 0;
+    padding: 12px 18px;
+    border-radius: 6px;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+    font-size: 1.1rem;
+}
+
+ul li:hover {
+    background: #333;
+    transform: scale(1.03);
+}
+
+a {
+    text-decoration: none;
+    color: #ffcc00;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+}
+
+a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 12px;
+    background: linear-gradient(135deg, #1a1a1a, #222);
+    color: #ffcc00;
+    margin-top: 25px;
+    border-top: 3px solid #ffcc00;
+    box-shadow: 0 -4px 10px rgba(255, 204, 0, 0.3);
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    header p {
+        font-size: 1rem;
+    }
+
+    main {
+        width: 90%;
+        padding: 20px;
+    }
+}
