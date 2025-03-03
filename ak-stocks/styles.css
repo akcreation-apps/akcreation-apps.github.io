@@ -40,6 +40,51 @@ body {
     max-width: 800px;
     margin: 20px auto;
 }
+.banner {
+    background: url('https://akcreation-apps.github.io/ak-stocks/banner.png') center/cover no-repeat;
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 20px;
+    position: relative;
+}
+.banner-content {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 85%;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.banner-content h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+.banner-content p {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+.cta-button {
+    display: inline-block;
+    background: #ff9800;
+    color: white;
+    padding: 12px 24px;
+    margin-top: 15px;
+    font-size: 1.3rem;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+.cta-button:hover {
+    background: #e68900;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
 .chart-section {
     background: rgba(255, 255, 255, 0.05);
     padding: 20px;
@@ -264,5 +309,16 @@ tr:hover {
 @media (max-width: 768px) {
     header {
         padding: 10px;
+    }
+    .banner-content {
+        max-width: 95%;
+        font-size: 1rem;
+        padding: 20px;
+    }
+    .banner-content h1 {
+        font-size: 1.5rem;
+    }
+    .banner-content p {
+        font-size: 1rem;
     }
 }
