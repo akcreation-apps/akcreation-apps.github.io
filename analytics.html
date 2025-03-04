@@ -15,7 +15,7 @@
             padding: 0;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
             padding: 20px;
             text-align: center;
@@ -41,16 +41,27 @@
         .loss {
             color: #ff5252;
         }
-        .chart-section {
-            background: #242424;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        }
+        .profit { color: #00c853; }
+        .loss { color: #ff5252; }
         .chart-container {
             height: 350px;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto; /* Enable horizontal scrolling if necessary */
+            display: flex;
+            justify-content: center;
         }
+
+        @media screen and (max-width: 600px) {
+            .chart-container {
+                height: 300px; /* Adjust height for smaller screens */
+                overflow-x: scroll; /* Allow scrolling on small screens */
+            }
+            canvas {
+                min-width: 600px; /* Ensure chart stays within bounds */
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -66,16 +77,27 @@
 
         <div class="chart-section">
             <h3>📈 Stock Price Comparison</h3>
-            <div class="chart-container">
-                <canvas id="priceComparisonChart"></canvas>
-            </div>
+            <div class="chart-container"><canvas id="priceComparisonChart"></canvas></div>
         </div>
 
         <div class="chart-section">
             <h3>📊 Total Profit/Loss</h3>
-            <div class="chart-container">
-                <canvas id="profitLossChart"></canvas>
-            </div>
+            <div class="chart-container"><canvas id="profitLossChart"></canvas></div>
+        </div>
+
+        <div class="chart-section">
+            <h3>💸 Dividend Earnings Over Time</h3>
+            <div class="chart-container"><canvas id="dividendChart"></canvas></div>
+        </div>
+
+        <div class="chart-section">
+            <h3>📊 Stock-Wise Returns</h3>
+            <div class="chart-container"><canvas id="returnsChart"></canvas></div>
+        </div>
+
+        <div class="chart-section">
+            <h3>🏦 Investment Distribution</h3>
+            <div class="chart-container"><canvas id="investmentChart"></canvas></div>
         </div>
     </div>
 
@@ -84,23 +106,33 @@
             fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
                 .then(response => response.json())
                 .then(data => {
-                    renderCharts(data.current_stock_data);
-                    renderSummary(data.datewise_returns);
+                    renderCharts(data);
+                    renderSummary(data);
                 })
                 .catch(error => console.error("❌ Error fetching JSON:", error));
         });
 
-        function renderCharts(stocks) {
-            const labels = stocks.map(stock => stock.Name);
-            const avgPrices = stocks.map(stock => stock["Avg Stock Average Value"]);
-            const currentPrices = stocks.map(stock => stock["Current Price"]);
-            const totalReturns = stocks.map(stock => stock["Total Returns"]);
-            const profitColors = totalReturns.map(value => value >= 0 ? "#00c853" : "#ff5252");
+        function renderCharts(data) {
+            const ctx1 = document.getElementById("priceComparisonChart").getContext("2d");
+            const ctx2 = document.getElementById("profitLossChart").getContext("2d");
+            const ctx3 = document.getElementById("dividendChart").getContext("2d");
+            const ctx4 = document.getElementById("returnsChart").getContext("2d");
+            const ctx5 = document.getElementById("investmentChart").getContext("2d");
 
-            new Chart(document.getElementById("priceComparisonChart").getContext("2d"), {
+            const labels = data.current_stock_data.map(stock => stock.Name.length > 10 ? stock.Name.substring(0, 10) + "…" : stock.Name);
+            const avgPrices = data.current_stock_data.map(stock => stock["Avg Stock Average Value"]);
+            const currentPrices = data.current_stock_data.map(stock => stock["Current Price"]);
+            const totalReturns = data.current_stock_data.map(stock => stock["Total Returns"]);
+            const totalInvestment = data.current_stock_data.map(stock => stock["Total Qty"] * stock["Avg Stock Average Value"]);
+
+            new Chart(ctx1, {
                 type: "bar",
                 data: {
                     labels,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    },
                     datasets: [
                         { label: "Avg Price", data: avgPrices, backgroundColor: "blue" },
                         { label: "Current Price", data: currentPrices, backgroundColor: "orange" }
@@ -108,25 +140,51 @@
                 }
             });
 
-            new Chart(document.getElementById("profitLossChart").getContext("2d"), {
+            new Chart(ctx2, {
                 type: "bar",
-                data: {
-                    labels,
-                    datasets: [{
-                        label: "Total Returns",
-                        data: totalReturns,
-                        backgroundColor: profitColors
-                    }]
-                }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                data: { labels, datasets: [{ label: "Profit/Loss", data: totalReturns, backgroundColor: totalReturns.map(v => v >= 0 ? "#00c853" : "#ff5252") }] }
+            });
+
+            const dividendDates = Object.keys(data.datewise_dividends);
+            const dividendAmounts = dividendDates.map(date => data.datewise_dividends[date].reduce((sum, d) => sum + d.dividend_amount, 0));
+            new Chart(ctx3, {
+                type: "line",
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                data: { labels: dividendDates, datasets: [{ label: "Dividends", data: dividendAmounts, backgroundColor: "gold", borderColor: "yellow" }] }
+            });
+
+            new Chart(ctx4, {
+                type: "pie",
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                data: { labels, datasets: [{ label: "Returns", data: totalReturns, backgroundColor: totalReturns.map(v => v >= 0 ? "#00c853" : "#ff5252") }] }
+            });
+
+            new Chart(ctx5, {
+                type: "doughnut",
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                data: { labels, datasets: [{ label: "Investment", data: totalInvestment, backgroundColor: ["red", "blue", "green", "yellow", "orange"] }] }
             });
         }
 
-        function renderSummary(datewiseReturns) {
-            const latestDate = Object.keys(datewiseReturns).sort().pop();
-            const latestData = datewiseReturns[latestDate];
-            document.getElementById("totalInvestment").innerText = `₹${latestData.total_investment.toLocaleString()}`;
-            document.getElementById("currentValue").innerText = `₹${(latestData.total_investment + latestData.total_profit_loss).toLocaleString()}`;
-            document.getElementById("totalProfitLoss").innerHTML = `<span class="${latestData.total_profit_loss >= 0 ? "profit" : "loss"}">₹${latestData.total_profit_loss.toLocaleString()}</span>`;
+        function renderSummary(data) {
+            const latestDate = Object.keys(data.datewise_returns).sort().pop();
+            const summary = data.datewise_returns[latestDate];
+            document.getElementById("totalInvestment").innerText = `₹${summary.total_investment.toLocaleString()}/-`;
+            document.getElementById("currentValue").innerText = `₹${(summary.total_investment + summary.total_profit_loss).toLocaleString()}/-`;
+            document.getElementById("totalProfitLoss").innerHTML = `<span class="${summary.total_profit_loss >= 0 ? "profit" : "loss"}">₹${summary.total_profit_loss.toLocaleString()}/-</span>`;
         }
     </script>
 </body>
