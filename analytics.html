@@ -15,7 +15,7 @@
             padding: 0;
         }
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: auto;
             padding: 20px;
             text-align: center;
@@ -41,27 +41,16 @@
         .loss {
             color: #ff5252;
         }
-        .profit { color: #00c853; }
-        .loss { color: #ff5252; }
+        .chart-section {
+            background: #242424;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
         .chart-container {
             height: 350px;
-            width: 100%;
-            max-width: 100%;
-            overflow-x: auto; /* Enable horizontal scrolling if necessary */
-            display: flex;
-            justify-content: center;
         }
-
-        @media screen and (max-width: 600px) {
-            .chart-container {
-                height: 300px; /* Adjust height for smaller screens */
-                overflow-x: scroll; /* Allow scrolling on small screens */
-            }
-            canvas {
-                min-width: 600px; /* Ensure chart stays within bounds */
-            }
-        }
-
     </style>
 </head>
 <body>
@@ -77,114 +66,142 @@
 
         <div class="chart-section">
             <h3>📈 Stock Price Comparison</h3>
-            <div class="chart-container"><canvas id="priceComparisonChart"></canvas></div>
+            <div class="chart-container">
+                <canvas id="priceComparisonChart"></canvas>
+            </div>
         </div>
 
         <div class="chart-section">
             <h3>📊 Total Profit/Loss</h3>
-            <div class="chart-container"><canvas id="profitLossChart"></canvas></div>
-        </div>
-
-        <div class="chart-section">
-            <h3>💸 Dividend Earnings Over Time</h3>
-            <div class="chart-container"><canvas id="dividendChart"></canvas></div>
-        </div>
-
-        <div class="chart-section">
-            <h3>📊 Stock-Wise Returns</h3>
-            <div class="chart-container"><canvas id="returnsChart"></canvas></div>
-        </div>
-
-        <div class="chart-section">
-            <h3>🏦 Investment Distribution</h3>
-            <div class="chart-container"><canvas id="investmentChart"></canvas></div>
+            <div class="chart-container">
+                <canvas id="profitLossChart"></canvas>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
+            fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
                 .then(response => response.json())
                 .then(data => {
-                    renderCharts(data);
-                    renderSummary(data);
+                    const aggregatedData = aggregateStockData(data);
+                    renderCharts(aggregatedData);
+                    renderSummary(aggregatedData);
                 })
                 .catch(error => console.error("❌ Error fetching JSON:", error));
         });
 
-        function renderCharts(data) {
-            const ctx1 = document.getElementById("priceComparisonChart").getContext("2d");
-            const ctx2 = document.getElementById("profitLossChart").getContext("2d");
-            const ctx3 = document.getElementById("dividendChart").getContext("2d");
-            const ctx4 = document.getElementById("returnsChart").getContext("2d");
-            const ctx5 = document.getElementById("investmentChart").getContext("2d");
+        function aggregateStockData(stocks) {
+            const stockMap = new Map();
+            stocks.forEach(stock => {
+                if (stock["Stock Average Value"] === 0) return; // Ignore stocks with average cost 0
+                const name = stock.Name;
+                if (!stockMap.has(name)) {
+                    stockMap.set(name, {
+                        ...stock,
+                        totalQty: stock.Qty,
+                        totalInvestment: stock["Stock Average Value"] * stock.Qty,
+                        totalCurrentValue: stock["Current Price"] * stock.Qty,
+                        totalReturns: stock["Total Returns"]
+                    });
+                } else {
+                    let existing = stockMap.get(name);
+                    existing.totalQty += stock.Qty;
+                    existing.totalInvestment += stock["Stock Average Value"] * stock.Qty;
+                    existing.totalCurrentValue += stock["Current Price"] * stock.Qty;
+                    existing.totalReturns += stock["Total Returns"];
+                    existing["Stock Average Value"] = existing.totalInvestment / existing.totalQty;
+                    stockMap.set(name, existing);
+                }
+            });
+            return Array.from(stockMap.values());
+        }
 
-            const labels = data.current_stock_data.map(stock => stock.Name.length > 10 ? stock.Name.substring(0, 10) + "…" : stock.Name);
-            const avgPrices = data.current_stock_data.map(stock => stock["Avg Stock Average Value"]);
-            const currentPrices = data.current_stock_data.map(stock => stock["Current Price"]);
-            const totalReturns = data.current_stock_data.map(stock => stock["Total Returns"]);
-            const totalInvestment = data.current_stock_data.map(stock => stock["Total Qty"] * stock["Avg Stock Average Value"]);
+        function truncateLabel(label, maxLength = 10) {
+            return label.length > maxLength ? label.substring(0, maxLength) + "…" : label;
+        }
 
-            new Chart(ctx1, {
+        function renderCharts(stocks) {
+            const priceCtx = document.getElementById("priceComparisonChart").getContext("2d");
+            const profitCtx = document.getElementById("profitLossChart").getContext("2d");
+
+            const labels = stocks.map(stock => truncateLabel(stock.Name));
+            const avgPrices = stocks.map(stock => stock["Stock Average Value"]);
+            const currentPrices = stocks.map(stock => stock["Current Price"]);
+
+            const totalProfits = stocks.map(stock => stock.totalCurrentValue - stock.totalInvestment);
+            const profitPercentage = stocks.map(stock =>
+                stock["Stock Average Value"] > 0
+                    ? ((stock["Current Price"] - stock["Stock Average Value"]) / stock["Stock Average Value"] * 100).toFixed(2)
+                    : 0
+            );
+
+            const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
+
+            new Chart(priceCtx, {
                 type: "bar",
                 data: {
                     labels,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false
-                    },
                     datasets: [
                         { label: "Avg Price", data: avgPrices, backgroundColor: "blue" },
                         { label: "Current Price", data: currentPrices, backgroundColor: "orange" }
                     ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
 
-            new Chart(ctx2, {
+            new Chart(profitCtx, {
                 type: "bar",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: "Profit/Loss (₹)",
+                        data: totalProfits,
+                        backgroundColor: profitColors
+                    }]
+                },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false
-                },
-                data: { labels, datasets: [{ label: "Profit/Loss", data: totalReturns, backgroundColor: totalReturns.map(v => v >= 0 ? "#00c853" : "#ff5252") }] }
-            });
-
-            const dividendDates = Object.keys(data.datewise_dividends);
-            const dividendAmounts = dividendDates.map(date => data.datewise_dividends[date].reduce((sum, d) => sum + d.dividend_amount, 0));
-            new Chart(ctx3, {
-                type: "line",
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                },
-                data: { labels: dividendDates, datasets: [{ label: "Dividends", data: dividendAmounts, backgroundColor: "gold", borderColor: "yellow" }] }
-            });
-
-            new Chart(ctx4, {
-                type: "pie",
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                },
-                data: { labels, datasets: [{ label: "Returns", data: totalReturns, backgroundColor: totalReturns.map(v => v >= 0 ? "#00c853" : "#ff5252") }] }
-            });
-
-            new Chart(ctx5, {
-                type: "doughnut",
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                },
-                data: { labels, datasets: [{ label: "Investment", data: totalInvestment, backgroundColor: ["red", "blue", "green", "yellow", "orange"] }] }
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let amount = totalProfits[context.dataIndex].toLocaleString("en-IN", { minimumFractionDigits: 2 });
+                                    let percent = profitPercentage[context.dataIndex];
+                                    return `₹${amount} (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
             });
         }
 
-        function renderSummary(data) {
-            const latestDate = Object.keys(data.datewise_returns).sort().pop();
-            const summary = data.datewise_returns[latestDate];
-            document.getElementById("totalInvestment").innerText = `₹${summary.total_investment.toLocaleString()}/-`;
-            document.getElementById("currentValue").innerText = `₹${(summary.total_investment + summary.total_profit_loss).toLocaleString()}/-`;
-            document.getElementById("totalProfitLoss").innerHTML = `<span class="${summary.total_profit_loss >= 0 ? "profit" : "loss"}">₹${summary.total_profit_loss.toLocaleString()}/-</span>`;
+        function formatRupees(value) {
+            return "₹" + value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })+"/-";
+        }
+
+        function renderSummary(stocks) {
+            let totalInvestment = 0, totalCurrentValue = 0, totalProfitLoss = 0;
+
+            stocks.forEach(stock => {
+                totalInvestment += stock.totalInvestment;
+                totalCurrentValue += stock.totalCurrentValue;
+                totalProfitLoss += stock.totalCurrentValue - stock.totalInvestment;
+            });
+
+            const roi = ((totalProfitLoss / totalInvestment) * 100).toFixed(2);
+
+            document.getElementById("totalInvestment").innerText = formatRupees(totalInvestment);
+            document.getElementById("currentValue").innerText = formatRupees(totalCurrentValue);
+            document.getElementById("totalProfitLoss").innerHTML = `
+                <span class="${totalProfitLoss >= 0 ? "profit" : "loss"}">
+                    ${formatRupees(totalProfitLoss)} (${roi}%)
+                </span>`;
         }
     </script>
 </body>
