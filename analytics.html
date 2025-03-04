@@ -81,64 +81,23 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
+            fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
                 .then(response => response.json())
                 .then(data => {
-                    const aggregatedData = aggregateStockData(data);
-                    renderCharts(aggregatedData);
-                    renderSummary(aggregatedData);
+                    renderCharts(data.current_stock_data);
+                    renderSummary(data.datewise_returns);
                 })
                 .catch(error => console.error("❌ Error fetching JSON:", error));
         });
 
-        function aggregateStockData(stocks) {
-            const stockMap = new Map();
-            stocks.forEach(stock => {
-                if (stock["Stock Average Value"] === 0) return; // Ignore stocks with average cost 0
-                const name = stock.Name;
-                if (!stockMap.has(name)) {
-                    stockMap.set(name, {
-                        ...stock,
-                        totalQty: stock.Qty,
-                        totalInvestment: stock["Stock Average Value"] * stock.Qty,
-                        totalCurrentValue: stock["Current Price"] * stock.Qty,
-                        totalReturns: stock["Total Returns"]
-                    });
-                } else {
-                    let existing = stockMap.get(name);
-                    existing.totalQty += stock.Qty;
-                    existing.totalInvestment += stock["Stock Average Value"] * stock.Qty;
-                    existing.totalCurrentValue += stock["Current Price"] * stock.Qty;
-                    existing.totalReturns += stock["Total Returns"];
-                    existing["Stock Average Value"] = existing.totalInvestment / existing.totalQty;
-                    stockMap.set(name, existing);
-                }
-            });
-            return Array.from(stockMap.values());
-        }
-
-        function truncateLabel(label, maxLength = 10) {
-            return label.length > maxLength ? label.substring(0, maxLength) + "…" : label;
-        }
-
         function renderCharts(stocks) {
-            const priceCtx = document.getElementById("priceComparisonChart").getContext("2d");
-            const profitCtx = document.getElementById("profitLossChart").getContext("2d");
-
-            const labels = stocks.map(stock => truncateLabel(stock.Name));
-            const avgPrices = stocks.map(stock => stock["Stock Average Value"]);
+            const labels = stocks.map(stock => stock.Name);
+            const avgPrices = stocks.map(stock => stock["Avg Stock Average Value"]);
             const currentPrices = stocks.map(stock => stock["Current Price"]);
+            const totalReturns = stocks.map(stock => stock["Total Returns"]);
+            const profitColors = totalReturns.map(value => value >= 0 ? "#00c853" : "#ff5252");
 
-            const totalProfits = stocks.map(stock => stock.totalCurrentValue - stock.totalInvestment);
-            const profitPercentage = stocks.map(stock =>
-                stock["Stock Average Value"] > 0
-                    ? ((stock["Current Price"] - stock["Stock Average Value"]) / stock["Stock Average Value"] * 100).toFixed(2)
-                    : 0
-            );
-
-            const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
-
-            new Chart(priceCtx, {
+            new Chart(document.getElementById("priceComparisonChart").getContext("2d"), {
                 type: "bar",
                 data: {
                     labels,
@@ -146,62 +105,28 @@
                         { label: "Avg Price", data: avgPrices, backgroundColor: "blue" },
                         { label: "Current Price", data: currentPrices, backgroundColor: "orange" }
                     ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
                 }
             });
 
-            new Chart(profitCtx, {
+            new Chart(document.getElementById("profitLossChart").getContext("2d"), {
                 type: "bar",
                 data: {
                     labels,
                     datasets: [{
-                        label: "Profit/Loss (₹)",
-                        data: totalProfits,
+                        label: "Total Returns",
+                        data: totalReturns,
                         backgroundColor: profitColors
                     }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let amount = totalProfits[context.dataIndex].toLocaleString("en-IN", { minimumFractionDigits: 2 });
-                                    let percent = profitPercentage[context.dataIndex];
-                                    return `₹${amount} (${percent}%)`;
-                                }
-                            }
-                        }
-                    }
                 }
             });
         }
 
-        function formatRupees(value) {
-            return "₹" + value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })+"/-";
-        }
-
-        function renderSummary(stocks) {
-            let totalInvestment = 0, totalCurrentValue = 0, totalProfitLoss = 0;
-
-            stocks.forEach(stock => {
-                totalInvestment += stock.totalInvestment;
-                totalCurrentValue += stock.totalCurrentValue;
-                totalProfitLoss += stock.totalCurrentValue - stock.totalInvestment;
-            });
-
-            const roi = ((totalProfitLoss / totalInvestment) * 100).toFixed(2);
-
-            document.getElementById("totalInvestment").innerText = formatRupees(totalInvestment);
-            document.getElementById("currentValue").innerText = formatRupees(totalCurrentValue);
-            document.getElementById("totalProfitLoss").innerHTML = `
-                <span class="${totalProfitLoss >= 0 ? "profit" : "loss"}">
-                    ${formatRupees(totalProfitLoss)} (${roi}%)
-                </span>`;
+        function renderSummary(datewiseReturns) {
+            const latestDate = Object.keys(datewiseReturns).sort().pop();
+            const latestData = datewiseReturns[latestDate];
+            document.getElementById("totalInvestment").innerText = `₹${latestData.total_investment.toLocaleString()}`;
+            document.getElementById("currentValue").innerText = `₹${(latestData.total_investment + latestData.total_profit_loss).toLocaleString()}`;
+            document.getElementById("totalProfitLoss").innerHTML = `<span class="${latestData.total_profit_loss >= 0 ? "profit" : "loss"}">₹${latestData.total_profit_loss.toLocaleString()}</span>`;
         }
     </script>
 </body>
