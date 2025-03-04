@@ -306,6 +306,14 @@ th {
 tr:hover {
     background: #333;
 }
+
+.small-text {
+    font-size: 0.8rem; /* Adjust size as needed */
+    color: #666; /* Soft gray for readability */
+    line-height: 1.4; /* Improve spacing */
+    font-weight: 400; /* Normal weight */
+}
+
 @media (max-width: 768px) {
     header {
         padding: 10px;
