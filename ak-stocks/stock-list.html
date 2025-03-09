@@ -185,8 +185,9 @@
                 <tr>
                     <th onclick="sortTable('Name', 0)">Name <span id="icon-0">⬆️⬇️</span></th>
                     <th onclick="sortTable('Current Price', 1)">Current Value <span id="icon-1">⬆️⬇️</span></th>
-                    <th onclick="sortTable('Dividend Yield', 2)">Dividend Yield <span id="icon-2">⬆️⬇️</span></th>
+                    <th onclick="sortTable('Dividend Yield', 2)">Div. Yield <span id="icon-2">⬆️⬇️</span></th>
                     <th onclick="sortTable('ROE', 3)">ROE <span id="icon-3">⬆️⬇️</span></th>
+                    <th onclick="sortTable('Debt to Equity', 4)">D/E Ratio <span id="icon-4">⬆️⬇️</span></th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -218,7 +219,8 @@
                 const stockUrl = stock.Url;
                 const dividendYield = parseFloat(stock["Dividend Yield"]) || 0;
                 const roe = parseFloat(stock["ROE"]) || 0;
-                const isLowValue  = dividendYield < 2 || roe < 10;
+                const debt_to_equity = parseFloat(stock["Debt to Equity"]) || 0;
+                const isLowValue  = dividendYield < 2 || roe < 15 || debt_to_equity > 1;
                 const row = document.createElement("tr");
                 if (isLowValue) hasRedFlag = true;
                 if (isLowValue) {
@@ -229,6 +231,7 @@
                     <td>₹ ${stock["Current Price"]}/-</td>
                     <td>${stock["Dividend Yield"]}</td>
                     <td>${stock["ROE"]}</td>
+                    <td>${stock["Debt to Equity"]}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -299,7 +302,7 @@
 
 
         function updateSortIcons(activeIndex) {
-            const icons = ["icon-0", "icon-1", "icon-2", "icon-3"];
+            const icons = ["icon-0", "icon-1", "icon-2", "icon-3", "icon-4"];
             icons.forEach((id, index) => {
                 document.getElementById(id).textContent = (index === activeIndex)
                     ? (sortOrder[index] ? "⬆️" : "⬇️")
