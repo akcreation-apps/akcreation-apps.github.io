@@ -203,7 +203,8 @@
               .then(response => response.json())
               .then(data => {
                   stockData = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
-                  renderStockList(stockData);
+                  sortTable('Name', 0);
+                  sortTable('Name', 0);
                   updateLastFetchedTime(stockData[0]?.["Time"]);
               })
               .catch(error => {
