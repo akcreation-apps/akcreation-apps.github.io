@@ -10,16 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const uniqueStocks = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
         renderCharts(uniqueStocks);
         const tableBody = document.getElementById("upcomingDividends");
-        data.forEach(stock => {
-                    if (stock["Upcoming Dividend Amount"] > 0) {
-                        const row = `<tr>
-                            <td>${stock["Name"]}</td>
-                            <td>₹${stock["Upcoming Dividend Amount"]}/-</td>
-                            <td>${stock["Upcoming Dividend Date"] || "N/A"}</td>
-                        </tr>`;
-                        tableBody.innerHTML += row;
-                    }
-                });
       })
       .catch(error => console.error("Error fetching JSON:", error));
 

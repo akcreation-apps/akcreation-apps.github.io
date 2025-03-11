@@ -17,10 +17,6 @@
             margin: 0;
             padding: 0;
         }
-        .container {
-            max-width: 1000px;
-            margin: auto;
-        }
         .navbar {
             position: fixed;
             top: 0;
@@ -95,6 +91,15 @@
             background: #222;
             color: white;
             font-size: 16px;
+        }
+        section {
+            padding: 20px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+            max-width: 1000px;
+            text-align: center;
         }
         table {
             width: 100%;
@@ -172,14 +177,30 @@
                 <a href="index.html">Home</a>
             </div>
         </nav>
-        <h1 id="stockCount">📜 Stocks On Tracking</h1>
+    </header>
+    <section id="upcoming-dividends" >
+        <h2>📅 Upcoming Dividends</h2>
+        <p>The <strong>Ex-Dividend Date</strong> is the cutoff date for investors to be eligible for the next dividend payout.</p>
+        <p>If you buy the stock on or after the ex-date, you won’t receive the upcoming dividend.</p>
+        <table class="order-box">
+            <thead>
+                <tr>
+                    <th>Stock Name</th>
+                    <th>Dividend Amount (₹)</th>
+                    <th>Dividend Ex-Date</th>
+                </tr>
+            </thead>
+            <tbody id="upcomingDividends"></tbody>
+        </table>
+    </section>
+    <section id="stock-list" >
+        <h2 id="stockCount">📜 Monitored Stocks</h2>
         <input type="text" id="searchBox" placeholder="🔍 Search stocks..." onkeyup="searchStocks()">
         <p id="redFlagNote" class="note" style="display: none; color: red;">
             ⚠️ Red Flag Stocks (Ready to Sell @ 13% Profit)
         </p>
         <p id="lastFetchedTime" class="timestamp">Fetching data...</p>
-    </header>
-    <div class="container">
+        <div class="container">
         <table id="stockTable">
             <thead>
                 <tr>
@@ -193,6 +214,7 @@
             <tbody></tbody>
         </table>
     </div>
+    </section>
 
     <script>
         let stockData = [];
@@ -206,6 +228,17 @@
                   sortTable('Name', 0);
                   sortTable('Name', 0);
                   updateLastFetchedTime(stockData[0]?.["Time"]);
+                  const tableBody = document.getElementById("upcomingDividends");
+                  data.forEach(stock => {
+                      if (stock["Upcoming Dividend Amount"] > 0) {
+                          const row = `<tr>
+                               <td>${stock["Name"]}</td>
+                               <td>₹ ${stock["Upcoming Dividend Amount"]}/-</td>
+                               <td>${stock["Upcoming Dividend Date"] || "N/A"}</td>
+                               </tr>`;
+                          tableBody.innerHTML += row;
+                      }
+                  });
               })
               .catch(error => {
                   console.error("❌ Error fetching JSON:", error);
@@ -236,7 +269,7 @@
                 `;
                 tbody.appendChild(row);
             });
-            document.getElementById("stockCount").textContent = `📜 Stocks On Tracking (${stocks.length})`;
+            document.getElementById("stockCount").textContent = `📜 Monitored Stocks (${stocks.length})`;
             const redFlagNote = document.getElementById("redFlagNote");
             if (hasRedFlag) {
                 redFlagNote.style.display = "block";
