@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AkCreation - Static Makeover Pages</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            text-align: center;
+            padding-top: 80px; /* For fixed header */
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        /* Services Section */
+        .services {
+            margin: 40px 0;
+        }
+
+        .services h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .service-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            padding: 10px;
+            justify-items: center;
+        }
+
+        .service {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+        #whatsappBtn{
+        margin-top: 20px
+        }
+        .service:hover {
+            transform: scale(1.05);
+        }
+
+        /* Portfolio Section */
+        .portfolio {
+            margin: 40px 0;
+        }
+
+        .portfolio img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .portfolio img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Contact Section */
+        .contact {
+            margin: 40px 0;
+        }
+
+        .contact button {
+            background: #e74c3c;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .contact button:hover {
+            background: #c0392b;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 20px;
+            }
+
+            .service {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AkCreation Solutions !!</h1>
+        <p>Get Beautiful, Responsive and SEO-friendly Static Websites</p>
+    </header>
+
+    <!-- Services Section -->
+    <section class="services">
+        <h2>Our Services</h2>
+        <div class="service-list">
+            <div class="service">
+                <h3>Custom Static Pages</h3>
+                <p>Get a unique, high-quality static page designed to your needs.</p>
+            </div>
+            <div class="service">
+                <h3>SEO Optimization</h3>
+                <p>Ensure your page is optimized for search engines.</p>
+            </div>
+            <div class="service">
+                <h3>Fast & Secure Hosting</h3>
+                <p>We provide lightweight, fast-loading pages.</p>
+            </div>
+            <div class="service">
+                <h3>Responsive Design</h3>
+                <p>Mobile-friendly designs that work on all devices.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact">
+        <h2>Get in Touch</h2>
+        <p>Have a project in mind? Let's talk!</p>
+        <button id="whatsappBtn">Chat on WhatsApp</button>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 AkCreation. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById("whatsappBtn").addEventListener("click", function() {
+            const phoneNumber = "+917749984274"; // Your WhatsApp Number
+            const message = "Hi! I need a static webpage for my business.";
+            window.location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        });
+    </script>
+
+</body>
+</html>

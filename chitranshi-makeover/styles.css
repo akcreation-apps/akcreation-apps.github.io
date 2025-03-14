@@ -139,7 +139,7 @@ header {
 
 /* Services Section */
 .services {
-    margin: 40px auto;
+    margin: 20px auto;
     text-align: center;
     padding: 20px;
 }
@@ -192,4 +192,17 @@ header {
     .service-list {
         grid-template-columns: repeat(1, 1fr); /* 1 column */
     }
+}
+.certification {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 30px;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 15px;
+    color: #ff3b3b;
+    text-align: center;
+    font-size: 14px;
 }
