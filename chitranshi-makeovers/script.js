@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
         whatsappBtn.addEventListener("click", function () {
             const phoneNumber = "+917735143792";
             const message = "Hi! Can I get more info about your makeup services ?";
-            window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+            window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`);
         });
     }
 

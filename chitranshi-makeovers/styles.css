@@ -129,14 +129,21 @@ header {
 }
 
 /* Services Section */
-.service-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Auto adjusts based on screen size */
-    gap: 20px;
-    justify-content: center;
+.services {
+    margin: 40px auto;
+    text-align: center;
     padding: 20px;
 }
 
+.service-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Same as gallery */
+    gap: 15px;
+    justify-content: center;
+    padding: 10px;
+}
+
+/* Individual Service Box */
 .service {
     background: white;
     padding: 15px;
@@ -146,27 +153,34 @@ header {
     text-align: center;
 }
 
+/* Hover Effect */
 .service:hover {
     transform: scale(1.05);
 }
 
+/* Service Images */
 .service img {
     width: 100%;
-    height: 180px; /* Ensures uniform size */
-    object-fit: cover; /* Prevents distortion */
+    height: 200px; /* Fixed height for uniform size */
+    object-fit: cover; /* Ensures images fit properly */
     border-radius: 10px;
 }
 
-/* Responsive Grid */
+/* Responsive Grid (Matching Gallery Behavior) */
+@media (max-width: 1024px) {
+    .service-list {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    }
+}
+
 @media (max-width: 768px) {
     .service-list {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns for tablets */
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
     }
 }
 
 @media (max-width: 480px) {
     .service-list {
-        grid-template-columns: repeat(1, 1fr); /* 1 column for mobile */
+        grid-template-columns: repeat(1, 1fr); /* 1 column */
     }
 }
-
