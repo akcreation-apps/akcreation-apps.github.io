@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Charts</title>
+    <title>Portfolio</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/png" href="https://akcreation-apps.github.io/ak-stocks/logo.webp">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,18 +47,68 @@
                 margin: 0 auto;
             }
         }
+
+        .summary-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(180px, 1fr)); /* Ensures 2 columns on larger screens */
+            gap: 20px;
+            max-width: auto;
+            margin: 20px auto;
+        }
+
+        .summary-box {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: white;
+        }
+
+        .summary-box h3 {
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        /* Ensure proper responsiveness */
+        @media (max-width: 550px) {
+            .summary-container {
+                grid-template-columns: repeat(2, minmax(180px, 1fr)); /* Switch to single column on smaller screens */
+            }
+        }
+
+
     </style>
 </head>
 <body>
+    <div class="summary-container">
+        <div class="summary-box">
+            <h3>Total Invested</h3>
+            <p id="totalInvested">Loading...</p>
+        </div>
+        <div class="summary-box">
+            <h3>Current Balance</h3>
+            <p id="currentBalance">Loading...</p>
+        </div>
+        <div class="summary-box">
+            <h3>Total Profit/Loss</h3>
+            <p id="totalProfitLoss">Loading...</p>
+        </div>
+        <div class="summary-box">
+            <h3>XIRR</h3>
+            <p id="xirr">Loading...</p>  <!-- Placeholder for XIRR -->
+        </div>
 
-    <h2>Stock Holdings (Total Qty)</h2>
-    <div class="chart-container">
-        <canvas id="barChart"></canvas>
     </div>
 
     <h2>Stock Price Trends</h2>
     <div class="chart-container">
         <canvas id="lineChart"></canvas>
+    </div>
+
+    <h2>Stock Holdings</h2>
+    <div class="chart-container">
+        <canvas id="barChart"></canvas>
     </div>
 
     <h2>Stock Allocation</h2>
@@ -147,13 +198,27 @@
                 totalProfitLossList.push(obj.total_investment + obj.total_profit_loss);
             });
 
+             // ✅ Calculate total values
+            let totalInvested = totalInvestmentList[totalInvestmentList.length - 1]; // Last date's investment
+            let currentBalance = totalProfitLossList[totalProfitLossList.length - 1]; // Last date's balance
+            let profitLoss = currentBalance - totalInvested;
+            let percentage = (currentBalance - totalInvested)/totalInvested *100
+
+            // ✅ Update UI
+            document.getElementById("totalInvested").textContent = `₹ ${totalInvested.toLocaleString()}`;
+            document.getElementById("currentBalance").textContent = `₹ ${currentBalance.toLocaleString()}`;
+            document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()}`;
+            document.getElementById("totalProfitLoss").style.color = profitLoss >= 0 ? "lightgreen" : "red";
+            document.getElementById("xirr").textContent = `${percentage ? percentage.toFixed(2) + "%" : "N/A"}`;
+            document.getElementById("xirr").style.color = percentage >= 0 ? "lightgreen" : "red";
+
             new Chart(document.getElementById("lineChart").getContext("2d"), {
                 type: "line",
                 data: {
                     labels: Object.keys(stockData),
                     datasets: [
-                        { label: 'Invested Amount', data: totalInvestmentList, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', fill: false, tension: 0.3 },
-                        { label: 'Current Amount', data: totalProfitLossList, borderColor: "#4CAF50", backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: false, tension: 0.3 }
+                        { label: 'Invested Amount', data: totalInvestmentList, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', fill: true, tension: 0.3 },
+                        { label: 'Current Amount', data: totalProfitLossList, borderColor: "#4CAF50", backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: true, tension: 0.3 }
                     ]
                 },
                 options: {
@@ -164,8 +229,10 @@
                         x: { grid: { color: "#555" } }
                     },
                     plugins: {
-                        legend: { labels: { color: "#fff" } }
-                    }
+                        legend: { labels: { color: "#fff" } },
+                        tooltip: { mode: 'index', intersect: false } // ✅ Show all values on hover
+                    },
+                    interaction: { mode: 'index', intersect: false } // ✅ Ensure all dataset values appear on hover
                 }
             });
         }
