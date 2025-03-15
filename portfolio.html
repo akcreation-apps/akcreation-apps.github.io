@@ -10,15 +10,41 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
+            background-color: #121212;
+            color: #fff;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
+
         .chart-container {
-            width: 90%;
-            max-width: 800px;
+            width: 95%;
+            max-width: 900px;
             margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
         }
         canvas {
             width: 100% !important;
             height: auto !important;
+            max-height: 400px; /* Restrict max height */
+        }
+        h2 {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                padding: 10px;
+                height: 400px !important;
+            }
+
+            #pieChart {
+                max-width: 500px; /* Set a max width for Pie Chart */
+                height: 400px !important;
+                margin: 0 auto;
+            }
         }
     </style>
 </head>
@@ -40,34 +66,33 @@
     </div>
 
     <script>
-        // Sample stock data (Can be fetched dynamically)
         document.addEventListener("DOMContentLoaded", function () {
             fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
-                    const stock_data = transformStockData(data['current_stock_data'])
-                    renderCharts(stock_data)
-                    renderDateWiseCharts(data['datewise_returns'])
+                    console.log(data);
+                    const stock_data = transformStockData(data['current_stock_data']);
+                    renderCharts(stock_data);
+                    renderDateWiseCharts(data['datewise_returns']);
                 })
                 .catch(error => console.error("❌ Error fetching JSON:", error));
         });
 
         function transformStockData(stockList) {
-            console.log(stockList)
             return stockList.map(stock => ({
                 name: stock.Name,
-                totalInvested: (stock["Avg Stock Average Value"] * stock["Total Qty"]).toFixed(2), // Total price invested
-                currentValue: (stock["Current Price"] * stock["Total Qty"]).toFixed(2) // Current total price
+                totalInvested: (stock["Avg Stock Average Value"] * stock["Total Qty"]).toFixed(2),
+                currentValue: (stock["Current Price"] * stock["Total Qty"]).toFixed(2)
             }));
         }
 
         function renderCharts(portfolio_stock_data) {
-
-            // Extract labels and data
-            const labels = portfolio_stock_data.map(stock => stock.name);
+            const labels = portfolio_stock_data.map(stock =>
+                    stock.name.length > 12 ? stock.name.substring(0, 9) + "..." : stock.name
+                );
             const invested_amount = portfolio_stock_data.map(stock => stock.totalInvested);
             const current_amount = portfolio_stock_data.map(stock => stock.currentValue);
+            const randomColors = Array.from({ length: labels.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`);
 
             // Bar Chart (Stock Holdings)
             new Chart(document.getElementById("barChart").getContext("2d"), {
@@ -75,14 +100,20 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        {label: "Current Amount", data: current_amount, backgroundColor: "orange", borderColor: "#333", borderWidth: 1},
-                        {label: "Invested Amount", data: invested_amount, backgroundColor: "green", borderColor: "#333", borderWidth: 1}
+                        { label: "Current Amount", data: current_amount, backgroundColor: "#FFD700"},
+                        { label: "Invested Amount", data: invested_amount, backgroundColor: "#4CAF50"}
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: "#555" } },
+                        x: { grid: { color: "#555" } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: "#fff" } }
+                    }
                 }
             });
 
@@ -93,19 +124,21 @@
                     labels: labels,
                     datasets: [{
                         data: current_amount,
-                        backgroundColor: Array.from({ length: current_amount.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`),
+                        backgroundColor: randomColors,
                         borderColor: "#fff"
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: "#fff" } }
+                    }
                 }
             });
         }
 
-        function renderDateWiseCharts(stockData){
-
+        function renderDateWiseCharts(stockData) {
             let totalInvestmentList = [];
             let totalProfitLossList = [];
 
@@ -114,31 +147,25 @@
                 totalProfitLossList.push(obj.total_investment + obj.total_profit_loss);
             });
 
-
-            // Line Chart (Stock Price Trends)
             new Chart(document.getElementById("lineChart").getContext("2d"), {
                 type: "line",
                 data: {
-                    labels: Array.from(Object.keys(stockData)),
-                    datasets: [{
-                            label: 'Invested Amount',
-                            data: totalInvestmentList,
-                            borderColor: 'orange',
-                            fill: false,
-                            tension: 0.3
-                        },{
-                            label: 'Current Amount',
-                            data: totalProfitLossList,
-                            borderColor: "green",
-                            fill: false,
-                            tension: 0.3
-                        }
+                    labels: Object.keys(stockData),
+                    datasets: [
+                        { label: 'Invested Amount', data: totalInvestmentList, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', fill: false, tension: 0.3 },
+                        { label: 'Current Amount', data: totalProfitLossList, borderColor: "#4CAF50", backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: false, tension: 0.3 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: false } }
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: "#555" } },
+                        x: { grid: { color: "#555" } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: "#fff" } }
+                    }
                 }
             });
         }
