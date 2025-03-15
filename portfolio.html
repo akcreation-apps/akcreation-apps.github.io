@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Stock Holdings (Total Qty)</h2>
+    <div class="chart-container">
+        <canvas id="barChart"></canvas>
+    </div>
+
+    <h2>Stock Price Trends</h2>
+    <div class="chart-container">
+        <canvas id="lineChart"></canvas>
+    </div>
+
+    <h2>Stock Allocation</h2>
+    <div class="chart-container">
+        <canvas id="pieChart"></canvas>
+    </div>
+
+    <script>
+        // Sample stock data (Can be fetched dynamically)
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    const stock_data = transformStockData(data['current_stock_data'])
+                    renderCharts(stock_data)
+                    renderDateWiseCharts(data['datewise_returns'])
+                })
+                .catch(error => console.error("❌ Error fetching JSON:", error));
+        });
+
+        function transformStockData(stockList) {
+            console.log(stockList)
+            return stockList.map(stock => ({
+                name: stock.Name,
+                totalInvested: (stock["Avg Stock Average Value"] * stock["Total Qty"]).toFixed(2), // Total price invested
+                currentValue: (stock["Current Price"] * stock["Total Qty"]).toFixed(2) // Current total price
+            }));
+        }
+
+        function renderCharts(portfolio_stock_data) {
+
+            // Extract labels and data
+            const labels = portfolio_stock_data.map(stock => stock.name);
+            const invested_amount = portfolio_stock_data.map(stock => stock.totalInvested);
+            const current_amount = portfolio_stock_data.map(stock => stock.currentValue);
+
+            // Bar Chart (Stock Holdings)
+            new Chart(document.getElementById("barChart").getContext("2d"), {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {label: "Current Amount", data: current_amount, backgroundColor: "orange", borderColor: "#333", borderWidth: 1},
+                        {label: "Invested Amount", data: invested_amount, backgroundColor: "green", borderColor: "#333", borderWidth: 1}
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Pie Chart (Stock Allocation)
+            new Chart(document.getElementById("pieChart").getContext("2d"), {
+                type: "pie",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: current_amount,
+                        backgroundColor: Array.from({ length: current_amount.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`),
+                        borderColor: "#fff"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function renderDateWiseCharts(stockData){
+
+            let totalInvestmentList = [];
+            let totalProfitLossList = [];
+
+            Object.values(stockData).forEach(obj => {
+                totalInvestmentList.push(obj.total_investment);
+                totalProfitLossList.push(obj.total_investment + obj.total_profit_loss);
+            });
+
+
+            // Line Chart (Stock Price Trends)
+            new Chart(document.getElementById("lineChart").getContext("2d"), {
+                type: "line",
+                data: {
+                    labels: Array.from(Object.keys(stockData)),
+                    datasets: [{
+                            label: 'Invested Amount',
+                            data: totalInvestmentList,
+                            borderColor: 'orange',
+                            fill: false,
+                            tension: 0.3
+                        },{
+                            label: 'Current Amount',
+                            data: totalProfitLossList,
+                            borderColor: "green",
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: false } }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
