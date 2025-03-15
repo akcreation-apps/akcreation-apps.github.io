@@ -50,7 +50,7 @@
 
         .summary-container {
             display: grid;
-            grid-template-columns: repeat(2, minmax(180px, 1fr)); /* Ensures 2 columns on larger screens */
+            grid-template-columns: repeat(2, minmax(120px, 1fr)); /* Ensures 2 columns on larger screens */
             gap: 20px;
             max-width: auto;
             margin: 20px auto;
@@ -73,7 +73,8 @@
         /* Ensure proper responsiveness */
         @media (max-width: 550px) {
             .summary-container {
-                grid-template-columns: repeat(2, minmax(180px, 1fr)); /* Switch to single column on smaller screens */
+                grid-template-columns: repeat(2, minmax(120px, 1fr)); /* Switch to single column on smaller screens */
+                max-width: fit-content;
             }
         }
 
