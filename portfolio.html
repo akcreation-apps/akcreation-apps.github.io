@@ -142,6 +142,13 @@
             const labels = portfolio_stock_data.map(stock =>
                     stock.name.length > 12 ? stock.name.substring(0, 9) + "..." : stock.name
                 );
+            const totalProfits = portfolio_stock_data.map(stock => stock.currentValue - stock.totalInvested);
+            const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
+            const profitPercentage = portfolio_stock_data.map(stock =>
+                stock.totalInvested > 0
+                    ? ((stock.currentValue - stock.totalInvested) / stock.totalInvested * 100).toFixed(2)
+                    : 0
+            );
             const invested_amount = portfolio_stock_data.map(stock => stock.totalInvested);
             const current_amount = portfolio_stock_data.map(stock => stock.currentValue);
             const randomColors = Array.from({ length: labels.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`);
@@ -152,8 +159,7 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: "Current Amount", data: current_amount, backgroundColor: "#FFD700"},
-                        { label: "Invested Amount", data: invested_amount, backgroundColor: "#4CAF50"}
+                        { label: "Profit/Loss (₹)", data: totalProfits, backgroundColor: profitColors}
                     ]
                 },
                 options: {
@@ -164,7 +170,16 @@
                         x: { grid: { color: "#555" } }
                     },
                     plugins: {
-                        legend: { labels: { color: "#fff" } }
+                        legend: { labels: { color: "#fff" } },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let amount = totalProfits[context.dataIndex].toLocaleString("en-IN", { minimumFractionDigits: 2 });
+                                    let percent = profitPercentage[context.dataIndex];
+                                    return `₹${amount} (${percent}%)`;
+                                }
+                            }
+                        }
                     }
                 }
             });
