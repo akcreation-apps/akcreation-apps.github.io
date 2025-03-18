@@ -22,20 +22,23 @@
 
     <!-- Full-Screen Image View -->
     <div class="fullscreen-view" id="fullscreenView">
+        <button class="nav-btn prev" id="prevImage">❮</button>
         <img id="fullscreenImage" src="" alt="Full-Screen View">
+        <button class="nav-btn next" id="nextImage">❯</button>
         <button class="close-btn" id="closeFullscreen">×</button>
     </div>
     <script>
-        document.getElementById("header").addEventListener("click", function() {
-            window.location.href = "index.html"; // Change this to your actual home page URL
-        });
         document.addEventListener("DOMContentLoaded", function () {
             const gallery = document.getElementById("gallery");
             const fullscreenView = document.getElementById("fullscreenView");
             const fullscreenImage = document.getElementById("fullscreenImage");
             const closeFullscreen = document.getElementById("closeFullscreen");
+            const prevImageBtn = document.getElementById("prevImage");
+            const nextImageBtn = document.getElementById("nextImage");
 
             const imagePath = "src/Hair/";  // Path to images folder
+            let images = [];
+            let currentIndex = 0;
             let imageIndex = 1;
 
             function loadImage() {
@@ -46,36 +49,78 @@
 
                 img.onload = function () {
                     gallery.appendChild(img);
+                    images.push(img.src); // Store image src for navigation
+                    imageIndex++;
 
-                    // Add click event listener for full-screen view
-                    img.addEventListener("click", function () {
-                        fullscreenImage.src = this.src;
-                        fullscreenView.style.display = "flex";
+                    // ✅ Click event added **after** image loads
+                    img.addEventListener("click", function (event) {
+                        event.stopPropagation(); // ❌ Prevents event from bubbling up
+                        let clickedImageSrc = new URL(this.src, location.href).href;
+                        currentIndex = images.findIndex(image => new URL(image, location.href).href === clickedImageSrc);
+
+                        if (currentIndex !== -1) {
+                            fullscreenImage.src = images[currentIndex];
+                            fullscreenView.style.display = "flex";
+                        }
                     });
 
-                    imageIndex++;
-                    loadImage(); // Recursively load next image
+                    loadImage(); // Load next image recursively
                 };
 
                 img.onerror = function () {
-                    console.log("No more images found.");
+                    console.log("🚫 No more images found or error loading image.");
                 };
             }
 
             loadImage();
+
+            // ✅ Prevent fullscreen from closing when clicking on image
+            fullscreenImage.addEventListener("click", function (event) {
+                event.stopPropagation(); // Prevent closing on image click
+            });
+
+            // ✅ Close only when clicking outside the image
+            fullscreenView.addEventListener("click", function (e) {
+                if (e.target === fullscreenView) { // Only close if clicking background
+                    fullscreenView.style.display = "none";
+                }
+            });
+
+            // Function to show next image
+            function showNextImage() {
+                if (currentIndex < images.length - 1) {
+                    currentIndex++;
+                    fullscreenImage.src = images[currentIndex];
+                }
+            }
+
+            // Function to show previous image
+            function showPrevImage() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    fullscreenImage.src = images[currentIndex];
+                }
+            }
+
+            // Add event listeners for navigation buttons
+            nextImageBtn.addEventListener("click", showNextImage);
+            prevImageBtn.addEventListener("click", showPrevImage);
 
             // Close full-screen view
             closeFullscreen.addEventListener("click", function () {
                 fullscreenView.style.display = "none";
             });
 
-            // Close full-screen view if clicking outside the image
-            fullscreenView.addEventListener("click", function (e) {
-                if (e.target !== fullscreenImage) {
-                    fullscreenView.style.display = "none";
+            // Allow navigation with arrow keys
+            document.addEventListener("keydown", function (event) {
+                if (fullscreenView.style.display === "flex") {
+                    if (event.key === "ArrowRight") showNextImage();
+                    if (event.key === "ArrowLeft") showPrevImage();
+                    if (event.key === "Escape") fullscreenView.style.display = "none";
                 }
             });
         });
+
     </script>
 </body>
 </html>

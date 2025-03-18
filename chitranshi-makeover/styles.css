@@ -105,6 +105,32 @@ header {
     color: red;
 }
 
+/* Navigation Buttons */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    color: black;
+    font-size: 30px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.prev {
+    left: 20px;
+}
+
+.next {
+    right: 20px;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .gallery-container {
