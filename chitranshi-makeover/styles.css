@@ -143,7 +143,6 @@ header {
 .services {
     margin: 20px auto;
     text-align: center;
-    padding: 20px;
 }
 
 .service-list {
@@ -192,7 +191,7 @@ header {
 
 @media (max-width: 480px) {
     .service-list {
-        grid-template-columns: repeat(1, 1fr); /* 1 column */
+        grid-template-columns: repeat(2, 1fr); /* 1 column */
     }
 }
 .certification {
