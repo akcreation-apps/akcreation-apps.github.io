@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chitranshi Makeover</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="https://akcreation-apps.github.io/chitranshi-makeover/logo.webp">
+</head>
+<body>
+    <header id="header">
+        <img src="https://akcreation-apps.github.io/chitranshi-makeover/logo.webp" alt="Chitranshi Makeovers Logo" class="logo">
+        <div>
+            <h2>Chitranshi Makeover</h2>
+            <p>Your Beauty, Our Passion</p>
+        </div>
+    </header>
+    <section class="services">
+        <h2>Our Trendy Hair Styles</h2>
+        <div class="gallery-container" id="gallery"></div>
+    </section>
+
+    <!-- Full-Screen Image View -->
+    <div class="fullscreen-view" id="fullscreenView">
+        <img id="fullscreenImage" src="" alt="Full-Screen View">
+        <button class="close-btn" id="closeFullscreen">×</button>
+    </div>
+    <script>
+        document.getElementById("header").addEventListener("click", function() {
+            window.location.href = "index.html"; // Change this to your actual home page URL
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const gallery = document.getElementById("gallery");
+            const fullscreenView = document.getElementById("fullscreenView");
+            const fullscreenImage = document.getElementById("fullscreenImage");
+            const closeFullscreen = document.getElementById("closeFullscreen");
+
+            const imagePath = "src/Hair/";  // Path to images folder
+            let imageIndex = 1;
+
+            function loadImage() {
+                let img = new Image();
+                img.src = `${imagePath}Hair-Style (${imageIndex}).jpg`;
+                img.alt = `Hair Style ${imageIndex}`;
+                img.classList.add("gallery-img");
+
+                img.onload = function () {
+                    gallery.appendChild(img);
+
+                    // Add click event listener for full-screen view
+                    img.addEventListener("click", function () {
+                        fullscreenImage.src = this.src;
+                        fullscreenView.style.display = "flex";
+                    });
+
+                    imageIndex++;
+                    loadImage(); // Recursively load next image
+                };
+
+                img.onerror = function () {
+                    console.log("No more images found.");
+                };
+            }
+
+            loadImage();
+
+            // Close full-screen view
+            closeFullscreen.addEventListener("click", function () {
+                fullscreenView.style.display = "none";
+            });
+
+            // Close full-screen view if clicking outside the image
+            fullscreenView.addEventListener("click", function (e) {
+                if (e.target !== fullscreenImage) {
+                    fullscreenView.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

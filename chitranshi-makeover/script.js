@@ -33,4 +33,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    document.getElementById("hair-style").addEventListener("click", function() {
+        window.location.href = "hair-styles.html"; // Change this to your actual home page URL
+    });
 });
