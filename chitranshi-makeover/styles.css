@@ -194,7 +194,7 @@ header {
         grid-template-columns: repeat(2, 1fr); /* 1 column */
     }
 }
-.certification {
+.certification, .contact {
     background: linear-gradient(90deg, #ff758c, #ff7eb3);
     color: white;
     text-align: center;
