@@ -186,11 +186,11 @@
 
             // Pie Chart (Stock Allocation)
             new Chart(document.getElementById("pieChart").getContext("2d"), {
-                type: "pie",
+                type: "doughnut",
                 data: {
                     labels: labels,
                     datasets: [{
-                        data: current_amount,
+                        data: invested_amount,
                         backgroundColor: randomColors,
                         borderColor: "#fff"
                     }]
