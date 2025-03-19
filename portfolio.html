@@ -129,6 +129,7 @@
                 <tr style="background: #FFD700; color: black;">
                     <th style="padding: 10px;">Stock Name</th>
                     <th style="padding: 10px;">Total Dividends (₹)</th>
+                    <th style="padding: 10px;">Last Dividend Received</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -302,9 +303,13 @@
             let totalDividends = [];
             let dividendDetails = {}; // Store company-wise dividends for each date
             let stockDividends = {};
+            let stockLatestDate = {};
             dividendDates.forEach(date => {
                 let sum = 0;
                 let companies = [];
+                let [month, day, year] = date.split("/"); // Extract year & month (YYYY-MM format)
+                let formattedDate = new Date(year, month - 1, 1); // Convert to Date object
+
                 datewise_dividends[date].forEach(stock => {
                     sum += stock.dividend_amount;
                     companies.push(`${stock.name}: ₹${stock.dividend_amount.toLocaleString()}`);
@@ -314,6 +319,11 @@
                         stockDividends[stock.name] += stock.dividend_amount;
                     } else {
                         stockDividends[stock.name] = stock.dividend_amount;
+                    }
+
+                    // Store the latest date for each stock
+                    if (!stockLatestDate[stock.name] || formattedDate > stockLatestDate[stock.name]) {
+                        stockLatestDate[stock.name] = formattedDate;
                     }
                 });
                 totalDividends.push(sum);
@@ -327,9 +337,14 @@
             let tableBody = document.querySelector("#dividendsTable tbody");
             tableBody.innerHTML = ""; // Clear existing data
             sortedStocks.forEach(stock => {
+                let latestDate = stockLatestDate[stock];
+                let monthAbbr = latestDate.toLocaleString('en-US', { month: 'short' }); // "Jan", "Feb", etc.
+                let yearAbbr = latestDate.getFullYear().toString().slice(-2); // "25" for 2025
+                let formattedMonthYear = `${monthAbbr}' ${yearAbbr}`; // Example: "Jan'25"
                 let row = `<tr>
                     <td style="padding: 10px; border: 1px solid #fff;">${stock}</td>
                     <td style="padding: 10px; border: 1px solid #fff;">₹ ${stockDividends[stock].toLocaleString()}/-</td>
+                    <td style="padding: 10px; border: 1px solid #fff;">${formattedMonthYear}</td>
                 </tr>`;
                 tableBody.innerHTML += row;
             });
