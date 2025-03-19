@@ -229,8 +229,12 @@
                   sortTable('Name', 0);
                   updateLastFetchedTime(stockData[0]?.["Time"]);
                   const tableBody = document.getElementById("upcomingDividends");
+                  tableBody.innerHTML = ""; // Clear previous entries
+                  const uniqueStocks = new Map();
+
                   data.forEach(stock => {
-                      if (stock["Upcoming Dividend Amount"] > 0) {
+                      if (stock["Upcoming Dividend Amount"] > 0 && !uniqueStocks.has(stock["Name"])) {
+                          uniqueStocks.set(stock["Name"], stock);
                           const row = `<tr>
                                <td>${stock["Name"]}</td>
                                <td>₹ ${stock["Upcoming Dividend Amount"]}/-</td>
