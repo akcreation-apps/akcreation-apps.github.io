@@ -96,8 +96,8 @@
             <p id="totalProfitLoss">Loading...</p>
         </div>
         <div class="summary-box">
-            <h3>Returns</h3>
-            <p id="xirr">Loading...</p>  <!-- Placeholder for XIRR -->
+            <h3>Dividends</h3>
+            <p id="totalDividends">Loading...</p>  <!-- Placeholder for XIRR -->
         </div>
 
     </div>
@@ -105,6 +105,11 @@
     <h2>Stock Price Trends</h2>
     <div class="chart-container">
         <canvas id="lineChart"></canvas>
+    </div>
+
+    <h2>Dividends Over Time</h2>
+    <div class="chart-container">
+        <canvas id="dividendsChart"></canvas>
     </div>
 
     <h2>Stock Holdings</h2>
@@ -126,6 +131,7 @@
                     const stock_data = transformStockData(data['current_stock_data']);
                     renderCharts(stock_data);
                     renderDateWiseCharts(data['datewise_returns']);
+                    renderDividendsChart(data['datewise_dividends']);
                 })
                 .catch(error => console.error("❌ Error fetching JSON:", error));
         });
@@ -166,7 +172,22 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true, grid: { color: "#555" } },
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: "#555" },
+                            ticks: {
+                                color: "#fff",
+                                callback: function(value) {
+                                    if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                    if (value <= -10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                    if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                    if (value <= -100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                    if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                    if (value <= -1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                    return value; // Keep the original value for small numbers
+                                }
+                            }
+                        },
                         x: { grid: { color: "#555" } }
                     },
                     plugins: {
@@ -223,10 +244,8 @@
             // ✅ Update UI
             document.getElementById("totalInvested").textContent = `₹ ${totalInvested.toLocaleString()}`;
             document.getElementById("currentBalance").textContent = `₹ ${currentBalance.toLocaleString()}`;
-            document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()}`;
+            document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()} (${percentage ? percentage.toFixed(2) + "%" : "N/A"})`;
             document.getElementById("totalProfitLoss").style.color = profitLoss >= 0 ? "lightgreen" : "red";
-            document.getElementById("xirr").textContent = `${percentage ? percentage.toFixed(2) + "%" : "N/A"}`;
-            document.getElementById("xirr").style.color = percentage >= 0 ? "lightgreen" : "red";
 
             new Chart(document.getElementById("lineChart").getContext("2d"), {
                 type: "line",
@@ -241,7 +260,19 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: false, grid: { color: "#555" } },
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: "#555" },
+                            ticks: {
+                                color: "#fff",
+                                callback: function(value) {
+                                    if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                    if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                    if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                    return value; // Keep the original value for small numbers
+                                }
+                            }
+                        },
                         x: { grid: { color: "#555" } }
                     },
                     plugins: {
@@ -249,6 +280,78 @@
                         tooltip: { mode: 'index', intersect: false } // ✅ Show all values on hover
                     },
                     interaction: { mode: 'index', intersect: false } // ✅ Ensure all dataset values appear on hover
+                }
+            });
+        }
+
+        function renderDividendsChart(datewise_dividends) {
+            let dividendDates = Object.keys(datewise_dividends);
+            let totalDividends = [];
+            let dividendDetails = {}; // Store company-wise dividends for each date
+             dividendDates.forEach(date => {
+                let sum = 0;
+                let companies = [];
+                datewise_dividends[date].forEach(stock => {
+                    sum += stock.dividend_amount;
+                    companies.push(`${stock.name}: ₹${stock.dividend_amount.toLocaleString()}`);
+                });
+                totalDividends.push(sum);
+                dividendDetails[date] = companies;
+            });
+
+            // ✅ Update UI with total dividend amount
+            let totalDividendAmount = totalDividends.reduce((sum, value) => sum + value, 0);
+            document.getElementById("totalDividends").textContent = `₹ ${totalDividendAmount.toLocaleString()}`;
+
+
+            new Chart(document.getElementById("dividendsChart").getContext("2d"), {
+                type: "bar",
+                data: {
+                    labels: dividendDates,
+                    datasets: [{
+                        label: 'Dividends Received',
+                        data: totalDividends,
+                        borderColor: "#FF9800",
+                        backgroundColor: "rgba(255, 152, 0, 0.2)",
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: "#555" },
+                            ticks: {
+                                color: "#fff",
+                                callback: function(value) {
+                                    if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                    if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                    if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                    return value; // Keep the original value for small numbers
+                                }
+                            }
+                        },
+                        x: { grid: { color: "#555" } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: "#fff" } },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function (context) {
+                                    let date = context.label;
+                                    let totalAmount = totalDividends[context.dataIndex].toLocaleString();
+                                    let companies = dividendDetails[date];
+                                    return [`Total: ₹${totalAmount}`, ...companies];
+                                }
+                            }
+                        }
+                    },
+                    interaction: { mode: 'index', intersect: false }
                 }
             });
         }
