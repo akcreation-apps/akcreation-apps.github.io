@@ -122,6 +122,19 @@
         <canvas id="pieChart"></canvas>
     </div>
 
+    <h2>Dividends Summary</h2>
+    <div class="chart-container">
+        <table id="dividendsTable" style="width: 100%; border-collapse: collapse; background: #1e1e1e; color: white;">
+            <thead>
+                <tr style="background: #FFD700; color: black;">
+                    <th style="padding: 10px;">Stock Name</th>
+                    <th style="padding: 10px;">Total Dividends (₹)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
@@ -288,15 +301,37 @@
             let dividendDates = Object.keys(datewise_dividends);
             let totalDividends = [];
             let dividendDetails = {}; // Store company-wise dividends for each date
-             dividendDates.forEach(date => {
+            let stockDividends = {};
+            dividendDates.forEach(date => {
                 let sum = 0;
                 let companies = [];
                 datewise_dividends[date].forEach(stock => {
                     sum += stock.dividend_amount;
                     companies.push(`${stock.name}: ₹${stock.dividend_amount.toLocaleString()}`);
+
+                    // Aggregate dividends per stock
+                    if (stockDividends[stock.name]) {
+                        stockDividends[stock.name] += stock.dividend_amount;
+                    } else {
+                        stockDividends[stock.name] = stock.dividend_amount;
+                    }
                 });
                 totalDividends.push(sum);
                 dividendDetails[date] = companies;
+            });
+
+            // Sort stock dividends alphabetically
+            let sortedStocks = Object.keys(stockDividends).sort();
+
+            // Populate the table
+            let tableBody = document.querySelector("#dividendsTable tbody");
+            tableBody.innerHTML = ""; // Clear existing data
+            sortedStocks.forEach(stock => {
+                let row = `<tr>
+                    <td style="padding: 10px; border: 1px solid #fff;">${stock}</td>
+                    <td style="padding: 10px; border: 1px solid #fff;">₹ ${stockDividends[stock].toLocaleString()}/-</td>
+                </tr>`;
+                tableBody.innerHTML += row;
             });
 
             // ✅ Update UI with total dividend amount
@@ -312,7 +347,7 @@
                         label: 'Dividends Received',
                         data: totalDividends,
                         borderColor: "#FF9800",
-                        backgroundColor: "rgba(255, 152, 0, 0.2)",
+                        backgroundColor: "#00c853",
                         fill: true,
                         tension: 0.3
                     }]
