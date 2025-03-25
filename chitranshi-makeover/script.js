@@ -74,4 +74,24 @@ document.addEventListener("DOMContentLoaded", function () {
     dots[0].classList.add("active");
     setInterval(autoSlide, 7000); // Change slide every 4 seconds
 
+    <!-- Countdown Timer Script -->
+    const openingDate = new Date("2025-05-01T00:00:00").getTime(); // Set opening date
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const timeLeft = openingDate - now;
+
+        if (timeLeft > 0) {
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            document.getElementById("countdown").innerText = `${days} days`;
+        } else {
+            document.getElementById("follow-us").style.display = "";
+            document.getElementById("countdown-section").style.display = "none";
+        }
+    }
+
+    // Run immediately and then every second
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
 });

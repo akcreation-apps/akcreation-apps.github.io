@@ -68,6 +68,20 @@ header {
     transform: scale(1.05);
 }
 
+#countdown-section {
+    background: #fce4ec;
+    color: #c2185b;
+    text-align: center;
+    padding: 12px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
 /* Welcome Section */
 .welcome {
     text-align: center;
