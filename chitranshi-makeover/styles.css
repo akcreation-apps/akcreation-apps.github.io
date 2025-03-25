@@ -52,7 +52,6 @@ header {
     gap: 10px;
     justify-content: center;
     padding: 10px;
-    background: linear-gradient(176deg, #ffffff, #ff758c);
 }
 
 .gallery-container img {
@@ -77,7 +76,7 @@ header {
     padding: 30px 20px;
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-    max-width: 800px;
+    max-width: 600px;
     margin: 30px auto;
 }
 
