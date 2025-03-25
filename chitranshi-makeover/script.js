@@ -37,4 +37,41 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("hair-style").addEventListener("click", function() {
         window.location.href = "hair-styles.html"; // Change this to your actual home page URL
     });
+
+    document.getElementById("bridal-makeup").addEventListener("click", function() {
+        window.location.href = "bridal.html"; // Change this to your actual home page URL
+    });
+
+    let index = 0;
+    const slider = document.querySelector(".testimonial-slider");
+    const testimonials = document.querySelectorAll(".testimonial");
+    const dotsContainer = document.querySelector(".slider-dots");
+
+    // Create navigation dots
+    testimonials.forEach((_, i) => {
+        const dot = document.createElement("span");
+        dot.addEventListener("click", () => moveToSlide(i));
+        dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll(".slider-dots span");
+    function moveToSlide(i) {
+        index = i;
+        slider.style.transform = `translateX(-${i * 100}%)`;
+        updateDots();
+    }
+
+    function updateDots() {
+        dots.forEach(dot => dot.classList.remove("active"));
+        dots[index].classList.add("active");
+    }
+
+    function autoSlide() {
+        index = (index + 1) % testimonials.length;
+        moveToSlide(index);
+    }
+
+    dots[0].classList.add("active");
+    setInterval(autoSlide, 4000); // Change slide every 4 seconds
+
 });

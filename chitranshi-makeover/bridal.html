@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chitranshi Makeover</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="https://akcreation-apps.github.io/chitranshi-makeover/logo.webp">
+</head>
+<body>
+    <header id="header">
+        <img src="https://akcreation-apps.github.io/chitranshi-makeover/logo.webp" alt="Chitranshi Makeovers Logo" class="logo">
+        <div>
+            <h2>Chitranshi Makeover</h2>
+            <p>Your Beauty, Our Passion</p>
+        </div>
+    </header>
+    <section class="services">
+        <h2>Bridal Makeup</h2>
+        <div class="gallery-container" id="gallery"></div>
+    </section>
+
+    <!-- Full-Screen Image View -->
+    <div class="fullscreen-view" id="fullscreenView">
+        <button class="nav-btn prev" id="prevImage">❮</button>
+        <img id="fullscreenImage" src="" alt="Full-Screen View">
+        <button class="nav-btn next" id="nextImage">❯</button>
+        <button class="close-btn" id="closeFullscreen">×</button>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const gallery = document.getElementById("gallery");
+            const fullscreenView = document.getElementById("fullscreenView");
+            const fullscreenImage = document.getElementById("fullscreenImage");
+            const closeFullscreen = document.getElementById("closeFullscreen");
+            const prevImageBtn = document.getElementById("prevImage");
+            const nextImageBtn = document.getElementById("nextImage");
+
+            const imagePath = "src/Bridal-Makeup/";  // Path to images folder
+            let images = [];
+            let currentIndex = 0;
+            let imageIndex = 1;
+
+            function loadImage() {
+                let img = new Image();
+                img.src = `${imagePath}Bridal (${imageIndex}).jpg`;
+                img.alt = `Bridal ${imageIndex}`;
+                img.classList.add("gallery-img");
+
+                img.onload = function () {
+                    gallery.appendChild(img);
+                    images.push(img.src); // Store image src for navigation
+                    imageIndex++;
+
+                    // ✅ Click event added **after** image loads
+                    img.addEventListener("click", function (event) {
+                        event.stopPropagation(); // ❌ Prevents event from bubbling up
+                        let clickedImageSrc = new URL(this.src, location.href).href;
+                        currentIndex = images.findIndex(image => new URL(image, location.href).href === clickedImageSrc);
+
+                        if (currentIndex !== -1) {
+                            fullscreenImage.src = images[currentIndex];
+                            fullscreenView.style.display = "flex";
+                        }
+                    });
+
+                    loadImage(); // Load next image recursively
+                };
+
+                img.onerror = function () {
+                    console.log("🚫 No more images found or error loading image.");
+                };
+            }
+
+            loadImage();
+
+            // ✅ Prevent fullscreen from closing when clicking on image
+            fullscreenImage.addEventListener("click", function (event) {
+                event.stopPropagation(); // Prevent closing on image click
+            });
+
+            // ✅ Close only when clicking outside the image
+            fullscreenView.addEventListener("click", function (e) {
+                if (e.target === fullscreenView) { // Only close if clicking background
+                    fullscreenView.style.display = "none";
+                }
+            });
+
+            // Function to show next image
+            function showNextImage() {
+                if (currentIndex < images.length - 1) {
+                    currentIndex++;
+                    fullscreenImage.src = images[currentIndex];
+                }
+            }
+
+            // Function to show previous image
+            function showPrevImage() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    fullscreenImage.src = images[currentIndex];
+                }
+            }
+
+            // Add event listeners for navigation buttons
+            nextImageBtn.addEventListener("click", showNextImage);
+            prevImageBtn.addEventListener("click", showPrevImage);
+
+            // Close full-screen view
+            closeFullscreen.addEventListener("click", function () {
+                fullscreenView.style.display = "none";
+            });
+
+            // Allow navigation with arrow keys
+            document.addEventListener("keydown", function (event) {
+                if (fullscreenView.style.display === "flex") {
+                    if (event.key === "ArrowRight") showNextImage();
+                    if (event.key === "ArrowLeft") showPrevImage();
+                    if (event.key === "Escape") fullscreenView.style.display = "none";
+                }
+            });
+        });
+        document.getElementById("header").addEventListener("click", function() {
+            window.location.href = "index.html"; // Change this to your actual home page URL
+        });
+    </script>
+</body>
+</html>

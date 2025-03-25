@@ -69,6 +69,183 @@ header {
     transform: scale(1.05);
 }
 
+/* Welcome Section */
+.welcome {
+    text-align: center;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    color: white;
+    padding: 30px 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    margin: 30px auto;
+}
+
+.welcome h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.welcome p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.welcome strong {
+    color: #ffdeeb;
+}
+
+/* Style for WhatsApp Button */
+.welcome #whatsappBtn {
+    background-color: #25D366;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.welcome #whatsappBtn:hover {
+    background-color: #1EBE5D;
+    transform: scale(1.05);
+}
+
+/* Why Choose Us Section */
+.why-choose-us {
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+}
+
+.why-choose-us h2 {
+    color: #ffff;
+    margin-bottom: 10px;
+}
+
+.why-choose-us ul {
+    color: #ffff;
+    list-style: none;
+}
+
+.why-choose-us li {
+    text-align: left;
+    margin: 5px 0;
+}
+
+/* Testimonials Section */
+.testimonials {
+    text-align: center;
+    background: #fbe7eb;
+    padding: 40px 20px;
+    border-radius: 10px;
+    margin: 30px auto;
+    max-width: 600px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.testimonial-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.testimonial-slider {
+    display: flex;
+    width: auto;
+    transition: transform 0.5s ease-in-out;
+}
+
+.testimonial{
+    width: 100%;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #333;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.testimonial span {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #d63384;
+}
+
+/* Navigation Dots */
+.slider-dots {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.slider-dots span {
+    height: 10px;
+    width: 10px;
+    margin: 0 5px;
+    display: inline-block;
+    background: #d63384;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.slider-dots .active {
+    background: #b82e74;
+}
+
+.follow-us {
+    text-align: center;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    padding: 15px 15px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 30px auto;
+    max-width: 600px;
+}
+
+.follow-us h2 {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.follow-us p {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: #ff007f;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: background 0.3s ease;
+}
+
+.social-btn img {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.social-btn:hover {
+    background-color: #d6006e;
+}
+
 /* Full-Screen Image View */
 .fullscreen-view {
     display: none;
