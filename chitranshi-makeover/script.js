@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const whatsappBtn = document.getElementById("whatsappBtn");
     if (whatsappBtn) {
         whatsappBtn.addEventListener("click", function () {
-            const phoneNumber = "+917735143792";
+            const phoneNumber = "+917682904911";
             const message = "Hi! Can I get more info about your makeup services ?";
             location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
         });
