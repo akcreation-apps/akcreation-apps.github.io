@@ -72,6 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     dots[0].classList.add("active");
-    setInterval(autoSlide, 4000); // Change slide every 4 seconds
+    setInterval(autoSlide, 7000); // Change slide every 4 seconds
 
 });
