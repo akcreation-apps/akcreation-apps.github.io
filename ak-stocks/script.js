@@ -15,6 +15,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchOrders("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/buy_stock_details.json", "buyOrders");
     fetchOrders("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/sell_stock_details.json", "sellOrders");
+    const whatsappBtn = document.getElementById("whatsappBtn");
+    if (whatsappBtn) {
+        whatsappBtn.addEventListener("click", function () {
+            const phoneNumber = "+917749984274";
+            const message = "Hi! Am interested in joining Ak Stocks.";
+            location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        });
+    }
 });
 
 function fetchOrders(url, tableId) {
