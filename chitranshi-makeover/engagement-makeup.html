@@ -38,7 +38,7 @@
             const nextImageBtn = document.getElementById("nextImage");
             const noImageMessage = document.getElementById("noImageMessage");
 
-            const imagePath = "src/Hair/";  // Path to images folder
+            const imagePath = "src/Engagement-Makeup/";  // Path to images folder
             let images = [];
             let currentIndex = 0;
             let imageIndex = 1;
@@ -46,8 +46,8 @@
 
             function loadImage() {
                 let img = new Image();
-                img.src = `${imagePath}Hair-Style (${imageIndex}).jpg`;
-                img.alt = `Hair Style ${imageIndex}`;
+                img.src = `${imagePath}Engagement-Makeup (${imageIndex}).jpg`;
+                img.alt = `Engagement-Makeup ${imageIndex}`;
                 img.classList.add("gallery-img");
 
                 img.onload = function () {

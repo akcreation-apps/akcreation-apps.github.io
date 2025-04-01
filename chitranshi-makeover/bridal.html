@@ -16,7 +16,10 @@
         </div>
     </header>
     <div class="gallery-container" id="gallery"></div>
-
+    <div id="noImageMessage" class="hidden">
+        <p>✨ <strong>Be the next beauty icon! Book your appointment today and get featured on our page!</strong> ✨</p>
+        <button id="whatsappBtn">Chat on WhatsApp</button>
+    </div>
     <!-- Full-Screen Image View -->
     <div class="fullscreen-view" id="fullscreenView">
         <button class="nav-btn prev" id="prevImage">❮</button>
@@ -24,6 +27,7 @@
         <button class="nav-btn next" id="nextImage">❯</button>
         <button class="close-btn" id="closeFullscreen">×</button>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const gallery = document.getElementById("gallery");
@@ -32,11 +36,13 @@
             const closeFullscreen = document.getElementById("closeFullscreen");
             const prevImageBtn = document.getElementById("prevImage");
             const nextImageBtn = document.getElementById("nextImage");
+            const noImageMessage = document.getElementById("noImageMessage");
 
             const imagePath = "src/Bridal-Makeup/";  // Path to images folder
             let images = [];
             let currentIndex = 0;
             let imageIndex = 1;
+            let foundImages = false;
 
             function loadImage() {
                 let img = new Image();
@@ -46,12 +52,12 @@
 
                 img.onload = function () {
                     gallery.appendChild(img);
-                    images.push(img.src); // Store image src for navigation
+                    images.push(img.src);
                     imageIndex++;
+                    foundImages = true;
 
-                    // ✅ Click event added **after** image loads
                     img.addEventListener("click", function (event) {
-                        event.stopPropagation(); // ❌ Prevents event from bubbling up
+                        event.stopPropagation();
                         let clickedImageSrc = new URL(this.src, location.href).href;
                         currentIndex = images.findIndex(image => new URL(image, location.href).href === clickedImageSrc);
 
@@ -65,25 +71,24 @@
                 };
 
                 img.onerror = function () {
-                    console.log("🚫 No more images found or error loading image.");
+                    if (!foundImages) {
+                        noImageMessage.classList.remove("hidden");
+                    }
                 };
             }
 
             loadImage();
 
-            // ✅ Prevent fullscreen from closing when clicking on image
             fullscreenImage.addEventListener("click", function (event) {
-                event.stopPropagation(); // Prevent closing on image click
+                event.stopPropagation();
             });
 
-            // ✅ Close only when clicking outside the image
             fullscreenView.addEventListener("click", function (e) {
-                if (e.target === fullscreenView) { // Only close if clicking background
+                if (e.target === fullscreenView) {
                     fullscreenView.style.display = "none";
                 }
             });
 
-            // Function to show next image
             function showNextImage() {
                 if (currentIndex < images.length - 1) {
                     currentIndex++;
@@ -91,7 +96,6 @@
                 }
             }
 
-            // Function to show previous image
             function showPrevImage() {
                 if (currentIndex > 0) {
                     currentIndex--;
@@ -99,16 +103,13 @@
                 }
             }
 
-            // Add event listeners for navigation buttons
             nextImageBtn.addEventListener("click", showNextImage);
             prevImageBtn.addEventListener("click", showPrevImage);
 
-            // Close full-screen view
             closeFullscreen.addEventListener("click", function () {
                 fullscreenView.style.display = "none";
             });
 
-            // Allow navigation with arrow keys
             document.addEventListener("keydown", function (event) {
                 if (fullscreenView.style.display === "flex") {
                     if (event.key === "ArrowRight") showNextImage();
@@ -116,10 +117,37 @@
                     if (event.key === "Escape") fullscreenView.style.display = "none";
                 }
             });
-        });
-        document.getElementById("header").addEventListener("click", function() {
-            window.location.href = "index.html"; // Change this to your actual home page URL
+
+            document.getElementById("header").addEventListener("click", function() {
+                window.location.href = "index.html";
+            });
+
+            const whatsappBtn = document.getElementById("whatsappBtn");
+            if (whatsappBtn) {
+                whatsappBtn.addEventListener("click", function () {
+                    const phoneNumber = "+917682904911";
+                    const message = "Hi! Can I get more info about your makeup services ?";
+                    location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                });
+            }
         });
     </script>
+
+    <style>
+        .hidden {
+            display: none;
+        }
+        #noImageMessage {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #d63384;
+            margin: 20px;
+            padding: 10px;
+            border: 2px dashed #d63384;
+            background: #fff3f6;
+            border-radius: 10px;
+        }
+    </style>
 </body>
 </html>
