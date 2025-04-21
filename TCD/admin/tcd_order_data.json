@@ -1,4 +1,39 @@
 {
+    "tMnUEvQLGjnHpZ5DcCC0": {
+        "total_cart_value": 64,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 7,
+                            "quantity": 2,
+                            "id": 2501,
+                            "name": "Chapati (Roti)"
+                        }
+                    ],
+                    "name": "Indian Breads / Roti"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 50,
+                            "quantity": 1,
+                            "id": 2901,
+                            "name": "Dal Tadka"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "created_at": "2025-04-19T08:37:29.056000+00:00",
+        "triggered_to": "+917077410424",
+        "status": "In Progress",
+        "table_no": "COD"
+    },
     "UPHNIZfQaMvLam6Zd6Hz": {
         "total_cart_value": 140,
         "order_details": [
