@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Redirector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+      font-size: 1.7rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      outline: none;
+    }
+
+    button {
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background-color: #fff;
+      color: #764ba2;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-bottom: 1rem;
+    }
+
+    button:hover {
+      background-color: #f2f2f2;
+    }
+
+    #generatedLink {
+      word-break: break-all;
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.1);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .link-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .copy-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+
+    .copy-button:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    @media screen and (max-width: 480px) {
+      h2 {
+        font-size: 1.4rem;
+      }
+
+      button, .copy-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="content">
+    <h2>Generate a Redirect Link</h2>
+    <input type="text" id="urlInput" placeholder="Paste your destination URL here...">
+    <button onclick="generateLink()">Generate Redirect URL</button>
+
+    <div id="generatedLink" style="display:none;">
+      <div class="link-container">
+        <a id="linkText" href="#" target="_blank"></a>
+        <button class="copy-button" id="copyBtn" onclick="copyToClipboard()">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get("redirect");
+
+    if (redirectUrl) {
+      if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
+        window.location.href = redirectUrl;
+      } else {
+        document.getElementById("content").innerHTML = "<h2>⚠️ Invalid Redirect URL</h2>";
+      }
+    }
+
+    function generateLink() {
+      const input = document.getElementById("urlInput").value.trim();
+      if (!input) {
+        alert("Please enter a valid URL.");
+        return;
+      }
+
+      const currentUrl = window.location.origin + window.location.pathname;
+      const fullRedirectUrl = `${currentUrl}?redirect=${encodeURIComponent(input)}`;
+
+      const linkText = document.getElementById("linkText");
+      linkText.href = fullRedirectUrl;
+      linkText.textContent = fullRedirectUrl;
+
+      document.getElementById("generatedLink").style.display = "block";
+    }
+
+    function copyToClipboard() {
+      const link = document.getElementById("linkText").href;
+      navigator.clipboard.writeText(link).then(() => {
+        const btn = document.getElementById("copyBtn");
+        btn.innerHTML = "✅ Copied!";
+        setTimeout(() => {
+          btn.innerHTML = "📋 Copy";
+        }, 1500);
+      });
+    }
+  </script>
+
+</body>
+</html>
