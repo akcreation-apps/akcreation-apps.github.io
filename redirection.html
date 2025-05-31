@@ -172,7 +172,11 @@
       <input type="text" id="urlInput" placeholder="Paste your destination URL here..." oninput="toggleClearIcon()">
       <span id="clearIcon" onclick="clearInput()">✖</span>
     </div>
-    <button onclick="generateLink()">Generate Redirect URL</button>
+
+    <button id="generateBtn" onclick="generateLink()">
+      <span id="btnText">Generate Redirect URL</span>
+      <span id="loader" style="display:none; margin-left: 8px;">⏳</span>
+    </button>
 
     <div id="generatedLink" class="link-container" style="display:none;">
       <a id="linkText" class="generated-link" href="#" target="_blank"></a>
@@ -244,15 +248,49 @@
         return;
       }
 
+      document.getElementById("btnText").style.display = "none";
+      document.getElementById("loader").style.display = "inline";
+
       const currentUrl = window.location.origin + window.location.pathname;
-      const fullRedirectUrl = `${currentUrl}?redirect=${encodeURIComponent(input)}`;
+      const redirectLink = `${currentUrl}?redirect=${encodeURIComponent(input)}`;
 
-      const linkText = document.getElementById("linkText");
-      linkText.href = fullRedirectUrl;
-      linkText.textContent = fullRedirectUrl;
+      fetch("https://cleanuri.com/api/v1/shorten", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({ url: redirectLink })
+      })
+        .then(res => res.json())
+        .then(data => {
+          let finalUrl = redirectLink; // fallback URL
 
-      document.getElementById("generatedLink").style.display = "block";
+          if (data.result_url) {
+            finalUrl = data.result_url;
+          }
+
+          const linkText = document.getElementById("linkText");
+          linkText.href = finalUrl;
+          linkText.textContent = finalUrl;
+
+          document.getElementById("generatedLink").style.display = "block";
+        })
+        .catch(() => {
+          // fallback to original redirect link if API fails
+          const linkText = document.getElementById("linkText");
+          linkText.href = redirectLink;
+          linkText.textContent = redirectLink;
+
+          document.getElementById("generatedLink").style.display = "block";
+        })
+        .finally(() => {
+          // Hide loader, show button text again
+          document.getElementById("btnText").style.display = "inline";
+          document.getElementById("loader").style.display = "none";
+        });
     }
+
+
 
     function copyToClipboard() {
       const link = document.getElementById("linkText").href;
