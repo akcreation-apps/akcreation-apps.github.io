@@ -254,7 +254,7 @@
       const currentUrl = window.location.origin + window.location.pathname;
       const redirectLink = `${currentUrl}?redirect=${encodeURIComponent(input)}`;
 
-      fetch("https://cleanuri.com/api/v1/shorten", {
+      fetch("https://cors-anywhere.herokuapp.com/https://cleanuri.com/api/v1/shorten", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
