@@ -202,20 +202,27 @@
     function openYouTubeApp(url) {
       try {
         const u = new URL(url);
-        const appUrl = "youtube://" + u.href.replace(/^https?:\/\//, "");
+        const isAndroid = /android/i.test(navigator.userAgent);
+        const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        const youtubeScheme = "youtube://" + u.href.replace(/^https?:\/\//, "");
+        const androidIntent = `intent://${u.host}${u.pathname}${u.search}#Intent;package=com.google.android.youtube;scheme=https;end`;
+
+        const appUrl = isAndroid ? androidIntent : youtubeScheme;
 
         if (isInstagramBrowser()) {
           document.getElementById("content").innerHTML = `
-          <h2>📲 Open in YouTube App</h2>
-          <p>Instagram blocks auto app redirection.<br>Tap the button below to open manually:</p>
-          <div style="display: flex; justify-content: center;">
-            <a href="${appUrl}" class="youtube-button">▶️ Watch on YouTube</a>
-          </div>
-          <p style="font-size:0.85rem;opacity:0.8;margin-top:1rem;">If it doesn't work, open in a browser.</p>
-        `;
+            <h2>📲 Open in YouTube App</h2>
+            <p>Instagram blocks auto app redirection.<br>Tap the button below to open manually:</p>
+            <div style="display: flex; justify-content: center;">
+              <a href="${appUrl}" class="youtube-button">▶️ Watch on YouTube</a>
+            </div>
+            <p style="font-size:0.85rem;opacity:0.8;margin-top:1rem;">If it doesn't work, open in a browser.</p>
+          `;
         } else {
-          // Try deep link then fallback
           window.location.href = appUrl;
+
+          // fallback after 1 sec if app doesn't open
           setTimeout(() => {
             window.location.href = url;
           }, 1000);
@@ -224,6 +231,7 @@
         window.location.href = url;
       }
     }
+
 
     if (redirectUrl) {
       if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
