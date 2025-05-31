@@ -90,6 +90,25 @@
       transition: background 0.3s;
     }
 
+    .youtube-button {
+      background-color: #FF0000;
+      color: white;
+      font-weight: bold;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .youtube-button:hover {
+      background-color: #cc0000;
+    }
+
     .copy-button:hover {
       background: rgba(255,255,255,0.25);
     }
@@ -144,13 +163,13 @@
 
         if (isInstagramBrowser()) {
           document.getElementById("content").innerHTML = `
-            <h2>📲 Open in YouTube App</h2>
-            <p>Instagram blocks auto app redirection.<br>Tap the button below to open manually:</p>
-            <a href="${appUrl}">
-              <button style="margin-top:1rem">🎬 Open in YouTube App</button>
-            </a>
-            <p style="font-size:0.85rem;opacity:0.8;margin-top:1rem;">If it doesn't work, open in a browser.</p>
-          `;
+          <h2>📲 Open in YouTube App</h2>
+          <p>Instagram blocks auto app redirection.<br>Tap the button below to open manually:</p>
+          <a href="${appUrl}">
+            <button class="youtube-button">▶️ Watch on YouTube</button>
+          </a>
+          <p style="font-size:0.85rem;opacity:0.8;margin-top:1rem;">If it doesn't work, open in a browser.</p>
+        `;
         } else {
           // Try deep link then fallback
           window.location.href = appUrl;
