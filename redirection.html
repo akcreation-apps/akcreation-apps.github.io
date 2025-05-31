@@ -129,13 +129,43 @@
     const params = new URLSearchParams(window.location.search);
     const redirectUrl = params.get("redirect");
 
+    function isYouTubeDomain(url) {
+      try {
+        const u = new URL(url);
+        return u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be");
+      } catch {
+        return false;
+      }
+    }
+
+    function openYouTubeApp(url) {
+      try {
+        const u = new URL(url);
+        const appUrl = "youtube://" + u.href.replace(/^https?:\/\//, "");
+        // Open in YouTube app
+        window.location.href = appUrl;
+
+        // Fallback after 1 second if app doesn't open
+        setTimeout(() => {
+          window.location.href = url;
+        }, 1000);
+      } catch {
+        window.location.href = url;
+      }
+    }
+
     if (redirectUrl) {
       if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
-        window.location.href = redirectUrl;
+        if (isYouTubeDomain(redirectUrl)) {
+          openYouTubeApp(redirectUrl);
+        } else {
+          window.location.href = redirectUrl;
+        }
       } else {
         document.getElementById("content").innerHTML = "<h2>⚠️ Invalid Redirect URL</h2>";
       }
     }
+
 
     function generateLink() {
       const input = document.getElementById("urlInput").value.trim();
