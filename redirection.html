@@ -40,7 +40,6 @@
 
     input[type="text"] {
       width: 100%;
-      padding: 0.75rem 1rem;
       border-radius: 8px;
       border: none;
       font-size: 1rem;
@@ -113,6 +112,43 @@
       background: rgba(255,255,255,0.25);
     }
 
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .input-wrapper input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem; /* enough space for icon */
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      box-sizing: border-box;
+      line-height: 1.5;
+      height: 48px; /* force consistent height */
+      display: flex;
+      align-items: center;
+    }
+
+    #clearIcon {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      color: #a79696;
+      cursor: pointer;
+      display: none;
+      line-height: 1;
+      user-select: none;
+    }
+
+    #clearIcon:hover {
+      color: #fff;
+    }
+
     @media screen and (max-width: 480px) {
       h2 {
         font-size: 1.4rem;
@@ -128,7 +164,10 @@
 
   <div class="container" id="content">
     <h2>Generate a Redirect Link</h2>
-    <input type="text" id="urlInput" placeholder="Paste your destination URL here...">
+    <div class="input-wrapper">
+      <input type="text" id="urlInput" placeholder="Paste your destination URL here..." oninput="toggleClearIcon()">
+      <span id="clearIcon" onclick="clearInput()">✖</span>
+    </div>
     <button onclick="generateLink()">Generate Redirect URL</button>
 
     <div id="generatedLink" class="link-container" style="display:none;">
@@ -221,6 +260,20 @@
         }, 1500);
       });
     }
+
+    function toggleClearIcon() {
+      const input = document.getElementById("urlInput");
+      const clearIcon = document.getElementById("clearIcon");
+      clearIcon.style.display = input.value ? "block" : "none";
+    }
+
+    function clearInput() {
+      const input = document.getElementById("urlInput");
+      input.value = "";
+      toggleClearIcon();
+      document.getElementById("generatedLink").style.display = "none";
+    }
+
   </script>
 </body>
 </html>
