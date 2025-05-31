@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -87,10 +89,6 @@
       transition: background 0.3s;
     }
 
-    .copy-button:hover {
-      background: rgba(255,255,255,0.25);
-    }
-
     .youtube-button {
       background-color: #FF0000;
       color: white;
@@ -114,6 +112,10 @@
       background-color: #cc0000;
     }
 
+    .copy-button:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
     .input-wrapper {
       position: relative;
       width: 100%;
@@ -122,14 +124,14 @@
 
     .input-wrapper input[type="text"] {
       width: 100%;
-      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      padding: 0.75rem 2.5rem 0.75rem 1rem; /* enough space for icon */
       border-radius: 8px;
       border: none;
       font-size: 1rem;
       outline: none;
       box-sizing: border-box;
       line-height: 1.5;
-      height: 48px;
+      height: 48px; /* force consistent height */
       display: flex;
       align-items: center;
     }
@@ -203,36 +205,16 @@
         const appUrl = "youtube://" + u.href.replace(/^https?:\/\//, "");
 
         if (isInstagramBrowser()) {
-          const container = document.getElementById("content");
-          container.innerHTML = ""; // clear previous content
-
-          const heading = document.createElement("h2");
-          heading.textContent = "📲 Open in YouTube App";
-
-          const info = document.createElement("p");
-          info.innerHTML = "Instagram blocks auto app redirection.<br>Tap the button below to open manually:";
-
-          const buttonWrapper = document.createElement("div");
-          buttonWrapper.style.display = "flex";
-          buttonWrapper.style.justifyContent = "center";
-
-          const button = document.createElement("a");
-          button.href = appUrl;
-          button.className = "youtube-button";
-          button.textContent = "▶️ Watch on YouTube";
-
-          const footerNote = document.createElement("p");
-          footerNote.style.fontSize = "0.85rem";
-          footerNote.style.opacity = "0.8";
-          footerNote.style.marginTop = "1rem";
-          footerNote.textContent = "If it doesn't work, open in a browser.";
-
-          buttonWrapper.appendChild(button);
-          container.appendChild(heading);
-          container.appendChild(info);
-          container.appendChild(buttonWrapper);
-          container.appendChild(footerNote);
+          document.getElementById("content").innerHTML = `
+          <h2>📲 Open in YouTube App</h2>
+          <p>Instagram blocks auto app redirection.<br>Tap the button below to open manually:</p>
+          <div style="display: flex; justify-content: center;">
+            <a href="${appUrl}" class="youtube-button">▶️ Watch on YouTube</a>
+          </div>
+          <p style="font-size:0.85rem;opacity:0.8;margin-top:1rem;">If it doesn't work, open in a browser.</p>
+        `;
         } else {
+          // Try deep link then fallback
           window.location.href = appUrl;
           setTimeout(() => {
             window.location.href = url;
@@ -265,22 +247,11 @@
       const currentUrl = window.location.origin + window.location.pathname;
       const fullRedirectUrl = `${currentUrl}?redirect=${encodeURIComponent(input)}`;
 
-      // Use is.gd to shorten
-      fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(fullRedirectUrl)}`)
-        .then(response => response.text())
-        .then(shortUrl => {
-          const linkText = document.getElementById("linkText");
-          linkText.href = shortUrl;
-          linkText.textContent = shortUrl;
-          document.getElementById("generatedLink").style.display = "block";
-        })
-        .catch(() => {
-          // Fallback to full URL
-          const linkText = document.getElementById("linkText");
-          linkText.href = fullRedirectUrl;
-          linkText.textContent = fullRedirectUrl;
-          document.getElementById("generatedLink").style.display = "block";
-        });
+      const linkText = document.getElementById("linkText");
+      linkText.href = fullRedirectUrl;
+      linkText.textContent = fullRedirectUrl;
+
+      document.getElementById("generatedLink").style.display = "block";
     }
 
     function copyToClipboard() {
@@ -306,6 +277,7 @@
       toggleClearIcon();
       document.getElementById("generatedLink").style.display = "none";
     }
+
   </script>
 </body>
 </html>
