@@ -182,30 +182,30 @@
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const redirectUrl = params.get("redirect");
+  const params = new URLSearchParams(window.location.search);
+  const redirectUrl = params.get("redirect");
 
-    function isYouTubeDomain(url) {
-      try {
-        const u = new URL(url);
-        return u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be");
-      } catch {
-        return false;
-      }
+  function isYouTubeDomain(url) {
+    try {
+      const u = new URL(url);
+      return u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be");
+    } catch {
+      return false;
     }
+  }
 
-    function isInstagramBrowser() {
-      const ua = navigator.userAgent.toLowerCase();
-      return ua.includes("instagram");
-    }
+  function isInstagramBrowser() {
+    const ua = navigator.userAgent.toLowerCase();
+    return ua.includes("instagram");
+  }
 
-    function openYouTubeApp(url) {
-      try {
-        const u = new URL(url);
-        const appUrl = "youtube://" + u.href.replace(/^https?:\/\//, "");
+  function openYouTubeApp(url) {
+    try {
+      const u = new URL(url);
+      const appUrl = "youtube://" + u.href.replace(/^https?:\/\//, "");
 
-        if (isInstagramBrowser()) {
-          document.getElementById("content").innerHTML = `
+      if (isInstagramBrowser()) {
+        document.getElementById("content").innerHTML = `
           <h2>📲 Open in YouTube App</h2>
           <p>Instagram blocks auto app redirection.<br>Tap the button below to open manually:</p>
           <div style="display: flex; justify-content: center;">
@@ -213,71 +213,81 @@
           </div>
           <p style="font-size:0.85rem;opacity:0.8;margin-top:1rem;">If it doesn't work, open in a browser.</p>
         `;
-        } else {
-          // Try deep link then fallback
-          window.location.href = appUrl;
-          setTimeout(() => {
-            window.location.href = url;
-          }, 1000);
-        }
-      } catch {
-        window.location.href = url;
-      }
-    }
-
-    if (redirectUrl) {
-      if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
-        if (isYouTubeDomain(redirectUrl)) {
-          openYouTubeApp(redirectUrl);
-        } else {
-          window.location.href = redirectUrl;
-        }
       } else {
-        document.getElementById("content").innerHTML = "<h2>⚠️ Invalid Redirect URL</h2>";
-      }
-    }
-
-    function generateLink() {
-      const input = document.getElementById("urlInput").value.trim();
-      if (!input) {
-        alert("Please enter a valid URL.");
-        return;
-      }
-
-      const currentUrl = window.location.origin + window.location.pathname;
-      const fullRedirectUrl = `${currentUrl}?redirect=${encodeURIComponent(input)}`;
-
-      const linkText = document.getElementById("linkText");
-      linkText.href = fullRedirectUrl;
-      linkText.textContent = fullRedirectUrl;
-
-      document.getElementById("generatedLink").style.display = "block";
-    }
-
-    function copyToClipboard() {
-      const link = document.getElementById("linkText").href;
-      navigator.clipboard.writeText(link).then(() => {
-        const btn = document.getElementById("copyBtn");
-        btn.innerHTML = "✅ Copied!";
+        window.location.href = appUrl;
         setTimeout(() => {
-          btn.innerHTML = "📋 Copy";
-        }, 1500);
+          window.location.href = url;
+        }, 1000);
+      }
+    } catch {
+      window.location.href = url;
+    }
+  }
+
+  if (redirectUrl) {
+    if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
+      if (isYouTubeDomain(redirectUrl)) {
+        openYouTubeApp(redirectUrl);
+      } else {
+        window.location.href = redirectUrl;
+      }
+    } else {
+      document.getElementById("content").innerHTML = "<h2>⚠️ Invalid Redirect URL</h2>";
+    }
+  }
+
+  function generateLink() {
+    const input = document.getElementById("urlInput").value.trim();
+    if (!input) {
+      alert("Please enter a valid URL.");
+      return;
+    }
+
+    const currentUrl = window.location.origin + window.location.pathname;
+    const fullRedirectUrl = `${currentUrl}?redirect=${encodeURIComponent(input)}`;
+
+    // Use shrtco.de API to shorten
+    fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(fullRedirectUrl)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          const shortUrl = data.result.full_short_link;
+          const linkText = document.getElementById("linkText");
+          linkText.href = shortUrl;
+          linkText.textContent = shortUrl;
+          document.getElementById("generatedLink").style.display = "block";
+        } else {
+          alert("❌ Failed to shorten the URL. Please try again.");
+        }
+      })
+      .catch(() => {
+        alert("⚠️ Error contacting the URL shortener. Please check your internet.");
       });
-    }
+  }
 
-    function toggleClearIcon() {
-      const input = document.getElementById("urlInput");
-      const clearIcon = document.getElementById("clearIcon");
-      clearIcon.style.display = input.value ? "block" : "none";
-    }
+  function copyToClipboard() {
+    const link = document.getElementById("linkText").href;
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.getElementById("copyBtn");
+      btn.innerHTML = "✅ Copied!";
+      setTimeout(() => {
+        btn.innerHTML = "📋 Copy";
+      }, 1500);
+    });
+  }
 
-    function clearInput() {
-      const input = document.getElementById("urlInput");
-      input.value = "";
-      toggleClearIcon();
-      document.getElementById("generatedLink").style.display = "none";
-    }
+  function toggleClearIcon() {
+    const input = document.getElementById("urlInput");
+    const clearIcon = document.getElementById("clearIcon");
+    clearIcon.style.display = input.value ? "block" : "none";
+  }
 
-  </script>
+  function clearInput() {
+    const input = document.getElementById("urlInput");
+    input.value = "";
+    toggleClearIcon();
+    document.getElementById("generatedLink").style.display = "none";
+  }
+</script>
 </body>
 </html>
