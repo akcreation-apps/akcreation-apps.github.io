@@ -222,36 +222,53 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/stock_data.json")
-              .then(response => response.json())
-              .then(data => {
-                  stockData = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
-                  sortTable('Name', 0);
-                  sortTable('Name', 0);
-                  updateLastFetchedTime(stockData[0]?.["Time"]);
-                  const tableBody = document.getElementById("upcomingDividends");
-                  tableBody.innerHTML = ""; // Clear previous entries
-                  const uniqueStocks = new Map();
+                .then(response => response.json())
+                .then(data => {
+                    stockData = Array.from(new Map(data.map(stock => [stock.Name, stock])).values());
+                    sortTable('Name', 0);
+                    sortTable('Name', 0);
+                    updateLastFetchedTime(stockData[0]?.["Time"]);
 
-                  data.forEach(stock => {
-                      if (stock["Upcoming Dividend Amount"] > 0 && !uniqueStocks.has(stock["Name"])) {
-                          uniqueStocks.set(stock["Name"], stock);
-                          const row = `<tr>
-                               <td>${stock["Name"]}</td>
-                               <td>₹ ${stock["Upcoming Dividend Amount"]}/-</td>
-                               <td>${stock["Upcoming Dividend Date"] || "N/A"}</td>
-                               </tr>`;
-                          tableBody.innerHTML += row;
-                      }
-                  });
-                  if(tableBody.innerHTML === ''){
-                    document.getElementById("upcoming-dividends").style.display = "none"
-                  }
-              })
-              .catch(error => {
-                  console.error("❌ Error fetching JSON:", error);
-                  document.getElementById("lastFetchedTime").textContent = "❌ Failed to fetch data";
-              });
+                    const tableBody = document.getElementById("upcomingDividends");
+                    tableBody.innerHTML = ""; // Clear previous entries
+
+                    // Filter stocks with dividend and avoid duplicates by name
+                    const uniqueStocks = new Map();
+                    data.forEach(stock => {
+                        if (stock["Upcoming Dividend Amount"] > 0 && !uniqueStocks.has(stock["Name"])) {
+                            uniqueStocks.set(stock["Name"], stock);
+                        }
+                    });
+
+                    // Convert map values to array and sort by date
+                    const sortedStocks = Array.from(uniqueStocks.values()).sort((a, b) => {
+                        const parseDate = str => {
+                            if (!str) return new Date(0); // Treat null/undefined as earliest
+                            return new Date(str.replace(/(\d{1,2}) (\w{3}), (\d{4})/, "$1 $2 $3"));
+                        };
+                        return parseDate(a["Upcoming Dividend Date"]) - parseDate(b["Upcoming Dividend Date"]);
+                    });
+
+                    // Render sorted rows
+                    sortedStocks.forEach(stock => {
+                        const row = `<tr>
+                            <td>${stock["Name"]}</td>
+                            <td>₹ ${stock["Upcoming Dividend Amount"]}/-</td>
+                            <td>${stock["Upcoming Dividend Date"] || "N/A"}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+
+                    if (tableBody.innerHTML === '') {
+                        document.getElementById("upcoming-dividends").style.display = "none";
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Error fetching JSON:", error);
+                    document.getElementById("lastFetchedTime").textContent = "❌ Failed to fetch data";
+                });
         });
+
 
         function renderStockList(stocks) {
             const tbody = document.querySelector("#stockTable tbody");
