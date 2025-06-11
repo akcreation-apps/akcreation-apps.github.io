@@ -63,7 +63,9 @@ function displayOrders(data, tableId) {
     // Get last 5 Orders
     const lastOrders = data.slice(-5).reverse();
     lastOrders.forEach(order => {
-        const row = `<tr><td>${new Date(order.Time).toLocaleDateString()}</td><td>${order.Name}</td><td>Rs. ${order['Current Price']}/-</td></tr>`;
+        const date = new Date(order.Time);
+        const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+        const row = `<tr><td>${formattedDate}</td><td>${order.Name}</td><td>Rs. ${order['Current Price']}/-</td></tr>`;
         tableBody.innerHTML += row;
     });
 }
