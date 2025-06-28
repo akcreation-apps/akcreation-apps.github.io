@@ -96,6 +96,19 @@
           content: "\1F6F5 ";
           font-size: 1.5rem;
         }
+        .back-to-top {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: var(--accent);
+          color: #000;
+          padding: 10px 14px;
+          border-radius: 50%;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+          font-size: 1.2rem;
+          cursor: pointer;
+          z-index: 1000;
+        }
         @media (max-width: 768px) {
           header h1 {
             font-size: 2rem;
@@ -133,7 +146,7 @@
             <li>4:30 PM - Reach Hotel Meenakshi, Koraput</li>
             <li>5:30 PM - Explore Local Market</li>
         </ul>
-        <p><strong>Stay:</strong><a href="https://www.google.com/maps/place/Meenakshi+Lodge+%26+Function+Hall" target="_blank"> 🏨 Hotel Meenakshi, Koraput</p>
+        <p><strong>Stay:</strong><a href="https://www.google.com/maps/place/Meenakshi+Lodge+%26+Function+Hall" target="_blank"> 🏨 Hotel Meenakshi, Koraput</a></p>
         <p><a href="https://www.google.com/maps/dir/Banki,+Odisha+754008/Brahmapur,+Odisha/Rayagada,+Odisha/Meenakshi+Lodge+%26+Function+Hall,+HOTEL+MEENAKSHI,+Bhejaput,+Damanjodi,+Odisha+763008"
               target="_blank">📍 Google Maps Route</a></p>
     </div>
@@ -166,7 +179,7 @@
             <li>4:30 PM - Chitrakote Waterfalls (~1 hr)</li>
             <li>7:00 PM - Return to Hotel Laxman Avenue and rest</li>
         </ul>
-        <p><strong>Stay:</strong><a href="https://www.google.com/maps/place/Laxman+Avenue" target="_blank"> 🏨 Hotel Laxman Avenue, Jagdalpur, Chhattisgarh</p>
+        <p><strong>Stay:</strong><a href="https://www.google.com/maps/place/Laxman+Avenue" target="_blank"> 🏨 Hotel Laxman Avenue, Jagdalpur, Chhattisgarh</a></p>
         <p>
             <a href="https://www.google.com/maps/dir/Meenakshi+Lodge+%26+Function+Hall,+HOTEL+MEENAKSHI,+Bhejaput,+Damanjodi,+Odisha+763008/Rani+Duduma+Waterfalls,+GQV2%2B8WR,+Odisha+764037/BALDA+CAVE+odisha,+CMQ6%2BF4M,+Balda,+Odisha+764038/Laxman+Avenue,+Jagdalpur,+Chhattisgarh+494001/Chitrakote+Waterfalls,+6M4X%2B2X8,+Tiratha,+Chhattisgarh+494010/Laxman+Avenue,+Jagdalpur,+Chhattisgarh+494001"
                target="_blank">📍 Google Maps Route</a></p>
@@ -228,5 +241,7 @@
         </ul>
     </div>
 </div>
+<div class="back-to-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" title="Back to Top">↑</div>
 </body>
 </html>
+
