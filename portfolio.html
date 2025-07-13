@@ -529,25 +529,22 @@
                 startDateInput.max = maxDate;
                 endDateInput.min = minDate;
                 endDateInput.max = maxDate;
-                startDateInput.value = minDate;
+
+                // Set end date to maxDate (latest date in dataset)
                 endDateInput.value = maxDate;
 
+                // Set start date to 1 month before maxDate
+                const oneMonthAgo = new Date(maxDate);
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+                // Make sure it's not earlier than minDate
+                const startValue = oneMonthAgo < new Date(minDate) ? minDate : toDateInputFormat(oneMonthAgo);
+                startDateInput.value = startValue;
+
+
                 // Initial chart rendering
-                renderEverything(minDate, maxDate);
+                renderEverything(startDateInput.value, endDateInput.value);
             });
-
-        dateForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-            const userStart = startDateInput.value;
-            const userEnd = endDateInput.value;
-
-            if (userStart > userEnd) {
-                alert("Start Date cannot be after End Date");
-                return;
-            }
-
-            renderEverything(userStart, userEnd);
-        });
 
         function renderEverything(startISO, endISO) {
             const start = toSlashFormat(startISO);
@@ -575,14 +572,14 @@
         endDateInput.addEventListener("change", handleDateChange);
 
         function handleDateChange() {
-            const userStart = startDateInput.value;
-            const userEnd = endDateInput.value;
+            let userStart = startDateInput.value;
+            let userEnd = endDateInput.value;
 
             if (!userStart || !userEnd) return;
 
             if (userStart > userEnd) {
-                alert("Start Date cannot be after End Date");
-                return;
+                endDateInput.value = userStart;
+                userEnd = userStart;
             }
 
             renderEverything(userStart, userEnd);
