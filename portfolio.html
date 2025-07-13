@@ -78,334 +78,518 @@
             }
         }
 
+        .date-form {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 150px;
+        }
+
+        input[type="date"] {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            background-color: #1e1e1e;
+            color: #fff;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        @media (max-width: 600px) {
+            .form-group {
+                width: 100%;
+                height: auto;
+            }
+
+            .date-form {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
 
     </style>
 </head>
 <body>
-    <div class="summary-container">
-        <div class="summary-box">
-            <h3>Invested</h3>
-            <p id="totalInvested">Loading...</p>
+<div class="date-container" style="margin-top: 10px;">
+    <h2>Select Date Range</h2>
+    <div id="dateFilterForm" class="date-form">
+        <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" required>
         </div>
-        <div class="summary-box">
-            <h3>Current</h3>
-            <p id="currentBalance">Loading...</p>
+        <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" required>
         </div>
-        <div class="summary-box">
-            <h3>Total P&L</h3>
-            <p id="totalProfitLoss">Loading...</p>
-        </div>
-        <div class="summary-box">
-            <h3>Dividends</h3>
-            <p id="totalDividends">Loading...</p>  <!-- Placeholder for XIRR -->
-        </div>
-
     </div>
 
-    <h2>Stock Price Trends</h2>
-    <div class="chart-container">
-        <canvas id="lineChart"></canvas>
+</div>
+
+<div class="summary-container">
+    <div class="summary-box">
+        <h3>Invested</h3>
+        <p id="totalInvested">Loading...</p>
+    </div>
+    <div class="summary-box">
+        <h3>Current</h3>
+        <p id="currentBalance">Loading...</p>
+    </div>
+    <div class="summary-box">
+        <h3>Total P&L</h3>
+        <p id="totalProfitLoss">Loading...</p>
+    </div>
+    <div class="summary-box">
+        <h3>Dividends</h3>
+        <p id="totalDividends">Loading...</p>  <!-- Placeholder for XIRR -->
     </div>
 
-    <h2>Dividends Over Time</h2>
-    <div class="chart-container">
-        <canvas id="dividendsChart"></canvas>
-    </div>
+</div>
 
-    <h2>Stock Holdings</h2>
-    <div class="chart-container">
-        <canvas id="barChart"></canvas>
-    </div>
+<h2>Stock Price Trends *</h2>
+<div class="chart-container">
+    <canvas id="lineChart"></canvas>
+</div>
 
-    <h2>Stock Allocation</h2>
-    <div class="chart-container">
-        <canvas id="pieChart"></canvas>
-    </div>
+<h2>Dividends Over Time *</h2>
+<div class="chart-container">
+    <canvas id="dividendsChart"></canvas>
+</div>
 
-    <h2>Dividends Summary</h2>
-    <div class="chart-container">
-        <table id="dividendsTable" style="width: 100%; border-collapse: collapse; background: #1e1e1e; color: white;">
-            <thead>
-                <tr style="background: #FFD700; color: black;">
-                    <th style="padding: 10px;">Stock Name</th>
-                    <th style="padding: 10px;">Total Dividends (₹)</th>
-                    <th style="padding: 10px;">Last Dividend Received</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+<h2>Stock Holdings</h2>
+<div class="chart-container">
+    <canvas id="barChart"></canvas>
+</div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    const stock_data = transformStockData(data['current_stock_data']);
-                    renderCharts(stock_data);
-                    renderDateWiseCharts(data['datewise_returns']);
-                    renderDividendsChart(data['datewise_dividends']);
-                })
-                .catch(error => console.error("❌ Error fetching JSON:", error));
+<h2>Stock Allocation</h2>
+<div class="chart-container">
+    <canvas id="pieChart"></canvas>
+</div>
+
+<h2>Dividends Summary *</h2>
+<div class="chart-container">
+    <table id="dividendsTable" style="width: 100%; border-collapse: collapse; background: #1e1e1e; color: white;">
+        <thead>
+        <tr style="background: #FFD700; color: black;">
+            <th style="padding: 10px;">Stock Name</th>
+            <th style="padding: 10px;">Total Dividends (₹)</th>
+            <th style="padding: 10px;">Last Dividend Received</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+
+    let barChartInstance = null;
+    let pieChartInstance = null;
+    let lineChartInstance = null;
+    let dividendsChartInstance = null;
+
+
+
+    // Helper function to filter data based on start date and end date
+    function filterData(data, startDate, endDate) {
+        const filteredData = {};
+
+        // Convert string dates (MM/DD/YYYY) into Date objects
+        const parseDate = (dateString) => {
+            const [month, day, year] = dateString.split("/").map(Number);
+            return new Date(year, month - 1, day); // JavaScript Date object expects months in 0-11 range
+        };
+
+        // Convert startDate and endDate to Date objects
+        const start = parseDate(startDate);
+        const end = parseDate(endDate);
+
+        // Check if both start and end dates are valid
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            console.error("Invalid start or end date.");
+            return filteredData;
+        }
+
+        const dateKeys = Object.keys(data);
+
+        // Filter the data based on the date range
+        dateKeys.forEach(dateKey => {
+            const date = parseDate(dateKey);
+
+            // Only include dates that are valid and fall within the specified range
+            if (date >= start && date <= end) {
+                filteredData[dateKey] = data[dateKey];
+            }
         });
 
-        function transformStockData(stockList) {
-            return stockList.map(stock => ({
-                name: stock.Name,
-                totalInvested: (stock["Avg Stock Average Value"] * stock["Total Qty"]).toFixed(2),
-                currentValue: (stock["Current Price"] * stock["Total Qty"]).toFixed(2)
-            }));
-        }
+        return filteredData;
+    }
 
-        function renderCharts(portfolio_stock_data) {
-            const labels = portfolio_stock_data.map(stock =>
-                    stock.name.length > 12 ? stock.name.substring(0, 9) + "..." : stock.name
-                );
-            const totalProfits = portfolio_stock_data.map(stock => stock.currentValue - stock.totalInvested);
-            const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
-            const profitPercentage = portfolio_stock_data.map(stock =>
-                stock.totalInvested > 0
-                    ? ((stock.currentValue - stock.totalInvested) / stock.totalInvested * 100).toFixed(2)
-                    : 0
+
+    function transformStockData(stockList) {
+        return stockList.map(stock => ({
+            name: stock.Name,
+            totalInvested: (stock["Avg Stock Average Value"] * stock["Total Qty"]).toFixed(2),
+            currentValue: (stock["Current Price"] * stock["Total Qty"]).toFixed(2)
+        }));
+    }
+
+    function renderCharts(portfolio_stock_data) {
+
+        // Destroy existing charts if they exist
+        if (barChartInstance) barChartInstance.destroy();
+        if (pieChartInstance) pieChartInstance.destroy();
+
+        const labels = portfolio_stock_data.map(stock =>
+                stock.name.length > 12 ? stock.name.substring(0, 9) + "..." : stock.name
             );
-            const invested_amount = portfolio_stock_data.map(stock => stock.totalInvested);
-            const current_amount = portfolio_stock_data.map(stock => stock.currentValue);
-            const randomColors = Array.from({ length: labels.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`);
+        const totalProfits = portfolio_stock_data.map(stock => stock.currentValue - stock.totalInvested);
+        const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
+        const profitPercentage = portfolio_stock_data.map(stock =>
+            stock.totalInvested > 0
+                ? ((stock.currentValue - stock.totalInvested) / stock.totalInvested * 100).toFixed(2)
+                : 0
+        );
+        const invested_amount = portfolio_stock_data.map(stock => stock.totalInvested);
+        const current_amount = portfolio_stock_data.map(stock => stock.currentValue);
+        const randomColors = Array.from({ length: labels.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`);
 
-            // Bar Chart (Stock Holdings)
-            new Chart(document.getElementById("barChart").getContext("2d"), {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: "Profit/Loss (₹)", data: totalProfits, backgroundColor: profitColors}
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: "#555" },
-                            ticks: {
-                                color: "#fff",
-                                callback: function(value) {
-                                    if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                    if (value <= -10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                    if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                    if (value <= -100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                    if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                    if (value <= -1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                    return value; // Keep the original value for small numbers
-                                }
+        // Bar Chart (Stock Holdings)
+        barChartInstance =new Chart(document.getElementById("barChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: "Profit/Loss (₹)", data: totalProfits, backgroundColor: profitColors}
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: "#555" },
+                        ticks: {
+                            color: "#fff",
+                            callback: function(value) {
+                                if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                if (value <= -10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                if (value <= -100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                if (value <= -1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                return value; // Keep the original value for small numbers
                             }
-                        },
-                        x: { grid: { color: "#555" } }
+                        }
                     },
-                    plugins: {
-                        legend: { labels: { color: "#fff" } },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let amount = totalProfits[context.dataIndex].toLocaleString("en-IN", { minimumFractionDigits: 2 });
-                                    let percent = profitPercentage[context.dataIndex];
-                                    return `₹${amount} (${percent}%)`;
-                                }
+                    x: { grid: { color: "#555" } }
+                },
+                plugins: {
+                    legend: { labels: { color: "#fff" } },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let amount = totalProfits[context.dataIndex].toLocaleString("en-IN", { minimumFractionDigits: 2 });
+                                let percent = profitPercentage[context.dataIndex];
+                                return `₹${amount} (${percent}%)`;
                             }
                         }
                     }
                 }
-            });
+            }
+        });
 
-            // Pie Chart (Stock Allocation)
-            new Chart(document.getElementById("pieChart").getContext("2d"), {
-                type: "doughnut",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: invested_amount,
-                        backgroundColor: randomColors,
-                        borderColor: "#fff"
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { color: "#fff" } }
-                    }
+        // Pie Chart (Stock Allocation)
+        pieChartInstance = new Chart(document.getElementById("pieChart").getContext("2d"), {
+            type: "doughnut",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: invested_amount,
+                    backgroundColor: randomColors,
+                    borderColor: "#fff"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: "#fff" } }
                 }
-            });
-        }
+            }
+        });
+    }
 
-        function renderDateWiseCharts(stockData) {
-            let totalInvestmentList = [];
-            let totalProfitLossList = [];
+    function renderDateWiseCharts(stockData) {
 
-            Object.values(stockData).forEach(obj => {
-                totalInvestmentList.push(obj.total_investment);
-                totalProfitLossList.push(obj.total_investment + obj.total_profit_loss);
-            });
+        // Destroy existing charts if they exist
 
-             // ✅ Calculate total values
-            let totalInvested = totalInvestmentList[totalInvestmentList.length - 1]; // Last date's investment
-            let currentBalance = totalProfitLossList[totalProfitLossList.length - 1]; // Last date's balance
-            let profitLoss = currentBalance - totalInvested;
-            let percentage = (currentBalance - totalInvested)/totalInvested *100
+        if (lineChartInstance) lineChartInstance.destroy();
 
-            // ✅ Update UI
-            document.getElementById("totalInvested").textContent = `₹ ${totalInvested.toLocaleString()}`;
-            document.getElementById("currentBalance").textContent = `₹ ${currentBalance.toLocaleString()}`;
-            document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()} (${percentage ? percentage.toFixed(2) + "%" : "N/A"})`;
-            document.getElementById("totalProfitLoss").style.color = profitLoss >= 0 ? "lightgreen" : "red";
+        let totalInvestmentList = [];
+        let totalProfitLossList = [];
 
-            new Chart(document.getElementById("lineChart").getContext("2d"), {
-                type: "line",
-                data: {
-                    labels: Object.keys(stockData),
-                    datasets: [
-                        { label: 'Invested Amount', data: totalInvestmentList, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', fill: true, tension: 0.3 },
-                        { label: 'Current Amount', data: totalProfitLossList, borderColor: "#4CAF50", backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: true, tension: 0.3 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: "#555" },
-                            ticks: {
-                                color: "#fff",
-                                callback: function(value) {
-                                    if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                    if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                    if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                    return value; // Keep the original value for small numbers
-                                }
-                            }
-                        },
-                        x: { grid: { color: "#555" } }
-                    },
-                    plugins: {
-                        legend: { labels: { color: "#fff" } },
-                        tooltip: { mode: 'index', intersect: false } // ✅ Show all values on hover
-                    },
-                    interaction: { mode: 'index', intersect: false } // ✅ Ensure all dataset values appear on hover
-                }
-            });
-        }
+        Object.values(stockData).forEach(obj => {
+            totalInvestmentList.push(obj.total_investment);
+            totalProfitLossList.push(obj.total_investment + obj.total_profit_loss);
+        });
 
-        function renderDividendsChart(datewise_dividends) {
-            let dividendDates = Object.keys(datewise_dividends);
-            let totalDividends = [];
-            let dividendDetails = {}; // Store company-wise dividends for each date
-            let stockDividends = {};
-            let stockLatestDate = {};
-            dividendDates.forEach(date => {
-                let sum = 0;
-                let companies = [];
-                let [month, day, year] = date.split("/"); // Extract year & month (YYYY-MM format)
-                let formattedDate = new Date(year, month - 1, 1); // Convert to Date object
+         // ✅ Calculate total values
+        let totalInvested = totalInvestmentList[totalInvestmentList.length - 1]; // Last date's investment
+        let currentBalance = totalProfitLossList[totalProfitLossList.length - 1]; // Last date's balance
+        let profitLoss = currentBalance - totalInvested;
+        let percentage = (currentBalance - totalInvested)/totalInvested *100
 
-                datewise_dividends[date].forEach(stock => {
-                    sum += stock.dividend_amount;
-                    companies.push(`${stock.name}: ₹${stock.dividend_amount.toLocaleString()}`);
+        // ✅ Update UI
+        document.getElementById("totalInvested").textContent = `₹ ${totalInvested.toLocaleString()}`;
+        document.getElementById("currentBalance").textContent = `₹ ${currentBalance.toLocaleString()}`;
+        document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()} (${percentage ? percentage.toFixed(2) + "%" : "N/A"})`;
+        document.getElementById("totalProfitLoss").style.color = profitLoss >= 0 ? "lightgreen" : "red";
 
-                    // Aggregate dividends per stock
-                    if (stockDividends[stock.name]) {
-                        stockDividends[stock.name] += stock.dividend_amount;
-                    } else {
-                        stockDividends[stock.name] = stock.dividend_amount;
-                    }
-
-                    // Store the latest date for each stock
-                    if (!stockLatestDate[stock.name] || formattedDate > stockLatestDate[stock.name]) {
-                        stockLatestDate[stock.name] = formattedDate;
-                    }
-                });
-                totalDividends.push(sum);
-                dividendDetails[date] = companies;
-            });
-
-            // Sort stock dividends alphabetically
-            let sortedStocks = Object.keys(stockDividends).sort();
-
-            // Populate the table
-            let tableBody = document.querySelector("#dividendsTable tbody");
-            tableBody.innerHTML = ""; // Clear existing data
-            sortedStocks.forEach(stock => {
-                let latestDate = stockLatestDate[stock];
-                let monthAbbr = latestDate.toLocaleString('en-US', { month: 'short' }); // "Jan", "Feb", etc.
-                let yearAbbr = latestDate.getFullYear().toString().slice(-2); // "25" for 2025
-                let formattedMonthYear = `${monthAbbr}' ${yearAbbr}`; // Example: "Jan'25"
-                let row = `<tr>
-                    <td style="padding: 10px; border: 1px solid #fff;">${stock}</td>
-                    <td style="padding: 10px; border: 1px solid #fff;">₹ ${stockDividends[stock].toLocaleString()}/-</td>
-                    <td style="padding: 10px; border: 1px solid #fff;">${formattedMonthYear}</td>
-                </tr>`;
-                tableBody.innerHTML += row;
-            });
-
-            // ✅ Update UI with total dividend amount
-            let totalDividendAmount = totalDividends.reduce((sum, value) => sum + value, 0);
-            document.getElementById("totalDividends").textContent = `₹ ${totalDividendAmount.toLocaleString()}`;
-
-
-            new Chart(document.getElementById("dividendsChart").getContext("2d"), {
-                type: "bar",
-                data: {
-                    labels: dividendDates,
-                    datasets: [{
-                        label: 'Dividends Received',
-                        data: totalDividends,
-                        borderColor: "#FF9800",
-                        backgroundColor: "#00c853",
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: "#555" },
-                            ticks: {
-                                color: "#fff",
-                                callback: function(value) {
-                                    if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                    if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                    if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                    return value; // Keep the original value for small numbers
-                                }
-                            }
-                        },
-                        x: { grid: { color: "#555" } }
-                    },
-                    plugins: {
-                        legend: { labels: { color: "#fff" } },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            callbacks: {
-                                label: function (context) {
-                                    let date = context.label;
-                                    let totalAmount = totalDividends[context.dataIndex].toLocaleString();
-                                    let companies = dividendDetails[date];
-                                    return [`Total: ₹${totalAmount}`, ...companies];
-                                }
+        lineChartInstance = new Chart(document.getElementById("lineChart").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: Object.keys(stockData),
+                datasets: [
+                    { label: 'Invested Amount', data: totalInvestmentList, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', fill: true, tension: 0.3 },
+                    { label: 'Current Amount', data: totalProfitLossList, borderColor: "#4CAF50", backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: true, tension: 0.3 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: "#555" },
+                        ticks: {
+                            color: "#fff",
+                            callback: function(value) {
+                                if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                return value; // Keep the original value for small numbers
                             }
                         }
                     },
-                    interaction: { mode: 'index', intersect: false }
+                    x: { grid: { color: "#555" } }
+                },
+                plugins: {
+                    legend: { labels: { color: "#fff" } },
+                    tooltip: { mode: 'index', intersect: false } // ✅ Show all values on hover
+                },
+                interaction: { mode: 'index', intersect: false } // ✅ Ensure all dataset values appear on hover
+            }
+        });
+    }
+
+    function renderDividendsChart(datewise_dividends) {
+
+        if (dividendsChartInstance) dividendsChartInstance.destroy();
+
+        let dividendDates = Object.keys(datewise_dividends);
+        let totalDividends = [];
+        let dividendDetails = {}; // Store company-wise dividends for each date
+        let stockDividends = {};
+        let stockLatestDate = {};
+        dividendDates.forEach(date => {
+            let sum = 0;
+            let companies = [];
+            let [month, day, year] = date.split("/"); // Extract year & month (YYYY-MM format)
+            let formattedDate = new Date(year, month - 1, 1); // Convert to Date object
+
+            datewise_dividends[date].forEach(stock => {
+                sum += stock.dividend_amount;
+                companies.push(`${stock.name}: ₹${stock.dividend_amount.toLocaleString()}`);
+
+                // Aggregate dividends per stock
+                if (stockDividends[stock.name]) {
+                    stockDividends[stock.name] += stock.dividend_amount;
+                } else {
+                    stockDividends[stock.name] = stock.dividend_amount;
+                }
+
+                // Store the latest date for each stock
+                if (!stockLatestDate[stock.name] || formattedDate > stockLatestDate[stock.name]) {
+                    stockLatestDate[stock.name] = formattedDate;
                 }
             });
+            totalDividends.push(sum);
+            dividendDetails[date] = companies;
+        });
+
+        // Sort stock dividends alphabetically
+        let sortedStocks = Object.keys(stockDividends).sort();
+
+        // Populate the table
+        let tableBody = document.querySelector("#dividendsTable tbody");
+        tableBody.innerHTML = ""; // Clear existing data
+        sortedStocks.forEach(stock => {
+            let latestDate = stockLatestDate[stock];
+            let monthAbbr = latestDate.toLocaleString('en-US', { month: 'short' }); // "Jan", "Feb", etc.
+            let yearAbbr = latestDate.getFullYear().toString().slice(-2); // "25" for 2025
+            let formattedMonthYear = `${monthAbbr}' ${yearAbbr}`; // Example: "Jan'25"
+            let row = `<tr>
+                <td style="padding: 10px; border: 1px solid #fff;">${stock}</td>
+                <td style="padding: 10px; border: 1px solid #fff;">₹ ${stockDividends[stock].toLocaleString()}/-</td>
+                <td style="padding: 10px; border: 1px solid #fff;">${formattedMonthYear}</td>
+            </tr>`;
+            tableBody.innerHTML += row;
+        });
+
+        // ✅ Update UI with total dividend amount
+        let totalDividendAmount = totalDividends.reduce((sum, value) => sum + value, 0);
+        document.getElementById("totalDividends").textContent = `₹ ${totalDividendAmount.toLocaleString()}`;
+
+
+        dividendsChartInstance  = new Chart(document.getElementById("dividendsChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: dividendDates,
+                datasets: [{
+                    label: 'Dividends Received',
+                    data: totalDividends,
+                    borderColor: "#FF9800",
+                    backgroundColor: "#00c853",
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: "#555" },
+                        ticks: {
+                            color: "#fff",
+                            callback: function(value) {
+                                if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
+                                if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
+                                if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
+                                return value; // Keep the original value for small numbers
+                            }
+                        }
+                    },
+                    x: { grid: { color: "#555" } }
+                },
+                plugins: {
+                    legend: { labels: { color: "#fff" } },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function (context) {
+                                let date = context.label;
+                                let totalAmount = totalDividends[context.dataIndex].toLocaleString();
+                                let companies = dividendDetails[date];
+                                return [`Total: ₹${totalAmount}`, ...companies];
+                            }
+                        }
+                    }
+                },
+                interaction: { mode: 'index', intersect: false }
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const dateForm = document.getElementById("dateFilterForm");
+        const startDateInput = document.getElementById("startDate");
+        const endDateInput = document.getElementById("endDate");
+
+        let globalData = {}; // Cache to store fetched data
+
+        fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
+            .then(response => response.json())
+            .then(data => {
+                globalData = data;
+
+                // Get the available date range
+                const allDates = Object.keys(data.datewise_returns);
+                const sortedDates = allDates.map(d => new Date(d)).sort((a, b) => a - b);
+                const minDate = toDateInputFormat(sortedDates[0]);
+                const maxDate = toDateInputFormat(sortedDates[sortedDates.length - 1]);
+
+                // Set min/max on input
+                startDateInput.min = minDate;
+                startDateInput.max = maxDate;
+                endDateInput.min = minDate;
+                endDateInput.max = maxDate;
+                startDateInput.value = minDate;
+                endDateInput.value = maxDate;
+
+                // Initial chart rendering
+                renderEverything(minDate, maxDate);
+            });
+
+        dateForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const userStart = startDateInput.value;
+            const userEnd = endDateInput.value;
+
+            if (userStart > userEnd) {
+                alert("Start Date cannot be after End Date");
+                return;
+            }
+
+            renderEverything(userStart, userEnd);
+        });
+
+        function renderEverything(startISO, endISO) {
+            const start = toSlashFormat(startISO);
+            const end = toSlashFormat(endISO);
+
+            const filteredReturns = filterData(globalData.datewise_returns, start, end);
+            const filteredDividends = filterData(globalData.datewise_dividends, start, end);
+
+            const stock_data = transformStockData(globalData.current_stock_data);
+            renderCharts(stock_data);
+            renderDateWiseCharts(filteredReturns);
+            renderDividendsChart(filteredDividends);
         }
-    </script>
+
+        function toDateInputFormat(dateObj) {
+            return dateObj.toISOString().split('T')[0]; // yyyy-mm-dd
+        }
+
+        function toSlashFormat(dateInputValue) {
+            const d = new Date(dateInputValue);
+            return `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}/${d.getFullYear()}`;
+        }
+
+        startDateInput.addEventListener("change", handleDateChange);
+        endDateInput.addEventListener("change", handleDateChange);
+
+        function handleDateChange() {
+            const userStart = startDateInput.value;
+            const userEnd = endDateInput.value;
+
+            if (!userStart || !userEnd) return;
+
+            if (userStart > userEnd) {
+                alert("Start Date cannot be after End Date");
+                return;
+            }
+
+            renderEverything(userStart, userEnd);
+        }
+    });
+
+</script>
 
 </body>
 </html>
