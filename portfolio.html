@@ -523,6 +523,7 @@
                 const sortedDates = allDates.map(d => new Date(d)).sort((a, b) => a - b);
                 const minDate = toDateInputFormat(sortedDates[0]);
                 const maxDate = toDateInputFormat(sortedDates[sortedDates.length - 1]);
+                console.log(sortedDates, sortedDates[sortedDates.length - 1].toISOString(), maxDate)
 
                 // Set min/max on input
                 startDateInput.min = minDate;
@@ -560,7 +561,10 @@
         }
 
         function toDateInputFormat(dateObj) {
-            return dateObj.toISOString().split('T')[0]; // yyyy-mm-dd
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`; // yyyy-mm-dd
         }
 
         function toSlashFormat(dateInputValue) {
