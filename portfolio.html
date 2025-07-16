@@ -333,67 +333,139 @@
     }
 
     function renderDateWiseCharts(stockData) {
-
-        // Destroy existing charts if they exist
-
         if (lineChartInstance) lineChartInstance.destroy();
 
-        let totalInvestmentList = [];
-        let totalProfitLossList = [];
+        const totalInvestmentList = [];
+        const totalProfitLossList = [];
+        const percentageChangeList = [];
+        const labels = Object.keys(stockData);
 
         Object.values(stockData).forEach(obj => {
-            totalInvestmentList.push(obj.total_investment);
-            totalProfitLossList.push(obj.total_investment + obj.total_profit_loss);
+            const invested = obj.total_investment;
+            const balance = invested + obj.total_profit_loss;
+            const percentage = invested !== 0 ? ((balance - invested) / invested) * 100 : 0;
+
+            totalInvestmentList.push(invested);
+            totalProfitLossList.push(balance);
+            percentageChangeList.push(+percentage.toFixed(2));
         });
 
-         // ✅ Calculate total values
-        let totalInvested = totalInvestmentList[totalInvestmentList.length - 1]; // Last date's investment
-        let currentBalance = totalProfitLossList[totalProfitLossList.length - 1]; // Last date's balance
-        let profitLoss = currentBalance - totalInvested;
-        let percentage = (currentBalance - totalInvested)/totalInvested *100
+        const totalInvested = totalInvestmentList.at(-1);
+        const currentBalance = totalProfitLossList.at(-1);
+        const profitLoss = currentBalance - totalInvested;
+        const finalPercentage = totalInvested !== 0 ? (profitLoss / totalInvested) * 100 : 0;
 
-        // ✅ Update UI
         document.getElementById("totalInvested").textContent = `₹ ${totalInvested.toLocaleString()}`;
         document.getElementById("currentBalance").textContent = `₹ ${currentBalance.toLocaleString()}`;
-        document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()} (${percentage ? percentage.toFixed(2) + "%" : "N/A"})`;
+        document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()} (${finalPercentage.toFixed(2)}%)`;
         document.getElementById("totalProfitLoss").style.color = profitLoss >= 0 ? "lightgreen" : "red";
+
+        // Determine percent color
+        const percentLineColor = finalPercentage >= 0 ? "#00BFFF" : "#FF7043";
 
         lineChartInstance = new Chart(document.getElementById("lineChart").getContext("2d"), {
             type: "line",
             data: {
-                labels: Object.keys(stockData),
+                labels,
                 datasets: [
-                    { label: 'Invested Amount', data: totalInvestmentList, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', fill: true, tension: 0.3 },
-                    { label: 'Current Amount', data: totalProfitLossList, borderColor: "#4CAF50", backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: true, tension: 0.3 }
+                    {
+                        label: 'Invested Amount',
+                        data: totalInvestmentList,
+                        borderColor: '#FFD700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Current Amount',
+                        data: totalProfitLossList,
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Profit/Loss %',
+                        data: percentageChangeList,
+                        borderColor: percentLineColor,
+                        backgroundColor: 'transparent',
+                        borderDash: [4, 4],
+                        tension: 0.3,
+                        pointRadius: 4,
+                        yAxisID: 'y1'
+                    }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
                 scales: {
                     y: {
-                        beginAtZero: false,
-                        grid: { color: "#555" },
+                        position: 'left',
+                        grid: { color: "#444" },
                         ticks: {
                             color: "#fff",
-                            callback: function(value) {
-                                if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                return value; // Keep the original value for small numbers
+                            callback(value) {
+                                if (value >= 1e7) return (value / 1e7).toFixed(1) + " Cr";
+                                if (value >= 1e5) return (value / 1e5).toFixed(1) + " L";
+                                if (value >= 1e3) return (value / 1e3).toFixed(1) + " K";
+                                return value;
                             }
                         }
                     },
-                    x: { grid: { color: "#555" } }
+                    y1: {
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        min: Math.min(...percentageChangeList, 0) - 5,
+                        max: Math.max(...percentageChangeList, 0) + 5,
+                        ticks: {
+                            color: percentLineColor,
+                            callback: val => `${val > 0 ? '+' : ''}${val}%`
+                        },
+                        title: {
+                            display: true,
+                            text: "Profit/Loss (%)",
+                            color: percentLineColor,
+                            font: { size: 12 }
+                        }
+                    },
+                    x: {
+                        grid: { color: "#444" },
+                        ticks: { color: "#ccc" }
+                    }
                 },
                 plugins: {
                     legend: { labels: { color: "#fff" } },
-                    tooltip: { mode: 'index', intersect: false } // ✅ Show all values on hover
-                },
-                interaction: { mode: 'index', intersect: false } // ✅ Ensure all dataset values appear on hover
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const val = context.parsed.y;
+                                if (label === "Profit/Loss %") {
+                                    const current = percentageChangeList[context.dataIndex];
+                                    const prev = context.dataIndex > 0 ? percentageChangeList[context.dataIndex - 1] : null;
+                                    const change = prev !== null ? (current - prev).toFixed(2) : null;
+                                    return `${label}: ${current > 0 ? '+' : ''}${current}%` +
+                                           (change !== null ? ` (${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}%)` : '');
+                                } else {
+                                    return `${label}: ₹ ${val.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
     }
+
+
 
     function renderDividendsChart(datewise_dividends) {
 
