@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Grade Calculator (BPUT Based) | AK Creation</title>
 
@@ -17,13 +18,13 @@
     <meta property="og:description" content="Easily calculate SGPA, CGPA, marks and percentage for BPUT. Free and mobile-friendly tool by AK Creation.">
     <meta property="og:url" content="https://akcreation-apps.github.io/">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://akcreation-apps.github.io/assets/img/demo-screen-1.jpeg">
+    <meta property="og:image" content="https://akcreation-apps.github.io/assets/img/banner.png">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="BPUT Grade Calculator by AK Creation">
     <meta name="twitter:description" content="Get accurate SGPA, CGPA & Percentage instantly. Use AK Creation’s BPUT tools now.">
-    <meta name="twitter:image" content="https://akcreation-apps.github.io/assets/img/demo-screen-1.jpeg">
+    <meta name="twitter:image" content="https://akcreation-apps.github.io/assets/img/banner.png">
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
@@ -33,119 +34,123 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
     <link rel="stylesheet" href="assets/css/styles.min.css">
-    <link rel="icon" type="image/png" href="https://akcreation-apps.github.io/logo.webp">
+    <link rel="canonical" href="https://akcreation-apps.github.io/">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
     <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "BPUT Grade Calculator",
-            "url": "https://akcreation-apps.github.io/",
-            "applicationCategory": "Education",
-            "operatingSystem": "All",
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "reviewCount": "95"
-            },
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "INR"
-            },
-            "author": {
-                "@type": "Person",
-                "name": "Anil Kumar Sahoo"
-            }
-        }
-    </script>
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "How are we evaluating the Marks system?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "BPUT had no marks system till 2020 pass-out. Each subject is considered out of 100. 'O' grade is mapped to 90–100. Using CGPA-to-percentage conversion (as per BPUT), we estimate your secured marks."
-                    }
+        [
+            {
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                "name": "BPUT Grade Calculator",
+                "url": "https://akcreation-apps.github.io/",
+                "applicationCategory": "Education",
+                "operatingSystem": "All",
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "4.8",
+                    "reviewCount": "95"
                 },
-                {
-                    "@type": "Question",
-                    "name": "How can I get the total marks?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Go to the 'Marks' section in the app, input CGPA and number of subjects or sum of known marks — you'll get total and secured marks instantly."
-                    }
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "INR"
                 },
-                {
-                    "@type": "Question",
-                    "name": "Why and how should I calculate actual SGPA after backlog clearance?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "After backlog clearance, updated SGPA isn’t shown directly. You must re-enter correct grades into SGPA utility by replacing 'F' with your actual grade to get your real SGPA."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Is it safe to upload CGPA/SGPA from this app on job portals?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "If results match your marksheets, it’s safe. However, it's your responsibility. We follow all BPUT guidelines strictly for calculations."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "What to provide in job portals — Marks or CGPA?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Till 2020, BPUT didn’t have a marks system. So CGPA/SGPA/Percentage is preferred. Use marks only if explicitly required and if BPUT officially adopted it."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "What if job portal only accepts Marks?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Use the CGPA to Percentage formula and derive marks using this app. Make sure the derived percentage from marks exactly matches your CGPA-based percentage."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How can I hide my past backlogs in interviews?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "The app’s facilitation utility helps create a reference PDF with updated SGPA and grades, useful when certificates aren’t yet issued. Use responsibly for reference only."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How to calculate Marks for certain semesters?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Calculate CGPA using the app, then go to Marks section and input CGPA and number of subjects or total known marks. You’ll get semester-wise marks."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How to verify the app is working fine?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Cross-check SGPA with your marksheet. For CGPA, use BPUT-issued certificates. We have applied all official formulas strictly as per BPUT norms."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How did I get secured marks, if subject marks are known?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Go to SGPA utility, enter total known subject marks, and the app will calculate SGPA and display secured marks from your full marks."
-                    }
+                "author": {
+                    "@type": "Person",
+                    "name": "Anil Kumar Sahoo"
                 }
-            ]
-        }
+            },
+            {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "How are we evaluating the Marks system?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "BPUT had no marks system till 2020 pass-out. Each subject is considered out of 100. 'O' grade is mapped to 90–100. Using CGPA-to-percentage conversion (as per BPUT), we estimate your secured marks."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "How can I get the total marks?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Go to the 'Marks' section in the app, input CGPA and number of subjects or sum of known marks — you'll get total and secured marks instantly."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Why and how should I calculate actual SGPA after backlog clearance?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "After backlog clearance, updated SGPA isn’t shown directly. You must re-enter correct grades into SGPA utility by replacing 'F' with your actual grade to get your real SGPA."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Is it safe to upload CGPA/SGPA from this app on job portals?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "If results match your marksheets, it’s safe. However, it's your responsibility. We follow all BPUT guidelines strictly for calculations."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "What to provide in job portals — Marks or CGPA?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Till 2020, BPUT didn’t have a marks system. So CGPA/SGPA/Percentage is preferred. Use marks only if explicitly required and if BPUT officially adopted it."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "What if job portal only accepts Marks?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Use the CGPA to Percentage formula and derive marks using this app. Make sure the derived percentage from marks exactly matches your CGPA-based percentage."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "How can I hide my past backlogs in interviews?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "The app’s facilitation utility helps create a reference PDF with updated SGPA and grades, useful when certificates aren’t yet issued. Use responsibly for reference only."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "How to calculate Marks for certain semesters?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Calculate CGPA using the app, then go to Marks section and input CGPA and number of subjects or total known marks. You’ll get semester-wise marks."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "How to verify the app is working fine?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Cross-check SGPA with your marksheet. For CGPA, use BPUT-issued certificates. We have applied all official formulas strictly as per BPUT norms."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "How did I get secured marks, if subject marks are known?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Go to SGPA utility, enter total known subject marks, and the app will calculate SGPA and display secured marks from your full marks."
+                        }
+                    }
+                ]
+            }
+        ]
     </script>
 </head>
 
