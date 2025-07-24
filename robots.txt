@@ -1,3 +1,2 @@
 User-agent: *
-Allow: /
-Sitemap: https://akcreation-apps.github.io/sitemap.xml
+Disallow: /
