@@ -1,0 +1,90 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #fff;
+}
+
+.menu-page {
+    page-break-after: always;
+    padding: 20px;
+    background: #b30000; /* deep red background */
+    color: white;
+    min-height: 100vh; /* fill full page height */
+    box-sizing: border-box;
+}
+
+.menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #b30000;
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+.menu-logo {
+    height: 80px;
+    margin-right: 20px;
+}
+
+.restaurant-title {
+    font-size: 3vw;
+    font-weight: bold;
+    color: #ffcc00;
+    text-transform: uppercase;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.menu-card {
+    background: linear-gradient(to bottom, #cc0000, #990000);
+    border-radius: 10px;
+    padding: 15px;
+    color: white;
+}
+
+.category-name {
+    font-size: 1.6vw;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #ffcc00;
+}
+
+.menu-list {
+    width: 100%;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1vw;
+}
+
+.price-badge {
+    background: #ffcc00;
+    color: #000;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9vw;
+}
+
+@media print {
+    body {
+        margin: 0;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .menu-page {
+        min-height: 100vh; /* ensures full page height */
+    }
+}
