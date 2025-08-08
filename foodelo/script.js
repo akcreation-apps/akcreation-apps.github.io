@@ -47,6 +47,40 @@ const menuData = [
     ]
   },
   {
+    "category": "TEA/COFFEE",
+    "items": [
+      { "name": "Adrak Tea", "price": "₹10" },
+      { "name": "Adrak Elaichi Tea", "price": "₹15" },
+      { "name": "Coffee", "price": "₹20" },
+      { "name": "Black Coffee", "price": "₹20" },
+      { "name": "Cold Coffee", "price": "₹30" }
+    ]
+  },
+  {
+    "category": "PASTA PERFECTION",
+    "items": [
+      { "name": "Cheesy Garden Pasta", "price": "₹60" },
+      { "name": "Tangy Tomato Twist", "price": "₹70" },
+      { "name": "Creamy Garlic Chicken", "price": "₹70" },
+      { "name": "Tomato Glazed Chicken", "price": "₹70" }
+    ]
+  },
+  {
+    "category": "SALAD BAR",
+    "items": [
+      { "name": "Veggie Mexican Salad", "price": "₹60" },
+      { "name": "Chicken Loaded Salad", "price": "₹70" }
+    ]
+  },
+  {
+    "category": "CRISPY PUFF BITES",
+    "items": [
+      { "name": "Mix Veg Puff", "price": "₹50" },
+      { "name": "Paneer Masala Puff", "price": "₹60" },
+      { "name": "Chatpatta Chicken Puff", "price": "₹60" }
+    ]
+  },
+  {
     "category": "FOODELO MOMO STATION (5PCS)",
     "items": [
       { "name": "Veg Steamed Momo", "price": "₹50" },
@@ -100,40 +134,6 @@ const menuData = [
     ]
   },
   {
-    "category": "TEA/COFFEE",
-    "items": [
-      { "name": "Adrak Tea", "price": "₹10" },
-      { "name": "Adrak Elaichi Tea", "price": "₹15" },
-      { "name": "Coffee", "price": "₹20" },
-      { "name": "Black Coffee", "price": "₹20" },
-      { "name": "Cold Coffee", "price": "₹30" }
-    ]
-  },
-  {
-    "category": "PASTA PERFECTION",
-    "items": [
-      { "name": "Cheesy Garden Pasta", "price": "₹60" },
-      { "name": "Tangy Tomato Twist", "price": "₹70" },
-      { "name": "Creamy Garlic Chicken", "price": "₹70" },
-      { "name": "Tomato Glazed Chicken", "price": "₹70" }
-    ]
-  },
-  {
-    "category": "SALAD BAR",
-    "items": [
-      { "name": "Veggie Mexican Salad", "price": "₹60" },
-      { "name": "Chicken Loaded Salad", "price": "₹70" }
-    ]
-  },
-  {
-    "category": "CRISPY PUFF BITES",
-    "items": [
-      { "name": "Mix Veg Puff", "price": "₹50" },
-      { "name": "Paneer Masala Puff", "price": "₹60" },
-      { "name": "Chatpatta Chicken Puff", "price": "₹60" }
-    ]
-  },
-  {
     "category": "FRENCH FRIES",
     "items": [
       { "name": "Plain French Fries", "price": "₹40" },
@@ -159,8 +159,21 @@ function renderMenu(menuArray, containerId) {
             const row = document.createElement("div");
             row.classList.add("menu-item");
 
+            // Veg / Non-Veg detection
+            const lowerName = item.name.toLowerCase();
+            let typeIcon = document.createElement("span");
+            typeIcon.classList.add("food-type");
+
+            if (/\b(egg|chicken)\b/i.test(item.name)) {
+                typeIcon.classList.add("non-veg");
+            } else {
+                typeIcon.classList.add("veg");
+            }
+
+
             const itemName = document.createElement("div");
             itemName.textContent = item.name;
+            itemName.prepend(typeIcon);
 
             const price = document.createElement("div");
             price.classList.add("price-badge");

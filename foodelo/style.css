@@ -88,3 +88,20 @@ body {
         min-height: 100vh; /* ensures full page height */
     }
 }
+.food-type {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    border-radius: 50%;
+    border: 2px solid white;
+    vertical-align: middle;
+}
+
+.food-type.veg {
+    background-color: green;
+}
+
+.food-type.non-veg {
+    background-color: red;
+}
