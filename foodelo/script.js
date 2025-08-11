@@ -13,8 +13,7 @@ const menuData = [
   {
     "category": "SANDWICH",
     "items": [
-      { "name": "Street Style Veggies Mayo", "price": "₹60" },
-      { "name": "Grill Peri Peri", "price": "₹50" },
+      { "name": "Street Style Veggies Mayo Grill", "price": "₹60" },
       { "name": "Corny Cheese Griller", "price": "₹70" },
       { "name": "Spicy Peri Paneer Melt", "price": "₹70" },
       { "name": "Chutney Chicken Mayo Grill", "price": "₹60" },
@@ -30,7 +29,6 @@ const menuData = [
       { "name": "Classic Cheese Burger", "price": "₹50" },
       { "name": "Egg & Cheese Burger", "price": "₹60" },
       { "name": "Crispy Chicken Burger", "price": "₹70" },
-      { "name": "Spicy Chicken Melt", "price": "₹70" }
     ]
   },
   {
@@ -38,12 +36,12 @@ const menuData = [
     "items": [
       { "name": "Masala Colddrinks", "price": "₹35" },
       { "name": "Lime Soda", "price": "₹35" },
-      { "name": "Virgin Mojito", "price": "₹60" },
-      { "name": "Litchy Sky", "price": "₹70" },
-      { "name": "Vanila Milk shake", "price": "₹70" },
-      { "name": "Oreo Overload", "price": "₹70" },
       { "name": "Blue Curacao", "price": "₹60" },
-      { "name": "Red Cinderella", "price": "₹60" }
+      { "name": "Virgin Mojito", "price": "₹60" },
+      { "name": "Red Cinderella", "price": "₹60" },
+      { "name": "Litchy Sky", "price": "₹70" },
+      { "name": "Vanila Milk Shake", "price": "₹70" },
+      { "name": "Oreo Overload", "price": "₹70" },
     ]
   },
   {
@@ -73,23 +71,24 @@ const menuData = [
     ]
   },
   {
-    "category": "CRISPY PUFF BITES",
+    "category": "CRISPY PETTIS BITES",
     "items": [
-      { "name": "Mix Veg Puff", "price": "₹50" },
-      { "name": "Paneer Masala Puff", "price": "₹60" },
-      { "name": "Chatpatta Chicken Puff", "price": "₹60" }
+      { "name": "Mix Veg Pettis", "price": "₹50" },
+      { "name": "Paneer Masala Pettis", "price": "₹60" },
+      { "name": "Chatpatta Chicken Pettis", "price": "₹60" }
     ]
   },
   {
     "category": "FOODELO MOMO STATION (5PCS)",
     "items": [
       { "name": "Veg Steamed Momo", "price": "₹50" },
-      { "name": "Paneer Steamed Momo", "price": "₹60" },
-      { "name": "Chicken Steamed Momo", "price": "₹60" },
-      { "name": "Corn Cheese Steamed Momo", "price": "₹60" },
-      { "name": "Fried Momo (Various Fillings)", "price": "₹60-70" },
-      { "name": "Chilli Momo", "price": "₹60-70" },
-      { "name": "Schezwan Momo", "price": "₹60-80" }
+      { "name": "Paneer/Cron-Cheese/Chicken (Steamed Momo)", "price": "₹60" },
+      { "name": "Veg Fried Momo", "price": "₹60" },
+      { "name": "Paneer/Cron-Cheese/Chicken (Fried Momo)", "price": "₹70" },
+      { "name": "Veg Chilli Momo", "price": "₹60" },
+      { "name": "Paneer/Cron-Cheese/Chicken (Chilli Momo)", "price": "₹70" },
+      { "name": "Veg Schezwan Momo", "price": "₹60" },
+      { "name": "Paneer/Cron-Cheese/Chicken (Schezwan Momo)", "price": "₹70" },
     ]
   },
   {
@@ -136,8 +135,9 @@ const menuData = [
   {
     "category": "FRENCH FRIES",
     "items": [
-      { "name": "Plain French Fries", "price": "₹40" },
-      { "name": "Cheese Baked Fries", "price": "₹50" }
+      { "name": "Plain", "price": "₹40" },
+      { "name": "Peri Peri", "price": "₹40" },
+      { "name": "Cheese Baked", "price": "₹50" }
     ]
   },
 ];

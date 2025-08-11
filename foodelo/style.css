@@ -7,7 +7,7 @@ body {
 .menu-page {
     page-break-after: always;
     padding: 20px;
-    background: #b30000; /* deep red background */
+    background: #000000; /* deep red background */
     color: white;
     min-height: 100vh; /* fill full page height */
     box-sizing: border-box;
@@ -17,7 +17,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #b30000;
+    background: #000000;
     padding: 10px 0;
     margin-bottom: 20px;
 }
@@ -41,7 +41,7 @@ body {
 }
 
 .menu-card {
-    background: linear-gradient(to bottom, #cc0000, #990000);
+    background: linear-gradient(to bottom, #000000, #000000);
     border-radius: 10px;
     padding: 15px;
     color: white;
