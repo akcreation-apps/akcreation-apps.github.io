@@ -340,7 +340,7 @@
       "category": "Indian",
       "subcategories": [
         {
-          "name": "Rice & Pulao",
+          "name": "Rice N Pulao",
           "dishes": [
             { "id": 2601, "name": "Steam Rice", "price": 30 },
             { "id": 2602, "name": "Basmati Rice", "price": 50 },
