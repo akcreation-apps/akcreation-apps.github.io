@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://akcreation-apps.netlify.app/sitemap.xml
