@@ -425,7 +425,7 @@
                         max: Math.max(...percentageChangeList, 0) + 5,
                         ticks: {
                             color: percentLineColor,
-                            callback: val => `${val > 0 ? '+' : ''}${val}%`
+                            callback: val => `${val > 0 ? '+' : ''}${Math.round(val)}%`
                         },
                         title: {
                             display: true,
