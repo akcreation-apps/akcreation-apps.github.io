@@ -1,0 +1,199 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  background: #f9fafc;
+  color: #333;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: #fff; /* adjust as per theme */
+  border-bottom: 1px solid #ddd;
+}
+.navbar .logo {
+  font-size: 18px;
+  font-weight: 600;
+}
+.navbar nav {
+  display: flex;
+  gap: 15px;
+}
+.navbar nav a {
+  color: #004aad;
+  margin-left: 1rem;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.navbar nav a:hover,
+.navbar nav a.active {
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, #004aad, #007bff);
+  color: white;
+}
+.hero h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.hero p {
+  font-size: 1.1rem;
+}
+
+/* Main Container */
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Card Design */
+.card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.card h2 {
+  margin-bottom: 1rem;
+  color: #004aad;
+}
+
+/* Forms */
+form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 0.7rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+button {
+  background: #007bff;
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover {
+  background: #007bff;
+}
+
+/* Result Highlight */
+.result {
+  margin-top: 1rem;
+  font-weight: 600;
+  color: #007bff;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  background: #f1f5f9;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* Menu Toggle (hidden by default) */
+.menu-toggle {
+  width: auto;
+  font-size: 22px;
+  border: none;
+  cursor: pointer;
+  display: none; /* hidden on desktop */
+  margin-left: auto; /* pushes it to the right */
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: nowrap;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .navbar nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;   /* below navbar */
+    right: 0;
+    width: 100%;
+    background: #004aad; /* same as navbar */
+    padding: 10px 0;
+  }
+  .navbar nav.active {
+    display: flex;
+  }
+
+  .navbar nav a {
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* Hero */
+  .hero {
+    padding: 2rem 1rem;
+  }
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+  .hero p {
+    font-size: 1rem;
+  }
+
+  /* Forms */
+  .semester {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  form label {
+    margin-bottom: 0.3rem;
+  }
+  input, textarea, select, button {
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  /* Container */
+  .container {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+
+  /* Cards */
+  .card {
+    padding: 1rem;
+  }
+}

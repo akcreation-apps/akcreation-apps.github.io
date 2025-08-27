@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPUT CGPA Calculator | Convert CGPA to Percentage Instantly</title>
+    <meta name="description" content="Calculate BPUT CGPA semester-wise from SGPA and credits. Convert CGPA to percentage instantly using our free online calculator for BPUT students in Odisha.">
+    <meta name="keywords" content="BPUT CGPA calculator, CGPA to Percentage BPUT, calculate CGPA in BPUT, BPUT grade calculator Odisha">
+    <meta name="robots" content="index, follow">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="style.css" as="style">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="canonical" href="https://akcreation-apps.netlify.app/bput-modified-grade-sheet.html"/>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <meta property="og:title" content="BPUT CGPA Calculator">
+    <meta property="og:description" content="Calculate your actual CGPA using the official BPUT formula. Also available in our Android app.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://akcreation-apps.netlify.app/bput-grade-sheet.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BPUT CGPA Calculator">
+    <meta name="twitter:description" content="Calculatr actual CGPA, based on BPUT formualla. Available in our Android app.">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">🎓 BPUT Tools</div>
+    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    <nav aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="bput-sgpa-calculator.html">SGPA</a>
+        <a href="bput-cgpa-calculator.html" class="active">CGPA</a>
+        <a href="bput-percentage.html">Percentage</a>
+        <a href="bput-marks-calculator.html">Marks</a>
+    </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+    <h1>BPUT CGPA Calculator</h1>
+    <p>The BPUT CGPA Calculator helps students of Biju Patnaik University of Technology (Odisha) quickly calculate their CGPA using official formulas. Whether you want to track progress semester-wise
+        or convert CGPA into percentage, this tool ensures accuracy for engineering, MBA, and MCA students.</p>
+</section>
+
+<!-- Main Content -->
+<main class="container">
+    <!-- How to Use -->
+    <div class="card">
+        <h2>How to Use</h2>
+        <ol>
+            <li>Enter your <strong>SGPA</strong> and <strong>Credits</strong> for each semester.</li>
+            <li>Click on <strong>+ Add Semester</strong> if you want to add more.</li>
+            <li>Click <strong>Calculate CGPA</strong> to see your result.</li>
+        </ol>
+    </div>
+
+    <!-- CGPA Calculator -->
+    <div class="card">
+        <h2>Calculate CGPA</h2>
+        <form id="cgpaForm">
+            <div id="semesters">
+                <div class="semester">
+                    <label>Semester Credit: <input type="number" name="credits" required></label>
+                    <label>Semester SGPA: <input type="number" step="0.01" name="sgpa" required></label>
+                </div>
+            </div>
+            <button type="button" id="addSemester">+ Add Semester</button>
+            <br><br>
+            <button type="submit">Calculate CGPA</button>
+        </form>
+        <p id="cgpaResult" class="result"></p>
+    </div>
+    <!-- Android App Download -->
+    <div class="card" style="text-align: center; margin-top: 20px;">
+        <h2>📱 Get Our Android App</h2>
+        <p>Download the Grade Calculator (BPUT Based) Android app for faster access and offline usage.</p>
+        <a id="apkLink" download class="download-btn">⬇️ Download APK</a>
+        <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students.</p>
+    </div>
+    <!-- FAQ -->
+    <div class="card">
+        <h2>FAQs</h2>
+
+        <h3>📘 How is CGPA calculated in BPUT?</h3>
+        <p>CGPA is calculated using the official formula: <strong>(Σ (SGPA × Credits)) ÷ (Σ Credits)</strong>. This ensures subjects with higher credits carry more weight.</p>
+        <br>
+        <h3>🔢 Example CGPA Calculation</h3>
+        <p>If your SGPA in Semester 1 is 8.0 with 20 credits and in Semester 2 is 8.5 with 22 credits, then CGPA = (8.0×20 + 8.5×22) ÷ (20+22) = 8.26.</p>
+        <br>
+        <h3>📊 How do I convert BPUT CGPA to percentage?</h3>
+        <p>BPUT follows the formula: <strong>Percentage = (CGPA - 0.5) × 10</strong>. For example, a CGPA of 8.2 equals 77%.</p>
+        <br>
+        <h3>📱 Can I calculate BPUT CGPA on mobile?</h3>
+        <p>Yes, our Grade Calculator (BPUT Based) is fully mobile-friendly.
+
+    </div>
+
+    <div class="card" style="text-align:center;">
+        <h2>Explore More BPUT Tools</h2>
+        <a href="bput-marks-calculator.html">Marks Calculator</a> |
+        <a href="bput-percentage.html">Percentage Calculator</a> |
+        <a href="bput-sgpa-calculator.html">SGPA Calculator</a><br><br>
+        <h2>Exclusive For BPUT Students</h2>
+        <a href="bput-grade-sheet.html">Modified Grade Sheet</a> |
+        <a href="bput-resume-builder.html">Resume Builder</a> |
+        <a href="bput-seminar-reports.html">Seminar Reports</a>
+    </div>
+</main>
+
+
+<!-- Footer -->
+<footer>
+    <p>© <span id="currentYear"></span> AK Creation | Made for BPUT Students</p>
+</footer>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How is CGPA calculated in BPUT?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "CGPA is calculated using the formula: (Σ (SGPA × Credits)) ÷ (Σ Credits)."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I convert BPUT CGPA to percentage?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "BPUT uses the formula: Percentage = (CGPA - 0.5) × 10."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I calculate BPUT CGPA on mobile?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, the BPUT Grade Calculator is fully mobile-friendly and also available as an Android app."
+                }
+            }
+        ]
+    }
+</script>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://akcreation-apps.netlify.app"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "BPUT Result Mobile",
+                "item": "https://akcreation-apps.netlify.app/bput-cgpa-calculator.html"
+            }
+        ]
+    }
+</script>
+
+
+<!-- Script -->
+<script>
+    // Footer Year
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+
+    // Add semester rows dynamically
+    document.getElementById("addSemester").addEventListener("click", function() {
+      const div = document.createElement("div");
+      div.classList.add("semester");
+      div.innerHTML = `
+        <label>Semester Credit: <input type="number" name="credits" required></label>
+        <label>Semester SGPA: <input type="number" step="0.01" name="sgpa" required></label>
+      `;
+      document.getElementById("semesters").appendChild(div);
+    });
+
+    // Format like Java DecimalFormat("##.##")
+    function formatTwoDecimals(num) {
+      return Math.floor(num * 100) / 100; // truncate to 2 decimals
+    }
+
+    // CGPA Calculator
+    document.getElementById("cgpaForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const sgpas = document.getElementsByName("sgpa");
+      const credits = document.getElementsByName("credits");
+
+      let totalWeighted = 0;
+      let totalCredits = 0;
+
+      for (let i = 0; i < sgpas.length; i++) {
+        const sgpa = parseFloat(sgpas[i].value);
+        const credit = parseFloat(credits[i].value);
+        if (!isNaN(sgpa) && !isNaN(credit)) {
+          totalWeighted += Math.round(sgpa * credit);
+          totalCredits += credit;
+        }
+      }
+
+      if (totalCredits > 0) {
+        let cgpa = totalWeighted / totalCredits;
+        cgpa = formatTwoDecimals(cgpa);
+
+        let percent = (cgpa - 0.5) * 10;
+        percent = formatTwoDecimals(percent);
+
+        document.getElementById("cgpaResult").innerHTML = `
+          🎓 Your CGPA is: <strong>${cgpa.toFixed(2)}</strong><br>
+          📊 Equivalent Percentage: <strong>${percent.toFixed(2)}%</strong>
+        `;
+      } else {
+        document.getElementById("cgpaResult").textContent = "⚠️ Please enter valid SGPA and Credits.";
+      }
+    });
+
+    // Navbar toggle
+    document.querySelector(".menu-toggle").addEventListener("click", () => {
+      document.querySelector(".navbar nav").classList.toggle("active");
+    });
+    // Load APK details from JSON
+    fetch("app_info.json")
+      .then(response => response.json())
+      .then(data => {
+        const link = document.getElementById("apkLink");
+        link.href = data.apkUrl;
+        link.setAttribute("download", data.apkFile);
+      })
+      .catch(err => console.error("Error loading APK JSON:", err));
+</script>
+
+</body>
+</html>

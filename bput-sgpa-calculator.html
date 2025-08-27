@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPUT SGPA Calculator Online | Calculate SGPA for BPUT Students in Odisha</title>
+    <meta name="description" content="Free online BPUT SGPA calculator for engineering, MBA, and MCA students in Odisha. Enter grades and credits to calculate semester grade point average instantly.">
+    <meta name="keywords" content="BPUT SGPA calculator, SGPA calculator Odisha, BPUT grade calculator, BPUT semester grade, calculate SGPA BPUT">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://akcreation-apps.netlify.app/bput-sgpa-calculator.html">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="BPUT SGPA Calculator">
+    <meta property="og:description" content="Free online SGPA calculator as per BPUT grading system.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://akcreation-apps.netlify.app/bput-sgpa-calculator.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BPUT SGPA Calculator">
+    <meta name="twitter:description" content="Calculate your SGPA easily using BPUT rules. Free online tool for students in Odisha.">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        table.bput-grading {
+          width: 100%;
+          border-collapse: collapse;
+          font-family: Arial, sans-serif;
+          margin: 20px 0;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table.bput-grading caption {
+          caption-side: top;
+          font-size: 1.2em;
+          font-weight: bold;
+          margin-bottom: 10px;
+          text-align: left;
+          color: #333;
+        }
+
+        table.bput-grading thead {
+          background-color: #0073e6;
+          color: white;
+        }
+
+        table.bput-grading th,
+        table.bput-grading td {
+          padding: 12px 15px;
+          text-align: center;
+          border: 1px solid #ddd;
+        }
+
+        table.bput-grading tbody tr:nth-child(even) {
+          background-color: #f9f9f9;
+        }
+
+        table.bput-grading tbody tr:hover {
+          background-color: #e6f2ff;
+        }
+
+        table.bput-grading td:first-child {
+          font-weight: bold;
+        }
+
+        table.bput-grading td:last-child {
+          font-weight: bold;
+          color: #0073e6;
+        }
+    </style>
+
+</head>
+<body>
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">🎓 BPUT Tools</div>
+    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    <nav aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="bput-sgpa-calculator.html" class="active">SGPA</a>
+        <a href="bput-cgpa-calculator.html">CGPA</a>
+        <a href="bput-percentage.html">Percentage</a>
+        <a href="bput-marks-calculator.html">Marks</a>
+    </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+    <h1>BPUT SGPA Calculator</h1>
+    <p>Free online SGPA calculator for Biju Patnaik University of Technology (Odisha) students. Enter subject grades and credits to calculate your SGPA instantly.</p>
+</section>
+
+<main class="container">
+
+    <!-- How to Use -->
+    <div class="card">
+        <h2>How to Use</h2>
+        <ol>
+            <li>Enter each subject's grade (O, E, A, B, C, D, F, M, S) and credits.</li>
+            <li>Click <strong>+ Add Subject</strong> to add more subjects.</li>
+            <li>Optionally, enter <strong>Total Marks</strong> from syllabus (if unknown, we assume 100 per subject).</li>
+            <li>Click <strong>Calculate SGPA</strong> to view your result.</li>
+        </ol>
+    </div>
+
+    <!-- SGPA Calculator -->
+    <div class="card">
+        <h2>Calculate SGPA</h2>
+        <form id="sgpaForm">
+            <div id="subjects">
+                <div class="subject">
+                    <label>Grade: <input type="text" name="grade" required placeholder="O / E / A / B / C / D / F"></label>
+                    <label>Credit: <input type="number" name="credit" required min="1" step="1" placeholder="Credits"></label>
+                </div>
+            </div>
+            <button type="button" id="addSubject">+ Add Subject</button>
+            <br><br>
+            <label style="display:block; margin-top:10px;">
+                Total Marks (Optional):
+                <input type="number" id="totalMarks" placeholder="Sum of all subject marks">
+            </label>
+
+            <button type="submit">Calculate SGPA</button>
+        </form>
+        <p id="sgpaResult" class="result" role="alert" aria-live="polite"></p>
+    </div>
+
+    <!-- Grading Table -->
+    <div class="card">
+        <h2>Grading Table</h2>
+        <table class="bput-grading" aria-describedby="grading-note">
+            <caption id="grading-note">BPUT Grading Table — Score ranges and corresponding grade points</caption>
+            <thead>
+            <tr>
+                <th>Grade</th>
+                <th>Score (Percentage)</th>
+                <th>Points</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>O</td>
+                <td>90 &amp; above up to 100</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td>E</td>
+                <td>80 &amp; above but less than 90</td>
+                <td>9</td>
+            </tr>
+            <tr>
+                <td>A</td>
+                <td>70 &amp; above but less than 80</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>B</td>
+                <td>60 &amp; above but less than 70</td>
+                <td>7</td>
+            </tr>
+            <tr>
+                <td>C</td>
+                <td>50 &amp; above but less than 60</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>D</td>
+                <td>37 &amp; above but less than 50</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>F</td>
+                <td>Below 37</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>M</td>
+                <td>Malpractice</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>S</td>
+                <td>Absent</td>
+                <td>0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Android App Download -->
+    <div class="card" style="text-align: center; margin-top: 20px;">
+        <h2>📱 Get Our Android App</h2>
+        <p>Download the Grade Calculator (BPUT Based) Android app for faster access and offline usage.</p>
+        <a id="apkLink" download class="download-btn">⬇️ Download APK</a>
+        <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students.</p>
+    </div>
+
+    <!-- FAQs -->
+    <div class="card">
+        <h2>FAQs</h2>
+        <h3>❓ What is SGPA in BPUT?</h3>
+        <p>SGPA stands for <strong>Semester Grade Point Average</strong>. It is the weighted average of grade points earned in all subjects during a semester.</p>
+        <br>
+        <h3>❓ How is SGPA calculated?</h3>
+        <p>SGPA = <strong>Σ (Credits × Grade Points) ÷ Σ (Credits)</strong>. Each subject's weight is based on its credits.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h2>Explore More BPUT Tools</h2>
+        <a href="bput-marks-calculator.html">Marks Calculator</a> |
+        <a href="bput-percentage.html">Percentage Calculator</a> |
+        <a href="bput-cgpa-calculator.html">CGPA Calculator</a><br><br>
+        <h2>Exclusive For BPUT Students</h2>
+        <a href="bput-grade-sheet.html">Modified Grade Sheet</a> |
+        <a href="bput-resume-builder.html">Resume Builder</a> |
+        <a href="bput-seminar-reports.html">Seminar Reports</a>
+    </div>
+
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>© <span id="currentYear"></span> AK Creation | Made for BPUT Students</p>
+</footer>
+
+<!-- Breadcrumb JSON-LD -->
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://akcreation-apps.netlify.app"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "SGPA Calculator",
+                "item": "https://akcreation-apps.netlify.app/bput-sgpa-calculator.html"
+            }
+        ]
+    }
+</script>
+
+<!-- FAQ JSON-LD -->
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is SGPA in BPUT?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "SGPA is Semester Grade Point Average, calculated for all subjects in a semester."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How is SGPA calculated?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "SGPA = Σ(Credits × Grade Points) ÷ Σ(Credits)"
+                }
+            }
+        ]
+    }
+</script>
+
+<!-- Scripts -->
+<script>
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+
+    const gradePoints = {
+      "O": 10,  // Outstanding
+      "E": 9,   // Excellent
+      "A": 8,   // Very Good
+      "B": 7,   // Good
+      "C": 6,   // Fair
+      "D": 5,   // Below Average
+      "F": 2,   // Failed
+      "M": 0,   // Malpractice
+      "S": 0    // Absent
+    };
+
+    // Add subject dynamically
+    document.getElementById("addSubject").addEventListener("click", () => {
+      const div = document.createElement("div");
+      div.classList.add("subject");
+      div.style.marginBottom = "10px"; // spacing
+      div.innerHTML = `
+        <label>Grade: <input type="text" name="grade" required placeholder="O / E / A / B / C / D / F"></label>
+        <label>Credit: <input type="number" name="credit" required min="1" step="1" placeholder="Credits"></label>
+        <button type="button" class="removeSubject" style="margin-left:10px; color:#fff; background:#e74c3c; border:none; padding:2px 6px; border-radius:4px;">Remove</button>
+      `;
+      document.getElementById("subjects").appendChild(div);
+
+      // Add event listener to remove button
+      div.querySelector(".removeSubject").addEventListener("click", () => {
+        div.remove();
+      });
+    });
+
+
+    // SGPA Calculation
+    document.getElementById("sgpaForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const grades = document.getElementsByName("grade");
+        const credits = document.getElementsByName("credit");
+        let totalWeighted = 0, totalCredits = 0, invalid = false;
+
+        for(let i=0;i<grades.length;i++){
+            const grade = grades[i].value.toUpperCase().trim();
+            const credit = parseFloat(credits[i].value);
+            if(gradePoints[grade]===undefined || isNaN(credit) || credit <= 0){
+                invalid = true;
+                break;
+            }
+            totalWeighted += gradePoints[grade]*credit;
+            totalCredits += credit;
+        }
+
+        const resultEl = document.getElementById("sgpaResult");
+        if(invalid){
+            resultEl.style.color="red";
+            resultEl.textContent = "⚠️ Please enter valid grades (O, E, A, B, C, D, F, M, S) and positive credits.";
+            return;
+        }
+        if(totalCredits === 0 || totalCredits > 50){
+            resultEl.style.color="red";
+            resultEl.textContent="⚠️ Total credits cannot be zero / more than 50.";
+            return;
+        }
+
+        // SGPA calculation
+        const sgpa = totalWeighted / totalCredits;
+
+        // Percentage calculation (SGPA - 0.5) * 10
+        const percentage = (sgpa - 0.5) * 10;
+
+        // Secured Marks calculation
+        let totalMarksInput = parseFloat(document.getElementById("totalMarks").value);
+        let securedMarks;
+        if(isNaN(totalMarksInput) || totalMarksInput <= 0){
+            totalMarksInput = grades.length * 100; // default 100 marks per subject
+        }
+        securedMarks = Math.round((percentage/100) * totalMarksInput);
+
+        // Display result
+        resultEl.style.color="green";
+        resultEl.innerHTML = `
+            🎓 <strong>SGPA:</strong> ${sgpa.toFixed(2)} <br>
+            📊 <strong>Percentage:</strong> ${percentage.toFixed(2)}% <br>
+            📝 <strong>Secured Marks:</strong> ${securedMarks} / ${totalMarksInput}
+        `;
+    });
+
+
+    // Navbar toggle for mobile
+    document.querySelector(".menu-toggle").addEventListener("click", () => {
+      document.querySelector(".navbar nav").classList.toggle("active");
+    });
+
+    // Load APK details from JSON
+    fetch("app_info.json")
+      .then(response => response.json())
+      .then(data => {
+        const link = document.getElementById("apkLink");
+        link.href = data.apkUrl;
+        link.setAttribute("download", data.apkFile);
+      })
+      .catch(err => console.error("Error loading APK JSON:", err));
+</script>
+</body>
+</html>

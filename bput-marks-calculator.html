@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPUT Marks Calculator for BPUT Students in Odisha | Convert SGPA/CGPA to Marks</title>
+    <meta name="description"
+          content="Use our free BPUT Marks Calculator to convert SGPA or CGPA into total marks and percentage instantly. Perfect for BPUT students in Odisha for placements and exams.">
+    <meta name="keywords" content="BPUT marks calculator, SGPA to marks BPUT, CGPA to marks BPUT, BPUT students, Odisha">
+    <meta name="robots" content="index, follow">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="style.css" as="style">
+    <link rel="stylesheet" href="style.css">
+    <link rel="canonical" href="https://akcreation-apps.netlify.app/bput-marks-calculator.html"/>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="BPUT Marks Calculator | Convert SGPA/CGPA to Marks">
+    <meta property="og:description" content="Convert SGPA or CGPA into total marks instantly using our free BPUT Marks Calculator. Perfect for placements and applications.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://akcreation-apps.netlify.app/bput-marks-calculator.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BPUT Marks Calculator">
+    <meta name="twitter:description" content="Estimate your marks from SGPA/CGPA instantly using our BPUT Marks Calculator.">
+    <meta name="twitter:image" content="https://akcreation-apps.netlify.app/assets/og-marks-calculator.jpg">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">🎓 BPUT Tools</div>
+    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    <nav aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="bput-sgpa-calculator.html">SGPA</a>
+        <a href="bput-cgpa-calculator.html">CGPA</a>
+        <a href="bput-percentage.html">Percentage</a>
+        <a href="bput-marks-calculator.html" class="active">Marks</a>
+    </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <h1>BPUT Marks Calculator</h1>
+    <p>Convert your <strong>SGPA/CGPA</strong> into percentage and secured marks easily. If you don’t know the total marks from the syllabus, we’ll assume 100 marks per subject.</p>
+</section>
+
+<main class="container">
+
+    <!-- About -->
+    <div class="card">
+        <h2>Calculate Your BPUT Marks from SGPA/CGPA Instantly</h2>
+        <ul>
+            <li>🧮 Instantly estimate your marks from SGPA/CGPA.</li>
+            <li>📑 Useful for placements, higher studies, and scholarship forms.</li>
+            <li>⚡ No manual calculations needed—just enter your values.</li>
+            <li>🎯 Built with the official BPUT conversion logic.</li>
+        </ul>
+    </div>
+    <div class="card">
+        <h2>How to Use</h2>
+        <ol>
+            <li>Enter <strong>Number of Subjects</strong> and your <strong>SGPA/CGPA</strong>.</li>
+            <li>Optionally, enter <strong>Total Marks</strong> from syllabus (if unknown, we assume 100 per subject).</li>
+            <li>Click <strong>Calculate Marks</strong> to see your percentage and secured marks.</li>
+        </ol>
+    </div>
+    <div class="card">
+        <h2>📌 Important Notes</h2>
+        <ul>
+            <li>📘 <strong>SGPA:</strong> Enter the SGPA for a <em>single semester</em> only. Also, provide the number of subjects for that semester.</li>
+            <li>📊 <strong>CGPA:</strong> Enter the CGPA across <em>one or more semesters</em>. Provide the <strong>total number of subjects</strong> and <strong>total marks</strong> combined from all
+                semesters included in the CGPA.
+            </li>
+            <li>💡 Example: If your CGPA is 8.5 for 2 semesters with 8 subjects each, total subjects = 16. Use total marks = sum of all semester marks.</li>
+        </ul>
+    </div>
+
+
+    <!-- Calculator -->
+    <div class="card">
+        <h2>Marks Calculation</h2>
+        <form id="marksForm">
+            <label>Number of Subjects: <input type="number" name="subjects" required></label>
+            <label>Enter SGPA/CGPA: <br><span style="font-size:12px; color:#666;">
+    (SGPA: single semester, CGPA: combined semesters)
+  </span> <input type="number" step="0.01" name="score" required></label>
+            <label>Total Marks (optional): <input type="number" name="totalMarks" placeholder="Leave empty if unknown"></label>
+            <button type="submit">Calculate Marks</button>
+        </form>
+        <p id="marksResult"></p>
+    </div>
+
+    <!-- CTA -->
+    <div class="card" style="text-align:center; margin-top:20px;">
+        <h2>📱 Get More Features in Our Android App</h2>
+        <p>The Marks Calculator is also available in our <strong>BPUT Grade Calculator App</strong> along with SGPA, CGPA, Percentage & Modified Sheet tools.</p>
+        <a id="apkLink">⬇️ Download Android App</a>
+        <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students.</p>
+    </div>
+
+    <!-- FAQs -->
+    <div class="card">
+        <h2>FAQs</h2>
+
+        <h3>📘 How does the Marks Calculator work?</h3>
+        <p>It converts your SGPA/CGPA into approximate marks using BPUT’s official calculation logic.</p>
+        <br>
+        <h3>📊 Can I use this for placements?</h3>
+        <p>Yes, it gives a clear idea of your marks percentage which is useful for resumes, forms, and interviews.</p>
+        <br>
+        <h3>🧠 Is the calculation 100% accurate?</h3>
+        <p>The formula is based on official BPUT guidelines. However, use it as an estimate until you receive official mark sheets.</p>
+        <br>
+        <h3>📱 Is this tool available offline?</h3>
+        <p>Yes, if you download our Android app, you can access it anytime without internet.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h2>Explore More BPUT Tools</h2>
+        <a href="bput-percentage.html">Percentage Calculator</a> |
+        <a href="bput-sgpa-calculator.html">SGPA Calculator</a> |
+        <a href="bput-cgpa-calculator.html">CGPA Calculator</a><br><br>
+        <h2>Exclusive For BPUT Students</h2>
+        <a href="bput-grade-sheet.html">Modified Grade Sheet</a> |
+        <a href="bput-resume-builder.html">Resume Builder</a> |
+        <a href="bput-seminar-reports.html">Seminar Reports</a>
+    </div>
+</main>
+
+<footer>
+    <p>© <span id="currentYear"></span> AK Creation | Made for BPUT Students</p>
+</footer>
+
+<!-- FAQ Schema -->
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How does the Marks Calculator work?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "It converts your SGPA/CGPA into approximate marks using BPUT’s official calculation logic."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I use this for placements?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, it gives a clear idea of your marks percentage which is useful for resumes, forms, and interviews."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is the calculation 100% accurate?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The formula is based on official BPUT guidelines. However, use it as an estimate until you receive official mark sheets."
+                }
+            }
+        ]
+    }
+</script>
+
+<!-- Breadcrumb Schema -->
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://akcreation-apps.netlify.app"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Marks Calculator",
+                "item": "https://akcreation-apps.netlify.app/bput-marks-calculator.html"
+            }
+        ]
+    }
+</script>
+
+<script>
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+    document.querySelector(".menu-toggle").addEventListener("click", () => {
+      document.querySelector(".navbar nav").classList.toggle("active");
+    });
+
+    // Marks Calculation Logic (example)
+    const resultEl = document.getElementById("marksResult");
+    document.getElementById("marksForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const subjects = parseInt(this.subjects.value);
+      const sgpa = parseFloat(this.score.value);
+      let totalMarks = parseInt(this.totalMarks.value);
+
+        // Basic validation
+      if (!subjects || subjects <= 0) {
+        resultEl.textContent = "Please enter a valid number of subjects.";
+        resultEl.style.color = "#d93025"; // red for error
+        return;
+      }
+      if (isNaN(sgpa) || sgpa <= 0 || sgpa > 10) {
+         resultEl.textContent = "Please enter a valid SGPA/CGPA between 0 and 10.";
+         resultEl.style.color = "#d93025"; // red for error
+         return;
+      }
+
+      // If user didn't enter total marks → assume 100 marks per subject
+      if (isNaN(totalMarks) || totalMarks <= 0) {
+        totalMarks = subjects * 100;
+      }
+
+      // Formula: Percentage = (SGPA - 0.5) * 10
+      const percentage = (sgpa - 0.5) * 10;
+
+      // Secured Marks = percentage% of totalMarks
+      const securedMarks = Math.round((percentage / 100) * totalMarks);
+      document.getElementById("marksResult").style.color = "#000";
+      document.getElementById("marksResult").innerHTML =
+        `📊 Percentage: <strong>${percentage.toFixed(2)}%</strong><br>` +
+        `✅ Secured Marks: <strong>${securedMarks} / ${totalMarks}</strong>`;
+    });
+
+    // Load APK details
+    fetch("app_info.json")
+      .then(response => response.json())
+      .then(data => {
+        const link = document.getElementById("apkLink");
+        link.href = data.apkUrl;
+        link.setAttribute("download", data.apkFile);
+      })
+      .catch(err => console.error("Error loading APK JSON:", err));
+</script>
+
+</body>
+</html>
