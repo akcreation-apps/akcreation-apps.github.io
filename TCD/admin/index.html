@@ -11,61 +11,87 @@
 </head>
 <body>
 
-    <!-- Password Popup -->
-    <div id="passwordPopup" class="popup">
-        <div class="popup-content">
-            <h2>Enter Password</h2>
-            <input type="password" id="password" class="password-input" placeholder="Enter your password" required>
-            <div class="password-toggle">
-                <label>
-                    <input type="checkbox" id="togglePassword"> Show Password
+<!-- Password Popup -->
+<div id="passwordPopup" class="popup">
+    <div class="popup-content">
+        <h2>Enter Password</h2>
+        <input type="password" id="password" class="password-input" placeholder="Enter your password" required>
+        <div class="password-toggle">
+            <label>
+                <input type="checkbox" id="togglePassword"> Show Password
+            </label>
+        </div>
+        <button id="submitPassword" class="submit-button">Submit</button>
+        <p id="passwordError" class="error-message"></p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container" id="mainContent" style="display:none;">
+    <nav>
+        <ul>
+            <li id="chartTab">Chart</li>
+            <li id="actionTab" class="active">Action</li>
+            <li id="accessTab">Controls</li>
+        </ul>
+    </nav>
+
+    <!-- Chart Section -->
+    <div id="chartSection" style="display:none;">
+        <h2>Chart View</h2>
+    </div>
+    <div id="actionControlSection">
+    </div>
+    <!-- Access Control Section -->
+    <div id="accessControlSection" style="display:none;">
+        <div class="save-container" id="saveContainer" style="display:none;">
+            <h5>Your changes haven't saved yet.</h5>
+            <button id="submitButton" onclick="save_changes()">Save Changes</button>
+        </div>
+
+        <div class="number-container" id="numberContainer">
+            <input type="number" id="inputNumber" placeholder="Enter a number">
+            <button id="validateButton" style="display:none;" onclick="verify_number()">Verify</button>
+        </div>
+
+        <!-- Shop Open/Close Control -->
+        <div class="shop-status-container" id="shopStatusContainer">
+            <div class="shop-toggle-row">
+                <label class="switch">
+                    <input type="checkbox" id="shopOpenToggle" onchange="toggleShopStatus()">
+                    <span class="slider round"></span>
                 </label>
+                <span class="shop-status-label" id="shopStatusText">Closed</span>
             </div>
-            <button id="submitPassword" class="submit-button">Submit</button>
-            <p id="passwordError" class="error-message"></p>
+
+            <div id="timingsContainer" class="timings-container" style="display:none;">
+                <h4>Set Shop Hours</h4>
+                <div class="time-inline">
+                    <label for="openHour">Open:</label>
+                    <select id="openHour"></select>
+
+                    <span class="to-label">to</span>
+
+                    <label for="closeHour">Close:</label>
+                    <select id="closeHour"></select>
+                </div>
+            </div>
+        </div>
+
+        <h3>List of Dishes</h3>
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Search dishes...">
+            <span id="clearSearch" class="clear-icon" style="display:none;">&times;</span>
+        </div>
+        <div id="dishesListAccess">
+            <!-- Dynamically loaded dishes with toggles will go here -->
+        </div>
+        <div id="noResultsContainer" style="display:none;">
+            <img id="noResultsImage" src="../../food_order_src/no-results.png" alt="No Results Found"/>
         </div>
     </div>
-
-    <!-- Main Content -->
-    <div class="container" id="mainContent" style="display:none;">
-        <nav>
-            <ul>
-                <li id="chartTab">Chart</li>
-                <li id="actionTab" class="active">Action</li>
-                <li id="accessTab">Controls</li>
-            </ul>
-        </nav>
-
-        <!-- Chart Section -->
-        <div id="chartSection" style="display:none;">
-            <h2>Chart View</h2>
-        </div>
-        <div id="actionControlSection">
-        </div>
-        <!-- Access Control Section -->
-        <div id="accessControlSection" style="display:none;">
-            <div class="save-container" id="saveContainer" style="display:none;">
-                <h5>Your changes haven't saved yet.</h5>
-                <button id="submitButton" onclick="save_changes()">Save Changes</button>
-            </div>
-           <div class="number-container" id="numberContainer">
-                <input type="number" id="inputNumber" placeholder="Enter a number">
-                <button id="validateButton" style="display:none;" onclick="verify_number()">Verify</button>
-           </div>
-            <h3>List of Dishes</h3>
-           <div class="search-container">
-                <input type="text" id="searchBar" placeholder="Search dishes...">
-                <span id="clearSearch" class="clear-icon" style="display:none;">&times;</span>
-            </div>
-            <div id="dishesListAccess">
-                <!-- Dynamically loaded dishes with toggles will go here -->
-            </div>
-            <div id="noResultsContainer" style="display:none;">
-                <img id="noResultsImage" src="../../food_order_src/no-results.png" alt="No Results Found" />
-            </div>
-        </div>
-    </div>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="script.js" type="module"></script>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="script.js" type="module"></script>
 </body>
 </html>

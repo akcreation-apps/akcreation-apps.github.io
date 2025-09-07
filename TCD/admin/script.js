@@ -4,10 +4,14 @@ import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, Timestamp, o
 
 
 window.doc_id = '';
+window.doc_shop_status = '';
+window.doc_opening_time = '';
+window.doc_closing_time = '';
 window.doc_whatsapp_no = '';
 window.doc_disable_item_ids = '';
 window.verify_number = verify_number;
 window.save_changes = save_changes;
+window.toggleShopStatus = toggleShopStatus;
 
 document.addEventListener('DOMContentLoaded', () => {
     const DAYS_RANGE = 150
@@ -31,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const numberInput = document.getElementById('inputNumber');
     const savedContainer = document.getElementById('saveContainer');
     const numberContainer = document.getElementById('numberContainer');
+    const shopStatusContainer = document.getElementById('shopStatusContainer');
+    const shopOpenToggle = document.getElementById('shopOpenToggle');
+    const openHour = document.getElementById('openHour');
+    const closeHour = document.getElementById('closeHour');
     const validateButton = document.getElementById('validateButton');
 
     let analyticsData = [];
@@ -41,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const sessionExpiration = localStorage.getItem('tcd_sessionExpiration');
     const currentTime = new Date().getTime();
+
+    populateHours("openHour");
+    populateHours("closeHour");
 
     togglePassword.addEventListener('change', function () {
         // Toggle the password visibility
@@ -150,6 +161,36 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
+                    if (doc.data().shop_status !== undefined) {
+                        window.doc_shop_status = doc.data().shop_status;
+                        if(!localStorage.getItem('shop_status')){
+                            localStorage.setItem('shop_status', window.doc_shop_status);
+                        } else{
+                            if(localStorage.getItem('shop_status') !== window.doc_shop_status){
+                                shopStatusContainer.style.backgroundColor = 'antiquewhite';
+                            }
+                        }
+                    }
+                    if (doc.data().opening_time !== undefined) {
+                        window.doc_opening_time = doc.data().opening_time;
+                        if(!localStorage.getItem('opening_time')){
+                            localStorage.setItem('opening_time', window.doc_opening_time);
+                        } else{
+                            if(localStorage.getItem('opening_time') !== window.doc_opening_time){
+                                shopStatusContainer.style.backgroundColor = 'antiquewhite';
+                            }
+                        }
+                    }
+                    if (doc.data().closing_time !== undefined) {
+                        window.doc_closing_time = doc.data().closing_time;
+                        if(!localStorage.getItem('closing_time')){
+                            localStorage.setItem('closing_time', window.doc_closing_time);
+                        } else{
+                            if(localStorage.getItem('closing_time') !== window.doc_closing_time){
+                                shopStatusContainer.style.backgroundColor = 'antiquewhite';
+                            }
+                        }
+                    }
                     if (doc.data().disabled_items !== undefined) {
                         window.doc_disable_item_ids = JSON.parse(doc.data().disabled_items)
                         if(!localStorage.getItem('disable_item_ids')){
@@ -184,7 +225,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
-                numberInput.value = localStorage.getItem('whatsapp_no').slice(3)
+                numberInput.value = localStorage.getItem('whatsapp_no').slice(3);
+                openHour.value = localStorage.getItem('opening_time');
+                closeHour.value = localStorage.getItem('closing_time');
+                shopOpenToggle.checked = (localStorage.getItem('shop_status') === "open");
+                const statusText = document.getElementById("shopStatusText");
+                if (shopOpenToggle.checked) {
+                    statusText.textContent = "Open";
+                } else {
+                    statusText.textContent = "Closed";
+                }
+                document.getElementById("timingsContainer").style.display = shopOpenToggle.checked ? "block" : "none";
                 renderDishes(data); // Call the function to render dishes
             })
             .catch(error => {
@@ -393,15 +444,81 @@ document.addEventListener('DOMContentLoaded', () => {
         update_save_container()
     });
 
-    function update_save_container(){
-        // Show submit button if any changes
-        const updated_disable_items = JSON.parse(localStorage.getItem('disable_item_ids'))
-        if(updated_disable_items.every(element => window.doc_disable_item_ids.includes(element)) && window.doc_disable_item_ids.every(element => updated_disable_items.includes(element)) && localStorage.getItem('whatsapp_no') === window.doc_whatsapp_no){
-            savedContainer.style.display = 'none';
-        }else{
-            savedContainer.style.display = 'inline-grid';
+    shopOpenToggle.addEventListener('change', function () {
+        const newStatus = shopOpenToggle.checked ? "open" : "closed";
+        localStorage.setItem('shop_status', newStatus);
+
+        // Background color feedback
+        if (newStatus === window.doc_shop_status) {
+            shopStatusContainer.style.backgroundColor = 'azure';
+        } else {
+            shopStatusContainer.style.backgroundColor = 'antiquewhite';
+        }
+
+        update_save_container();
+    });
+
+    openHour.addEventListener('change', function () {
+        localStorage.setItem('opening_time', openHour.value);
+        if (openHour.value === window.doc_opening_time) {
+            shopStatusContainer.style.backgroundColor = 'azure';
+        } else {
+            shopStatusContainer.style.backgroundColor = 'antiquewhite';
+        }
+        update_save_container();
+    });
+
+    closeHour.addEventListener('change', function () {
+        localStorage.setItem('closing_time', closeHour.value);
+        if (closeHour.value === window.doc_closing_time) {
+            shopStatusContainer.style.backgroundColor = 'azure';
+        } else {
+            shopStatusContainer.style.backgroundColor = 'antiquewhite';
+        }
+        update_save_container();
+    });
+
+    function update_save_container() {
+        const updated_disable_items = JSON.parse(localStorage.getItem('disable_item_ids')) || [];
+
+        // Get local values
+        const localWhatsapp = localStorage.getItem('whatsapp_no');
+        const localShopStatus = localStorage.getItem('shop_status');
+        const localOpenTime = localStorage.getItem('opening_time');
+        const localCloseTime = localStorage.getItem('closing_time');
+
+        // Get Firestore values
+        const docWhatsapp = window.doc_whatsapp_no;
+        const docShopStatus = window.doc_shop_status;
+        const docOpenTime = window.doc_opening_time ? window.doc_opening_time : "00";
+        const docCloseTime = window.doc_closing_time ? window.doc_closing_time : "00";
+
+        // Compare disabled items
+        const disableItemsEqual =
+            updated_disable_items.every(element => window.doc_disable_item_ids.includes(element)) &&
+            window.doc_disable_item_ids.every(element => updated_disable_items.includes(element));
+        console.log("localWhatsapp", localWhatsapp);
+        console.log("docWhatsapp", docWhatsapp);
+        console.log("localShopStatus", localShopStatus);
+        console.log("docShopStatus", docShopStatus);
+        console.log("localOpenTime", localOpenTime);
+        console.log("docOpenTime", docOpenTime);
+        console.log("localCloseTime", localCloseTime);
+        console.log("docCloseTime", docCloseTime);
+        // Compare all values
+        if (
+            disableItemsEqual &&
+            localWhatsapp === docWhatsapp &&
+            localShopStatus === docShopStatus &&
+            localOpenTime === docOpenTime &&
+            localCloseTime === docCloseTime
+        ) {
+            savedContainer.style.display = 'none'; // No changes
+        } else {
+            savedContainer.style.display = 'inline-grid'; // Show Save Changes
         }
     }
+
 
     function logOrderId(action, orderId) {
         console.log(`Action: ${action}, Order ID: ${orderId}`);
@@ -662,7 +779,10 @@ async function update_changes() {
 
         let updatedData = {
             'disabled_items': localStorage.getItem('disable_item_ids'),
-            'whatsapp_no': localStorage.getItem('whatsapp_no')
+            'whatsapp_no': localStorage.getItem('whatsapp_no'),
+            'shop_status': localStorage.getItem('shop_status'),
+            'opening_time': localStorage.getItem('opening_time'),
+            'closing_time': localStorage.getItem('closing_time')
         };
 
         console.log(credentials);
@@ -672,10 +792,29 @@ async function update_changes() {
         await updateDoc(foodItemRef, updatedData);
 
         let data = {
-            'disabled_items_changes':{'old_data':JSON.stringify(window.doc_disable_item_ids), 'new_data':localStorage.getItem('disable_item_ids')},
-            'whatsapp_no_changes':{'old_data':window.doc_whatsapp_no, 'new_data':localStorage.getItem('whatsapp_no')},
-            'created_at':Timestamp.now()
-        }
+            disabled_items_changes: {
+                old_data: JSON.stringify(window.doc_disable_item_ids),
+                new_data: localStorage.getItem('disable_item_ids')
+            },
+            whatsapp_no_changes: {
+                old_data: window.doc_whatsapp_no,
+                new_data: localStorage.getItem('whatsapp_no')
+            },
+            shop_status_changes: {
+                old_data: window.doc_shop_status,
+                new_data: localStorage.getItem('shop_status')
+            },
+            shop_opening_time_changes: {
+                old_data: window.doc_opening_time,
+                new_data: localStorage.getItem('opening_time')
+            },
+            shop_closing_time_changes: {
+                old_data: window.doc_closing_time,
+                new_data: localStorage.getItem('closing_time')
+            },
+            created_at: Timestamp.now()
+        };
+
         await addDoc(collection(db, decrypt_values(credentials.ADMIN_HISTORY_TABLE_NAME, credentials.KEY)), data);
 
         return true; // Set success to true only after updateDoc completes successfully
@@ -970,4 +1109,26 @@ function fetchJsonData(url) {
     return fetch(url)
         .then(response => response.json())
         .catch(error => console.error('Error fetching JSON data:', error));
+}
+
+function populateHours(selectId) {
+    let select = document.getElementById(selectId);
+    for (let i = 0; i < 24; i++) {
+        let option = document.createElement("option");
+        option.value = i;
+        option.text = i.toString().padStart(2, '0') + ":00";
+        select.appendChild(option);
+    }
+}
+
+function toggleShopStatus() {
+    let isOpen = document.getElementById("shopOpenToggle").checked;
+    document.getElementById("timingsContainer").style.display = isOpen ? "block" : "none";
+    const statusText = document.getElementById("shopStatusText");
+
+    if (isOpen) {
+        statusText.textContent = "Open";
+    } else {
+        statusText.textContent = "Closed";
+    }
 }

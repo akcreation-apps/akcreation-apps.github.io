@@ -637,3 +637,116 @@ input:checked + .slider:before {
         text-anchor: end;
     }
 }
+
+/* Shop status container */
+.shop-status-container {
+    margin: 20px 10px;
+    padding: 15px;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Row for toggle + label */
+.shop-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Label beside toggle */
+.shop-status-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Switch (reuse your existing switch but tuned) */
+.shop-status-container .switch {
+    width: 55px;
+    height: 30px;
+    margin-right: 10px;
+}
+.shop-status-container .slider {
+    border-radius: 30px;
+}
+.shop-status-container .slider:before {
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+}
+
+/* Timings container */
+.timings-container {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Title inside timing box */
+.timings-container h4 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #4a90e2;
+}
+
+/* Inline time selection */
+.time-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap; /* stack on small screens */
+}
+.time-inline label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #444;
+}
+.to-label {
+    font-weight: bold;
+    color: #666;
+}
+
+/* Stylish select dropdown */
+.time-inline select {
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: linear-gradient(to bottom, #fff, #f7f7f7);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.time-inline select:hover {
+    border-color: #4a90e2;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+.time-inline select:focus {
+    border-color: #357abd;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74,144,226,0.25);
+}
+
+/* Responsive tweaks */
+@media (max-width: 500px) {
+    .time-inline {
+        flex-direction: row; /* keep same line */
+        flex-wrap: nowrap;   /* prevent wrapping */
+        gap: 8px;            /* slightly tighter gap for mobile */
+    }
+
+    .time-inline select {
+        flex: 1;             /* shrink to fit smaller screens */
+        min-width: 70px;     /* ensure tap-friendly size */
+    }
+}
