@@ -1,6 +1,8 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 const BACKUP_WP_NO = "+918920042482"
+const MINIMUM_ORDER_PRICE = 200
+const DELIVERY_CHARGES = 50
 // Retrieve the cart from localStorage
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -32,7 +34,10 @@ const renderCartItems = () => {
                 cartItem.innerHTML = `
                     <img src="${url}" alt="${dishItem.name}">
                     <div class="cart-item-info">
-                        <h5>${dishItem.name} (${categoryItem.category.name})</h5>
+                        <h5>
+                          ${dishItem.type === "NonVeg" ? '<span class="nonveg-icon"></span>' : ''}
+                          ${dishItem.name} (${categoryItem.category.name})
+                        </h5>
                         <p class="cart-item-price">₹${dishItem.price.toFixed(2)}/-</p>
                     </div>
                     <div class="cart-item-controls">
@@ -98,6 +103,7 @@ const renderCartItems = () => {
 // Calculate and update the total price
 const updateTotalPrice = () => {
     const totalPriceElement = document.getElementById('cart-total');
+    const deliveryNoteElement = document.getElementById('delivery-note');
     let total = 0;
 
     // Iterate through each category and dish to calculate the total price
@@ -106,6 +112,24 @@ const updateTotalPrice = () => {
             total += dishItem.price * dishItem.quantity;
         });
     });
+    const table = localStorage.getItem('table');
+
+    if (table === 'COD') {
+        if (total > 0 && total < MINIMUM_ORDER_PRICE) {
+            deliveryNoteElement.innerHTML = `
+                <span style="color:red;">₹${DELIVERY_CHARGES} delivery charge added for orders below ₹${MINIMUM_ORDER_PRICE}.</span><br>
+                Current Total: ₹${total.toFixed(2)} <br>
+                Delivery Charges: ₹${DELIVERY_CHARGES}
+            `;
+            total += DELIVERY_CHARGES;
+        } else if (total >= MINIMUM_ORDER_PRICE) {
+            deliveryNoteElement.innerHTML = `
+                <span style="color:green;">🎉 Free delivery on orders above ₹${MINIMUM_ORDER_PRICE}!</span>
+            `;
+        } else {
+            deliveryNoteElement.textContent = ""; // Empty cart
+        }
+    }
 
     // Update the displayed total price
     totalPriceElement.textContent = `₹${total.toFixed(2)}`;
@@ -158,11 +182,12 @@ function createOrderMessage(cartItems) {
         
         // Iterate through the dish details to add dishes to the corresponding category
         item.category.dish_details.forEach(dish => {
-            const dishName = dish.name; // Get the dish name
+            const dishId = dish.id; // Get the dish name
+            const dishName = dish.type === "NonVeg" ? `${dish.name} (Non-Veg)` : dish.name; // Get the dish name
             const quantity = dish.quantity; // Get the quantity
 
             // Find if the dish already exists in this category
-            const existingDish = categoryMap[categoryName].find(d => d.name === dishName);
+            const existingDish = categoryMap[categoryName].find(d => d.id === dishId);
             
             if (existingDish) {
                 // If it exists, update the quantity
@@ -184,26 +209,35 @@ function createOrderMessage(cartItems) {
 
         message += '\n'; // Add a new line after each category
     }
-
-    const table = localStorage.getItem('table');
-    if (table === 'COD') {
-        message += `Total Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nPayment Mode: Cash On Delivery`;
-    } else {
-        message += `Total Price: ₹${calculateTotal(cartItems).toFixed(2)}/-\n\nTable Number: ${table}`;
-    }
+    message = calculateTotal(cartItems, message)
     return message; // Return the constructed message
 }
 
 
 // Function to calculate total amount
-function calculateTotal(cartItems) {
-    return cartItems.reduce((total, categoryItem) => {
+function calculateTotal(cartItems, message) {
+    let total = cartItems.reduce((total, categoryItem) => {
         // Iterate through each dish detail in the category
         return total + categoryItem.category.dish_details.reduce((categoryTotal, dish) => {
             // Sum up the price of each dish multiplied by its quantity
             return categoryTotal + (dish.price * dish.quantity);
         }, 0);
     }, 0);
+    let deliveryNote = "";
+    const table = localStorage.getItem('table');
+
+    if (table === 'COD') {
+        // Apply delivery charge if below 200
+        if (total > 0 && total < MINIMUM_ORDER_PRICE) {
+            total += DELIVERY_CHARGES;
+            deliveryNote = `\n(₹${DELIVERY_CHARGES} delivery charge applied for orders below ₹${MINIMUM_ORDER_PRICE})`;
+        }
+        message += `Total Price: ₹${total.toFixed(2)}/-\n${deliveryNote}\nPayment Mode: Cash On Delivery`;
+    } else {
+        message += `Total Price: ₹${total.toFixed(2)}/-\n${deliveryNote}\nTable Number: ${table}`;
+    }
+
+    return message;
 }
 
 // Function to send message via WhatsApp
@@ -220,6 +254,10 @@ placeOrderButton.addEventListener('click', () => {
     showLoader();
     const cartItems = getCartItems(); // Get cart items
     const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
+    const storedShopStatus = localStorage.getItem('shop_status');
+    const storedOpeningTime = localStorage.getItem('opening_time');
+    const storedClosingTime = localStorage.getItem('closing_time');
+    const currentHour = new Date().getHours();
     if (storedExpirationTime && localStorage.getItem('table')!=="COD") {
         const currentTime = Date.now();
         if (currentTime >= storedExpirationTime) {
@@ -231,6 +269,22 @@ placeOrderButton.addEventListener('click', () => {
         Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error');
         hideLoader();
             return;
+    }
+    if (storedShopStatus ==="closed") {
+        const currentTime = Date.now();
+        Swal.fire('We’re currently closed 🛑','Our shop is taking a break right now. Please check back when we’re open!', 'info');
+        hideLoader();
+        return;
+    }
+    // Check if current time is outside operating hours
+    if (currentHour < storedOpeningTime || currentHour >= storedClosingTime) {
+        Swal.fire(
+            'We’re taking a break 😊',
+            `Our kitchen is open from ${storedOpeningTime}:00 to ${storedClosingTime}:00. Please visit us during these hours!`,
+            'info'
+        );
+        hideLoader();
+        return;
     }
     if (cartItems.length === 0) {
         Swal.fire('Error', 'Your cart is empty.', 'error').then(() => {
@@ -269,6 +323,7 @@ function collect_data(){
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const cartTotalValue = document.getElementById('cart-total').textContent
+        const deliveryNoteValue = document.getElementById('delivery-note').textContent
         const cartTotalNumber = parseFloat(cartTotalValue.replace(/[^0-9.-]+/g,"")); // Removes currency symbols, etc.
         let data = {
             'order_details':getCartItems(),
@@ -277,7 +332,9 @@ function collect_data(){
             'table_no':localStorage.getItem('table'),
             'status':'In Progress',
             'created_at':Timestamp.now()}
-        
+        if (deliveryNoteValue.includes("delivery charge")) {
+            data['delivery_charges'] = DELIVERY_CHARGES;
+        }
         // Add the document to Firestore
         addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)), data)
             .then(docRef => {

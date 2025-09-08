@@ -111,6 +111,7 @@ function createOrderElement(order, order_id) {
     orderElement.classList.add('order-container');
 
     const orderDetails = order.order_details;
+    const deliveryCharges = order.delivery_charges;
     const orderTime = formatDate(orderDetails.created_at.seconds);
 
     orderElement.innerHTML = `
@@ -124,11 +125,19 @@ function createOrderElement(order, order_id) {
                 <h3>${cat.category.name}</h3>
                 ${cat.category.dish_details.map(dish => `
                     <div class="dish-item">
-                        <span class="dish-name">${dish.name}</span>
+                        <span class="dish-name">
+                            ${dish.type === "NonVeg" ? dish.name + " (Non-Veg)" : dish.name}
+                        </span>
                         <span>₹${dish.price} x ${dish.quantity}</span>
                     </div>
                 `).join('')}
             `).join('')}
+            ${orderDetails.delivery_charges
+                ? `<div class="dish-item">
+                       <span class="dish-name">Delivery Charges</span>
+                       <span>₹${orderDetails.delivery_charges}</span>
+                   </div>`
+            : ''}
             <div class="icons">
                 <i class="fas fa-trash delete-icon"></i>
                 <i class="fas fa-eye preview-icon"></i>

@@ -497,14 +497,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const disableItemsEqual =
             updated_disable_items.every(element => window.doc_disable_item_ids.includes(element)) &&
             window.doc_disable_item_ids.every(element => updated_disable_items.includes(element));
-        console.log("localWhatsapp", localWhatsapp);
-        console.log("docWhatsapp", docWhatsapp);
-        console.log("localShopStatus", localShopStatus);
-        console.log("docShopStatus", docShopStatus);
-        console.log("localOpenTime", localOpenTime);
-        console.log("docOpenTime", docOpenTime);
-        console.log("localCloseTime", localCloseTime);
-        console.log("docCloseTime", docCloseTime);
         // Compare all values
         if (
             disableItemsEqual &&
@@ -662,6 +654,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <li>${dish.quantity} x ${dish.name} - ₹${(dish.price * dish.quantity).toFixed(2)}</li>
                                 `).join('')}
                             `).join('')}
+                            ${orderDetails.delivery_charges && orderDetails.delivery_charges > 0
+                            ? `<li style="color: red; font-weight: 600;">Delivery Charges - ₹${orderDetails.delivery_charges.toFixed(2)}</li>`
+                            : ''}
                         </ul>
                         <div class="order-actions" style="display: flex; justify-content: space-between; margin-top: 10px;">
                             <button class="cross-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" data-action="cross">

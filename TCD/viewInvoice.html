@@ -57,7 +57,7 @@
         const date = new Date(createdAtSeconds * 1000);
         const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
         document.getElementById('billDate').textContent = `Date: ${formattedDate}`;
-
+        const deliveryCharges = order.order_details.delivery_charges;
         // Build the bill content
         order.order_details.order_details.forEach(cat => {
             const liCategory = document.createElement('li');
@@ -68,12 +68,19 @@
             cat.category.dish_details.forEach(dish => {
                 const liDish = document.createElement('li');
                 liDish.classList.add('bill-item');
-                liDish.textContent = `${dish.quantity} x ${dish.name} - ₹${(dish.price * dish.quantity).toFixed(2)}`;
+                liDish.textContent = `${dish.quantity} x ${dish.name}${dish.type === "NonVeg" ? " (Non-Veg)" : ""} - ₹${(dish.price * dish.quantity).toFixed(2)}`;
                 billItemsElement.appendChild(liDish);
                 total += dish.price * dish.quantity; // Calculate total
             });
         });
-
+        if (order.order_details.delivery_charges && order.order_details.delivery_charges > 0) {
+            const liDelivery = document.createElement('li');
+            liDelivery.classList.add('bill-item', 'delivery-charge');
+            liDelivery.textContent = `Delivery Charges - ₹${order.order_details.delivery_charges.toFixed(2)}`;
+            liDelivery.style.color = 'red'; // Optional: highlight delivery charges
+            billItemsElement.appendChild(liDelivery);
+            total += order.order_details.delivery_charges; // Include in total
+        }
         document.getElementById('billTotal').textContent = `Total: ₹${total.toFixed(2)}`;
     });
 

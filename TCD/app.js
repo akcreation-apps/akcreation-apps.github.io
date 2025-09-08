@@ -9,14 +9,14 @@ const searchBar = document.getElementById('searchBar');
 const clearSearchButton = document.getElementById('clearSearch');
 
 // Function to check if an item is in the cart
-const isItemInCart = (categoryName, dishName) => {
+const isItemInCart = (categoryName, dishId) => {
     if (cart && Array.isArray(cart)) {
             // Find the category in the cart
         const categoryInCart = cart.find(item => item.category.name === categoryName);
 
         // If the category exists, check for the dish in that category
         if (categoryInCart) {
-            const dishInCart = categoryInCart.category.dish_details.find(dishItem => dishItem.name === dishName);
+            const dishInCart = categoryInCart.category.dish_details.find(dishItem => dishItem.id === dishId);
             return !!dishInCart; // Return true if dish is found, otherwise false
         }
     }
@@ -60,11 +60,11 @@ const addToCart = (dishCategory, dishObject, button) => {
         let dishPrice = dishObject.price;
         let src = dishObject.image_url;
         // Check if the category already exists in the cart
-        let existingCategoryItem = cart.find(item => item.category.name === dishCategory);
+        let existingCategoryItem = cart.find(item => item.category.name === dishCategory.name);
 
         if (existingCategoryItem) {
             // Category exists, now check if the dish exists within that category
-            let existingDish = existingCategoryItem.category.dish_details.find(dish => dish.name === dishName);
+            let existingDish = existingCategoryItem.category.dish_details.find(dish => dish.id === dishId);
     
             if (existingDish) {
                 // If the dish exists, increase the quantity
@@ -74,6 +74,7 @@ const addToCart = (dishCategory, dishObject, button) => {
                 existingCategoryItem.category.dish_details.push({
                     id: dishId,
                     name: dishName,
+                    type: dishCategory.type,
                     price: dishPrice,
                     quantity: 1,
                     image_src: src
@@ -83,11 +84,12 @@ const addToCart = (dishCategory, dishObject, button) => {
             // If the category doesn't exist, create a new category with the new dish
             cart.push({
                 category: {
-                    name: dishCategory,
+                    name: dishCategory.name,
                     dish_details: [
                         {
                             id: dishId,
                             name: dishName,
+                            type: dishCategory.type,
                             price: dishPrice,
                             quantity: 1,
                             image_src: src
@@ -103,9 +105,11 @@ const addToCart = (dishCategory, dishObject, button) => {
     }
     hideLoader();
 
+    button.style.background = "#28a745";  // green background
+    button.style.color = "#fff";
     // Change button text and style if item added for the first time
-    button.textContent = 'Go to Cart';
-    button.style.backgroundColor = 'green';
+//    button.textContent = 'Go to Cart';
+//    button.style.backgroundColor = 'green';
 
     // Add an event listener to navigate to the cart page on button click
     button.addEventListener('click', () => {
@@ -226,22 +230,28 @@ document.addEventListener('DOMContentLoaded', async() => {
 
                             const menuItem = document.createElement('div');
                             menuItem.classList.add('menu-item');
+                            menuItem.style.background = subcategory.type === "NonVeg" ? "#f1c2c2" : "#c2e6c2";
                             const url = get_dish_url(dish.name);
                             menuItem.innerHTML = `
-                                <div class="menu-item-container" style="text-align: center;">
-                                    <img src="${url}" alt="${dish.name}" style="width: 130px; height: 130px; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto 10px auto;">
-                                    <h5 style="margin-top: 10px;">${dish.name}</h5>
-                                    <p class="price">₹${dish.price.toFixed(2)}/-</p>
-                                    <button class="add-to-cart-btn" data-name="${dish.name}" data-price="${dish.price}">
-                                        ${isItemInCart(subcategory.name, dish.name) ? 'Go to Cart' : 'Add to Cart'}
-                                    </button>
-                                </div>
+                              <div class="menu-item-container">
+                                    <div class="dish-card">
+                                        <img src="${url}" alt="${dish.name}" class="dish-img">
+                                        <div class="dish-overlay">
+                                            <h5 class="dish-name">${dish.name}</h5>
+                                            <p class="price">₹${dish.price.toFixed(2)}/-</p>
+                                        </div>
+                                        <button class="add-to-cart-btn" data-name="${dish.name}" data-price="${dish.price}">
+                                            🛒
+                                        </button>
+                                    </div>
+                              </div>
+
                             `;
 
                             // Add event listener to "Add to Cart" button
                             const addToCartButton = menuItem.querySelector('.add-to-cart-btn');
 
-                            if (isItemInCart(subcategory.name, dish.name)) {
+                            if (isItemInCart(subcategory.name, dish.id)) {
                                 addToCartButton.classList.add('added-to-cart'); // Add class if item is in cart
                             }
 
@@ -251,17 +261,17 @@ document.addEventListener('DOMContentLoaded', async() => {
                                 // Check if the category exists in the cart
                                 if (categoryInCart) {
                                     // Check if the dish exists in that category
-                                    const existingDish = categoryInCart.category.dish_details.find(dishItem => dishItem.name === dish.name);
+                                    const existingDish = categoryInCart.category.dish_details.find(dishItem => dishItem.id === dish.id);
 
                                     if (existingDish) {
                                         // If the dish is already in the cart, go to cart
                                         window.location.href = 'cart.html';
                                     } else {
-                                        addToCart(subcategory.name, dish, addToCartButton);
+                                        addToCart(subcategory, dish, addToCartButton);
                                     }
                                 } else {
                                     // If the category doesn't exist, add a new category with the dish
-                                    addToCart(subcategory.name, dish, addToCartButton);
+                                    addToCart(subcategory, dish, addToCartButton);
                                 }
                             });
 
@@ -335,6 +345,15 @@ function fetch_data(){
                     }
                     if (doc.data().disabled_items !== undefined) {
                         localStorage.setItem('disable_item_ids', doc.data().disabled_items);
+                    }
+                    if (doc.data().shop_status !== undefined) {
+                        localStorage.setItem('shop_status', doc.data().shop_status);
+                    }
+                    if (doc.data().opening_time !== undefined) {
+                        localStorage.setItem('opening_time', doc.data().opening_time);
+                    }
+                    if (doc.data().closing_time !== undefined) {
+                        localStorage.setItem('closing_time', doc.data().closing_time);
                     }
                 });
                
