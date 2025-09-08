@@ -105,7 +105,7 @@ const addToCart = (dishCategory, dishObject, button) => {
     }
     hideLoader();
 
-    button.style.background = "#28a745";  // green background
+    button.style.background = "#ff7043";  // green background
     button.style.color = "#fff";
     // Change button text and style if item added for the first time
 //    button.textContent = 'Go to Cart';
