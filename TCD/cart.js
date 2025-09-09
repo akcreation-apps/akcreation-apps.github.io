@@ -185,6 +185,7 @@ function createOrderMessage(cartItems) {
             const dishId = dish.id; // Get the dish name
             const dishName = dish.type === "NonVeg" ? `${dish.name} (Non-Veg)` : dish.name; // Get the dish name
             const quantity = dish.quantity; // Get the quantity
+            const price = dish.price; // Get the price
 
             // Find if the dish already exists in this category
             const existingDish = categoryMap[categoryName].find(d => d.id === dishId);
@@ -194,7 +195,7 @@ function createOrderMessage(cartItems) {
                 existingDish.quantity += quantity;
             } else {
                 // If it doesn't exist, add it to the category
-                categoryMap[categoryName].push({ name: dishName, quantity: quantity });
+                categoryMap[categoryName].push({ name: dishName, quantity: quantity, price: price });
             }
         });
     });
@@ -204,7 +205,7 @@ function createOrderMessage(cartItems) {
         message += `*${category}:*\n`; // Add category header
 
         categoryMap[category].forEach(dish => {
-            message += `  - ${dish.name} (${dish.quantity}x)\n`; // List each dish under the category
+            message += `  - ${dish.name} (${dish.quantity}x) - ₹${dish.quantity*dish.price}/-\n`; // List each dish under the category
         });
 
         message += '\n'; // Add a new line after each category
