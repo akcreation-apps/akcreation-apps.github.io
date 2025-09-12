@@ -56,9 +56,9 @@
           "name": "MainCourse",
           "type": "Veg",
           "dishes": [
-            { "id": 301, "name": "Hakka Noodles", "price": 110 },
-            { "id": 302, "name": "Sezwan Noodles", "price": 110 },
-            { "id": 303, "name": "Singapore Noodles", "price": 110 },
+            { "id": 301, "name": "Hakka Noodles", "price": 129 },
+            { "id": 302, "name": "Sezwan Noodles", "price": 129 },
+            { "id": 303, "name": "Singapore Noodles", "price": 129 },
             { "id": 304, "name": "Sezwan Fried Rice", "price": 119 },
             { "id": 305, "name": "Paneer Fried Rice", "price": 129 },
             { "id": 306, "name": "Kaju Fried Rice", "price": 139 },
@@ -69,8 +69,8 @@
           "name": "MainCourse",
           "type": "NonVeg",
           "dishes": [
-            { "id": 401, "name": "Chicken Hakka Noodles", "price": 120 },
-            { "id": 402, "name": "Chicken Sezwan Noodles", "price": 120 },
+            { "id": 401, "name": "Chicken Hakka Noodles", "price": 149 },
+            { "id": 402, "name": "Chicken Sezwan Noodles", "price": 149 },
             { "id": 403, "name": "Egg Fried Rice", "price": 129 },
             { "id": 404, "name": "Chicken Sezwan Fried Rice", "price": 129 },
             { "id": 405, "name": "Chicken Fried Rice", "price": 129 },
