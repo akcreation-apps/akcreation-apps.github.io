@@ -11,6 +11,7 @@ window.doc_whatsapp_no = '';
 window.doc_disable_item_ids = '';
 window.verify_number = verify_number;
 window.save_changes = save_changes;
+window.reset_changes = reset_changes;
 window.toggleShopStatus = toggleShopStatus;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -507,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ) {
             savedContainer.style.display = 'none'; // No changes
         } else {
-            savedContainer.style.display = 'inline-grid'; // Show Save Changes
+            savedContainer.style.display = 'block'; // Show Save Changes
         }
     }
 
@@ -844,6 +845,22 @@ async function save_changes() {
             location.reload(); // Reload the page to prompt for the password again
          });
     }
+}
+
+async function reset_changes() {
+    localStorage.removeItem('shop_status');
+    localStorage.removeItem('opening_time');
+    localStorage.removeItem('closing_time');
+    localStorage.removeItem('disable_item_ids');
+    localStorage.removeItem('whatsapp_no');
+    Swal.fire({
+        title: 'Success',
+        text: 'Changes Reset Successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+    }).then((result) => {
+        location.reload(); // Reload the page to prompt for the password again
+    });
 }
 
 // Function to create charts based on data with filters

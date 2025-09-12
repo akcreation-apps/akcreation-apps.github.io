@@ -139,10 +139,10 @@ h2 {
 }
 
 #submitButton {
-     background-color: #4a90e2;
+    background-color: #4a90e2;
     color: white;
     border: none;
-    padding: 10px 15px; /* Add horizontal padding */
+    padding: 10px 10px; /* Add horizontal padding */
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem; /* Responsive font size */
@@ -150,6 +150,21 @@ h2 {
 }
 
 #submitButton:hover {
+    background-color: #357abd; /* Darker blue on hover */
+}
+
+#resetButton {
+    background-color: #e2754a;
+    color: white;
+    border: none;
+    padding: 10px 10px; /* Add horizontal padding */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem; /* Responsive font size */
+    transition: background-color 0.3s; /* Transition for hover effect */
+}
+
+#resetButton:hover {
     background-color: #357abd; /* Darker blue on hover */
 }
 
@@ -425,12 +440,11 @@ input:checked + .slider:before {
 
 /* Save container */
 .save-container {
-    display: inline-grid;
     background-color: #ffd1d1; /* White background for a clean look */
+    gap: 14px;
     align-items: center; /* Center items vertically */
     margin: 20px 10px; /* Margin above and below */
     padding: 15px 15px; /* Add padding around the container */
-    padding-top: 0px;
     border-radius: 25px; /* Rounded corners for a modern look */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
     position: relative; /* Set position to relative for positioning the clear icon */
