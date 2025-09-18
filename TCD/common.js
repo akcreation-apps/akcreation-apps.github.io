@@ -1,6 +1,6 @@
 function get_dish_url(dish_name) {
     // Split the string into words by spaces, then join with an underscore
-    return '../food_order_src/'+dish_name.split(' ').join('_')+'.png';
+    return '../food_src/'+dish_name.split(' ').join('_')+'.webp';
 }
 
 async function get_credentials() {
