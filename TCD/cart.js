@@ -166,7 +166,15 @@ function getCartItems() {
 
 // Function to create the order message string
 function createOrderMessage(cartItems) {
+    const now = new Date();
+    const orderId =
+      now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0') +
+      now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0');
     let message = "Hello, I would like to place an order for the following items:\n\n";
+    message += "Ordered ID: "+orderId+"\n\n";
     message += "Ordered Items:\n\n";
 
     // Create an object to group items by category
