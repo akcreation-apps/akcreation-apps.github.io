@@ -508,7 +508,7 @@ display: block;
 .hero {
     position: relative;
     min-height: auto; /* Will fit content but expand to full viewport height if needed */
-    background: url('../food_order_src/hero-background.png') center center/cover no-repeat;
+    background: url('../food_src/hero-background.png') center center/cover no-repeat;
     display: flex;
     align-items: center;    /* Vertically center */
     justify-content: center; /* Horizontally center */
