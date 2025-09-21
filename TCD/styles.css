@@ -385,19 +385,53 @@ h1 {
 
 #place-order-btn {
     margin-top: 20px;
-    background-color: #28a745;
+    background-color: #2e7d32; /* professional deep green */
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 10px 20px;
     cursor: pointer;
-    font-size: 18px;
-    transition: background-color 0.2s;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+#place-order-btn img {
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+#place-order-btn .btn-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+#place-order-btn .main-text {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+#place-order-btn .sub-text {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.85;
 }
 
 #place-order-btn:hover {
-    background-color: #218838;
+    background-color: #256629; /* slightly darker green */
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
+
 
 /* Filter Container */
 .filter-container {
