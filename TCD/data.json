@@ -341,10 +341,11 @@
           "name": "Biryani",
           "type": "NonVeg",
           "dishes": [
-            { "id": 2801, "name": "Chicken Biryani (Mini)", "price": 109 },
-            { "id": 2802, "name": "Chicken Biryani (Half)", "price": 149 },
-            { "id": 2803, "name": "Chicken Biryani (Full)", "price": 219 },
-            { "id": 2804, "name": "Mutton Biryani", "price": 219 }
+            { "id": 2801, "name": "Chicken Biryani (2pc)", "price": 109 },
+            { "id": 2802, "name": "Chicken Biryani (3pc)", "price": 149 },
+            { "id": 2803, "name": "Chicken Biryani (5pc)", "price": 219 },
+            { "id": 2804, "name": "Mutton Biryani (4pc)", "price": 219 },
+            { "id": 2804, "name": "Mutton Biryani (6pc)", "price": 329 }
           ]
         },
         {
