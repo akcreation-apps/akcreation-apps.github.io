@@ -1,42 +1,42 @@
 const menuData = [
   {
-    "category": "MAGGIE MANIA BITES",
+    "category": "CHINESE ZONE",
     "items": [
-      { "name": "Classic Masala Maggie", "price": "₹50" },
-      { "name": "Cheese Brust Maggie", "price": "₹60" },
-      { "name": "Veggies Delight Maggie", "price": "₹60" },
-      { "name": "Paneer Maggie", "price": "₹70" },
-      { "name": "Egg Bhurji Maggie", "price": "₹60" },
-      { "name": "Chicken Cheesy Maggie", "price": "₹70" }
+      { "name": "Steam Rice", "price": "₹40" },
+      { "name": "Veg Manchurian", "price": "₹60" },
+      { "name": "Veg Fried Rice", "price": "₹60" },
+      { "name": "Egg Fried Rice", "price": "₹70" },
+      { "name": "Egg Chicken Fried Rice", "price": "₹80" },
+      { "name": "Veg Hakka Noodles", "price": "₹70" },
+      { "name": "Egg Chicken Noodles", "price": "₹80" },
+      { "name": "Veg (Chilli/Manchurian)", "price": "₹70" },
+      { "name": "Egg (Chilli/Manchurian/65)", "price": "₹70" },
+      { "name": "Paneer (Chilli/Manchurian/65)", "price": "₹100" },
+      { "name": "Mushroom (Chilli/Manchurian/65)", "price": "₹100" },
+      { "name": "Chicken (Chilli/Manchurian/65)", "price": "₹100" }
     ]
   },
   {
-    "category": "SANDWICH",
+    "category": "QUICK BITES",
     "items": [
-      { "name": "Street Style Veggies Mayo Grill", "price": "₹60" },
-      { "name": "Corny Cheese Griller", "price": "₹70" },
-      { "name": "Spicy Peri Paneer Melt", "price": "₹70" },
-      { "name": "Chutney Chicken Mayo Grill", "price": "₹60" },
-      { "name": "Spicy Chicken Melt", "price": "₹70" },
-      { "name": "Spicy Flame Chicken Grill", "price": "₹70" }
+      { "name": "Egg Bread Omlet", "price": "₹60" },
+      { "name": "American Corn", "price": "₹50" },
+      { "name": "Veg Hot Dog", "price": "₹60" },
+      { "name": "Paneer Hot Dog", "price": "₹70" },
+      { "name": "Chicken Hot Dog", "price": "₹70" },
+      { "name": "Paneer Roll", "price": "₹60" },
+      { "name": "Mushroom Roll", "price": "₹70" },
+      { "name": "Single Egg Chicken Roll", "price": "₹70" },
+      { "name": "Double Egg Chicken Roll", "price": "₹80" }
     ]
   },
   {
-    "category": "MIGHTY BITES",
+    "category": "BEVERAGES",
     "items": [
-      { "name": "Veggie Supreme Burger", "price": "₹50" },
-      { "name": "Double Trouble Burger", "price": "₹60" },
-      { "name": "Classic Cheese Burger", "price": "₹50" },
-      { "name": "Egg & Cheese Burger", "price": "₹60" },
-      { "name": "Crispy Chicken Burger", "price": "₹70" },
-    ]
-  },
-  {
-    "category": "THE CHILL SIP",
-    "items": [
-      { "name": "Masala Colddrinks", "price": "₹35" },
-      { "name": "Lime Soda", "price": "₹35" },
-      { "name": "Blue Curacao", "price": "₹60" },
+      { "name": "Cold Coffee", "price": "₹40" },
+      { "name": "Masala Colddrinks", "price": "₹40" },
+      { "name": "Lime Soda", "price": "₹40" },
+      { "name": "Blue Lagoon", "price": "₹60" },
       { "name": "Virgin Mojito", "price": "₹60" },
       { "name": "Red Cinderella", "price": "₹60" },
       { "name": "Litchy Sky", "price": "₹70" },
@@ -45,22 +45,91 @@ const menuData = [
     ]
   },
   {
-    "category": "TEA/COFFEE",
+    "category": "PIZZA MANIA",
     "items": [
-      { "name": "Adrak Tea", "price": "₹10" },
-      { "name": "Adrak Elaichi Tea", "price": "₹15" },
-      { "name": "Coffee", "price": "₹20" },
-      { "name": "Black Coffee", "price": "₹20" },
-      { "name": "Cold Coffee", "price": "₹30" }
+      { "name": "Margarita Pizza (Medium)", "price": "₹70" },
+      { "name": "Veg Maxican Pizza (Medium)", "price": "₹80" },
+      { "name": "Farmhouse Pizza (Medium)", "price": "₹80" },
+      { "name": "Chicken Pizza (Medium)", "price": "₹100" },
+      { "name": "Margarita Pizza (Large)", "price": "₹80" },
+      { "name": "Veg Maxican Pizza (Large)", "price": "₹100" },
+      { "name": "Farmhouse Pizza (Large)", "price": "₹100" },
+      { "name": "Chicken Pizza (Large)", "price": "₹120" },
     ]
   },
   {
-    "category": "PASTA PERFECTION",
+    "category": "SANDWICH",
     "items": [
-      { "name": "Cheesy Garden Pasta", "price": "₹60" },
-      { "name": "Tangy Tomato Twist", "price": "₹70" },
-      { "name": "Creamy Garlic Chicken", "price": "₹70" },
-      { "name": "Tomato Glazed Chicken", "price": "₹70" }
+      { "name": "Veggies Mayo Sandwich", "price": "₹60" },
+      { "name": "Corny Cheese Sandwich", "price": "₹60" },
+      { "name": "Paneer Sandwich", "price": "₹70" },
+      { "name": "Chicken Sandwich", "price": "₹70" },
+      { "name": "Veggies Foodelo Club Sandwich", "price": "₹80" },
+      { "name": "Chicken Foodelo Club Sandwich", "price": "₹90" }
+    ]
+  },
+  {
+    "category": "REFRESHERS",
+    "items": [
+      { "name": "Adrak Tea", "price": "₹10" },
+      { "name": "Coffee", "price": "₹20" },
+      { "name": "Black Coffee", "price": "₹20" },
+      { "name": "Cold Coffee", "price": "₹40" },
+      { "name": "Veg Soup (Manchow/Hot N Sour)", "price": "₹40" },
+      { "name": "Chicken Soup (Manchow/Hot N Sour)", "price": "₹50" },
+    ]
+  },
+  {
+    "category": "MAGGIE MANIA BITES",
+    "items": [
+      { "name": "Classic Masala Maggie", "price": "₹50" },
+      { "name": "Veggies Delight Maggie", "price": "₹60" },
+      { "name": "Egg Bhurji Maggie", "price": "₹60" },
+      { "name": "Paneer Maggie", "price": "₹70" },
+      { "name": "Chicken Cheesy Maggie", "price": "₹70" }
+    ]
+  },
+  {
+    "category": "NORTH INDIAN TADKA",
+    "items": [
+      { "name": "Lachha Paratha", "price": "₹20" },
+      { "name": "Egg Curry/Masala", "price": "₹70" },
+      { "name": "Paneer Butter/Kadai/Masala", "price": "₹90" },
+      { "name": "Mushroom Butter/Kadai/Masala", "price": "₹90" },
+      { "name": "Chicken Butter/Kadai/Masala", "price": "₹100" },
+      { "name": "Paneer Biryani", "price": "₹120" },
+      { "name": "Chicken Biryani", "price": "₹120" },
+    ]
+  },
+  {
+    "category": "MOMO STATION",
+    "items": [
+      { "name": "Veg (6pc Steamed Momo)", "price": "₹50" },
+      { "name": "Veg (6pc Fried Momo)", "price": "₹60" },
+      { "name": "Paneer (6PCS Steamed Momo)", "price": "₹60" },
+      { "name": "Paneer (6pc Fried Momo)", "price": "₹70" },
+      { "name": "Chicken (6PCS Steamed Momo)", "price": "₹60" },
+      { "name": "Chicken (6pc Fried Momo)", "price": "₹70" }
+    ]
+  },
+  {
+    "category": "COMBOS",
+    "items": [
+      { "name": "Veg Fried Rice + Paneer/Mushroom Chilly + Onion Salad", "price": "₹110" },
+      { "name": "Egg Chicken Fried Rice + Chilly Chicken(3pc) + Onion Salad", "price": "₹110" },
+      { "name": "Veg Burger + French Fries + Colddrinks", "price": "₹110" },
+      { "name": "Chicken Burger + French Fries + Colddrinks", "price": "₹110" }
+    ]
+  },
+  {
+    "category": "BULKY BITES",
+    "items": [
+      { "name": "Veg Burger", "price": "₹60" },
+      { "name": "Paneer Burger", "price": "₹70" },
+      { "name": "Chicken Burger", "price": "₹70" },
+      { "name": "Veg Cheese Pasta", "price": "₹70" },
+      { "name": "Chicken Creamy Pasta", "price": "₹70" }
+
     ]
   },
   {
@@ -68,76 +137,6 @@ const menuData = [
     "items": [
       { "name": "Veggie Mexican Salad", "price": "₹60" },
       { "name": "Chicken Loaded Salad", "price": "₹70" }
-    ]
-  },
-  {
-    "category": "CRISPY PETTIS BITES",
-    "items": [
-      { "name": "Mix Veg Pettis", "price": "₹50" },
-      { "name": "Paneer Masala Pettis", "price": "₹60" },
-      { "name": "Chatpatta Chicken Pettis", "price": "₹60" }
-    ]
-  },
-  {
-    "category": "FOODELO MOMO STATION (5PCS)",
-    "items": [
-      { "name": "Veg Steamed Momo", "price": "₹50" },
-      { "name": "Paneer/Cron-Cheese/Chicken (Steamed Momo)", "price": "₹60" },
-      { "name": "Veg Fried Momo", "price": "₹60" },
-      { "name": "Paneer/Cron-Cheese/Chicken (Fried Momo)", "price": "₹70" },
-      { "name": "Veg Chilli Momo", "price": "₹60" },
-      { "name": "Paneer/Cron-Cheese/Chicken (Chilli Momo)", "price": "₹70" },
-      { "name": "Veg Schezwan Momo", "price": "₹60" },
-      { "name": "Paneer/Cron-Cheese/Chicken (Schezwan Momo)", "price": "₹70" },
-    ]
-  },
-  {
-    "category": "COMBOS",
-    "items": [
-      { "name": "Chole+Bhatura(2pc)+Onion Salad", "price": "₹70" },
-      { "name": "Pav(2Pc)+Bhaji+Onion Salad", "price": "₹70" },
-      { "name": "Veg Fried Rice+Paneer/Mushroom(3pc)+Onion Salad", "price": "₹110" },
-      { "name": "Egg Chicken Fried Rice+Chilly Chicken(3pc)+Onion Salad", "price": "₹110" },
-      { "name": "Veg Burger+French Fries+Colddrinks", "price": "₹110" },
-      { "name": "Cheese Burger+French Fries+Colddrinks", "price": "₹110" },
-      { "name": "Chicken Burger+French Fries+Colddrinks", "price": "₹110" }
-    ]
-  },
-  {
-    "category": "SMALL BITES",
-    "items": [
-      { "name": "Bread Omlet Single Egg", "price": "₹50" },
-      { "name": "Bread Omlet Double Egg", "price": "₹60" },
-      { "name": "Veg Chop (2pc)", "price": "₹40" },
-      { "name": "Beetroot Cutlet (2pc)", "price": "₹50" },
-      { "name": "Pure Cheese Ball (2pc)", "price": "₹40" },
-      { "name": "Paneer Popcorn (5pc)", "price": "₹50" },
-      { "name": "Paneer Stick (2pc)", "price": "₹50" },
-      { "name": "Chicken Popcorn (5pc)", "price": "₹60" },
-      { "name": "Chicken Stick (2pc)", "price": "₹60" },
-      { "name": "Chicken Nuggets (5pc)", "price": "₹60" }
-    ]
-  },
-  {
-    "category": "SOMETHING MORE",
-    "items": [
-      { "name": "Veg Fried Rice", "price": "₹60" },
-      { "name": "Egg Fried Rice", "price": "₹70" },
-      { "name": "Egg Chicken Fried Rice", "price": "₹80" },
-      { "name": "Veg Noodles", "price": "₹50" },
-      { "name": "Egg Noodles", "price": "₹60" },
-      { "name": "Double Egg Chicken Noodles", "price": "₹70" },
-      { "name": "Paneer (Chilli/Manchurian)", "price": "₹80" },
-      { "name": "Mushroom (Chilli/Manchurian)", "price": "₹80" },
-      { "name": "Chicken (Chilli/Manchurian)", "price": "₹80" }
-    ]
-  },
-  {
-    "category": "FRENCH FRIES",
-    "items": [
-      { "name": "Plain", "price": "₹40" },
-      { "name": "Peri Peri", "price": "₹40" },
-      { "name": "Cheese Baked", "price": "₹50" }
     ]
   },
 ];

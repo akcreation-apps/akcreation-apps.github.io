@@ -56,7 +56,7 @@ body {
 }
 
 .menu-list {
-    width: 100%;
+    hight: 100%;
 }
 
 .menu-item {
@@ -66,7 +66,7 @@ body {
     margin-bottom: 5px;
     padding: 5px 10px;
     border-radius: 5px;
-    font-size: 1vw;
+    font-size: 2vw;
 }
 
 .price-badge {
@@ -75,7 +75,7 @@ body {
     font-weight: bold;
     padding: 2px 6px;
     border-radius: 4px;
-    font-size: 0.9vw;
+    font-size: 1.9vw;
 }
 
 @media print {
