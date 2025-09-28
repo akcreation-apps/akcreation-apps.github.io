@@ -3,7 +3,6 @@ const menuData = [
     "category": "CHINESE ZONE",
     "items": [
       { "name": "Steam Rice", "price": "₹40" },
-      { "name": "Veg Manchurian", "price": "₹60" },
       { "name": "Veg Fried Rice", "price": "₹60" },
       { "name": "Egg Fried Rice", "price": "₹70" },
       { "name": "Egg Chicken Fried Rice", "price": "₹80" },
@@ -11,9 +10,9 @@ const menuData = [
       { "name": "Egg Chicken Noodles", "price": "₹80" },
       { "name": "Veg (Chilli/Manchurian)", "price": "₹70" },
       { "name": "Egg (Chilli/Manchurian/65)", "price": "₹70" },
-      { "name": "Paneer (Chilli/Manchurian/65)", "price": "₹100" },
-      { "name": "Mushroom (Chilli/Manchurian/65)", "price": "₹100" },
-      { "name": "Chicken (Chilli/Manchurian/65)", "price": "₹100" }
+      { "name": "Paneer (Chilli/Manchurian/65)", "price": "₹90" },
+      { "name": "Mushroom (Chilli/Manchurian/65)", "price": "₹90" },
+      { "name": "Chicken (Chilli/Manchurian/65)", "price": "₹90" }
     ]
   },
   {
@@ -24,7 +23,7 @@ const menuData = [
       { "name": "Veg Hot Dog", "price": "₹60" },
       { "name": "Paneer Hot Dog", "price": "₹70" },
       { "name": "Chicken Hot Dog", "price": "₹70" },
-      { "name": "Paneer Roll", "price": "₹60" },
+      { "name": "Paneer Roll", "price": "₹70" },
       { "name": "Mushroom Roll", "price": "₹70" },
       { "name": "Single Egg Chicken Roll", "price": "₹70" },
       { "name": "Double Egg Chicken Roll", "price": "₹80" }
@@ -45,27 +44,16 @@ const menuData = [
     ]
   },
   {
-    "category": "PIZZA MANIA",
+    "category": "NORTH INDIAN TADKA",
     "items": [
-      { "name": "Margarita Pizza (Medium)", "price": "₹70" },
-      { "name": "Veg Maxican Pizza (Medium)", "price": "₹80" },
-      { "name": "Farmhouse Pizza (Medium)", "price": "₹80" },
-      { "name": "Chicken Pizza (Medium)", "price": "₹100" },
-      { "name": "Margarita Pizza (Large)", "price": "₹80" },
-      { "name": "Veg Maxican Pizza (Large)", "price": "₹100" },
-      { "name": "Farmhouse Pizza (Large)", "price": "₹100" },
-      { "name": "Chicken Pizza (Large)", "price": "₹120" },
-    ]
-  },
-  {
-    "category": "SANDWICH",
-    "items": [
-      { "name": "Veggies Mayo Sandwich", "price": "₹60" },
-      { "name": "Corny Cheese Sandwich", "price": "₹60" },
-      { "name": "Paneer Sandwich", "price": "₹70" },
-      { "name": "Chicken Sandwich", "price": "₹70" },
-      { "name": "Veggies Foodelo Club Sandwich", "price": "₹80" },
-      { "name": "Chicken Foodelo Club Sandwich", "price": "₹90" }
+      { "name": "Lachha Paratha", "price": "₹20" },
+      { "name": "Egg Curry/Masala", "price": "₹70" },
+      { "name": "Paneer Butter/Kadai/Masala", "price": "₹100" },
+      { "name": "Mushroom Butter/Kadai/Masala", "price": "₹100" },
+      { "name": "Chicken Butter/Kadai/Masala", "price": "₹100" },
+      { "name": "Chicken Muglai", "price": "₹110" },
+      { "name": "Paneer Biryani", "price": "₹120" },
+      { "name": "Chicken Biryani", "price": "₹120" },
     ]
   },
   {
@@ -80,45 +68,24 @@ const menuData = [
     ]
   },
   {
+    "category": "SANDWICH",
+    "items": [
+      { "name": "Veggies Mayo Sandwich", "price": "₹60" },
+      { "name": "Corny Cheese Sandwich", "price": "₹60" },
+      { "name": "Paneer Sandwich", "price": "₹70" },
+      { "name": "Chicken Sandwich", "price": "₹70" },
+      { "name": "Veggies Foodelo Club Sandwich", "price": "₹80" },
+      { "name": "Chicken Foodelo Club Sandwich", "price": "₹90" }
+    ]
+  },
+  {
     "category": "MAGGIE MANIA BITES",
     "items": [
       { "name": "Classic Masala Maggie", "price": "₹50" },
       { "name": "Veggies Delight Maggie", "price": "₹60" },
       { "name": "Egg Bhurji Maggie", "price": "₹60" },
       { "name": "Paneer Maggie", "price": "₹70" },
-      { "name": "Chicken Cheesy Maggie", "price": "₹70" }
-    ]
-  },
-  {
-    "category": "NORTH INDIAN TADKA",
-    "items": [
-      { "name": "Lachha Paratha", "price": "₹20" },
-      { "name": "Egg Curry/Masala", "price": "₹70" },
-      { "name": "Paneer Butter/Kadai/Masala", "price": "₹90" },
-      { "name": "Mushroom Butter/Kadai/Masala", "price": "₹90" },
-      { "name": "Chicken Butter/Kadai/Masala", "price": "₹100" },
-      { "name": "Paneer Biryani", "price": "₹120" },
-      { "name": "Chicken Biryani", "price": "₹120" },
-    ]
-  },
-  {
-    "category": "MOMO STATION",
-    "items": [
-      { "name": "Veg (6pc Steamed Momo)", "price": "₹50" },
-      { "name": "Veg (6pc Fried Momo)", "price": "₹60" },
-      { "name": "Paneer (6PCS Steamed Momo)", "price": "₹60" },
-      { "name": "Paneer (6pc Fried Momo)", "price": "₹70" },
-      { "name": "Chicken (6PCS Steamed Momo)", "price": "₹60" },
-      { "name": "Chicken (6pc Fried Momo)", "price": "₹70" }
-    ]
-  },
-  {
-    "category": "COMBOS",
-    "items": [
-      { "name": "Veg Fried Rice + Paneer/Mushroom Chilly + Onion Salad", "price": "₹110" },
-      { "name": "Egg Chicken Fried Rice + Chilly Chicken(3pc) + Onion Salad", "price": "₹110" },
-      { "name": "Veg Burger + French Fries + Colddrinks", "price": "₹110" },
-      { "name": "Chicken Burger + French Fries + Colddrinks", "price": "₹110" }
+      { "name": "Chicken Maggie", "price": "₹70" }
     ]
   },
   {
@@ -127,9 +94,35 @@ const menuData = [
       { "name": "Veg Burger", "price": "₹60" },
       { "name": "Paneer Burger", "price": "₹70" },
       { "name": "Chicken Burger", "price": "₹70" },
-      { "name": "Veg Cheese Pasta", "price": "₹70" },
-      { "name": "Chicken Creamy Pasta", "price": "₹70" }
+      { "name": "Veg Classic Pasta", "price": "₹70" },
+      { "name": "Chicken Classic Pasta", "price": "₹70" }
 
+    ]
+  },
+  {
+    "category": "PIZZA MANIA",
+    "items": [
+      { "name": "Margarita Pizza", "price": "₹70" },
+      { "name": "Veg Maxican Pizza", "price": "₹80" },
+      { "name": "Farmhouse Pizza", "price": "₹80" },
+      { "name": "Chicken Pizza", "price": "₹100" }
+    ]
+  },
+  {
+    "category": "COMBOS",
+    "items": [
+      { "name": "Veg Burger + French Fries + Colddrinks", "price": "₹110" },
+      { "name": "Chicken Burger + French Fries + Colddrinks", "price": "₹110" },
+      { "name": "Veg Fried Rice + Paneer/Mushroom Chilly + Onion Salad", "price": "₹130" },
+      { "name": "Egg Chicken Fried Rice + Chilly Chicken(3pc) + Onion Salad", "price": "₹130" }
+    ]
+  },
+  {
+    "category": "MOMO STATION",
+    "items": [
+      { "name": "Veg (6pc Steamed Momo)", "price": "₹50" },
+      { "name": "Paneer (6PCS Steamed Momo)", "price": "₹60" },
+      { "name": "Chicken (6PCS Steamed Momo)", "price": "₹60" },
     ]
   },
   {
