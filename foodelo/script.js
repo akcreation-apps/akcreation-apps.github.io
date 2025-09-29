@@ -79,7 +79,7 @@ const menuData = [
     ]
   },
   {
-    "category": "MAGGIE MANIA BITES",
+    "category": "MAGGIE SWAGGY",
     "items": [
       { "name": "Classic Masala Maggie", "price": "₹50" },
       { "name": "Veggies Delight Maggie", "price": "₹60" },
