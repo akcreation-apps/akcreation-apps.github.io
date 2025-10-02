@@ -91,11 +91,12 @@ const menuData = [
   {
     "category": "BULKY BITES",
     "items": [
-      { "name": "Veg Burger", "price": "₹60" },
+      { "name": "Veg Burger", "price": "₹50" },
+      { "name": "Aloo Tikki Burger", "price": "₹60" },
       { "name": "Paneer Burger", "price": "₹70" },
       { "name": "Chicken Burger", "price": "₹70" },
       { "name": "Veg Classic Pasta", "price": "₹70" },
-      { "name": "Chicken Classic Pasta", "price": "₹70" }
+      { "name": "Chicken Classic Pasta", "price": "₹80" }
 
     ]
   },
@@ -128,7 +129,7 @@ const menuData = [
   {
     "category": "SALAD BAR",
     "items": [
-      { "name": "Veggie Mexican Salad", "price": "₹60" },
+      { "name": "Protein Salad", "price": "₹60" },
       { "name": "Chicken Loaded Salad", "price": "₹70" }
     ]
   },
