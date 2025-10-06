@@ -18,6 +18,8 @@ const menuData = [
   {
     "category": "QUICK BITES",
     "items": [
+      { "name": "French Fries", "price": "₹40" },
+      { "name": "Peri Peri French Fries", "price": "₹50" },
       { "name": "Egg Bread Omlet", "price": "₹60" },
       { "name": "American Corn", "price": "₹50" },
       { "name": "Veg Hot Dog", "price": "₹60" },
