@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Millets are the Future of Healthy Eating | DEBAHARI ENTERPRISE</title>
+    <link href="https://fonts.googleapis.com/css?family=Philosopher" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav>
+    <div class="nav-wrap">
+        <div class="brand">
+            <div class="logo">DEBAHARI</div>
+            <div class="tag">Enterprise Pvt. Ltd.</div>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="index.html#products">Products</a>
+            <a href="index.html#contact">Contact</a>
+            <a href="index.html#blog">Blog</a>
+        </div>
+        <div class="nav-toggle" id="navToggle">☰</div>
+    </div>
+</nav>
+
+<main>
+    <h1>Why Millets are the Future of Healthy Eating</h1>
+    <p>Millets are ancient grains that are highly nutritious, gluten-free, and easy to digest. Rich in protein, fiber, and essential minerals, they are becoming the preferred choice for
+        health-conscious consumers worldwide.</p>
+    <p>Beyond health benefits, millets are environmentally sustainable, requiring less water and fewer chemical inputs than traditional cereal crops. This makes them not only a superfood for people
+        but also a friend to the planet.</p>
+    <p>Globally, demand for millets is increasing rapidly, opening new export opportunities for Indian farmers and agro-exporters.</p>
+</main>
+<script>
+    // mobile nav toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    navToggle.addEventListener('click', ()=>{
+      if(navLinks.classList.contains('mobile')) navLinks.classList.remove('mobile');
+      else navLinks.classList.add('mobile');
+    });
+    // JS to add class on scroll
+window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if(window.scrollY > 50){
+        nav.classList.add('scrolled');
+    } else {
+        nav.classList.remove('scrolled');
+    }
+});
+
+    // close mobile menu on link click
+    document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>navLinks.classList.remove('mobile')));
+</script>
+<footer>
+    © 2025 DEBAHARI ENTERPRISE PVT. LTD. <br> All Rights Reserved
+</footer>
+
+</body>
+</html>
