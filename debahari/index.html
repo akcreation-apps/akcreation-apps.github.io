@@ -8,400 +8,7 @@
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-          font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-          color: #333;
-          background-color: #fafafa;
-          line-height: 1.6;
-        }
-
-        /* Header */
-        header {
-          background: linear-gradient(90deg, #cfa245, #006400);
-          color: #fff;
-          padding: 1.5rem 20px;
-          text-align: center;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        header h1 {
-          font-size: 2rem;
-          font-weight: 700;
-          margin-bottom: 5px;
-          text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-        }
-
-        header p {
-          font-size: 1rem;
-          color: #fffbfb;
-          opacity: 0.9;
-        }
-
-        /* Navigation */
-        nav {
-        background: #fff;
-        border-bottom: 1px solid #e0e0e0;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      }
-
-      .nav-container {
-        max-width: 1200px;
-        margin: auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
-      }
-
-      .nav-logo {
-        font-weight: 700;
-        font-size: 1.2rem;
-        color: #006400;
-      }
-
-      .nav-links {
-        display: flex;
-        gap: 15px;
-      }
-
-      .nav-links a {
-        color: #333;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s;
-      }
-
-      .nav-links a:hover {
-        color: #cfa245;
-        transform: scale(1.05);
-      }
-
-      .nav-toggle {
-        display: none;
-        font-size: 1.8rem;
-        cursor: pointer;
-        color: #006400;
-      }
-      select {
-        width: 100%;
-        padding: 12px 15px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        font-size: 0.95rem;
-        background-color: #fff;
-        appearance: none; /* Remove default arrow */
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        cursor: pointer;
-        transition: all 0.3s;
-        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23333' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        background-size: 12px;
-      }
-
-      select:focus {
-        border-color: #cfa245;
-        box-shadow: 0 0 8px rgba(207,162,69,0.3);
-        outline: none;
-      }
-
-      /* Mobile Styles */
-      @media (max-width: 768px) {
-        .nav-toggle {
-          display: block;
-        }
-
-        .nav-links {
-          position: absolute;
-          top: 60px;
-          right: 0;
-          background: #fff;
-          flex-direction: column;
-          width: 200px;
-          padding: 20px;
-          gap: 15px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          display: none; /* hidden by default */
-          border-radius: 0 0 10px 10px;
-        }
-
-        .nav-links.active {
-          display: flex;
-        }
-      }
-    input[type="number"] {
-        width: 100%;
-        padding: 12px 15px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        font-size: 0.95rem;
-        transition: all 0.3s;
-      }
-
-      input[type="number"]:focus {
-        border-color: #cfa245;
-        box-shadow: 0 0 8px rgba(207,162,69,0.3);
-        outline: none;
-      }
-
-    /* Hero Section */
-    .hero {
-      background: url('https://images.unsplash.com/photo-1615484477211-7c3c5fca6f09?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
-      color: #fff;
-      text-align: center;
-      padding: 120px 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.30);
-      z-index: 0;
-    }
-
-    .hero h2, .hero p, .cta-btn {
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero h2 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-
-    .hero p {
-      margin: 0 auto 25px;
-      max-width: 600px;
-      font-size: 1.1rem;
-      line-height: 1.5;
-    }
-
-    .cta-btn {
-      background: #cfa245;
-      color: #fff;
-      border: none;
-      padding: 14px 28px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-
-    .cta-btn:hover {
-      background: #b38b35;
-      transform: scale(1.05);
-    }
-
-    /* Sections */
-    section {
-      padding: 20px 20px;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    h2 {
-      text-align: center;
-      color: #006400;
-      font-size: 2rem;
-      margin-bottom: 25px;
-      position: relative;
-    }
-
-    h2::after {
-      content: "";
-      display: block;
-      width: 60px;
-      height: 3px;
-      background: #cfa245;
-      margin: 10px auto 0;
-      border-radius: 3px;
-    }
-
-    p {
-      margin-bottom: 15px;
-      color: #555;
-    }
-
-    /* Product Grid */
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 25px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 15px;
-      padding: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    }
-
-    .card h3 {
-      color: #cfa245;
-      margin-bottom: 12px;
-      font-size: 1.3rem;
-    }
-
-    /* Contact Section */
-    .contact-section {
-      background-color: #fdfdfd;
-      padding: 20px 20px;
-    }
-
-    .contact-intro {
-      text-align: center;
-      max-width: 700px;
-      margin: 0 auto 50px;
-      color: #555;
-      line-height: 1.7;
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      align-items: start;
-    }
-
-    .contact-form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      background: #fff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-    }
-
-    .contact-form label {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .contact-form input,
-    .contact-form textarea {
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      width: 100%;
-      transition: all 0.3s;
-    }
-
-    .contact-form input:focus,
-    .contact-form textarea:focus {
-      border-color: #cfa245;
-      outline: none;
-      box-shadow: 0 0 8px rgba(207,162,69,0.3);
-    }
-
-    .send-btn {
-      background-color: #cfa245;
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      padding: 14px;
-      font-size: 1.05rem;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .send-btn:hover {
-      background-color: #b38b35;
-      transform: scale(1.05);
-    }
-
-    .contact-info {
-      background: #fff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-    }
-
-    .contact-info h3 {
-      margin-bottom: 15px;
-      color: #006400;
-    }
-
-    .contact-info a {
-      color: #cfa245;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-
-    .contact-info a:hover {
-      text-decoration: underline;
-    }
-
-    .map-container {
-      margin-top: 20px;
-      border-radius: 12px;
-      overflow: hidden;
-      height: 300px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .map-container iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
-    /* Footer */
-    footer {
-      background: #006400;
-      color: white;
-      text-align: center;
-      padding: 25px 15px;
-      font-size: 0.95rem;
-    }
-
-    footer a {
-      color: #cfa245;
-      text-decoration: none;
-      margin: 0 5px;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-      .hero h2 {
-        font-size: 1.8rem;
-      }
-      .hero p {
-        font-size: 1rem;
-      }
-    }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <!-- Navigation -->
@@ -415,10 +22,8 @@
             <a href="#home">Home</a>
             <a href="#about">About</a>
             <a href="#products">Products</a>
-            <a href="#quality">Quality</a>
-            <a href="#shipping">Shipping</a>
-            <a href="#csr">CSR</a>
             <a href="#contact">Contact</a>
+            <a href="#blog">Blog</a>
         </div>
     </div>
 </nav>
@@ -505,13 +110,11 @@
 
     <div class="contact-grid">
         <!-- Left -->
-        <form class="contact-form" action="mailto:anil01081997@gmail.com" method="post" enctype="text/plain">
+        <form class="contact-form" action="mailto:svstrader6226@gmail.com" method="post" enctype="text/plain">
             <label for="name">Full Name</label>
             <input type="text" id="name" name="Name" required placeholder="Your Name">
-            <label for="company">Company</label>
-            <input type="text" id="company" name="Company" placeholder="Your Company">
-            <label for="country">Country</label>
-            <input type="text" id="country" name="Country" placeholder="Your Country">
+            <label for="address">Full Address</label>
+            <input type="text" id="address" name="Address" required placeholder="Your Address">
             <label for="product">Product Interest</label>
             <select id="product" name="Product Interest" required>
                 <option value="" disabled selected>Select a product</option>
@@ -519,8 +122,8 @@
                 <option value="Finger Millet (Ragi)">Finger Millet (Ragi)</option>
                 <option value="Turmeric">Turmeric</option>
             </select>
-            <label for="quantity">Quantity</label>
-            <input type="number" id="quantity" name="Quantity" placeholder="Approximate Quantity">
+            <label for="quantity">Quantity (KG)</label>
+            <input type="number" id="quantity" name="Quantity" required placeholder="Approximate Quantity">
             <label for="message">Message</label>
             <textarea id="message" name="Message" rows="4" placeholder="Your message here..."></textarea>
             <button type="submit" class="send-btn">Send Inquiry</button>
@@ -529,17 +132,43 @@
         <!-- Right -->
         <div class="contact-info">
             <h3>Reach Us</h3>
-            <p><strong>Email:</strong> <a href="mailto:info@debaharienterprise.com">info@debaharienterprise.com</a></p>
-            <p><strong>WhatsApp:</strong> <a href="https://wa.me/919999999999" target="_blank">+91 99999 99999</a></p>
-            <p><strong>Office Address:</strong><br>Bhubaneswar, Odisha, India</p>
+            <p><strong>Email:</strong> <a href="mailto:svstrader6226@gmail.com">svstrader6226@gmail.com</a></p>
+            <p><strong>WhatsApp:</strong> <a href="https://wa.me/918249229087" target="_blank">+91 8249229087</a></p>
+            <p><strong>Office Address:</strong><br>Millenium City , Pahala, Bhubaneswar, Odisha, India</p>
 
             <div class="map-container">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14750.28424531211!2d85.803!3d20.2961!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a19a7b06f9c9d25%3A0x7a3e3bffb0c70a7d!2sBhubaneswar%2C%20Odisha!5e0!3m2!1sen!2sin!4v1696189536000!5m2!1sen!2sin"
-                        allowfullscreen="" loading="lazy"></iframe>
+                <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3686.043682123456!2d85.881472!3d20.336889!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1696189536000"
+                        allowfullscreen=""
+                        loading="lazy">
+                </iframe>
             </div>
+
         </div>
     </div>
 </section>
+<!-- Blog / Knowledge Hub -->
+<section id="blog">
+    <h2>Blogs</h2>
+    <div class="product-grid">
+        <div class="card">
+            <h3>Why Millets are the Future of Healthy Eating</h3>
+            <p>Explore how millets are nutrient-rich, sustainable, and becoming a global superfood.</p>
+            <a href="millets.html" class="cta-btn" style="padding:8px 16px; font-size:0.9rem;">Read More</a>
+        </div>
+        <div class="card">
+            <h3>How Indian Turmeric is Conquering Global Markets</h3>
+            <p>Learn about India’s turmeric exports, curcumin benefits, and international demand trends.</p>
+            <a href="turmeric.html" class="cta-btn" style="padding:8px 16px; font-size:0.9rem;">Read More</a>
+        </div>
+        <div class="card">
+            <h3>Understanding International Rice Quality Standards</h3>
+            <p>Get insights into grading, certifications, and quality checks for rice exports worldwide.</p>
+            <a href="rice.html" class="cta-btn" style="padding:8px 16px; font-size:0.9rem;">Read More</a>
+        </div>
+    </div>
+</section>
+
 <script>
     const mobileMenu = document.getElementById('mobile-menu');
     const navLinks = document.getElementById('nav-links');
