@@ -51,15 +51,6 @@ nav {
   padding: 12px 20px;
 }
 
-.hero-decor-left {
-    position: absolute;
-    height: 300px;
-    width: 300px;
-    top: -10%;
-    left: 25%;
-    opacity: 0.5;
-    transform: rotate(-15deg);
-}
 .parallax {
     background-image: url('assets/hero4.jpg'); /* your image */
     background-size: cover;
@@ -620,5 +611,5 @@ footer a { color: var(--gold); text-decoration: none; }
     gap: 8px;
     width: 220px;
   }
-  .hero h2 { font-size: 1.4rem; color: darkgray; }
+  .hero h2 { font-size: 1.4rem; color: var(--white); }
 }
