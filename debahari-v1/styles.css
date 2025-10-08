@@ -558,7 +558,7 @@ section h2::after {
 }
 
 
-.contact-info a { color: var(--gold); text-decoration: none; }
+.contact-info a { color: var(--green); text-decoration: none; font-weight:bold }
 
 .map-container {
   border-radius: 10px;
