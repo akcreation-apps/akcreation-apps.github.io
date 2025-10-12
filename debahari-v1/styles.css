@@ -557,6 +557,15 @@ section h2::after {
   }
 }
 
+.order-field {
+  transition: all 0.3s ease;
+}
+.hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
 
 .contact-info a { color: var(--green); text-decoration: none; font-weight:bold }
 

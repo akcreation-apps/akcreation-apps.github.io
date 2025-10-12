@@ -166,41 +166,64 @@
     <!-- Contact -->
     <section id="contact" class="contact-section">
         <h2>Contact Us</h2>
-        <p class="lead">Get in touch with <strong>DEBAHARI ENTERPRISE PVT. LTD.</strong> for export inquiries, partnerships, or product information.</p>
+        <p class="lead">We’d love to hear from you — share your feedback or place an order directly with <strong>DEBAHARI ENTERPRISE PVT. LTD.</strong></p>
 
         <div class="contact-grid">
-            <!-- Left: form (kept as provided) -->
+            <!-- Left: Form -->
             <form class="contact-form" action="mailto:svstrader6226@gmail.com" method="post" enctype="text/plain">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="Name" required placeholder="Your Name">
-                <label for="address">Full Address</label>
-                <input type="text" id="address" name="Address" required placeholder="Your Address">
-                <label for="product">Product Interest</label>
-                <select id="product" name="Product Interest" required>
-                    <option value="" disabled selected>Select a product</option>
-                    <option value="Rice">Rice</option>
-                    <option value="Finger Millet (Ragi)">Finger Millet (Ragi)</option>
-                    <option value="Turmeric">Turmeric</option>
-                </select>
-                <label for="quantity">Quantity (KG)</label>
-                <input type="number" id="quantity" name="Quantity" required placeholder="Approximate Quantity">
-                <label for="message">Message</label>
-                <textarea id="message" name="Message" rows="4" placeholder="Your message here..."></textarea>
-                <button type="submit" class="send-btn" style="margin-top:6px;background:var(--gold);border:none;padding:12px 16px;border-radius:10px;color:#fff;cursor:pointer">Send Inquiry</button>
+                <div class="form-group">
+                    <label for="purpose">Purpose</label>
+                    <select id="purpose" name="Purpose" required>
+                        <option value="Feedback" selected>Feedback / Inquiry</option>
+                        <option value="Order">Place an Order</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="Name" required placeholder="Your Full Name">
+                </div>
+
+                <!-- Order-only fields -->
+                <div class="form-group order-field hidden">
+                    <label for="address">Full Address</label>
+                    <input type="text" id="address" name="Address" placeholder="Your Address">
+                </div>
+
+                <div class="form-group order-field hidden">
+                    <label for="product">Product Interest</label>
+                    <select id="product" name="Product">
+                        <option value="" disabled selected>Select a product</option>
+                        <option value="Rice">Rice</option>
+                        <option value="Finger Millet (Ragi)">Finger Millet (Ragi)</option>
+                        <option value="Turmeric">Turmeric</option>
+                    </select>
+                </div>
+
+                <div class="form-group order-field hidden">
+                    <label for="quantity">Quantity (KG)</label>
+                    <input type="number" id="quantity" name="Quantity" placeholder="Approximate Quantity">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="Message" rows="4" placeholder="Write your feedback or order details..."></textarea>
+                </div>
+
+                <button type="submit" class="send-btn">Send Message</button>
             </form>
 
-            <!-- Right: contact info + map -->
+            <!-- Right: Info + Map -->
             <div class="contact-info">
                 <h3>Reach Us</h3>
                 <p><strong>Email:</strong> <a href="mailto:svstrader6226@gmail.com">svstrader6226@gmail.com</a></p>
                 <p><strong>WhatsApp:</strong> <a href="https://wa.me/918249229087" target="_blank">+91 8249229087</a></p>
-                <p><strong>Office Address:</strong><br>Millenium City , Pahala, Bhubaneswar, Odisha, India</p>
+                <p><strong>Office Address:</strong><br>Millenium City, Pahala, Bhubaneswar, Odisha, India</p>
 
                 <div class="map-container">
                     <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3686.043682123456!2d85.881472!3d20.336889!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1696189536000"
                             loading="lazy" allowfullscreen=""></iframe>
                 </div>
-
             </div>
         </div>
     </section>
@@ -222,6 +245,27 @@
 
     // close mobile menu on link click
     document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>navLinks.classList.remove('mobile')));
+
+    const purposeSelect = document.getElementById("purpose");
+    const orderFields = document.querySelectorAll(".order-field");
+
+    function toggleOrderFields() {
+    const isOrder = purposeSelect.value === "Order";
+
+    orderFields.forEach(field => {
+      const inputs = field.querySelectorAll("input, select");
+      field.classList.toggle("hidden", !isOrder);
+
+      // Disable/enable inputs based on selection
+      inputs.forEach(input => input.disabled = !isOrder);
+    });
+    }
+
+    // Initialize on page load
+    toggleOrderFields();
+
+    // Update dynamically on selection
+    purposeSelect.addEventListener("change", toggleOrderFields);
 </script>
 </body>
 </html>
