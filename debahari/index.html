@@ -276,6 +276,15 @@
 
     // Update dynamically on selection
     purposeSelect.addEventListener("change", toggleOrderFields);
+    window.addEventListener("scroll", () => {
+      const nav = document.querySelector(".navbar");
+      const logo = document.querySelector(".brand-logo img");
+      if (window.scrollY > 50) {
+        logo.style.height = "40px";
+      } else {
+        logo.style.height = "50px";
+      }
+    });
 </script>
 </body>
 </html>
