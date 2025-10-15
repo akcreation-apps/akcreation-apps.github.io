@@ -42,15 +42,6 @@ nav {
   z-index: 60;
 }
 
-.nav-wrap {
-  background: linear-gradient(90deg, var(--gold), var(--green));
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
-}
-
 .parallax {
     background-image: url('assets/hero4.jpg'); /* your image */
     background-size: cover;
@@ -106,39 +97,9 @@ nav {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo {
-  font-weight: 700;
-  color: var(--green);
-  font-size: 1.15rem;
-}
-
 .tag {
   font-size: 0.85rem;
   color: var(--white);
-}
-
-.nav-links {
-  display: flex;
-  gap: 14px;
-}
-
-.nav-links a {
-  color: var(--white);
-  text-decoration: none;
-  font-weight: 600;
-  padding: 8px 10px;
-  border-radius: 8px;
-}
-
-.nav-links a:hover {
-  background: rgba(0, 100, 0, 0.06);
-  color: var(--black);
 }
 
 .nav-toggle {
@@ -605,7 +566,6 @@ footer a { color: var(--gold); text-decoration: none; }
 @media(max-width:640px){
   .nav-links { display: none; }
   .nav-toggle { display: block; }
-  nav .nav-wrap { position: fixed; width:100% }
   .nav-links.mobile {
     color: var(--green);
     position: absolute;
@@ -621,4 +581,72 @@ footer a { color: var(--gold); text-decoration: none; }
     width: 220px;
   }
   .hero h2 { font-size: 1.4rem; color: var(--white); }
+}
+/* --- NAVBAR --- */
+.navbar {
+  position: fixed; /* Keeps it visible on scroll */
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+/* --- BRAND --- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo img {
+  height: 50px;
+  width: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.brand-logo img:hover {
+  transform: scale(1.05);
+}
+
+.tagline {
+  font-family: 'Philosopher', sans-serif;
+  font-size: 1rem;
+  color: #444;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* --- NAV LINKS --- */
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #222;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--gold);
+}
+
+/* --- MOBILE --- */
+.nav-toggle {
+  display: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
