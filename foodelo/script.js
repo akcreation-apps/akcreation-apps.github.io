@@ -85,6 +85,7 @@ const menuData = [
     "items": [
       { "name": "Classic Masala Maggie", "price": "₹50" },
       { "name": "Veggies Delight Maggie", "price": "₹60" },
+      { "name": "Cheese Maggie", "price": "₹60" },
       { "name": "Egg Bhurji Maggie", "price": "₹60" },
       { "name": "Paneer Maggie", "price": "₹70" },
       { "name": "Chicken Maggie", "price": "₹70" }
@@ -114,6 +115,7 @@ const menuData = [
   {
     "category": "COMBOS",
     "items": [
+      { "name": "Lachha Paratha(2pc) + Veg Manchurian", "price": "₹90" },
       { "name": "Veg Burger + French Fries + Colddrinks", "price": "₹110" },
       { "name": "Chicken Burger + French Fries + Colddrinks", "price": "₹110" },
       { "name": "Veg Fried Rice + Paneer/Mushroom Chilly + Onion Salad", "price": "₹130" },
