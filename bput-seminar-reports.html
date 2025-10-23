@@ -9,13 +9,13 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="canonical" href="https://akcreation-apps.netlify.app/bput-seminar-reports.html"/>
+    <link rel="canonical" href="https://akcreation-apps.com/bput-seminar-reports.html"/>
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
     <meta property="og:title" content="BPUT Seminar Reports | Request Custom Project Reports">
     <meta property="og:description" content="View demo seminar reports in our Android app, see pricing, request via WhatsApp, and receive reports within 24 hours.">
-    <meta property="og:url" content="https://akcreation-apps.netlify.app/bput-seminar-reports.html">
+    <meta property="og:url" content="https://akcreation-apps.com/bput-seminar-reports.html">
     <meta property="og:type" content="website">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -129,13 +129,13 @@
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Home",
-                "item": "https://akcreation-apps.netlify.app"
+                "item": "https://akcreation-apps.com"
             },
             {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "BPUT Resume Builder",
-                "item": "https://akcreation-apps.netlify.app/bput-seminar-reports.html"
+                "item": "https://akcreation-apps.com/bput-seminar-reports.html"
             }
         ]
     }
@@ -146,17 +146,52 @@
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "Custom BPUT Seminar Report",
+        "image": "https://akcreation-apps.com/assets/img/seminar.jpg",
         "description": "Professional seminar/project report service exclusively for BPUT students. Select a report, make payment, and receive it via WhatsApp within 24 hours.",
         "brand": {
             "@type": "Organization",
-            "name": "AK Creation"
+            "name": "AK Creation",
+            "url": "https://akcreation-apps.com"
         },
         "offers": {
-            "@type": "Offer",
-            "url": "https://akcreation-apps.netlify.app/bput-seminar-reports.html",
-            "priceCurrency": "INR",
-            "price": "Varies by report",
-            "availability": "https://schema.org/InStock"
+          "@type": "Offer",
+          "url": "https://akcreation-apps.com/bput-seminar-reports.html",
+          "priceCurrency": "INR",
+          "price": "70",
+          "availability": "https://schema.org/InStock",
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": "30",
+            "returnPolicySeasonalOverride": false
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "IN"
+            },
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "70",
+              "currency": "INR"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 10,
+                "maxValue": 1440,
+                "unitCode": "min"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 10,
+                "maxValue": 1440,
+                "unitCode": "min"
+              }
+            }
+          }
         }
     }
 </script>

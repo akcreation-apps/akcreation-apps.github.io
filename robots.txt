@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://akcreation-apps.netlify.app/sitemap.xml
+Sitemap: https://akcreation-apps.com/sitemap.xml
