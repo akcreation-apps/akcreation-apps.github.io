@@ -244,7 +244,7 @@ const notes = [
   "With you, even silence speaks the sweetest words.",
   "I love you more than all the stars in the night sky."
 ];
-document.getElementById('noteBtn').addEventListener('click', ()=>{ showToast(notes[Math.floor(Math.random()*notes.length)]); });
+document.getElementById('noteBtn').addEventListener('click', ()=>{ showToast(notes[Math.floor(Math.random()*notes.length)]); spawnHearts(56); randomHeartsBurst();});
 function showToast(text){
   const t=document.createElement('div'); t.className='toast'; t.textContent=text;
   document.body.appendChild(t);
@@ -304,6 +304,7 @@ const popup=document.getElementById('popup'); const popupClose=document.getEleme
 document.getElementById('surpriseBtn').addEventListener('click', ()=>{
   popup.style.display='flex'; popup.setAttribute('aria-hidden','false'); spawnHearts(26);
   if(!touched) startAudio(); else if(!playing) startAudio();
+  randomHeartsBurst();
 });
 popupClose.addEventListener('click', ()=>{ popup.style.display='none'; popup.setAttribute('aria-hidden','true'); });
 
@@ -321,9 +322,6 @@ function randomHeartsBurst() {
     randomHeartsBurst(); // recursively call for next burst
   }, interval);
 }
-
-// Start the random hearts bursts automatically
-randomHeartsBurst();
 
 </script>
 </body>
