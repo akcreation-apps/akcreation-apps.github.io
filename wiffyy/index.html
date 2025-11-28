@@ -152,7 +152,6 @@
         <div class="controls" role="group" aria-label="actions">
           <button class="btn" id="noteBtn" type="button">Give me a love note</button>
           <button class="btn" id="surpriseBtn" type="button">Reveal the Surprise 🎁</button>
-          <button class="btn" id="confettiBtn" type="button">Celebrate 🎉</button>
         </div>
       </div>
 
@@ -308,15 +307,24 @@ document.getElementById('surpriseBtn').addEventListener('click', ()=>{
 });
 popupClose.addEventListener('click', ()=>{ popup.style.display='none'; popup.setAttribute('aria-hidden','true'); });
 
-document.getElementById('confettiBtn').addEventListener('click', ()=>{
-  spawnHearts(36); const p=document.getElementById('mainPhoto');
-  p.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:1500,easing:'ease-out'});
-});
-
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && popup.style.display==='flex'){ popup.style.display='none'; popup.setAttribute('aria-hidden','true'); } });
 popup.addEventListener('touchmove', e=>{ e.stopPropagation(); }, {passive:false});
 
 window.addEventListener('pagehide', ()=>{ if(audioEl) audioEl.pause(); if(raf) cancelAnimationFrame(raf); });
+// Remove Celebrate button functionality and trigger hearts randomly
+function randomHeartsBurst() {
+  // random interval between 1s and 4s
+  const interval = 1000 + Math.random() * 3000;
+  setTimeout(() => {
+    // spawn a random number of hearts (20-50)
+    spawnHearts(20 + Math.floor(Math.random() * 30));
+    randomHeartsBurst(); // recursively call for next burst
+  }, interval);
+}
+
+// Start the random hearts bursts automatically
+randomHeartsBurst();
+
 </script>
 </body>
 </html>
