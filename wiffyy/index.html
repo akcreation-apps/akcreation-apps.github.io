@@ -255,21 +255,50 @@ function showToast(text){
 
 /* ---------------- Falling Hearts ---------------- */
 const heartsLayer=document.getElementById('heartsLayer');
-function spawnHearts(count=28){
-  const vw=window.innerWidth;
-  const safeRight=vw-120; const safeBottom=120;
-  for(let i=0;i<count;i++){
-    const h=document.createElement("div"); h.textContent="💖"; h.style.position="fixed";
-    const size=Math.random()*18+12; h.style.fontSize=size+"px";
-    let x=Math.random()*vw; if(x>safeRight)x-=140;
-    h.style.left=x+"px"; h.style.bottom=(Math.random()*20+safeBottom)*-1+"px";
+function spawnHearts(count = 50) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const centerX = vw / 2;
+  const centerY = vh / 2;
+
+  for (let i = 0; i < count; i++) {
+    const h = document.createElement("div");
+    h.textContent = "💖";
+    h.style.position = "fixed";
+
+    // random size and visibility
+    const size = Math.random() * 28 + 16; // 16px to 44px
+    h.style.fontSize = size + "px";
+    h.style.opacity = 0.8 + Math.random() * 0.2;
+
+    // start exactly at center
+    h.style.left = centerX + "px";
+    h.style.top = centerY + "px";
+    h.style.pointerEvents = "none";
+
     heartsLayer.appendChild(h);
-    const rise=900+Math.random()*900; const horiz=Math.random()*220-110;
-    h.animate([{transform:"translateY(0)",opacity:1},{transform:`translateY(-${rise}px) translateX(${horiz}px)`,opacity:0}],
-      {duration:2000+Math.random()*1000,easing:"ease-out"});
-    setTimeout(()=>h.remove(),3300);
+
+    // random angle and distance
+    const angle = Math.random() * 2 * Math.PI; // 0 to 360°
+    const distance = 200 + Math.random() * 200; // how far it flies
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+
+    const duration = 1200 + Math.random() * 800; // speed
+
+    h.animate(
+      [
+        { transform: "translate(0,0) scale(1)", opacity: parseFloat(h.style.opacity) },
+        { transform: `translate(${x}px, ${-y}px) scale(${1 + Math.random() * 0.3})`, opacity: 0 }
+      ],
+      { duration: duration, easing: "ease-out" }
+    );
+
+    // remove after animation
+    setTimeout(() => h.remove(), duration + 50);
   }
 }
+
 
 /* ---------------- Popup ---------------- */
 const popup=document.getElementById('popup'); const popupClose=document.getElementById('popupClose');
