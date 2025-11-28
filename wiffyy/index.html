@@ -1,205 +1,293 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Happy Birthday Wiffyy ❤️</title>
-
 <style>
-    body {
-        margin: 0;
-        font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #ffd6e8, #fff4fc, #ffe3f4);
-        color: #4a4a4a;
-        overflow-x: hidden;
-        text-align: center;
-        padding: 20px;
-    }
+  :root{
+    --bg1:#fff0f7; --bg2:#fff8fb;
+    --accent:#ff5fae; --card:#ffffffee;
+    --btn-shadow: 0 8px 24px rgba(255,105,165,0.14);
+  }
 
-    h1 {
-        font-size: 2rem;
-        color: #ff4f8b;
-        margin-top: 15px;
-        animation: pop 1s ease forwards;
-    }
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial; -webkit-font-smoothing:antialiased;}
+  body{
+    background: linear-gradient(180deg,var(--bg1),var(--bg2));
+    padding:16px; box-sizing:border-box; display:flex; justify-content:center;
+  }
 
-    @keyframes pop {
-        from { transform: scale(0.6); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
+  .wrap{width:100%;max-width:520px}
+  .card{
+    background:var(--card); border-radius:16px; padding:14px; box-shadow:0 12px 36px rgba(230,120,170,0.08);
+  }
 
-    .photo-box img {
-        width: 85%;
-        max-width: 320px;
-        border-radius: 20px;
-        box-shadow: 0 12px 25px rgba(255, 100, 150, 0.25);
-        animation: fadeIn 1.5s ease forwards;
-        margin-top: 15px;
-    }
+  header{display:flex;gap:12px;align-items:center}
+  .avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(180deg,#ffd1ea,#ffb3df);display:flex;align-items:center;justify-content:center;font-weight:700;color:#4b0029;font-size:20px;box-shadow:0 6px 18px rgba(255,120,175,0.12)}
+  h1{margin:0;font-size:18px;color:#c4166f}
+  .lead{margin:2px 0 0;color:#6d123f;font-size:13px}
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+  .hero{margin-top:12px;text-align:center}
+  .title{font-size:26px;margin:6px 0;color:transparent;background:linear-gradient(90deg,#ff69b4,#ffb3e6);-webkit-background-clip:text;font-weight:800}
+  .sub{color:#7a1b4b;margin-top:6px;font-size:13px}
 
-    .card {
-        background: white;
-        border-radius: 18px;
-        padding: 20px;
-        box-shadow: 0 8px 20px rgba(255, 90, 150, 0.2);
-        margin-top: 25px;
-        animation: fadeIn 2s ease forwards;
-    }
+  .photo-wrap{position:relative;margin:14px auto 8px;width:92%;max-width:380px}
+  .photo{width:100%;height:auto;border-radius:14px;display:block;box-shadow:0 16px 40px rgba(255,120,170,0.12);outline:6px solid rgba(255,255,255,0.6);object-fit:cover}
+  .glow{
+    position:absolute;inset:-14px;border-radius:18px;pointer-events:none;
+    background: radial-gradient(circle at 50% 40%, rgba(255,140,200,0.24), rgba(255,160,210,0.06) 30%, transparent 60%);
+    filter: blur(20px); opacity:var(--glow-opacity,0.85); transform:scale(var(--glow-scale,1));
+    transition: opacity .12s linear, transform .08s linear;
+  }
 
-    .heart {
-        font-size: 2.3rem;
-        animation: heartbeat 1.4s infinite;
-    }
+  .card-body{padding:6px 2px 2px}
+  .msg{font-size:14px;color:#4a133b;line-height:1.5;margin:8px 6px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .btn{background:linear-gradient(180deg,#ff9ad6,#ff7ec2);border:none;padding:11px 14px;border-radius:12px;color:#fff;font-weight:700;box-shadow:var(--btn-shadow);font-size:14px}
+  .btn:active{transform:translateY(1px)}
 
-    @keyframes heartbeat {
-        0%,100% { transform: scale(1); }
-        50% { transform: scale(1.25); }
-    }
+  footer{text-align:center;color:#b42458;margin-top:12px;font-size:13px}
 
-    .msg {
-        font-size: 1.1rem;
-        line-height: 1.7rem;
-        color: #444;
-        margin-top: 10px;
-    }
+  /* music button: fixed, high z-index */
+  #musicBtn {
+    --size:58px;
+    position:fixed;
+    right:14px;
+    bottom:14px;
+    width:var(--size);
+    height:var(--size);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:99999;
+    background:linear-gradient(180deg,#ff6fb4,#ff3f8a);
+    color:white;
+    font-size:22px;
+    box-shadow:0 12px 36px rgba(255,80,150,0.22);
+    border:4px solid rgba(255,255,255,0.12);
+    touch-action:manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-    .button {
-        display: inline-block;
-        padding: 12px 22px;
-        margin-top: 15px;
-        font-size: 1rem;
-        background: #ff69b4;
-        color: white;
-        border-radius: 10px;
-        text-decoration: none;
-        box-shadow: 0 4px 10px rgba(255, 70, 130, 0.3);
-        transition: 0.3s;
+  /* Smaller screens: scale down music button */
+  @media (max-width:420px){
+    #musicBtn {
+      --size:46px;
+      width:var(--size);
+      height:var(--size);
+      right:10px;
+      bottom:10px;
+      font-size:18px;
     }
-    .button:active { transform: scale(0.95); }
+  }
 
-    footer {
-        margin-top: 30px;
-        font-size: 0.9rem;
-        color: #b42458;
+  @media (max-width:360px){
+    #musicBtn {
+      --size:40px;
+      width:var(--size);
+      height:var(--size);
+      right:8px;
+      bottom:8px;
+      font-size:16px;
     }
+  }
 
-    /* POPUP STYLES */
-    #popup {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.65);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 15px;
-        box-sizing: border-box;
-        overflow-y: auto; /* prevents break on very small screens */
-    }
+  #musicBtn.playing{ box-shadow:0 16px 48px rgba(255,80,150,0.28); }
 
-    .popup-box {
-        background: white;
-        width: 100%;
-        max-width: 330px;
-        border-radius: 18px;
-        padding: 15px;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(255, 80, 140, 0.3);
-        animation: scaleIn 0.4s ease forwards;
-        box-sizing: border-box;
-    }
+  /* popup: mobile safe */
+  #popup{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:99998;
+    background:linear-gradient(180deg, rgba(6,4,12,0.45), rgba(4,4,12,0.75)); padding:12px; box-sizing:border-box;
+  }
+  .popup-inner{
+    width:100%; max-width:360px; background:linear-gradient(180deg,#fff,#fffafc); border-radius:14px; padding:12px; box-sizing:border-box;
+    box-shadow:0 20px 60px rgba(8,6,20,0.6); text-align:center;
+  }
+  .popup-inner img{width:100%;height:auto;border-radius:10px;margin-bottom:10px;object-fit:cover}
+  .popup-text{color:#c41b6a;font-size:15px;line-height:1.4;margin-bottom:10px}
+  .popup-close{width:100%;padding:10px;border-radius:12px;border:none;background:#ff5fae;color:white;font-weight:700;font-size:15px}
 
-    @keyframes scaleIn {
-        from { transform: scale(0.6); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
+  /* falling hearts layer (below popup z-index) */
+  .hearts-layer{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:99990;overflow:hidden}
 
-    .popup-box img {
-        width: 100%;
-        height: auto;
-        border-radius: 15px;
-        margin-bottom: 12px;
-    }
+  /* toast notifications */
+  .toast{
+    position:fixed; left:50%; transform:translateX(-50%); bottom:84px; background:rgba(255,255,255,0.96);
+    color:#a61757; padding:10px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(200,80,140,0.12);
+    max-width:90%; text-align:center; font-size:14px; z-index:9999;
+  }
 
-    .popup-msg {
-        font-size: 1rem;
-        color: #ff4f8b;
-        margin-bottom: 12px;
-        line-height: 1.5;
-    }
-
-    .close-btn {
-        background: #ff69b4;
-        color: white;
-        border: none;
-        padding: 10px 18px;
-        border-radius: 10px;
-        font-size: 1rem;
-        width: 100%;
-    }
+  @media (max-width:380px){
+    :root{ --btn-shadow: 0 6px 18px rgba(255,110,170,0.10); }
+    .title{font-size:22px}
+    #musicBtn{ --size:50px; right:12px; bottom:12px; font-size:20px }
+    .photo-wrap{width:96%}
+  }
 </style>
 </head>
-
 <body>
 
-<!-- Background Music -->
-<audio autoplay loop>
+<div class="wrap">
+  <div class="card" role="main" aria-label="Birthday card">
+    <header>
+      <div class="avatar" aria-hidden="true">W</div>
+      <div>
+        <h1>Happy Birthday</h1>
+        <div class="lead">For my lovely Wiffyy — made with code & lots of love</div>
+      </div>
+    </header>
+
+    <main class="hero">
+      <div class="title">Wiffyy, this day is for you 🎀</div>
+
+      <div class="photo-wrap" aria-hidden="false">
+        <div class="glow" id="photoGlow" style="--glow-scale:1;--glow-opacity:0.8"></div>
+        <img id="mainPhoto" class="photo" src="couple.png" alt="Wiffyy & you">
+      </div>
+
+      <div class="card-body">
+        <p class="msg">My cute little Wiffyy, you are the sparkle of my life and the softness in my heart. Thank you for every breath of joy. I love you always ❤️</p>
+
+        <div class="controls" role="group" aria-label="actions">
+          <button class="btn" id="noteBtn" type="button">Give me a love note</button>
+          <button class="btn" id="surpriseBtn" type="button">Reveal the Surprise 🎁</button>
+          <button class="btn" id="confettiBtn" type="button">Celebrate 🎉</button>
+        </div>
+      </div>
+
+      <footer>Made with infinite love by your husband ❤️</footer>
+    </main>
+  </div>
+</div>
+
+<button id="musicBtn" aria-label="Play music">♪</button>
+
+<audio id="bgAudio" loop preload="auto">
   <source src="audio.mp3" type="audio/mpeg">
+  Your browser does not support audio.
 </audio>
 
-<h1>Happy Birthday, My Sweet Wiffyy 🎀💗</h1>
-
-<div class="photo-box">
-    <img src="couple.png" alt="Wiffyy Photo">
+<div id="popup" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="popup-inner" role="document">
+    <img id="popupImg" src="wiffy.png" alt="Wiffyy">
+    <div class="popup-text">You are my forever, my cutest blessing, and the most beautiful part of my life. I love you endlessly, Wiffyy! 💞</div>
+    <button id="popupClose" class="popup-close" type="button">Close 💗</button>
+  </div>
 </div>
 
-<div class="card">
-    <div class="heart">💗</div>
-
-    <p class="msg">
-        My cute little Wiffyy, today is your special day…
-        <br><br>
-        You are the sparkle of my life,
-        the softness in my heart,
-        and the happiness in all my moments.
-        <br><br>
-        Thank you for being YOU — adorable, loving, caring, and mine.
-    </p>
-
-    <a class="button" onclick="showSurprise()">Tap for a Surprise 🎁💞</a>
-</div>
-
-<footer>
-    Made with unlimited love ❤️ by Your Husband
-</footer>
-
-<!-- SURPRISE POPUP -->
-<div id="popup">
-    <div class="popup-box">
-        <img src="wiffy.png">
-        <p class="popup-msg">
-            You are my forever, my cutest blessing,
-            and the most beautiful part of my life 💗
-            I love you endlessly, Wiffyy! 💞🥺💫
-        </p>
-        <button class="close-btn" onclick="closeSurprise()">Close 💗</button>
-    </div>
-</div>
+<div class="hearts-layer" id="heartsLayer" aria-hidden="true"></div>
 
 <script>
-function showSurprise() {
-    document.getElementById("popup").style.display = "flex";
+/* ---------------- Audio & Glow ---------------- */
+const audioEl = document.getElementById('bgAudio');
+const musicBtn = document.getElementById('musicBtn');
+let audioContext, analyser, sourceNode, dataArray, raf;
+let playing=false, touched=false;
+
+function initAnalyser(){
+  if(audioContext) return;
+  try {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    sourceNode = audioContext.createMediaElementSource(audioEl);
+    sourceNode.connect(analyser);
+    analyser.connect(audioContext.destination);
+  } catch(e){console.warn(e);}
 }
 
-function closeSurprise() {
-    document.getElementById("popup").style.display = "none";
+function pulseGlow(){
+  if(!analyser) return;
+  const glowEl = document.getElementById('photoGlow');
+  (function loop(){
+    analyser.getByteTimeDomainData(dataArray);
+    let sum=0;
+    for(let i=0;i<dataArray.length;i++){
+      let v=(dataArray[i]-128)/128;
+      sum+=v*v;
+    }
+    let rms=Math.sqrt(sum/dataArray.length);
+    glowEl.style.setProperty('--glow-scale',(1+Math.min(0.9,rms*8)).toFixed(3));
+    glowEl.style.setProperty('--glow-opacity',(0.55+Math.min(0.6,rms*6)).toFixed(3));
+    raf=requestAnimationFrame(loop);
+  })();
 }
+function stopGlow(){ if(raf) cancelAnimationFrame(raf); }
+
+function startAudio(){
+  if(!touched){ touched=true; initAnalyser(); if(audioContext.state==='suspended') audioContext.resume().catch(()=>{}); }
+  audioEl.play().then(()=>{
+    playing=true; musicBtn.classList.add('playing'); musicBtn.textContent = playing ? '❚❚' : '♪';
+  }).catch(e=>console.warn(e));
+}
+function pauseAudio(){ audioEl.pause(); playing=false; musicBtn.classList.remove('playing'); musicBtn.textContent='♪'; stopGlow(); }
+
+musicBtn.addEventListener('click', e=>{ e.stopPropagation(); if(!touched) startAudio(); else if(playing) pauseAudio(); else startAudio(); });
+document.addEventListener('click', function firstTap(){ if(!touched) startAudio(); document.removeEventListener('click', firstTap); }, {passive:true});
+
+/* ---------------- Toast Notes ---------------- */
+const notes = [
+  "I love the way you laugh — it lights up my worst days.",
+  "Your kindness is the softest thing I know.",
+  "You are my favorite hello and hardest goodbye.",
+  "With you, ordinary becomes magical every day.",
+  "I fall more in love with you with every sunrise.",
+  "Your smile is my favorite sight, every single day.",
+  "Being with you feels like home, no matter where we are.",
+  "You make my heart dance in ways words can't describe.",
+  "Every moment with you is my new favorite memory.",
+  "You are the sparkle in my life and the warmth in my soul.",
+  "Loving you is the easiest thing I’ve ever done.",
+  "You turn my simplest days into unforgettable adventures.",
+  "Your love is my favorite song, and I never want it to end.",
+  "With you, even silence speaks the sweetest words.",
+  "I love you more than all the stars in the night sky."
+];
+document.getElementById('noteBtn').addEventListener('click', ()=>{ showToast(notes[Math.floor(Math.random()*notes.length)]); });
+function showToast(text){
+  const t=document.createElement('div'); t.className='toast'; t.textContent=text;
+  document.body.appendChild(t);
+  setTimeout(()=> t.style.opacity='0', 4500);
+  setTimeout(()=> t.remove(), 5000);
+}
+
+/* ---------------- Falling Hearts ---------------- */
+const heartsLayer=document.getElementById('heartsLayer');
+function spawnHearts(count=28){
+  const vw=window.innerWidth;
+  const safeRight=vw-120; const safeBottom=120;
+  for(let i=0;i<count;i++){
+    const h=document.createElement("div"); h.textContent="💖"; h.style.position="fixed";
+    const size=Math.random()*18+12; h.style.fontSize=size+"px";
+    let x=Math.random()*vw; if(x>safeRight)x-=140;
+    h.style.left=x+"px"; h.style.bottom=(Math.random()*20+safeBottom)*-1+"px";
+    heartsLayer.appendChild(h);
+    const rise=900+Math.random()*900; const horiz=Math.random()*220-110;
+    h.animate([{transform:"translateY(0)",opacity:1},{transform:`translateY(-${rise}px) translateX(${horiz}px)`,opacity:0}],
+      {duration:2000+Math.random()*1000,easing:"ease-out"});
+    setTimeout(()=>h.remove(),3300);
+  }
+}
+
+/* ---------------- Popup ---------------- */
+const popup=document.getElementById('popup'); const popupClose=document.getElementById('popupClose');
+document.getElementById('surpriseBtn').addEventListener('click', ()=>{
+  popup.style.display='flex'; popup.setAttribute('aria-hidden','false'); spawnHearts(26);
+  if(!touched) startAudio(); else if(!playing) startAudio();
+});
+popupClose.addEventListener('click', ()=>{ popup.style.display='none'; popup.setAttribute('aria-hidden','true'); });
+
+document.getElementById('confettiBtn').addEventListener('click', ()=>{
+  spawnHearts(36); const p=document.getElementById('mainPhoto');
+  p.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:1500,easing:'ease-out'});
+});
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && popup.style.display==='flex'){ popup.style.display='none'; popup.setAttribute('aria-hidden','true'); } });
+popup.addEventListener('touchmove', e=>{ e.stopPropagation(); }, {passive:false});
+
+window.addEventListener('pagehide', ()=>{ if(audioEl) audioEl.pause(); if(raf) cancelAnimationFrame(raf); });
 </script>
-
 </body>
 </html>
