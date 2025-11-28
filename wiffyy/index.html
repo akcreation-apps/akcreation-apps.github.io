@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Birthday Wiffyy ❤️</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #ffd6e8, #fff4fc, #ffe3f4);
+        color: #4a4a4a;
+        overflow-x: hidden;
+        text-align: center;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        color: #ff4f8b;
+        margin-top: 15px;
+        animation: pop 1s ease forwards;
+    }
+
+    @keyframes pop {
+        from { transform: scale(0.6); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .photo-box img {
+        width: 85%;
+        max-width: 320px;
+        border-radius: 20px;
+        box-shadow: 0 12px 25px rgba(255, 100, 150, 0.25);
+        animation: fadeIn 1.5s ease forwards;
+        margin-top: 15px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+        background: white;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(255, 90, 150, 0.2);
+        margin-top: 25px;
+        animation: fadeIn 2s ease forwards;
+    }
+
+    .heart {
+        font-size: 2.3rem;
+        animation: heartbeat 1.4s infinite;
+    }
+
+    @keyframes heartbeat {
+        0%,100% { transform: scale(1); }
+        50% { transform: scale(1.25); }
+    }
+
+    .msg {
+        font-size: 1.1rem;
+        line-height: 1.7rem;
+        color: #444;
+        margin-top: 10px;
+    }
+
+    .button {
+        display: inline-block;
+        padding: 12px 22px;
+        margin-top: 15px;
+        font-size: 1rem;
+        background: #ff69b4;
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(255, 70, 130, 0.3);
+        transition: 0.3s;
+    }
+    .button:active { transform: scale(0.95); }
+
+    footer {
+        margin-top: 30px;
+        font-size: 0.9rem;
+        color: #b42458;
+    }
+
+    /* POPUP STYLES */
+    #popup {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        box-sizing: border-box;
+        overflow-y: auto; /* prevents break on very small screens */
+    }
+
+    .popup-box {
+        background: white;
+        width: 100%;
+        max-width: 330px;
+        border-radius: 18px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(255, 80, 140, 0.3);
+        animation: scaleIn 0.4s ease forwards;
+        box-sizing: border-box;
+    }
+
+    @keyframes scaleIn {
+        from { transform: scale(0.6); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .popup-box img {
+        width: 100%;
+        height: auto;
+        border-radius: 15px;
+        margin-bottom: 12px;
+    }
+
+    .popup-msg {
+        font-size: 1rem;
+        color: #ff4f8b;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .close-btn {
+        background: #ff69b4;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 1rem;
+        width: 100%;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Background Music -->
+<audio autoplay loop>
+  <source src="audio.mp3" type="audio/mpeg">
+</audio>
+
+<h1>Happy Birthday, My Sweet Wiffyy 🎀💗</h1>
+
+<div class="photo-box">
+    <img src="couple.png" alt="Wiffyy Photo">
+</div>
+
+<div class="card">
+    <div class="heart">💗</div>
+
+    <p class="msg">
+        My cute little Wiffyy, today is your special day…
+        <br><br>
+        You are the sparkle of my life,
+        the softness in my heart,
+        and the happiness in all my moments.
+        <br><br>
+        Thank you for being YOU — adorable, loving, caring, and mine.
+    </p>
+
+    <a class="button" onclick="showSurprise()">Tap for a Surprise 🎁💞</a>
+</div>
+
+<footer>
+    Made with unlimited love ❤️ by Your Husband
+</footer>
+
+<!-- SURPRISE POPUP -->
+<div id="popup">
+    <div class="popup-box">
+        <img src="wiffy.png">
+        <p class="popup-msg">
+            You are my forever, my cutest blessing,
+            and the most beautiful part of my life 💗
+            I love you endlessly, Wiffyy! 💞🥺💫
+        </p>
+        <button class="close-btn" onclick="closeSurprise()">Close 💗</button>
+    </div>
+</div>
+
+<script>
+function showSurprise() {
+    document.getElementById("popup").style.display = "flex";
+}
+
+function closeSurprise() {
+    document.getElementById("popup").style.display = "none";
+}
+</script>
+
+</body>
+</html>
