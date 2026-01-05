@@ -205,10 +205,10 @@
     function filterData(data, startDate, endDate) {
         const filteredData = {};
 
-        // Convert string dates (MM/DD/YYYY) into Date objects
+        // Convert string dates (YYYY/MM/DD) into Date objects
         const parseDate = (dateString) => {
-            const [month, day, year] = dateString.split("/").map(Number);
-            return new Date(year, month - 1, day); // JavaScript Date object expects months in 0-11 range
+            const [year, month, day] = dateString.split("/").map(Number);
+            return new Date(year, month - 1, day); // ✅ Changed order: year first
         };
 
         // Convert startDate and endDate to Date objects
@@ -235,6 +235,7 @@
 
         return filteredData;
     }
+
 
 
     function transformStockData(stockList) {
@@ -470,17 +471,17 @@
     function renderDividendsChart(datewise_dividends) {
 
         if (dividendsChartInstance) dividendsChartInstance.destroy();
-
         let dividendDates = Object.keys(datewise_dividends);
         let totalDividends = [];
-        let dividendDetails = {}; // Store company-wise dividends for each date
+        let dividendDetails = {};
         let stockDividends = {};
         let stockLatestDate = {};
+
         dividendDates.forEach(date => {
             let sum = 0;
             let companies = [];
-            let [month, day, year] = date.split("/"); // Extract year & month (YYYY-MM format)
-            let formattedDate = new Date(year, month - 1, 1); // Convert to Date object
+            let [year, month, day] = date.split("/").map(Number); // ✅ Changed order
+            let formattedDate = new Date(year, month - 1, day); // ✅ Changed order
 
             datewise_dividends[date].forEach(stock => {
                 sum += stock.dividend_amount;
@@ -641,7 +642,10 @@
 
         function toSlashFormat(dateInputValue) {
             const d = new Date(dateInputValue);
-            return `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}/${d.getFullYear()}`;
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
+            return `${year}/${month}/${day}`; // ✅ Changed to YYYY/MM/DD
         }
 
         startDateInput.addEventListener("change", handleDateChange);
