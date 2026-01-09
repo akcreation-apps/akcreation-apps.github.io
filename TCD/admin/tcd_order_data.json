@@ -1,4 +1,213 @@
 {
+    "LcoQsYJMAWXdeWy2Xxx9": {
+        "total_cart_value": 219,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 219,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 2803,
+                            "name": "Chicken Biryani (5pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "created_at": "2026-01-09T08:37:59.858000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "GV9mALSFPBiXecT67ABp": {
+        "total_cart_value": 298,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 105,
+                            "name": "Paneer Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "created_at": "2026-01-04T06:12:43.909000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Rejected",
+        "table_no": "COD"
+    },
+    "6gJIcUYcKKkSyRKdEpNM": {
+        "total_cart_value": 218,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 303,
+                            "name": "Singapore Noodles"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 89,
+                            "quantity": 1,
+                            "id": 1309,
+                            "name": "TCD Special Guava Lagoon"
+                        }
+                    ],
+                    "name": "Mocktails"
+                }
+            }
+        ],
+        "created_at": "2025-12-21T08:48:47.742000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "kJK6S99y03BRh5umoMIN": {
+        "total_cart_value": 119,
+        "created_at": "2025-12-11T03:35:31.734000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 71,
+                            "name": "Hot And Sour"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "kiP9nn277VJ2Hi7aDdi7": {
+        "total_cart_value": 119,
+        "created_at": "2025-12-11T03:28:41.426000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 71,
+                            "name": "Hot And Sour"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "c3Rdnp6l7SzPnHMlAo2e": {
+        "total_cart_value": 188,
+        "created_at": "2025-12-11T03:28:09.048000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 71,
+                            "name": "Hot And Sour"
+                        },
+                        {
+                            "price": 69,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 72,
+                            "name": "Manchow"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "9Lt1RfJeTPqHVUo3zjA5": {
+        "total_cart_value": 199,
+        "created_at": "2025-12-04T12:46:31.633000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 107,
+                            "name": "Honey Chilli Potato"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "DYZoTSBQZpOZ1QKc1a8S": {
+        "total_cart_value": 119,
+        "created_at": "2025-11-28T06:24:09.143000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 73,
+                            "name": "Clear"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
     "5NT9fgZWm9cM2E1eECMp": {
         "total_cart_value": 179,
         "created_at": "2025-11-13T13:43:58.491000+00:00",
