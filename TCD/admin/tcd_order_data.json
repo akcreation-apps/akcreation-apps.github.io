@@ -1,4 +1,195 @@
 {
+    "6O7Nv0VHL7KM3RT3yhMl": {
+        "total_cart_value": 278,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 801,
+                            "name": "Casun Chicken"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "created_at": "2026-01-20T04:47:17.141000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "KybRPVtc1oJbQur4T7Up": {
+        "total_cart_value": 238,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 303,
+                            "name": "Singapore Noodles"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 109,
+                            "quantity": 1,
+                            "id": 1503,
+                            "name": "Cold Coffee"
+                        }
+                    ],
+                    "name": "Refreshment"
+                }
+            }
+        ],
+        "created_at": "2026-01-17T08:17:33.983000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "x2puEXhAYYWMu6Ee8CDc": {
+        "total_cart_value": 218,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 109,
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 2801,
+                            "name": "Chicken Biryani (2pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "created_at": "2026-01-17T08:14:44.228000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Rejected",
+        "table_no": "COD"
+    },
+    "SkAGvyq7xwK0w2BZYtY6": {
+        "total_cart_value": 238,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 109,
+                            "quantity": 1,
+                            "id": 1503,
+                            "name": "Cold Coffee"
+                        }
+                    ],
+                    "name": "Refreshment"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 303,
+                            "name": "Singapore Noodles"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            }
+        ],
+        "created_at": "2026-01-17T08:03:31.237000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Rejected",
+        "table_no": "COD"
+    },
+    "YgPKIrjp9NitTh4QHuR4": {
+        "total_cart_value": 208,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "created_at": "2026-01-10T06:47:24.509000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "96dbflo1xJ5wIdqA0qkK": {
+        "total_cart_value": 227,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "quantity": 2,
+                            "id": 2509,
+                            "name": "Lachha Paratha"
+                        }
+                    ],
+                    "name": "Indian Breads / Roti"
+                }
+            }
+        ],
+        "created_at": "2026-01-09T15:28:31.094000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Rejected",
+        "table_no": "COD"
+    },
     "LcoQsYJMAWXdeWy2Xxx9": {
         "total_cart_value": 219,
         "order_details": [
