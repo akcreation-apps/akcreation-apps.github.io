@@ -1,4 +1,131 @@
 {
+    "TwJJrOOx9fbTuBLtOcxH": {
+        "total_cart_value": 218,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "created_at": "2026-02-01T13:14:05.007000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "0wjaJWXuVYLRJIkvyTFR": {
+        "total_cart_value": 208,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Egg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "created_at": "2026-01-27T13:57:18.598000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "nOgXCvd0xXaAChmAiHfo": {
+        "total_cart_value": 328,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 219,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 2803,
+                            "name": "Chicken Biryani (5pc)"
+                        },
+                        {
+                            "price": 109,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 2801,
+                            "name": "Chicken Biryani (2pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "created_at": "2026-01-24T08:11:26.809000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Approved",
+        "table_no": "COD"
+    },
+    "wiudT4V9crtbl4c2T8Hm": {
+        "total_cart_value": 219,
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 219,
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 2803,
+                            "name": "Chicken Biryani (5pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "created_at": "2026-01-24T07:44:58.112000+00:00",
+        "triggered_to": "+917749984274",
+        "status": "Rejected",
+        "table_no": "COD"
+    },
     "6O7Nv0VHL7KM3RT3yhMl": {
         "total_cart_value": 278,
         "order_details": [
