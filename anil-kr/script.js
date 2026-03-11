@@ -1,15 +1,16 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const fadeInElements = document.querySelectorAll(".fade-in");
+document.addEventListener("DOMContentLoaded", () => {
 
-    function fadeInOnScroll() {
-        fadeInElements.forEach(el => {
-            if (el.getBoundingClientRect().top < window.innerHeight * 0.9) {
-                el.style.opacity = 1;
-                el.style.transform = "translateY(0)";
-            }
-        });
-    }
+const elements = document.querySelectorAll(".fade-in");
 
-    window.addEventListener("scroll", fadeInOnScroll);
-    fadeInOnScroll();
-});
+const observer = new IntersectionObserver((entries)=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.style.opacity=1
+entry.target.style.transform="translateY(0)"
+}
+})
+},{threshold:0.2})
+
+elements.forEach(el=>observer.observe(el))
+
+})
