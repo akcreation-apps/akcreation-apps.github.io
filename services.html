@@ -1,175 +1,608 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="#">
-    <title>AkCreation - Static Makeover Pages</title>
-    <style>
-        /* General Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AK Creation – Website Design for Local Businesses in Odisha</title>
+  <meta name="description" content="AK Creation builds fast, mobile-friendly websites for restaurants, transport services, shops and more in Odisha. WhatsApp booking, 24hr delivery. Starting affordable.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1a2a4a;
+      --accent:  #ff7043;
+      --green:   #25d366;
+      --light:   #f8fafc;
+      --text:    #1e293b;
+      --muted:   #64748b;
+      --white:   #ffffff;
+      --shadow:  0 4px 24px rgba(0,0,0,0.08);
+      --nav-h:   64px;
+    }
+    *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Poppins',Arial,sans-serif; color:var(--text); background:var(--white); }
+    a { text-decoration:none; color:inherit; }
 
-        body {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: white;
-            text-align: center;
-            padding-top: 80px; /* For fixed header */
-        }
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position:fixed; top:0; left:0; right:0; height:var(--nav-h);
+      background:rgba(26,42,74,0.97); backdrop-filter:blur(10px);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 28px; z-index:1000; box-shadow:0 2px 20px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:10px; color:var(--white); }
+    .nav-logo {
+      width:38px; height:38px; background:var(--accent); border-radius:10px;
+      display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
+    }
+    .nav-name { font-size:1.05rem; font-weight:700; }
+    .nav-name span { color:var(--accent); }
+    .nav-links { display:flex; align-items:center; gap:28px; }
+    .nav-links a { color:rgba(255,255,255,0.75); font-size:0.85rem; font-weight:500; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--white); }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .nav-cta {
+      background:var(--green); color:var(--white); padding:8px 18px;
+      border-radius:24px; font-size:0.82rem; font-weight:700;
+      display:flex; align-items:center; gap:6px; border:none; cursor:pointer;
+      transition:background 0.2s, transform 0.15s; white-space:nowrap;
+    }
+    .nav-cta:hover { background:#1da855; transform:scale(1.04); }
+    .hamburger { display:none; background:none; border:none; color:var(--white); font-size:1.35rem; cursor:pointer; padding:4px; }
 
-        /* Header */
-        header {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
+    /* Mobile Nav Drawer */
+    .nav-drawer {
+      display:none; flex-direction:column; position:fixed;
+      top:var(--nav-h); left:0; right:0;
+      background:#1a2a4a; padding:20px 28px; gap:18px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.35); z-index:999;
+    }
+    .nav-drawer.open { display:flex; }
+    .nav-drawer a { color:rgba(255,255,255,0.85); font-size:0.95rem; font-weight:500; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
 
-        header h1 {
-            font-size: 24px;
-        }
+    /* ===== HERO ===== */
+    .hero {
+      background:linear-gradient(135deg, #0f172a 0%, #1a2a4a 50%, #1565c0 100%);
+      padding:calc(var(--nav-h) + 60px) 24px 80px;
+      text-align:center; position:relative; overflow:hidden;
+      min-height:92vh; display:flex; align-items:center; justify-content:center;
+    }
+    .hero::before { content:''; position:absolute; top:-100px; right:-100px; width:420px; height:420px; background:rgba(255,112,67,0.1); border-radius:50%; }
+    .hero::after  { content:''; position:absolute; bottom:-80px; left:-80px; width:340px; height:340px; background:rgba(37,211,102,0.08); border-radius:50%; }
+    .hero-content { position:relative; z-index:2; max-width:780px; margin:0 auto; }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+      color:#81d4fa; border-radius:20px; padding:6px 16px;
+      font-size:0.78rem; font-weight:500; margin-bottom:24px;
+    }
+    .hero h1 { font-size:3.1rem; font-weight:800; color:var(--white); line-height:1.2; margin-bottom:20px; }
+    .hero h1 span { color:var(--accent); }
+    .hero-sub { font-size:1.05rem; color:#b3d4f5; line-height:1.8; margin:0 auto 36px; max-width:580px; }
+    .hero-btns { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-bottom:56px; }
+    .btn-wa {
+      background:var(--green); color:var(--white); padding:15px 30px;
+      border-radius:32px; font-size:1rem; font-weight:700;
+      display:inline-flex; align-items:center; gap:8px;
+      box-shadow:0 4px 20px rgba(37,211,102,0.35); border:none; cursor:pointer;
+      transition:background 0.2s, transform 0.2s;
+    }
+    .btn-wa:hover { background:#1da855; transform:translateY(-2px); }
+    .btn-ghost {
+      background:transparent; color:var(--white); padding:15px 30px;
+      border-radius:32px; font-size:1rem; font-weight:600;
+      display:inline-flex; align-items:center; gap:8px;
+      border:2px solid rgba(255,255,255,0.35); cursor:pointer;
+      transition:border-color 0.2s, background 0.2s;
+    }
+    .btn-ghost:hover { border-color:var(--white); background:rgba(255,255,255,0.08); }
+    .hero-stats {
+      display:flex; flex-wrap:wrap; justify-content:center; gap:40px;
+      border-top:1px solid rgba(255,255,255,0.12); padding-top:36px;
+    }
+    .stat { text-align:center; }
+    .stat-num { font-size:2rem; font-weight:800; color:var(--accent); }
+    .stat-label { font-size:0.68rem; color:#90caf9; text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
 
-        /* Services Section */
-        .services {
-            margin: 40px 0;
-        }
+    /* ===== LAYOUT ===== */
+    section { padding:80px 24px; }
+    .container { max-width:1100px; margin:0 auto; }
+    .sec-head { text-align:center; margin-bottom:48px; }
+    .badge-lbl { display:inline-block; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent); margin-bottom:10px; }
+    .sec-title { font-size:2rem; font-weight:800; color:var(--primary); line-height:1.3; margin-bottom:12px; }
+    .sec-sub { font-size:0.95rem; color:var(--muted); max-width:520px; margin:0 auto; line-height:1.75; }
+    .alt-bg { background:var(--light); }
 
-        .services h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
+    /* ===== SERVICE CARDS ===== */
+    .svc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:24px; }
+    .svc-card {
+      background:var(--white); border-radius:20px; padding:32px 28px;
+      box-shadow:var(--shadow); border:1.5px solid #f0f4f8; position:relative;
+      overflow:hidden; transition:transform 0.3s, box-shadow 0.3s;
+    }
+    .svc-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--c,var(--accent)); }
+    .svc-card:hover { transform:translateY(-8px); box-shadow:0 16px 48px rgba(0,0,0,0.12); }
+    .svc-icon {
+      width:58px; height:58px; border-radius:16px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; margin-bottom:18px;
+      background:var(--ib, #fff3e0); color:var(--c, var(--accent));
+    }
+    .svc-card h3 { font-size:1.08rem; font-weight:700; color:var(--primary); margin-bottom:10px; }
+    .svc-card p { font-size:0.85rem; color:var(--muted); line-height:1.75; margin-bottom:18px; }
+    .svc-tags { display:flex; flex-wrap:wrap; gap:6px; }
+    .tag { font-size:0.68rem; font-weight:600; padding:3px 10px; border-radius:10px; background:var(--tb,#fff3e0); color:var(--c,var(--accent)); }
 
-        .service-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            padding: 10px;
-            justify-items: center;
-        }
+    /* ===== PROCESS ===== */
+    .process-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:32px; }
+    .process-card { text-align:center; }
+    .process-num {
+      width:52px; height:52px; border-radius:50%;
+      background:linear-gradient(135deg, var(--primary), #1565c0);
+      color:var(--white); font-size:1.2rem; font-weight:800;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 14px; box-shadow:0 4px 16px rgba(26,42,74,0.3);
+    }
+    .process-icon { font-size:2.2rem; margin-bottom:10px; }
+    .process-card h4 { font-size:0.97rem; font-weight:700; color:var(--primary); margin-bottom:8px; }
+    .process-card p { font-size:0.82rem; color:var(--muted); line-height:1.7; }
 
-        .service {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease-in-out;
-        }
-        #whatsappBtn{
-        margin-top: 20px
-        }
-        .service:hover {
-            transform: scale(1.05);
-        }
+    /* ===== PORTFOLIO ===== */
+    .port-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:24px; }
+    .port-card {
+      background:var(--white); border-radius:20px; overflow:hidden;
+      box-shadow:var(--shadow); transition:transform 0.3s, box-shadow 0.3s;
+    }
+    .port-card:hover { transform:translateY(-6px); box-shadow:0 16px 48px rgba(0,0,0,0.13); }
+    .port-thumb {
+      height:170px; display:flex; align-items:center; justify-content:center; font-size:5.5rem;
+    }
+    .port-body { padding:22px 22px 20px; }
+    .port-pill {
+      display:inline-block; font-size:0.68rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.8px;
+      padding:3px 12px; border-radius:10px; margin-bottom:10px;
+    }
+    .port-body h3 { font-size:1.05rem; font-weight:700; color:var(--primary); margin-bottom:6px; }
+    .port-body p { font-size:0.82rem; color:var(--muted); line-height:1.7; margin-bottom:14px; }
+    .port-link { display:inline-flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:700; color:var(--primary); transition:gap 0.2s; }
+    .port-link i { font-size:0.75rem; }
+    .port-link:hover { gap:10px; color:var(--accent); }
 
-        /* Portfolio Section */
-        .portfolio {
-            margin: 40px 0;
-        }
+    /* ===== WHY US ===== */
+    .why-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:20px; }
+    .why-card {
+      background:var(--white); border-radius:16px; padding:28px 22px; text-align:center;
+      border:1.5px solid #e8edf5; transition:transform 0.3s, box-shadow 0.3s;
+    }
+    .why-card:hover { transform:translateY(-4px); box-shadow:0 8px 28px rgba(26,42,74,0.1); }
+    .why-icon { font-size:2.2rem; margin-bottom:12px; }
+    .why-card h4 { font-size:0.95rem; font-weight:700; color:var(--primary); margin-bottom:8px; }
+    .why-card p { font-size:0.8rem; color:var(--muted); line-height:1.65; }
 
-        .portfolio img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
+    /* ===== TESTIMONIAL ===== */
+    .testi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:20px; }
+    .testi-card {
+      background:var(--white); border-radius:16px; padding:26px 24px;
+      box-shadow:var(--shadow); position:relative;
+    }
+    .testi-card::before {
+      content:'\201C'; position:absolute; top:14px; left:18px;
+      font-size:4rem; color:#e3f0ff; line-height:1; font-family:Georgia,serif;
+    }
+    .testi-stars { color:#f59e0b; font-size:0.9rem; margin-bottom:12px; position:relative; z-index:1; }
+    .testi-text { font-size:0.85rem; color:#4a5568; line-height:1.75; margin-bottom:16px; }
+    .testi-author { display:flex; align-items:center; gap:12px; }
+    .testi-av {
+      width:42px; height:42px; border-radius:50%; font-size:1rem;
+      font-weight:700; color:var(--white); display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg, var(--primary), #1565c0); flex-shrink:0;
+    }
+    .testi-name { font-size:0.87rem; font-weight:700; color:var(--primary); }
+    .testi-biz { font-size:0.73rem; color:var(--muted); }
 
-        .portfolio img:hover {
-            transform: scale(1.1);
-        }
+    /* ===== CTA BANNER ===== */
+    .cta-banner {
+      background:linear-gradient(135deg, var(--primary), #1565c0);
+      border-radius:24px; padding:64px 40px; text-align:center; color:var(--white);
+    }
+    .cta-banner .badge-lbl { color:#ff9d80; }
+    .cta-banner h2 { font-size:2rem; font-weight:800; margin-bottom:12px; }
+    .cta-banner h2 span { color:var(--accent); }
+    .cta-banner p { color:#90caf9; font-size:1rem; margin-bottom:32px; }
+    .cta-btns { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; }
+    .btn-wa-lg {
+      background:var(--green); color:var(--white); padding:16px 32px;
+      border-radius:32px; font-size:1rem; font-weight:700;
+      display:inline-flex; align-items:center; gap:10px;
+      box-shadow:0 4px 20px rgba(37,211,102,0.4); border:none; cursor:pointer;
+      transition:background 0.2s, transform 0.2s;
+    }
+    .btn-wa-lg:hover { background:#1da855; transform:translateY(-2px); }
+    .btn-call {
+      background:rgba(255,255,255,0.1); color:var(--white); padding:16px 32px;
+      border-radius:32px; font-size:1rem; font-weight:600;
+      display:inline-flex; align-items:center; gap:10px;
+      border:2px solid rgba(255,255,255,0.25); cursor:pointer;
+      transition:background 0.2s, border-color 0.2s;
+    }
+    .btn-call:hover { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.5); }
 
-        /* Contact Section */
-        .contact {
-            margin: 40px 0;
-        }
+    /* ===== FOOTER ===== */
+    footer { background:#0f172a; color:#64748b; text-align:center; padding:32px 24px; font-size:0.82rem; line-height:2; }
+    footer a { color:#90caf9; transition:color 0.2s; }
+    footer a:hover { color:var(--white); }
+    .footer-links { margin-bottom:8px; }
+    .footer-links a { margin:0 12px; }
 
-        .contact button {
-            background: #e74c3c;
-            color: white;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background 0.3s ease-in-out;
-        }
+    /* ===== FLOATING WA ===== */
+    .wa-float {
+      position:fixed; bottom:24px; right:20px;
+      background:var(--green); color:var(--white);
+      width:56px; height:56px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; z-index:998;
+      box-shadow:0 4px 20px rgba(37,211,102,0.5);
+      transition:transform 0.2s;
+    }
+    .wa-float:hover { transform:scale(1.1); }
 
-        .contact button:hover {
-            background: #c0392b;
-        }
+    /* ===== FADE-IN ===== */
+    .fi { opacity:0; transform:translateY(22px); transition:opacity 0.55s ease, transform 0.55s ease; }
+    .fi.on { opacity:1; transform:translateY(0); }
 
-        /* Footer */
-        footer {
-            margin-top: 40px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            text-align: center;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 20px;
-            }
-
-            .service {
-                width: 90%;
-            }
-        }
-    </style>
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:768px) {
+      .nav-links { display:none; }
+      .hamburger { display:block; }
+      .hero h1 { font-size:2.1rem; }
+      .sec-title { font-size:1.65rem; }
+      .hero-stats { gap:22px; }
+      section { padding:60px 18px; }
+      .cta-banner { padding:44px 22px; }
+      .cta-banner h2 { font-size:1.5rem; }
+    }
+    @media(max-width:480px) {
+      :root { --nav-h:56px; }
+      .navbar { padding:0 16px; }
+      .hero { min-height:auto; padding:calc(var(--nav-h) + 48px) 16px 60px; }
+      .hero h1 { font-size:1.65rem; }
+      .hero-sub { font-size:0.9rem; }
+      .stat-num { font-size:1.7rem; }
+      section { padding:48px 14px; }
+      .svc-grid, .port-grid { grid-template-columns:1fr; }
+      .cta-banner { padding:36px 18px; }
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>AkCreation Solutions !!</h1>
-        <p>Get Beautiful, Responsive and Static Websites</p>
-    </header>
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo"><i class="fas fa-code"></i></div>
+    <div class="nav-name">AK <span>Creation</span></div>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a href="#services">Services</a>
+    <a href="#process">How It Works</a>
+    <a href="#portfolio">Portfolio</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-cta" onclick="wa('general')"><i class="fab fa-whatsapp"></i> Start Project</button>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
 
-    <!-- Services Section -->
-    <section class="services">
-        <h2>Our Services</h2>
-        <div class="service-list">
-            <div class="service">
-                <h3>Custom Static Pages</h3>
-                <p>Get a unique, high-quality static page designed to your needs.</p>
-            </div>
-            <div class="service">
-                <h3>Fast & Secure Hosting</h3>
-                <p>We provide lightweight, fast-loading pages.</p>
-            </div>
-            <div class="service">
-                <h3>Responsive Design</h3>
-                <p>Mobile-friendly designs that work on all devices.</p>
-            </div>
+<!-- Mobile Nav Drawer -->
+<div class="nav-drawer" id="navDrawer">
+  <a href="#services" onclick="closeNav()">Services</a>
+  <a href="#process" onclick="closeNav()">How It Works</a>
+  <a href="#portfolio" onclick="closeNav()">Portfolio</a>
+  <a href="#contact" onclick="closeNav()">Contact</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="hero-badge"><i class="fas fa-star"></i> &nbsp;Trusted by local businesses in Odisha</div>
+    <h1>Your Business Deserves a<br><span>Beautiful Website</span></h1>
+    <p class="hero-sub">We build fast, mobile-friendly pages for restaurants, transport services, shops and more — delivered in days, not weeks. Book via WhatsApp.</p>
+    <div class="hero-btns">
+      <button class="btn-wa" onclick="wa('general')"><i class="fab fa-whatsapp"></i> Start Your Project</button>
+      <a class="btn-ghost" href="#portfolio"><i class="fas fa-eye"></i> View Our Work</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">20+</div><div class="stat-label">Projects Delivered</div></div>
+      <div class="stat"><div class="stat-num">24hr</div><div class="stat-label">Avg Delivery</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Mobile Ready</div></div>
+      <div class="stat"><div class="stat-num">Free</div><div class="stat-label">Hosting Included</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICES ===== -->
+<section id="services" class="alt-bg">
+  <div class="container">
+    <div class="sec-head">
+      <div class="badge-lbl">What We Build</div>
+      <h2 class="sec-title">Services We Offer</h2>
+      <p class="sec-sub">From restaurant menus to transport booking pages — we build it all, fast and affordable.</p>
+    </div>
+    <div class="svc-grid">
+
+      <div class="svc-card fi" style="--c:#1565c0;--ib:#e3f0ff;--tb:#e3f0ff;">
+        <div class="svc-icon"><i class="fas fa-store"></i></div>
+        <h3>Business Landing Page</h3>
+        <p>A clean, professional page for your shop, clinic, salon or any local business — with services, contact info and a WhatsApp booking button.</p>
+        <div class="svc-tags">
+          <span class="tag">Shops</span><span class="tag">Clinics</span><span class="tag">Salons</span><span class="tag">Any Business</span>
         </div>
-    </section>
+      </div>
 
-    <!-- Contact Section -->
-    <section class="contact">
-        <h2>Get in Touch</h2>
-        <p>Have a project in mind? Let's talk!</p>
-        <button id="whatsappBtn">Chat on WhatsApp</button>
-    </section>
+      <div class="svc-card fi" style="--c:#e65100;--ib:#fff3e0;--tb:#fff3e0;">
+        <div class="svc-icon"><i class="fas fa-utensils"></i></div>
+        <h3>Restaurant & Food Menu</h3>
+        <p>A beautiful digital menu for your restaurant or food business, with item showcases, prices and one-tap WhatsApp ordering for customers.</p>
+        <div class="svc-tags">
+          <span class="tag">Restaurant</span><span class="tag">Cafe</span><span class="tag">Tiffin</span><span class="tag">Catering</span>
+        </div>
+      </div>
 
-    <footer>
-        <p>&copy; 2025 AkCreation. All rights reserved.</p>
-    </footer>
+      <div class="svc-card fi" style="--c:#2e7d32;--ib:#e8f5e9;--tb:#e8f5e9;">
+        <div class="svc-icon"><i class="fas fa-car"></i></div>
+        <h3>Transport Booking Page</h3>
+        <p>A WhatsApp-powered booking page for cab, auto, tractor or bus services. Customers book in under 5 minutes — no app needed.</p>
+        <div class="svc-tags">
+          <span class="tag">Cab</span><span class="tag">Auto</span><span class="tag">Tractor</span><span class="tag">Bus</span>
+        </div>
+      </div>
 
-    <script>
-        document.getElementById("whatsappBtn").addEventListener("click", function() {
-            const phoneNumber = "+917749984274"; // Your WhatsApp Number
-            const message = "Hi! I need a static webpage for my business.";
-            window.location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        });
-    </script>
+      <div class="svc-card fi" style="--c:#6d28d9;--ib:#ede9fe;--tb:#ede9fe;">
+        <div class="svc-icon"><i class="fas fa-user-circle"></i></div>
+        <h3>Portfolio & Profile Page</h3>
+        <p>A professional digital profile for freelancers, teachers, doctors or individuals to showcase their skills and get more clients.</p>
+        <div class="svc-tags">
+          <span class="tag">Resume</span><span class="tag">Portfolio</span><span class="tag">Profile</span>
+        </div>
+      </div>
 
+      <div class="svc-card fi" style="--c:#0891b2;--ib:#e0f7fa;--tb:#e0f7fa;">
+        <div class="svc-icon"><i class="fas fa-tools"></i></div>
+        <h3>Custom Web Tools</h3>
+        <p>Calculators, invoice generators, grade sheets and interactive tools — custom built to solve your specific business or institution needs.</p>
+        <div class="svc-tags">
+          <span class="tag">Calculator</span><span class="tag">Invoice</span><span class="tag">Forms</span>
+        </div>
+      </div>
+
+      <div class="svc-card fi" style="--c:#25d366;--ib:#e8fdf0;--tb:#e8fdf0;">
+        <div class="svc-icon"><i class="fab fa-whatsapp"></i></div>
+        <h3>WhatsApp Integration</h3>
+        <p>Every page we build has smart WhatsApp booking — customers tap once and a pre-filled message goes straight to your phone. Included free with all packages.</p>
+        <div class="svc-tags">
+          <span class="tag">Auto Message</span><span class="tag">One-Tap Book</span><span class="tag">Free Add-on</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="process">
+  <div class="container">
+    <div class="sec-head">
+      <div class="badge-lbl">Simple Process</div>
+      <h2 class="sec-title">Go Live in 3 Easy Steps</h2>
+      <p class="sec-sub">No technical knowledge needed. We handle everything from design to delivery — you just share the link.</p>
+    </div>
+    <div class="process-grid">
+      <div class="process-card fi">
+        <div class="process-num">1</div>
+        <div class="process-icon">💬</div>
+        <h4>Tell Us Your Idea</h4>
+        <p>WhatsApp us with your business name, what you need and any examples you like. Takes just 5 minutes.</p>
+      </div>
+      <div class="process-card fi">
+        <div class="process-num">2</div>
+        <div class="process-icon">🎨</div>
+        <h4>We Design & Build</h4>
+        <p>We create your full website — design, content, WhatsApp integration — and send you a preview within 24–48 hours.</p>
+      </div>
+      <div class="process-card fi">
+        <div class="process-num">3</div>
+        <div class="process-icon">🚀</div>
+        <h4>Your Page Goes Live</h4>
+        <p>We host it free at your own link. Share it on WhatsApp, Facebook, Google — your business is online instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PORTFOLIO ===== -->
+<section id="portfolio" class="alt-bg">
+  <div class="container">
+    <div class="sec-head">
+      <div class="badge-lbl">Our Work</div>
+      <h2 class="sec-title">Live Projects</h2>
+      <p class="sec-sub">Real pages we've built for businesses — tap any card to see it live.</p>
+    </div>
+    <div class="port-grid">
+
+      <div class="port-card fi">
+        <div class="port-thumb" style="background:linear-gradient(135deg,#1a2a4a,#1565c0);">🚗</div>
+        <div class="port-body">
+          <span class="port-pill" style="background:#e3f0ff;color:#1565c0;">Transport</span>
+          <h3>Banki Transport Service</h3>
+          <p>Cab, auto & tractor booking page with bilingual support (Odia + English). Customers book directly via WhatsApp in under 5 minutes.</p>
+          <a class="port-link" href="/banki-transport/" target="_blank" rel="noopener">View Live <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="port-card fi">
+        <div class="port-thumb" style="background:linear-gradient(135deg,#7b1fa2,#ab47bc);">🍽️</div>
+        <div class="port-body">
+          <span class="port-pill" style="background:#f3e5f5;color:#7b1fa2;">Restaurant</span>
+          <h3>The Cafe Darbar</h3>
+          <p>Full digital menu with WhatsApp ordering, item photos, categories and invoice generation for a restaurant in Odisha.</p>
+          <a class="port-link" href="/TCD/index.html" target="_blank" rel="noopener">View Live <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="port-card fi">
+        <div class="port-thumb" style="background:linear-gradient(135deg,#e65100,#ff7043);">🎓</div>
+        <div class="port-body">
+          <span class="port-pill" style="background:#fff3e0;color:#e65100;">Student Tools</span>
+          <h3>BPUT Student Toolkit</h3>
+          <p>GPA calculator, grade sheet, resume builder and seminar report tools — used by thousands of BPUT students across Odisha.</p>
+          <a class="port-link" href="/index.html" target="_blank" rel="noopener">View Live <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHY US ===== -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <div class="badge-lbl">Why AK Creation</div>
+      <h2 class="sec-title">What Makes Us Different</h2>
+      <p class="sec-sub">We focus on small and local businesses — affordable, fast, and built for WhatsApp-first customers.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card fi">
+        <div class="why-icon">⚡</div>
+        <h4>24–48 Hour Delivery</h4>
+        <p>Your page goes live within a day or two. No waiting weeks or months for your website to be ready.</p>
+      </div>
+      <div class="why-card fi">
+        <div class="why-icon">📱</div>
+        <h4>Mobile-First Design</h4>
+        <p>Every page looks perfect on phones. Your customers browse on mobile — we design for that first.</p>
+      </div>
+      <div class="why-card fi">
+        <div class="why-icon">💰</div>
+        <h4>Affordable Pricing</h4>
+        <p>No hidden charges, no monthly subscriptions. Pay once, use forever. Free hosting included.</p>
+      </div>
+      <div class="why-card fi">
+        <div class="why-icon">🤝</div>
+        <h4>WhatsApp Support</h4>
+        <p>Chat with us directly on WhatsApp anytime. Easy updates, quick fixes, zero tech jargon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="alt-bg">
+  <div class="container">
+    <div class="sec-head">
+      <div class="badge-lbl">What Clients Say</div>
+      <h2 class="sec-title">Real Feedback</h2>
+      <p class="sec-sub">Businesses that trusted AK Creation to get them online.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card fi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Our transport booking page was ready within a day. Now customers book cabs directly from WhatsApp — we get more bookings every day!"</p>
+        <div class="testi-author">
+          <div class="testi-av">R</div>
+          <div><div class="testi-name">Ravi Kumar</div><div class="testi-biz">Banki Transport Service</div></div>
+        </div>
+      </div>
+      <div class="testi-card fi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The restaurant menu page AK Creation built for us is beautiful. Customers love browsing the menu on their phone and ordering through WhatsApp."</p>
+        <div class="testi-author">
+          <div class="testi-av">S</div>
+          <div><div class="testi-name">Sourav Das</div><div class="testi-biz">Cafe Owner, Cuttack</div></div>
+        </div>
+      </div>
+      <div class="testi-card fi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Very affordable and fast! My business profile page was done in 24 hours. Now people find me on Google and reach me on WhatsApp easily."</p>
+        <div class="testi-author">
+          <div class="testi-av">P</div>
+          <div><div class="testi-name">Priya Mohanty</div><div class="testi-biz">Freelancer, Bhubaneswar</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA BANNER ===== -->
+<section id="contact">
+  <div class="container">
+    <div class="cta-banner">
+      <div class="badge-lbl">Ready to Start?</div>
+      <h2>Get Your Business Online <span>Today</span></h2>
+      <p>Tell us about your business on WhatsApp and we'll have your page ready in 24 hours.</p>
+      <div class="cta-btns">
+        <button class="btn-wa-lg" onclick="wa('general')"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</button>
+        <a class="btn-call" href="tel:+917749984274"><i class="fas fa-phone"></i> Call Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#portfolio">Portfolio</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <p>📞 <a href="tel:+917749984274">+91 77499 84274</a> &nbsp;|&nbsp; <a href="https://wa.me/917749984274" target="_blank" rel="noopener">WhatsApp</a></p>
+  <p style="margin-top:6px;">&copy; 2026 AK Creation. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+</footer>
+
+<!-- Floating WhatsApp -->
+<a class="wa-float" href="https://wa.me/917749984274?text=Hi!%20I%20want%20a%20website%20for%20my%20business." target="_blank" rel="noopener" aria-label="WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<script>
+  const WA = "917749984274";
+  const MSGS = {
+    general:   "Hi! I want a website for my business. Can you help me?",
+    transport: "Hi! I need a transport booking page like Banki Transport. Can you build one for my business?",
+    restaurant:"Hi! I need a restaurant menu / food ordering page. Can you help?",
+    portfolio: "Hi! I need a portfolio or profile page. Can you build one for me?"
+  };
+
+  function wa(type) {
+    const msg = MSGS[type] || MSGS.general;
+    window.open("https://wa.me/" + WA + "?text=" + encodeURIComponent(msg), "_blank");
+  }
+
+  /* Hamburger */
+  const hamburger = document.getElementById("hamburger");
+  const drawer    = document.getElementById("navDrawer");
+  hamburger.addEventListener("click", () => {
+    drawer.classList.toggle("open");
+    hamburger.querySelector("i").className = drawer.classList.contains("open") ? "fas fa-times" : "fas fa-bars";
+  });
+  function closeNav() { drawer.classList.remove("open"); hamburger.querySelector("i").className = "fas fa-bars"; }
+
+  /* Scroll-in animations */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add("on"), i * 90);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll(".fi").forEach(el => io.observe(el));
+</script>
 </body>
 </html>
