@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2a4a"/>
+      <stop offset="55%" stop-color="#1565c0"/>
+      <stop offset="100%" stop-color="#0d47a1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1120" cy="-60" r="300" fill="#ff7043" opacity="0.08"/>
+  <circle cx="20" cy="700" r="280" fill="#25d366" opacity="0.07"/>
+
+  <!-- Left accent bar -->
+  <rect x="60" y="110" width="6" height="320" fill="#ff7043" rx="3"/>
+
+  <!-- Location badge -->
+  <rect x="82" y="68" width="230" height="34" rx="17" fill="rgba(255,255,255,0.1)"/>
+  <text x="197" y="90" font-family="Arial, sans-serif" font-size="13" fill="#81d4fa" text-anchor="middle">&#x1F4CD; Banki, Cuttack District, Odisha</text>
+
+  <!-- Main heading -->
+  <text x="82" y="192" font-family="Arial Black, Arial, sans-serif" font-size="78" fill="#ffffff" font-weight="900" letter-spacing="-1">Banki</text>
+  <text x="82" y="276" font-family="Arial Black, Arial, sans-serif" font-size="78" fill="#ff7043" font-weight="900" letter-spacing="-1">Transport</text>
+  <text x="82" y="360" font-family="Arial Black, Arial, sans-serif" font-size="78" fill="#ffffff" font-weight="900" letter-spacing="-1">Service</text>
+
+  <!-- Tagline -->
+  <text x="82" y="408" font-family="Arial, sans-serif" font-size="22" fill="#90caf9">Cab &#xB7; Auto Rickshaw &#xB7; Tractor Rental</text>
+
+  <!-- WhatsApp CTA -->
+  <rect x="82" y="432" width="270" height="50" rx="25" fill="#25d366"/>
+  <text x="217" y="463" font-family="Arial, sans-serif" font-size="17" fill="#ffffff" text-anchor="middle" font-weight="700">&#x1F4F1; Book via WhatsApp</text>
+
+  <!-- Phone -->
+  <text x="370" y="463" font-family="Arial, sans-serif" font-size="17" fill="#e2e8f0">&#x260E; +91 77499 84274</text>
+
+  <!-- Right panel: 3 service cards -->
+
+  <!-- Card 1: Cab -->
+  <rect x="660" y="40" width="490" height="162" rx="16" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+  <text x="720" y="152" font-family="Arial, sans-serif" font-size="82">&#x1F697;</text>
+  <text x="840" y="100" font-family="Arial Black, Arial, sans-serif" font-size="27" fill="#ffffff" font-weight="700">Cab Booking</text>
+  <text x="840" y="128" font-family="Arial, sans-serif" font-size="16" fill="#90caf9">Local &amp; Outstation Trips</text>
+  <text x="840" y="153" font-family="Arial, sans-serif" font-size="13" fill="rgba(255,255,255,0.45)">AC / Non-AC &#xB7; Airport Drop &#xB7; Hospital</text>
+
+  <!-- Card 2: Auto -->
+  <rect x="660" y="222" width="490" height="162" rx="16" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+  <text x="720" y="334" font-family="Arial, sans-serif" font-size="82">&#x1F6FA;</text>
+  <text x="840" y="282" font-family="Arial Black, Arial, sans-serif" font-size="27" fill="#ffffff" font-weight="700">Auto Rickshaw</text>
+  <text x="840" y="310" font-family="Arial, sans-serif" font-size="16" fill="#90caf9">Short Rides Within Banki</text>
+  <text x="840" y="335" font-family="Arial, sans-serif" font-size="13" fill="rgba(255,255,255,0.45)">Market &#xB7; School &#xB7; College Routes</text>
+
+  <!-- Card 3: Tractor -->
+  <rect x="660" y="404" width="490" height="162" rx="16" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+  <text x="720" y="516" font-family="Arial, sans-serif" font-size="82">&#x1F69C;</text>
+  <text x="840" y="464" font-family="Arial Black, Arial, sans-serif" font-size="27" fill="#ffffff" font-weight="700">Tractor Rental</text>
+  <text x="840" y="492" font-family="Arial, sans-serif" font-size="16" fill="#90caf9">Transport &amp; Agriculture</text>
+  <text x="840" y="517" font-family="Arial, sans-serif" font-size="13" fill="rgba(255,255,255,0.45)">Sand &#xB7; Bricks &#xB7; Farm Plowing</text>
+
+  <!-- Bottom stats bar -->
+  <rect x="0" y="574" width="1200" height="56" fill="rgba(0,0,0,0.28)"/>
+  <text x="180" y="608" font-family="Arial, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle" font-weight="600">&#x26A1; 24/7 Available</text>
+  <text x="400" y="610" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.25)" text-anchor="middle">&#xB7;</text>
+  <text x="600" y="608" font-family="Arial, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle" font-weight="600">&#x1F4B0; Affordable Rates</text>
+  <text x="800" y="610" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.25)" text-anchor="middle">&#xB7;</text>
+  <text x="1000" y="608" font-family="Arial, sans-serif" font-size="15" fill="#ffffff" text-anchor="middle" font-weight="600">&#x1F30D; akcreation-apps.com</text>
+</svg>
