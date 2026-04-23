@@ -745,6 +745,10 @@
         }
         footer a { color: #a5b4fc; text-decoration: none; }
         footer a:hover { color: #fff; }
+        /* push footer content above the sticky CTA on mobile */
+        @media (max-width: 767px) {
+            footer { padding-bottom: 88px; }
+        }
 
         /* ── Mobile sticky CTA ── */
         .mobile-sticky-cta {
@@ -1407,7 +1411,7 @@
     <div class="container">
         <p style="margin-bottom:.4rem;">
             &copy; <span id="currentYear"></span>
-            <strong style="color:#c7d2fe;">AK Creation</strong> — Made with ❤️ for BPUT Students
+            <a href="https://akcreation-apps.com/services.html" style="color:#c7d2fe; font-weight:700; text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#c7d2fe'">AK Creation</a> — Made with ❤️ for BPUT Students
         </p>
         <p class="footer-links" style="font-size:.8rem; color:#475569;">
             <a href="bput-sgpa-calculator.html">SGPA Calculator</a>
