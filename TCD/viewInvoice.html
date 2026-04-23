@@ -3,118 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="icon" href="/favicon.ico">
-    <meta name="theme-color" content="#4f46e5">
-    <title>Generate and Share Bill</title>
-    <link rel="stylesheet" href="viewInvoice_styles.css">
+    <meta name="theme-color" content="#1A1A2E">
+    <title>Bill — The Cafe Darbar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #FF6B35;
+            --navy:    #1A1A2E;
+            --bg:      #F5F0EB;
+            --text:    #2D2D2D;
+            --muted:   #888;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 16px 14px 40px;
+        }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--navy); font-size: 0.82rem; font-weight: 500;
+            text-decoration: none; margin-bottom: 16px;
+            padding: 6px 0;
+            transition: color 0.15s;
+        }
+        .back-link:hover { color: var(--primary); }
+        .back-link i { font-size: 0.75rem; }
+
+        /* ── Bill card ── */
+        #billContainer {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+            overflow: hidden;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            font-family: 'Courier Prime', 'Courier New', monospace;
+        }
+
+        /* Header band */
+        .bill-header-band {
+            background: var(--navy);
+            padding: 18px 20px 14px;
+            text-align: center;
+        }
+        .bill-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem; font-weight: 700;
+            color: #fff; margin: 0;
+            letter-spacing: 0.5px;
+        }
+        .bill-title span { color: var(--primary); }
+
+        /* Restaurant info below header */
+        .restaurant-info {
+            background: #f8f8f8;
+            padding: 10px 20px 8px;
+            text-align: center;
+            border-bottom: 1px dashed #ddd;
+        }
+        .restaurant-info p {
+            font-size: 11px; color: #555;
+            line-height: 1.6; margin: 0;
+        }
+
+        /* Table + date */
+        .table-info {
+            display: flex; justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px dashed #ddd;
+        }
+        .table-info p {
+            font-size: 11px; color: var(--text);
+            margin: 0; font-weight: 700;
+        }
+        .table-info p:last-child { font-weight: 400; color: var(--muted); }
+
+        .separator {
+            border: none;
+            border-top: 1px dashed #ccc;
+            margin: 0 20px;
+        }
+
+        /* Items list */
+        .bill-items {
+            list-style: none;
+            padding: 8px 20px;
+            margin: 0;
+        }
+        .bill-item {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 8px;
+            padding: 5px 0;
+            border-bottom: 1px dotted #eee;
+            font-size: 12px; color: var(--text);
+        }
+        .bill-item:last-child { border-bottom: none; }
+        .bill-item strong {
+            font-size: 11px; font-weight: 700;
+            color: var(--navy); text-transform: uppercase;
+            letter-spacing: 0.5px; padding-top: 6px;
+            display: block;
+        }
+        .bill-item .delivery-charge { color: #c62828; }
+
+        /* Total */
+        #billTotal {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem; font-weight: 700;
+            color: var(--navy);
+            text-align: right;
+            padding: 10px 20px 4px;
+            border-top: 2px solid var(--navy);
+            margin: 4px 20px 0;
+        }
+
+        /* Thank you note */
+        .thank-you {
+            text-align: center;
+            padding: 10px 20px 4px;
+            font-size: 11px; color: var(--muted);
+            font-style: italic;
+        }
+
+        /* Download button (inside billContainer, hidden before capture) */
+        .download-button {
+            display: block; width: calc(100% - 40px);
+            margin: 12px 20px 20px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 10px;
+            padding: 12px; font-size: 0.88rem; font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .download-button:hover { background: #e64a19; }
+    </style>
 </head>
 <body>
+
+    <!-- Back navigation (outside billContainer, not captured) -->
+    <a class="back-link" href="invoice.html">
+        ← Back to Orders
+    </a>
+
+    <!-- Bill container — captured by html2canvas -->
     <div id="billContainer" class="bill-container">
-        <h2 class="bill-title">The Cafe Darbar (TCD)</h2>
+
+        <!-- Branded header -->
+        <div class="bill-header-band">
+            <h2 class="bill-title">The <span>Cafe</span> Darbar</h2>
+        </div>
+
+        <!-- Restaurant address -->
         <div class="restaurant-info">
-            <p> BJP party office side</p>
+            <p>BJP party office side</p>
             <p>Banki College Road, Towards Sunadei</p>
             <p>Banki, Cuttack 754008</p>
             <p>TEL: 089200 42482</p>
         </div>
+
+        <!-- Table + date -->
         <div class="table-info">
-            <p id="tableNo">Table - 06</p>
+            <p id="tableNo">Table — 06</p>
             <p id="billDate"></p>
         </div>
+
         <hr class="separator">
-        <ul id="billItems" class="bill-items">
-            <!-- Bill items will be generated here -->
-        </ul>
+
+        <!-- Line items -->
+        <ul id="billItems" class="bill-items"></ul>
+
         <hr class="separator">
+
+        <!-- Total -->
         <p id="billTotal" class="bill-total">Total: ₹0</p>
-        <button class="download-button" id="generateImageButton">Download Bill</button>
+
+        <p class="thank-you">Thank you for dining with us! 🙏</p>
+
+        <!-- Download button (hidden during html2canvas capture) -->
+        <button class="download-button" id="generateImageButton">
+            ⬇ Download Bill
+        </button>
     </div>
 
     <script>
-    // Sample JSON data - Replace with actual data as needed
     let orders = JSON.parse(localStorage.getItem('order_history')) || [];
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
     orders = orders.filter(order => order.order_id === orderId);
-    console.log(orders, "/////", orderId);
 
-    // Populate bill items on page load
     document.addEventListener('DOMContentLoaded', function() {
         const billItemsElement = document.getElementById('billItems');
         let total = 0;
 
-        // Get the first order details to display in the bill
-        const order = orders[0]; // Assuming we are displaying the first order
-        console.log(order);
-        // Set the table number
+        const order = orders[0];
+
         document.getElementById('tableNo').textContent =
-          order.order_details.table_no === 'COD'
-            ? 'Payment Mode: COD'
-            : `Table - ${order.order_details.table_no}`;
+            order.order_details.table_no === 'COD'
+                ? 'Payment: COD'
+                : `Table — ${order.order_details.table_no}`;
 
-
-        // Format date and time
         const createdAtSeconds = order.order_details.created_at.seconds;
         const date = new Date(createdAtSeconds * 1000);
         const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-        document.getElementById('billDate').textContent = `Date: ${formattedDate}`;
-        const deliveryCharges = order.order_details.delivery_charges;
-        // Build the bill content
+        document.getElementById('billDate').textContent = formattedDate;
+
         order.order_details.order_details.forEach(cat => {
             const liCategory = document.createElement('li');
             liCategory.classList.add('bill-item');
             liCategory.innerHTML = `<strong>${cat.category.name}</strong>`;
-            billItemsElement.appendChild(liCategory); // Append category heading
+            billItemsElement.appendChild(liCategory);
 
             cat.category.dish_details.forEach(dish => {
                 const liDish = document.createElement('li');
                 liDish.classList.add('bill-item');
-                liDish.textContent = `${dish.quantity} x ${dish.name}${dish.type === "NonVeg" ? " (Non-Veg)" : ""} - ₹${(dish.price * dish.quantity).toFixed(2)}`;
+                const label = `${dish.quantity} × ${dish.name}${dish.type === "NonVeg" ? " (NV)" : ""}`;
+                const price = `₹${(dish.price * dish.quantity).toFixed(2)}`;
+                liDish.innerHTML = `<span>${label}</span><span>${price}</span>`;
                 billItemsElement.appendChild(liDish);
-                total += dish.price * dish.quantity; // Calculate total
+                total += dish.price * dish.quantity;
             });
         });
+
         if (order.order_details.delivery_charges && order.order_details.delivery_charges > 0) {
             const liDelivery = document.createElement('li');
             liDelivery.classList.add('bill-item', 'delivery-charge');
-            liDelivery.textContent = `Delivery Charges - ₹${order.order_details.delivery_charges.toFixed(2)}`;
-            liDelivery.style.color = 'red'; // Optional: highlight delivery charges
+            liDelivery.innerHTML = `<span>Delivery Charges</span><span>₹${order.order_details.delivery_charges.toFixed(2)}</span>`;
             billItemsElement.appendChild(liDelivery);
-            total += order.order_details.delivery_charges; // Include in total
+            total += order.order_details.delivery_charges;
         }
+
         document.getElementById('billTotal').textContent = `Total: ₹${total.toFixed(2)}`;
     });
 
-    // Generate an image from the bill container
     document.getElementById('generateImageButton').addEventListener('click', function() {
-        this.style.display = 'none'; // Hide button
+        this.style.display = 'none';
         const billContainer = document.getElementById('billContainer');
         html2canvas(billContainer, { useCORS: true }).then(canvas => {
             const link = document.createElement('a');
-
-            // Get the current date and time for filename
             const now = new Date();
-            const tableNo = orders[0].order_details.table_no; // Getting the table number from the first order
-            const hour = String(now.getHours()).padStart(2, '0');
-            const minute = String(now.getMinutes()).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = String(now.getFullYear()).slice(-2);
-
-            // Create filename in the specified format
-            const filename = `${tableNo}_${hour}${minute}_${day}${month}${year}_Bill.png`;
-
-            link.href = canvas.toDataURL("image/png");
-            link.download = filename; // Set the dynamic filename
+            const tableNo = orders[0].order_details.table_no;
+            const filename = `${tableNo}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}_${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getFullYear()).slice(-2)}_Bill.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.download = filename;
             link.click();
-            this.style.display = 'block'; // Show button again
+            this.style.display = 'block';
         });
     });
-</script>
+    </script>
 </body>
 </html>

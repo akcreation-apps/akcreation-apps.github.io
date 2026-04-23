@@ -46,13 +46,14 @@ Deployment is via git push to `main` — GitHub Pages serves directly from the r
 
 ## HTML Conventions
 
-### Mobile-First Design
-All HTML pages — new and existing — must be designed **mobile-first**. This means:
-- Base styles target small screens; larger breakpoints are added with `min-width` media queries.
+### Mobile-First Design (with full responsiveness)
+All HTML pages — new and existing — must be designed **mobile-first** while remaining fully responsive across all screen sizes. This means:
+- Base styles target small screens; scale up with `min-width` media queries (`md`, `lg`, `xl`).
 - Always include `<meta name="viewport" content="width=device-width, initial-scale=1">` in `<head>`.
-- Use Bootstrap's responsive grid (`col-12` as default, scaling up with `col-md-*`, `col-lg-*`).
+- Use Bootstrap's responsive grid: `col-12` as the mobile default, then `col-md-*` for tablets, `col-lg-*` for desktop.
 - Touch targets (buttons, links) must be large enough for thumbs (min 44×44px).
-- Test layout at 375px width before considering desktop appearance.
+- Test at 375px (mobile) first, then verify at 768px (tablet) and 1280px (desktop) before considering a layout done.
+- On desktop, use the extra space to improve readability: wider containers, multi-column layouts, larger typography — don't just stretch the mobile layout.
 
 ### `<head>` Boilerplate
 Every new HTML file must include the following standard `<head>` block (adjust `<title>`, description, and canonical URL per page):

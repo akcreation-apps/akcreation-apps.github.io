@@ -3,51 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="icon" href="/favicon.ico">
-    <meta name="theme-color" content="#4f46e5">
-    <title>Order List</title>
+    <meta name="theme-color" content="#1A1A2E">
+    <title>Order History — The Cafe Darbar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="invoice_styles.css">
-    <link rel="stylesheet" href="styles.css">
     <script src="invoice_scripts.js" type="module"></script>
     <script src="common.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+        :root {
+            --primary:   #FF6B35;
+            --navy:      #1A1A2E;
+            --bg:        #F5F0EB;
+            --card:      #FFFFFF;
+            --text:      #2D2D2D;
+            --muted:     #888;
+            --border:    #E2D9D0;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.13);
+            --r:         12px;
+            --nav-h:     56px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding-top: var(--nav-h);
+        }
+
+        /* ── Loader ── */
+        .loader-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 9999; justify-content: center; align-items: center;
+        }
+        .loader {
+            width: 44px; height: 44px;
+            border: 4px solid rgba(255,255,255,0.25);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Navbar ── */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--nav-h); z-index: 1000;
+            background: var(--navy);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .logo {
+            font-size: 1.05rem; font-weight: 700; color: #fff;
+            cursor: pointer; flex: 1; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .logo .brand-accent { color: var(--primary); }
+        .cart-icon {
+            position: relative; color: rgba(255,255,255,0.88);
+            font-size: 1.1rem; cursor: pointer;
+            display: flex; align-items: center;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .cart-icon:hover { color: #fff; transform: scale(1.1); }
+        .cart-count {
+            position: absolute; top: -7px; right: -9px;
+            background: var(--primary); color: #fff;
+            font-size: 0.6rem; font-weight: 700;
+            min-width: 16px; height: 16px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 3px;
+        }
+        /* ── needed by JS ── */
+        .icon-container { display: flex; align-items: center; gap: 18px; }
+
+        /* ── Page header ── */
+        .page-header {
+            max-width: 600px; margin: 0 auto;
+            padding: 18px 16px 6px;
+        }
+        .page-header h1 {
+            font-size: 1.1rem; font-weight: 700; color: var(--navy);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .page-header p {
+            font-size: 0.75rem; color: var(--muted); margin-top: 2px;
+        }
+
+        /* ── Empty state ── */
+        #empty-invoice-banner {
+            text-align: center; padding: 60px 20px;
+        }
+        #empty-invoice-banner img {
+            max-width: 200px; height: auto;
+            opacity: 0.8; display: block; margin: 0 auto 14px;
+        }
+        #empty-invoice-banner p {
+            font-size: 0.85rem; color: var(--muted);
+        }
+
+        /* ── Orders list wrapper ── */
+        #orderList {
+            max-width: 600px; margin: 0 auto;
+            padding: 6px 12px 30px;
+        }
+
+        /* ── Order card (created by invoice_scripts.js) ── */
+        .order-container {
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+            border-left: 3px solid var(--primary);
+            position: relative;
+        }
+        .order-container:hover { box-shadow: var(--shadow-md); }
+        .order-container::after {
+            content: '\f107'; /* fa-angle-down */
+            font-family: 'Font Awesome 5 Free'; font-weight: 900;
+            position: absolute; right: 14px; top: 14px;
+            color: var(--muted); font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        .order-header {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 8px;
+            padding-right: 20px; /* room for chevron */
+        }
+        .order-header h2 {
+            font-size: 0.88rem; font-weight: 700;
+            color: var(--navy); margin: 0;
+        }
+        .order-header p {
+            font-size: 0.7rem; color: var(--muted);
+            margin: 0; white-space: nowrap;
+        }
+        .order-total {
+            font-size: 0.82rem; font-weight: 700;
+            color: var(--primary); margin: 4px 0 0;
+        }
+
+        /* Expanded state */
+        .order-details {
+            display: none;
+            margin-top: 12px; padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .order-details h3 {
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--navy); text-transform: uppercase;
+            letter-spacing: 0.8px; margin: 10px 0 4px;
+        }
+        .order-details h3:first-child { margin-top: 0; }
+
+        .dish-item {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 5px 0;
+            border-bottom: 1px solid #f5f0eb;
+            font-size: 0.78rem; color: var(--text);
+        }
+        .dish-item .dish-name { font-weight: 500; }
+        .dish-item span:last-child { color: var(--muted); white-space: nowrap; }
+
+        /* Action icons */
+        .icons {
+            display: flex; justify-content: flex-end;
+            gap: 8px; margin-top: 14px;
+            padding-top: 10px; border-top: 1px solid var(--border);
+        }
+        .icons i {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer; font-size: 0.85rem;
+            transition: background 0.15s;
+        }
+        .delete-icon { color: #dc3545; }
+        .delete-icon:hover { background: #fdecea; }
+        .preview-icon { color: var(--primary); }
+        .preview-icon:hover { background: rgba(255,107,53,0.1); }
+    </style>
 </head>
 <body>
+
+    <!-- Loader -->
     <div class="loader-overlay" id="loaderOverlay">
         <div class="loader"></div>
     </div>
+
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo" onclick="redirect_to_home()">The Cafe Darbar (TCD)</div>
-        <div class="icon-container"> <!-- Add this container -->
-
-            <div class="cart-icon">
-                <i class="fas fa-shopping-cart" onclick="redirect_to_cart()"></i>
+        <div class="logo" onclick="redirect_to_home()">
+            🍽️ <span class="brand-accent">The Cafe</span> Darbar
+        </div>
+        <div class="icon-container">
+            <div class="cart-icon" onclick="redirect_to_cart()">
+                <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count">0</span>
             </div>
-
         </div>
     </nav>
 
-    <header class="header">
-        <h1>Order History</h1>
-    </header>
-
-    <div id="empty-invoice-banner" style="display: none; color: #ff7043; font-size: 1.5rem; text-align: center; margin-bottom: 20px;">
-        <img src="../food_src/no_invoice_generated.webp" alt="Empty Cart" style="width: 300px; height: auto;">
+    <!-- Page title -->
+    <div class="page-header">
+        <h1><i class="fas fa-receipt" style="color:var(--primary);font-size:0.9rem;"></i> Order History</h1>
+        <p>Tap an order card to view details</p>
     </div>
 
-    <div class="order-container" id="orderList">
-        <!-- Dynamic orders will be populated here -->
+    <!-- Empty state -->
+    <div id="empty-invoice-banner" style="display: none;">
+        <img src="../food_src/no_invoice_generated.webp" alt="No orders yet">
+        <p>No approved orders yet</p>
     </div>
 
+    <!-- Orders list — filled by invoice_scripts.js -->
+    <div id="orderList"></div>
 
 </body>
 </html>
