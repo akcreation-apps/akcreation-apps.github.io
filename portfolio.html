@@ -142,6 +142,7 @@
         @media (max-width: 520px) {
             .fs-chips { display: none; }
             .filter-status { justify-content: flex-start; }
+            .fs-left { flex-wrap: wrap; gap: 4px; }
         }
 
         /* ── Summary Grid ── */
@@ -174,7 +175,7 @@
             background: var(--bg-surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 16px 24px;
             display: flex; align-items: center; gap: 0;
-            margin-bottom: 20px; overflow: hidden;
+            margin-bottom: 20px; overflow: visible;
         }
         .stat-item { flex: 1; padding: 4px 20px; text-align: center; }
         .stat-item:first-child { padding-left: 0; }
@@ -278,10 +279,18 @@
             .chart-wrap.tall { height: 280px; }
         }
 
+        /* Stack date inputs vertically on narrow screens so each gets full width */
+        @media (max-width: 480px) {
+            .filter-inputs { flex-direction: column; gap: 8px; }
+            .input-group { width: 100%; flex: none; }
+            input[type="date"] { font-size: 0.9rem; }
+        }
+
         @media (max-width: 380px) {
             .card-value { font-size: 0.9rem; }
             .chart-wrap { height: 210px; }
             .stat-item { min-width: 100%; }
+            .section-title { white-space: normal; font-size: 0.82rem; }
         }
     </style>
 </head>
