@@ -74,9 +74,16 @@
             background: var(--navy);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
         }
 
         .logo {
@@ -139,7 +146,7 @@
             padding-bottom: 2px;
         }
         .sticky-inner {
-            max-width: 900px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -274,14 +281,15 @@
         /* ── Menu section ── */
         .menu { padding: 10px 0 4px; }
         .menu-container {
-            padding: 0 10px;
-            max-width: 900px;
+            padding: 0 16px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
         /* ── Category block ── */
         .category-block {
             margin-bottom: 20px;
+            scroll-margin-top: calc(var(--nav-h) + 144px); /* navbar + sticky-bar height */
         }
         .category-block > h3 {
             font-size: 1rem;
@@ -423,6 +431,12 @@
         @media (min-width: 768px) {
             .dish-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
         }
+        @media (min-width: 1024px) {
+            .dish-grid { grid-template-columns: repeat(6, 1fr); gap: 12px; }
+        }
+        @media (min-width: 1400px) {
+            .dish-grid { grid-template-columns: repeat(8, 1fr); gap: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -434,19 +448,21 @@
 
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo" onclick="redirect_to_home()">
-            🍽️ <span class="brand-accent">The Cafe</span> Darbar
-        </div>
-        <div class="icon-container">
-            <div class="nav-icon" id="searchIcon">
-                <i class="fas fa-search"></i>
+        <div class="navbar-inner">
+            <div class="logo" onclick="redirect_to_home()">
+                🍽️ <span class="brand-accent">The Cafe</span> Darbar
             </div>
-            <div class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()">
-                <i class="fas fa-receipt"></i>
-            </div>
-            <div class="nav-icon cart-icon" onclick="redirect_to_cart()">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
+            <div class="icon-container">
+                <div class="nav-icon" id="searchIcon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="nav-icon cart-icon" onclick="redirect_to_cart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
             </div>
         </div>
     </nav>

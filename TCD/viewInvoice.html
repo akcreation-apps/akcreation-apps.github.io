@@ -30,7 +30,16 @@
             font-family: 'Poppins', sans-serif;
             background: var(--bg);
             min-height: 100vh;
-            padding: 16px 14px 40px;
+            padding: 20px 14px 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ── Page content wrapper ── */
+        .page-content {
+            width: 100%;
+            max-width: 480px;
         }
 
         /* ── Back link ── */
@@ -48,8 +57,7 @@
         #billContainer {
             background: #fff;
             border-radius: 16px;
-            max-width: 400px;
-            margin: 0 auto;
+            width: 100%;
             overflow: hidden;
             box-shadow: 0 6px 24px rgba(0,0,0,0.12);
             font-family: 'Courier Prime', 'Courier New', monospace;
@@ -157,6 +165,8 @@
 </head>
 <body>
 
+    <div class="page-content">
+
     <!-- Back navigation (outside billContainer, not captured) -->
     <a class="back-link" href="invoice.html">
         ← Back to Orders
@@ -201,6 +211,8 @@
             ⬇ Download Bill
         </button>
     </div>
+
+    </div><!-- /.page-content -->
 
     <script>
     let orders = JSON.parse(localStorage.getItem('order_history')) || [];

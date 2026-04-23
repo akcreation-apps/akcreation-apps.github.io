@@ -70,9 +70,16 @@
             background: var(--navy);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
         }
         .logo {
             font-size: 1.05rem; font-weight: 700;
@@ -90,11 +97,48 @@
         }
         .nav-icon:hover { color: #fff; transform: scale(1.1); }
 
+        /* ── Two-column wrapper (desktop only) ── */
+        .cart-wrapper {
+            display: block; /* mobile: stacked */
+        }
+
         /* ── Page wrapper ── */
         #cart {
-            max-width: 600px;
+            max-width: 640px;
             margin: 0 auto;
-            padding: 0 12px 100px; /* bottom pad for the sticky total bar */
+            padding: 0 14px 110px; /* bottom pad clears fixed total bar */
+        }
+
+        /* ── Desktop: side-by-side layout ── */
+        @media (min-width: 900px) {
+            .cart-wrapper {
+                display: flex;
+                align-items: flex-start;
+                gap: 28px;
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 0 24px 40px;
+            }
+            #cart {
+                flex: 1;
+                max-width: none;
+                margin: 0;
+                padding: 0 0 30px;
+            }
+            #cart-total-container {
+                position: sticky !important;
+                top: calc(var(--nav-h) + 16px);
+                bottom: auto !important;
+                left: auto !important;
+                right: auto !important;
+                width: 300px;
+                flex-shrink: 0;
+                border-radius: var(--r);
+                border: 1px solid var(--border);
+                border-top: 1px solid var(--border) !important;
+                box-shadow: var(--shadow-md);
+                margin-top: 58px; /* visual align below cart title */
+            }
         }
 
         /* ── Page title ── */
@@ -264,50 +308,57 @@
 
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo" onclick="redirect_to_home()">
-            🍽️ <span class="brand-accent">The Cafe</span> Darbar
-        </div>
-        <div style="display:flex; align-items:center;">
-            <div class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()">
-                <i class="fas fa-receipt"></i>
+        <div class="navbar-inner">
+            <div class="logo" onclick="redirect_to_home()">
+                🍽️ <span class="brand-accent">The Cafe</span> Darbar
+            </div>
+            <div style="display:flex; align-items:center;">
+                <div class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()">
+                    <i class="fas fa-receipt"></i>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Cart -->
-    <div id="cart">
-        <h2 class="cart-page-title">
-            <i class="fas fa-shopping-cart" style="color:var(--primary);font-size:0.95rem;"></i>
-            Your Cart
-        </h2>
+    <!-- Wrapper: block on mobile, flex row on desktop -->
+    <div class="cart-wrapper">
 
-        <!-- Empty state -->
-        <div id="empty-cart-banner" style="display: none;">
-            <img src="../food_src/empty_cart.webp" alt="Empty Cart">
-            <p>Your cart is empty!</p>
-            <button class="browse-btn" onclick="redirect_to_home()">
-                <i class="fas fa-utensils"></i> Browse Menu
+        <!-- Left / full-width: cart items -->
+        <div id="cart">
+            <h2 class="cart-page-title">
+                <i class="fas fa-shopping-cart" style="color:var(--primary);font-size:0.95rem;"></i>
+                Your Cart
+            </h2>
+
+            <!-- Empty state -->
+            <div id="empty-cart-banner" style="display: none;">
+                <img src="../food_src/empty_cart.webp" alt="Empty Cart">
+                <p>Your cart is empty!</p>
+                <button class="browse-btn" onclick="redirect_to_home()">
+                    <i class="fas fa-utensils"></i> Browse Menu
+                </button>
+            </div>
+
+            <!-- Cart items (populated by cart.js) -->
+            <div id="cart-items"></div>
+        </div>
+
+        <!-- Right / sticky-bottom: order summary (shown/hidden by cart.js) -->
+        <div id="cart-total-container" style="display: none;">
+            <div id="delivery-note"></div>
+            <div class="total-row">
+                <span class="total-label">Grand Total</span>
+                <span id="cart-total">₹0.00</span>
+            </div>
+            <button id="place-order-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+                <span class="btn-text">
+                    <span class="main-text">Place Order</span>
+                    <span class="sub-text">via WhatsApp</span>
+                </span>
             </button>
         </div>
 
-        <!-- Cart items -->
-        <div id="cart-items"></div>
-    </div>
-
-    <!-- Sticky total (shown/hidden by cart.js) -->
-    <div id="cart-total-container" style="display: none;">
-        <div id="delivery-note"></div>
-        <div class="total-row">
-            <span class="total-label">Grand Total</span>
-            <span id="cart-total">₹0.00</span>
-        </div>
-        <button id="place-order-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
-            <span class="btn-text">
-                <span class="main-text">Place Order</span>
-                <span class="sub-text">via WhatsApp</span>
-            </span>
-        </button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
