@@ -87,7 +87,7 @@
             font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
             text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;
         }
-        .filter-inputs { display: flex; gap: 12px; flex: 1; flex-wrap: wrap; }
+        .filter-inputs { display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; }
         .input-group { display: flex; flex-direction: column; gap: 4px; min-width: 160px; flex: 1; }
         .input-group label { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
         input[type="date"] {
@@ -281,7 +281,7 @@
 
         /* Stack date inputs vertically on narrow screens so each gets full width */
         @media (max-width: 480px) {
-            .filter-inputs { flex-direction: column; gap: 8px; }
+            .filter-inputs { grid-template-columns:1fr; }
             .input-group { width: 100%; flex: none; }
             input[type="date"] { font-size: 0.9rem; }
         }
