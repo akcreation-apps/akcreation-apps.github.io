@@ -3,461 +3,657 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio</title>
+    <title>Portfolio Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" type="image/png" href="https://akcreation-apps.com/ak-stocks/logo.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary:    #08111f;
+            --bg-surface:    #0f1d2f;
+            --bg-surface2:   #172234;
+            --bg-surface3:   #1e2c3f;
+            --border:        #243447;
+            --border-light:  #2e4260;
+            --accent:        #f59e0b;
+            --accent-dim:    rgba(245,158,11,0.12);
+            --accent-glow:   rgba(245,158,11,0.28);
+            --green:         #10b981;
+            --green-dim:     rgba(16,185,129,0.12);
+            --red:           #ef4444;
+            --red-dim:       rgba(239,68,68,0.12);
+            --blue:          #38bdf8;
+            --blue-dim:      rgba(56,189,248,0.12);
+            --purple:        #a78bfa;
+            --purple-dim:    rgba(167,139,250,0.12);
+            --text-primary:  #e2e8f0;
+            --text-secondary:#8fa3be;
+            --text-muted:    #4f6480;
+            --radius:        12px;
+            --radius-lg:     16px;
+            --shadow-sm:     0 2px 12px rgba(0,0,0,0.35);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-            background-color: #121212;
-            color: #fff;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
         }
 
-        .chart-container {
-            width: 95%;
-            max-width: 900px;
-            margin: 20px auto;
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
-        }
-        canvas {
-            width: 100% !important;
-            height: auto !important;
-            max-height: 400px; /* Restrict max height */
-        }
-        h2 {
-            color: #FFD700;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .chart-container {
-                padding: 10px;
-                height: 400px !important;
-            }
-
-            #pieChart {
-                max-width: 500px; /* Set a max width for Pie Chart */
-                height: 400px !important;
-                margin: 0 auto;
-            }
-        }
-
-        .summary-container {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(120px, 1fr)); /* Ensures 2 columns on larger screens */
-            gap: 20px;
-            max-width: auto;
-            margin: 20px auto;
-        }
-
-        .summary-box {
-            background: #1e1e1e;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
-            text-align: center;
-            color: white;
-        }
-
-        .summary-box h3 {
-            color: #FFD700;
-            margin-bottom: 5px;
-        }
-
-        /* Ensure proper responsiveness */
-        @media (max-width: 550px) {
-            .summary-container {
-                grid-template-columns: repeat(2, minmax(120px, 1fr)); /* Switch to single column on smaller screens */
-                max-width: fit-content;
-            }
-        }
-
-        .date-form {
+        /* ── Header ── */
+        .header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 10px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
         }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            min-width: 150px;
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .header-logo { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-light); }
+        .header-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+        .header-subtitle { font-size: 0.72rem; color: var(--text-muted); font-weight: 400; margin-top: 1px; }
+        .live-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+            color: var(--green); font-size: 0.68rem; font-weight: 600;
+            padding: 4px 10px; border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase;
         }
+        .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 1.8s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
+        /* ── Layout ── */
+        .main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+
+        /* ── Filter Bar ── */
+        .filter-bar {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 14px 20px;
+            margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        }
+        .filter-icon-label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;
+        }
+        .filter-inputs { display: flex; gap: 12px; flex: 1; flex-wrap: wrap; }
+        .input-group { display: flex; flex-direction: column; gap: 4px; min-width: 160px; flex: 1; }
+        .input-group label { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
         input[type="date"] {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            background-color: #1e1e1e;
-            color: #fff;
-            width: 100%;
-            box-sizing: border-box;
+            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+            font-size: 0.85rem; background: var(--bg-surface2); color: var(--text-primary);
+            width: 100%; font-family: 'Inter', sans-serif;
+            transition: border-color .2s, box-shadow .2s; outline: none; cursor: pointer;
+        }
+        input[type="date"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+
+        /* ── Filter Status Bar ── */
+        .filter-status {
+            background: rgba(245,158,11,0.06);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 8px; padding: 8px 16px; margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 8px; font-size: 0.74rem; color: var(--text-secondary);
+            transition: border-color .3s;
+        }
+        .fs-left  { display: flex; align-items: center; gap: 6px; }
+        .fs-range { color: var(--accent); font-weight: 600; }
+        .fs-sep   { color: var(--text-muted); }
+        .fs-chips { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .fs-chip  {
+            font-size: 0.6rem; font-weight: 600;
+            color: var(--accent); background: var(--accent-dim);
+            border: 1px solid var(--accent-glow);
+            padding: 1px 7px; border-radius: 8px; letter-spacing: 0.04em;
         }
 
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
+        /* ── Card filter flag ── */
+        .card-filter-flag {
+            position: absolute; bottom: 8px; right: 10px;
+            font-size: 0.58rem; font-weight: 600;
+            color: var(--accent); background: var(--accent-dim);
+            padding: 1px 6px; border-radius: 5px;
+            letter-spacing: 0.04em; pointer-events: none;
+        }
+
+        /* ── Filter dot on insights strip ── */
+        .filter-dot {
+            display: inline-block; width: 5px; height: 5px;
+            border-radius: 50%; background: var(--accent);
+            margin-left: 4px; vertical-align: middle;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        /* ── Section tag dynamic update ── */
+        .section-tag.live { transition: color .3s, background .3s; }
+
+        @media (max-width: 520px) {
+            .fs-chips { display: none; }
+            .filter-status { justify-content: flex-start; }
+        }
+
+        /* ── Summary Grid ── */
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+        .summary-card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 16px;
+            position: relative; overflow: hidden; cursor: default;
+            transition: border-color .2s, transform .25s, box-shadow .25s;
+        }
+        .summary-card::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; border-radius: var(--radius) var(--radius) 0 0;
+        }
+        .summary-card:hover { border-color: var(--border-light); transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+        .c-invested::after  { background: var(--accent); }
+        .c-current::after   { background: var(--blue); }
+        .c-pnl::after       { background: var(--green); }
+        .c-dividends::after { background: var(--purple); }
+        .card-icon-wrap { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-bottom: 12px; }
+        .c-invested .card-icon-wrap  { background: var(--accent-dim); }
+        .c-current .card-icon-wrap   { background: var(--blue-dim); }
+        .c-pnl .card-icon-wrap       { background: var(--green-dim); }
+        .c-dividends .card-icon-wrap { background: var(--purple-dim); }
+        .card-label { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 5px; }
+        .card-value { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1.2; min-height: 1.6rem; }
+
+        /* ── Insights Strip ── */
+        .insights-strip {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 24px;
+            display: flex; align-items: center; gap: 0;
+            margin-bottom: 20px; overflow: hidden;
+        }
+        .stat-item { flex: 1; padding: 4px 20px; text-align: center; }
+        .stat-item:first-child { padding-left: 0; }
+        .stat-item:last-child  { padding-right: 0; }
+        .stat-divider { width: 1px; height: 44px; background: var(--border); flex-shrink: 0; }
+        .stat-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 4px; }
+        .stat-value { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; margin-bottom: 5px; }
+        .stat-note  { font-size: 0.65rem; color: var(--text-muted); }
+        .mini-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 2px; }
+        .mini-bar-fill { height: 100%; border-radius: 2px; transition: width .9s cubic-bezier(.4,0,.2,1); }
+        .fill-accent  { background: var(--accent); }
+        .fill-green   { background: var(--green); }
+        .fill-blue    { background: var(--blue); }
+        .fill-purple  { background: var(--purple); }
+
+        /* ── Top Performers ── */
+        .performers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        /* ── Section ── */
+        .section { margin-bottom: 24px; }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .section-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+        .section-tag {
+            font-size: 0.62rem; font-weight: 600; color: var(--accent);
+            background: var(--accent-dim); border: 1px solid var(--accent-glow);
+            padding: 2px 8px; border-radius: 10px; letter-spacing: 0.04em;
+        }
+        .section-tag.blue { color: var(--blue); background: var(--blue-dim); border-color: rgba(56,189,248,.28); }
+        .section-rule { flex: 1; height: 1px; background: var(--border); }
+
+        /* ── Chart Card ── */
+        .chart-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 20px 16px; box-shadow: var(--shadow-sm); }
+        .chart-wrap { position: relative; height: 300px; }
+        .chart-wrap.tall { height: 350px; }
+        canvas { width: 100% !important; }
+
+        /* ── Table Card ── */
+        .table-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .table-card-header { padding: 12px 16px; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); background: var(--bg-surface2); display: flex; align-items: center; gap: 8px; }
+        .table-scroll { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 280px; }
+        .data-table thead tr { background: var(--bg-surface2); border-bottom: 1px solid var(--border); }
+        .data-table thead th { padding: 11px 14px; text-align: left; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.09em; }
+        .data-table thead th:first-child { border-left: 2px solid var(--accent); }
+        .data-table.losers-table thead th:first-child { border-left: 2px solid var(--red); }
+        .data-table tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        .data-table tbody tr:last-child { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--bg-surface2); }
+        .data-table tbody td { padding: 11px 14px; font-size: 0.83rem; color: var(--text-secondary); }
+        .data-table tbody td:first-child { color: var(--text-primary); font-weight: 500; }
+
+        /* Badges */
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 6px;
+            font-size: 0.75rem; font-weight: 600;
+        }
+        .badge-green { background: var(--green-dim); color: var(--green); }
+        .badge-red   { background: var(--red-dim);   color: var(--red);   }
+        .td-green { color: var(--green) !important; font-weight: 500; }
+        .td-red   { color: var(--red)   !important; font-weight: 500; }
+
+        /* Rank */
+        .rank { font-size: 0.9rem; margin-right: 4px; }
+
+        /* ── Skeleton ── */
+        .skeleton {
+            display: inline-block; height: 1.2rem; width: 90px; border-radius: 4px;
+            background: linear-gradient(90deg, var(--bg-surface2) 25%, var(--bg-surface3) 50%, var(--bg-surface2) 75%);
+            background-size: 200% 100%; animation: shimmer 1.4s infinite; vertical-align: middle;
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+        /* ── Responsive ── */
+        @media (max-width: 860px) { .summary-grid { grid-template-columns: repeat(2,1fr); } }
+
+        @media (max-width: 640px) {
+            .insights-strip { flex-wrap: wrap; padding: 14px 16px; gap: 12px; }
+            .stat-divider { display: none; }
+            .stat-item { min-width: calc(50% - 6px); text-align: left; padding: 0; }
+
+            .performers-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 600px) {
-            .form-group {
-                width: 100%;
-                height: auto;
-            }
-
-            .date-form {
-                flex-direction: column;
-                align-items: center;
-            }
+            .header { padding: 12px 14px; }
+            .live-badge { display: none; }
+            .main { padding: 16px 12px 40px; }
+            .filter-bar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
+            .filter-inputs { width: 100%; }
+            .input-group { min-width: unset; }
+            .summary-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+            .summary-card { padding: 14px 12px; }
+            .card-value { font-size: 1rem; }
+            .chart-card { padding: 14px 10px 10px; }
+            .chart-wrap { height: 240px; }
+            .chart-wrap.tall { height: 280px; }
         }
 
+        @media (max-width: 380px) {
+            .card-value { font-size: 0.9rem; }
+            .chart-wrap { height: 210px; }
+            .stat-item { min-width: 100%; }
+        }
     </style>
 </head>
 <body>
-<div class="date-container" style="margin-top: 10px;">
-    <h2>Select Date Range</h2>
-    <div id="dateFilterForm" class="date-form">
-        <div class="form-group">
-            <label for="startDate">Start Date</label>
-            <input type="date" id="startDate" required>
-        </div>
-        <div class="form-group">
-            <label for="endDate">End Date</label>
-            <input type="date" id="endDate" required>
+
+<header class="header">
+    <div class="header-brand">
+        <img src="https://akcreation-apps.com/ak-stocks/logo.webp" alt="AK Logo" class="header-logo">
+        <div>
+            <div class="header-title">Portfolio Dashboard</div>
+            <div class="header-subtitle">Stock &amp; Dividend Tracker</div>
         </div>
     </div>
+    <div class="live-badge"><span class="live-dot"></span>Live</div>
+</header>
 
-</div>
+<main class="main">
 
-<div class="summary-container">
-    <div class="summary-box">
-        <h3>Invested</h3>
-        <p id="totalInvested">Loading...</p>
-    </div>
-    <div class="summary-box">
-        <h3>Current</h3>
-        <p id="currentBalance">Loading...</p>
-    </div>
-    <div class="summary-box">
-        <h3>Total P&L</h3>
-        <p id="totalProfitLoss">Loading...</p>
-    </div>
-    <div class="summary-box">
-        <h3>Dividends *</h3>
-        <p id="totalDividends">Loading...</p>  <!-- Placeholder for XIRR -->
+    <!-- Date Filter -->
+    <div class="filter-bar">
+        <div class="filter-icon-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Date Range
+        </div>
+        <div class="filter-inputs" id="dateFilterForm">
+            <div class="input-group"><label for="startDate">From</label><input type="date" id="startDate" required></div>
+            <div class="input-group"><label for="endDate">To</label><input type="date" id="endDate" required></div>
+        </div>
     </div>
 
-</div>
+    <!-- Filter Status Bar -->
+    <div class="filter-status" id="filterStatus">
+        <div class="fs-left">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+            </svg>
+            <span>Showing: <span class="fs-range" id="fsRange">--</span></span>
+            <span class="fs-sep">·</span>
+            <span id="fsDays">-- days</span>
+        </div>
+        <div class="fs-chips">
+            <span class="fs-chip">Summary Cards</span>
+            <span class="fs-chip">Price Trends</span>
+            <span class="fs-chip">Dividends Chart</span>
+            <span class="fs-chip">Peak P&amp;L</span>
+            <span class="fs-chip">Profitable Days</span>
+            <span class="fs-chip">Div Table</span>
+        </div>
+    </div>
 
-<h2>Stock Price Trends *</h2>
-<div class="chart-container">
-    <canvas id="lineChart"></canvas>
-</div>
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+        <div class="summary-card c-invested">
+            <div class="card-icon-wrap">💰</div>
+            <div class="card-label">Invested</div>
+            <div class="card-value" id="totalInvested"><span class="skeleton"></span></div>
+            <span class="card-filter-flag">🗓️ filtered</span>
+        </div>
+        <div class="summary-card c-current">
+            <div class="card-icon-wrap">📈</div>
+            <div class="card-label">Current Value</div>
+            <div class="card-value" id="currentBalance"><span class="skeleton"></span></div>
+            <span class="card-filter-flag">🗓️ filtered</span>
+        </div>
+        <div class="summary-card c-pnl">
+            <div class="card-icon-wrap">⚡</div>
+            <div class="card-label">Total P&amp;L</div>
+            <div class="card-value" id="totalProfitLoss"><span class="skeleton"></span></div>
+            <span class="card-filter-flag">🗓️ filtered</span>
+        </div>
+        <div class="summary-card c-dividends">
+            <div class="card-icon-wrap">🎯</div>
+            <div class="card-label">Dividends *</div>
+            <div class="card-value" id="totalDividends"><span class="skeleton"></span></div>
+            <span class="card-filter-flag">🗓️ filtered</span>
+        </div>
+    </div>
 
-<h2>Dividends Over Time *</h2>
-<div class="chart-container">
-    <canvas id="dividendsChart"></canvas>
-</div>
+    <!-- Insights Strip -->
+    <div class="insights-strip">
+        <div class="stat-item">
+            <div class="stat-label">Stock Win Rate</div>
+            <div class="stat-value" id="insightWinCount"><span class="skeleton" style="width:60px"></span></div>
+            <div class="mini-bar"><div class="mini-bar-fill fill-accent" id="insightWinBar" style="width:0%"></div></div>
+            <div class="stat-note" id="insightWinNote">&nbsp;</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <div class="stat-label">Peak P&amp;L (Range) <span class="filter-dot"></span></div>
+            <div class="stat-value" id="insightPeakPL"><span class="skeleton" style="width:80px"></span></div>
+            <div class="mini-bar"><div class="mini-bar-fill fill-green" id="insightPeakBar" style="width:0%"></div></div>
+            <div class="stat-note" id="insightPeakNote">&nbsp;</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <div class="stat-label">Profitable Days <span class="filter-dot"></span></div>
+            <div class="stat-value" id="insightProfDays"><span class="skeleton" style="width:50px"></span></div>
+            <div class="mini-bar"><div class="mini-bar-fill fill-blue" id="insightProfBar" style="width:0%"></div></div>
+            <div class="stat-note" id="insightProfNote">&nbsp;</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <div class="stat-label">All-time Div Yield</div>
+            <div class="stat-value" id="insightDivYield"><span class="skeleton" style="width:55px"></span></div>
+            <div class="mini-bar"><div class="mini-bar-fill fill-purple" id="insightDivBar" style="width:0%"></div></div>
+            <div class="stat-note" id="insightDivNote">&nbsp;</div>
+        </div>
+    </div>
 
-<h2>Stock Holdings</h2>
-<div class="chart-container">
-    <canvas id="barChart"></canvas>
-</div>
+    <!-- Top Performers -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Top Performers</span>
+            <span class="section-tag blue">current holdings</span>
+            <div class="section-rule"></div>
+        </div>
+        <div class="performers-grid">
+            <div class="table-card">
+                <div class="table-card-header">🟢 Top Gainers (by % return)</div>
+                <div class="table-scroll">
+                    <table class="data-table" id="gainersTable">
+                        <thead><tr><th>Stock</th><th>Return %</th><th>P&amp;L (₹)</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="table-card">
+                <div class="table-card-header">🔴 Top Losers (by % return)</div>
+                <div class="table-scroll">
+                    <table class="data-table losers-table" id="losersTable">
+                        <thead><tr><th>Stock</th><th>Return %</th><th>P&amp;L (₹)</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<h2>Stock Allocation</h2>
-<div class="chart-container">
-    <canvas id="pieChart"></canvas>
-</div>
+    <!-- Stock Price Trends -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Stock Price Trends</span>
+            <span class="section-tag live" id="tagTrends">filtered</span>
+            <div class="section-rule"></div>
+        </div>
+        <div class="chart-card"><div class="chart-wrap"><canvas id="lineChart"></canvas></div></div>
+    </div>
 
-<h2>Dividends Summary *</h2>
-<div class="chart-container">
-    <table id="dividendsTable" style="width: 100%; border-collapse: collapse; background: #1e1e1e; color: white;">
-        <thead>
-        <tr style="background: #FFD700; color: black;">
-            <th style="padding: 10px;">Stock Name</th>
-            <th style="padding: 10px;">Total Dividends (₹)</th>
-            <th style="padding: 10px;">Last Dividend Received</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+    <!-- Dividends Over Time -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Dividends Over Time</span>
+            <span class="section-tag live" id="tagDivChart">filtered</span>
+            <div class="section-rule"></div>
+        </div>
+        <div class="chart-card"><div class="chart-wrap"><canvas id="dividendsChart"></canvas></div></div>
+    </div>
+
+    <!-- Stock Holdings P&L -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Stock Holdings — P&amp;L Breakdown</span>
+            <div class="section-rule"></div>
+        </div>
+        <div class="chart-card"><div class="chart-wrap"><canvas id="barChart"></canvas></div></div>
+    </div>
+
+    <!-- Stock Allocation -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Stock Allocation</span>
+            <div class="section-rule"></div>
+        </div>
+        <div class="chart-card"><div class="chart-wrap tall"><canvas id="pieChart"></canvas></div></div>
+    </div>
+
+    <!-- Monthly Dividend Calendar — NEW -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Monthly Dividend Calendar</span>
+            <span class="section-tag blue">all-time</span>
+            <div class="section-rule"></div>
+        </div>
+        <div class="chart-card"><div class="chart-wrap"><canvas id="monthlyDivChart"></canvas></div></div>
+    </div>
+
+    <!-- Dividends Summary Table -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title">Dividends Summary</span>
+            <span class="section-tag live" id="tagDivTable">filtered</span>
+            <div class="section-rule"></div>
+        </div>
+        <div class="table-card">
+            <div class="table-scroll">
+                <table class="data-table" id="dividendsTable">
+                    <thead>
+                        <tr><th>Stock Name</th><th>Total Dividends (₹)</th><th>Last Received</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
 
 <script>
+    /* ── Color palette ── */
+    const C = {
+        accent: '#f59e0b', green: '#10b981', red: '#ef4444',
+        blue: '#38bdf8', purple: '#a78bfa',
+        surface: '#0f1d2f', surface2: '#172234', border: '#243447',
+        text: '#e2e8f0', muted: '#8fa3be',
+        grid: 'rgba(255,255,255,0.05)'
+    };
 
-    let barChartInstance = null;
-    let pieChartInstance = null;
-    let lineChartInstance = null;
-    let dividendsChartInstance = null;
+    const PALETTE = [
+        '#f59e0b','#10b981','#38bdf8','#a78bfa','#f472b6',
+        '#34d399','#60a5fa','#fb923c','#4ade80','#e879f9',
+        '#fbbf24','#2dd4bf','#818cf8','#f87171','#a3e635',
+        '#22d3ee','#c084fc','#fdba74','#86efac','#67e8f9'
+    ];
 
+    const TT = {
+        backgroundColor: '#172234', borderColor: '#243447', borderWidth: 1,
+        titleColor: '#e2e8f0', bodyColor: '#8fa3be', padding: 10, cornerRadius: 8
+    };
 
+    let barChartInst = null, pieChartInst = null, lineChartInst = null;
+    let dividendsChartInst = null, monthlyDivChartInst = null;
 
-    // Helper function to filter data based on start date and end date
-    function filterData(data, startDate, endDate) {
-        const filteredData = {};
-
-        // Convert string dates (YYYY/MM/DD) into Date objects
-        const parseDate = (dateString) => {
-            const [year, month, day] = dateString.split("/").map(Number);
-            return new Date(year, month - 1, day); // ✅ Changed order: year first
-        };
-
-        // Convert startDate and endDate to Date objects
-        const start = parseDate(startDate);
-        const end = parseDate(endDate);
-
-        // Check if both start and end dates are valid
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            console.error("Invalid start or end date.");
-            return filteredData;
-        }
-
-        const dateKeys = Object.keys(data);
-
-        // Filter the data based on the date range
-        dateKeys.forEach(dateKey => {
-            const date = parseDate(dateKey);
-
-            // Only include dates that are valid and fall within the specified range
-            if (date >= start && date <= end) {
-                filteredData[dateKey] = data[dateKey];
-            }
-        });
-
-        return filteredData;
+    /* ── Helpers ── */
+    function filterData(data, s, e) {
+        const pd = str => { const [y,m,d] = str.split('/').map(Number); return new Date(y,m-1,d); };
+        const start = pd(s), end = pd(e);
+        const out = {};
+        if (isNaN(start)||isNaN(end)) return out;
+        Object.keys(data).forEach(k => { const d=pd(k); if(d>=start&&d<=end) out[k]=data[k]; });
+        return out;
     }
 
-
-
-    function transformStockData(stockList) {
-        return stockList.map(stock => ({
-            name: stock.Name,
-            totalInvested: (stock["Avg Stock Average Value"] * stock["Total Qty"]).toFixed(2),
-            currentValue: (stock["Current Price"] * stock["Total Qty"]).toFixed(2)
+    function transformStockData(list) {
+        return list.map(s => ({
+            name: s.Name,
+            totalInvested: +(s['Avg Stock Average Value'] * s['Total Qty']).toFixed(2),
+            currentValue:  +(s['Current Price'] * s['Total Qty']).toFixed(2),
+            totalReturns:  s['Total Returns']
         }));
     }
 
-    function renderCharts(portfolio_stock_data) {
+    function fmtV(v) {
+        const a = Math.abs(v);
+        if (a >= 1e7) return (v/1e7).toFixed(1)+' Cr';
+        if (a >= 1e5) return (v/1e5).toFixed(1)+' L';
+        if (a >= 1e3) return (v/1e3).toFixed(1)+' K';
+        return v;
+    }
 
-        // Destroy existing charts if they exist
-        if (barChartInstance) barChartInstance.destroy();
-        if (pieChartInstance) pieChartInstance.destroy();
+    function shortName(n, len=16) { return n.length > len ? n.slice(0, len-1)+'…' : n; }
 
-        const labels = portfolio_stock_data.map(stock =>
-                stock.name.length > 12 ? stock.name.substring(0, 9) + "..." : stock.name
-            );
-        const totalProfits = portfolio_stock_data.map(stock => stock.currentValue - stock.totalInvested);
-        const profitColors = totalProfits.map(value => value >= 0 ? "#00c853" : "#ff5252");
-        const profitPercentage = portfolio_stock_data.map(stock =>
-            stock.totalInvested > 0
-                ? ((stock.currentValue - stock.totalInvested) / stock.totalInvested * 100).toFixed(2)
-                : 0
-        );
-        const invested_amount = portfolio_stock_data.map(stock => stock.totalInvested);
-        const current_amount = portfolio_stock_data.map(stock => stock.currentValue);
-        const randomColors = Array.from({ length: labels.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`);
+    /* ── Bar + Doughnut ── */
+    function renderCharts(data) {
+        if (barChartInst) barChartInst.destroy();
+        if (pieChartInst)  pieChartInst.destroy();
 
-        // Bar Chart (Stock Holdings)
-        barChartInstance =new Chart(document.getElementById("barChart").getContext("2d"), {
-            type: "bar",
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: "Profit/Loss (₹)", data: totalProfits, backgroundColor: profitColors}
-                ]
-            },
+        const labels = data.map(s => s.name.length > 12 ? s.name.slice(0,9)+'…' : s.name);
+        const profits = data.map(s => +(s.currentValue - s.totalInvested).toFixed(2));
+        const pct = data.map(s => s.totalInvested > 0 ? ((s.currentValue-s.totalInvested)/s.totalInvested*100).toFixed(2) : 0);
+        const invested = data.map(s => s.totalInvested);
+        const profitColors = profits.map(v => v >= 0 ? C.green : C.red);
+
+        const scaleCfg = { grid:{color:C.grid}, ticks:{color:C.muted,font:{size:11}} };
+
+        barChartInst = new Chart(document.getElementById('barChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels, datasets:[{ label:'Profit / Loss (₹)', data:profits, backgroundColor:profitColors, borderRadius:6, borderSkipped:false }] },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive:true, maintainAspectRatio:false,
                 scales: {
-                    y: {
-                        beginAtZero: false,
-                        grid: { color: "#555" },
-                        ticks: {
-                            color: "#fff",
-                            callback: function(value) {
-                                if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                if (value <= -10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                if (value <= -100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                if (value <= -1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                return value; // Keep the original value for small numbers
-                            }
-                        }
-                    },
-                    x: { grid: { color: "#555" } }
+                    y: { ...scaleCfg, beginAtZero:false, ticks:{...scaleCfg.ticks, callback:fmtV} },
+                    x: scaleCfg
                 },
                 plugins: {
-                    legend: { labels: { color: "#fff" } },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let amount = totalProfits[context.dataIndex].toLocaleString("en-IN", { minimumFractionDigits: 2 });
-                                let percent = profitPercentage[context.dataIndex];
-                                return `₹${amount} (${percent}%)`;
-                            }
-                        }
-                    }
+                    legend: { labels:{ color:C.text, font:{size:12} } },
+                    tooltip: { ...TT, callbacks:{ label: ctx => `₹ ${profits[ctx.dataIndex].toLocaleString('en-IN',{minimumFractionDigits:2})}  (${pct[ctx.dataIndex]}%)` } }
                 }
             }
         });
 
-        // Pie Chart (Stock Allocation)
-        pieChartInstance = new Chart(document.getElementById("pieChart").getContext("2d"), {
-            type: "doughnut",
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: invested_amount,
-                    backgroundColor: randomColors,
-                    borderColor: "#fff"
-                }]
-            },
+        pieChartInst = new Chart(document.getElementById('pieChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels, datasets:[{ data:invested, backgroundColor:PALETTE.slice(0,labels.length), borderColor:C.surface, borderWidth:2 }] },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive:true, maintainAspectRatio:false, cutout:'58%',
                 plugins: {
-                    legend: { labels: { color: "#fff" } }
+                    legend: { position:'bottom', labels:{ color:C.text, font:{size:11}, padding:14 } },
+                    tooltip: { ...TT }
                 }
             }
         });
     }
 
+    /* ── Line Chart ── */
     function renderDateWiseCharts(stockData) {
-        if (lineChartInstance) lineChartInstance.destroy();
+        if (lineChartInst) lineChartInst.destroy();
 
-        const totalInvestmentList = [];
-        const totalProfitLossList = [];
-        const percentageChangeList = [];
         const labels = Object.keys(stockData);
+        const invList=[], balList=[], pctList=[];
 
         Object.values(stockData).forEach(obj => {
-            const invested = obj.total_investment;
-            const balance = invested + obj.total_profit_loss;
-            const percentage = invested !== 0 ? ((balance - invested) / invested) * 100 : 0;
-
-            totalInvestmentList.push(invested);
-            totalProfitLossList.push(balance);
-            percentageChangeList.push(+percentage.toFixed(2));
+            const inv = obj.total_investment;
+            const bal = inv + obj.total_profit_loss;
+            invList.push(inv);
+            balList.push(bal);
+            pctList.push(+( inv!==0 ? ((bal-inv)/inv*100) : 0 ).toFixed(2));
         });
 
-        const totalInvested = totalInvestmentList.at(-1);
-        const currentBalance = totalProfitLossList.at(-1);
-        const profitLoss = currentBalance - totalInvested;
-        const finalPercentage = totalInvested !== 0 ? (profitLoss / totalInvested) * 100 : 0;
+        const totalInv  = invList.at(-1) ?? 0;
+        const totalBal  = balList.at(-1) ?? 0;
+        const pl        = +(totalBal - totalInv).toFixed(2);
+        const finalPct  = totalInv !== 0 ? (pl/totalInv*100) : 0;
+        const plColor   = pl >= 0 ? C.green : C.red;
+        const pctLine   = finalPct >= 0 ? C.blue : '#f87171';
 
-        document.getElementById("totalInvested").textContent = `₹ ${totalInvested.toLocaleString()}`;
-        document.getElementById("currentBalance").textContent = `₹ ${currentBalance.toLocaleString()}`;
-        document.getElementById("totalProfitLoss").textContent = `₹ ${profitLoss.toLocaleString()} (${finalPercentage.toFixed(2)}%)`;
-        document.getElementById("totalProfitLoss").style.color = profitLoss >= 0 ? "lightgreen" : "red";
+        document.getElementById('totalInvested').textContent   = `₹ ${totalInv.toLocaleString()}`;
+        document.getElementById('currentBalance').textContent  = `₹ ${totalBal.toLocaleString()}`;
+        document.getElementById('totalProfitLoss').textContent = `₹ ${pl.toLocaleString()}  (${finalPct.toFixed(2)}%)`;
+        document.getElementById('totalProfitLoss').style.color = plColor;
 
-        // Determine percent color
-        const percentLineColor = finalPercentage >= 0 ? "#00BFFF" : "#FF7043";
+        const sc = { grid:{color:C.grid}, ticks:{color:C.muted,font:{size:11}} };
 
-        lineChartInstance = new Chart(document.getElementById("lineChart").getContext("2d"), {
-            type: "line",
+        lineChartInst = new Chart(document.getElementById('lineChart').getContext('2d'), {
+            type: 'line',
             data: {
                 labels,
                 datasets: [
-                    {
-                        label: 'Invested Amount',
-                        data: totalInvestmentList,
-                        borderColor: '#FFD700',
-                        backgroundColor: 'rgba(255, 215, 0, 0.2)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 3,
-                        yAxisID: 'y'
-                    },
-                    {
-                        label: 'Current Amount',
-                        data: totalProfitLossList,
-                        borderColor: '#4CAF50',
-                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 3,
-                        yAxisID: 'y'
-                    },
-                    {
-                        label: 'Profit/Loss %',
-                        data: percentageChangeList,
-                        borderColor: percentLineColor,
-                        backgroundColor: 'transparent',
-                        borderDash: [4, 4],
-                        tension: 0.3,
-                        pointRadius: 4,
-                        yAxisID: 'y1'
-                    }
+                    { label:'Invested Amount', data:invList, borderColor:C.accent, backgroundColor:'rgba(245,158,11,.07)', fill:true, tension:.4, pointRadius:2, pointHoverRadius:5, yAxisID:'y' },
+                    { label:'Current Amount',  data:balList, borderColor:C.green,  backgroundColor:'rgba(16,185,129,.07)', fill:true, tension:.4, pointRadius:2, pointHoverRadius:5, yAxisID:'y' },
+                    { label:'Profit / Loss %', data:pctList, borderColor:pctLine, backgroundColor:'transparent', borderDash:[5,4], tension:.4, pointRadius:3, pointHoverRadius:6, yAxisID:'y1' }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
+                responsive:true, maintainAspectRatio:false,
+                interaction:{ mode:'index', intersect:false },
                 scales: {
-                    y: {
-                        position: 'left',
-                        grid: { color: "#444" },
-                        ticks: {
-                            color: "#fff",
-                            callback(value) {
-                                if (value >= 1e7) return (value / 1e7).toFixed(1) + " Cr";
-                                if (value >= 1e5) return (value / 1e5).toFixed(1) + " L";
-                                if (value >= 1e3) return (value / 1e3).toFixed(1) + " K";
-                                return value;
-                            }
-                        }
-                    },
+                    y: { ...sc, position:'left', ticks:{...sc.ticks, callback:fmtV} },
                     y1: {
-                        position: 'right',
-                        grid: { drawOnChartArea: false },
-                        min: Math.min(...percentageChangeList, 0) - 5,
-                        max: Math.max(...percentageChangeList, 0) + 5,
-                        ticks: {
-                            color: percentLineColor,
-                            callback: val => `${val > 0 ? '+' : ''}${Math.round(val)}%`
-                        },
-                        title: {
-                            display: true,
-                            text: "Profit/Loss (%)",
-                            color: percentLineColor,
-                            font: { size: 12 }
-                        }
+                        position:'right', grid:{drawOnChartArea:false},
+                        min: Math.min(...pctList,0)-5, max: Math.max(...pctList,0)+5,
+                        ticks:{ color:pctLine, font:{size:11}, callback: v=>`${v>0?'+':''}${Math.round(v)}%` },
+                        title:{ display:true, text:'P/L %', color:pctLine, font:{size:10} }
                     },
-                    x: {
-                        grid: { color: "#444" },
-                        ticks: { color: "#ccc" }
-                    }
+                    x: { ...sc, ticks:{...sc.ticks, maxTicksLimit:8} }
                 },
                 plugins: {
-                    legend: { labels: { color: "#fff" } },
+                    legend: { labels:{ color:C.text, font:{size:12} } },
                     tooltip: {
-                        mode: 'index',
-                        intersect: false,
+                        ...TT, mode:'index', intersect:false,
                         callbacks: {
-                            label: function(context) {
-                                const label = context.dataset.label || '';
-                                const val = context.parsed.y;
-                                if (label === "Profit/Loss %") {
-                                    const current = percentageChangeList[context.dataIndex];
-                                    const prev = context.dataIndex > 0 ? percentageChangeList[context.dataIndex - 1] : null;
-                                    const change = prev !== null ? (current - prev).toFixed(2) : null;
-                                    return `${label}: ${current > 0 ? '+' : ''}${current}%` +
-                                           (change !== null ? ` (${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}%)` : '');
-                                } else {
-                                    return `${label}: ₹ ${val.toLocaleString()}`;
+                            label(ctx) {
+                                const lbl = ctx.dataset.label || '';
+                                const val = ctx.parsed.y;
+                                if (lbl === 'Profit / Loss %') {
+                                    const cur  = pctList[ctx.dataIndex];
+                                    const prev = ctx.dataIndex > 0 ? pctList[ctx.dataIndex-1] : null;
+                                    const diff = prev !== null ? (cur-prev).toFixed(2) : null;
+                                    return `${lbl}: ${cur>0?'+':''}${cur}%` + (diff!==null ? `  (${+diff>=0?'▲':'▼'} ${Math.abs(diff)}%)` : '');
                                 }
+                                return `${lbl}: ₹ ${val.toLocaleString()}`;
                             }
                         }
                     }
@@ -466,207 +662,277 @@
         });
     }
 
+    /* ── Dividends Chart + Table ── */
+    function renderDividendsChart(datewise) {
+        if (dividendsChartInst) dividendsChartInst.destroy();
 
+        const dates=[], totals=[], details={}, stockDiv={}, stockLatest={};
 
-    function renderDividendsChart(datewise_dividends) {
-
-        if (dividendsChartInstance) dividendsChartInstance.destroy();
-        let dividendDates = Object.keys(datewise_dividends);
-        let totalDividends = [];
-        let dividendDetails = {};
-        let stockDividends = {};
-        let stockLatestDate = {};
-
-        dividendDates.forEach(date => {
-            let sum = 0;
-            let companies = [];
-            let [year, month, day] = date.split("/").map(Number); // ✅ Changed order
-            let formattedDate = new Date(year, month - 1, day); // ✅ Changed order
-
-            datewise_dividends[date].forEach(stock => {
-                sum += stock.dividend_amount;
-                companies.push(`${stock.name}: ₹${stock.dividend_amount.toLocaleString()}`);
-
-                // Aggregate dividends per stock
-                if (stockDividends[stock.name]) {
-                    stockDividends[stock.name] += stock.dividend_amount;
-                } else {
-                    stockDividends[stock.name] = stock.dividend_amount;
-                }
-
-                // Store the latest date for each stock
-                if (!stockLatestDate[stock.name] || formattedDate > stockLatestDate[stock.name]) {
-                    stockLatestDate[stock.name] = formattedDate;
-                }
+        Object.entries(datewise).forEach(([date, stocks]) => {
+            let sum = 0; const companies = [];
+            const [y,m,d] = date.split('/').map(Number);
+            const fd = new Date(y,m-1,d);
+            stocks.forEach(s => {
+                sum += s.dividend_amount;
+                companies.push(`${s.name}: ₹${s.dividend_amount.toLocaleString()}`);
+                stockDiv[s.name] = (stockDiv[s.name]||0) + s.dividend_amount;
+                if (!stockLatest[s.name] || fd > stockLatest[s.name]) stockLatest[s.name] = fd;
             });
-            totalDividends.push(sum);
-            dividendDetails[date] = companies;
+            dates.push(date); totals.push(sum); details[date] = companies;
         });
 
-        // Sort stock dividends alphabetically
-        let sortedStocks = Object.keys(stockDividends).sort();
+        const tbody = document.querySelector('#dividendsTable tbody');
+        tbody.innerHTML = '';
+        Object.keys(stockDiv).sort().forEach(stock => {
+            const d = stockLatest[stock];
+            const mon = d.toLocaleString('en-US',{month:'short'});
+            const yr  = d.getFullYear().toString().slice(-2);
+            tbody.innerHTML += `<tr><td>${stock}</td><td class="td-green">₹ ${stockDiv[stock].toLocaleString()}/-</td><td>${mon}' ${yr}</td></tr>`;
+        });
 
-        // Populate the table
-        let tableBody = document.querySelector("#dividendsTable tbody");
-        tableBody.innerHTML = ""; // Clear existing data
-        sortedStocks.forEach(stock => {
-            let latestDate = stockLatestDate[stock];
-            let monthAbbr = latestDate.toLocaleString('en-US', { month: 'short' }); // "Jan", "Feb", etc.
-            let yearAbbr = latestDate.getFullYear().toString().slice(-2); // "25" for 2025
-            let formattedMonthYear = `${monthAbbr}' ${yearAbbr}`; // Example: "Jan'25"
-            let row = `<tr>
-                <td style="padding: 10px; border: 1px solid #fff;">${stock}</td>
-                <td style="padding: 10px; border: 1px solid #fff;">₹ ${stockDividends[stock].toLocaleString()}/-</td>
-                <td style="padding: 10px; border: 1px solid #fff;">${formattedMonthYear}</td>
+        const total = totals.reduce((a,b) => a+b, 0);
+        document.getElementById('totalDividends').textContent = `₹ ${total.toLocaleString()}`;
+
+        const sc = { grid:{color:C.grid}, ticks:{color:C.muted,font:{size:11}} };
+        dividendsChartInst = new Chart(document.getElementById('dividendsChart').getContext('2d'), {
+            type:'bar',
+            data: { labels:dates, datasets:[{ label:'Dividends Received', data:totals, backgroundColor:C.green, borderRadius:5, borderSkipped:false }] },
+            options: {
+                responsive:true, maintainAspectRatio:false,
+                scales: { y:{ ...sc, beginAtZero:true, ticks:{...sc.ticks, callback:fmtV} }, x:sc },
+                plugins: {
+                    legend:{ labels:{ color:C.text, font:{size:12} } },
+                    tooltip: { ...TT, mode:'index', intersect:false, callbacks:{ label: ctx => [`Total: ₹${totals[ctx.dataIndex].toLocaleString()}`, ...details[ctx.label]] } }
+                },
+                interaction:{ mode:'index', intersect:false }
+            }
+        });
+    }
+
+    /* ── NEW: Insights Strip ── */
+    function renderInsightsStrip(allData, filteredReturns) {
+        /* Win Rate — from current_stock_data (static) */
+        const profitable = allData.current_stock_data.filter(s => s['Total Returns'] > 0).length;
+        const total      = allData.current_stock_data.length;
+        const winPct     = Math.round(profitable / total * 100);
+        document.getElementById('insightWinCount').textContent = `${profitable} / ${total}`;
+        document.getElementById('insightWinNote').textContent  = `${winPct}% stocks in profit`;
+        setTimeout(() => { document.getElementById('insightWinBar').style.width = `${winPct}%`; }, 100);
+
+        /* Peak P&L + Profitable Days — from filtered date range */
+        const retVals = Object.entries(filteredReturns);
+        if (retVals.length > 0) {
+            let peakPL = -Infinity, peakDate = '';
+            let profDays = 0;
+            retVals.forEach(([date, obj]) => {
+                if (obj.total_profit_loss > peakPL) { peakPL = obj.total_profit_loss; peakDate = date; }
+                if (obj.total_profit_loss >= 0) profDays++;
+            });
+            const profPct = Math.round(profDays / retVals.length * 100);
+            const peakFmt = peakDate ? (() => { const [y,m,d]=peakDate.split('/'); return new Date(+y,+m-1,+d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); })() : '';
+
+            document.getElementById('insightPeakPL').textContent  = `₹ ${peakPL.toLocaleString()}`;
+            document.getElementById('insightPeakNote').textContent = peakFmt ? `on ${peakFmt}` : '';
+            setTimeout(() => { document.getElementById('insightPeakBar').style.width = `${Math.min(100,Math.max(0,(peakPL/100000)*100))}%`; }, 100);
+
+            document.getElementById('insightProfDays').textContent = `${profPct}%`;
+            document.getElementById('insightProfNote').textContent = `${profDays} of ${retVals.length} trading days`;
+            setTimeout(() => { document.getElementById('insightProfBar').style.width = `${profPct}%`; }, 100);
+        }
+
+        /* All-time Dividend Yield — total dividends / latest invested */
+        const totalDiv = Object.values(allData.datewise_dividends).flat().reduce((s, d) => s + d.dividend_amount, 0);
+        const latestEntry = Object.values(allData.datewise_returns).at(-1);
+        const latestInv   = latestEntry ? latestEntry.total_investment : 1;
+        const yieldPct    = (totalDiv / latestInv * 100).toFixed(2);
+        document.getElementById('insightDivYield').textContent = `${yieldPct}%`;
+        document.getElementById('insightDivNote').textContent  = `₹ ${totalDiv.toLocaleString()} total earned`;
+        setTimeout(() => { document.getElementById('insightDivBar').style.width = `${Math.min(100, yieldPct * 5)}%`; }, 100);
+    }
+
+    /* ── NEW: Top Gainers / Losers ── */
+    function renderTopStocks(data) {
+        const stocks = data.current_stock_data.map(s => ({
+            name:    s.Name,
+            returns: s['Total Returns'],
+            invested: s['Avg Stock Average Value'] * s['Total Qty'],
+            pct:     (s['Total Returns'] / (s['Avg Stock Average Value'] * s['Total Qty'])) * 100
+        })).sort((a, b) => b.pct - a.pct);
+
+        const top5 = stocks.slice(0, 5);
+        const bot5 = [...stocks].reverse().slice(0, 5);
+        const medals = ['🥇','🥈','🥉','④','⑤'];
+
+        const gainersBody = document.querySelector('#gainersTable tbody');
+        gainersBody.innerHTML = '';
+        top5.forEach((s, i) => {
+            gainersBody.innerHTML += `<tr>
+                <td><span class="rank">${medals[i]}</span>${shortName(s.name)}</td>
+                <td><span class="badge badge-green">+${s.pct.toFixed(1)}%</span></td>
+                <td class="td-green">₹ ${s.returns.toLocaleString()}</td>
             </tr>`;
-            tableBody.innerHTML += row;
         });
 
-        // ✅ Update UI with total dividend amount
-        let totalDividendAmount = totalDividends.reduce((sum, value) => sum + value, 0);
-        document.getElementById("totalDividends").textContent = `₹ ${totalDividendAmount.toLocaleString()}`;
+        const losersBody = document.querySelector('#losersTable tbody');
+        losersBody.innerHTML = '';
+        bot5.forEach(s => {
+            losersBody.innerHTML += `<tr>
+                <td>${shortName(s.name)}</td>
+                <td><span class="badge badge-red">${s.pct.toFixed(1)}%</span></td>
+                <td class="td-red">₹ ${s.returns.toLocaleString()}</td>
+            </tr>`;
+        });
+    }
 
+    /* ── NEW: Monthly Dividend Calendar ── */
+    function renderMonthlyDividendsChart(datewise) {
+        if (monthlyDivChartInst) monthlyDivChartInst.destroy();
 
-        dividendsChartInstance  = new Chart(document.getElementById("dividendsChart").getContext("2d"), {
-            type: "bar",
+        const monthly = {};
+        Object.entries(datewise).forEach(([date, stocks]) => {
+            const [y, m] = date.split('/');
+            const key = `${y}-${m}`;
+            monthly[key] = (monthly[key]||0) + stocks.reduce((s,d) => s+d.dividend_amount, 0);
+        });
+
+        const sortedKeys = Object.keys(monthly).sort();
+        const labels = sortedKeys.map(k => {
+            const [y,m] = k.split('-');
+            return new Date(+y, +m-1).toLocaleString('en-US', { month:'short', year:'2-digit' });
+        });
+        const values = sortedKeys.map(k => +monthly[k].toFixed(2));
+        const maxVal = Math.max(...values);
+
+        /* Color by intensity — higher = greener */
+        const colors = values.map(v => {
+            const t = v / maxVal;
+            if (t >= 0.7) return C.green;
+            if (t >= 0.35) return C.blue;
+            return '#4f6480';
+        });
+
+        const sc = { grid:{color:C.grid}, ticks:{color:C.muted,font:{size:11}} };
+        monthlyDivChartInst = new Chart(document.getElementById('monthlyDivChart').getContext('2d'), {
+            type: 'bar',
             data: {
-                labels: dividendDates,
+                labels,
                 datasets: [{
-                    label: 'Dividends Received',
-                    data: totalDividends,
-                    borderColor: "#FF9800",
-                    backgroundColor: "#00c853",
-                    fill: true,
-                    tension: 0.3
+                    label: 'Monthly Dividends (₹)',
+                    data: values,
+                    backgroundColor: colors,
+                    borderRadius: 5,
+                    borderSkipped: false
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: false,
-                        grid: { color: "#555" },
-                        ticks: {
-                            color: "#fff",
-                            callback: function(value) {
-                                if (value >= 10000000) return (value / 10000000).toFixed(1) + " Cr"; // Convert to Crore
-                                if (value >= 100000) return (value / 100000).toFixed(1) + " L"; // Convert to Lakh
-                                if (value >= 1000) return (value / 1000).toFixed(1) + " K"; // Convert to Thousand
-                                return value; // Keep the original value for small numbers
-                            }
-                        }
-                    },
-                    x: { grid: { color: "#555" } }
+                    y: { ...sc, beginAtZero: true, ticks:{...sc.ticks, callback:fmtV} },
+                    x: sc
                 },
                 plugins: {
-                    legend: { labels: { color: "#fff" } },
+                    legend: { labels:{ color:C.text, font:{size:12} } },
                     tooltip: {
-                        mode: 'index',
-                        intersect: false,
+                        ...TT,
                         callbacks: {
-                            label: function (context) {
-                                let date = context.label;
-                                let totalAmount = totalDividends[context.dataIndex].toLocaleString();
-                                let companies = dividendDetails[date];
-                                return [`Total: ₹${totalAmount}`, ...companies];
-                            }
+                            label: ctx => `₹ ${ctx.parsed.y.toLocaleString('en-IN')}`
                         }
                     }
-                },
-                interaction: { mode: 'index', intersect: false }
+                }
             }
         });
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const dateForm = document.getElementById("dateFilterForm");
-        const startDateInput = document.getElementById("startDate");
-        const endDateInput = document.getElementById("endDate");
+    /* ── Filter Flags ── */
+    function updateFilterFlags(startISO, endISO) {
+        const sd = new Date(startISO), ed = new Date(endISO);
+        const opts = { day: 'numeric', month: 'short', year: '2-digit' };
+        const sfmt = sd.toLocaleDateString('en-IN', opts);
+        const efmt = ed.toLocaleDateString('en-IN', opts);
+        const diffDays = Math.round((ed - sd) / 86400000) + 1;
 
-        let globalData = {}; // Cache to store fetched data
+        /* Status bar */
+        document.getElementById('fsRange').textContent = `${sfmt} → ${efmt}`;
+        document.getElementById('fsDays').textContent  = `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
 
-        fetch("https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json")
-            .then(response => response.json())
+        /* Section tags — short form */
+        const shortFmt = d => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const tagText = `${shortFmt(sd)} → ${shortFmt(ed)}`;
+        ['tagTrends', 'tagDivChart', 'tagDivTable'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = tagText;
+        });
+
+        /* Card flags — update title tooltip */
+        document.querySelectorAll('.card-filter-flag').forEach(el => {
+            el.title = `Date filter active: ${sfmt} → ${efmt}`;
+        });
+    }
+
+    /* ── Bootstrap ── */
+    document.addEventListener('DOMContentLoaded', () => {
+        const startIn = document.getElementById('startDate');
+        const endIn   = document.getElementById('endDate');
+        let globalData = {};
+
+        fetch('https://raw.githubusercontent.com/anil-kr-sahoo/stock_alert/main/portfolio.json')
+            .then(r => r.json())
             .then(data => {
                 globalData = data;
 
-                // Get the available date range
-                const allDates = Object.keys(data.datewise_returns);
-                const sortedDates = allDates.map(d => new Date(d)).sort((a, b) => a - b);
-                const minDate = toDateInputFormat(sortedDates[0]);
-                const maxDate = toDateInputFormat(sortedDates[sortedDates.length - 1]);
-                console.log(sortedDates, sortedDates[sortedDates.length - 1].toISOString(), maxDate)
+                const sorted = Object.keys(data.datewise_returns)
+                    .map(d => new Date(d)).sort((a,b) => a-b);
+                const minD = fmt(sorted[0]);
+                const maxD = fmt(sorted.at(-1));
 
-                // Set min/max on input
-                startDateInput.min = minDate;
-                startDateInput.max = maxDate;
-                endDateInput.min = minDate;
-                endDateInput.max = maxDate;
+                [startIn, endIn].forEach(el => { el.min = minD; el.max = maxD; });
+                endIn.value = maxD;
+                const prev = new Date(maxD);
+                prev.setMonth(prev.getMonth() - 1);
+                startIn.value = prev < new Date(minD) ? minD : fmt(prev);
 
-                // Set end date to maxDate (latest date in dataset)
-                endDateInput.value = maxDate;
+                /* Render static sections once */
+                renderTopStocks(globalData);
+                renderMonthlyDividendsChart(globalData.datewise_dividends);
 
-                // Set start date to 1 month before maxDate
-                const oneMonthAgo = new Date(maxDate);
-                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-                // Make sure it's not earlier than minDate
-                const startValue = oneMonthAgo < new Date(minDate) ? minDate : toDateInputFormat(oneMonthAgo);
-                startDateInput.value = startValue;
-
-
-                // Initial chart rendering
-                renderEverything(startDateInput.value, endDateInput.value);
+                renderAll(startIn.value, endIn.value);
             });
 
-        function renderEverything(startISO, endISO) {
-            const start = toSlashFormat(startISO);
-            const end = toSlashFormat(endISO);
-
-            const filteredReturns = filterData(globalData.datewise_returns, start, end);
+        function renderAll(s, e) {
+            const start = slash(s), end = slash(e);
+            const filteredReturns   = filterData(globalData.datewise_returns, start, end);
             const filteredDividends = filterData(globalData.datewise_dividends, start, end);
+            const stockData = transformStockData(globalData.current_stock_data);
 
-            const stock_data = transformStockData(globalData.current_stock_data);
-            renderCharts(stock_data);
+            updateFilterFlags(s, e);
+            renderCharts(stockData);
             renderDateWiseCharts(filteredReturns);
             renderDividendsChart(filteredDividends);
+            renderInsightsStrip(globalData, filteredReturns);
         }
 
-        function toDateInputFormat(dateObj) {
-            const year = dateObj.getFullYear();
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const day = String(dateObj.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`; // yyyy-mm-dd
+        function fmt(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth()+1).padStart(2,'0');
+            const d = String(dateObj.getDate()).padStart(2,'0');
+            return `${y}-${m}-${d}`;
         }
 
-        function toSlashFormat(dateInputValue) {
-            const d = new Date(dateInputValue);
-            const year = d.getFullYear();
-            const month = (d.getMonth() + 1).toString().padStart(2, '0');
-            const day = d.getDate().toString().padStart(2, '0');
-            return `${year}/${month}/${day}`; // ✅ Changed to YYYY/MM/DD
+        function slash(val) {
+            const d = new Date(val);
+            return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
         }
 
-        startDateInput.addEventListener("change", handleDateChange);
-        endDateInput.addEventListener("change", handleDateChange);
-
-        function handleDateChange() {
-            let userStart = startDateInput.value;
-            let userEnd = endDateInput.value;
-
-            if (!userStart || !userEnd) return;
-
-            if (userStart > userEnd) {
-                endDateInput.value = userStart;
-                userEnd = userStart;
-            }
-
-            renderEverything(userStart, userEnd);
+        function onChange() {
+            let s = startIn.value, e = endIn.value;
+            if (!s || !e) return;
+            if (s > e) { endIn.value = s; e = s; }
+            renderAll(s, e);
         }
+
+        startIn.addEventListener('change', onChange);
+        endIn.addEventListener('change', onChange);
     });
-
 </script>
-
 </body>
 </html>
