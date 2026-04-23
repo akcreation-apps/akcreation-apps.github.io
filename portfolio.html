@@ -268,15 +268,16 @@
             .header { padding: 12px 14px; }
             .live-badge { display: none; }
             .main { padding: 16px 12px 40px; }
-            .filter-bar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
-            .filter-inputs { width: 100%; }
-            .input-group { min-width: unset; }
+            .filter-bar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 14px; }
+            .filter-inputs { display: flex; flex-direction: column; width: 100%; gap: 10px; }
+            .input-group { width: 100%; min-width: 100%; flex: unset; }
             .summary-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
             .summary-card { padding: 14px 12px; }
             .card-value { font-size: 1rem; }
             .chart-card { padding: 14px 10px 10px; }
             .chart-wrap { height: 240px; }
             .chart-wrap.tall { height: 280px; }
+            input[type="date"] { width: 100%; height: 42px; font-size: 0.9rem; }
         }
 
         /* Stack date inputs vertically on narrow screens so each gets full width */
