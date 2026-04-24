@@ -120,6 +120,25 @@
         #searchIcon  {}
         #invoiceIcon {}
 
+        /* ── Refer icon with blinking dot ── */
+        .refer-btn {
+            position: relative;
+            color: rgba(255,255,255,0.88);
+        }
+        .refer-btn::after {
+            content: '';
+            position: absolute;
+            top: -4px; right: -4px;
+            width: 8px; height: 8px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: referPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes referPulse {
+            0%,100% { transform: scale(1);   opacity: 1; box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
+            50%      { transform: scale(1.25); opacity: 0.8; box-shadow: 0 0 0 5px rgba(255,215,0,0); }
+        }
+
         .cart-icon { position: relative; }
         .cart-count {
             position: absolute;
@@ -453,6 +472,9 @@
                 🍽️ <span class="brand-accent">The Cafe</span> Darbar
             </div>
             <div class="icon-container">
+                <a class="nav-icon refer-btn" href="referral.html" title="Refer & Earn">
+                    <i class="fas fa-share-alt"></i>
+                </a>
                 <div class="nav-icon" id="searchIcon">
                     <i class="fas fa-search"></i>
                 </div>

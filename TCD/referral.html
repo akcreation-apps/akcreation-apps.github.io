@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="theme-color" content="#1A1A2E">
+    <title>Refer &amp; Earn — The Cafe Darbar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary:   #FF6B35;
+            --navy:      #1A1A2E;
+            --bg:        #F5F0EB;
+            --card:      #FFFFFF;
+            --text:      #2D2D2D;
+            --muted:     #888;
+            --border:    #E2D9D0;
+            --gold:      #FFD700;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.13);
+            --r:         12px;
+            --nav-h:     56px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding-top: var(--nav-h);
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--nav-h); z-index: 1000;
+            background: var(--navy);
+            display: flex; align-items: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .navbar-inner {
+            max-width: 1400px; margin: 0 auto; width: 100%;
+            display: flex; align-items: center;
+            justify-content: space-between; padding: 0 20px;
+        }
+        .logo {
+            font-size: 1.05rem; font-weight: 700; color: #fff;
+            cursor: pointer; flex: 1; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+            text-decoration: none;
+        }
+        .logo .brand-accent { color: var(--primary); }
+        .back-btn {
+            color: rgba(255,255,255,0.88); font-size: 1rem;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            text-decoration: none; transition: color 0.2s;
+            font-size: 0.82rem; font-weight: 500;
+        }
+        .back-btn:hover { color: #fff; }
+
+        /* ── Page wrapper ── */
+        .page {
+            max-width: 680px; margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        /* ── Hero banner ── */
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #2a2a4e 100%);
+            border-radius: var(--r);
+            padding: 32px 24px 28px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -30px; right: -30px;
+            width: 120px; height: 120px;
+            background: rgba(255,107,53,0.15);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute; bottom: -20px; left: -20px;
+            width: 80px; height: 80px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 50%;
+        }
+        .hero-icon {
+            width: 60px; height: 60px;
+            background: rgba(255,215,0,0.15);
+            border: 2px solid rgba(255,215,0,0.4);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+        .hero h1 {
+            font-size: 1.6rem; font-weight: 800;
+            color: #fff; margin-bottom: 6px;
+        }
+        .hero p {
+            font-size: 0.82rem; color: rgba(255,255,255,0.7);
+            line-height: 1.6;
+        }
+
+        /* ── Reward pills ── */
+        .reward-row {
+            display: flex; gap: 12px; justify-content: center;
+            margin: 20px 0 0;
+        }
+        .reward-pill {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 50px;
+            padding: 10px 20px;
+            text-align: center;
+            min-width: 120px;
+        }
+        .reward-pill .amount {
+            font-size: 1.5rem; font-weight: 800;
+            color: var(--gold); line-height: 1;
+        }
+        .reward-pill .label {
+            font-size: 0.65rem; color: rgba(255,255,255,0.65);
+            margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* ── Section card ── */
+        .card {
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .card-title {
+            font-size: 0.78rem; font-weight: 700;
+            color: var(--navy); text-transform: uppercase;
+            letter-spacing: 0.8px; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-title i { color: var(--primary); font-size: 0.85rem; }
+
+        /* ── Steps ── */
+        .steps { list-style: none; }
+        .step {
+            display: flex; gap: 14px; align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .step:last-child { border-bottom: none; padding-bottom: 0; }
+        .step-num {
+            width: 28px; height: 28px; flex-shrink: 0;
+            background: var(--primary); color: #fff;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .step-body { flex: 1; }
+        .step-body > strong {
+            display: block; font-size: 0.83rem;
+            font-weight: 600; color: var(--navy);
+            margin-bottom: 2px;
+        }
+        .step-body p {
+            font-size: 0.74rem; color: var(--muted);
+            line-height: 1.55;
+        }
+
+        /* ── Share button ── */
+        .share-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%;
+            background: #25D366; color: #fff;
+            border: none; border-radius: var(--r);
+            padding: 14px 20px; margin-top: 18px;
+            font-size: 0.92rem; font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(37,211,102,0.3);
+            transition: background 0.2s, transform 0.15s;
+            text-decoration: none;
+        }
+        .share-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
+        .share-btn img { width: 22px; height: 22px; }
+
+        /* ── Notes / T&C ── */
+        .notes { list-style: none; }
+        .notes li {
+            font-size: 0.73rem; color: var(--muted);
+            padding: 4px 0; padding-left: 16px;
+            position: relative; line-height: 1.5;
+        }
+        .notes li::before {
+            content: '•'; position: absolute; left: 0;
+            color: var(--primary); font-weight: 700;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 20px 16px;
+            font-size: 0.72rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            margin-top: 10px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a class="logo" href="index.html">
+                🍽️ <span class="brand-accent">The Cafe</span> Darbar
+            </a>
+            <a class="back-btn" href="index.html">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <div class="page">
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <h1>Refer &amp; Earn</h1>
+            <p>Share The Cafe Darbar with friends.<br>Both of you get a discount on your next order!</p>
+            <div class="reward-row">
+                <div class="reward-pill">
+                    <div class="amount">₹50</div>
+                    <div class="label">You Get</div>
+                </div>
+                <div class="reward-pill">
+                    <div class="amount">₹25</div>
+                    <div class="label">Friend Gets</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-list-ol"></i> How It Works
+            </div>
+            <ul class="steps">
+                <li class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <strong>Share the Link</strong>
+                        <p>Tap the WhatsApp button below and send your referral message to a friend.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-body">
+                        <strong>Friend Places an Order</strong>
+                        <p>Your friend opens the link, browses the menu, and places an order via WhatsApp.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-body">
+                        <strong>Send the Screenshot</strong>
+                        <p>Your friend sends the order screenshot to the cafe. Once the order is verified and confirmed, they get <strong>₹25 off</strong> instantly.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-body">
+                        <strong>You Earn ₹50</strong>
+                        <p>After your friend's first successful order, you get a <strong>₹50 discount</strong> credited on your next visit.</p>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- WhatsApp share button -->
+            <a class="share-btn" id="whatsappShareBtn" href="#" target="_blank" rel="noopener">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+                Share via WhatsApp
+            </a>
+        </div>
+
+        <!-- Terms -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-info-circle"></i> Terms &amp; Conditions
+            </div>
+            <ul class="notes">
+                <li>Offer valid only for orders placed via the WhatsApp referral link.</li>
+                <li>Friend must be a first-time customer at The Cafe Darbar.</li>
+                <li>Order screenshot must be shared with the cafe for verification.</li>
+                <li>₹25 discount applied to friend's order after verification.</li>
+                <li>₹50 referral reward applied to your next dine-in or COD order.</li>
+                <li>Discount cannot be combined with other ongoing offers.</li>
+                <li>Cafe reserves the right to cancel fraudulent or duplicate referrals.</li>
+                <li>Offer valid while the program is active. Subject to change.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/food-order-kiosk.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+    </footer>
+
+    <script>
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        const referralMessage = [
+            "*Special Offer - The Cafe Darbar*",
+            "",
+            "Hey! I found this amazing cafe in Banki.",
+            "Thought you would love it - give it a try!",
+            "",
+            "*Exclusive deal just for you:*",
+            "Get *FLAT Rs.25 OFF* on your first order!",
+            "",
+            "*How to claim:*",
+            "",
+            "1. Open the menu:",
+            "   https://akcreation-apps.com/TCD/index.html?table=COD",
+            "",
+            "2. Place your order via WhatsApp",
+            "",
+            "3. Send me your order screenshot",
+            "",
+            "4. Get Rs.25 OFF after verification"
+        ].join("\n");
+
+        document.getElementById('whatsappShareBtn').href =
+            'https://wa.me/?text=' + encodeURIComponent(referralMessage);
+    </script>
+
+</body>
+</html>
