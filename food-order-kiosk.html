@@ -1,172 +1,614 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="description" content="Smart self-ordering kiosk for restaurants. No app, no login — just scan & order. Powered by AK Creation.">
+
+    <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="icon" href="/favicon.ico">
-    <meta name="theme-color" content="#4f46e5">
-    <title>Kiosk Food Ordering (AkCreation)</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Analytics -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+    <title>Smart Food Ordering Kiosk — AK Creation</title>
+
     <style>
+        :root {
+            --brand: #4f46e5;
+            --brand-dark: #3730a3;
+            --brand-light: #eef2ff;
+            --accent: #f97316;
+            --green: #22c55e;
+            --text: #1e1b4b;
+            --muted: #64748b;
+            --card-bg: #ffffff;
+            --section-bg: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            color: var(--text);
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        .header img {
-            width: 100%;
-            border-radius: 10px;
-        }
-        .content {
-            padding: 20px;
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 60%, #7c3aed 100%);
+            color: white;
+            padding: 60px 20px 80px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .hero-title {
-            font-size: 32px;
-            font-weight: bold;
-            color: #474952;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -40px;
+            width: 250px; height: 250px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            padding: 6px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
             text-transform: uppercase;
             margin-bottom: 20px;
-            letter-spacing: 2px;
         }
-        .content p {
-            color: #333;
-            font-size: 18px;
-            line-height: 1.6;
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(28px, 6vw, 48px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
         }
-        .section {
-            text-align: left;
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            background: #f9f9f9;
-            border-radius: 8px;
+        .hero h1 span { color: #fbbf24; }
+        .hero p {
+            font-size: clamp(15px, 2.5vw, 18px);
+            opacity: 0.88;
+            max-width: 560px;
+            margin: 0 auto 30px;
+            line-height: 1.7;
+        }
+        .hero-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+        .hero-pill {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .hero-pill i { margin-right: 6px; color: #fbbf24; }
+        .btn-cta {
+            display: inline-block;
+            background: #f97316;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 24px rgba(249,115,22,0.4);
+        }
+        .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(249,115,22,0.5); color: white; text-decoration: none; }
+
+        /* ── WAVE DIVIDER ── */
+        .wave { display: block; line-height: 0; }
+        .wave svg { display: block; }
+
+        /* ── SECTION WRAPPER ── */
+        .section-wrap { padding: 50px 16px; }
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(22px, 4vw, 30px);
+            font-weight: 700;
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .section-sub {
+            text-align: center;
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 36px;
+        }
+        .pill-label {
+            display: inline-block;
+            background: var(--brand-light);
+            color: var(--brand);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 10px;
         }
-        .section h2 {
-            color: #474952;
+
+        /* ── HOW IT WORKS STEPS ── */
+        .steps-wrap { background: var(--section-bg); border-radius: 16px; padding: 24px; }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .step:last-child { border-bottom: none; }
+        .step-num {
+            flex-shrink: 0;
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: var(--brand);
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .step-icon {
+            flex-shrink: 0;
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: var(--brand-light);
+            color: var(--brand);
+            font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .step-body h5 { font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--text); }
+        .step-body p { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.5; }
+
+        /* ── FEATURE CARDS ── */
+        .feat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            height: 100%;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .feat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.10); }
+        .feat-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
             font-size: 22px;
+            margin-bottom: 14px;
+        }
+        .feat-card h5 { font-weight: 700; font-size: 16px; margin-bottom: 8px; color: var(--text); }
+        .feat-card p { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.6; }
+
+        /* ── ANALYTICS GRID ── */
+        .analytics-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--brand);
+        }
+        .analytics-card.ac-green { border-left-color: var(--green); }
+        .analytics-card.ac-orange { border-left-color: var(--accent); }
+        .analytics-card.ac-purple { border-left-color: #9333ea; }
+        .analytics-card.ac-sky { border-left-color: #0ea5e9; }
+        .analytics-card.ac-rose { border-left-color: #f43f5e; }
+        .analytics-card h5 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .analytics-card p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5; }
+        .analytics-card i { font-size: 20px; margin-bottom: 10px; }
+
+        /* ── WHY US CHECKLIST ── */
+        .why-list { list-style: none; padding: 0; margin: 0; }
+        .why-list li {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 15px;
+            color: var(--text);
+        }
+        .why-list li:last-child { border-bottom: none; }
+        .why-list li i { color: var(--green); font-size: 17px; flex-shrink: 0; margin-top: 2px; }
+
+        /* ── PRICING CARD ── */
+        .pricing-card {
+            background: linear-gradient(135deg, #1e1b4b, #4f46e5);
+            border-radius: 20px;
+            padding: 36px 28px;
+            color: white;
             text-align: center;
         }
-        .section ul {
-            padding: 10px 20px;
+        .pricing-card .price-tag {
+            font-size: 48px;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1;
         }
-        .section ul li {
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .footer {
-            text-align: center;
-            padding: 15px;
+        .pricing-card .price-tag small { font-size: 18px; opacity: 0.7; }
+        .pricing-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            text-align: left;
             font-size: 14px;
-            color: white;
-            background: #474952;
-            border-radius: 0 0 10px 10px;
         }
-        .footer a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .whatsapp-btn {
-            display: inline-block;
-            background-color: #25D366;
+        .pricing-item:last-of-type { border-bottom: none; }
+        .pricing-item i { color: #fbbf24; flex-shrink: 0; font-size: 16px; margin-top: 2px; }
+        .pricing-item strong { display: block; font-size: 13px; opacity: 0.75; font-weight: 400; }
+        .btn-wa {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: #25D366;
             color: white;
-            padding: 10px 20px;
+            padding: 14px 28px;
+            border-radius: 50px;
             font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
+            font-weight: 700;
             text-decoration: none;
-            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+            margin-top: 20px;
+        }
+        .btn-wa:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(37,211,102,0.45); color: white; text-decoration: none; }
+
+        /* ── DEMO BANNER ── */
+        .demo-banner {
+            background: var(--brand-light);
+            border: 1px solid #c7d2fe;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+        }
+        .demo-banner h4 { font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .demo-banner p { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+        .btn-demo {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--brand);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-demo:hover { background: var(--brand-dark); color: white; text-decoration: none; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #1e1b4b;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 28px 16px;
+            font-size: 14px;
+        }
+        footer a { color: #a5b4fc; text-decoration: none; }
+        footer a:hover { color: white; text-decoration: underline; }
+
+        @media (min-width: 768px) {
+            .section-wrap { padding: 70px 24px; }
+            .hero { padding: 90px 24px 110px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="content">
-            <div class="hero-title">
-                Dear Champions of Hospitality!
+
+<!-- ── HERO ── -->
+<section class="hero">
+    <div class="hero-badge">🍽️ Smart Restaurant Technology</div>
+    <h1>Revolutionizing<br><span>Contactless Food Ordering</span></h1>
+    <p>We bring your restaurant a smart self-ordering kiosk — giving customers instant access to your menu with zero friction.</p>
+    <div class="hero-pills">
+        <span class="hero-pill"><i class="fas fa-mobile-alt"></i> No App</span>
+        <span class="hero-pill"><i class="fas fa-lock-open"></i> No Login</span>
+        <span class="hero-pill"><i class="fas fa-qrcode"></i> Just Scan & Order</span>
+    </div>
+    <a class="btn-cta" href="https://akcreation-apps.com/TCD/" target="_blank">
+        <i class="fas fa-eye mr-2"></i> See Live Demo
+    </a>
+</section>
+
+<!-- WAVE -->
+<div class="wave">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="background:#4f46e5;">
+        <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f1f5f9"/>
+    </svg>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section-wrap" style="background:#f1f5f9;">
+    <div class="container" style="max-width:640px;">
+        <div class="text-center mb-1">
+            <span class="pill-label">How It Works</span>
+        </div>
+        <h2 class="section-title">Customer Journey in 5 Steps</h2>
+        <p class="section-sub">Frictionless ordering from scan to delivery</p>
+
+        <div class="steps-wrap">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-icon"><i class="fas fa-qrcode"></i></div>
+                <div class="step-body">
+                    <h5>Scan the QR Code</h5>
+                    <p>Each table has a unique QR. Customer scans it with their phone camera — no app needed.</p>
+                </div>
             </div>
-            <p>We understand that speed, efficiency, and customer convenience are key to restaurant success. That’s why we bring you a smart self-ordering kiosk.</p>
-        </div>
-        <div class="content">
-            <h1>Revolutionizing Contactless Food Ordering</h1>
-            <p>🚀 No App | No Login | Just Scan & Order!</p>
-        </div>
-
-        <div class="section">
-            <h2>Customer Experience</h2>
-            <ul>
-                <li>📌 <b>Scan the QR Code:</b> Customers scan a unique QR placed on the table.</li>
-                <li>🔗 <b>Get Instant Access:</b> A temporary link opens the menu for 1 hour.</li>
-                <li>🍔 <b>Place an Order:</b> Select food and confirm the order.</li>
-                <li>📲 <b>WhatsApp Order Notification:</b> Restaurant receives orders via WhatsApp.</li>
-                <li>✅ <b>Food Delivery & Digital Bill:</b> Customers can view and download their digital bill once the order is approved.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Admin Features & Control Panel</h2>
-            <ul>
-                <li>📊 <b>Analytics:</b> View data insights on sales and orders.</li>
-                <li>⚡ <b>Live Orders:</b> Accept or reject orders in real time.</li>
-                <li>🎛️ <b>Manage:</b> Update dish availability and control WhatsApp order notifications.</li>
-                <li>📱 <b>Offline Orders:</b> Use the admin QR to manually input offline orders and sync with your analytics.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Boost Your Business with Analytics</h2>
-            <ul>
-                <li>📈 <b>Total Sales Over Time:</b> Track your total sales progress over last 30 days.</li>
-                <li>📊 <b>Category-Wise Sales:</b> View sales performance by category (e.g., starters, main course, desserts).</li>
-                <li>🧾 <b>Orders Per Table:</b> See how many orders each table is making.</li>
-                <li>🍽️ <b>Most Ordered Dishes:</b> Identify top-selling items.</li>
-                <li>🛒 <b>Order Status Breakdown:</b> Monitor the status of orders (Approved, In-Progress and Rejected).</li>
-                <li>⏰ <b>Peak Order Times:</b> Discover peak times for orders to better manage staff.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Why Choose Us?</h2>
-            <ul>
-                <li>✅ No App Installation Required</li>
-                <li>✅ Contactless & Hassle-Free Ordering</li>
-                <li>✅ Real-time Order Management</li>
-                <li>✅ Powerful Analytics for Growth</li>
-                <li>✅ Quick Setup & Easy to Use</li>
-                <li>✅ Optimized for All Mobile Screens</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Our Offer</h2>
-            <ul>
-                <li>🗓️ <b>Setup Time:</b> Send us your menu and get your personalized app ready within 7 days.</li>
-                <li>💲 <b>Installation Fee:</b> A one-time cost of Rs 1000/- covers 3 months of free service.</li>
-                <li>📉 <b>Ongoing Service Cost:</b> After 3 months, it will cost you only 0.1% of your monthly sales.</li>
-                <li>📱 <b>QR Codes:</b> You will receive one unique QR code for each table and admin QR for your restaurant.</li>
-                <li>💡 <b>Menu Updates:</b> For any future menu changes, simply connect with us.</li>
-            </ul>
-            <p>🌐 <b>See a Demo:</b> Check out the customer experience in our <a href="https://akcreation-apps.com/TCD/" target="_blank">Demo Link</a>.</p>
-        </div>
-
-        <div class="footer">
-            <p>Need more info? Contact us at <a href="mailto:akcreation072k19@gmail.com">akcreation072k19@gmail.com</a></p>
-            <a class="whatsapp-btn" href="https://wa.me/+917749984274" target="_blank">📩 Contact via WhatsApp</a>
-            <p>&copy; 2025 AkCreation | Made in India with ❤️</p>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-icon"><i class="fas fa-link"></i></div>
+                <div class="step-body">
+                    <h5>Instant Menu Access</h5>
+                    <p>A temporary session link opens the full menu in the browser — valid for 1 hour.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-icon"><i class="fas fa-utensils"></i></div>
+                <div class="step-body">
+                    <h5>Browse & Place Order</h5>
+                    <p>Customer selects dishes, reviews the cart, and confirms the order.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-icon"><i class="fab fa-whatsapp"></i></div>
+                <div class="step-body">
+                    <h5>WhatsApp Notification</h5>
+                    <p>The restaurant receives the order instantly on WhatsApp. No hardware required.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">5</div>
+                <div class="step-icon"><i class="fas fa-file-invoice"></i></div>
+                <div class="step-body">
+                    <h5>Delivery & Digital Bill</h5>
+                    <p>Once approved, the customer can view and download a digital bill directly on their phone.</p>
+                </div>
+            </div>
         </div>
     </div>
+</section>
+
+<!-- ── ADMIN FEATURES ── -->
+<section class="section-wrap" style="background:#fff;">
+    <div class="container">
+        <div class="text-center mb-1">
+            <span class="pill-label">Admin Panel</span>
+        </div>
+        <h2 class="section-title">Full Control at Your Fingertips</h2>
+        <p class="section-sub">Manage your restaurant in real time from any device</p>
+
+        <div class="row">
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="feat-card">
+                    <div class="feat-icon" style="background:#eef2ff; color:#4f46e5;">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h5>Live Orders</h5>
+                    <p>Accept or reject incoming orders in real time without missing a beat.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="feat-card">
+                    <div class="feat-icon" style="background:#f0fdf4; color:#22c55e;">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h5>Menu Control</h5>
+                    <p>Mark dishes available or unavailable instantly. Toggle WhatsApp notifications on/off.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="feat-card">
+                    <div class="feat-icon" style="background:#fff7ed; color:#f97316;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h5>Analytics</h5>
+                    <p>Rich visual insights on sales, peak hours, and popular dishes.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="feat-card">
+                    <div class="feat-icon" style="background:#fdf4ff; color:#9333ea;">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h5>Offline Orders</h5>
+                    <p>Use the admin QR to manually input offline orders and sync them with analytics.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── ANALYTICS ── -->
+<section class="section-wrap" style="background:#f1f5f9;">
+    <div class="container">
+        <div class="text-center mb-1">
+            <span class="pill-label">Analytics</span>
+        </div>
+        <h2 class="section-title">Data-Driven Growth</h2>
+        <p class="section-sub">Everything you need to understand your business performance</p>
+
+        <div class="row">
+            <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                <div class="analytics-card">
+                    <i class="fas fa-chart-line" style="color:#4f46e5;"></i>
+                    <h5>Total Sales Over Time</h5>
+                    <p>Track your revenue progress across the last 30 days at a glance.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                <div class="analytics-card ac-green">
+                    <i class="fas fa-layer-group" style="color:#22c55e;"></i>
+                    <h5>Category-Wise Sales</h5>
+                    <p>Compare starters, mains, desserts, and beverages side by side.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                <div class="analytics-card ac-orange">
+                    <i class="fas fa-table" style="color:#f97316;"></i>
+                    <h5>Orders Per Table</h5>
+                    <p>See which tables generate the most revenue and footfall.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                <div class="analytics-card ac-purple">
+                    <i class="fas fa-fire" style="color:#9333ea;"></i>
+                    <h5>Most Ordered Dishes</h5>
+                    <p>Identify your bestsellers to optimize menu and stock.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                <div class="analytics-card ac-sky">
+                    <i class="fas fa-tasks" style="color:#0ea5e9;"></i>
+                    <h5>Order Status Breakdown</h5>
+                    <p>Monitor Approved, In-Progress, and Rejected orders over time.</p>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                <div class="analytics-card ac-rose">
+                    <i class="fas fa-clock" style="color:#f43f5e;"></i>
+                    <h5>Peak Order Times</h5>
+                    <p>Discover busiest hours to plan staffing and kitchen prep.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── WHY US + PRICING ── -->
+<section class="section-wrap" style="background:#fff;">
+    <div class="container">
+        <div class="row align-items-start">
+
+            <!-- WHY US -->
+            <div class="col-12 col-md-6 mb-4 mb-md-0">
+                <span class="pill-label">Why Choose Us</span>
+                <h2 class="section-title text-left mt-2">Built for Modern<br>Restaurants</h2>
+                <ul class="why-list mt-3">
+                    <li><i class="fas fa-check-circle"></i> No App Installation Required</li>
+                    <li><i class="fas fa-check-circle"></i> Contactless &amp; Hassle-Free Ordering</li>
+                    <li><i class="fas fa-check-circle"></i> Real-Time Order Management</li>
+                    <li><i class="fas fa-check-circle"></i> Powerful Analytics for Growth</li>
+                    <li><i class="fas fa-check-circle"></i> Quick Setup — Ready in 7 Days</li>
+                    <li><i class="fas fa-check-circle"></i> Optimized for All Mobile Screens</li>
+                    <li><i class="fas fa-check-circle"></i> WhatsApp-Native — No Extra Hardware</li>
+                </ul>
+            </div>
+
+            <!-- PRICING -->
+            <div class="col-12 col-md-6">
+                <div class="pricing-card">
+                    <span class="pill-label" style="background:rgba(255,255,255,0.15); color:#fbbf24;">Our Offer</span>
+                    <div class="price-tag mt-3">₹1000<small>/setup</small></div>
+                    <p style="opacity:0.75; font-size:13px; margin-bottom:20px;">One-time installation fee · 3 months free service</p>
+
+                    <div class="pricing-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <div>
+                            <b>Ready in 7 Days</b>
+                            <strong>Send us your menu and your app goes live within a week</strong>
+                        </div>
+                    </div>
+                    <div class="pricing-item">
+                        <i class="fas fa-gift"></i>
+                        <div>
+                            <b>3 Months Free Service</b>
+                            <strong>No recurring charges for the first 3 months after installation</strong>
+                        </div>
+                    </div>
+                    <div class="pricing-item">
+                        <i class="fas fa-percentage"></i>
+                        <div>
+                            <b>0.1% of Monthly Sales</b>
+                            <strong>After 3 months — a fraction of what you earn</strong>
+                        </div>
+                    </div>
+                    <div class="pricing-item">
+                        <i class="fas fa-qrcode"></i>
+                        <div>
+                            <b>QR Codes Included</b>
+                            <strong>One unique QR per table + admin QR for your staff</strong>
+                        </div>
+                    </div>
+                    <div class="pricing-item">
+                        <i class="fas fa-edit"></i>
+                        <div>
+                            <b>Menu Updates On-Demand</b>
+                            <strong>Just message us — changes done within 24 hours</strong>
+                        </div>
+                    </div>
+
+                    <a class="btn-wa" href="https://wa.me/+917749984274" target="_blank">
+                        <i class="fab fa-whatsapp fa-lg"></i> Chat on WhatsApp
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── DEMO BANNER ── -->
+<section class="section-wrap" style="background:#f1f5f9;">
+    <div class="container" style="max-width:600px;">
+        <div class="demo-banner">
+            <h4>🚀 See It In Action</h4>
+            <p>Experience the full customer ordering flow in our live demo — no setup needed.</p>
+            <a class="btn-demo" href="https://akcreation-apps.com/TCD/" target="_blank">
+                <i class="fas fa-external-link-alt"></i> Open Live Demo
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <p>Questions? Email us at <a href="mailto:akcreation072k19@gmail.com">akcreation072k19@gmail.com</a></p>
+    <p style="margin-top:6px;">&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+</footer>
+
+<script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
