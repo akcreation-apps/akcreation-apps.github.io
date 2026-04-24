@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Tracker — Insights Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080a0e;--surface:#0f1117;--surface2:#161922;--surface3:#1c2030;
+  --border:#1e2336;--border2:#252d42;
+  --text:#e4e9f7;--text-muted:#68748f;--text-dim:#333d58;
+  --study:#4f9eff;--ai:#a78bfa;--engage:#34d399;--leave:#fb923c;--other:#94a3b8;
+  --holiday:#f59e0b;
+  --dev:#22d3ee;--stg:#818cf8;--prod:#f87171;
+  --r:12px;--rs:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(79,158,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(79,158,255,.025) 1px,transparent 1px);
+  background-size:44px 44px;pointer-events:none;z-index:0;
+}
+.wrap{position:relative;z-index:1;max-width:1360px;margin:0 auto;padding:40px 24px;}
+
+/* ── HEADER ── */
+header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:20px;}
+.hl h1{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,42px);font-weight:800;letter-spacing:-1.5px;line-height:1;
+  background:linear-gradient(120deg,#e4e9f7 20%,#4f9eff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hl p{font-size:11px;color:var(--text-muted);margin-top:8px;letter-spacing:1.5px;text-transform:uppercase;}
+.hr{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.status-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);padding:6px 14px;border-radius:99px;}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);}
+.sdot.on{background:var(--engage);box-shadow:0 0 8px var(--engage);}
+#reset-btn{display:none;align-items:center;gap:6px;background:transparent;border:1px solid var(--border2);color:var(--text-muted);padding:8px 16px;border-radius:var(--rs);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;}
+#reset-btn:hover{border-color:var(--study);color:var(--text);}
+#reset-btn.on{display:inline-flex;}
+
+/* ── UPLOAD ── */
+#upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:64px 40px;text-align:center;background:var(--surface);cursor:pointer;transition:all .3s;margin-bottom:40px;position:relative;overflow:hidden;}
+#upload-zone::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(79,158,255,.06) 0%,transparent 70%);opacity:0;transition:opacity .3s;}
+#upload-zone:hover::before,#upload-zone.over::before{opacity:1;}
+#upload-zone:hover,#upload-zone.over{border-color:var(--study);transform:translateY(-2px);}
+.uico{width:58px;height:58px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;}
+#upload-zone h3{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;margin-bottom:8px;}
+#upload-zone p{font-size:12px;color:var(--text-muted);margin-bottom:22px;}
+.btn-up{display:inline-flex;align-items:center;gap:8px;background:var(--study);color:#000;border:none;padding:11px 26px;border-radius:var(--rs);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;}
+.btn-up:hover{background:#fff;box-shadow:0 0 24px rgba(79,158,255,.4);transform:translateY(-1px);}
+#fi{display:none;}
+
+/* ── DASHBOARD ── */
+#dash{display:none;}
+#dash.on{display:block;animation:up .5s ease;}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FILTER BAR ── */
+.sel-wrap{position:relative;display:inline-flex;align-items:center;}
+.sel-wrap::after{content:'▾';position:absolute;right:11px;font-size:10px;color:var(--text-muted);pointer-events:none;transition:transform .2s;}
+.sel-wrap:focus-within::after{transform:rotate(180deg);color:var(--study);}
+#sel-month{
+  appearance:none;-webkit-appearance:none;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);
+  color:var(--text);font-family:'DM Mono',monospace;font-size:11px;
+  padding:8px 32px 8px 14px;cursor:pointer;transition:all .2s;outline:none;min-width:148px;
+}
+#sel-month:hover{background:var(--surface3);}
+#sel-month:focus{border-color:var(--study);box-shadow:0 0 0 3px rgba(79,158,255,.1);}
+#sel-month option{background:var(--surface2);color:var(--text);}
+
+/* ── SECTION TITLE ── */
+.st{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--text-muted);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.st::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── STAT CARDS ── */
+.srow{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-bottom:30px;}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
+.sc:hover{transform:translateY(-2px);}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;}
+.sc.total::after{background:linear-gradient(90deg,var(--study),var(--ai),var(--engage));}
+.sc.study::after{background:var(--study);}
+.sc.ai::after{background:var(--ai);}
+.sc.engage::after{background:var(--engage);}
+.sc.leave::after{background:var(--leave);}
+.sc.holiday::after{background:var(--holiday);}
+.sc.tickets::after{background:linear-gradient(90deg,#22d3ee,#818cf8);}
+.slbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:6px;}
+.sval{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;line-height:1;margin-bottom:4px;transition:transform .15s;}
+.sval.bump{transform:scale(1.12);}
+.sc.total  .sval{color:var(--text);}
+.sc.study  .sval{color:var(--study);}
+.sc.ai     .sval{color:var(--ai);}
+.sc.engage .sval{color:var(--engage);}
+.sc.leave  .sval{color:var(--leave);}
+.sc.holiday .sval{color:var(--holiday);}
+.sc.tickets .sval{color:#22d3ee;}
+.ssub{font-size:10px;color:var(--text-dim);}
+
+/* ── CARD BASE ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;}
+.card h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:18px;color:var(--text);}
+
+/* ── GRID LAYOUTS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:28px;}
+.g13{display:grid;grid-template-columns:1fr 1.8fr;gap:18px;margin-bottom:28px;}
+.g31{display:grid;grid-template-columns:1.8fr 1fr;gap:18px;margin-bottom:28px;}
+@media(max-width:900px){.g2,.g3,.g13,.g31{grid-template-columns:1fr;}}
+
+/* ── CHART WRAP ── */
+.cw{position:relative;height:220px;}.cw-scroll{overflow-x:auto;}.cw-scroll canvas{min-width:600px;}
+
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;padding:2px 10px;border-radius:99px;font-size:10px;white-space:nowrap;letter-spacing:.2px;}
+.pill.study {background:rgba(79,158,255,.1); color:var(--study); border:1px solid rgba(79,158,255,.2);}
+.pill.ai    {background:rgba(167,139,250,.1);color:var(--ai);    border:1px solid rgba(167,139,250,.2);}
+.pill.engage{background:rgba(52,211,153,.1); color:var(--engage);border:1px solid rgba(52,211,153,.2);}
+.pill.leave {background:rgba(251,146,60,.1); color:var(--leave); border:1px solid rgba(251,146,60,.2);}
+.pill.other {background:rgba(148,163,184,.08);color:var(--other);border:1px solid rgba(148,163,184,.15);}
+.pill.holiday{background:rgba(245,158,11,.1);color:var(--holiday);border:1px solid rgba(245,158,11,.2);}
+.pills{display:flex;flex-wrap:wrap;gap:5px;}
+
+/* ── MINI BAR ── */
+.mbar-wrap{display:flex;align-items:center;gap:8px;}
+.mbar-bg{flex:1;height:4px;background:var(--border2);border-radius:99px;overflow:hidden;}
+.mbar{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.16,1,.3,1);}
+.mbar.study {background:var(--study);}
+.mbar.ai    {background:var(--ai);}
+.mbar.engage{background:var(--engage);}
+.mbar.leave {background:var(--leave);}
+.mbar.dev   {background:var(--dev);}
+.mbar.stg   {background:var(--stg);}
+.mbar.prod  {background:var(--prod);}
+.mbar-val{font-size:10px;color:var(--text-muted);min-width:22px;text-align:right;}
+
+/* ── TIMELINE TABLE ── */
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;margin-bottom:28px;overflow-x:auto;}
+.tcard h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:18px;}
+.ttbl{width:100%;border-collapse:collapse;font-size:11px;min-width:560px;}
+.ttbl th{text-align:left;padding:7px 12px;color:var(--text-muted);font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:1.2px;border-bottom:1px solid var(--border);}
+.ttbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.ttbl tr:last-child td{border-bottom:none;}
+.ttbl tr:hover td{background:var(--surface2);}
+.wlbl{font-family:'Syne',sans-serif;font-weight:600;font-size:11px;white-space:nowrap;}
+.msub{font-size:9px;color:var(--text-dim);display:block;margin-top:2px;}
+.msep td{background:var(--surface2);font-family:'Syne',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);padding:5px 12px;border-bottom:1px solid var(--border);}
+
+/* ── MONTH COMPARE ── */
+.cmp-grid{display:flex;flex-wrap:wrap;gap:20px;}
+.cmp-m{flex:1;min-width:180px;}
+.cmp-mlbl{font-size:11px;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.cmp-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.cmp-name{font-size:10px;color:var(--text-muted);min-width:88px;}
+.cmp-trk{flex:1;height:5px;background:var(--border2);border-radius:99px;overflow:hidden;}
+.cmp-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.16,1,.3,1);}
+.cmp-num{font-size:10px;color:var(--text-dim);min-width:22px;text-align:right;}
+
+/* ── TICKET LIST ── */
+.tkt-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+.tkt-item{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface2);border-radius:var(--rs);border:1px solid var(--border);font-size:11px;transition:border-color .15s;}
+.tkt-item:hover{border-color:var(--border2);}
+.tkt-id{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;min-width:90px;}
+.tkt-id.str{color:var(--study);}
+.tkt-id.azc{color:var(--ai);}
+.tkt-count{margin-left:auto;background:var(--surface3);padding:2px 9px;border-radius:99px;font-size:9px;color:var(--text-muted);}
+
+/* ── ENV PIPELINE ── */
+.env-pipeline{display:flex;align-items:center;gap:0;margin-bottom:16px;}
+.env-node{flex:1;text-align:center;padding:10px 6px;background:var(--surface2);border:1px solid var(--border);position:relative;}
+.env-node:first-child{border-radius:var(--rs) 0 0 var(--rs);}
+.env-node:last-child{border-radius:0 var(--rs) var(--rs) 0;}
+.env-node+.env-node{border-left:none;}
+.env-node .env-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:4px;}
+.env-node .env-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.env-node.dev-n .env-val{color:var(--dev);}
+.env-node.stg-n .env-val{color:var(--stg);}
+.env-node.prod-n .env-val{color:var(--prod);}
+.env-arrow{font-size:14px;color:var(--text-dim);flex:0;padding:0 6px;z-index:1;}
+
+/* ── COLLAB ── */
+.collab-list{display:flex;flex-direction:column;gap:8px;}
+.collab-row{display:flex;align-items:center;gap:10px;}
+.collab-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;flex-shrink:0;}
+.collab-name{font-size:12px;color:var(--text);flex:1;}
+.collab-bar-wrap{flex:2;display:flex;align-items:center;gap:8px;}
+
+/* ── ACTION BREAKDOWN ── */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.action-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;display:flex;align-items:center;gap:10px;}
+.action-ico{font-size:16px;flex-shrink:0;}
+.action-info{flex:1;}
+.action-name{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.action-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);}
+.action-bar{height:2px;background:var(--border2);border-radius:99px;margin-top:6px;overflow:hidden;}
+.action-fill{height:100%;border-radius:99px;}
+
+/* ── LEAVE TRACKER ── */
+.leave-list{list-style:none;}
+.leave-list li{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.leave-list li:last-child{border-bottom:none;}
+.lw-name{color:var(--text-muted);}
+.lbadge{background:rgba(251,146,60,.1);color:var(--leave);border:1px solid rgba(251,146,60,.25);padding:2px 10px;border-radius:99px;font-size:9px;}
+.hbadge{background:rgba(245,158,11,.1);color:var(--holiday);border:1px solid rgba(245,158,11,.25);padding:2px 10px;border-radius:99px;font-size:9px;}
+.lm-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-dim);padding:8px 0 3px;border-bottom:1px solid var(--border);margin-bottom:2px;font-family:'Syne',sans-serif;}
+
+/* ── TASKS ── */
+.pg{margin-bottom:18px;}
+.pg:last-child{margin-bottom:0;}
+.ph{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.pdot.study {background:var(--study);}
+.pdot.ai    {background:var(--ai);}
+.pdot.engage{background:var(--engage);}
+.pdot.other {background:var(--other);}
+.pname{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.pname.study {color:var(--study);}
+.pname.ai    {color:var(--ai);}
+.pname.engage{color:var(--engage);}
+.pname.other {color:var(--other);}
+.pcnt{margin-left:auto;font-size:9px;color:var(--text-dim);background:var(--surface2);padding:2px 8px;border-radius:99px;}
+.ptasks{list-style:none;padding-left:16px;}
+.ptasks li{font-size:10px;color:var(--text-muted);padding:4px 0;border-left:2px solid var(--border);padding-left:12px;margin-left:-2px;line-height:1.5;transition:color .15s,border-color .15s;cursor:default;}
+.study  .ptasks li:hover{border-left-color:var(--study); color:var(--text);}
+.ai     .ptasks li:hover{border-left-color:var(--ai);    color:var(--text);}
+.engage .ptasks li:hover{border-left-color:var(--engage);color:var(--text);}
+.other  .ptasks li:hover{border-left-color:var(--other); color:var(--text);}
+
+/* ── SUMMARY CARD ── */
+.summary-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 22px;margin-top:8px;}
+.summary-wrap .sum-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);margin-bottom:6px;}
+.summary-wrap .sum-val{font-size:12px;color:var(--text);}
+
+/* ── TICKET PREFIX LEGEND ── */
+.tkt-legend{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+.tkt-leg-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted);}
+.tkt-leg-dot{width:8px;height:8px;border-radius:2px;}
+
+.empty{text-align:center;padding:28px;color:var(--text-dim);font-size:11px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* ── TOOLTIP ── */
+.has-tip{position:relative;cursor:help;}
+.tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:#0f1117;border:1px solid var(--border2);border-radius:6px;padding:6px 10px;
+  font-size:10px;color:var(--text-muted);white-space:nowrap;z-index:99;pointer-events:none;}
+.has-tip:hover .tip{display:block;}
+
+/* ── CARD HOVER GLOW ── */
+.card{transition:box-shadow .2s;}
+.card:hover{box-shadow:0 0 0 1px var(--border2),0 8px 28px rgba(0,0,0,.35);}
+.sc:hover{box-shadow:0 0 0 1px var(--border2);}
+
+/* ── KEY INSIGHTS ── */
+.insight-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-bottom:30px;}
+.ic{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;}
+.ic:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 0 20px rgba(0,0,0,.3);}
+.ic::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;background:var(--ic-clr,var(--study));}
+.ic-ico{font-size:20px;margin-bottom:8px;line-height:1;}
+.ic-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:4px;}
+.ic-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;color:var(--ic-clr,var(--text));margin-bottom:2px;}
+.ic-sub{font-size:9px;color:var(--text-dim);margin-bottom:6px;}
+.ic-trend{font-size:9px;display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:99px;}
+.ic-trend.up{background:rgba(52,211,153,.12);color:var(--engage);}
+.ic-trend.down{background:rgba(251,146,60,.12);color:var(--leave);}
+.ic-trend.flat{background:rgba(148,163,184,.08);color:var(--other);}
+
+/* ── AUTO SUMMARY ── */
+.nscard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 26px;margin-bottom:28px;position:relative;overflow:hidden;}
+.nscard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(79,158,255,.55) 40%,rgba(167,139,250,.4) 60%,transparent 100%);}
+.nscard h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text);}
+.ns-body{font-size:12px;color:var(--text-muted);line-height:1.9;}
+.ns-body strong{color:var(--text);}
+.nstag{display:inline-flex;align-items:center;background:rgba(79,158,255,.09);border:1px solid rgba(79,158,255,.18);color:var(--study);padding:1px 9px;border-radius:4px;font-size:10px;font-family:'Syne',sans-serif;font-weight:700;margin:0 2px;}
+
+/* ── ACTIVITY HEATMAP ── */
+.hm-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:4px 0;}
+.hm-cell{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:'Syne',sans-serif;font-weight:700;cursor:default;transition:transform .15s;}
+.hm-cell:hover{transform:scale(1.2);z-index:2;}
+.hm-legend{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:9px;color:var(--text-muted);}
+.hm-leg-cells{display:flex;gap:3px;}
+.hm-leg-cell{width:12px;height:12px;border-radius:2px;}
+
+/* ── EXPORT BTN ── */
+.btn-export{display:none;align-items:center;gap:6px;background:transparent;border:1px solid var(--border2);color:var(--text-muted);padding:8px 16px;border-radius:var(--rs);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;}
+.btn-export:hover{border-color:var(--engage);color:var(--engage);}
+.btn-export:active{transform:scale(.97);}
+.btn-export.on{display:inline-flex;}
+
+@media print{
+  #upload-zone,#reset-btn,.btn-export{display:none!important;}
+  body::before{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="hl">
+      <h1>Task Tracker<br>Insights</h1>
+      <p>Developer Activity Dashboard · 2026</p>
+    </div>
+    <div class="hr">
+      <div class="status-badge"><span class="sdot" id="sdot"></span><span id="stxt">Awaiting CSV</span></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="sel-wrap" id="month-filter-wrap" style="display:none">
+          <select id="sel-month" onchange="onMonthChange()">
+            <option value="all">All Months</option>
+          </select>
+        </div>
+        <button id="reset-btn" onclick="resetDash()">↩ Upload New File</button>
+        <button class="btn-export" id="export-btn" onclick="exportDash()">⬇ Export PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- UPLOAD -->
+  <div id="upload-zone" onclick="document.getElementById('fi').click()"
+       ondragover="dov(event)" ondragleave="dol()" ondrop="dod(event)">
+    <div class="uico">📊</div>
+    <h3>Drop your Timeline CSV here</h3>
+    <p>Export your Monthly (2026) tracker from Google Sheets · Columns A–E · Weeks as columns</p>
+    <button class="btn-up" onclick="event.stopPropagation();document.getElementById('fi').click()">⬆ Choose CSV File</button>
+    <input type="file" id="fi" accept=".csv" onchange="onFile(event)">
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash">
+
+    <!-- STAT CARDS -->
+    <p class="st">Overview</p>
+    <div class="srow">
+      <div class="sc total"><div class="slbl">Total Entries</div><div class="sval" id="s-total">0</div><div class="ssub">task lines</div></div>
+      <div class="sc study"><div class="slbl">StudyReach</div><div class="sval" id="s-study">0</div><div class="ssub">entries</div></div>
+      <div class="sc ai"><div class="slbl">AI Transcript</div><div class="sval" id="s-ai">0</div><div class="ssub">entries</div></div>
+      <div class="sc engage"><div class="slbl">Engage</div><div class="sval" id="s-engage">0</div><div class="ssub">entries</div></div>
+      <div class="sc leave"><div class="slbl">Leave</div><div class="sval" id="s-leave">0</div><div class="ssub">days</div></div>
+      <div class="sc holiday"><div class="slbl">Holidays</div><div class="sval" id="s-holiday">0</div><div class="ssub">days</div></div>
+      <div class="sc tickets"><div class="slbl">Tickets</div><div class="sval" id="s-tickets">0</div><div class="ssub">unique refs</div></div>
+    </div>
+
+    <!-- KEY INSIGHTS -->
+    <p class="st">Key Insights</p>
+    <div class="insight-row" id="insights-row"></div>
+
+    <!-- AUTO SUMMARY -->
+    <div class="nscard" id="auto-summary" style="display:none">
+      <h3>📝 Period Summary</h3>
+      <div class="ns-body" id="auto-summary-body"></div>
+    </div>
+
+    <!-- MONTH COMPARE (all only) -->
+    <div id="compare-sec" style="display:none">
+      <p class="st">Month Comparison</p>
+      <div class="card" style="margin-bottom:28px"><h3>Tasks per Month</h3><div class="cmp-grid" id="cmp-grid"></div></div>
+    </div>
+
+    <!-- CHARTS ROW 1 -->
+    <p class="st">Distribution</p>
+    <div class="g13">
+      <div class="card"><h3>Project Distribution</h3><div class="cw"><canvas id="pie"></canvas></div></div>
+      <div class="card"><h3>Task Activity — All Weeks <span id="bar-subtitle" style="font-weight:400;color:var(--text-muted);font-size:11px"></span></h3><div class="cw-scroll"><div class="cw" id="bar-wrap"><canvas id="bar"></canvas></div></div></div>
+    </div>
+
+    <!-- DEPLOYMENT PIPELINE + ACTION BREAKDOWN -->
+    <p class="st">Engineering Signals</p>
+    <div class="g2">
+      <div class="card">
+        <h3>Deployment Pipeline</h3>
+        <div class="env-pipeline">
+          <div class="env-node dev-n"><div class="env-lbl">Dev</div><div class="env-val" id="env-dev">0</div></div>
+          <div class="env-arrow">→</div>
+          <div class="env-node stg-n"><div class="env-lbl">Staging</div><div class="env-val" id="env-stg">0</div></div>
+          <div class="env-arrow">→</div>
+          <div class="env-node prod-n"><div class="env-lbl">Prod</div><div class="env-val" id="env-prod">0</div></div>
+        </div>
+        <div class="cw-scroll"><div class="cw" id="env-wrap" style="height:160px"><canvas id="env-chart"></canvas></div></div>
+      </div>
+      <div class="card">
+        <h3>Work Type Breakdown</h3>
+        <div class="action-grid" id="action-grid"></div>
+      </div>
+    </div>
+
+    <!-- TICKETS + COLLABORATORS -->
+    <div class="g2">
+      <div class="card">
+        <h3>Ticket References</h3>
+        <div class="tkt-legend" id="tkt-legend"></div>
+        <div class="tkt-list" id="tkt-list"></div>
+      </div>
+      <div class="card">
+        <h3>Collaborators</h3>
+        <div class="collab-list" id="collab-list"></div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <p class="st">Weekly Timeline</p>
+    <div class="tcard">
+      <h3>Week-by-Week Activity <span id="timeline-subtitle" style="font-weight:400;color:var(--text-muted);font-size:11px"></span></h3>
+      <table class="ttbl">
+        <thead>
+          <tr>
+            <th id="th-week">Week</th><th>Active Projects</th>
+            <th style="width:110px">StudyReach</th>
+            <th style="width:110px">AI Transcript</th>
+            <th style="width:110px">Engage</th>
+            <th style="width:90px">Time Off</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- LEAVE + TASKS -->
+    <p class="st">Details</p>
+    <div class="g2">
+      <div class="card"><h3>🏖 Leave & Holiday Tracker</h3><div id="leave-c"></div></div>
+      <div class="card" style="overflow-y:auto;max-height:500px"><h3>📋 Task Categorizer</h3><div id="tasks-c"></div></div>
+    </div>
+
+    <!-- ACTIVITY HEATMAP -->
+    <p class="st">Activity Heatmap</p>
+    <div class="card" style="margin-bottom:28px">
+      <h3>Weekly Task Intensity <span style="font-weight:400;color:var(--text-muted);font-size:11px">— each cell represents one week · hover for details</span></h3>
+      <div id="heatmap-body"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CONSTANTS & STATE
+// ─────────────────────────────────────────────────────────────
+const MC = ['#4f9eff','#a78bfa','#34d399','#fb923c','#f472b6','#facc15','#38bdf8'];
+let pieC=null, barC=null, envC=null;
+let ALL=[];
+
+// ─────────────────────────────────────────────────────────────
+// CLASSIFICATION
+// Determines project category from a single task line.
+// Returns: 'leave' | 'holiday' | 'studyreach' | 'aitranscript' | 'engage' | 'other' | null
+// ─────────────────────────────────────────────────────────────
+function classifyLine(v) {
+  if (!v) return null;
+  const s = v.toLowerCase().trim();
+  if (!s || s === 'n/a' || s === 'nan') return null;
+  if (s === 'leave') return 'leave';
+  if (s === 'holiday') return 'holiday';
+  if (s.includes('studyreach') || s.includes('study reach') || s.includes('studyrech')) return 'studyreach';
+  if (s.includes('ai transcript') || s.includes('(transcript)') || s.includes('( ai transcript )') || s.includes('( ai transcript)')) return 'aitranscript';
+  if (s.includes('engage') || s.includes('( engage )')) return 'engage';
+  // If none matched but the line has meaningful content → other
+  if (s.length > 4) return 'other';
+  return null;
+}
+
+// Checks if a value looks like a week-range header (e.g. "1st - 3rd", "9th - 13th", "30th - 31st")
+const isWk = v => {
+  if (!v) return false;
+  const s = v.trim();
+  // Must contain digit + ordinal suffix on at least one side, with a dash/en-dash separator
+  return /\d+(st|nd|rd|th)\s*[-–]\s*\d+(st|nd|rd|th)/i.test(s);
+};
+
+// Checks if a value contains a month name
+const isMo = v => /january|february|march|april|may|june|july|august|september|october|november|december/i.test(v || '');
+
+// Extracts the month name with proper casing
+const getMo = v => {
+  const m = (v || '').match(/january|february|march|april|may|june|july|august|september|october|november|december/i);
+  return m ? m[0][0].toUpperCase() + m[0].slice(1).toLowerCase() : null;
+};
+
+// ─────────────────────────────────────────────────────────────
+// EXTRACTION HELPERS
+// ─────────────────────────────────────────────────────────────
+function extractTickets(text) { return (text.match(/[A-Z]+-\d+/g) || []); }
+
+// BUG FIX: improved people extraction — capture names after "with" or "and" before
+// punctuation/keywords, not requiring trailing keywords (which caused most names to be missed)
+function extractPeople(text) {
+  const r = [];
+  // Match "Connected with Name", "with Name and Name2", etc.
+  const matches = text.match(/(?:with|and)\s+([A-Z][a-z]{1,})/g) || [];
+  matches.forEach(m => {
+    const p = m.match(/(?:with|and)\s+([A-Z][a-z]{1,})/);
+    if (p && p[1].length > 1) r.push(p[1]);
+  });
+  return r;
+}
+
+function extractEnv(text) {
+  const t = text.toLowerCase();
+  return {
+    dev:  /\bdev\b|in dev|on dev|deployed.*dev|dev.*deploy/.test(t),
+    stg:  /\bstg\b|in stg|on stg|deployed.*stg|stg.*deploy/.test(t),
+    prod: /\bprod\b|\bprd\b|in prod|on prod|deployed.*prod|prod.*deploy/.test(t)
+  };
+}
+
+function extractActions(text) {
+  const t = text.toLowerCase();
+  return {
+    deployed:  /deploy(ed|ing)/.test(t),
+    fixes:     /fix(es|ed|ing)|bug/.test(t),
+    testing:   /test(ing|ed|s)|unit test/.test(t),
+    connected: /connected with/.test(t),
+    working:   /working on|working for/.test(t),
+    debug:     /debug|rca|root cause/.test(t),
+    docs:      /document(ation|ed)|confluence/.test(t),
+    analysis:  /analyz(ing|ed)|identify|identif/.test(t),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// WEEK OBJECT
+// ─────────────────────────────────────────────────────────────
+function mkWeek(label, month) {
+  return {
+    weekLabel: label, month,
+    tasks: { studyreach: [], aitranscript: [], engage: [], other: [] },
+    leaveCount: 0, holidayCount: 0,
+    counts: { studyreach: 0, aitranscript: 0, engage: 0 },
+    tickets: [], people: [],
+    env: { dev: 0, stg: 0, prod: 0 },
+    actions: { deployed:0, fixes:0, testing:0, connected:0, working:0, debug:0, docs:0, analysis:0 }
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// absorbCell — process one CSV cell into a week object
+//
+// BUG FIX (critical): The original code called classify() on the WHOLE multi-line cell
+// first, and if it returned null (which it always did for multi-task cells like
+// "- Working on AZC-808 (AI Transcript)\n- Working on AZC-809 (AI Transcript)")
+// the function returned early, silently dropping all those tasks.
+//
+// Fix: Always split on newlines first, then classify each individual line.
+// Single-word sentinel cells ("LEAVE", "HOLIDAY", "N/A") are handled before splitting.
+// ─────────────────────────────────────────────────────────────
+function absorbCell(raw, week) {
+  if (!raw) return;
+  const v = raw.trim();
+  if (!v || v === 'nan') return;
+
+  // Handle sentinel-only cells first (entire cell = one keyword)
+  const vLower = v.toLowerCase();
+  if (vLower === 'n/a') return;
+  if (vLower === 'leave')   { week.leaveCount++;   return; }
+  if (vLower === 'holiday') { week.holidayCount++; return; }
+
+  // Split cell into individual lines (each line = one daily task entry)
+  const lines = v.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+
+  lines.forEach(line => {
+    const lLower = line.toLowerCase().trim();
+
+    // Skip noise
+    if (!lLower || lLower === 'n/a' || lLower === 'nan') return;
+
+    // Handle per-line sentinels (e.g. a cell that mixes task lines with "LEAVE")
+    if (lLower === 'leave')   { week.leaveCount++;   return; }
+    if (lLower === 'holiday') { week.holidayCount++; return; }
+
+    // Classify the individual line
+    const proj = classifyLine(line);
+    if (!proj || proj === 'leave' || proj === 'holiday') return;
+
+    // Clean up the display text
+    const clean = line
+      .replace(/^[-•]\s*/, '')
+      .replace(/\(\s*studyreach\s*\)/ig, '').replace(/\(\s*studyrech\s*\)/ig, '')
+      .replace(/\(\s*ai transcript\s*\)/ig, '').replace(/\(\s*transcript\s*\)/ig, '')
+      .replace(/\(\s*engage\s*\)/ig, '')
+      .trim();
+
+    if (clean.length < 4) return;
+
+    if (proj === 'other') {
+      if (!week.tasks.other.includes(clean)) week.tasks.other.push(clean);
+    } else {
+      if (!week.tasks[proj].includes(clean)) week.tasks[proj].push(clean);
+      week.counts[proj]++;
+    }
+
+    // Extract metadata from the original line (not the cleaned version)
+    extractTickets(line).forEach(t => { if (!week.tickets.includes(t)) week.tickets.push(t); });
+    extractPeople(line).forEach(p => { if (!week.people.includes(p)) week.people.push(p); });
+
+    const env = extractEnv(line);
+    if (env.dev)  week.env.dev++;
+    if (env.stg)  week.env.stg++;
+    if (env.prod) week.env.prod++;
+
+    const act = extractActions(line);
+    Object.keys(act).forEach(k => { if (act[k]) week.actions[k]++; });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// parseCSV — SINGLE authoritative parser (column-based layout)
+//
+// CSV structure:
+//   Row A: Month header  e.g. "April -2026" (only col 0, rest empty)
+//   Row B: Week-range headers across cols 0–4  e.g. "1st - 3rd" | "6th - 10th" | ...
+//   Rows C-N: Daily task entries — EACH COLUMN maps to its week from Row B
+//             (PapaParse preserves in-cell newlines inside quoted fields)
+//   Blank rows: separate months
+//
+// BUG FIX (critical): The original file defined parseCSV TWICE.
+// The second definition (a simpler row-based parser that only read col 0 as the week
+// label) completely overwrote the first correct column-based parser at runtime,
+// so data from cols 1-4 was entirely lost and month detection was broken.
+// Fix: Remove the duplicate. This is now the only parseCSV.
+// ─────────────────────────────────────────────────────────────
+function parseCSV(rows) {
+  const weeks = [];
+  let currentMonth = 'Unknown';
+  // weekHeaders[i] = week object for column i (null if that column has no header)
+  let weekHeaders = [];
+
+  rows.forEach(row => {
+    // Normalise to 5 columns
+    const cols = [0, 1, 2, 3, 4].map(i => (row[i] || '').toString().trim());
+
+    // Skip fully blank rows
+    if (cols.every(c => !c)) return;
+
+    // ── Month header row ──
+    // Identified by: col 0 contains a month name AND all other cols are empty
+    if (isMo(cols[0]) && cols.slice(1).every(c => !c)) {
+      currentMonth = getMo(cols[0]) || currentMonth;
+      weekHeaders = []; // reset so next row can become week headers
+      return;
+    }
+
+    // ── Week-header row ──
+    // Identified by: every non-empty cell matches the ordinal date-range pattern
+    const nonEmpty = cols.filter(c => c);
+    if (nonEmpty.length > 0 && nonEmpty.every(c => isWk(c))) {
+      weekHeaders = cols.map(c => {
+        if (!c) return null;
+        const wk = mkWeek(c, currentMonth);
+        weeks.push(wk);
+        return wk;
+      });
+      return;
+    }
+
+    // ── Data row ──
+    // Distribute each column's cell into the matching week object
+    if (weekHeaders.length > 0) {
+      cols.forEach((cell, i) => {
+        if (weekHeaders[i]) absorbCell(cell, weekHeaders[i]);
+      });
+    }
+  });
+
+  ALL = weeks;
+  buildFilters();
+  renderAll();
+
+  document.getElementById('upload-zone').style.display = 'none';
+  document.getElementById('dash').classList.add('on');
+  document.getElementById('sdot').classList.add('on');
+  document.getElementById('stxt').textContent = 'Data Loaded';
+  document.getElementById('reset-btn').classList.add('on');
+  document.getElementById('export-btn').classList.add('on');
+}
+
+// ─────────────────────────────────────────────────────────────
+// FILE HANDLING
+// ─────────────────────────────────────────────────────────────
+function dov(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('over'); }
+function dol()  { document.getElementById('upload-zone').classList.remove('over'); }
+function dod(e) {
+  e.preventDefault(); dol();
+  const f = e.dataTransfer.files[0];
+  if (f && f.name.endsWith('.csv')) proc(f);
+  else alert('Please drop a .csv file.');
+}
+function onFile(e) { if (e.target.files[0]) proc(e.target.files[0]); }
+function proc(file) {
+  Papa.parse(file, {
+    skipEmptyLines: false,          // keep blank rows so month separators are visible
+    complete: r => {
+      try { parseCSV(r.data); }
+      catch (err) { alert('Parse error: ' + err.message); console.error(err); }
+    },
+    error: err => alert('Papa error: ' + err)
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// MONTH FILTER
+// ─────────────────────────────────────────────────────────────
+function buildFilters() {
+  const months = [...new Set(ALL.map(w => w.month))];
+  const mSel = document.getElementById('sel-month');
+  mSel.innerHTML = '<option value="all">All Months</option>';
+  months.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m;
+    const wkCount = ALL.filter(w => w.month === m).length;
+    o.textContent = m + ' (' + wkCount + ' wks)';
+    mSel.appendChild(o);
+  });
+  const wrap = document.getElementById('month-filter-wrap');
+  if (wrap) wrap.style.display = '';
+}
+
+function onMonthChange() { renderAll(); }
+
+function getW() {
+  const mo = document.getElementById('sel-month').value;
+  let weeks = [...ALL];
+  if (mo !== 'all') weeks = weeks.filter(w => w.month === mo);
+  const sec = document.getElementById('compare-sec');
+  if (sec) sec.style.display = (mo === 'all') ? 'block' : 'none';
+  return weeks;
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER ALL
+// ─────────────────────────────────────────────────────────────
+function renderAll() {
+  const W = getW();
+  let ts=0, ta=0, te=0, tl=0, th=0;
+  const allTasks = { studyreach: new Set(), aitranscript: new Set(), engage: new Set(), other: new Set() };
+  const allTickets = {};
+  const allPeople  = {};
+  const totEnv = { dev:0, stg:0, prod:0 };
+  const totAct = { deployed:0, fixes:0, testing:0, connected:0, working:0, debug:0, docs:0, analysis:0 };
+
+  W.forEach(w => {
+    ts += w.counts.studyreach; ta += w.counts.aitranscript; te += w.counts.engage;
+    tl += w.leaveCount;        th += w.holidayCount;
+    w.tasks.studyreach.forEach(t  => allTasks.studyreach.add(t));
+    w.tasks.aitranscript.forEach(t => allTasks.aitranscript.add(t));
+    w.tasks.engage.forEach(t      => allTasks.engage.add(t));
+    w.tasks.other.forEach(t       => allTasks.other.add(t));
+    w.tickets.forEach(t => { allTickets[t] = (allTickets[t] || 0) + 1; });
+    w.people.forEach(p  => { allPeople[p]  = (allPeople[p]  || 0) + 1; });
+    totEnv.dev  += w.env.dev;
+    totEnv.stg  += w.env.stg;
+    totEnv.prod += w.env.prod;
+    Object.keys(totAct).forEach(k => totAct[k] += w.actions[k]);
+  });
+
+  const totalTickets = Object.keys(allTickets).length;
+  bump('s-total',   ts + ta + te);
+  bump('s-study',   ts);  bump('s-ai',   ta);  bump('s-engage', te);
+  bump('s-leave',   tl);  bump('s-holiday', th); bump('s-tickets', totalTickets);
+  bump('env-dev',   totEnv.dev); bump('env-stg', totEnv.stg); bump('env-prod', totEnv.prod);
+
+  const sec = document.getElementById('compare-sec');
+  if (sec && sec.style.display !== 'none') renderCompare();
+
+  renderPie(ts, ta, te);
+  renderBar(W);
+  renderEnvChart(W);
+  renderActions(totAct);
+  renderTickets(allTickets);
+  renderCollabs(allPeople);
+  renderTimeline(W);
+  renderLeave(W, tl, th);
+  renderTasks(allTasks);
+  renderInsights(W);
+  renderSummary(W, ts, ta, te, tl, th);
+  renderHeatmap(W);
+}
+
+function bump(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = val;
+  el.classList.remove('bump');
+  requestAnimationFrame(() => { el.classList.add('bump'); setTimeout(() => el.classList.remove('bump'), 200); });
+}
+
+// ─────────────────────────────────────────────────────────────
+// MONTH COMPARISON
+// ─────────────────────────────────────────────────────────────
+function renderCompare() {
+  const months = [...new Set(ALL.map(w => w.month))];
+  const g = document.getElementById('cmp-grid');
+  g.innerHTML = '';
+  if (months.length < 2) { g.innerHTML = '<div class="empty" style="flex:1">Upload a multi-month CSV to compare.</div>'; return; }
+  const projs = [
+    { k: 'studyreach',   l: 'StudyReach',   c: '#4f9eff' },
+    { k: 'aitranscript', l: 'AI Transcript', c: '#a78bfa' },
+    { k: 'engage',       l: 'Engage',        c: '#34d399' }
+  ];
+  const maxV = Math.max(...months.map(m =>
+    ALL.filter(w => w.month === m).reduce((a, w) => a + projs.reduce((s, p) => s + w.counts[p.k], 0), 0)
+  ), 1);
+  months.forEach((m, i) => {
+    const clr = MC[i % MC.length];
+    const mW  = ALL.filter(w => w.month === m);
+    const tots = projs.map(p => mW.reduce((s, w) => s + w.counts[p.k], 0));
+    const grand = tots.reduce((a, b) => a + b, 0);
+    const lv = mW.reduce((a, w) => a + w.leaveCount, 0);
+    const hd = mW.reduce((a, w) => a + w.holidayCount, 0);
+    let html = `<div class="cmp-m"><div class="cmp-mlbl" style="color:${clr}">📅 ${m}<span style="color:var(--text-muted);font-weight:400;font-size:10px"> · ${grand} tasks</span>`;
+    if (lv) html += `<span style="color:var(--leave);font-size:9px"> · ${lv}L</span>`;
+    if (hd) html += `<span style="color:var(--holiday);font-size:9px"> · ${hd}H</span>`;
+    html += `</div>`;
+    projs.forEach((p, j) => {
+      const pct = maxV ? (tots[j] / maxV * 100) : 0;
+      html += `<div class="cmp-row"><span class="cmp-name" style="color:${p.c}">${p.l}</span><div class="cmp-trk"><div class="cmp-fill" style="width:${pct.toFixed(1)}%;background:${p.c}"></div></div><span class="cmp-num">${tots[j]}</span></div>`;
+    });
+    html += `</div>`;
+    g.innerHTML += html;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// PIE CHART
+// ─────────────────────────────────────────────────────────────
+function renderPie(s, a, e) {
+  const ctx = document.getElementById('pie').getContext('2d');
+  if (pieC) pieC.destroy();
+  const tot = s + a + e || 1;
+  pieC = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['StudyReach', 'AI Transcript', 'Engage'],
+      datasets: [{ data: [s, a, e], backgroundColor: ['#4f9eff','#a78bfa','#34d399'], borderColor: '#0f1117', borderWidth: 3, hoverOffset: 10 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#68748f', font: { family: 'DM Mono', size: 10 }, padding: 14, usePointStyle: true, pointStyleWidth: 8 } },
+        tooltip: { backgroundColor: '#161922', borderColor: '#252d42', borderWidth: 1, titleColor: '#e4e9f7', bodyColor: '#68748f',
+          callbacks: { label: c => ` ${c.parsed} (${((c.parsed / tot) * 100).toFixed(0)}%)` }
+        }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// BAR CHART
+// ─────────────────────────────────────────────────────────────
+function barLabel(w) {
+  const mo = w.month ? w.month.slice(0, 3) : '';
+  // Strip ordinal suffixes so labels read "Apr 1–3" not "Apr 1st–3rd"
+  const wk = w.weekLabel
+    .replace(/(\d+)(st|nd|rd|th)/gi, '$1')
+    .replace(/\s*[-–]\s*/, '–')
+    .trim();
+  return mo + ' ' + wk;
+}
+
+function renderBar(W) {
+  const wrap = document.getElementById('bar-wrap');
+  if (wrap) wrap.style.width = Math.max(600, W.length * 72) + 'px';
+  const ctx = document.getElementById('bar').getContext('2d');
+  if (barC) barC.destroy();
+  const sub = document.getElementById('bar-subtitle');
+  if (sub) {
+    const mo = document.getElementById('sel-month').value;
+    sub.textContent = mo === 'all' ? '— all ' + W.length + ' weeks' : '— ' + W.length + ' weeks in ' + mo;
+  }
+  barC = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: W.map(w => barLabel(w)),
+      datasets: [
+        { label: 'StudyReach',    data: W.map(w => w.counts.studyreach),   backgroundColor: 'rgba(79,158,255,.75)',  borderRadius: 4 },
+        { label: 'AI Transcript', data: W.map(w => w.counts.aitranscript), backgroundColor: 'rgba(167,139,250,.75)', borderRadius: 4 },
+        { label: 'Engage',        data: W.map(w => w.counts.engage),       backgroundColor: 'rgba(52,211,153,.75)',  borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#68748f', font: { family: 'DM Mono', size: 10 }, padding: 12, usePointStyle: true, pointStyleWidth: 8 } },
+        tooltip: { backgroundColor: '#161922', borderColor: '#252d42', borderWidth: 1, titleColor: '#e4e9f7', bodyColor: '#68748f' }
+      },
+      scales: {
+        x: { stacked: true, ticks: { color: '#68748f', font: { family: 'DM Mono', size: 9 } }, grid: { color: 'rgba(255,255,255,.02)' }, border: { color: '#1e2336' } },
+        y: { stacked: true, beginAtZero: true, ticks: { color: '#68748f', font: { family: 'DM Mono', size: 9 }, stepSize: 1 }, grid: { color: 'rgba(255,255,255,.03)' }, border: { color: '#1e2336' } }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// ENV CHART
+// ─────────────────────────────────────────────────────────────
+function renderEnvChart(W) {
+  const ewrap = document.getElementById('env-wrap');
+  if (ewrap) ewrap.style.width = Math.max(400, W.length * 72) + 'px';
+  const ctx = document.getElementById('env-chart').getContext('2d');
+  if (envC) envC.destroy();
+  envC = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: W.map(w => barLabel(w)),
+      datasets: [
+        { label: 'Dev',  data: W.map(w => w.env.dev),  backgroundColor: 'rgba(34,211,238,.6)',  borderRadius: 3 },
+        { label: 'Stg',  data: W.map(w => w.env.stg),  backgroundColor: 'rgba(129,140,248,.6)', borderRadius: 3 },
+        { label: 'Prod', data: W.map(w => w.env.prod), backgroundColor: 'rgba(248,113,113,.6)', borderRadius: 3 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#68748f', font: { family: 'DM Mono', size: 9 }, padding: 10, usePointStyle: true, pointStyleWidth: 6 } },
+        tooltip: { backgroundColor: '#161922', borderColor: '#252d42', borderWidth: 1, titleColor: '#e4e9f7', bodyColor: '#68748f' }
+      },
+      scales: {
+        x: { ticks: { color: '#68748f', font: { family: 'DM Mono', size: 8 } }, grid: { color: 'rgba(255,255,255,.02)' }, border: { color: '#1e2336' } },
+        y: { beginAtZero: true, ticks: { color: '#68748f', font: { family: 'DM Mono', size: 9 }, stepSize: 1 }, grid: { color: 'rgba(255,255,255,.03)' }, border: { color: '#1e2336' } }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// ACTION BREAKDOWN
+// ─────────────────────────────────────────────────────────────
+function renderActions(act) {
+  const el = document.getElementById('action-grid');
+  const items = [
+    { k: 'deployed',  ico: '🚀', lbl: 'Deployed',  color: '#4f9eff' },
+    { k: 'fixes',     ico: '🔧', lbl: 'Bug Fixes',  color: '#f87171' },
+    { k: 'connected', ico: '🤝', lbl: 'Collab',     color: '#34d399' },
+    { k: 'testing',   ico: '🧪', lbl: 'Testing',    color: '#a78bfa' },
+    { k: 'working',   ico: '⚙️', lbl: 'Dev Work',   color: '#fb923c' },
+    { k: 'debug',     ico: '🔍', lbl: 'Debug/RCA',  color: '#22d3ee' },
+    { k: 'docs',      ico: '📝', lbl: 'Docs',       color: '#818cf8' },
+    { k: 'analysis',  ico: '📊', lbl: 'Analysis',   color: '#f59e0b' },
+  ];
+
+  // Split into items that have data vs those that are zero
+  const withData = items.filter(i => act[i.k] > 0);
+  const noData   = items.filter(i => act[i.k] === 0);
+
+  // If NOTHING has any data at all, show an empty state
+  if (!withData.length) {
+    el.innerHTML = `<div class="empty" style="grid-column:1/-1">No work-type signals found in task descriptions for this period.</div>`;
+    return;
+  }
+
+  const maxV = Math.max(...withData.map(i => act[i.k]), 1);
+  el.innerHTML = '';
+
+  // Render items WITH data first, full colour
+  withData.forEach(item => {
+    // Clamp bar to a minimum of 6% so even count=1 is visibly non-zero
+    const rawPct = act[item.k] / maxV * 100;
+    const pct = Math.max(rawPct, 6).toFixed(1);
+    el.innerHTML += `<div class="action-item">
+      <div class="action-ico">${item.ico}</div>
+      <div class="action-info">
+        <div class="action-name">${item.lbl}</div>
+        <div class="action-val" style="color:${item.color}">${act[item.k]}</div>
+        <div class="action-bar"><div class="action-fill" style="width:${pct}%;background:${item.color}"></div></div>
+      </div>
+    </div>`;
+  });
+
+  // Render zero items dimmed at the bottom so the grid stays complete
+  noData.forEach(item => {
+    el.innerHTML += `<div class="action-item" style="opacity:0.35">
+      <div class="action-ico">${item.ico}</div>
+      <div class="action-info">
+        <div class="action-name">${item.lbl}</div>
+        <div class="action-val" style="color:var(--text-dim)">0</div>
+        <div class="action-bar"><div class="action-fill" style="width:0%;background:var(--border2)"></div></div>
+      </div>
+    </div>`;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// TICKETS
+// ─────────────────────────────────────────────────────────────
+function renderTickets(tks) {
+  const legend  = document.getElementById('tkt-legend');
+  const list    = document.getElementById('tkt-list');
+  const prefixes = [...new Set(Object.keys(tks).map(t => t.split('-')[0]))];
+  const pColors  = { STR: '#4f9eff', AZC: '#a78bfa' };
+  legend.innerHTML = prefixes.map(p =>
+    `<div class="tkt-leg-item"><div class="tkt-leg-dot" style="background:${pColors[p] || '#94a3b8'}"></div>${p} tickets</div>`
+  ).join('');
+  const sorted = Object.entries(tks).sort((a, b) => b[1] - a[1]);
+  list.innerHTML = '';
+  sorted.forEach(([id, cnt]) => {
+    const prefix = id.split('-')[0];
+    const clr = pColors[prefix] || '#94a3b8';
+    list.innerHTML += `<div class="tkt-item">
+      <span class="tkt-id" style="color:${clr}">${esc(id)}</span>
+      <span style="font-size:10px;color:var(--text-muted);flex:1"></span>
+      <span class="tkt-count">${cnt}×</span>
+    </div>`;
+  });
+  if (!sorted.length) list.innerHTML = '<div class="empty">No ticket references found</div>';
+}
+
+// ─────────────────────────────────────────────────────────────
+// COLLABORATORS
+// ─────────────────────────────────────────────────────────────
+function renderCollabs(people) {
+  const el = document.getElementById('collab-list');
+  const sorted = Object.entries(people).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const maxV = sorted.length ? sorted[0][1] : 1;
+  el.innerHTML = '';
+  if (!sorted.length) { el.innerHTML = '<div class="empty">No collaborator mentions found</div>'; return; }
+  sorted.forEach(([name, cnt], i) => {
+    const clr = MC[i % MC.length];
+    const pct = (cnt / maxV * 100).toFixed(0);
+    el.innerHTML += `<div class="collab-row">
+      <div class="collab-av" style="background:${clr}22;color:${clr}">${name[0]}</div>
+      <span class="collab-name">${esc(name)}</span>
+      <div class="collab-bar-wrap">
+        <div class="mbar-bg"><div class="mbar" style="width:${pct}%;background:${clr}"></div></div>
+        <span class="mbar-val">${cnt}</span>
+      </div>
+    </div>`;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// TIMELINE TABLE
+// ─────────────────────────────────────────────────────────────
+function renderTimeline(W) {
+  const max = Math.max(...W.map(w => w.counts.studyreach + w.counts.aitranscript + w.counts.engage), 1);
+  const tb  = document.getElementById('tbody');
+  tb.innerHTML = '';
+  if (!W.length) { tb.innerHTML = '<tr><td colspan="6" class="empty">No data matches current filters</td></tr>'; return; }
+  const mo = document.getElementById('sel-month').value;
+
+  const tSub = document.getElementById('timeline-subtitle');
+  if (tSub) {
+    tSub.textContent = mo === 'all'
+      ? '— ' + W.length + ' weeks across all months'
+      : '— ' + W.length + ' week' + (W.length !== 1 ? 's' : '') + ' in ' + mo;
+  }
+
+  const thWk = document.getElementById('th-week');
+  if (thWk) thWk.textContent = mo === 'all' ? 'Month · Week' : 'Week (' + mo + ')';
+
+  let lastMo = null;
+  W.forEach(w => {
+    if (mo === 'all' && w.month !== lastMo) {
+      lastMo = w.month;
+      const sep = document.createElement('tr');
+      sep.className = 'msep';
+      sep.innerHTML = `<td colspan="6">📅 ${esc(w.month)}</td>`;
+      tb.appendChild(sep);
+    }
+    const hasOff = w.leaveCount > 0 || w.holidayCount > 0;
+    const pills = [];
+    if (w.counts.studyreach  > 0) pills.push('<span class="pill study">StudyReach</span>');
+    if (w.counts.aitranscript > 0) pills.push('<span class="pill ai">AI Transcript</span>');
+    if (w.counts.engage       > 0) pills.push('<span class="pill engage">Engage</span>');
+    if (w.leaveCount   > 0)        pills.push('<span class="pill leave">Leave</span>');
+    if (w.holidayCount > 0)        pills.push('<span class="pill holiday">Holiday</span>');
+    if (!pills.length)             pills.push('<span class="pill other">—</span>');
+
+    const bar = (n, cls) => `<div class="mbar-wrap"><div class="mbar-bg"><div class="mbar ${cls}" style="width:${(n / max * 100).toFixed(1)}%"></div></div><span class="mbar-val">${n}</span></div>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="wlbl">${mo === 'all' ? `<span style="color:var(--text-dim);font-size:9px;display:block;margin-bottom:2px">${esc(w.month)}</span>` : ''}${esc(w.weekLabel)}</span></td>
+      <td><div class="pills">${pills.join('')}</div></td>
+      <td>${bar(w.counts.studyreach,   'study')}</td>
+      <td>${bar(w.counts.aitranscript, 'ai')}</td>
+      <td>${bar(w.counts.engage,       'engage')}</td>
+      <td>${hasOff
+        ? `${w.leaveCount   ? `<span class="pill leave"   style="margin-right:3px">${w.leaveCount}L</span>`   : ''}${w.holidayCount ? `<span class="pill holiday">${w.holidayCount}H</span>` : ''}`
+        : '<span style="color:var(--text-dim);font-size:10px">—</span>'}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// LEAVE TRACKER
+// ─────────────────────────────────────────────────────────────
+function renderLeave(W, tl, th) {
+  const el = document.getElementById('leave-c');
+  const withOff = W.filter(w => w.leaveCount > 0 || w.holidayCount > 0);
+  if (!tl && !th) { el.innerHTML = '<div class="empty">No leave or holidays recorded.</div>'; return; }
+  const mo = document.getElementById('sel-month').value;
+  let html = '';
+  if (mo === 'all') {
+    const byMo = {};
+    withOff.forEach(w => { (byMo[w.month] = byMo[w.month] || []).push(w); });
+    Object.entries(byMo).forEach(([m, ws]) => {
+      html += `<div class="lm-lbl">📅 ${esc(m)}</div><ul class="leave-list">`;
+      ws.forEach(w => {
+        html += `<li><span class="lw-name">${esc(w.weekLabel)}</span><span style="display:flex;gap:5px">
+          ${w.leaveCount   ? `<span class="lbadge">${w.leaveCount} leave</span>`   : ''}
+          ${w.holidayCount ? `<span class="hbadge">${w.holidayCount} holiday</span>` : ''}
+        </span></li>`;
+      });
+      html += `</ul>`;
+    });
+  } else {
+    html = '<ul class="leave-list">';
+    withOff.forEach(w => {
+      html += `<li><span class="lw-name">${esc(w.weekLabel)}</span><span style="display:flex;gap:5px">
+        ${w.leaveCount   ? `<span class="lbadge">${w.leaveCount} leave</span>`   : ''}
+        ${w.holidayCount ? `<span class="hbadge">${w.holidayCount} holiday</span>` : ''}
+      </span></li>`;
+    });
+    html += '</ul>';
+  }
+  const pct = W.length ? ((withOff.length / W.length) * 100).toFixed(0) : 0;
+  html += `<div class="summary-wrap"><div class="sum-lbl">Summary</div>
+    <div class="sum-val">${tl} leave + ${th} holiday days · ${withOff.length} of ${W.length} weeks (${pct}%)</div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────────────────────
+// TASKS
+// ─────────────────────────────────────────────────────────────
+function renderTasks(all) {
+  const el = document.getElementById('tasks-c');
+  const groups = [
+    { k: 'studyreach',   cls: 'study',  lbl: 'StudyReach' },
+    { k: 'aitranscript', cls: 'ai',     lbl: 'AI Transcript' },
+    { k: 'engage',       cls: 'engage', lbl: 'Engage' },
+    { k: 'other',        cls: 'other',  lbl: 'Other' },
+  ];
+  let html = '';
+  groups.forEach(g => {
+    const tasks = [...all[g.k]].filter(Boolean);
+    if (!tasks.length) return;
+    html += `<div class="pg ${g.cls}">
+      <div class="ph"><span class="pdot ${g.cls}"></span><span class="pname ${g.cls}">${g.lbl}</span><span class="pcnt">${tasks.length}</span></div>
+      <ul class="ptasks">${tasks.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+    </div>`;
+  });
+  el.innerHTML = html || '<div class="empty">No tasks found.</div>';
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─────────────────────────────────────────────────────────────
+// KEY INSIGHTS
+// ─────────────────────────────────────────────────────────────
+function renderInsights(W) {
+  const el = document.getElementById('insights-row');
+  if (!el) return;
+  if (!W.length) { el.innerHTML = '<div class="empty" style="grid-column:1/-1">Upload data to see insights.</div>'; return; }
+
+  const totals    = W.map(w => w.counts.studyreach + w.counts.aitranscript + w.counts.engage);
+  const grandTotal = totals.reduce((a, b) => a + b, 0);
+  const avgPerWeek = W.length ? (grandTotal / W.length) : 0;
+
+  const bestIdx   = totals.indexOf(Math.max(...totals));
+  const bestWeek  = W[bestIdx] || null;
+  const bestCount = bestIdx >= 0 ? totals[bestIdx] : 0;
+
+  const activeWeeks = totals.filter(v => v > 0).length;
+  const activeRate  = W.length ? ((activeWeeks / W.length) * 100).toFixed(0) : 0;
+
+  const otherCount = W.reduce((a, w) => a + w.tasks.other.length, 0);
+  const focusPct   = (grandTotal + otherCount) > 0
+    ? Math.round((grandTotal / (grandTotal + otherCount)) * 100) : 100;
+
+  const totalProd = W.reduce((a, w) => a + w.env.prod, 0);
+  const totalDev  = W.reduce((a, w) => a + w.env.dev,  0);
+  const totalStg  = W.reduce((a, w) => a + w.env.stg,  0);
+
+  const uniquePeople    = new Set([].concat.apply([], W.map(w => w.people))).size;
+  const collabSessions  = W.reduce((a, w) => a + w.actions.connected, 0);
+
+  // Trend: compare first half vs second half
+  const half    = Math.max(1, Math.floor(W.length / 2));
+  const firstH  = totals.slice(0, half).reduce((a, b) => a + b, 0);
+  const secondH = totals.slice(half).reduce((a, b) => a + b, 0);
+  const trendDir  = secondH > firstH ? 'up' : secondH < firstH ? 'down' : 'flat';
+  const trendIcon = { up: '↑', down: '↓', flat: '→' }[trendDir];
+  const trendText = { up: 'Picking up pace', down: 'Pace slowing', flat: 'Steady pace' }[trendDir];
+
+  const cards = [
+    {
+      ico: '🏆', lbl: 'Best Week', val: bestCount,
+      sub: bestWeek ? `${bestWeek.weekLabel}${bestWeek.month ? ' · ' + bestWeek.month : ''}` : '—',
+      clr: '#f59e0b', trend: `${trendIcon} ${trendText}`, tdir: trendDir
+    },
+    {
+      ico: '📈', lbl: 'Avg / Week', val: avgPerWeek.toFixed(1),
+      sub: 'tasks per week',
+      clr: '#4f9eff', trend: `${W.length} week${W.length !== 1 ? 's' : ''} in view`, tdir: 'flat'
+    },
+    {
+      ico: '🎯', lbl: 'Focus Score', val: focusPct + '%',
+      sub: 'core project share',
+      clr: '#34d399', trend: `${grandTotal} core · ${otherCount} other`,
+      tdir: focusPct >= 75 ? 'up' : focusPct >= 50 ? 'flat' : 'down'
+    },
+    {
+      ico: '✅', lbl: 'Active Weeks', val: activeWeeks + '/' + W.length,
+      sub: activeRate + '% utilisation',
+      clr: '#a78bfa', trend: `${W.length - activeWeeks} idle week${W.length - activeWeeks !== 1 ? 's' : ''}`,
+      tdir: Number(activeRate) >= 80 ? 'up' : Number(activeRate) >= 50 ? 'flat' : 'down'
+    },
+    {
+      ico: '🚀', lbl: 'Prod Deploys', val: totalProd,
+      sub: 'production events',
+      clr: '#f87171', trend: `${totalDev}D · ${totalStg}S · ${totalProd}P`, tdir: 'flat'
+    },
+    {
+      ico: '👥', lbl: 'Collaborators', val: uniquePeople,
+      sub: 'unique people',
+      clr: '#22d3ee', trend: `${collabSessions} collab session${collabSessions !== 1 ? 's' : ''}`, tdir: 'flat'
+    }
+  ];
+
+  el.innerHTML = cards.map(c => `
+    <div class="ic" style="--ic-clr:${c.clr}">
+      <div class="ic-ico">${c.ico}</div>
+      <div class="ic-lbl">${c.lbl}</div>
+      <div class="ic-val">${esc(String(c.val))}</div>
+      <div class="ic-sub">${esc(c.sub)}</div>
+      <div class="ic-trend ${c.tdir}">${c.trend}</div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUTO SUMMARY
+// ─────────────────────────────────────────────────────────────
+function renderSummary(W, ts, ta, te, tl, th) {
+  const card = document.getElementById('auto-summary');
+  const body = document.getElementById('auto-summary-body');
+  if (!card || !body) return;
+  if (!W.length) { card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  const mo     = document.getElementById('sel-month').value;
+  const period = mo === 'all' ? 'the full tracked period' : '<strong>' + mo + '</strong>';
+  const total  = ts + ta + te;
+  const totals = W.map(w => w.counts.studyreach + w.counts.aitranscript + w.counts.engage);
+  const bestIdx = totals.indexOf(Math.max(...totals));
+  const bestW   = W[bestIdx] || null;
+
+  let dominant = 'StudyReach';
+  if (ta > ts && ta > te) dominant = 'AI Transcript';
+  else if (te > ts && te > ta) dominant = 'Engage';
+
+  const allPeople    = new Set([].concat.apply([], W.map(w => w.people)));
+  const totalTickets = new Set([].concat.apply([], W.map(w => w.tickets))).size;
+  const prodDeploys  = W.reduce((a, w) => a + w.env.prod, 0);
+  const otherCount   = W.reduce((a, w) => a + w.tasks.other.length, 0);
+
+  let text = 'During ' + period + ', you logged <strong>' + total + '</strong> task' + (total !== 1 ? 's' : '') + ' — ';
+  text += '<strong>' + ts + '</strong> StudyReach, <strong>' + ta + '</strong> AI Transcript, and <strong>' + te + '</strong> Engage ';
+  text += 'entries across <strong>' + W.length + '</strong> week' + (W.length !== 1 ? 's' : '') + '. ';
+  text += 'The dominant focus area was <span class="nstag">' + dominant + '</span>. ';
+
+  if (bestW && totals[bestIdx] > 0) {
+    text += 'Peak activity was the week of <span class="nstag">' + esc(bestW.weekLabel) + (bestW.month ? ' · ' + esc(bestW.month) : '') + '</span>';
+    text += ' with <strong>' + totals[bestIdx] + '</strong> task' + (totals[bestIdx] !== 1 ? 's' : '') + '. ';
+  }
+  if (tl + th > 0) {
+    text += '<strong>' + tl + '</strong> leave + <strong>' + th + '</strong> holiday day' + ((tl + th) !== 1 ? 's' : '') + ' recorded. ';
+  }
+  if (totalTickets > 0) {
+    text += '<strong>' + totalTickets + '</strong> unique ticket' + (totalTickets !== 1 ? 's' : '') + ' referenced. ';
+  }
+  if (prodDeploys > 0) {
+    text += '<strong>' + prodDeploys + '</strong> production deployment event' + (prodDeploys !== 1 ? 's' : '') + ' logged. ';
+  }
+  if (allPeople.size > 0) {
+    text += 'Collaborated with <strong>' + allPeople.size + '</strong> colleague' + (allPeople.size !== 1 ? 's' : '') + '. ';
+  }
+  if (otherCount > 0) {
+    text += '<strong>' + otherCount + '</strong> additional task' + (otherCount !== 1 ? 's' : '') + ' in uncategorised work.';
+  }
+
+  body.innerHTML = text;
+}
+
+// ─────────────────────────────────────────────────────────────
+// ACTIVITY HEATMAP
+// ─────────────────────────────────────────────────────────────
+function renderHeatmap(W) {
+  const el = document.getElementById('heatmap-body');
+  if (!el) return;
+  if (!W.length) { el.innerHTML = '<div class="empty">No data to display.</div>'; return; }
+
+  const totals = W.map(w => w.counts.studyreach + w.counts.aitranscript + w.counts.engage);
+  const maxV   = Math.max(...totals, 1);
+
+  const getColor = v => {
+    if (v === 0) return 'rgba(30,35,54,.75)';
+    const p = v / maxV;
+    if (p < .25) return 'rgba(79,158,255,.25)';
+    if (p < .5)  return 'rgba(79,158,255,.5)';
+    if (p < .75) return 'rgba(79,158,255,.75)';
+    return 'rgba(79,158,255,1)';
+  };
+
+  let html = '<div class="hm-wrap">';
+  W.forEach((w, i) => {
+    const v   = totals[i];
+    const off = w.leaveCount + w.holidayCount;
+    const bg  = off > 0 ? 'rgba(251,146,60,.3)' : getColor(v);
+    const col = v > 0 ? 'rgba(255,255,255,.8)' : off > 0 ? 'rgba(255,255,255,.5)' : 'transparent';
+    const lbl = off > 0 ? '✕' : (v > 0 ? v : '');
+    const tipTxt = esc(w.weekLabel) + (w.month ? ' (' + esc(w.month) + ')' : '') + ': ' + v + ' task' + (v !== 1 ? 's' : '') + (off > 0 ? ' · ' + off + ' off' : '');
+    html += '<div class="hm-cell has-tip" style="background:' + bg + ';color:' + col + '">' + lbl + '<span class="tip">' + tipTxt + '</span></div>';
+  });
+  html += '</div>';
+  html += '<div class="hm-legend">'
+    + '<span>Less active</span>'
+    + '<div class="hm-leg-cells">'
+    + '<div class="hm-leg-cell" style="background:rgba(79,158,255,.25)"></div>'
+    + '<div class="hm-leg-cell" style="background:rgba(79,158,255,.5)"></div>'
+    + '<div class="hm-leg-cell" style="background:rgba(79,158,255,.75)"></div>'
+    + '<div class="hm-leg-cell" style="background:rgba(79,158,255,1)"></div>'
+    + '</div>'
+    + '<span>More active</span>'
+    + '<div class="hm-leg-cell" style="background:rgba(251,146,60,.3);margin-left:10px"></div>'
+    + '<span>Time off</span>'
+    + '</div>';
+  el.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPORT / PRINT
+// ─────────────────────────────────────────────────────────────
+function exportDash() { window.print(); }
+
+function resetDash() {
+  document.getElementById('upload-zone').style.display = '';
+  document.getElementById('dash').classList.remove('on');
+  document.getElementById('sdot').classList.remove('on');
+  document.getElementById('stxt').textContent = 'Awaiting CSV';
+  document.getElementById('reset-btn').classList.remove('on');
+  document.getElementById('export-btn').classList.remove('on');
+  document.getElementById('fi').value = '';
+  [pieC, barC, envC].forEach(c => { if (c) c.destroy(); });
+  pieC = barC = envC = null; ALL = [];
+  const ir = document.getElementById('insights-row');
+  if (ir) ir.innerHTML = '';
+  const as = document.getElementById('auto-summary');
+  if (as) as.style.display = 'none';
+  const hm = document.getElementById('heatmap-body');
+  if (hm) hm.innerHTML = '';
+  const wrap = document.getElementById('month-filter-wrap');
+  if (wrap) wrap.style.display = 'none';
+  const mSel = document.getElementById('sel-month');
+  if (mSel) mSel.innerHTML = '<option value="all">All Months</option>';
+}
+</script>
+</body>
+</html>
