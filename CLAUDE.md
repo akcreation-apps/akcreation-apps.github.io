@@ -105,6 +105,12 @@ The year must never be hardcoded — always set via `new Date().getFullYear()` s
 
 After completing **any** HTML/CSS/JS changes to UI components — new pages, modified sections, layout changes, interactive components — always run the `ui-ux-reviewer` agent to audit the result before reporting the task as done. Do this proactively without waiting for the user to ask.
 
+## SEO Workflow
+
+After completing **any** changes to files inside `/banki-transport/` or `/TCD/` — always run the `seo-optimizer` agent before reporting the task as done. Do this proactively without waiting for the user to ask.
+
+Both `/banki-transport/` and `/TCD/` are local businesses physically located in **Banki, Cuttack, Odisha, 754008, India**. All SEO work on these pages must use hyper-local signals targeting that specific location.
+
 ### Hosting / Routing
 - `CNAME` → `akcreation-apps.com` (GitHub Pages)
 - `_redirects` + `netlify.toml` handle `netlify.app` → custom domain redirect and asset caching headers

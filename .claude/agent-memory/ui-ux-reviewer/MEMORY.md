@@ -1,0 +1,1 @@
+- [TCD App Design Patterns and Known Issues](project_tcd_patterns.md) — Recurring design/a11y issues in TCD restaurant POS; intentional navy+orange brand, FA 5.15.4
