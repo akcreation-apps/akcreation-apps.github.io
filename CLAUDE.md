@@ -101,6 +101,10 @@ Every new HTML file must include a footer with a dynamically updated copyright y
 
 The year must never be hardcoded — always set via `new Date().getFullYear()` so it stays current without any manual edits.
 
+## UI/UX Review Workflow
+
+After completing **any** HTML/CSS/JS changes to UI components — new pages, modified sections, layout changes, interactive components — always run the `ui-ux-reviewer` agent to audit the result before reporting the task as done. Do this proactively without waiting for the user to ask.
+
 ### Hosting / Routing
 - `CNAME` → `akcreation-apps.com` (GitHub Pages)
 - `_redirects` + `netlify.toml` handle `netlify.app` → custom domain redirect and asset caching headers

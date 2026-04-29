@@ -8,6 +8,24 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const searchBar = document.getElementById('searchBar');
 const clearSearchButton = document.getElementById('clearSearch');
 
+// Show a brief toast confirming the add-to-cart action
+const showCartToast = (dishName) => {
+    const toast = document.getElementById('cartToast');
+    const msg   = document.getElementById('toastMsg');
+    msg.textContent = `${dishName} added to cart`;
+    toast.classList.add('show');
+    clearTimeout(showCartToast._timer);
+    showCartToast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+};
+
+// Animate the navbar cart badge on every add
+const popCartBadge = () => {
+    const badge = document.querySelector('.cart-count');
+    badge.classList.remove('pop');
+    void badge.offsetWidth; // force reflow to restart animation
+    badge.classList.add('pop');
+};
+
 // Function to check if an item is in the cart
 const isItemInCart = (categoryName, dishId) => {
     if (cart && Array.isArray(cart)) {
@@ -47,6 +65,10 @@ const updateCartCount = () => {
 
     // Update cart count with the total number of unique dishes
     cartCount.textContent = totalDishes;
+    const cartButton = document.querySelector('.cart-icon');
+    if (cartButton) {
+        cartButton.setAttribute('aria-label', `View cart — ${totalDishes} item${totalDishes !== 1 ? 's' : ''}`);
+    }
 };
 
 
@@ -100,6 +122,8 @@ const addToCart = (dishCategory, dishObject, button) => {
         }
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCount();
+        showCartToast(dishName);
+        popCartBadge();
     } catch(e){
         console.log(e)
     }
@@ -177,6 +201,10 @@ document.addEventListener('DOMContentLoaded', async() => {
                     shortcutLink.href = `#${category.category}`; // Link to the category ID
                     shortcutLink.className = 'shortcut';
                     shortcutLink.textContent = category.category; // Set link text
+                    shortcutLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        scrollToCategory(category.category);
+                    });
                     shortcutCard.appendChild(shortcutLink);
                     shortcutsContainer.appendChild(shortcutCard); // Append to shortcuts container
                 });
@@ -231,7 +259,9 @@ document.addEventListener('DOMContentLoaded', async() => {
                             const menuItem = document.createElement('div');
                             menuItem.classList.add('menu-item');
                             menuItem.style.background = subcategory.type === "NonVeg" ? "#f1c2c2" : "#c2e6c2";
+                            menuItem.setAttribute('aria-label', `${dish.name} — ${subcategory.type === 'NonVeg' ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}`);
                             const url = get_dish_url(dish.name);
+                            const dietLabel = subcategory.type === 'NonVeg' ? 'Non-veg' : 'Veg';
                             menuItem.innerHTML = `
                               <div class="menu-item-container">
                                     <div class="dish-card">
@@ -240,12 +270,11 @@ document.addEventListener('DOMContentLoaded', async() => {
                                             <h5 class="dish-name">${dish.name}</h5>
                                             <p class="price">₹${dish.price.toFixed(2)}/-</p>
                                         </div>
-                                        <button class="add-to-cart-btn" data-name="${dish.name}" data-price="${dish.price}">
+                                        <button class="add-to-cart-btn" aria-label="Add ${dish.name} (${dietLabel}) to cart" data-name="${dish.name}" data-price="${dish.price}">
                                             🛒
                                         </button>
                                     </div>
                               </div>
-
                             `;
 
                             // Add event listener to "Add to Cart" button
@@ -314,14 +343,6 @@ document.addEventListener('DOMContentLoaded', async() => {
     onlyVegCheckbox.addEventListener('change', saveCheckboxState);
     onlyNonVegCheckbox.addEventListener('change', saveCheckboxState);
 
-    // Setup shortcut navigation
-    const shortcuts = document.querySelectorAll('.shortcut');
-    shortcuts.forEach(shortcut => {
-        shortcut.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent default link behavior
-            scrollToCategory(shortcut.textContent); // Scroll to the category
-        });
-    });
 });
 
 function fetch_data(){
@@ -375,14 +396,6 @@ function fetch_data(){
 }
 
 searchBar.addEventListener('input', function () {
-    const searchBarRect = searchBar.getBoundingClientRect(); // Get the position of the search bar
-
-    // Scroll to the top position of the search bar
-    window.scrollTo({
-        top: searchBarRect.top + window.scrollY-70, // Adjust for current scroll position
-        behavior: 'smooth' // Smooth scroll
-    });
-
     if (searchBar.value) {
         clearSearchButton.style.display = 'block'; // Show clear button
     } else {
@@ -497,14 +510,10 @@ function resetFilter() {
 
 // Clear the search bar when the clear button is clicked
 clearSearchButton.addEventListener('click', function() {
-    searchBar.value = ''; // Clear the search bar value
-    clearSearchButton.style.display = 'none'; // Hide the clear button
-    resetFilter(); // Reset the filter to show all items
-});
-
-// Optional: Focus on the search bar when the clear button is clicked
-clearSearchButton.addEventListener('click', function() {
-    searchBar.focus(); // Optionally, refocus on the search bar
+    searchBar.value = '';
+    clearSearchButton.style.display = 'none';
+    resetFilter();
+    searchBar.focus();
 });
 
 //async function getPincodeUsingOSM(lat, lon) {

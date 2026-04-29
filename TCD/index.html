@@ -28,7 +28,7 @@
             --bg:           #F5F0EB;
             --card:         #FFFFFF;
             --text:         #2D2D2D;
-            --muted:        #888;
+            --muted:        #6B6B6B;
             --border:       #E2D9D0;
             --shadow-sm:    0 1px 4px rgba(0,0,0,0.07);
             --shadow-md:    0 4px 14px rgba(0,0,0,0.13);
@@ -96,6 +96,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
             letter-spacing: 0.2px;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            text-align: left;
         }
         .logo .brand-accent { color: var(--primary); }
 
@@ -113,6 +118,9 @@
             display: flex;
             align-items: center;
             transition: color 0.2s, transform 0.2s;
+            background: none;
+            border: none;
+            padding: 0;
         }
         .nav-icon:hover { color: #fff; transform: scale(1.1); }
 
@@ -402,8 +410,8 @@
             background: rgba(255,255,255,0.88);
             border: none;
             border-radius: 50%;
-            width: 28px; height: 28px;
-            font-size: 0.78rem;
+            width: 36px; height: 36px;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -418,6 +426,60 @@
             transform: scale(1.12);
         }
         .add-to-cart-btn.added-to-cart { background: var(--primary); }
+        .add-to-cart-btn::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+        }
+
+        /* ── Cart badge pop ── */
+        @keyframes badgePop {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(1.6); }
+            70%  { transform: scale(0.88); }
+            100% { transform: scale(1); }
+        }
+        .cart-count.pop { animation: badgePop 0.38s ease; }
+
+        /* ── Toast ── */
+        .cart-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(90px);
+            background: var(--navy);
+            color: #fff;
+            padding: 11px 16px 11px 14px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.28);
+            z-index: 8000;
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+            white-space: nowrap;
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
+        }
+        .cart-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .cart-toast .toast-icon { color: #4CAF50; font-size: 0.95rem; flex-shrink: 0; }
+        .cart-toast .toast-msg { overflow: hidden; text-overflow: ellipsis; }
+        .cart-toast .toast-action {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            flex-shrink: 0;
+            padding-left: 4px;
+        }
+        .cart-toast .toast-action:hover { text-decoration: underline; }
 
         /* ── No results ── */
         .no-results {
@@ -456,9 +518,60 @@
         @media (min-width: 1400px) {
             .dish-grid { grid-template-columns: repeat(8, 1fr); gap: 14px; }
         }
+
+        /* ── Focus visibility ── */
+        :focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        .search-container input[type="text"]:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+
+        /* ── Screen reader only ── */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* ── Skip link ── */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 16px;
+            z-index: 9999;
+            border-radius: 0 0 var(--r) 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: top 0.15s;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* ── Reduced motion ── */
+        @media (prefers-reduced-motion: reduce) {
+            .refer-btn::after { animation: none; }
+            html { scroll-behavior: auto; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Skip link -->
+    <a href="#menu" class="skip-link">Skip to menu</a>
 
     <!-- Loader -->
     <div class="loader-overlay" id="loaderOverlay">
@@ -468,23 +581,23 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <div class="logo" onclick="redirect_to_home()">
+            <button class="logo" onclick="redirect_to_home()" aria-label="The Cafe Darbar - Go home">
                 🍽️ <span class="brand-accent">The Cafe</span> Darbar
-            </div>
+            </button>
             <div class="icon-container">
-                <a class="nav-icon refer-btn" href="referral.html" title="Refer & Earn">
-                    <i class="fas fa-share-alt"></i>
+                <a class="nav-icon refer-btn" href="referral.html" aria-label="Refer & Earn">
+                    <i class="fas fa-share-alt" aria-hidden="true"></i>
                 </a>
-                <div class="nav-icon" id="searchIcon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <div class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()">
-                    <i class="fas fa-receipt"></i>
-                </div>
-                <div class="nav-icon cart-icon" onclick="redirect_to_cart()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count">0</span>
-                </div>
+                <button class="nav-icon" id="searchIcon" aria-label="Search dishes">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                </button>
+                <button class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()" aria-label="View invoice">
+                    <i class="fas fa-receipt" aria-hidden="true"></i>
+                </button>
+                <button class="nav-icon cart-icon" onclick="redirect_to_cart()" aria-label="View cart — 0 items">
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                    <span class="cart-count" aria-live="polite" aria-atomic="true">0</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -513,9 +626,10 @@
 
             <!-- Search -->
             <div class="search-container">
-                <i class="fas fa-search search-prefix-icon"></i>
-                <input type="text" id="searchBar" placeholder="Search dishes…" />
-                <button id="clearSearch" class="clear-button">&times;</button>
+                <i class="fas fa-search search-prefix-icon" aria-hidden="true"></i>
+                <label for="searchBar" class="sr-only">Search dishes</label>
+                <input type="text" id="searchBar" placeholder="Search dishes…" autocomplete="off" />
+                <button id="clearSearch" class="clear-button" aria-label="Clear search">&times;</button>
             </div>
 
             <div class="sticky-divider"></div>
@@ -523,7 +637,7 @@
     </div>
 
     <!-- Menu -->
-    <section class="menu" id="menu">
+    <section class="menu" id="menu" aria-label="Food menu">
         <div class="menu-container" id="menu-container">
             <!-- Dynamically populated by app.js -->
         </div>
@@ -532,6 +646,13 @@
     <!-- No results -->
     <div class="no-results" id="noResults" style="display: none;">
         <img src="../food_src/no-results.webp" alt="No Results Found" />
+    </div>
+
+    <!-- Cart toast -->
+    <div class="cart-toast" id="cartToast" role="status" aria-live="polite">
+        <i class="fas fa-check-circle toast-icon" aria-hidden="true"></i>
+        <span class="toast-msg" id="toastMsg">Added to cart</span>
+        <a class="toast-action" href="cart.html">View Cart →</a>
     </div>
 
     <!-- Footer -->
