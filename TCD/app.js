@@ -470,23 +470,6 @@ searchBar.addEventListener('input', function () {
 });
 
 
-
-// Add click event listener to the search icon
-searchIcon.addEventListener('click', function () {
-    // Get the search icon and search bar input
-    const searchIcon = document.getElementById('searchIcon');
-    const searchBar = document.getElementById('searchBar');
-    searchBar.focus(); // Focus on the search bar when the icon is clicked
-     // Scroll the search bar to the top of the viewport
-     const searchBarRect = searchBar.getBoundingClientRect(); // Get the position of the search bar
-
-     // Scroll to the top position of the search bar
-     window.scrollTo({
-         top: searchBarRect.top + window.scrollY-70, // Adjust for current scroll position
-         behavior: 'smooth' // Smooth scroll
-     });
-});
-
 function resetFilter() {
     const categoryBlocks = document.querySelectorAll('.category-block'); // Get all category blocks
 
