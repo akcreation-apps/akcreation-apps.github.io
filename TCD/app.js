@@ -193,22 +193,6 @@ document.addEventListener('DOMContentLoaded', async() => {
                 // Reset shortcuts
                 shortcutsContainer.innerHTML = '';
 
-                // Create shortcut links based on categories
-                data.menu.forEach(category => {
-                    const shortcutCard = document.createElement('div');
-                    shortcutCard.classList.add('shortcut-card');
-                    const shortcutLink = document.createElement('a');
-                    shortcutLink.href = `#${category.category}`; // Link to the category ID
-                    shortcutLink.className = 'shortcut';
-                    shortcutLink.textContent = category.category; // Set link text
-                    shortcutLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        scrollToCategory(category.category);
-                    });
-                    shortcutCard.appendChild(shortcutLink);
-                    shortcutsContainer.appendChild(shortcutCard); // Append to shortcuts container
-                });
-
                 // Render categories and dishes
                 data.menu.forEach(category => {
                     const categoryBlock = document.createElement('div');
@@ -315,7 +299,20 @@ document.addEventListener('DOMContentLoaded', async() => {
                     });
 
                     if (hasVisibleDishes) {
-                        menuContainer.appendChild(categoryBlock); // Only append if there are visible dishes
+                        menuContainer.appendChild(categoryBlock);
+
+                        const shortcutCard = document.createElement('div');
+                        shortcutCard.classList.add('shortcut-card');
+                        const shortcutLink = document.createElement('a');
+                        shortcutLink.href = `#${category.category}`;
+                        shortcutLink.className = 'shortcut';
+                        shortcutLink.textContent = category.category;
+                        shortcutLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            scrollToCategory(category.category);
+                        });
+                        shortcutCard.appendChild(shortcutLink);
+                        shortcutsContainer.appendChild(shortcutCard);
                     }
                 });
 
