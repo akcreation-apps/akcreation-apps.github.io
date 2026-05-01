@@ -740,10 +740,8 @@ function decrypt_values(value, key){
 function verify_number() {
     const message = "Your dining order will be delivered to this WhatsApp number.\nSave your modifications to begin receiving orders."
     const phoneNumber = localStorage.getItem('whatsapp_no')
-    console.log(phoneNumber)
-    const formattedMessage = message.replace(/\n/g, '%0A');  // Replace line breaks with %0A
-    const url = `https://wa.me/${phoneNumber}?text=${formattedMessage}`;
-    window.location.href = url; // Navigate to WhatsApp in the same tab
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.location.href = url;
 }
 
 // Save changes in db

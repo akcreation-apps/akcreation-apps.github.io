@@ -381,7 +381,6 @@ function fetch_data(){
                 cart.forEach(category => {
                     category.category.dish_details = category.category.dish_details.filter(dish => !currentDisableIds.includes(dish.id));
                 });
-                console.log(cart)
 
                 // Update the cart in localStorage
                 localStorage.setItem('cart', JSON.stringify(cart));
