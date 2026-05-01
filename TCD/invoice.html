@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://akcreation-apps.com/TCD/invoice.html">
     <link rel="apple-touch-icon" sizes="180x180" href="tcd-logo.png">
     <link rel="icon" type="image/png" sizes="32x32" href="tcd-logo.png">
     <link rel="icon" type="image/png" sizes="16x16" href="tcd-logo.png">
@@ -105,6 +107,15 @@
         }
         /* ── needed by JS ── */
         .icon-container { display: flex; align-items: center; gap: 18px; }
+        .nav-icon {
+            color: rgba(255,255,255,0.88);
+            font-size: 1.1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            min-width: 44px; min-height: 44px;
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .nav-icon:hover { color: #fff; transform: scale(1.1); }
 
         /* ── Page header ── */
         .page-header {
@@ -241,13 +252,16 @@
     <nav class="navbar">
         <div class="navbar-inner">
             <div class="logo" onclick="redirect_to_home()">
-                <img src="tcd-logo.png" alt="" />
+                <img src="tcd-logo.png" alt="The Cafe Darbar logo" />
                 <span class="logo-text"><span class="brand-accent">The Cafe</span> Darbar</span>
             </div>
             <div class="icon-container">
-                <div class="cart-icon" onclick="redirect_to_cart()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count">0</span>
+                <a class="nav-icon" href="referral.html" title="Refer &amp; Earn" aria-label="Refer &amp; Earn">
+                    <i class="fas fa-gift" aria-hidden="true"></i>
+                </a>
+                <div class="cart-icon" onclick="redirect_to_cart()" role="button" aria-label="View cart">
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                    <span class="cart-count" aria-label="0 items in cart">0</span>
                 </div>
             </div>
         </div>
