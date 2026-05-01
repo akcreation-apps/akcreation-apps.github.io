@@ -218,6 +218,10 @@
         let total = 0;
 
         const order = orders[0];
+        if (!order) {
+            document.getElementById('billContainer').innerHTML = '<p style="padding:20px;text-align:center;">Order not found.</p>';
+            return;
+        }
 
         document.getElementById('tableNo').textContent =
             order.order_details.table_no === 'COD'

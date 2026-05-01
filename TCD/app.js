@@ -1,6 +1,6 @@
 // Import the necessary Firebase services
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 // Initialize cart array to store selected items
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -379,8 +379,10 @@ function fetch_data(){
                 });
                
                 // Remove disabled dishes from the cart
+                const disableIdsRaw = localStorage.getItem('disable_item_ids');
+                const currentDisableIds = disableIdsRaw ? JSON.parse(disableIdsRaw) : [];
                 cart.forEach(category => {
-                    category.category.dish_details = category.category.dish_details.filter(dish => !JSON.parse(localStorage.getItem('disable_item_ids')).includes(dish.id));
+                    category.category.dish_details = category.category.dish_details.filter(dish => !currentDisableIds.includes(dish.id));
                 });
                 console.log(cart)
 

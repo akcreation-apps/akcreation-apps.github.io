@@ -177,8 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
     } else if(!storedExpirationTime){
-        Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error').then(() => {
-            window.location.href = 'index.html'; // Replace 'index.html' with your home page URL
+        Swal.fire('Access Required', 'Please use your ordering link to access your orders.', 'info').then(() => {
+            window.location.href = 'index.html';
         });
         return;
     }

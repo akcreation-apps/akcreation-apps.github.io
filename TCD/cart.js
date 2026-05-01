@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 const BACKUP_WP_NO = "+918920042482"
 const MINIMUM_ORDER_PRICE = 200
 const DELIVERY_CHARGES = 50
@@ -251,9 +251,8 @@ function calculateTotal(cartItems, message) {
 
 // Function to send message via WhatsApp
 function sendWhatsAppMessage(message, phoneNumber) {
-    const formattedMessage = message.replace(/\n/g, '%0A');  // Replace line breaks with %0A
-    const url = `https://wa.me/${phoneNumber}?text=${formattedMessage}`;
-    window.location.href = url; // Navigate to WhatsApp in the same tab
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.location.href = url;
 }
 
 // Event listener for the "Place Order" button
@@ -275,18 +274,18 @@ placeOrderButton.addEventListener('click', () => {
             return;
         }
     } else if(!storedExpirationTime){
-        Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error');
+        Swal.fire('Access Required', 'Please use your ordering link to place an order.', 'info');
         hideLoader();
-            return;
+        return;
     }
     if (storedShopStatus ==="closed") {
-        const currentTime = Date.now();
-        Swal.fire('We’re currently closed 🛑','Our shop is taking a break right now. Please check back when we’re open!', 'info');
+        Swal.fire('We\'re currently closed 🛑','Our shop is taking a break right now. Please check back when we\'re open!', 'info');
         hideLoader();
         return;
     }
     // Check if current time is outside operating hours
-    if (currentHour < storedOpeningTime || currentHour >= storedClosingTime) {
+    if (storedOpeningTime !== null && storedClosingTime !== null &&
+        (currentHour < storedOpeningTime || currentHour >= storedClosingTime)) {
         Swal.fire(
             'We’re taking a break 😊',
             `Our kitchen is open from ${storedOpeningTime}:00 to ${storedClosingTime}:00. Please visit us during these hours!`,
@@ -302,7 +301,20 @@ placeOrderButton.addEventListener('click', () => {
         hideLoader();
         return;
     }
-    const orderMessage = createOrderMessage(cartItems); 
+    const today = new Date().toDateString();
+    const lastOrderDate = localStorage.getItem('tcd_order_date');
+    let ordersToday = parseInt(localStorage.getItem('tcd_order_count') || '0', 10);
+    if (lastOrderDate && lastOrderDate !== today) {
+        localStorage.removeItem('tcd_order_date');
+        localStorage.removeItem('tcd_order_count');
+        ordersToday = 0;
+    }
+    if (ordersToday >= 5) {
+        Swal.fire('Daily Limit Reached', 'You have placed the maximum of 5 orders for today. Please try again tomorrow!', 'info');
+        hideLoader();
+        return;
+    }
+    const orderMessage = createOrderMessage(cartItems);
     let phoneNo = ''
     if (!localStorage.getItem('whatsapp_no')) {
         phoneNo = BACKUP_WP_NO;
@@ -310,6 +322,8 @@ placeOrderButton.addEventListener('click', () => {
         phoneNo = localStorage.getItem('whatsapp_no');
     }
     collect_data()
+    localStorage.setItem('tcd_order_date', today);
+    localStorage.setItem('tcd_order_count', ordersToday + 1);
     sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
     hideLoader();
     Swal.fire('Success', 'Order Placed Successfully.', 'success').then(() => {
