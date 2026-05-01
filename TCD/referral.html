@@ -394,21 +394,35 @@
         const waUrl = 'https://wa.me/?text=' + encodeURIComponent(referralMessage);
         const btn = document.getElementById('whatsappShareBtn');
 
+        // True pointer/mouse device = desktop browser; everything else (touch,
+        // mobile browser, WebView) should navigate in-frame so the OS can
+        // intercept the wa.me URL and open WhatsApp natively.
+        const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+        function openWhatsApp() {
+            if (isDesktop) {
+                window.open(waUrl, '_blank', 'noopener');
+            } else {
+                window.location.href = waUrl;
+            }
+        }
+
         if (navigator.share) {
-            // Mobile: native OS share sheet (WhatsApp, SMS, etc.)
+            // Mobile browser or iOS WKWebView — native OS share sheet
             document.getElementById('shareBtnLabel').textContent = 'Share with a Friend';
             btn.addEventListener('click', async () => {
                 try {
                     await navigator.share({ text: referralMessage });
-                } catch {
-                    // User dismissed — do nothing
+                } catch (err) {
+                    // Fall back to WhatsApp URL if share fails (not just dismissed)
+                    if (err.name !== 'AbortError') {
+                        openWhatsApp();
+                    }
                 }
             });
         } else {
-            // Desktop: open WhatsApp Web in a new tab
-            btn.addEventListener('click', () => {
-                window.open(waUrl, '_blank', 'noopener');
-            });
+            // Android WebView or browser without Share API
+            btn.addEventListener('click', openWhatsApp);
         }
     </script>
 
