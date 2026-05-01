@@ -24,7 +24,7 @@
             --bg:        #F5F0EB;
             --card:      #FFFFFF;
             --text:      #2D2D2D;
-            --muted:     #888;
+            --muted:     #666666;
             --border:    #E2D9D0;
             --gold:      #FFD700;
             --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
@@ -78,7 +78,7 @@
         /* ── Page wrapper ── */
         .page {
             max-width: 680px; margin: 0 auto;
-            padding: 24px 16px 60px;
+            padding: 24px 16px 90px; /* bottom clears fixed share bar */
         }
 
         /* ── Hero banner ── */
@@ -188,22 +188,48 @@
             line-height: 1.55;
         }
 
-        /* ── Share button ── */
+        /* ── Fixed bottom share bar ── */
+        .share-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 800;
+            pointer-events: none;
+        }
+        .share-bar-inner {
+            max-width: 680px;
+            margin: 0 auto;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 10px 16px 16px;
+            pointer-events: auto;
+        }
         .share-btn {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
             width: 100%;
             background: #25D366; color: #fff;
             border: none; border-radius: var(--r);
-            padding: 14px 20px; margin-top: 18px;
-            font-size: 0.92rem; font-weight: 700;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(37,211,102,0.3);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            cursor: pointer; font-family: 'Poppins', sans-serif;
             transition: background 0.2s, transform 0.15s;
-            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(37,211,102,0.25);
         }
         .share-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
         .share-btn img { width: 22px; height: 22px; }
+        .share-btn .btn-text {
+            display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;
+        }
+        .share-btn .main-text { font-size: 0.9rem; font-weight: 600; }
+        .share-btn .sub-text { font-size: 0.63rem; opacity: 0.85; }
+
+        /* ── Small screen adjustments ── */
+        @media (max-width: 360px) {
+            .hero { padding: 20px 14px 18px; }
+            .hero h1 { font-size: 1.25rem; }
+            .reward-row { gap: 8px; }
+            .reward-pill { padding: 8px 12px; min-width: 90px; }
+            .reward-pill .amount { font-size: 1.2rem; }
+        }
 
         /* ── Notes / T&C ── */
         .notes { list-style: none; }
@@ -224,7 +250,8 @@
             font-size: 0.72rem;
             color: var(--muted);
             border-top: 1px solid var(--border);
-            margin-top: 10px;
+            margin: 10px auto 90px;
+            max-width: 680px;
         }
         footer a { color: var(--primary); text-decoration: none; }
         footer a:hover { text-decoration: underline; }
@@ -276,7 +303,7 @@
                     <div class="step-num">1</div>
                     <div class="step-body">
                         <strong>Share the Link</strong>
-                        <p>Tap the WhatsApp button below and send your referral message to a friend.</p>
+                        <p>Tap the share button at the bottom of the screen and send your referral message to a friend.</p>
                     </div>
                 </li>
                 <li class="step">
@@ -302,11 +329,6 @@
                 </li>
             </ul>
 
-            <!-- WhatsApp share button -->
-            <a class="share-btn" id="whatsappShareBtn" href="#" target="_blank" rel="noopener">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-                Share via WhatsApp
-            </a>
         </div>
 
         <!-- Terms -->
@@ -328,6 +350,19 @@
 
     </div>
 
+    <!-- Fixed bottom share bar -->
+    <div class="share-bar">
+        <div class="share-bar-inner">
+            <button class="share-btn" id="whatsappShareBtn" type="button">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="">
+                <span class="btn-text">
+                    <span class="main-text" id="shareBtnLabel">Share via WhatsApp</span>
+                    <span class="sub-text">Refer &amp; earn ₹50</span>
+                </span>
+            </button>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/food-order-kiosk.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
     </footer>
@@ -347,7 +382,7 @@
             "*How to claim:*",
             "",
             "1. Open the menu:",
-            "   https://akcreation-apps.com/TCD/index.html?table=COD",
+            "   https://akcreation-apps.com/TCD/?table=COD",
             "",
             "2. Place your order via WhatsApp",
             "",
@@ -356,8 +391,25 @@
             "4. Get Rs.25 OFF after verification"
         ].join("\n");
 
-        document.getElementById('whatsappShareBtn').href =
-            'https://wa.me/?text=' + encodeURIComponent(referralMessage);
+        const waUrl = 'https://wa.me/?text=' + encodeURIComponent(referralMessage);
+        const btn = document.getElementById('whatsappShareBtn');
+
+        if (navigator.share) {
+            // Mobile: native OS share sheet (WhatsApp, SMS, etc.)
+            document.getElementById('shareBtnLabel').textContent = 'Share with a Friend';
+            btn.addEventListener('click', async () => {
+                try {
+                    await navigator.share({ text: referralMessage });
+                } catch {
+                    // User dismissed — do nothing
+                }
+            });
+        } else {
+            // Desktop: open WhatsApp Web in a new tab
+            btn.addEventListener('click', () => {
+                window.open(waUrl, '_blank', 'noopener');
+            });
+        }
     </script>
 
 </body>

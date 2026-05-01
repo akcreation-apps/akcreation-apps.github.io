@@ -30,3 +30,12 @@ Known issues identified in first review (2026-04-26):
 
 **Why:** First full audit of TCD index.html conducted by ui-ux-reviewer agent.
 **How to apply:** Reference these when reviewing cart.html, invoice.html, or referral.html — many of these patterns likely repeat across TCD pages.
+
+Confirmed recurring issues found in referral.html review (2026-05-01):
+- --muted (#888) on white fails WCAG AA (3.54:1) — affects step descriptions, T&C list, footer. Fix: --muted: #666666
+- FA icon elements missing aria-hidden="true" (back-btn arrow, card-title icons) — screen readers announce icon names
+- No skip-to-content link — confirmed pattern across TCD pages
+- No prefers-reduced-motion guard on hover transforms — .share-btn:hover uses translateY
+- External asset dependency: WhatsApp SVG loaded from Wikimedia Commons; FA 5.15.4 fab fa-whatsapp is available locally
+- Font sizes below 0.7rem used in UI components (.sub-text: 0.63rem, .reward-pill .label: 0.65rem, .notes li: 0.73rem)
+- Fixed bottom bar (full viewport width) with inner max-width constraint creates visual disconnect on desktop — shadow/border span full width while button is centered at 680px; prefer moving shadow/border to .share-bar-inner
