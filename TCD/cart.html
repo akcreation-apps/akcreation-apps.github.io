@@ -94,15 +94,27 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .logo-text .brand-accent { color: var(--primary); }
-        .icon-container { display: flex; align-items: center; gap: 18px; }
+        .icon-container { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
         .nav-icon {
             color: rgba(255,255,255,0.88);
             font-size: 1.1rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            min-width: 44px; min-height: 44px;
+            display: flex; align-items: center;
             transition: color 0.2s, transform 0.2s;
+            background: none; border: none; padding: 0; text-decoration: none;
         }
         .nav-icon:hover { color: #fff; transform: scale(1.1); }
+        .refer-btn { position: relative; }
+        .refer-btn::after {
+            content: '';
+            position: absolute; top: -4px; right: -4px;
+            width: 8px; height: 8px;
+            background: #FFD700; border-radius: 50%;
+            animation: referPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes referPulse {
+            0%,100% { transform: scale(1);   opacity: 1; box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
+            50%      { transform: scale(1.25); opacity: 0.8; box-shadow: 0 0 0 5px rgba(255,215,0,0); }
+        }
 
         /* ── Two-column wrapper (desktop only) ── */
         .cart-wrapper {
@@ -321,12 +333,12 @@
                 <span class="logo-text"><span class="brand-accent">The Cafe</span> Darbar</span>
             </div>
             <div class="icon-container">
-                <a class="nav-icon" href="referral.html" title="Refer &amp; Earn" aria-label="Refer &amp; Earn" style="text-decoration:none;">
-                    <i class="fas fa-gift" aria-hidden="true"></i>
+                <a class="nav-icon refer-btn" href="referral.html" title="Refer &amp; Earn" aria-label="Refer &amp; Earn">
+                    <i class="fas fa-share-alt" aria-hidden="true"></i>
                 </a>
-                <div class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()" role="button" aria-label="View order history">
+                <button class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()" aria-label="View order history">
                     <i class="fas fa-receipt" aria-hidden="true"></i>
-                </div>
+                </button>
             </div>
         </div>
     </nav>
