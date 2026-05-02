@@ -312,13 +312,14 @@
             user-select: none;
             transition: background 0.18s, border-color 0.18s;
         }
-        .shortcut-card:hover,
-        .shortcut-card:active {
-            background: var(--primary);
+        .shortcut-card:hover {
+            background: rgba(255,107,53,0.1);
             border-color: var(--primary);
         }
-        .shortcut-card:hover a,
-        .shortcut-card:active a { color: #fff; }
+        .shortcut-card:active {
+            background: rgba(255,107,53,0.2);
+            border-color: var(--primary);
+        }
         .shortcut-card a {
             text-decoration: none;
             color: var(--text);
@@ -364,10 +365,19 @@
             margin: 0;
         }
 
+        /* ── Search row ── */
+        .search-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px 8px;
+        }
+
         /* ── Search ── */
         .search-container {
             position: relative;
-            padding: 4px 12px 8px;
+            flex: 1;
+            padding: 0;
         }
         .search-container input[type="text"] {
             width: 100%;
@@ -388,7 +398,7 @@
         .search-container input[type="text"]::placeholder { color: #bbb; }
         .search-prefix-icon {
             position: absolute;
-            left: 24px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: #bbb;
@@ -397,7 +407,7 @@
         }
         .clear-button {
             position: absolute;
-            right: 24px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             border: none;
@@ -411,6 +421,42 @@
             transition: color 0.15s;
         }
         .clear-button:hover { color: var(--primary); }
+
+        /* ── Bestseller filter button ── */
+        .bestseller-filter-btn {
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            background: var(--card);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            padding: 0;
+            position: relative;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        .bestseller-filter-btn::after {
+            content: '';
+            position: absolute;
+            top: 2px; right: 2px;
+            width: 8px; height: 8px;
+            background: var(--border);
+            border-radius: 50%;
+            border: 1.5px solid var(--card);
+            transition: background 0.15s;
+        }
+        .bestseller-filter-btn.active {
+            background: #FFF3EE;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.2), inset 0 0 0 1px rgba(255,107,53,0.25);
+        }
+        .bestseller-filter-btn.active::after {
+            background: var(--primary);
+        }
 
         .sticky-divider {
             height: 1px;
@@ -645,15 +691,17 @@
             position: absolute;
             top: 5px; right: 5px;
             z-index: 3;
-            background: rgba(230,100,0,0.88);
+            background: #E64A19;
             color: #fff;
             font-size: 0.52rem;
             font-weight: 700;
-            padding: 2px 5px;
+            padding: 2px 6px;
             border-radius: 8px;
             white-space: nowrap;
             letter-spacing: 0.2px;
             line-height: 1.4;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.25);
         }
 
         /* ── View Cart bar ── */
@@ -784,6 +832,7 @@
             .cart-count.pop { animation: none; }
             .view-cart-bar { transition: none; }
             .loader { animation: none; }
+            .bestseller-filter-btn { transition: none; }
         }
 
         /* ── Local business info section ── */
@@ -891,12 +940,17 @@
                 </div>
             </div>
 
-            <!-- Search -->
-            <div class="search-container">
-                <i class="fas fa-search search-prefix-icon" aria-hidden="true"></i>
-                <label for="searchBar" class="sr-only">Search dishes</label>
-                <input type="text" id="searchBar" placeholder="Search dishes…" autocomplete="off" />
-                <button id="clearSearch" class="clear-button" aria-label="Clear search">&times;</button>
+            <!-- Search + Bestseller filter -->
+            <div class="search-row">
+                <div class="search-container">
+                    <i class="fas fa-search search-prefix-icon" aria-hidden="true"></i>
+                    <label for="searchBar" class="sr-only">Search dishes</label>
+                    <input type="text" id="searchBar" placeholder="Search dishes…" autocomplete="off" />
+                    <button id="clearSearch" class="clear-button" aria-label="Clear search">&times;</button>
+                </div>
+                <button id="bestsellerFilter" class="bestseller-filter-btn" aria-pressed="false" aria-label="Show bestsellers only" title="Bestsellers only">
+                    🔥
+                </button>
             </div>
 
             <div class="sticky-divider"></div>
@@ -947,7 +1001,7 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/food-order-kiosk.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+        <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
     </footer>
 
     <!-- View Cart bar (slides up when cart has items) -->

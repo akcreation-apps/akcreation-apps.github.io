@@ -195,19 +195,15 @@ const updateCartCount = () => {
         return;
     }
 
-    // Calculate the total number of unique dishes across categories in the cart
-    const totalDishes = cart.reduce((sum, categoryItem) => {
-        // Check if categoryItem and dish_details exist
+    // Calculate total quantity across all dishes in the cart
+    const totalQty = cart.reduce((sum, categoryItem) => {
         if (categoryItem.category && Array.isArray(categoryItem.category.dish_details)) {
-            // Count the number of unique dishes within the category's dish_details array
-            const uniqueDishesCount = categoryItem.category.dish_details.length; // Simply count the length of the dish_details array
-            return sum + uniqueDishesCount; // Add the count of unique dishes
+            return sum + categoryItem.category.dish_details.reduce((s, d) => s + (d.quantity || 1), 0);
         }
         return sum;
     }, 0);
 
-    // Update cart count with the total number of unique dishes
-    cartCount.textContent = totalDishes;
+    cartCount.textContent = totalQty;
 };
 updateCartCount();
 

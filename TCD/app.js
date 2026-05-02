@@ -8,6 +8,20 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const searchBar = document.getElementById('searchBar');
 const clearSearchButton = document.getElementById('clearSearch');
 
+// Scrolls the shortcuts grid horizontally to center the active chip.
+// Uses container.scrollTo (not scrollIntoView) so the main page never scrolls.
+const scrollChipIntoView = (chip) => {
+    const grid = document.querySelector('.shortcuts-grid');
+    if (!grid) return;
+    const target = chip.offsetLeft - (grid.clientWidth - chip.offsetWidth) / 2;
+    grid.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+};
+
+// When a chip click triggers programmatic page scroll, suppress the scroll-spy
+// for 1 s so the animation doesn't cycle through every in-between category.
+let _spyIgnore = false;
+let _spyIgnoreTimer = null;
+
 // Announce cart changes to screen readers
 const announceCart = (dishName, qty) => {
     const el = document.getElementById('cartAnnouncer');
@@ -152,23 +166,39 @@ const updateViewCartBar = () => {
     }
 };
 
+const syncActiveChip = () => {
+    if (_spyIgnore) return;
+    const stickyBar = document.querySelector('.sticky-bar');
+    const threshold = stickyBar ? stickyBar.getBoundingClientRect().bottom + 8 : 180;
+    let activeId = null;
+    document.querySelectorAll('.category-block').forEach(block => {
+        if (block.getBoundingClientRect().top <= threshold) activeId = block.id;
+    });
+    // On first load (page at top) no block may have crossed the threshold — default to first
+    if (!activeId) {
+        const first = document.querySelector('.category-block');
+        if (first) activeId = first.id;
+    }
+    document.querySelectorAll('.shortcut-card').forEach(chip => {
+        const link = chip.querySelector('a');
+        const isActive = link?.getAttribute('href') === `#${activeId}`;
+        const wasActive = chip.classList.contains('active');
+        chip.classList.toggle('active', isActive);
+        if (isActive && !wasActive) scrollChipIntoView(chip);
+    });
+};
+
 let scrollSpyObserver = null;
 const setupScrollSpy = () => {
     if (scrollSpyObserver) scrollSpyObserver.disconnect();
-    scrollSpyObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            const id = entry.target.id;
-            document.querySelectorAll('.shortcut-card').forEach(chip => {
-                const link = chip.querySelector('a');
-                const isActive = link?.getAttribute('href') === `#${id}`;
-                chip.classList.toggle('active', isActive);
-                if (isActive) chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            });
-        });
-    }, { rootMargin: '-180px 0px -60% 0px', threshold: 0 });
+    scrollSpyObserver = new IntersectionObserver(syncActiveChip, {
+        rootMargin: '-120px 0px -40% 0px',
+        threshold: 0
+    });
     document.querySelectorAll('.category-block').forEach(b => scrollSpyObserver.observe(b));
 };
+
+let bestsellerOnly = false;
 
 let bestsellerNames = new Set();
 const fetchBestsellers = async () => {
@@ -176,9 +206,16 @@ const fetchBestsellers = async () => {
         const res = await fetch(`admin/tcd_order_data.json?v=${Date.now()}`);
         if (!res.ok) return;
         const data = await res.json();
+        const threeMonthsAgo = Date.now() - (90 * 24 * 60 * 60 * 1000);
         const dishQty = {};
         Object.values(data).forEach(order => {
             if (order.status !== 'Approved') return;
+            if (order.created_at) {
+                const ts = order.created_at.seconds
+                    ? order.created_at.seconds * 1000
+                    : new Date(order.created_at).getTime();
+                if (ts < threeMonthsAgo) return;
+            }
             order.order_details?.forEach(cat => {
                 cat.category?.dish_details?.forEach(dish => {
                     dishQty[dish.name] = (dishQty[dish.name] || 0) + dish.quantity;
@@ -187,6 +224,7 @@ const fetchBestsellers = async () => {
         });
         bestsellerNames = new Set(
             Object.entries(dishQty)
+                .filter(([, qty]) => qty >= 3)
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 5)
                 .map(([name]) => name)
@@ -336,6 +374,14 @@ document.addEventListener('DOMContentLoaded', async() => {
                         shortcutLink.textContent = category.category;
                         shortcutLink.addEventListener('click', (e) => {
                             e.preventDefault();
+                            document.querySelectorAll('.shortcut-card').forEach(c => c.classList.remove('active'));
+                            shortcutCard.classList.add('active');
+                            scrollChipIntoView(shortcutCard);
+                            // Suppress scroll-spy for 1 s so the smooth-scroll animation
+                            // doesn't cycle through every category it passes over
+                            _spyIgnore = true;
+                            clearTimeout(_spyIgnoreTimer);
+                            _spyIgnoreTimer = setTimeout(() => { _spyIgnore = false; }, 1000);
                             scrollToCategory(category.category);
                         });
                         shortcutCard.appendChild(shortcutLink);
@@ -346,6 +392,8 @@ document.addEventListener('DOMContentLoaded', async() => {
                 // Update cart count on page load
                 updateCartCount();
                 setupScrollSpy();
+                syncActiveChip(); // set initial active chip without waiting for scroll
+                applyFilters();
             })
             .catch(error => {
                 console.error('Error fetching menu data:', error);
@@ -356,6 +404,10 @@ document.addEventListener('DOMContentLoaded', async() => {
     };
 
     await fetchBestsellers();
+    const bestsellerFilterBtn = document.getElementById('bestsellerFilter');
+    if (bestsellerFilterBtn) {
+        bestsellerFilterBtn.style.display = bestsellerNames.size > 0 ? '' : 'none';
+    }
     renderMenu(); // Initial render of menu
     updateViewCartBar();
 
@@ -369,6 +421,15 @@ document.addEventListener('DOMContentLoaded', async() => {
 
     onlyVegCheckbox.addEventListener('change', saveCheckboxState);
     onlyNonVegCheckbox.addEventListener('change', saveCheckboxState);
+
+    if (bestsellerFilterBtn) {
+        bestsellerFilterBtn.addEventListener('click', () => {
+            bestsellerOnly = !bestsellerOnly;
+            bestsellerFilterBtn.classList.toggle('active', bestsellerOnly);
+            bestsellerFilterBtn.setAttribute('aria-pressed', String(bestsellerOnly));
+            applyFilters();
+        });
+    }
 
 });
 
@@ -423,107 +484,54 @@ function fetch_data(){
     });
 }
 
-searchBar.addEventListener('input', function () {
-    if (searchBar.value) {
-        clearSearchButton.style.display = 'block'; // Show clear button
-    } else {
-        clearSearchButton.style.display = 'none'; // Hide clear button
-    }
+function applyFilters() {
+    const searchTerm = searchBar.value.toLowerCase();
+    const noResultsDiv = document.getElementById('noResults');
+    let anyVisibleDish = false;
 
-    const searchTerm = searchBar.value.toLowerCase(); // Get the input value
-    const noResultsDiv = document.getElementById('noResults'); // Get the no results div
-    let anyVisibleDish = false; // Flag to track if any dish is visible
-
-    // Get all category blocks
-    const categoryBlocks = document.querySelectorAll('.category-block');
-
-    // Iterate through each category block
-    categoryBlocks.forEach(categoryBlock => {
-        const subcategoryBlocks = categoryBlock.querySelectorAll('.subcategory-block'); // Get subcategory blocks
-        let hasVisibleDishesInCategory = false; // Track if any visible dishes in this category
-
-        // Iterate through each subcategory
-        subcategoryBlocks.forEach(subcategoryBlock => {
+    document.querySelectorAll('.category-block').forEach(categoryBlock => {
+        let hasVisibleInCategory = false;
+        categoryBlock.querySelectorAll('.subcategory-block').forEach(subcategoryBlock => {
             const dishGrid = subcategoryBlock.querySelector('.dish-grid');
-            const dishes = dishGrid.querySelectorAll('.menu-item');
+            const dishes = dishGrid ? dishGrid.querySelectorAll('.menu-item') : [];
+            let hasVisibleInSubcategory = false;
+            const subcategoryName = subcategoryBlock.querySelector('h4')?.textContent.toLowerCase() || '';
+            const subcategoryMatchesSearch = searchTerm && subcategoryName.includes(searchTerm);
 
-            let hasVisibleDishesInSubcategory = false; // Track if any visible dishes in this subcategory
-
-            // Check if the subcategory name matches the search term
-            const subcategoryName = subcategoryBlock.querySelector('h4').textContent.toLowerCase();
-            if (subcategoryName.includes(searchTerm)) {
-                // If subcategory matches, show all dishes in this subcategory
-                dishes.forEach(dish => {
-                    dish.style.display = ''; // Show all dishes
-                    hasVisibleDishesInSubcategory = true; // Mark that there's a visible dish
-                    anyVisibleDish = true; // Set flag to true
-                });
-            } else {
-                // Iterate through each dish
-                dishes.forEach(dish => {
-                    const dishName = dish.querySelector('h5').textContent.toLowerCase(); // Get dish name
-                    if (dishName.includes(searchTerm)) {
-                        dish.style.display = ''; // Show item if it matches
-                        hasVisibleDishesInSubcategory = true; // Mark that there's a visible dish
-                        anyVisibleDish = true; // Set flag to true
-                    } else {
-                        dish.style.display = 'none'; // Hide item if it doesn't match
-                    }
-                });
-            }
-
-            // If any dishes are found in this subcategory, show the subcategory block
-            if (hasVisibleDishesInSubcategory) {
-                subcategoryBlock.style.display = ''; // Show subcategory if it has visible dishes
-                hasVisibleDishesInCategory = true; // Mark that there's at least one visible dish in the category
-            } else {
-                subcategoryBlock.style.display = 'none'; // Hide subcategory if no dishes are visible
-            }
-        });
-
-        // If no subcategories are visible, hide the category block
-        if (hasVisibleDishesInCategory) {
-            categoryBlock.style.display = ''; // Show category block if it has visible dishes
-        } else {
-            categoryBlock.style.display = 'none'; // Hide category block if no subcategories are visible
-        }
-    });
-
-    // Show or hide no results image based on visibility of dishes
-    if (anyVisibleDish) {
-        noResultsDiv.style.display = 'none'; // Hide no results message
-    } else {
-        noResultsDiv.style.display = 'block'; // Show no results message
-    }
-});
-
-
-function resetFilter() {
-    const categoryBlocks = document.querySelectorAll('.category-block'); // Get all category blocks
-
-    // Show all category blocks
-    categoryBlocks.forEach(categoryBlock => {
-        categoryBlock.style.display = ''; // Reset display to show all categories
-        const subcategoryBlocks = categoryBlock.querySelectorAll('.subcategory-block');
-
-        // Show all subcategory blocks and their dishes
-        subcategoryBlocks.forEach(subcategoryBlock => {
-            subcategoryBlock.style.display = ''; // Show all subcategories
-            const dishes = subcategoryBlock.querySelectorAll('.menu-item');
-
-            // Show all dishes
             dishes.forEach(dish => {
-                dish.style.display = ''; // Show all dishes
+                const dishName = dish.querySelector('h5')?.textContent.toLowerCase() || '';
+                const isBestseller = !!dish.querySelector('.bestseller-badge');
+                const matchesSearch = !searchTerm || subcategoryMatchesSearch || dishName.includes(searchTerm);
+                const matchesBestseller = !bestsellerOnly || isBestseller;
+
+                if (matchesSearch && matchesBestseller) {
+                    dish.style.display = '';
+                    hasVisibleInSubcategory = true;
+                    anyVisibleDish = true;
+                } else {
+                    dish.style.display = 'none';
+                }
             });
+
+            subcategoryBlock.style.display = hasVisibleInSubcategory ? '' : 'none';
+            if (hasVisibleInSubcategory) hasVisibleInCategory = true;
         });
+        categoryBlock.style.display = hasVisibleInCategory ? '' : 'none';
     });
+
+    if (noResultsDiv) noResultsDiv.style.display = anyVisibleDish ? 'none' : 'block';
 }
+
+searchBar.addEventListener('input', function () {
+    clearSearchButton.style.display = searchBar.value ? 'block' : 'none';
+    applyFilters();
+});
 
 // Clear the search bar when the clear button is clicked
 clearSearchButton.addEventListener('click', function() {
     searchBar.value = '';
     clearSearchButton.style.display = 'none';
-    resetFilter();
+    applyFilters();
     searchBar.focus();
 });
 

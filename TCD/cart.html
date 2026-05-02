@@ -90,6 +90,7 @@
         .logo {
             cursor: pointer; flex: 1; min-width: 0;
             display: flex; align-items: center; gap: 10px;
+            background: none; border: none; padding: 0;
         }
         .logo img { height: 40px; width: auto; display: block; flex-shrink: 0; }
         .logo-text {
@@ -129,7 +130,7 @@
         #cart {
             max-width: 640px;
             margin: 0 auto;
-            padding: 0 14px 110px; /* bottom pad clears fixed total bar */
+            padding: 0 14px 160px;
         }
 
         /* ── Desktop: side-by-side layout ── */
@@ -338,10 +339,10 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <div class="logo" onclick="redirect_to_home()">
+            <button class="logo" onclick="redirect_to_home()" aria-label="The Cafe Darbar — go to menu">
                 <img src="tcd-logo.png" alt="The Cafe Darbar logo" />
                 <span class="logo-text"><span class="brand-accent">The Cafe</span> Darbar</span>
-            </div>
+            </button>
             <div class="icon-container">
                 <a class="nav-icon refer-btn" href="referral.html" title="Refer &amp; Earn" aria-label="Refer &amp; Earn">
                     <i class="fas fa-share-alt" aria-hidden="true"></i>

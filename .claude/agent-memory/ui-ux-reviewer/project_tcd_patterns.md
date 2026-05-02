@@ -60,3 +60,11 @@ Patterns from in-cart orange bar + slim View Cart bar review (2026-05-02):
 - Removing toasts creates a discoverability gap: the only feedback when adding an item is the orange .in-cart background + navbar badge pop; this is adequate for sighted users but insufficient for screen reader users who cannot perceive the color change — an aria-live announcement is now mandatory
 - Bestseller badge always shown (no threshold) means all top-5 appear from first load even with zero orders; if tcd_order_data.json returns empty or 404, bestsellerNames stays an empty Set and no badge shows — this is safe fallback behavior
 - .view-cart-bar role="complementary" is semantically incorrect for a sticky action bar; use role="region" with aria-label or a plain <nav> element; also onclick on a div means keyboard Enter/Space do not work — the bar must be a <button> or have tabindex="0" + keydown handler
+
+Patterns from search-row / bestseller button / badge + cart padding review (2026-05-02):
+- .bestseller-filter-btn is 40×40px — same recurring touch target failure; all new circular icon buttons in TCD should be 44×44px minimum
+- Active state using background #FFF3EE (warm white) on page background #F5F0EB (warm beige) has very low visual distinction; active circular toggle buttons should use dual ring (outer glow + inset border) not just a background shift
+- Toggle buttons with emoji content have no toggle affordance without additional indicator; use ::after pseudo-element orange dot (matching refer-btn notification dot pattern) to signal active state
+- cart.html logo remains a <div> with onclick (not a <button>) — index.html was fixed but the fix was not propagated to cart.html; watch for same divergence between pages on future fixes
+- 160px cart bottom padding on mobile is correct (accommodates fixed WhatsApp button) and is overridden correctly to 30px at ≥900px breakpoint — no issue, but the large value is surprising without a comment
+- bestseller filter toggle: aria-pressed is managed correctly in app.js (String(bestsellerOnly)) — this pattern is working and should be used on any future toggle buttons
