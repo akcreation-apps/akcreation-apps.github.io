@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://akcreation-apps.com/TCD/cart.html">
@@ -16,7 +16,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Analytics -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
     <script src="cart.js" type="module"></script>
     <script src="common.js"></script>
     <style>
@@ -220,19 +224,25 @@
             font-weight: 600; margin: 0;
         }
 
-        /* nonveg dot */
-        .nonveg-icon {
-            display: inline-block; flex-shrink: 0;
+        /* FSSAI diet badge — matches menu page */
+        .cart-diet-badge {
+            display: inline-flex; flex-shrink: 0;
             width: 10px; height: 10px;
-            border: 1.5px solid #900; background: #900;
-            border-radius: 2px; position: relative;
+            border-radius: 2px; border: 1.5px solid;
+            position: relative; vertical-align: middle;
+            background: rgba(255,255,255,0.92);
         }
-        .nonveg-icon::after {
+        .cart-diet-badge::after {
             content: ""; position: absolute;
-            top: 1px; left: 1px;
-            width: 5px; height: 5px;
-            background: #fff; border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 5px; height: 5px; border-radius: 50%;
         }
+        .cart-diet-badge.veg      { border-color: #00922A; }
+        .cart-diet-badge.veg::after   { background: #00922A; }
+        .cart-diet-badge.nonveg   { border-color: #963415; }
+        .cart-diet-badge.nonveg::after { background: #963415; }
+        .price-x { opacity: 0.55; font-weight: 400; }
 
         /* ── Qty + delete controls ── */
         .cart-item-controls {

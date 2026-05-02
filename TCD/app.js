@@ -8,14 +8,14 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const searchBar = document.getElementById('searchBar');
 const clearSearchButton = document.getElementById('clearSearch');
 
-// Show a brief toast confirming the add-to-cart action
-const showCartToast = (dishName) => {
-    const toast = document.getElementById('cartToast');
-    const msg   = document.getElementById('toastMsg');
-    msg.textContent = `${dishName} added to cart`;
-    toast.classList.add('show');
-    clearTimeout(showCartToast._timer);
-    showCartToast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+// Announce cart changes to screen readers
+const announceCart = (dishName, qty) => {
+    const el = document.getElementById('cartAnnouncer');
+    if (!el) return;
+    el.textContent = '';
+    requestAnimationFrame(() => {
+        el.textContent = qty === 0 ? `${dishName} removed from cart` : `${dishName} — ${qty} in cart`;
+    });
 };
 
 // Animate the navbar cart badge on every add
@@ -26,119 +26,172 @@ const popCartBadge = () => {
     badge.classList.add('pop');
 };
 
-// Function to check if an item is in the cart
-const isItemInCart = (categoryName, dishId) => {
-    if (cart && Array.isArray(cart)) {
-            // Find the category in the cart
-        const categoryInCart = cart.find(item => item.category.name === categoryName);
-
-        // If the category exists, check for the dish in that category
-        if (categoryInCart) {
-            const dishInCart = categoryInCart.category.dish_details.find(dishItem => dishItem.id === dishId);
-            return !!dishInCart; // Return true if dish is found, otherwise false
-        }
+// Returns current quantity of a dish in cart (0 if not present)
+const getItemQty = (categoryName, dishId) => {
+    const categoryInCart = cart.find(item => item.category.name === categoryName);
+    if (categoryInCart) {
+        const dish = categoryInCart.category.dish_details.find(d => d.id === dishId);
+        return dish ? dish.quantity : 0;
     }
-
-    return false; // Return false if category or dish is not found
+    return 0;
 };
 
-// Update the cart count in the navbar to show the total number of unique dishes in the cart
 const updateCartCount = () => {
     const cartCount = document.querySelector('.cart-count');
-    
-    // Ensure cart is not undefined or empty
     if (!cart || cart.length === 0) {
         cartCount.textContent = 0;
+        updateViewCartBar();
         return;
     }
-
-    // Calculate the total number of unique dishes across categories in the cart
-    const totalDishes = cart.reduce((sum, categoryItem) => {
-        // Check if categoryItem and dish_details exist
+    const totalQty = cart.reduce((sum, categoryItem) => {
         if (categoryItem.category && Array.isArray(categoryItem.category.dish_details)) {
-            // Count the number of unique dishes within the category's dish_details array
-            const uniqueDishesCount = categoryItem.category.dish_details.length; // Simply count the length of the dish_details array
-            return sum + uniqueDishesCount; // Add the count of unique dishes
+            return sum + categoryItem.category.dish_details.reduce((s, d) => s + d.quantity, 0);
         }
         return sum;
     }, 0);
-
-    // Update cart count with the total number of unique dishes
-    cartCount.textContent = totalDishes;
+    cartCount.textContent = totalQty;
     const cartButton = document.querySelector('.cart-icon');
     if (cartButton) {
-        cartButton.setAttribute('aria-label', `View cart — ${totalDishes} item${totalDishes !== 1 ? 's' : ''}`);
+        cartButton.setAttribute('aria-label', `View cart — ${totalQty} item${totalQty !== 1 ? 's' : ''}`);
     }
+    updateViewCartBar();
 };
 
 
 
-// Add to Cart button functionality
-const addToCart = (dishCategory, dishObject, button) => {
-    showLoader();
-    try {
-        let dishId = dishObject.id;
-        let dishName = dishObject.name;
-        let dishPrice = dishObject.price;
-        let src = dishObject.image_url;
-        // Check if the category already exists in the cart
-        let existingCategoryItem = cart.find(item => item.category.name === dishCategory.name);
-
-        if (existingCategoryItem) {
-            // Category exists, now check if the dish exists within that category
-            let existingDish = existingCategoryItem.category.dish_details.find(dish => dish.id === dishId);
-    
-            if (existingDish) {
-                // If the dish exists, increase the quantity
-                existingDish.quantity += 1;
-            } else {
-                // If the dish doesn't exist, add the new dish to the category
-                existingCategoryItem.category.dish_details.push({
-                    id: dishId,
-                    name: dishName,
-                    type: dishCategory.type,
-                    price: dishPrice,
-                    quantity: 1,
-                    image_src: src
-                });
-            }
-        } else {
-            // If the category doesn't exist, create a new category with the new dish
-            cart.push({
-                category: {
-                    name: dishCategory.name,
-                    dish_details: [
-                        {
-                            id: dishId,
-                            name: dishName,
-                            type: dishCategory.type,
-                            price: dishPrice,
-                            quantity: 1,
-                            image_src: src
-                        }
-                    ]
+// Mutates cart quantity by delta (+1 / -1); removes dish/category when qty hits 0
+const updateItemQty = (subcategory, dish, delta) => {
+    const existingCategory = cart.find(item => item.category.name === subcategory.name);
+    if (existingCategory) {
+        const existingDish = existingCategory.category.dish_details.find(d => d.id === dish.id);
+        if (existingDish) {
+            existingDish.quantity += delta;
+            if (existingDish.quantity <= 0) {
+                existingCategory.category.dish_details = existingCategory.category.dish_details.filter(d => d.id !== dish.id);
+                if (existingCategory.category.dish_details.length === 0) {
+                    cart.splice(cart.indexOf(existingCategory), 1);
                 }
+            }
+        } else if (delta > 0) {
+            existingCategory.category.dish_details.push({
+                id: dish.id, name: dish.name, type: subcategory.type,
+                price: dish.price, quantity: 1, image_src: get_dish_url(dish.name)
             });
         }
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
-        showCartToast(dishName);
-        popCartBadge();
-    } catch(e){
-        console.log(e)
+    } else if (delta > 0) {
+        cart.push({
+            category: {
+                name: subcategory.name,
+                dish_details: [{
+                    id: dish.id, name: dish.name, type: subcategory.type,
+                    price: dish.price, quantity: 1, image_src: get_dish_url(dish.name)
+                }]
+            }
+        });
     }
-    hideLoader();
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+};
 
-    button.style.background = "#ff7043";  // green background
-    button.style.color = "#fff";
-    // Change button text and style if item added for the first time
-//    button.textContent = 'Go to Cart';
-//    button.style.backgroundColor = 'green';
+// Renders ADD bar or full-width qty stepper below the dish card
+const renderControl = (container, subcategory, dish, announce = false) => {
+    const qty = getItemQty(subcategory.name, dish.id);
+    container.classList.toggle('in-cart', qty > 0);
+    if (announce) announceCart(dish.name, qty);
+    if (qty === 0) {
+        container.innerHTML = `<button class="add-btn" aria-label="Add ${dish.name} to cart">+ ADD</button>`;
+        container.querySelector('.add-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateItemQty(subcategory, dish, 1);
+            popCartBadge();
+            renderControl(container, subcategory, dish, true);
+            container.querySelectorAll('.qty-btn')[1]?.focus();
+        });
+    } else {
+        container.innerHTML = `
+            <div class="qty-stepper" role="group" aria-label="Quantity for ${dish.name}">
+                <button class="qty-btn" aria-label="Remove one ${dish.name}">&#8722;</button>
+                <span class="qty-display" aria-live="polite" aria-atomic="true">${qty}</span>
+                <button class="qty-btn" aria-label="Add one more ${dish.name}">+</button>
+            </div>`;
+        const [decBtn, incBtn] = container.querySelectorAll('.qty-btn');
+        decBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateItemQty(subcategory, dish, -1);
+            popCartBadge();
+            const newQty = getItemQty(subcategory.name, dish.id);
+            renderControl(container, subcategory, dish, true);
+            (newQty === 0
+                ? container.querySelector('.add-btn')
+                : container.querySelectorAll('.qty-btn')[0]
+            )?.focus();
+        });
+        incBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateItemQty(subcategory, dish, 1);
+            popCartBadge();
+            renderControl(container, subcategory, dish, true);
+            container.querySelectorAll('.qty-btn')[1]?.focus();
+        });
+    }
+};
 
-    // Add an event listener to navigate to the cart page on button click
-    button.addEventListener('click', () => {
-        window.location.href = 'cart.html';
-    });
+const updateViewCartBar = () => {
+    const bar = document.getElementById('viewCartBar');
+    if (!bar) return;
+    const totalQty = cart.reduce((sum, cat) =>
+        sum + cat.category.dish_details.reduce((s, d) => s + d.quantity, 0), 0);
+    const totalPrice = cart.reduce((sum, cat) =>
+        sum + cat.category.dish_details.reduce((s, d) => s + d.price * d.quantity, 0), 0);
+    if (totalQty === 0) {
+        bar.classList.remove('visible');
+    } else {
+        bar.classList.add('visible');
+        document.getElementById('vcbCount').textContent = `${totalQty} item${totalQty !== 1 ? 's' : ''}`;
+        document.getElementById('vcbTotal').textContent = `₹${totalPrice.toFixed(0)}`;
+    }
+};
+
+let scrollSpyObserver = null;
+const setupScrollSpy = () => {
+    if (scrollSpyObserver) scrollSpyObserver.disconnect();
+    scrollSpyObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            document.querySelectorAll('.shortcut-card').forEach(chip => {
+                const link = chip.querySelector('a');
+                const isActive = link?.getAttribute('href') === `#${id}`;
+                chip.classList.toggle('active', isActive);
+                if (isActive) chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            });
+        });
+    }, { rootMargin: '-180px 0px -60% 0px', threshold: 0 });
+    document.querySelectorAll('.category-block').forEach(b => scrollSpyObserver.observe(b));
+};
+
+let bestsellerNames = new Set();
+const fetchBestsellers = async () => {
+    try {
+        const res = await fetch(`admin/tcd_order_data.json?v=${Date.now()}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const dishQty = {};
+        Object.values(data).forEach(order => {
+            if (order.status !== 'Approved') return;
+            order.order_details?.forEach(cat => {
+                cat.category?.dish_details?.forEach(dish => {
+                    dishQty[dish.name] = (dishQty[dish.name] || 0) + dish.quantity;
+                });
+            });
+        });
+        bestsellerNames = new Set(
+            Object.entries(dishQty)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([name]) => name)
+        );
+    } catch { /* fail silently */ }
 };
 
 // Function to scroll to the category
@@ -242,51 +295,25 @@ document.addEventListener('DOMContentLoaded', async() => {
 
                             const menuItem = document.createElement('div');
                             menuItem.classList.add('menu-item');
-                            menuItem.style.background = subcategory.type === "NonVeg" ? "#f1c2c2" : "#c2e6c2";
+                            menuItem.setAttribute('role', 'article');
                             menuItem.setAttribute('aria-label', `${dish.name} — ${subcategory.type === 'NonVeg' ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}`);
                             const url = get_dish_url(dish.name);
-                            const dietLabel = subcategory.type === 'NonVeg' ? 'Non-veg' : 'Veg';
+                            const isNonVeg = subcategory.type === 'NonVeg';
                             menuItem.innerHTML = `
                               <div class="menu-item-container">
                                     <div class="dish-card">
                                         <img src="${url}" alt="${dish.name}" class="dish-img">
+                                        <div class="diet-badge ${isNonVeg ? 'nonveg' : 'veg'}" aria-label="${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}"></div>
+                                        ${bestsellerNames.has(dish.name) ? '<span class="bestseller-badge">🔥 Bestseller</span>' : ''}
                                         <div class="dish-overlay">
                                             <h5 class="dish-name">${dish.name}</h5>
                                             <p class="price">₹${dish.price.toFixed(2)}/-</p>
                                         </div>
-                                        <button class="add-to-cart-btn" aria-label="Add ${dish.name} (${dietLabel}) to cart" data-name="${dish.name}" data-price="${dish.price}">
-                                            🛒
-                                        </button>
+                                        <div class="item-control"></div>
                                     </div>
                               </div>
                             `;
-
-                            // Add event listener to "Add to Cart" button
-                            const addToCartButton = menuItem.querySelector('.add-to-cart-btn');
-
-                            if (isItemInCart(subcategory.name, dish.id)) {
-                                addToCartButton.classList.add('added-to-cart'); // Add class if item is in cart
-                            }
-
-                            addToCartButton.addEventListener('click', () => {
-                                const categoryInCart = cart.find(item => item.category.name === subcategory.name);
-
-                                // Check if the category exists in the cart
-                                if (categoryInCart) {
-                                    // Check if the dish exists in that category
-                                    const existingDish = categoryInCart.category.dish_details.find(dishItem => dishItem.id === dish.id);
-
-                                    if (existingDish) {
-                                        // If the dish is already in the cart, go to cart
-                                        window.location.href = 'cart.html';
-                                    } else {
-                                        addToCart(subcategory, dish, addToCartButton);
-                                    }
-                                } else {
-                                    // If the category doesn't exist, add a new category with the dish
-                                    addToCart(subcategory, dish, addToCartButton);
-                                }
-                            });
+                            renderControl(menuItem.querySelector('.item-control'), subcategory, dish);
 
                             dishGrid.appendChild(menuItem);
                             hasVisibleDishes = true; // Mark that there's at least one visible dish
@@ -318,6 +345,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
                 // Update cart count on page load
                 updateCartCount();
+                setupScrollSpy();
             })
             .catch(error => {
                 console.error('Error fetching menu data:', error);
@@ -327,7 +355,9 @@ document.addEventListener('DOMContentLoaded', async() => {
             });
     };
 
+    await fetchBestsellers();
     renderMenu(); // Initial render of menu
+    updateViewCartBar();
 
     // Setup filter functionality
     const saveCheckboxState = () => {

@@ -15,7 +15,7 @@
     <link rel="canonical" href="https://akcreation-apps.com/TCD/">
 
     <!-- Open Graph / Facebook / WhatsApp -->
-    <meta property="og:type" content="restaurant">
+    <meta property="og:type" content="website">
     <meta property="og:site_name" content="The Cafe Darbar">
     <meta property="og:title" content="The Cafe Darbar - Best Restaurant in Banki, Cuttack | Chinese &amp; North Indian">
     <meta property="og:description" content="Best restaurant &amp; cafe in Banki, Cuttack, Odisha. Chinese starters, North Indian curries, Tandoor, pizzas, burgers &amp; mocktails. Order online!">
@@ -44,7 +44,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Analytics -->
     <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
@@ -466,13 +466,10 @@
             gap: 8px;
         }
 
-        /* ── Menu item wrapper ──
-           JS sets background: #f1c2c2 (nonveg) or #c2e6c2 (veg) as inline style.
-           padding-bottom lets that color peek out as a visible indicator strip. */
+        /* ── Menu item wrapper ── */
         .menu-item {
             border-radius: var(--r);
             overflow: hidden;
-            padding-bottom: 5px;
         }
         .menu-item-container { display: block; width: 100%; }
 
@@ -481,7 +478,7 @@
             position: relative;
             width: 100%;
             aspect-ratio: 5 / 6;
-            border-radius: var(--r) var(--r) 0 0; /* flat bottom sits on color strip */
+            border-radius: var(--r) var(--r) 0 0;
             overflow: hidden;
             box-shadow: var(--shadow-md);
             cursor: pointer;
@@ -496,10 +493,33 @@
         }
         .dish-card:hover .dish-img { transform: scale(1.04); }
 
+        /* ── FSSAI veg / non-veg badge (top-left of card) ── */
+        .diet-badge {
+            position: absolute;
+            top: 5px; left: 5px;
+            z-index: 3;
+            width: 14px; height: 14px;
+            border-radius: 2px;
+            border: 1.5px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.92);
+        }
+        .diet-badge::after {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+        }
+        .diet-badge.veg      { border-color: #00922A; }
+        .diet-badge.veg::after   { background: #00922A; }
+        .diet-badge.nonveg   { border-color: #963415; }
+        .diet-badge.nonveg::after { background: #963415; }
+
         .dish-overlay {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            padding: 20px 6px 6px;
+            padding: 24px 6px 42px;
             background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%);
             color: #fff;
         }
@@ -516,34 +536,69 @@
             margin: 0;
         }
 
-        /* ── Add-to-cart button ── */
-        .add-to-cart-btn {
+        /* ── Item control (ADD bar / qty stepper — bottom edge overlay) ── */
+        .item-control {
             position: absolute;
-            top: 6px; right: 6px;
-            background: rgba(255,255,255,0.88);
+            bottom: 0; left: 0; right: 0;
+            z-index: 2;
+            display: flex;
+            align-items: stretch;
+            min-height: 34px;
+            background: rgba(0,0,0,0.62);
+            transition: background 0.2s;
+        }
+        .item-control.in-cart { background: rgba(255,107,53,1); }
+        .add-btn {
+            flex: 1;
+            background: none;
             border: none;
-            border-radius: 50%;
-            width: 36px; height: 36px;
-            font-size: 0.9rem;
+            padding: 0;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.4px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 3px;
+            transition: background 0.15s;
+            min-height: 34px;
+        }
+        .add-btn:hover,
+        .add-btn:active { background: rgba(255,255,255,0.15); }
+        .qty-stepper {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+        .qty-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            min-height: 34px;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-            transition: background 0.18s, transform 0.15s;
-            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            padding: 0;
         }
-        .add-to-cart-btn:hover,
-        .add-to-cart-btn:active {
-            background: var(--primary);
-            transform: scale(1.12);
-        }
-        .add-to-cart-btn.added-to-cart { background: var(--primary); }
-        .add-to-cart-btn::before {
-            content: '';
-            position: absolute;
-            inset: -8px;
-            border-radius: 50%;
+        .qty-btn:hover,
+        .qty-btn:active { background: rgba(255,255,255,0.18); }
+        .qty-display {
+            flex: 0 0 auto;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #fff;
+            min-width: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
         }
 
         /* ── Cart badge pop ── */
@@ -555,44 +610,92 @@
         }
         .cart-count.pop { animation: badgePop 0.38s ease; }
 
-        /* ── Toast ── */
-        .cart-toast {
+        /* ── Active category chip (scroll spy) ── */
+        .shortcut-card.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .shortcut-card.active a { color: #fff; }
+
+        /* ── FSSAI dot for filter pills ── */
+        .fssai-dot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 12px; height: 12px;
+            border-radius: 2px;
+            border: 1.5px solid;
+            flex-shrink: 0;
+            vertical-align: middle;
+            position: relative;
+        }
+        .fssai-dot::after {
+            content: '';
+            position: absolute;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+        }
+        .fssai-dot.veg      { border-color: #00922A; }
+        .fssai-dot.veg::after   { background: #00922A; }
+        .fssai-dot.nonveg   { border-color: #963415; }
+        .fssai-dot.nonveg::after { background: #963415; }
+
+        /* ── Bestseller badge ── */
+        .bestseller-badge {
+            position: absolute;
+            top: 5px; right: 5px;
+            z-index: 3;
+            background: rgba(230,100,0,0.88);
+            color: #fff;
+            font-size: 0.52rem;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 8px;
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+            line-height: 1.4;
+        }
+
+        /* ── View Cart bar ── */
+        .view-cart-bar {
             position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(90px);
+            bottom: 0; left: 0; right: 0;
+            z-index: 700;
             background: var(--navy);
             color: #fff;
-            padding: 11px 16px 11px 14px;
-            border-radius: 24px;
-            font-size: 0.8rem;
-            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.28);
-            z-index: 8000;
-            opacity: 0;
-            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
-            white-space: nowrap;
-            pointer-events: none;
-            max-width: calc(100vw - 32px);
+            justify-content: space-between;
+            padding: 10px 16px;
+            min-height: 56px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.25);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .cart-toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-            pointer-events: auto;
+        .view-cart-bar.visible { transform: translateY(0); }
+        .vcb-left { display: flex; align-items: center; gap: 8px; }
+        .vcb-count {
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.22);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
         }
-        .cart-toast .toast-icon { color: #4CAF50; font-size: 0.95rem; flex-shrink: 0; }
-        .cart-toast .toast-msg { overflow: hidden; text-overflow: ellipsis; }
-        .cart-toast .toast-action {
-            color: var(--primary);
+        .vcb-total { font-size: 0.85rem; font-weight: 700; }
+        .vcb-right {
+            font-size: 0.78rem;
             font-weight: 700;
-            text-decoration: none;
-            flex-shrink: 0;
-            padding-left: 4px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .cart-toast .toast-action:hover { text-decoration: underline; }
+        .vcb-right i { color: var(--primary); }
 
         /* ── No results ── */
         .no-results {
@@ -678,6 +781,9 @@
         @media (prefers-reduced-motion: reduce) {
             .refer-btn::after { animation: none; }
             html { scroll-behavior: auto; }
+            .cart-count.pop { animation: none; }
+            .view-cart-bar { transition: none; }
+            .loader { animation: none; }
         }
 
         /* ── Local business info section ── */
@@ -745,7 +851,7 @@
     <nav class="navbar">
         <div class="navbar-inner">
             <button class="logo" onclick="redirect_to_home()" aria-label="The Cafe Darbar - Go home">
-                <img src="tcd-logo.png" alt="" />
+                <img src="tcd-logo.png" alt="The Cafe Darbar logo" />
                 <span class="logo-text"><span class="brand-accent">The Cafe</span> Darbar</span>
             </button>
             <div class="icon-container">
@@ -777,10 +883,10 @@
             <div class="filter-container">
                 <div class="filter-card">
                     <label class="filter-label">
-                        <input type="checkbox" id="vegFilter" /> 🥗 Veg
+                        <input type="checkbox" id="vegFilter" /> <span class="fssai-dot veg" aria-hidden="true"></span> Veg
                     </label>
                     <label class="filter-label">
-                        <input type="checkbox" id="nonVegFilter" /> 🍗 Non-Veg
+                        <input type="checkbox" id="nonVegFilter" /> <span class="fssai-dot nonveg" aria-hidden="true"></span> Non-Veg
                     </label>
                 </div>
             </div>
@@ -802,6 +908,8 @@
         <div class="menu-container" id="menu-container">
             <!-- Dynamically populated by app.js -->
         </div>
+        <!-- SEO: static H2 for crawlers — the dynamic category headings (h3) are JS-rendered -->
+        <h2 class="sr-only">Full Menu — Chinese, North Indian, Tandoor, Continental, Beverages &amp; More in Banki, Cuttack</h2>
     </section>
 
     <!-- No results -->
@@ -809,12 +917,8 @@
         <img src="../food_src/no-results.webp" alt="No Results Found" />
     </div>
 
-    <!-- Cart toast -->
-    <div class="cart-toast" id="cartToast" role="status" aria-live="polite">
-        <i class="fas fa-check-circle toast-icon" aria-hidden="true"></i>
-        <span class="toast-msg" id="toastMsg">Added to cart</span>
-        <a class="toast-action" href="cart.html">View Cart →</a>
-    </div>
+    <!-- Screen reader cart announcer (replaces visual toast) -->
+    <div id="cartAnnouncer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
     <!-- Local business info: static HTML for Google crawler local signals -->
     <section class="local-info-section" aria-label="Restaurant information">
@@ -843,8 +947,19 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/food-order-kiosk.html" target="_blank">AkCreation</a> | Made in India with ❤️</p>
+        <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/food-order-kiosk.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
     </footer>
+
+    <!-- View Cart bar (slides up when cart has items) -->
+    <button class="view-cart-bar" id="viewCartBar" onclick="redirect_to_cart()" aria-label="View cart">
+        <div class="vcb-left">
+            <span class="vcb-count" id="vcbCount">0 items</span>
+            <span class="vcb-total" id="vcbTotal">₹0</span>
+        </div>
+        <div class="vcb-right">
+            View Cart <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </div>
+    </button>
 
     <script>
         document.getElementById('footer-year').textContent = new Date().getFullYear();

@@ -35,10 +35,10 @@ const renderCartItems = () => {
                     <img src="${url}" alt="${dishItem.name}">
                     <div class="cart-item-info">
                         <h5>
-                          ${dishItem.type === "NonVeg" ? '<span class="nonveg-icon"></span>' : ''}
+                          <span class="cart-diet-badge ${dishItem.type === 'NonVeg' ? 'nonveg' : 'veg'}"></span>
                           ${dishItem.name} (${categoryItem.category.name})
                         </h5>
-                        <p class="cart-item-price">₹${dishItem.price.toFixed(2)}/-</p>
+                        <p class="cart-item-price">₹${dishItem.price.toFixed(0)} <span class="price-x">×</span> ${dishItem.quantity} = <strong>₹${(dishItem.price * dishItem.quantity).toFixed(0)}</strong></p>
                     </div>
                     <div class="cart-item-controls">
                         <div class="cart-item-quantity">
