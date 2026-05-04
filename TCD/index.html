@@ -7,8 +7,8 @@
     <meta name="theme-color" content="#1A1A2E">
 
     <!-- Primary SEO Meta Tags -->
-    <title>The Cafe Darbar - Best Restaurant in Banki, Cuttack | Chinese &amp; North Indian Food</title>
-    <meta name="description" content="The Cafe Darbar (TCD) — best restaurant &amp; cafe in Banki, Cuttack, Odisha. Enjoy Chinese starters, North Indian curries, Tandoor, pizzas, burgers &amp; mocktails. Order online now!">
+    <title>The Cafe Darbar | Best Restaurant in Banki, Cuttack Odisha</title>
+    <meta name="description" content="The Cafe Darbar — best restaurant in Banki, Cuttack, Odisha. Chinese, North Indian, Tandoor, pizzas &amp; mocktails. Order online! Banki 754008.">
     <meta name="keywords" content="The Cafe Darbar, TCD, restaurant in Banki, cafe in Banki Cuttack, Chinese food Banki, North Indian restaurant Banki Odisha, best restaurant Banki, food Banki 754008, restaurant near Banki, dining Banki Odisha, Chilli Chicken Banki, Paneer Tikka Banki, restaurant Cuttack district">
     <meta name="robots" content="index, follow">
     <meta name="author" content="AK Creation">
@@ -17,19 +17,21 @@
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="The Cafe Darbar">
-    <meta property="og:title" content="The Cafe Darbar - Best Restaurant in Banki, Cuttack | Chinese &amp; North Indian">
-    <meta property="og:description" content="Best restaurant &amp; cafe in Banki, Cuttack, Odisha. Chinese starters, North Indian curries, Tandoor, pizzas, burgers &amp; mocktails. Order online!">
+    <meta property="og:title" content="The Cafe Darbar | Best Restaurant in Banki, Cuttack Odisha">
+    <meta property="og:description" content="Best restaurant in Banki, Cuttack, Odisha. Chinese, North Indian, Tandoor, pizzas &amp; mocktails. Order online! Banki 754008.">
     <meta property="og:url" content="https://akcreation-apps.com/TCD/">
     <meta property="og:image" content="https://akcreation-apps.com/TCD/tcd-logo.png">
+    <meta property="og:image:alt" content="The Cafe Darbar logo — best restaurant in Banki, Cuttack, Odisha">
     <meta property="og:image:width" content="1080">
     <meta property="og:image:height" content="1080">
     <meta property="og:locale" content="en_IN">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="The Cafe Darbar - Best Restaurant in Banki, Cuttack">
-    <meta name="twitter:description" content="Best restaurant &amp; cafe in Banki, Cuttack, Odisha. Chinese, North Indian, Tandoor, pizzas &amp; more. Order online!">
+    <meta name="twitter:title" content="The Cafe Darbar | Best Restaurant in Banki, Cuttack">
+    <meta name="twitter:description" content="Best restaurant in Banki, Cuttack, Odisha. Chinese, North Indian, Tandoor, pizzas &amp; more. Order online!">
     <meta name="twitter:image" content="https://akcreation-apps.com/TCD/tcd-logo.png">
+    <meta name="twitter:image:alt" content="The Cafe Darbar logo — best restaurant in Banki, Cuttack, Odisha">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="tcd-logo.png">
@@ -37,6 +39,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="tcd-logo.png">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="icon" href="tcd-logo.png">
+
+    <!-- Preload LCP image (navbar logo) -->
+    <link rel="preload" as="image" href="tcd-logo.png" fetchpriority="high">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -91,11 +96,18 @@
           "https://maps.app.goo.gl/JSGtbqW55FQkPeBK6"
         ],
         "hasMap": "https://maps.app.goo.gl/JSGtbqW55FQkPeBK6",
-        "potentialAction": {
-          "@type": "ViewAction",
-          "target": "https://akcreation-apps.com/TCD/",
-          "name": "View Menu"
-        }
+        "potentialAction": [
+          {
+            "@type": "ViewAction",
+            "target": "https://akcreation-apps.com/TCD/",
+            "name": "View Menu"
+          },
+          {
+            "@type": "OrderAction",
+            "target": "https://akcreation-apps.com/TCD/",
+            "name": "Order Food Online"
+          }
+        ]
       },
       {
         "@context": "https://schema.org",

@@ -520,6 +520,16 @@ function applyFilters() {
     });
 
     if (noResultsDiv) noResultsDiv.style.display = anyVisibleDish ? 'none' : 'block';
+
+    const shortcutsGrid = document.querySelector('.shortcuts-grid');
+    if (searchTerm) {
+        if (shortcutsGrid) shortcutsGrid.style.display = 'none';
+        document.querySelectorAll('.shortcut-card').forEach(c => c.classList.remove('active'));
+    } else {
+        if (shortcutsGrid) shortcutsGrid.style.display = '';
+        if (!bestsellerOnly) syncActiveChip();
+        else document.querySelectorAll('.shortcut-card').forEach(c => c.classList.remove('active'));
+    }
 }
 
 searchBar.addEventListener('input', function () {
