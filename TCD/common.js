@@ -44,6 +44,7 @@ function store_data(){
 }
 
 // Opens the place picker modal. Optionally pre-selects `currentPlace`.
+// Tapping a chip closes immediately; "Other" reveals an inline input+tick.
 // dismissible=true allows Escape/overlay-click to close (used for the "Change" flow).
 // triggerEl is the element to return focus to on close.
 // Returns a Promise that resolves with the chosen place string (or null if dismissed).
@@ -54,7 +55,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
         const options = modal.querySelectorAll('.place-chip');
         const otherWrapper = document.getElementById('placeOtherWrapper');
         const otherInput = document.getElementById('placeOtherInput');
-        const confirmBtn = document.getElementById('placeConfirmBtn');
+        const otherConfirm = document.getElementById('placeOtherConfirm');
         const errorMsg = document.getElementById('placeError');
 
         // Reset UI
@@ -63,11 +64,9 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
             o.classList.remove('selected');
             o.setAttribute('aria-pressed', 'false');
         });
-        confirmBtn.classList.add('disabled');
         otherWrapper.style.display = 'none';
         otherInput.value = '';
         errorMsg.style.display = 'none';
-        let selectedValue = '';
 
         // Pre-select current value if it exists in the list
         if (currentPlace) {
@@ -76,30 +75,24 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
                 if (opt.dataset.value === currentPlace) {
                     opt.classList.add('selected');
                     opt.setAttribute('aria-pressed', 'true');
-                    selectedValue = currentPlace;
                     found = true;
                 }
             });
             if (!found) {
-                // Custom "Other" value
                 const otherOpt = modal.querySelector('.place-chip[data-value="Other"]');
                 if (otherOpt) {
                     otherOpt.classList.add('selected');
                     otherOpt.setAttribute('aria-pressed', 'true');
-                    selectedValue = 'Other';
                     otherInput.value = currentPlace;
                     otherWrapper.style.display = 'block';
                 }
             }
-            confirmBtn.classList.remove('disabled');
         }
 
         modal.style.display = 'flex';
-        // Move focus into the modal — first selected chip or first chip
         const firstSelected = modal.querySelector('.place-chip.selected') || modal.querySelector('.place-chip');
         if (firstSelected) firstSelected.focus();
 
-        // AbortController removes all listeners when modal closes (prevents duplicate listeners on re-open)
         const ac = new AbortController();
         const sig = { signal: ac.signal };
 
@@ -110,40 +103,44 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
             resolve(result);
         }
 
+        function confirmOther() {
+            const custom = otherInput.value.trim();
+            if (!custom) {
+                errorMsg.textContent = 'Please enter your location.';
+                errorMsg.style.display = 'block';
+                otherInput.focus();
+                return;
+            }
+            localStorage.setItem('place', custom);
+            closeModal(custom);
+        }
+
         options.forEach(opt => {
             opt.addEventListener('click', () => {
+                const value = opt.dataset.value;
                 options.forEach(o => {
                     o.classList.remove('selected');
                     o.setAttribute('aria-pressed', 'false');
                 });
                 opt.classList.add('selected');
                 opt.setAttribute('aria-pressed', 'true');
-                selectedValue = opt.dataset.value;
-                otherWrapper.style.display = selectedValue === 'Other' ? 'block' : 'none';
-                errorMsg.style.display = 'none';
-                confirmBtn.classList.remove('disabled');
+
+                if (value === 'Other') {
+                    otherWrapper.style.display = 'block';
+                    errorMsg.style.display = 'none';
+                    otherInput.focus();
+                } else {
+                    otherWrapper.style.display = 'none';
+                    errorMsg.style.display = 'none';
+                    localStorage.setItem('place', value);
+                    closeModal(value);
+                }
             }, sig);
         });
 
-        confirmBtn.addEventListener('click', () => {
-            if (!selectedValue) {
-                errorMsg.textContent = 'Please select your location.';
-                errorMsg.style.display = 'block';
-                return;
-            }
-            let finalPlace = selectedValue;
-            if (selectedValue === 'Other') {
-                const custom = otherInput.value.trim();
-                if (!custom) {
-                    errorMsg.textContent = 'Please enter your location.';
-                    errorMsg.style.display = 'block';
-                    otherInput.focus();
-                    return;
-                }
-                finalPlace = custom;
-            }
-            localStorage.setItem('place', finalPlace);
-            closeModal(finalPlace);
+        otherConfirm.addEventListener('click', confirmOther, sig);
+        otherInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); confirmOther(); }
         }, sig);
 
         // Focus trap — keep Tab/Shift+Tab cycling within the modal
@@ -156,7 +153,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
             if (e.key !== 'Tab') return;
             const focusable = Array.from(modal.querySelectorAll(
                 'button:not([disabled]), input:not([disabled]), [tabindex="0"]'
-            )).filter(el => el.offsetParent !== null); // visible only
+            )).filter(el => el.offsetParent !== null);
             if (focusable.length === 0) return;
             const first = focusable[0];
             const last = focusable[focusable.length - 1];
@@ -167,7 +164,6 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
             }
         }, sig);
 
-        // Overlay-click dismiss (only when dismissible)
         if (dismissible) {
             modal.addEventListener('click', e => {
                 if (e.target === modal) closeModal(null);

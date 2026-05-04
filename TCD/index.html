@@ -986,9 +986,14 @@
         .place-chip.other-chip i { font-size: 0.7rem; }
         .place-chip.other-chip.selected { border-style: solid; color: #fff; }
         .place-other-wrapper { margin-top: 12px; }
+        .place-other-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .place-other-input {
-            width: 100%;
-            box-sizing: border-box;
+            flex: 1;
+            min-width: 0;
             padding: 11px 14px;
             border: 1.5px solid var(--border);
             border-radius: 10px;
@@ -1003,34 +1008,27 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
         }
+        .place-other-confirm {
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .place-other-confirm:hover  { background: #E64A19; }
+        .place-other-confirm:active { transform: scale(0.93); }
+        .place-other-confirm:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
         .place-error {
             font-size: 0.74rem;
             color: #E53935;
             margin-top: 8px;
             display: none;
         }
-        .place-confirm-btn {
-            margin-top: 18px;
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 0.92rem;
-            font-weight: 700;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 16px rgba(255,107,53,0.38);
-            transition: background 0.18s, transform 0.1s, box-shadow 0.18s;
-        }
-        .place-confirm-btn:hover  { background: var(--primary-dark); box-shadow: 0 6px 20px rgba(255,107,53,0.45); }
-        .place-confirm-btn:active { transform: scale(0.98); }
-        .place-confirm-btn.disabled { opacity: 0.45; pointer-events: none; box-shadow: none; }
 
         /* ── Reduced motion ── */
         @media (prefers-reduced-motion: reduce) {
@@ -1259,13 +1257,15 @@
                     </button>
                 </div>
                 <div id="placeOtherWrapper" class="place-other-wrapper" style="display:none;">
-                    <input type="text" id="placeOtherInput" class="place-other-input"
-                           placeholder="Type your area name…" maxlength="60" aria-label="Enter your area name" />
+                    <div class="place-other-field">
+                        <input type="text" id="placeOtherInput" class="place-other-input"
+                               placeholder="Type your area name…" maxlength="60" aria-label="Enter your area name" />
+                        <button id="placeOtherConfirm" class="place-other-confirm" type="button" aria-label="Confirm location">
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <p id="placeError" class="place-error" role="alert"></p>
                 </div>
-                <p id="placeError" class="place-error" role="alert"></p>
-                <button id="placeConfirmBtn" class="place-confirm-btn disabled" type="button">
-                    <i class="fas fa-check-circle" aria-hidden="true"></i> Confirm Location
-                </button>
             </div>
         </div>
     </div>
