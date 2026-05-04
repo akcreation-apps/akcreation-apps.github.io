@@ -245,6 +245,8 @@ document.addEventListener('DOMContentLoaded', async() => {
     showLoader(); // Show loader before starting the fetch request
 
     store_data();
+    await checkAndAskPlace();
+    updateDeliveryBadge();
     const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();

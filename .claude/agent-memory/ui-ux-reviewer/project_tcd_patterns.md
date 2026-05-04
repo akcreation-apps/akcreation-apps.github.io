@@ -69,6 +69,22 @@ Patterns from search-row / bestseller button / badge + cart padding review (2026
 - 160px cart bottom padding on mobile is correct (accommodates fixed WhatsApp button) and is overridden correctly to 30px at ≥900px breakpoint — no issue, but the large value is surprising without a comment
 - bestseller filter toggle: aria-pressed is managed correctly in app.js (String(bestsellerOnly)) — this pattern is working and should be used on any future toggle buttons
 
+Patterns from place selector bottom sheet review (2026-05-04):
+- Chips use `<div role="option">` inside a `role="listbox"` — ARIA listbox pattern requires roving tabindex (only one tabindex="0" at a time, arrow-key navigation) and `aria-selected`; current markup gives every chip tabindex="0" simultaneously which violates the pattern; simplest correct fix is to switch chips to `<button>` elements and use `role="group"` on the grid
+- `aria-selected` attribute is absent on all place chips — screen readers have no way to announce which area is selected
+- Modal overlay has `role="dialog"` but focus is never explicitly moved into the dialog on open — keyboard users start outside the modal; `app.js` must call `placeConfirmBtn.focus()` (or the first chip's focus) immediately after `placeModal.style.display = 'block'`
+- No `aria-describedby` connecting `.place-modal-sub` paragraph to the dialog — assistive tech won't read the subtitle when the dialog is announced
+- Overlay click-to-dismiss is missing — clicking the dark backdrop does not close the sheet; users with no other way to dismiss are trapped if they change their mind (also fails pointer/touch UX expectations)
+- Keyboard Escape key is not handled — pressing Escape while the sheet is open must close it (WCAG 2.1 SC 2.1.2 — no keyboard trap); must be added in `app.js`
+- `sheetUp` animation is NOT guarded in the `prefers-reduced-motion` block (lines 1034–1041) — same recurring gap seen across all TCD modals; add `.place-modal { animation: none; }` inside the `@media (prefers-reduced-motion: reduce)` block
+- `.place-error` uses `display:none` toggled to `display:flex` — this is correct for `role="alert"` live regions ONLY if the element is already in the DOM when the error text is injected; the current pattern is fine but must not use `innerHTML` swap after first render or the alert won't re-fire
+- `.place-modal-sub` at `0.74rem` and `.place-error` at `0.74rem` are on the cusp of the 0.75rem readable floor used elsewhere in TCD; acceptable but worth noting as a recurring micro-font pattern
+- `.place-modal` has `max-width: 560px` centered on desktop — good desktop handling; the sheet will render as a card-style modal centered on wide screens
+- Chip touch targets: `padding: 11px 10px` with `font-size: 0.82rem` yields approximately 38–40px natural height — slightly below 44px minimum; increasing vertical padding to `13px 10px` resolves this without layout change
+- `maxlength="60"` on `placeOtherInput` is good practice; no character counter shown — users do not know the limit until they hit it; a small counter (e.g. `12/60`) would reduce frustration on long area names
+- `.place-modal-handle` drag handle is purely decorative (no drag-to-dismiss JS) — the visual affordance implies a behavior that does not exist; either implement drag-to-dismiss or remove the handle
+- Landscape + small screen edge case: `.place-modal` has no `max-height` — on landscape 667px height (iPhone SE landscape), the full sheet + safe area may exceed the viewport and cut off the Confirm button; add `max-height: 90dvh; overflow-y: auto;` to `.place-modal`
+
 ---
 
 ## Site-wide recurring patterns (non-TCD pages)

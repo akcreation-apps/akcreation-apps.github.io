@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     renderCartItems();
+    updateDeliveryBadge();
     hideLoader();
 });
 
@@ -235,13 +236,15 @@ function calculateTotal(cartItems, message) {
     let deliveryNote = "";
     const table = localStorage.getItem('table');
 
+    const place = localStorage.getItem('place') || '';
     if (table === 'COD') {
         // Apply delivery charge if below 200
         if (total > 0 && total < MINIMUM_ORDER_PRICE) {
             total += DELIVERY_CHARGES;
             deliveryNote = `\n(₹${DELIVERY_CHARGES} delivery charge applied for orders below ₹${MINIMUM_ORDER_PRICE})`;
         }
-        message += `Total Price: ₹${total.toFixed(2)}/-\n${deliveryNote}\nPayment Mode: Cash On Delivery`;
+        const placeNote = place ? `\nDelivering at: ${place}` : '';
+        message += `Total Price: ₹${total.toFixed(2)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Cash On Delivery`;
     } else {
         message += `Total Price: ₹${total.toFixed(2)}/-\n${deliveryNote}\nTable Number: ${table}`;
     }
@@ -353,6 +356,7 @@ function collect_data(){
             'triggered_to':localStorage.getItem('whatsapp_no'),
             'total_cart_value':cartTotalNumber,
             'table_no':localStorage.getItem('table'),
+            'place':localStorage.getItem('place') || '',
             'status':'In Progress',
             'created_at':Timestamp.now()}
         if (deliveryNoteValue.includes("delivery charge")) {
