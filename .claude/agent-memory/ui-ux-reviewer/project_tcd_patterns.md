@@ -68,3 +68,22 @@ Patterns from search-row / bestseller button / badge + cart padding review (2026
 - cart.html logo remains a <div> with onclick (not a <button>) — index.html was fixed but the fix was not propagated to cart.html; watch for same divergence between pages on future fixes
 - 160px cart bottom padding on mobile is correct (accommodates fixed WhatsApp button) and is overridden correctly to 30px at ≥900px breakpoint — no issue, but the large value is surprising without a comment
 - bestseller filter toggle: aria-pressed is managed correctly in app.js (String(bestsellerOnly)) — this pattern is working and should be used on any future toggle buttons
+
+---
+
+## Site-wide recurring patterns (non-TCD pages)
+
+Patterns from birth.html (Baby Announcement Frame Designer) review (2026-05-03, updated on second pass):
+- ALL form <label> elements lack for= attributes — screen readers cannot associate label text with inputs; recurring critical a11y gap
+- Two <h1> elements on same page (form panel + preview panel) — breaks document outline; preview header must be <h2>
+- Gender toggle uses plain <div onclick> with no tabindex, role, or keydown handler — completely keyboard-inaccessible; requires role="radio", tabindex="0", keydown handler, and aria-checked state management
+- html2canvas lazy-loaded on first download click with no .catch() — fails silently on network error; always add .catch() with user-visible message
+- Browser alert() used for form validation — jarring on iOS Safari (shows domain name); replace with inline border/focus validation
+- Download and Print buttons shown as always-visible (.download-btn.visible hardcoded in HTML) — no empty state; show only after generateFrame() is called
+- .corner flourishes at opacity:0.18 + 15px are nearly invisible — raise to opacity:0.38 + 20px for intended decorative effect
+- outline: none on focus without sufficient replacement — .form-group input uses 10% rgba box-shadow; action buttons (.generate-btn, .download-btn) have NO :focus-visible style at all
+- #aaa / #bbb used for muted text at 10–13px — fails WCAG AA contrast; minimum safe color is #767676 on white
+- prefers-reduced-motion not guarded on translateY hover effects (.upload-box, .generate-btn, .download-btn)
+- aria-live missing on live-preview card region — screen reader users cannot perceive real-time updates
+- img alt="baby" / alt="parents" non-descriptive for dynamically uploaded user photos — update alt dynamically from the name input
+- theme-color meta is #c2187b (intentional pink brand) — differs from site-wide #4f46e5; document as intentional if keeping

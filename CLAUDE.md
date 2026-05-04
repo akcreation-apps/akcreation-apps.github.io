@@ -103,11 +103,15 @@ The year must never be hardcoded — always set via `new Date().getFullYear()` s
 
 ## UI/UX Review Workflow
 
-After completing **any** HTML/CSS/JS changes to UI components — new pages, modified sections, layout changes, interactive components — always run the `ui-ux-reviewer` agent to audit the result before reporting the task as done. Do this proactively without waiting for the user to ask.
+After completing **any** HTML/CSS/JS changes to UI components — new pages, modified sections, layout changes, interactive components — **ask the user** whether they would like to run the `ui-ux-reviewer` agent before reporting the task as done. Do not run it automatically; wait for the user's confirmation.
+
+Example prompt: "Would you like me to run the UI/UX reviewer agent to audit this for design and accessibility issues?"
 
 ## SEO Workflow
 
-After completing **any** changes to files inside `/banki-transport/` or `/TCD/` — always run the `seo-optimizer` agent before reporting the task as done. Do this proactively without waiting for the user to ask.
+After completing **any** changes to files inside `/banki-transport/` or `/TCD/` — **ask the user** whether they would like to run the `seo-optimizer` agent before reporting the task as done. Do not run it automatically; wait for the user's confirmation.
+
+Example prompt: "Would you like me to run the SEO optimizer agent for this page?"
 
 Both `/banki-transport/` and `/TCD/` are local businesses physically located in **Banki, Cuttack, Odisha, 754008, India**. All SEO work on these pages must use hyper-local signals targeting that specific location.
 

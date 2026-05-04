@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<title>Baby Announcement Frame Designer | AK Creation</title>
+<meta name="theme-color" content="#6eadbe">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@400;700;800;900&family=Pacifico&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0ebe0 50%, #e8f0e8 100%);
+  min-height: 100vh;
+  padding: 24px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-wrap {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 22px;
+  max-width: 1060px;
+  width: 100%;
+}
+@media (max-width: 820px) { .app-wrap { grid-template-columns: 1fr; } }
+
+/* ===== FORM PANEL ===== */
+.form-panel {
+  background: rgba(255,255,255,0.92);
+  border-radius: 20px;
+  padding: 20px 16px 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.1);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.form-title { text-align: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed #f0c8d8; }
+.form-title h1 {
+  font-size: 18px; font-weight: 800;
+  background: linear-gradient(135deg, #6eadbe, #c8a060);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.form-title p { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+.f-label {
+  font-size: 10.5px; font-weight: 700; color: #888;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin: 8px 0 3px; display: block;
+}
+.f-input {
+  width: 100%; padding: 7px 10px;
+  border: 1.5px solid #e8d8e8; border-radius: 8px;
+  font-size: 12.5px; font-family: inherit;
+  background: #fdf8fc; color: #333;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.f-input:focus { outline: none; border-color: #9acad4; box-shadow: 0 0 0 3px rgba(110,173,190,0.14); background: #fff; }
+.f-input.invalid { border-color: #e08090; box-shadow: 0 0 0 3px rgba(220,80,100,0.1); }
+
+.f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.gender-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 3px; }
+.gender-opt {
+  padding: 8px 6px; border: 1.5px solid #e8d8e8; border-radius: 8px;
+  text-align: center; cursor: pointer; font-size: 12px; font-weight: 600;
+  color: #aaa; background: white; user-select: none; transition: all 0.25s; outline: none;
+}
+.gender-opt:focus-visible { box-shadow: 0 0 0 3px rgba(110,173,190,0.3); }
+.gender-opt[aria-checked="true"] { border-color: #9acad4; background: linear-gradient(135deg,#d8eef4,#c8e4ec); color: #3a7a8a; }
+.gender-opt.girl[aria-checked="true"] { border-color: #f0a0c0; background: linear-gradient(135deg,#fde0ec,#f8c8dc); color: #c04070; }
+
+.field-error { font-size: 10.5px; color: #d06080; margin-top: 3px; display: none; }
+.field-error.show { display: block; }
+
+.btn-gen {
+  width: 100%; padding: 11px; margin-top: 12px;
+  background: linear-gradient(135deg, #6eadbe, #c8a060);
+  color: white; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; letter-spacing: 0.5px;
+  box-shadow: 0 6px 18px rgba(110,173,190,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-gen:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(110,173,190,0.4); }
+
+.btn-action {
+  width: 100%; padding: 9px; margin-top: 8px;
+  background: white; color: #6eadbe;
+  border: 1.5px solid #9acad4; border-radius: 10px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all 0.2s; display: none;
+}
+.btn-action.visible { display: block; }
+.btn-action:hover { background: #f0f8fa; transform: translateY(-1px); }
+
+.dl-err { font-size: 10.5px; color: #c04060; text-align: center; margin-top: 5px; display: none; }
+.dl-err.show { display: block; }
+
+/* ===== PREVIEW PANEL ===== */
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ===== PORTRAIT CARD ===== */
+.portrait-card {
+  width: 100%;
+  max-width: 390px;
+  aspect-ratio: 9 / 16;
+  background: linear-gradient(175deg,
+    #72b8c8 0%,
+    #8cbcaa 20%,
+    #a8b882 44%,
+    #c4ac72 70%,
+    #c8a860 100%
+  );
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px 8px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+/* ── TOP DECORATION ── */
+.deco-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-shrink: 0;
+  height: 13%;
+  margin: 0 -12px;
+  padding: 0 4px;
+  position: relative;
+}
+
+.deco-tl {
+  font-size: 15px;
+  line-height: 1.25;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  align-self: flex-start;
+  padding-top: 2px;
+}
+
+.deco-top-flowers {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 15px;
+  letter-spacing: -3px;
+  padding-bottom: 3px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+.deco-tr {
+  font-size: 15px;
+  line-height: 1.25;
+  text-align: right;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  padding-top: 2px;
+}
+
+/* ── BABY NAME ── */
+.name-section {
+  text-align: center;
+  padding: 2px 4px 6px;
+  flex-shrink: 0;
+}
+
+.baby-name-text {
+  font-family: 'Poppins', sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(18px, 6.5vw, 27px);
+  color: #111108;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.25);
+  line-height: 1.15;
+}
+
+/* ── MIDDLE ROW: zodiac | baby photo | born-at ── */
+.middle-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  height: 36%;
+}
+
+.left-col {
+  width: 22%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
+  padding: 4px 0;
+  gap: 6px;
+}
+
+.right-col {
+  width: 22%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: flex-start;
+  padding-top: 4px;
+}
+
+.script-lbl {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(11px, 3vw, 14px);
+  font-weight: 700;
+  color: #1a1008;
+  display: block;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.zodiac-wrap, .date-wrap, .born-at-wrap { display: flex; flex-direction: column; }
+.born-at-wrap { align-items: flex-end; }
+
+.big-emoji { font-size: clamp(22px, 6vw, 30px); line-height: 1.1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); }
+.info-val { font-size: clamp(9px, 2.5vw, 12px); font-weight: 800; color: #100808; line-height: 1.3; }
+
+/* ── BABY PHOTO (center) ── */
+.center-col {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.baby-photo-wrap { position: relative; }
+
+.baby-ring {
+  width: clamp(130px, 38vw, 168px);
+  height: clamp(130px, 38vw, 168px);
+  border-radius: 50%;
+  border: 3px solid #c8a050;
+  box-shadow:
+    0 0 0 2px rgba(200,160,80,0.6),
+    0 0 0 10px rgba(200,160,80,0.12),
+    inset 0 0 0 2px rgba(200,160,80,0.3);
+  overflow: hidden;
+  background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.baby-ring img { width: 100%; height: 100%; object-fit: cover; }
+.baby-ring .ph { font-size: clamp(36px, 10vw, 50px); opacity: 0.5; }
+
+/* Flowers positioned around baby photo ring */
+.ring-flowers { position: absolute; inset: -22px; pointer-events: none; }
+.rf { position: absolute; font-size: clamp(14px, 4vw, 18px); line-height: 1; }
+.rf.f1 { bottom: 14px; left: 2px; transform: rotate(-45deg); }
+.rf.f2 { bottom: 5px; left: 22px; transform: rotate(-22deg); }
+.rf.f3 { bottom: 0; left: 50%; transform: translateX(-50%); }
+.rf.f4 { bottom: 5px; right: 22px; transform: rotate(22deg); }
+.rf.f5 { bottom: 14px; right: 2px; transform: rotate(45deg); }
+.rf.f6 { top: 22px; left: 2px; transform: rotate(-65deg); }
+.rf.f7 { top: 22px; right: 2px; transform: rotate(65deg); }
+
+/* Pink bow top-right of baby photo */
+.bow-deco {
+  position: absolute;
+  top: -14px;
+  right: -10px;
+  font-size: clamp(28px, 8vw, 38px);
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ── STATS ROW ── */
+.stats-section {
+  display: flex;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255,255,255,0.28);
+  margin-top: 6px;
+  padding-top: 8px;
+  height: 22%;
+  align-items: flex-start;
+}
+
+.stat-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 3px;
+}
+
+.stat-col + .stat-col { border-left: 1px solid rgba(255,255,255,0.22); }
+
+.stat-fa {
+  font-size: clamp(30px, 9vw, 44px);
+  line-height: 1.05;
+  margin: 3px 0;
+  display: block;
+}
+
+.stat-fa.hosp  { color: #1e4d9a; }
+.stat-fa.drop  { color: #800012; }
+.stat-fa.wt    { color: #1e4a28; }
+
+.stat-val {
+  font-size: clamp(10px, 2.8vw, 13px);
+  font-weight: 800;
+  color: #0e0e06;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+/* ── PARENTS SECTION ── */
+.parents-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255,255,255,0.28);
+  margin-top: 6px;
+  padding-top: 8px;
+  flex: 1;
+}
+
+.parents-photo-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.parents-ring {
+  width: clamp(96px, 26vw, 118px);
+  height: clamp(96px, 26vw, 118px);
+  border-radius: 50%;
+  border: 2.5px solid rgba(220,205,178,0.9);
+  box-shadow: 0 0 0 5px rgba(220,205,178,0.2), inset 0 0 0 1px rgba(220,205,178,0.3);
+  overflow: hidden;
+  background: rgba(255,255,255,0.14);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.parents-ring img { width: 100%; height: 100%; object-fit: cover; }
+.parents-ring .ph { font-size: clamp(28px, 8vw, 38px); opacity: 0.5; }
+
+/* Flowers around parents photo */
+.prf { position: absolute; font-size: clamp(12px, 3.5vw, 16px); pointer-events: none; }
+.prf.p1 { top: -6px; left: -6px; transform: rotate(-20deg); }
+.prf.p2 { bottom: -4px; left: -8px; transform: rotate(25deg); }
+.prf.p3 { top: -6px; right: -6px; transform: rotate(20deg) scaleX(-1); }
+.prf.p4 { bottom: -4px; right: -8px; transform: rotate(-25deg) scaleX(-1); }
+
+.parents-name-col { flex: 1; }
+
+.dad-mom-label {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(13px, 4vw, 17px);
+  font-weight: 700;
+  color: #d04070;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.parents-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.parent-name {
+  font-size: clamp(14px, 4vw, 20px);
+  font-weight: 800;
+  color: #0e0e06;
+  line-height: 1.1;
+}
+
+.heart-sep { font-size: clamp(16px, 4vw, 20px); }
+
+/* ── BOTTOM DECORATION ── */
+.deco-bottom {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: auto -12px 0;
+  padding: 0 4px;
+}
+
+.deco-bl { font-size: clamp(18px, 5vw, 24px); filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); }
+.deco-br { font-size: clamp(13px, 4vw, 17px); letter-spacing: -3px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
+
+
+/* ===== PAGE FOOTER ===== */
+footer { margin-top: 28px; text-align: center; font-size: 11.5px; color: #bbb; }
+footer a { color: #6eadbe; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="app-wrap">
+
+  <!-- ===== FORM ===== -->
+  <main class="form-panel">
+    <div class="form-title">
+      <h1>👶 Baby Frame Designer</h1>
+      <p>Portrait-style birth announcement card</p>
+    </div>
+
+    <!-- Photos -->
+    <label class="f-label" style="margin-top:0;">📸 Baby's Photo</label>
+    <div style="position:relative;border:1.5px dashed #c8d8dc;border-radius:10px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;background:#f0f8fa;display:flex;align-items:center;justify-content:center;gap:6px;flex-direction:column;" id="babyUpBox">
+      <span style="font-size:22px;">👶</span>
+      <span style="font-size:11.5px;color:#7aabb8;font-weight:600;">Click to upload</span>
+      <input type="file" accept="image/*" id="babyPhoto" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleUpload(event,'previewBaby','placeholderBaby','babyUpBox')">
+      <img id="babyUpThumb" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;display:none;" alt="">
+    </div>
+
+    <label class="f-label">👨‍👩 Parents' Photo</label>
+    <div style="position:relative;border:1.5px dashed #c8d8dc;border-radius:10px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;background:#f0f8fa;display:flex;align-items:center;justify-content:center;gap:6px;flex-direction:column;" id="parentsUpBox">
+      <span style="font-size:22px;">👨‍👩</span>
+      <span style="font-size:11.5px;color:#7aabb8;font-weight:600;">Click to upload</span>
+      <input type="file" accept="image/*" id="parentsPhoto" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleUpload(event,'previewParentsImg','placeholderParents','parentsUpBox')">
+      <img id="parentsUpThumb" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;display:none;" alt="">
+    </div>
+
+    <label class="f-label" for="babyName">💝 Baby's Name</label>
+    <input class="f-input" type="text" id="babyName" placeholder="e.g. Dvithi Pallavi" oninput="clearErr();updatePreview()">
+    <div class="field-error" id="nameErr">Please enter the baby's name.</div>
+
+    <label class="f-label" id="genLabel">🌈 Gender</label>
+    <div class="gender-toggle" role="radiogroup" aria-labelledby="genLabel">
+      <div class="gender-opt girl" id="gOptGirl" role="radio" aria-checked="true" tabindex="0"
+        onclick="setGender('girl')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setGender('girl')}">👸 Girl</div>
+      <div class="gender-opt" id="gOptBoy" role="radio" aria-checked="false" tabindex="0"
+        onclick="setGender('boy')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setGender('boy')}">🤴 Boy</div>
+    </div>
+
+    <div class="f-row">
+      <div>
+        <label class="f-label" for="birthDate">🎂 Birth Date</label>
+        <input class="f-input" type="date" id="birthDate" oninput="updatePreview()">
+      </div>
+      <div>
+        <label class="f-label" for="birthTime">⏰ Birth Time</label>
+        <input class="f-input" type="time" id="birthTime" oninput="updatePreview()">
+      </div>
+    </div>
+
+    <div class="f-row">
+      <div>
+        <label class="f-label" for="weight">⚖️ Weight</label>
+        <input class="f-input" type="text" id="weight" placeholder="e.g. 2.850 kg" oninput="updatePreview()">
+      </div>
+      <div>
+        <label class="f-label" for="bloodGroup">🩸 Blood Group</label>
+        <select class="f-input" id="bloodGroup" onchange="updatePreview()">
+          <option value="">—</option>
+          <option>A+ve</option><option>A-ve</option>
+          <option>B+ve</option><option>B-ve</option>
+          <option>O+ve</option><option>O-ve</option>
+          <option>AB+ve</option><option>AB-ve</option>
+        </select>
+      </div>
+    </div>
+
+    <label class="f-label" for="hospital">🏥 Hospital</label>
+    <input class="f-input" type="text" id="hospital" placeholder="e.g. Alma Hospital" oninput="updatePreview()">
+
+    <label class="f-label" for="zodiac">⭐ Zodiac <span style="color:#ccc;font-weight:400;font-size:9px;">(auto from date)</span></label>
+    <input class="f-input" type="text" id="zodiac" placeholder="e.g. Capricorn" oninput="updatePreview()">
+
+    <div class="f-row">
+      <div>
+        <label class="f-label" for="fatherName">👨 Father's Name</label>
+        <input class="f-input" type="text" id="fatherName" placeholder="e.g. Vishnu" oninput="updatePreview()">
+      </div>
+      <div>
+        <label class="f-label" for="motherName">👩 Mother's Name</label>
+        <input class="f-input" type="text" id="motherName" placeholder="e.g. Reshma" oninput="updatePreview()">
+      </div>
+    </div>
+
+    <button class="btn-gen" onclick="generateFrame()">✨ Generate Frame</button>
+    <button class="btn-action" id="btnDl" onclick="downloadFrame()"><i class="fas fa-download"></i> Download Image</button>
+    <button class="btn-action" id="btnPr" onclick="printFrame()"><i class="fas fa-image"></i> Download for Print (HD)</button>
+    <div class="dl-err" id="dlErr">Download failed — try Print instead.</div>
+  </main>
+
+  <!-- ===== PREVIEW ===== -->
+  <aside class="preview-panel">
+
+    <div class="portrait-card" id="captureTarget">
+
+      <!-- TOP DECORATION -->
+      <div class="deco-top" aria-hidden="true">
+        <div class="deco-tl">🧸🌙<br>☁️⭐✨</div>
+        <div class="deco-top-flowers">🌸🌿🌷🌸🌿🌸🌷🌿🌸🌿🌸</div>
+        <div class="deco-tr">🎈<br>🧸</div>
+      </div>
+
+      <!-- BABY NAME -->
+      <div class="name-section">
+        <div class="baby-name-text" id="previewName">Baby's Name</div>
+      </div>
+
+      <!-- MIDDLE ROW -->
+      <div class="middle-row">
+
+        <!-- Left: Zodiac + Date -->
+        <div class="left-col">
+          <div class="zodiac-wrap">
+            <span class="script-lbl">zodiac</span>
+            <div class="big-emoji">⭐</div>
+            <div class="info-val" id="previewZodiac">—</div>
+          </div>
+          <div class="date-wrap">
+            <span class="script-lbl" style="font-style:italic;">Birth in</span>
+            <div class="big-emoji">📅</div>
+            <div class="info-val">
+              <span id="previewDateFull">—</span><br>
+              <span id="previewDay">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center: Baby photo -->
+        <div class="center-col">
+          <div class="baby-photo-wrap">
+            <div class="baby-ring" id="babyRing">
+              <img id="previewBaby" style="display:none;" alt="Baby photo">
+              <span class="ph" id="placeholderBaby">👶</span>
+            </div>
+            <div class="ring-flowers" aria-hidden="true">
+              <span class="rf f1">🌸</span>
+              <span class="rf f2">🌷</span>
+              <span class="rf f3">🌸</span>
+              <span class="rf f4">🌷</span>
+              <span class="rf f5">🌸</span>
+              <span class="rf f6">🌿</span>
+              <span class="rf f7">🌿</span>
+            </div>
+            <div class="bow-deco" aria-hidden="true">🎀</div>
+          </div>
+        </div>
+
+        <!-- Right: Born at -->
+        <div class="right-col">
+          <div class="born-at-wrap">
+            <span class="script-lbl" style="text-align:right;">Born at</span>
+            <div class="big-emoji" style="text-align:right;">🕐</div>
+            <div class="info-val" style="text-align:right;" id="previewTime">—</div>
+          </div>
+        </div>
+
+      </div><!-- /middle-row -->
+
+      <!-- STATS -->
+      <div class="stats-section">
+        <div class="stat-col">
+          <span class="script-lbl" style="text-align:center;">Weight</span>
+          <i class="fas fa-weight-scale stat-fa wt" aria-hidden="true"></i>
+          <div class="stat-val" id="previewWeight">—</div>
+        </div>
+        <div class="stat-col">
+          <span class="script-lbl" style="text-align:center;">Hospital</span>
+          <i class="fas fa-hospital stat-fa hosp" aria-hidden="true"></i>
+          <div class="stat-val" id="previewHospital">—</div>
+        </div>
+        <div class="stat-col">
+          <span class="script-lbl" style="text-align:center;">Blood group</span>
+          <i class="fas fa-droplet stat-fa drop" aria-hidden="true"></i>
+          <div class="stat-val" id="previewBlood" style="font-size:clamp(13px,3.5vw,18px);">—</div>
+        </div>
+      </div>
+
+      <!-- PARENTS -->
+      <div class="parents-section">
+        <div class="parents-photo-wrap">
+          <div class="parents-ring" id="parentsRing">
+            <img id="previewParentsImg" style="display:none;" alt="Parents photo">
+            <span class="ph" id="placeholderParents">👨‍👩</span>
+          </div>
+          <span class="prf p1" aria-hidden="true">🌸</span>
+          <span class="prf p2" aria-hidden="true">🌹</span>
+          <span class="prf p3" aria-hidden="true">🌸</span>
+          <span class="prf p4" aria-hidden="true">🌷</span>
+        </div>
+        <div class="parents-name-col">
+          <span class="dad-mom-label">Beloved Parents</span>
+          <div class="parents-name-row">
+            <span class="parent-name" id="previewFather">Father</span>
+            <span class="heart-sep">❤️</span>
+            <span class="parent-name" id="previewMother">Mother</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM DECORATION -->
+      <div class="deco-bottom" aria-hidden="true">
+        <div class="deco-bl">👶🌿</div>
+        <div class="deco-br">🌹🌸🌿🌷🌸🌹🌿🌸🌷</div>
+      </div>
+
+    </div><!-- /portrait-card -->
+
+  </aside>
+</div>
+
+<footer>
+  <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+</footer>
+
+<script>
+  let gender = 'girl';
+
+  /* ── Photo upload ── */
+  function handleUpload(event, previewId, placeholderId, boxId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const url = e.target.result;
+      // Update upload box thumbnail
+      const box = document.getElementById(boxId);
+      const thumb = box.querySelector('img');
+      if (thumb) { thumb.src = url; thumb.style.display = 'block'; }
+      // Hide upload prompt content inside box
+      Array.from(box.children).forEach(c => { if (c.tagName !== 'IMG' && c.tagName !== 'INPUT') c.style.display = 'none'; });
+      // Update card photo
+      const prev = document.getElementById(previewId);
+      const ph   = document.getElementById(placeholderId);
+      prev.src = url;
+      prev.style.display = 'block';
+      if (ph) ph.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ── Gender toggle ── */
+  function setGender(g) {
+    gender = g;
+    document.getElementById('gOptGirl').setAttribute('aria-checked', g === 'girl' ? 'true' : 'false');
+    document.getElementById('gOptBoy').setAttribute('aria-checked',  g === 'boy'  ? 'true' : 'false');
+    updatePreview();
+  }
+
+  /* ── Zodiac calculation ── */
+  function calcZodiac(d) {
+    const m = d.getMonth() + 1, day = d.getDate();
+    if ((m===1&&day>=20)||(m===2&&day<=18)) return 'Aquarius';
+    if ((m===2&&day>=19)||(m===3&&day<=20)) return 'Pisces';
+    if ((m===3&&day>=21)||(m===4&&day<=19)) return 'Aries';
+    if ((m===4&&day>=20)||(m===5&&day<=20)) return 'Taurus';
+    if ((m===5&&day>=21)||(m===6&&day<=20)) return 'Gemini';
+    if ((m===6&&day>=21)||(m===7&&day<=22)) return 'Cancer';
+    if ((m===7&&day>=23)||(m===8&&day<=22)) return 'Leo';
+    if ((m===8&&day>=23)||(m===9&&day<=22)) return 'Virgo';
+    if ((m===9&&day>=23)||(m===10&&day<=22)) return 'Libra';
+    if ((m===10&&day>=23)||(m===11&&day<=21)) return 'Scorpio';
+    if ((m===11&&day>=22)||(m===12&&day<=21)) return 'Sagittarius';
+    return 'Capricorn';
+  }
+
+  /* ── Live preview update ── */
+  function updatePreview() {
+    const name     = document.getElementById('babyName').value.trim()    || "Baby's Name";
+    const dateVal  = document.getElementById('birthDate').value;
+    const timeVal  = document.getElementById('birthTime').value;
+    const wt       = document.getElementById('weight').value.trim()       || '—';
+    const hosp     = document.getElementById('hospital').value.trim()     || '—';
+    const blood    = document.getElementById('bloodGroup').value          || '—';
+    const zodiac   = document.getElementById('zodiac').value.trim();
+    const father   = document.getElementById('fatherName').value.trim()  || 'Father';
+    const mother   = document.getElementById('motherName').value.trim()  || 'Mother';
+
+    document.getElementById('previewName').textContent    = name;
+    document.getElementById('previewWeight').textContent  = wt;
+    document.getElementById('previewHospital').textContent = hosp;
+    document.getElementById('previewBlood').textContent   = blood;
+    document.getElementById('previewFather').textContent  = father;
+    document.getElementById('previewMother').textContent  = mother;
+
+    if (dateVal) {
+      const d = new Date(dateVal + 'T00:00:00');
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const dd = String(d.getDate()).padStart(2,'0');
+      document.getElementById('previewDateFull').textContent = `${dd} ${months[d.getMonth()]} ${d.getFullYear()}`;
+      document.getElementById('previewDay').textContent = days[d.getDay()];
+      // Auto-fill zodiac only if user hasn't typed one
+      if (!zodiac) {
+        const z = calcZodiac(d);
+        document.getElementById('previewZodiac').textContent = z;
+        document.getElementById('zodiac').value = z;
+      }
+    } else {
+      document.getElementById('previewDateFull').textContent = '—';
+      document.getElementById('previewDay').textContent = '—';
+    }
+
+    document.getElementById('previewZodiac').textContent = zodiac || (dateVal ? calcZodiac(new Date(dateVal + 'T00:00:00')) : '—');
+
+    if (timeVal) {
+      const [h, m] = timeVal.split(':').map(Number);
+      const ampm = h >= 12 ? 'pm' : 'am';
+      document.getElementById('previewTime').textContent = `${(h % 12) || 12}:${String(m).padStart(2,'0')} ${ampm}`;
+    } else {
+      document.getElementById('previewTime').textContent = '—';
+    }
+  }
+
+  /* ── Validation ── */
+  function clearErr() {
+    document.getElementById('babyName').classList.remove('invalid');
+    document.getElementById('nameErr').classList.remove('show');
+  }
+
+  /* ── Generate ── */
+  function generateFrame() {
+    const nameInput = document.getElementById('babyName');
+    if (!nameInput.value.trim()) {
+      nameInput.classList.add('invalid');
+      document.getElementById('nameErr').classList.add('show');
+      nameInput.focus();
+      return;
+    }
+    updatePreview();
+    document.getElementById('btnDl').classList.add('visible');
+    document.getElementById('btnPr').classList.add('visible');
+    document.getElementById('captureTarget').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* ── Download ── */
+  function downloadFrame() {
+    document.getElementById('dlErr').classList.remove('show');
+    function run() {
+      doCapture(function(canvas) {
+        const name = document.getElementById('babyName').value.trim() || 'baby-frame';
+        const a = document.createElement('a');
+        a.download = name.replace(/\s+/g,'-').toLowerCase() + '-announcement.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      });
+    }
+    if (typeof html2canvas !== 'undefined') { run(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = run;
+    s.onerror = () => document.getElementById('dlErr').classList.add('show');
+    document.head.appendChild(s);
+  }
+
+  function doCapture(callback) {
+    html2canvas(document.getElementById('captureTarget'), {
+      scale: 3, useCORS: true, backgroundColor: null, logging: false
+    }).then(function (canvas) {
+      callback(canvas);
+    }).catch(() => document.getElementById('dlErr').classList.add('show'));
+  }
+
+  /* ── Print as image (download high-res for printing) ── */
+  function printFrame() {
+    document.getElementById('dlErr').classList.remove('show');
+    function run() {
+      html2canvas(document.getElementById('captureTarget'), {
+        scale: 4, useCORS: true, backgroundColor: null, logging: false
+      }).then(function(canvas) {
+        const name = document.getElementById('babyName').value.trim() || 'baby-frame';
+        const a = document.createElement('a');
+        a.download = name.replace(/\s+/g,'-').toLowerCase() + '-print.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      }).catch(() => document.getElementById('dlErr').classList.add('show'));
+    }
+    if (typeof html2canvas !== 'undefined') { run(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = run;
+    s.onerror = () => document.getElementById('dlErr').classList.add('show');
+    document.head.appendChild(s);
+  }
+
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+  updatePreview();
+</script>
+
+</body>
+</html>
