@@ -35,9 +35,20 @@ function store_data(){
     const urlParams = new URLSearchParams(window.location.search);
     const table_no = urlParams.get('table');
     if(table_no){
-        localStorage.setItem('table', table_no)
-        localStorage.removeItem('place'); // reset place on new table scan
-        const expirationTime = Date.now() + 60 * 60 * 1000; // 30 minutes from now
+        localStorage.setItem('table', table_no);
+        if (/^\d+$/.test(table_no)) {
+            // Numeric table → Dine-In session, set place immediately
+            localStorage.setItem('place', 'Dine-In');
+        } else {
+            // Non-numeric (COD, etc.)
+            const existingPlace = localStorage.getItem('place');
+            if (existingPlace === 'Dine-In') {
+                // Switching from a dine-in session — clear stale Dine-In so location is asked
+                localStorage.removeItem('place');
+            }
+            // Any real delivery location already stored → keep it untouched
+        }
+        const expirationTime = Date.now() + 60 * 60 * 1000;
         localStorage.setItem('tcd_urlExpiration', expirationTime);
         window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname;
     }
