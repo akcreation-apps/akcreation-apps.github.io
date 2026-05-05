@@ -832,11 +832,15 @@
         /* ── Footer ── */
         footer {
             text-align: center;
-            padding: 18px 16px 80px; /* 80px bottom clears the fixed View Cart bar */
+            padding: 18px 16px 24px;
             font-size: 0.72rem;
             color: var(--muted);
             border-top: 1px solid var(--border);
             margin-top: 12px;
+        }
+        /* Expand bottom padding only when the View Cart bar is visible */
+        body:has(#viewCartBar.visible) footer {
+            padding-bottom: 70px;
         }
         footer a { color: var(--primary); text-decoration: none; }
 
