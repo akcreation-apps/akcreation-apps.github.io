@@ -47,7 +47,7 @@
             font-family: 'Poppins', sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding-top: var(--nav-h);
+            padding-top: calc(var(--nav-h) + var(--strip-h, 0px));
         }
 
         /* ── Loader ── */
@@ -329,11 +329,18 @@
         #place-order-btn .main-text { font-size: 0.9rem; font-weight: 600; }
         #place-order-btn .sub-text { font-size: 0.63rem; opacity: 0.85; }
 
-        /* ── Delivery info strip ── */
+        /* ── Delivery info strip — fixed below navbar ── */
         .delivery-strip {
             background: var(--card);
             border-bottom: 1px solid var(--border);
             padding: 6px 20px;
+        }
+        #deliveryStrip {
+            position: fixed;
+            top: var(--nav-h);
+            left: 0;
+            right: 0;
+            z-index: 999;
         }
         .delivery-strip-inner {
             max-width: 1400px;
@@ -639,6 +646,21 @@
         </div>
     </div>
 
+    <script>
+    (function () {
+        var strip = document.getElementById('deliveryStrip');
+        if (!strip) return;
+        function sync() {
+            var h = strip.style.display !== 'none' ? strip.offsetHeight : 0;
+            document.documentElement.style.setProperty('--strip-h', h + 'px');
+        }
+        var mo = new MutationObserver(function () {
+            requestAnimationFrame(sync);
+        });
+        mo.observe(strip, { attributes: true, attributeFilter: ['style'] });
+        sync();
+    }());
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
