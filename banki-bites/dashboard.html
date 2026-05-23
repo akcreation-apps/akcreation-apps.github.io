@@ -435,15 +435,6 @@
       transition: background 0.2s;
     }
     .btn-order:hover { background: var(--primary-dark); }
-    .btn-whatsapp {
-      background: #dcfce7; color: #15803d;
-      padding: 13px; border-radius: 12px;
-      font-size: 0.88rem; font-weight: 700; text-decoration: none;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      border: 1px solid #bbf7d0;
-      transition: background 0.2s;
-    }
-    .btn-whatsapp:hover { background: #bbf7d0; }
 
     /* ── Footer ── */
     footer {
@@ -548,9 +539,6 @@
         <a class="btn-order" id="modalOrderBtn" href="#" target="_blank" rel="noopener">
           <i class="fas fa-utensils" aria-hidden="true"></i> Order Now
         </a>
-        <a class="btn-whatsapp" id="modalWABtn" href="#" target="_blank" rel="noopener">
-          <i class="fab fa-whatsapp" aria-hidden="true"></i> Order via WhatsApp
-        </a>
       </div>
     </div>
   </div>
@@ -587,7 +575,6 @@
       document.getElementById('modalRating').innerHTML   = renderStars(p.rating) + ' / 5';
       document.getElementById('modalTags').innerHTML     = p.services.map(s => `<span class="modal-tag">${s}</span>`).join('');
       document.getElementById('modalOrderBtn').href      = p.url;
-      document.getElementById('modalWABtn').href         = `https://wa.me/${p.whatsapp.replace(/[^0-9]/g, '')}`;
       backdrop.classList.add('open');
       document.body.style.overflow = 'hidden';
     }

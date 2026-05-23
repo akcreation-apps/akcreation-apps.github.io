@@ -1,12 +1,16 @@
 {
+  "locations": [
+    "Harirajpur", "Chakapada", "Sisua", "Bedapur", "Khamaranga",
+    "Charchika", "Ranapur", "Banki", "Sahadapada", "Gopalapur", "Patapur"
+  ],
   "partners": [
     {
       "id": "tcd",
       "name": "The Cafe Darbar",
       "logo": "https://akcreation-apps.com/TCD/tcd-logo.png",
-      "url": "https://akcreation-apps.com/TCD/",
+      "url": "https://akcreation-apps.com/TCD/?table=COD",
       "services": ["Chinese", "North Indian", "Tandoor", "Beverages"],
-      "rating": 4.8,
+      "rating": 4.6,
       "hours": "10:00 AM – 10:00 PM",
       "address": "BJP Party Office Side, Banki College Road, Banki 754008",
       "whatsapp": "+918920042482",
@@ -16,9 +20,9 @@
       "id": "a1",
       "name": "A1 Amul Fast Food",
       "logo": "https://akcreation-apps.com/A1/a1-logo.png",
-      "url": "https://akcreation-apps.com/A1/",
+      "url": "https://akcreation-apps.com/A1/?table=COD",
       "services": ["Fast Food", "Chinese", "Snacks", "Beverages"],
-      "rating": 4.7,
+      "rating": 4.5,
       "hours": "9:00 AM – 10:00 PM",
       "address": "Banki College Road, Towards Sunadei, Banki 754008",
       "whatsapp": "+918920042482",
