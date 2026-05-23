@@ -600,7 +600,16 @@
       }
     }
 
-    dateInput.addEventListener('change', update);
+    // iOS Safari ignores the `min` attribute on date pickers — validate on change
+    dateInput.addEventListener('change', function() {
+      var todayStr = today.getFullYear() + '-'
+        + String(today.getMonth() + 1).padStart(2, '0') + '-'
+        + String(today.getDate()).padStart(2, '0');
+      if (this.value && this.value < todayStr) {
+        this.value = todayStr;
+      }
+      update();
+    });
     timeSelect.addEventListener('change', update);
     passengerSelect.addEventListener('change', update);
     document.getElementById('destination').addEventListener('input', update);
