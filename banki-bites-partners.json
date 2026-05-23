@@ -5,28 +5,26 @@
   ],
   "partners": [
     {
-      "id": "tcd",
       "name": "The Cafe Darbar",
       "logo": "https://akcreation-apps.com/TCD/tcd-logo.png",
       "url": "https://akcreation-apps.com/TCD/?table=COD",
       "services": ["Chinese", "Continental", "Drinks", "Indian"],
       "rating": 4.6,
-      "hours": "10:00 AM – 10:00 PM",
+      "opening_hour": "10",
+      "closing_hour": "22",
       "address": "BJP Party Office Side, Banki College Road, Banki 754008",
-      "whatsapp": "+917749984274",
-      "open": true
+      "is_active": true
     },
     {
-      "id": "a1",
       "name": "A1 Amul Fast Food",
       "logo": "https://akcreation-apps.com/A1/a1-logo.png",
       "url": "https://akcreation-apps.com/A1/?table=COD",
       "services": ["Chinese", "Indian"],
       "rating": 4.5,
-      "hours": "9:00 AM – 10:00 PM",
+      "opening_hour": "10",
+      "closing_hour": "22",
       "address": "Banki College Road, Towards Sunadei, Banki 754008",
-      "whatsapp": "+917749984274",
-      "open": true
+      "is_active": true
     }
   ]
 }
