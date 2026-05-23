@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#4f46e5">
+    <title>Restaurant Onboarding Guide — AK Creation</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary:   #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark:  #3730a3;
+            --success:   #10b981;
+            --warning:   #f59e0b;
+            --danger:    #ef4444;
+            --info:      #3b82f6;
+            --bg:        #f8f9ff;
+            --card:      #ffffff;
+            --text:      #1e1b4b;
+            --muted:     #6b7280;
+            --border:    #e5e7eb;
+            --code-bg:   #1e1e2e;
+            --code-text: #cdd6f4;
+            --sidebar-w: 260px;
+            --nav-h:     56px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            height: var(--nav-h);
+            background: var(--primary);
+            display: flex; align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 16px rgba(79,70,229,0.4);
+            gap: 12px;
+        }
+        .topbar-menu-btn {
+            background: none; border: none; color: #fff;
+            font-size: 1.2rem; cursor: pointer; padding: 4px;
+            display: none;
+        }
+        .topbar-title {
+            font-size: 1rem; font-weight: 700; color: #fff;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .topbar-badge {
+            background: rgba(255,255,255,0.2);
+            color: #fff; font-size: 0.65rem; font-weight: 600;
+            padding: 2px 8px; border-radius: 12px;
+        }
+        .topbar-progress {
+            margin-left: auto;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .progress-text { color: rgba(255,255,255,0.8); font-size: 0.8rem; }
+        .progress-bar-wrap {
+            width: 120px; height: 6px;
+            background: rgba(255,255,255,0.25); border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; background: #fff; border-radius: 3px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        /* ── Layout ── */
+        .layout {
+            display: flex;
+            padding-top: var(--nav-h);
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: var(--nav-h); left: 0;
+            height: calc(100vh - var(--nav-h));
+            overflow-y: auto;
+            padding: 20px 0 40px;
+            transition: transform 0.3s ease;
+            z-index: 900;
+        }
+        .sidebar-section { padding: 0 16px; margin-bottom: 6px; }
+        .sidebar-label {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--muted);
+            padding: 12px 8px 4px;
+        }
+        .sidebar-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 8px;
+            font-size: 0.8rem; color: var(--muted);
+            cursor: pointer; text-decoration: none;
+            transition: all 0.15s;
+            position: relative;
+        }
+        .sidebar-item:hover { background: var(--bg); color: var(--primary); }
+        .sidebar-item.active {
+            background: #ede9fe; color: var(--primary); font-weight: 600;
+        }
+        .sidebar-item .step-num {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--border); color: var(--muted);
+            font-size: 0.65rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .sidebar-item.active .step-num { background: var(--primary); color: #fff; }
+        .sidebar-item.done .step-num { background: var(--success); color: #fff; }
+        .sidebar-item.done { color: var(--success); }
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4); z-index: 850;
+        }
+
+        /* ── Main content ── */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1; padding: 32px 24px 80px;
+            max-width: calc(100% - var(--sidebar-w));
+        }
+
+        /* ── Hero ── */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            border-radius: 16px; padding: 36px 32px;
+            color: #fff; margin-bottom: 40px;
+        }
+        .hero h1 { font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+        .hero p { font-size: 0.95rem; opacity: 0.85; max-width: 500px; }
+        .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .hero-chip {
+            background: rgba(255,255,255,0.18);
+            color: #fff; font-size: 0.72rem; font-weight: 600;
+            padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.25);
+        }
+
+        /* ── Section ── */
+        .section {
+            margin-bottom: 56px;
+            scroll-margin-top: calc(var(--nav-h) + 20px);
+        }
+        .section-header {
+            display: flex; align-items: flex-start; gap: 14px;
+            margin-bottom: 24px;
+        }
+        .section-num {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            font-size: 0.85rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 2px;
+        }
+        .section-title { font-size: 1.3rem; font-weight: 700; color: var(--text); }
+        .section-subtitle { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card);
+            border-radius: 12px; border: 1px solid var(--border);
+            padding: 20px; margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .card-title {
+            font-size: 0.9rem; font-weight: 700;
+            margin-bottom: 12px; color: var(--text);
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* ── Checklist ── */
+        .checklist { list-style: none; }
+        .checklist li {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .checklist li:last-child { border-bottom: none; }
+        .checklist input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; cursor: pointer; accent-color: var(--primary); transform: scale(1.1); }
+        .checklist label { cursor: pointer; }
+        .checklist input[type="checkbox"]:checked + label { text-decoration: line-through; color: var(--muted); }
+
+        /* ── Callouts ── */
+        .callout {
+            border-radius: 10px; padding: 14px 16px;
+            font-size: 0.83rem; margin-bottom: 16px;
+            display: flex; gap: 12px; align-items: flex-start;
+        }
+        .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+        .callout p { margin: 0; }
+        .callout strong { display: block; margin-bottom: 3px; }
+        .callout.warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+        .callout.info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+        .callout.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+        .callout.danger  { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
+
+        /* ── Code blocks ── */
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 10px; overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .code-header {
+            background: #2a2a3e; padding: 8px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .code-lang {
+            font-size: 0.7rem; font-weight: 600;
+            color: #94a3b8; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.1); border: none;
+            color: #94a3b8; font-size: 0.72rem; cursor: pointer;
+            padding: 4px 10px; border-radius: 6px;
+            transition: all 0.15s;
+            display: flex; align-items: center; gap: 5px;
+            font-family: 'Inter', sans-serif;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        .copy-btn.copied { background: var(--success); color: #fff; }
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 0.8rem;
+            line-height: 1.7;
+        }
+        code {
+            font-family: 'Fira Code', monospace;
+            color: var(--code-text);
+        }
+        /* Syntax highlight colors */
+        .kw  { color: #cba6f7; } /* keyword */
+        .str { color: #a6e3a1; } /* string */
+        .num { color: #fab387; } /* number */
+        .cmt { color: #6c7086; font-style: italic; } /* comment */
+        .fn  { color: #89b4fa; } /* function */
+        .key { color: #f38ba8; } /* object key */
+        .var { color: #cdd6f4; } /* variable */
+        .op  { color: #89dceb; } /* operator */
+
+        /* ── Inline code ── */
+        code.inline {
+            background: #ede9fe; color: var(--primary-dark);
+            padding: 1px 6px; border-radius: 4px;
+            font-size: 0.82em;
+        }
+
+        /* ── Step list ── */
+        .step-list { list-style: none; }
+        .step-list li {
+            display: flex; gap: 14px;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            font-size: 0.85rem; align-items: flex-start;
+        }
+        .step-list li:last-child { border-bottom: none; }
+        .step-list .icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+        /* ── Grid ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        /* ── Field table ── */
+        .field-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .field-table th {
+            background: var(--bg); font-weight: 600;
+            padding: 8px 12px; text-align: left;
+            border-bottom: 2px solid var(--border);
+        }
+        .field-table td {
+            padding: 8px 12px; border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        .field-table tr:last-child td { border-bottom: none; }
+        .badge {
+            font-size: 0.65rem; font-weight: 700; padding: 2px 7px;
+            border-radius: 10px; display: inline-block;
+        }
+        .badge-req  { background: #fee2e2; color: #991b1b; }
+        .badge-opt  { background: #f3f4f6; color: #6b7280; }
+
+        /* ── Credentials Generator Tool ── */
+        .tool-card {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+            border-radius: 14px; padding: 24px;
+            margin-bottom: 16px; color: #cdd6f4;
+        }
+        .tool-title {
+            font-size: 0.95rem; font-weight: 700; color: #cba6f7;
+            margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+        }
+        .tool-subtitle { font-size: 0.78rem; color: #6c7086; margin-bottom: 20px; }
+        .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .tool-field label {
+            display: block; font-size: 0.72rem; font-weight: 600;
+            color: #94a3b8; margin-bottom: 5px; letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .tool-field input, .tool-field textarea {
+            width: 100%; background: #11111b;
+            border: 1px solid #313244; border-radius: 8px;
+            color: #cdd6f4; font-family: 'Fira Code', monospace;
+            font-size: 0.78rem; padding: 8px 10px;
+            outline: none; transition: border 0.15s;
+        }
+        .tool-field input:focus, .tool-field textarea:focus {
+            border-color: #cba6f7;
+        }
+        .tool-field textarea { resize: vertical; min-height: 60px; }
+        .tool-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-generate {
+            background: var(--primary); color: #fff;
+            border: none; padding: 10px 20px; border-radius: 8px;
+            font-size: 0.83rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 7px;
+            transition: background 0.15s; font-family: 'Inter', sans-serif;
+        }
+        .btn-generate:hover { background: var(--primary-dark); }
+        .btn-clear {
+            background: transparent; color: #94a3b8;
+            border: 1px solid #313244; padding: 10px 20px; border-radius: 8px;
+            font-size: 0.83rem; font-weight: 600; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: all 0.15s;
+        }
+        .btn-clear:hover { border-color: #6c7086; color: #cdd6f4; }
+        .tool-output {
+            margin-top: 16px; background: #11111b;
+            border: 1px solid #313244; border-radius: 10px;
+            padding: 14px; display: none; position: relative;
+        }
+        .tool-output pre { color: #a6e3a1; font-size: 0.75rem; line-height: 1.7; white-space: pre-wrap; word-break: break-all; }
+        .tool-output-actions {
+            display: flex; gap: 8px; margin-top: 10px;
+        }
+        .btn-copy-output {
+            background: var(--success); color: #fff; border: none;
+            padding: 7px 14px; border-radius: 6px; font-size: 0.78rem;
+            font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .tool-note {
+            margin-top: 12px; background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.25); border-radius: 8px;
+            padding: 10px 12px; font-size: 0.75rem; color: #fde68a;
+        }
+
+        /* ── Directory tree ── */
+        .dir-tree {
+            background: var(--code-bg); border-radius: 10px;
+            padding: 16px; font-family: 'Fira Code', monospace;
+            font-size: 0.8rem; line-height: 1.9; overflow-x: auto;
+        }
+        .dir-tree .dir  { color: #89b4fa; }
+        .dir-tree .file { color: #cdd6f4; }
+        .dir-tree .new  { color: #a6e3a1; font-weight: 600; }
+        .dir-tree .mod  { color: #f9e2af; }
+        .dir-tree .grey { color: #6c7086; }
+
+        /* ── Final checklist ── */
+        .final-checklist {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+        .final-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 14px;
+            font-size: 0.82rem; cursor: pointer;
+            transition: border-color 0.15s;
+        }
+        .final-item:hover { border-color: var(--primary); }
+        .final-item input { accent-color: var(--success); flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+        .final-item label { cursor: pointer; font-weight: 500; }
+        .final-item input:checked + label { text-decoration: line-through; color: var(--muted); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; }
+            .topbar-menu-btn { display: block; }
+            .main { margin-left: 0; max-width: 100%; padding: 20px 16px 60px; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .tool-grid { grid-template-columns: 1fr; }
+            .final-checklist { grid-template-columns: 1fr; }
+            .hero { padding: 24px 20px; }
+            .hero h1 { font-size: 1.4rem; }
+            .topbar-progress { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+    <button class="topbar-menu-btn" id="menuBtn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="topbar-title">
+        <i class="fas fa-utensils"></i>
+        Restaurant Onboarding Guide
+        <span class="topbar-badge">v2.0</span>
+    </div>
+    <div class="topbar-progress">
+        <span class="progress-text" id="progressText">0 / 9 steps</span>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-label">Navigation</div>
+
+        <div class="sidebar-section">
+            <a class="sidebar-item active" href="#overview" data-step="0">
+                <span class="step-num"><i class="fas fa-home" style="font-size:0.6rem"></i></span>
+                Overview
+            </a>
+        </div>
+
+        <div class="sidebar-label">Steps</div>
+        <div class="sidebar-section">
+            <a class="sidebar-item" href="#step1" data-step="1"><span class="step-num">1</span> Firebase Setup</a>
+            <a class="sidebar-item" href="#step2" data-step="2"><span class="step-num">2</span> Gather Assets</a>
+            <a class="sidebar-item" href="#step3" data-step="3"><span class="step-num">3</span> Clone Directory</a>
+            <a class="sidebar-item" href="#step4" data-step="4"><span class="step-num">4</span> restaurant.js Config</a>
+            <a class="sidebar-item" href="#step5" data-step="5"><span class="step-num">5</span> credentials.json</a>
+            <a class="sidebar-item" href="#step6" data-step="6"><span class="step-num">6</span> data.json Menu</a>
+            <a class="sidebar-item" href="#step7" data-step="7"><span class="step-num">7</span> Update HTML Files</a>
+            <a class="sidebar-item" href="#step8" data-step="8"><span class="step-num">8</span> Seed Firestore</a>
+            <a class="sidebar-item" href="#step9" data-step="9"><span class="step-num">9</span> Deploy &amp; Verify</a>
+        </div>
+
+        <div class="sidebar-label">Tools</div>
+        <div class="sidebar-section">
+            <a class="sidebar-item" href="#tool-creds" data-step="0">
+                <span class="step-num"><i class="fas fa-key" style="font-size:0.55rem"></i></span>
+                Credential Encryptor
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+        <!-- Hero -->
+        <div class="hero" id="overview">
+            <h1>Onboard a New Restaurant</h1>
+            <p>Follow this step-by-step guide to deploy a fully functional restaurant ordering system. The entire process takes about 30–60 minutes.</p>
+            <div class="hero-chips">
+                <span class="hero-chip"><i class="fab fa-google"></i> Firebase Firestore</span>
+                <span class="hero-chip"><i class="fas fa-code"></i> Vanilla JS</span>
+                <span class="hero-chip"><i class="fas fa-lock"></i> AES Encrypted</span>
+                <span class="hero-chip"><i class="fas fa-mobile-alt"></i> Mobile First</span>
+                <span class="hero-chip"><i class="fas fa-clock"></i> ~45 min setup</span>
+            </div>
+        </div>
+
+        <div class="callout info">
+            <span class="callout-icon"><i class="fas fa-info-circle"></i></span>
+            <p><strong>How this works</strong>The system is based on The Cafe Darbar (<code class="inline">/TCD/</code>). You will copy that directory, rename it, and swap out config, branding, and menu data. All app logic remains unchanged.</p>
+        </div>
+
+        <!-- ── STEP 1 — Firebase ── -->
+        <div class="section" id="step1">
+            <div class="section-header">
+                <div class="section-num">1</div>
+                <div>
+                    <div class="section-title">Firebase Project Setup</div>
+                    <div class="section-subtitle">Create the backend — Firestore database for orders, config, and admin history</div>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <span class="callout-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                <p><strong>Do this first</strong>You need the Firebase credentials before you can build <code class="inline">credentials.json</code>. Complete this step entirely before moving on.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-list-check" style="color:var(--primary)"></i> Firebase Setup Checklist</div>
+                <ul class="checklist">
+                    <li>
+                        <input type="checkbox" id="fb1"><label for="fb1">Go to <strong>console.firebase.google.com</strong> → "Add project" → give it a unique name (e.g. <code class="inline">my-restaurant-prod</code>)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="fb2"><label for="fb2">Disable Google Analytics if not needed (keeps it simpler), or enable it — your choice</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="fb3"><label for="fb3">Go to <strong>Build → Firestore Database</strong> → "Create database" → choose <strong>Production mode</strong> → select a region (asia-south1 for India)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="fb4"><label for="fb4">Go to <strong>Project Settings → General → Your apps</strong> → click "Add app" → choose Web (<code class="inline">&lt;/&gt;</code>) → register it → copy the <code class="inline">firebaseConfig</code> object</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="fb5"><label for="fb5">Note down all 7 values: <code class="inline">apiKey</code>, <code class="inline">authDomain</code>, <code class="inline">projectId</code>, <code class="inline">storageBucket</code>, <code class="inline">messagingSenderId</code>, <code class="inline">appId</code>, <code class="inline">measurementId</code></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="fb6"><label for="fb6">Decide on 4 Firestore collection names: config, orders, admin, admin_history (or custom names — they're encrypted)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="fb7"><label for="fb7">Set Firestore security rules to allow read/write (you'll tighten later)</label>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-shield-halved" style="color:var(--warning)"></i> Recommended Firestore Rules</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">Firestore Rules</span>
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <pre><code><span class="kw">rules_version</span> = <span class="str">'2'</span>;
+<span class="kw">service</span> cloud.firestore {
+  <span class="kw">match</span> /databases/{database}/documents {
+    <span class="cmt">// Config: public read, no public write</span>
+    <span class="kw">match</span> /config/{document} {
+      <span class="kw">allow</span> read: <span class="kw">if</span> <span class="fn">true</span>;
+      <span class="kw">allow</span> write: <span class="kw">if</span> <span class="fn">false</span>;
+    }
+    <span class="cmt">// Orders: anyone can write (place order), no public read</span>
+    <span class="kw">match</span> /orders/{document} {
+      <span class="kw">allow</span> read:  <span class="kw">if</span> <span class="fn">false</span>;
+      <span class="kw">allow</span> write: <span class="kw">if</span> <span class="fn">true</span>;
+    }
+    <span class="cmt">// Admin collections: locked down</span>
+    <span class="kw">match</span> /admin/{document} {
+      <span class="kw">allow</span> read, write: <span class="kw">if</span> <span class="fn">false</span>;
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-table-columns" style="color:var(--info)"></i> What Each Collection Does</div>
+                <table class="field-table">
+                    <thead>
+                        <tr><th>Collection</th><th>Purpose</th><th>Who writes?</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code class="inline">config</code></td><td>Shop open/close status, hours, WhatsApp number, disabled item IDs</td><td>Admin panel</td></tr>
+                        <tr><td><code class="inline">orders</code></td><td>Customer orders submitted from cart</td><td>Customer (cart.js)</td></tr>
+                        <tr><td><code class="inline">admin</code></td><td>Reserved for future admin config</td><td>—</td></tr>
+                        <tr><td><code class="inline">admin_history</code></td><td>Admin action log</td><td>Admin panel</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── STEP 2 — Assets ── -->
+        <div class="section" id="step2">
+            <div class="section-header">
+                <div class="section-num">2</div>
+                <div>
+                    <div class="section-title">Gather Restaurant Assets</div>
+                    <div class="section-subtitle">Everything you need before touching any code</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-store" style="color:var(--primary)"></i> Identity</div>
+                    <ul class="checklist">
+                        <li><input type="checkbox" id="a1"><label for="a1">Restaurant full name (e.g. "My Food Corner")</label></li>
+                        <li><input type="checkbox" id="a2"><label for="a2">Short directory name / prefix (e.g. <code class="inline">mfc</code>, 2–5 lowercase chars)</label></li>
+                        <li><input type="checkbox" id="a3"><label for="a3">Logo file — PNG/WebP, square format recommended</label></li>
+                        <li><input type="checkbox" id="a4"><label for="a4">Primary brand color (hex) — used as CSS theme</label></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-location-dot" style="color:var(--danger)"></i> Location & Contact</div>
+                    <ul class="checklist">
+                        <li><input type="checkbox" id="a5"><label for="a5">Full address (for footer/bill)</label></li>
+                        <li><input type="checkbox" id="a6"><label for="a6">Google Maps link (maps.app.goo.gl shortlink)</label></li>
+                        <li><input type="checkbox" id="a7"><label for="a7">WhatsApp number for order notifications (with country code)</label></li>
+                        <li><input type="checkbox" id="a8"><label for="a8">Phone number for the bill footer</label></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-motorcycle" style="color:var(--warning)"></i> Delivery Config</div>
+                    <ul class="checklist">
+                        <li><input type="checkbox" id="a9"><label for="a9">Minimum order for free delivery (₹ amount)</label></li>
+                        <li><input type="checkbox" id="a10"><label for="a10">Delivery charge below minimum</label></li>
+                        <li><input type="checkbox" id="a11"><label for="a11">Delivery area names (list of localities)</label></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-clock" style="color:var(--success)"></i> Operations</div>
+                    <ul class="checklist">
+                        <li><input type="checkbox" id="a12"><label for="a12">Default opening hour (0–23)</label></li>
+                        <li><input type="checkbox" id="a13"><label for="a13">Default closing hour (0–23)</label></li>
+                        <li><input type="checkbox" id="a14"><label for="a14">Admin password (will be AES encrypted)</label></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-images" style="color:var(--primary)"></i> Dish Images</div>
+                <ul class="step-list">
+                    <li><span class="icon">📁</span><div>Place all dish images inside <code class="inline">/food_src/</code> (shared across all restaurants) as <code class="inline">WebP</code> format.</div></li>
+                    <li><span class="icon">🏷️</span><div>Name each file exactly: <strong>Dish_Name.webp</strong> — spaces replaced with underscores, match the dish name in <code class="inline">data.json</code> exactly.</div></li>
+                    <li><span class="icon">✅</span><div>If TCD already has the same dish image, you don't need to add it — it's shared via the same <code class="inline">/food_src/</code> directory.</div></li>
+                    <li><span class="icon">📐</span><div>Recommended size: 400×400px minimum. Use <a href="https://squoosh.app" target="_blank" style="color:var(--primary)">squoosh.app</a> to convert PNG/JPG → WebP.</div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ── STEP 3 — Clone ── -->
+        <div class="section" id="step3">
+            <div class="section-header">
+                <div class="section-num">3</div>
+                <div>
+                    <div class="section-title">Clone the TCD Directory</div>
+                    <div class="section-subtitle">Copy the entire TCD app as your starting point</div>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <span class="callout-icon"><i class="fas fa-info-circle"></i></span>
+                <p>TCD is the reference implementation. All logic is already inside it. You only need to swap config, data, and branding.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-terminal" style="color:var(--primary)"></i> Terminal Commands</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <pre><code><span class="cmt"># From the repo root (akcreation-apps.github.io/)</span>
+<span class="cmt"># Replace "MFC" with your restaurant directory name</span>
+
+cp -r TCD/ MFC/
+
+<span class="cmt"># Rename the logo placeholder</span>
+mv MFC/tcd-logo.png MFC/mfc-logo.png
+
+<span class="cmt"># Rename the admin order data file</span>
+mv MFC/admin/tcd_order_data.json MFC/admin/mfc_order_data.json
+
+<span class="cmt"># Update the hardcoded filename reference in app.js (line 206)</span>
+sed -i <span class="str">'s/admin\/tcd_order_data.json/admin\/mfc_order_data.json/g'</span> MFC/app.js
+
+<span class="cmt"># Update the same reference in admin/script.js (line 123)</span>
+sed -i <span class="str">'s/tcd_order_data.json/mfc_order_data.json/g'</span> MFC/admin/script.js</code></pre>
+                </div>
+                <div class="callout warning">
+                    <span class="callout-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                    <p><strong>Windows note:</strong> Use <code class="inline">xcopy /E /I TCD MFC</code> or copy via Explorer. The logo rename can be done in Explorer too.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-folder-tree" style="color:var(--info)"></i> Files You Will Modify</div>
+                <div class="dir-tree">
+<span class="dir">MFC/</span>
+├── <span class="new">restaurant.js</span>          <span class="grey">← NEW: restaurant config (replaces TCD version)</span>
+├── <span class="new">credentials.json</span>       <span class="grey">← NEW: your encrypted Firebase credentials</span>
+├── <span class="new">data.json</span>              <span class="grey">← NEW: your menu data</span>
+├── <span class="new">mfc-logo.png</span>           <span class="grey">← NEW: your restaurant logo</span>
+├── <span class="mod">index.html</span>             <span class="grey">← MOD: title, meta, canonical, address, colors</span>
+├── <span class="mod">cart.html</span>              <span class="grey">← MOD: title, meta, canonical</span>
+├── <span class="mod">invoice.html</span>           <span class="grey">← MOD: title, meta, canonical</span>
+├── <span class="mod">viewInvoice.html</span>       <span class="grey">← MOD: title, restaurant header, address</span>
+├── <span class="mod">app.js</span>                 <span class="grey">← MOD: update order_data.json path (line 206)</span>
+├── <span class="file">cart.js</span>                <span class="grey">← unchanged (reads from restaurant.js)</span>
+├── <span class="file">common.js</span>              <span class="grey">← unchanged (reads from restaurant.js)</span>
+├── <span class="file">invoice_scripts.js</span>     <span class="grey">← unchanged</span>
+└── <span class="dir">admin/</span>
+    ├── <span class="mod">index.html</span>         <span class="grey">← MOD: title</span>
+    ├── <span class="file">script.js</span>          <span class="grey">← unchanged</span>
+    ├── <span class="file">styles.css</span>         <span class="grey">← unchanged</span>
+    └── <span class="new">mfc_order_data.json</span> <span class="grey">← NEW: renamed from tcd_order_data.json</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── STEP 4 — restaurant.js ── -->
+        <div class="section" id="step4">
+            <div class="section-header">
+                <div class="section-num">4</div>
+                <div>
+                    <div class="section-title">Create restaurant.js</div>
+                    <div class="section-subtitle">The single source of truth for all restaurant-specific config</div>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <span class="callout-icon"><i class="fas fa-circle-check"></i></span>
+                <p><strong>Why this file matters</strong>Every script in the app reads from <code class="inline">RESTAURANT</code> object. Change this one file and the entire app adapts. Never hardcode restaurant values anywhere else.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">MFC/restaurant.js</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <pre><code><span class="kw">const</span> <span class="var">RESTAURANT</span> = {
+    <span class="key">name</span>:           <span class="str">"My Food Corner"</span>,         <span class="cmt">// Full name shown in UI & WhatsApp messages</span>
+    <span class="key">prefix</span>:         <span class="str">"mfc"</span>,                   <span class="cmt">// Short prefix — ALL localStorage keys use this</span>
+    <span class="key">encKey</span>:         [<span class="str">'MFC'</span>, <span class="str">'FOOD'</span>, <span class="str">'CORNER'</span>].<span class="fn">join</span>(<span class="str">'-'</span>),  <span class="cmt">// AES decrypt key for credentials.json</span>
+    <span class="key">logo</span>:           <span class="str">"mfc-logo.png"</span>,           <span class="cmt">// Logo filename in this directory</span>
+    <span class="key">mapsUrl</span>:        <span class="str">"https://maps.app.goo.gl/YOURLINK"</span>,  <span class="cmt">// Google Maps share link</span>
+    <span class="key">wpFallback</span>:     <span class="str">"+919XXXXXXXXX"</span>,          <span class="cmt">// Fallback WhatsApp if Firestore unreachable</span>
+    <span class="key">minOrder</span>:       <span class="num">200</span>,                      <span class="cmt">// Minimum order for free delivery (₹)</span>
+    <span class="key">deliveryCharge</span>: <span class="num">50</span>                       <span class="cmt">// Delivery charge below minimum (₹)</span>
+};
+
+<span class="kw">function</span> <span class="fn">lsKey</span>(<span class="var">key</span>) { <span class="kw">return</span> <span class="var">RESTAURANT</span>.<span class="key">prefix</span> + <span class="str">'_'</span> + <span class="var">key</span>; }</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-table" style="color:var(--warning)"></i> Field Reference</div>
+                <table class="field-table">
+                    <thead><tr><th>Field</th><th>Example</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td><code class="inline">name</code></td><td>"My Food Corner"</td><td>Shown in navbar, WhatsApp messages, bill header</td></tr>
+                        <tr><td><code class="inline">prefix</code></td><td>"mfc"</td><td><strong>Lowercase, 2–5 chars.</strong> All localStorage keys become <code class="inline">mfc_cart</code>, <code class="inline">mfc_table</code>, etc.</td></tr>
+                        <tr><td><code class="inline">encKey</code></td><td>"MFC-FOOD-CORNER"</td><td>Used to AES-encrypt credentials.json. Match exactly in Step 5 tool.</td></tr>
+                        <tr><td><code class="inline">logo</code></td><td>"mfc-logo.png"</td><td>Must exist in the restaurant directory</td></tr>
+                        <tr><td><code class="inline">mapsUrl</code></td><td>maps.app.goo.gl/…</td><td>Short share link from Google Maps</td></tr>
+                        <tr><td><code class="inline">wpFallback</code></td><td>+91XXXXXXXXXX</td><td>Used if Firestore config unavailable</td></tr>
+                        <tr><td><code class="inline">minOrder</code></td><td>200</td><td>Number in ₹ (no quotes)</td></tr>
+                        <tr><td><code class="inline">deliveryCharge</code></td><td>50</td><td>Number in ₹ (no quotes)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── STEP 5 — credentials.json ── -->
+        <div class="section" id="step5">
+            <div class="section-header">
+                <div class="section-num">5</div>
+                <div>
+                    <div class="section-title">Generate credentials.json</div>
+                    <div class="section-subtitle">Encrypt your Firebase values using the encKey from Step 4</div>
+                </div>
+            </div>
+
+            <div class="callout danger">
+                <span class="callout-icon"><i class="fas fa-shield-halved"></i></span>
+                <p><strong>Security note:</strong> The <code class="inline">encKey</code> is the decryption password. It lives only in <code class="inline">restaurant.js</code> (client-side). This is obfuscation — it's not truly secret, but it prevents casual scraping of your Firebase credentials from a public repo.</p>
+            </div>
+
+            <!-- Interactive credentials generator -->
+            <div class="tool-card" id="tool-creds">
+                <div class="tool-title"><i class="fas fa-key"></i> Credential Encryptor Tool</div>
+                <div class="tool-subtitle">Paste your Firebase values below and get a ready-to-use credentials.json</div>
+
+                <div class="tool-grid">
+                    <div class="tool-field">
+                        <label>Encryption Key (encKey from restaurant.js)</label>
+                        <input type="text" id="enc-key" placeholder="MFC-FOOD-CORNER" value="">
+                    </div>
+                    <div class="tool-field">
+                        <label>apiKey</label>
+                        <input type="text" id="fb-apiKey" placeholder="AIzaSy...">
+                    </div>
+                    <div class="tool-field">
+                        <label>authDomain</label>
+                        <input type="text" id="fb-authDomain" placeholder="my-app.firebaseapp.com">
+                    </div>
+                    <div class="tool-field">
+                        <label>projectId</label>
+                        <input type="text" id="fb-projectId" placeholder="my-app-12345">
+                    </div>
+                    <div class="tool-field">
+                        <label>storageBucket</label>
+                        <input type="text" id="fb-storageBucket" placeholder="my-app.appspot.com">
+                    </div>
+                    <div class="tool-field">
+                        <label>messagingSenderId</label>
+                        <input type="text" id="fb-messagingSenderId" placeholder="123456789012">
+                    </div>
+                    <div class="tool-field">
+                        <label>appId</label>
+                        <input type="text" id="fb-appId" placeholder="1:123456789:web:abc...">
+                    </div>
+                    <div class="tool-field">
+                        <label>measurementId (optional)</label>
+                        <input type="text" id="fb-measurementId" placeholder="G-XXXXXXXX">
+                    </div>
+                    <div class="tool-field">
+                        <label>Config collection name</label>
+                        <input type="text" id="fb-dbName" placeholder="config" value="config">
+                    </div>
+                    <div class="tool-field">
+                        <label>Orders collection name</label>
+                        <input type="text" id="fb-orderTable" placeholder="orders" value="orders">
+                    </div>
+                    <div class="tool-field">
+                        <label>Admin history collection name</label>
+                        <input type="text" id="fb-adminHistory" placeholder="admin_history" value="admin_history">
+                    </div>
+                    <div class="tool-field">
+                        <label>Admin password</label>
+                        <input type="password" id="fb-passKey" placeholder="YourSecurePassword123">
+                    </div>
+                </div>
+
+                <div class="tool-actions">
+                    <button class="btn-generate" onclick="generateCredentials()">
+                        <i class="fas fa-bolt"></i> Generate credentials.json
+                    </button>
+                    <button class="btn-clear" onclick="clearCredentialsTool()">
+                        <i class="fas fa-eraser"></i> Clear
+                    </button>
+                </div>
+
+                <div class="tool-output" id="credOutput">
+                    <pre id="credOutputText"></pre>
+                    <div class="tool-output-actions">
+                        <button class="btn-copy-output" onclick="copyCredOutput()">
+                            <i class="fas fa-copy"></i> Copy JSON
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-note">
+                    <i class="fas fa-circle-info"></i>
+                    <strong> This runs entirely in your browser.</strong> Nothing is sent to any server. Save the output as <code style="color:#fde68a">MFC/credentials.json</code>.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-eye" style="color:var(--muted)"></i> Expected credentials.json shape</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <pre><code>{
+  <span class="key">"API_KEY"</span>:                  <span class="str">"U2FsdGVkX1+..."</span>,
+  <span class="key">"AUTH_DOMAIN"</span>:              <span class="str">"U2FsdGVkX1/..."</span>,
+  <span class="key">"ID"</span>:                       <span class="str">"U2FsdGVkX1+..."</span>,
+  <span class="key">"STORAGE_BUCKET"</span>:           <span class="str">"U2FsdGVkX18..."</span>,
+  <span class="key">"MESSAGING_SENDER_ID"</span>:      <span class="str">"U2FsdGVkX18..."</span>,
+  <span class="key">"APP_ID"</span>:                   <span class="str">"U2FsdGVkX1/..."</span>,
+  <span class="key">"MEASUREMENT_ID"</span>:           <span class="str">"U2FsdGVkX1/..."</span>,
+  <span class="key">"DB_NAME"</span>:                  <span class="str">"U2FsdGVkX18..."</span>,  <span class="cmt">// config collection name</span>
+  <span class="key">"ORDER_TABLE_NAME"</span>:         <span class="str">"U2FsdGVkX1/..."</span>,  <span class="cmt">// orders collection name</span>
+  <span class="key">"ADMIN_HISTORY_TABLE_NAME"</span>:  <span class="str">"U2FsdGVkX19..."</span>,  <span class="cmt">// admin_history collection name</span>
+  <span class="key">"PASS_KEY"</span>:                 <span class="str">"U2FsdGVkX1/..."</span>   <span class="cmt">// encrypted admin password</span>
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── STEP 6 — data.json ── -->
+        <div class="section" id="step6">
+            <div class="section-header">
+                <div class="section-num">6</div>
+                <div>
+                    <div class="section-title">Build data.json (Menu)</div>
+                    <div class="section-subtitle">Define all categories, subcategories, and dishes</div>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <span class="callout-icon"><i class="fas fa-info-circle"></i></span>
+                <p><strong>IDs must be globally unique</strong> across the entire file. Use a numbering scheme like: Category 1 → 100–199, Category 2 → 200–299, etc. Dish IDs are used to track disabled items in admin.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">MFC/data.json — Full structure</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <pre><code>{
+  <span class="key">"menu"</span>: [
+    {
+      <span class="key">"category"</span>: <span class="str">"Fast Food"</span>,          <span class="cmt">// Category heading shown in UI</span>
+      <span class="key">"subcategories"</span>: [
+        {
+          <span class="key">"name"</span>: <span class="str">"Burgers"</span>,             <span class="cmt">// Subcategory label</span>
+          <span class="key">"type"</span>: <span class="str">"Veg"</span>,               <span class="cmt">// "Veg" or "NonVeg" — controls veg/non-veg filter</span>
+          <span class="key">"dishes"</span>: [
+            { <span class="key">"id"</span>: <span class="num">101</span>, <span class="key">"name"</span>: <span class="str">"Veg Burger"</span>,        <span class="key">"price"</span>: <span class="num">79</span>  },
+            { <span class="key">"id"</span>: <span class="num">102</span>, <span class="key">"name"</span>: <span class="str">"Cheese Burger"</span>,     <span class="key">"price"</span>: <span class="num">99</span>  },
+            { <span class="key">"id"</span>: <span class="num">103</span>, <span class="key">"name"</span>: <span class="str">"Aloo Tikki Burger"</span>, <span class="key">"price"</span>: <span class="num">69</span>  }
+          ]
+        },
+        {
+          <span class="key">"name"</span>: <span class="str">"Burgers"</span>,
+          <span class="key">"type"</span>: <span class="str">"NonVeg"</span>,
+          <span class="key">"dishes"</span>: [
+            { <span class="key">"id"</span>: <span class="num">201</span>, <span class="key">"name"</span>: <span class="str">"Chicken Burger"</span>,     <span class="key">"price"</span>: <span class="num">119</span> },
+            { <span class="key">"id"</span>: <span class="num">202</span>, <span class="key">"name"</span>: <span class="str">"Spicy Chicken Burger"</span>,<span class="key">"price"</span>: <span class="num">139</span> }
+          ]
+        },
+        {
+          <span class="key">"name"</span>: <span class="str">"Pizza"</span>,
+          <span class="key">"type"</span>: <span class="str">"Veg"</span>,
+          <span class="key">"dishes"</span>: [
+            { <span class="key">"id"</span>: <span class="num">301</span>, <span class="key">"name"</span>: <span class="str">"Margherita"</span>,         <span class="key">"price"</span>: <span class="num">149</span> },
+            { <span class="key">"id"</span>: <span class="num">302</span>, <span class="key">"name"</span>: <span class="str">"Paneer Tikka Pizza"</span>,  <span class="key">"price"</span>: <span class="num">189</span> }
+          ]
+        }
+      ]
+    },
+    {
+      <span class="key">"category"</span>: <span class="str">"Beverages"</span>,
+      <span class="key">"subcategories"</span>: [
+        {
+          <span class="key">"name"</span>: <span class="str">"Cold Drinks"</span>,
+          <span class="key">"type"</span>: <span class="str">"Veg"</span>,
+          <span class="key">"dishes"</span>: [
+            { <span class="key">"id"</span>: <span class="num">401</span>, <span class="key">"name"</span>: <span class="str">"Coca Cola"</span>,          <span class="key">"price"</span>: <span class="num">40</span>  },
+            { <span class="key">"id"</span>: <span class="num">402</span>, <span class="key">"name"</span>: <span class="str">"Mango Shake"</span>,        <span class="key">"price"</span>: <span class="num">79</span>  }
+          ]
+        }
+      ]
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-circle-exclamation" style="color:var(--warning)"></i> Data Rules</div>
+                <ul class="step-list">
+                    <li><span class="icon">🔑</span><div><strong>IDs must be unique integers.</strong> Duplicate IDs break the disable/enable items feature in admin.</div></li>
+                    <li><span class="icon">🏷️</span><div><strong>Dish names must match image filenames.</strong> <code class="inline">Veg Burger</code> → image must be <code class="inline">/food_src/Veg_Burger.webp</code> (spaces → underscores).</div></li>
+                    <li><span class="icon">🥗</span><div><strong>type</strong> must be exactly <code class="inline">"Veg"</code> or <code class="inline">"NonVeg"</code> — case-sensitive. This drives the veg/non-veg toggle filter.</div></li>
+                    <li><span class="icon">💰</span><div><strong>price</strong> is a number (no ₹ symbol, no quotes). Decimals are allowed: <code class="inline">49.50</code>.</div></li>
+                    <li><span class="icon">📋</span><div>Multiple subcategories can share the same name (e.g. "Starter" Veg and "Starter" NonVeg) — they display as separate sections.</div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ── STEP 7 — HTML Files ── -->
+        <div class="section" id="step7">
+            <div class="section-header">
+                <div class="section-num">7</div>
+                <div>
+                    <div class="section-title">Update HTML Files</div>
+                    <div class="section-subtitle">Swap branding, meta tags, address, and delivery area buttons</div>
+                </div>
+            </div>
+
+            <!-- index.html -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-file-code" style="color:var(--primary)"></i> index.html — What to change</div>
+                <table class="field-table">
+                    <thead><tr><th>What</th><th>Find (TCD value)</th><th>Replace with your value</th></tr></thead>
+                    <tbody>
+                        <tr><td><code class="inline">&lt;title&gt;</code></td><td>The Cafe Darbar — …</td><td>My Food Corner — Order Online</td></tr>
+                        <tr><td>canonical URL</td><td>…/TCD/</td><td>…/MFC/</td></tr>
+                        <tr><td>og:title / og:description</td><td>"The Cafe Darbar"</td><td>"My Food Corner"</td></tr>
+                        <tr><td>Schema <code class="inline">name</code></td><td>"The Cafe Darbar"</td><td>"My Food Corner"</td></tr>
+                        <tr><td>Schema <code class="inline">address</code></td><td>Banki address</td><td>Your address</td></tr>
+                        <tr><td>Schema <code class="inline">telephone</code></td><td>+918920042482</td><td>Your phone</td></tr>
+                        <tr><td>CSS <code class="inline">--primary</code></td><td>#FF6B35 (orange)</td><td>Your brand color</td></tr>
+                        <tr><td>Maps link href</td><td>maps.app.goo.gl/…</td><td>Your Google Maps link</td></tr>
+                        <tr><td>Delivery area buttons</td><td>Nayabazar, Mankamba, etc.</td><td>Your delivery locality names</td></tr>
+                        <tr><td>Address in header</td><td>Banki, Cuttack</td><td>Your address</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">index.html — CSS variables (find & replace)</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <pre><code><span class="cmt">/* Find this block in &lt;style&gt; and replace colors */</span>
+<span class="kw">:root</span> {
+    <span class="key">--primary</span>:   <span class="str">#FF6B35</span>;   <span class="cmt">/* ← your brand primary color */</span>
+    <span class="key">--navy</span>:      <span class="str">#1A1A2E</span>;   <span class="cmt">/* ← navbar / dark backgrounds */</span>
+    <span class="key">--bg</span>:        <span class="str">#F5F0EB</span>;   <span class="cmt">/* ← page background */</span>
+}</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">index.html — Delivery area buttons (find & replace)</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <pre><code><span class="cmt">&lt;!-- Find the place picker section and update localities --&gt;</span>
+&lt;<span class="kw">button</span> <span class="key">class</span>=<span class="str">"place-btn"</span> <span class="key">onclick</span>=<span class="str">"store_data('Locality 1')"</span>&gt;Locality 1&lt;/<span class="kw">button</span>&gt;
+&lt;<span class="kw">button</span> <span class="key">class</span>=<span class="str">"place-btn"</span> <span class="key">onclick</span>=<span class="str">"store_data('Locality 2')"</span>&gt;Locality 2&lt;/<span class="kw">button</span>&gt;
+&lt;<span class="kw">button</span> <span class="key">class</span>=<span class="str">"place-btn"</span> <span class="key">onclick</span>=<span class="str">"store_data('Locality 3')"</span>&gt;Locality 3&lt;/<span class="kw">button</span>&gt;</code></pre>
+            </div>
+
+            <!-- cart.html, invoice.html -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-file-code" style="color:var(--info)"></i> cart.html, invoice.html — What to change</div>
+                <ul class="step-list">
+                    <li><span class="icon">🏷️</span><div>Update <code class="inline">&lt;title&gt;</code> to use your restaurant name</div></li>
+                    <li><span class="icon">🔗</span><div>Update <code class="inline">canonical</code> href from <code class="inline">/TCD/cart.html</code> → <code class="inline">/MFC/cart.html</code></div></li>
+                    <li><span class="icon">🖼️</span><div>Update <code class="inline">og:image</code> and <code class="inline">og:title</code> meta tags</div></li>
+                    <li><span class="icon">✅</span><div>The script tags (<code class="inline">restaurant.js</code>, <code class="inline">cart.js</code>, <code class="inline">common.js</code>) don't need changes — paths are relative</div></li>
+                </ul>
+            </div>
+
+            <!-- viewInvoice.html -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-receipt" style="color:var(--success)"></i> viewInvoice.html — Bill header</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">viewInvoice.html — bill-header section</span>
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <pre><code>&lt;<span class="kw">div</span> <span class="key">class</span>=<span class="str">"bill-header"</span>&gt;
+    &lt;<span class="kw">div</span> <span class="key">class</span>=<span class="str">"bill-title"</span>&gt;My Food Corner&lt;/<span class="kw">div</span>&gt;
+    &lt;<span class="kw">div</span> <span class="key">class</span>=<span class="str">"restaurant-info"</span>&gt;
+        &lt;<span class="kw">p</span>&gt;Your Landmark / Area&lt;/<span class="kw">p</span>&gt;
+        &lt;<span class="kw">p</span>&gt;Street, Road Name&lt;/<span class="kw">p</span>&gt;
+        &lt;<span class="kw">p</span>&gt;City, State PINCODE&lt;/<span class="kw">p</span>&gt;
+        &lt;<span class="kw">p</span>&gt;TEL: 09XXXXXXXXX&lt;/<span class="kw">p</span>&gt;
+    &lt;/<span class="kw">div</span>&gt;
+&lt;/<span class="kw">div</span>&gt;</code></pre>
+                </div>
+            </div>
+
+            <!-- admin/index.html -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-lock" style="color:var(--danger)"></i> admin/index.html</div>
+                <ul class="step-list">
+                    <li><span class="icon">🏷️</span><div>Update <code class="inline">&lt;title&gt;</code></div></li>
+                    <li><span class="icon">🔗</span><div>The script tag path is <code class="inline">../restaurant.js</code> — this is already correct after cloning, no change needed</div></li>
+                    <li><span class="icon">📦</span><div>Update <code class="inline">tcd_order_data.json</code> reference in <strong>2 files</strong>:<br>• <code class="inline">app.js</code> line 206 — <code class="inline">fetch(`admin/tcd_order_data.json`)</code> → <code class="inline">fetch(`admin/mfc_order_data.json`)</code><br>• <code class="inline">admin/script.js</code> line 123 — same filename swap</div></li>
+                </ul>
+            </div>
+
+            <div class="callout warning">
+                <span class="callout-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                <p><strong>Check admin/script.js for the order_data filename.</strong> Search for <code class="inline">_order_data.json</code> in <code class="inline">admin/script.js</code> and update the prefix to match your restaurant.</p>
+            </div>
+        </div>
+
+        <!-- ── STEP 8 — Seed Firestore ── -->
+        <div class="section" id="step8">
+            <div class="section-header">
+                <div class="section-num">8</div>
+                <div>
+                    <div class="section-title">Seed Firestore Config Document</div>
+                    <div class="section-subtitle">Create the initial config document that the app reads on first load</div>
+                </div>
+            </div>
+
+            <div class="callout danger">
+                <span class="callout-icon"><i class="fas fa-exclamation-circle"></i></span>
+                <p><strong>Without this, the app will fail silently.</strong> On first load, <code class="inline">app.js</code> reads shop status, opening/closing times, WhatsApp number, and disabled items from Firestore. If the document doesn't exist, the shop appears closed and WhatsApp falls back to <code class="inline">wpFallback</code>.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-database" style="color:var(--primary)"></i> Create the config document in Firebase Console</div>
+                <ul class="step-list">
+                    <li><span class="icon">1️⃣</span><div>Go to Firebase Console → Firestore Database → your project</div></li>
+                    <li><span class="icon">2️⃣</span><div>Click <strong>"Start collection"</strong> → name it <code class="inline">config</code> (or whatever you put in credentials.json)</div></li>
+                    <li><span class="icon">3️⃣</span><div>Create the first document with <strong>Auto ID</strong></div></li>
+                    <li><span class="icon">4️⃣</span><div>Add these fields to the document (see table below)</div></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-table" style="color:var(--info)"></i> Required Firestore Config Fields</div>
+                <table class="field-table">
+                    <thead><tr><th>Field name</th><th>Type</th><th>Initial value</th><th>Purpose</th></tr></thead>
+                    <tbody>
+                        <tr><td><code class="inline">shop_status</code></td><td>string</td><td><code class="inline">open</code></td><td>Controls whether ordering is allowed (<code class="inline">open</code> / <code class="inline">closed</code>)</td></tr>
+                        <tr><td><code class="inline">opening_time</code></td><td>string</td><td><code class="inline">10</code></td><td>Hour the shop opens (24h format, as string)</td></tr>
+                        <tr><td><code class="inline">closing_time</code></td><td>string</td><td><code class="inline">22</code></td><td>Hour the shop closes (24h format, as string)</td></tr>
+                        <tr><td><code class="inline">whatsapp_no</code></td><td>string</td><td><code class="inline">+919XXXXXXXXX</code></td><td>WhatsApp number for receiving orders</td></tr>
+                        <tr><td><code class="inline">disabled_items</code></td><td>string</td><td><code class="inline">[]</code></td><td>JSON array of disabled dish IDs (e.g. <code class="inline">[101, 205]</code>). Note: localStorage key is <code class="inline">disable_item_ids</code> but the Firestore field is <code class="inline">disabled_items</code>.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout info">
+                <span class="callout-icon"><i class="fas fa-info-circle"></i></span>
+                <p>All field names are <strong>unprefixed</strong> — they're the same across all restaurants. The restaurant prefix only applies to localStorage keys, never to Firestore field names.</p>
+            </div>
+        </div>
+
+        <!-- ── STEP 9 — Deploy ── -->
+        <div class="section" id="step9">
+            <div class="section-header">
+                <div class="section-num">9</div>
+                <div>
+                    <div class="section-title">Deploy &amp; Verify</div>
+                    <div class="section-subtitle">Push to GitHub Pages, update sitemap, and run the final checklist</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-code-branch" style="color:var(--primary)"></i> Add to sitemap.xml</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">sitemap.xml — add this entry</span>
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <pre><code>&lt;<span class="kw">url</span>&gt;
+    &lt;<span class="kw">loc</span>&gt;https://akcreation-apps.com/MFC/&lt;/<span class="kw">loc</span>&gt;
+    &lt;<span class="kw">lastmod</span>&gt;2025-01-01&lt;/<span class="kw">lastmod</span>&gt;
+    &lt;<span class="kw">changefreq</span>&gt;weekly&lt;/<span class="kw">changefreq</span>&gt;
+    &lt;<span class="kw">priority</span>&gt;0.8&lt;/<span class="kw">priority</span>&gt;
+&lt;/<span class="kw">url</span>&gt;</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-terminal" style="color:var(--text)"></i> Git Commit &amp; Push</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <pre><code><span class="cmt"># Stage only the new restaurant directory and sitemap</span>
+git add MFC/ sitemap.xml
+
+git commit -m <span class="str">"feat: onboard My Food Corner restaurant app"</span>
+
+git push origin main
+
+<span class="cmt"># GitHub Pages deploys automatically in ~60 seconds</span>
+<span class="cmt"># Live at: https://akcreation-apps.com/MFC/</span></code></pre>
+                </div>
+            </div>
+
+            <!-- Final checklist -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-clipboard-check" style="color:var(--success)"></i> Final Verification Checklist</div>
+                <div class="final-checklist">
+                    <label class="final-item"><input type="checkbox"> <label>Home page loads, menu visible</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Shop status shows "Open" correctly</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Can add items to cart</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Cart page shows items and total</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Delivery charge applied below minimum</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>WhatsApp order message sends correctly</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Order saved to Firestore (check console)</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Invoice page shows the order</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Bill download (PNG) works</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Admin page loads, password works</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Admin can toggle shop open/close</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Admin can disable a dish, verify it shows disabled on menu</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>localStorage keys are prefixed with <code class="inline">mfc_</code> (check DevTools → Application → Local Storage)</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>No TCD data bleeds into new restaurant (open both in same browser, verify separate cart)</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Veg/Non-veg filter works correctly</label></label>
+                    <label class="final-item"><input type="checkbox"> <label>Mobile layout looks correct at 375px</label></label>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <span class="callout-icon"><i class="fas fa-party-horn"></i></span>
+                <p><strong>You're live!</strong> The restaurant is fully onboarded. Customers can now order, the admin can manage the menu and hours, and all data is isolated from other restaurants in the system.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-circle-question" style="color:var(--muted)"></i> Quick Troubleshooting</div>
+                <table class="field-table">
+                    <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+                    <tbody>
+                        <tr><td>Blank page / console errors</td><td>Firebase credentials wrong or encKey mismatch</td><td>Re-run the encryptor tool with the exact same encKey as in restaurant.js</td></tr>
+                        <tr><td>Shop always shows "Closed"</td><td>Missing Firestore config document</td><td>Complete Step 8 — seed the config document</td></tr>
+                        <tr><td>WhatsApp message shows wrong name</td><td>RESTAURANT.name not updated</td><td>Update <code class="inline">name</code> in restaurant.js</td></tr>
+                        <tr><td>Cart from TCD appearing in new restaurant</td><td>Same prefix used</td><td>Change <code class="inline">prefix</code> in restaurant.js to something unique</td></tr>
+                        <tr><td>Admin login fails</td><td>PASS_KEY encrypted with wrong key</td><td>Re-encrypt the admin password with your encKey</td></tr>
+                        <tr><td>Images not showing</td><td>Filename mismatch</td><td>Image must be <code class="inline">/food_src/Exact_Dish_Name.webp</code> — spaces to underscores</td></tr>
+                        <tr><td>Delivery areas not showing</td><td>Place picker buttons not updated</td><td>Update the <code class="inline">store_data('...')</code> button list in index.html</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+// ── Sidebar toggle (mobile) ──────────────────────────────
+const menuBtn     = document.getElementById('menuBtn');
+const sidebar     = document.getElementById('sidebar');
+const overlay     = document.getElementById('sidebarOverlay');
+
+menuBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+});
+overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+});
+
+// ── Active sidebar + progress tracking ──────────────────
+const sections = document.querySelectorAll('.section[id]');
+const navItems = document.querySelectorAll('.sidebar-item[data-step]');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+const TOTAL_STEPS = 9;
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const id = entry.target.id;
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + id) {
+                    item.classList.add('active');
+                }
+            });
+        }
+    });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(s => observer.observe(s));
+
+// Checkbox progress tracking
+function updateProgress() {
+    const allChecks = document.querySelectorAll('.checklist input[type="checkbox"], .final-checklist input[type="checkbox"]');
+    const checked = document.querySelectorAll('.checklist input[type="checkbox"]:checked, .final-checklist input[type="checkbox"]:checked');
+    const ratio = allChecks.length > 0 ? checked.length / allChecks.length : 0;
+    const stepsComplete = Math.round(ratio * TOTAL_STEPS);
+    progressFill.style.width = (ratio * 100) + '%';
+    progressText.textContent = `${stepsComplete} / ${TOTAL_STEPS} steps`;
+}
+document.addEventListener('change', e => {
+    if (e.target.type === 'checkbox') updateProgress();
+});
+updateProgress();
+
+// ── Copy code ───────────────────────────────────────────
+function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+        }, 2000);
+    });
+}
+
+// ── Credentials Generator ────────────────────────────────
+function generateCredentials() {
+    const encKey = document.getElementById('enc-key').value.trim();
+    if (!encKey) { alert('Enter the encryption key first.'); return; }
+
+    const fields = {
+        API_KEY:                 document.getElementById('fb-apiKey').value.trim(),
+        AUTH_DOMAIN:             document.getElementById('fb-authDomain').value.trim(),
+        ID:                      document.getElementById('fb-projectId').value.trim(),
+        STORAGE_BUCKET:          document.getElementById('fb-storageBucket').value.trim(),
+        MESSAGING_SENDER_ID:     document.getElementById('fb-messagingSenderId').value.trim(),
+        APP_ID:                  document.getElementById('fb-appId').value.trim(),
+        MEASUREMENT_ID:          document.getElementById('fb-measurementId').value.trim(),
+        DB_NAME:                 document.getElementById('fb-dbName').value.trim(),
+        ORDER_TABLE_NAME:        document.getElementById('fb-orderTable').value.trim(),
+        ADMIN_HISTORY_TABLE_NAME:document.getElementById('fb-adminHistory').value.trim(),
+        PASS_KEY:                document.getElementById('fb-passKey').value.trim(),
+    };
+
+    const missing = Object.entries(fields)
+        .filter(([k, v]) => !v && k !== 'MEASUREMENT_ID')
+        .map(([k]) => k);
+    if (missing.length) {
+        alert('Missing required fields: ' + missing.join(', '));
+        return;
+    }
+
+    const encrypted = {};
+    for (const [k, v] of Object.entries(fields)) {
+        if (v) encrypted[k] = CryptoJS.AES.encrypt(v, encKey).toString();
+    }
+
+    const output = JSON.stringify(encrypted, null, 2);
+    document.getElementById('credOutputText').textContent = output;
+    document.getElementById('credOutput').style.display = 'block';
+}
+
+function clearCredentialsTool() {
+    ['enc-key','fb-apiKey','fb-authDomain','fb-projectId','fb-storageBucket',
+     'fb-messagingSenderId','fb-appId','fb-measurementId','fb-passKey'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('fb-dbName').value = 'config';
+    document.getElementById('fb-orderTable').value = 'orders';
+    document.getElementById('fb-adminHistory').value = 'admin_history';
+    document.getElementById('credOutput').style.display = 'none';
+}
+
+function copyCredOutput() {
+    const text = document.getElementById('credOutputText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.btn-copy-output');
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copy JSON'; }, 2000);
+    });
+}
+</script>
+
+</body>
+</html>
