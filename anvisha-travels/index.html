@@ -573,6 +573,9 @@
           <div id="pax-custom-wrap" style="display:none; margin-top:10px;">
             <input type="number" id="pax-custom" min="8" max="50" placeholder="Enter exact number (e.g. 10)"
               style="background:var(--dark-3);border:1.5px solid var(--dark-4);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:15px;font-weight:500;padding:13px 14px;width:100%;outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;appearance:none;">
+            <p id="pax-error" style="display:none; color:#ef4444; font-size:11px; margin-top:5px; font-weight:600;">
+              <i class="fas fa-circle-exclamation"></i> Number must be 8 or more
+            </p>
           </div>
         </div>
       </div>
@@ -685,14 +688,29 @@
       } else {
         paxCustomWrap.style.display = 'none';
         paxCustom.value = '';
+        paxCustom.style.borderColor = 'var(--dark-4)';
+        paxCustom.style.boxShadow   = '';
+        document.getElementById('pax-error').style.display = 'none';
       }
       update();
     });
 
     paxCustom.addEventListener('input', function() {
-      // Style focus like other inputs
-      this.style.borderColor = this.value ? 'var(--amber)' : 'var(--dark-4)';
-      this.style.boxShadow   = this.value ? '0 0 0 3px rgba(245,158,11,0.15)' : '';
+      var n        = parseInt(this.value, 10);
+      var paxError = document.getElementById('pax-error');
+      if (this.value === '') {
+        this.style.borderColor = 'var(--dark-4)';
+        this.style.boxShadow   = '';
+        paxError.style.display = 'none';
+      } else if (n < 8) {
+        this.style.borderColor = '#ef4444';
+        this.style.boxShadow   = '0 0 0 3px rgba(239,68,68,0.15)';
+        paxError.style.display = 'block';
+      } else {
+        this.style.borderColor = 'var(--amber)';
+        this.style.boxShadow   = '0 0 0 3px rgba(245,158,11,0.15)';
+        paxError.style.display = 'none';
+      }
       update();
     });
 
