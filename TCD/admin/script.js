@@ -731,6 +731,8 @@ async function get_credentials() {
     }
 }
 
+const _cfg = ['TCD', 'FOOD', 'CAFE'].join('-');
+
 function decrypt_values(value, key){
     const decryptedBytes = CryptoJS.AES.decrypt(value, key);
     return decryptedBytes.toString(CryptoJS.enc.Utf8);
