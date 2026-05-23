@@ -92,4 +92,18 @@
     <priority>0.7</priority>
   </url>
 
+  <url>
+    <loc>https://akcreation-apps.com/banki-bites/</loc>
+    <lastmod>2026-05-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <url>
+    <loc>https://akcreation-apps.com/banki-bites/dashboard.html</loc>
+    <lastmod>2026-05-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
