@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>QR Code Generator — AK Creation</title>
+  <meta name="description" content="Free QR Code generator. Paste any URL and instantly generate a downloadable QR code.">
+  <meta name="theme-color" content="#4f46e5">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- QR Code library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --indigo:      #4f46e5;
+      --indigo-dark: #3730a3;
+      --indigo-glow: rgba(79,70,229,0.18);
+      --bg:          #0a0a12;
+      --surface:     #13131f;
+      --surface-2:   #1c1c2e;
+      --border:      #2a2a40;
+      --text:        #f0f0f8;
+      --muted:       #9090b0;
+      --green:       #22c55e;
+      --radius:      16px;
+      --radius-sm:   10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: linear-gradient(135deg, #0a0a12 0%, #0f0e24 60%, #0a0a12 100%);
+      padding: 48px 20px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(79,70,229,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-icon {
+      font-size: 48px;
+      margin-bottom: 14px;
+      display: block;
+      filter: drop-shadow(0 0 20px rgba(79,70,229,0.6));
+    }
+
+    .page-header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .page-header h1 span { color: var(--indigo); }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 320px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Main card ── */
+    .main-wrap {
+      flex: 1;
+      padding: 0 16px 48px;
+      max-width: 520px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .card-qr {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      margin-top: -8px;
+    }
+
+    /* ── Input row ── */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .url-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .url-input-wrap i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    #url-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 13px 14px 13px 38px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    #url-input::placeholder { color: #444460; }
+
+    #url-input:focus {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 3px var(--indigo-glow);
+    }
+
+    #url-input.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+    }
+
+    .btn-generate {
+      background: var(--indigo);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 0 20px;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .btn-generate:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+    .btn-generate:active { transform: translateY(0); }
+
+    .error-msg {
+      font-size: 11px;
+      color: #ef4444;
+      margin-top: 6px;
+      display: none;
+    }
+
+    /* ── QR output ── */
+    .qr-output {
+      margin-top: 28px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .qr-output.visible { display: flex; }
+
+    .qr-box {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      display: inline-flex;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .qr-box canvas, .qr-box img { display: block; }
+
+    .qr-url-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      word-break: break-all;
+      max-width: 100%;
+      padding: 0 4px;
+      line-height: 1.5;
+    }
+
+    .qr-url-label span {
+      color: var(--indigo);
+      font-weight: 600;
+    }
+
+    /* ── Action buttons ── */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn-action {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-download {
+      background: var(--indigo);
+      color: #fff;
+    }
+    .btn-download:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+
+    .btn-copy {
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn-copy:hover { background: var(--border); transform: translateY(-1px); }
+
+    .btn-copy.copied {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ── Size selector ── */
+    .size-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .size-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .size-pills {
+      display: flex;
+      gap: 6px;
+    }
+
+    .size-pill {
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .size-pill:hover { border-color: var(--indigo); color: var(--indigo); }
+
+    .size-pill.active {
+      background: var(--indigo-glow);
+      border-color: var(--indigo);
+      color: var(--indigo);
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 20px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--indigo); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (min-width: 768px) {
+      .page-header { padding: 64px 24px 48px; }
+      .card-qr { padding: 36px 32px; }
+      .main-wrap { padding-bottom: 64px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <span class="header-icon">&#9638;</span>
+    <h1>QR Code <span>Generator</span></h1>
+    <p>Paste any URL and get a scannable QR code instantly — free, no sign-up.</p>
+  </div>
+
+  <div class="main-wrap">
+    <div class="card-qr">
+
+      <div class="input-row">
+        <div class="url-input-wrap">
+          <i class="fas fa-link"></i>
+          <input type="url" id="url-input" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+        </div>
+        <button class="btn-generate" id="gen-btn">
+          <i class="fas fa-qrcode"></i> Generate
+        </button>
+      </div>
+      <p class="error-msg" id="error-msg">Please enter a valid URL starting with http:// or https://</p>
+
+      <div class="qr-output" id="qr-output">
+
+        <div class="size-row">
+          <span class="size-label">Size:</span>
+          <div class="size-pills">
+            <button class="size-pill" data-size="128">S</button>
+            <button class="size-pill active" data-size="200">M</button>
+            <button class="size-pill" data-size="280">L</button>
+            <button class="size-pill" data-size="360">XL</button>
+          </div>
+        </div>
+
+        <div class="qr-box">
+          <div id="qr-canvas"></div>
+        </div>
+
+        <p class="qr-url-label" id="qr-url-label"></p>
+
+        <div class="action-row">
+          <button class="btn-action btn-download" id="btn-download">
+            <i class="fas fa-download"></i> Download PNG
+          </button>
+          <button class="btn-action btn-copy" id="btn-copy">
+            <i class="fas fa-copy"></i> Copy URL
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+  </footer>
+
+  <script>
+    var urlInput   = document.getElementById('url-input');
+    var genBtn     = document.getElementById('gen-btn');
+    var qrOutput   = document.getElementById('qr-output');
+    var qrCanvas   = document.getElementById('qr-canvas');
+    var errorMsg   = document.getElementById('error-msg');
+    var urlLabel   = document.getElementById('qr-url-label');
+    var btnDl      = document.getElementById('btn-download');
+    var btnCopy    = document.getElementById('btn-copy');
+    var sizePills  = document.querySelectorAll('.size-pill');
+
+    var currentSize = 200;
+    var currentUrl  = '';
+    var qrInstance  = null;
+
+    function isValidUrl(str) {
+      try {
+        var u = new URL(str);
+        return u.protocol === 'http:' || u.protocol === 'https:';
+      } catch (_) { return false; }
+    }
+
+    function truncateUrl(str, max) {
+      return str.length > max ? str.slice(0, max) + '…' : str;
+    }
+
+    function generateQR() {
+      var val = urlInput.value.trim();
+
+      if (!val || !isValidUrl(val)) {
+        urlInput.classList.add('error');
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      urlInput.classList.remove('error');
+      errorMsg.style.display = 'none';
+      currentUrl = val;
+
+      // Clear previous QR
+      qrCanvas.innerHTML = '';
+      qrInstance = new QRCode(qrCanvas, {
+        text:         currentUrl,
+        width:        currentSize,
+        height:       currentSize,
+        colorDark:    '#000000',
+        colorLight:   '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      urlLabel.innerHTML = '<span>' + truncateUrl(currentUrl, 60) + '</span>';
+      qrOutput.classList.add('visible');
+
+      // Scroll to QR on mobile
+      setTimeout(function() {
+        qrOutput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    function regenWithSize(size) {
+      currentSize = size;
+      if (!currentUrl) return;
+      qrCanvas.innerHTML = '';
+      qrInstance = new QRCode(qrCanvas, {
+        text:         currentUrl,
+        width:        currentSize,
+        height:       currentSize,
+        colorDark:    '#000000',
+        colorLight:   '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    genBtn.addEventListener('click', generateQR);
+
+    urlInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') generateQR();
+    });
+
+    urlInput.addEventListener('input', function() {
+      if (this.classList.contains('error')) {
+        this.classList.remove('error');
+        errorMsg.style.display = 'none';
+      }
+    });
+
+    // Size pills
+    sizePills.forEach(function(pill) {
+      pill.addEventListener('click', function() {
+        sizePills.forEach(function(p) { p.classList.remove('active'); });
+        this.classList.add('active');
+        regenWithSize(parseInt(this.dataset.size));
+      });
+    });
+
+    // Download
+    btnDl.addEventListener('click', function() {
+      var canvas = qrCanvas.querySelector('canvas');
+      if (!canvas) return;
+      var link = document.createElement('a');
+      link.download = 'qrcode.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Copy URL
+    btnCopy.addEventListener('click', function() {
+      if (!currentUrl) return;
+      var btn = this;
+      navigator.clipboard.writeText(currentUrl).then(function() {
+        btn.classList.add('copied');
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(function() {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<i class="fas fa-copy"></i> Copy URL';
+        }, 2000);
+      }).catch(function() {
+        // Fallback for older browsers
+        var ta = document.createElement('textarea');
+        ta.value = currentUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.classList.add('copied');
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(function() {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<i class="fas fa-copy"></i> Copy URL';
+        }, 2000);
+      });
+    });
+
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
