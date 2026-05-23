@@ -780,7 +780,7 @@ async function update_changes() {
         };
 
         console.log(credentials);
-        const foodItemRef = doc(db, decrypt_values(credentials.ADMIN_TABLE_NAME, credentials.KEY), window.doc_id);
+        const foodItemRef = doc(db, decrypt_values(credentials.DB_NAME, credentials.KEY), window.doc_id);
 
         // Await for the updateDoc operation to complete
         await updateDoc(foodItemRef, updatedData);
