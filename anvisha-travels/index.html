@@ -27,6 +27,10 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+  <!-- Flatpickr — cross-platform date picker (fixes iOS showing past dates) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
   <!-- Analytics -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
 
@@ -428,6 +432,96 @@
       .card-booking { padding: 36px 32px; }
       .booking-section, .how-section { padding-bottom: 64px; }
     }
+
+    /* ── Flatpickr dark theme ── */
+    .flatpickr-calendar {
+      background: #1e1e1e !important;
+      border: 1px solid #2e2e2e !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+      font-family: 'Inter', sans-serif !important;
+      color: #f5f5f5 !important;
+    }
+    /* All inner containers dark */
+    .flatpickr-months,
+    .flatpickr-month,
+    .flatpickr-weekdays,
+    .flatpickr-weekdaycontainer,
+    .flatpickr-innerContainer,
+    .flatpickr-rContainer,
+    .flatpickr-days,
+    .dayContainer {
+      background: #1e1e1e !important;
+      color: #f5f5f5 !important;
+    }
+    .flatpickr-days,
+    .dayContainer { border-color: #2e2e2e !important; }
+    /* Month/year header */
+    .flatpickr-current-month,
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input.cur-year {
+      color: #f5f5f5 !important;
+      background: transparent !important;
+    }
+    .flatpickr-monthDropdown-months { background: #1e1e1e !important; }
+    /* Weekday labels */
+    .flatpickr-weekday {
+      color: #888 !important;
+      background: transparent !important;
+      font-weight: 600 !important;
+    }
+    /* Day cells */
+    .flatpickr-day {
+      color: #f0f0f0 !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      border-radius: 8px !important;
+    }
+    .flatpickr-day:hover,
+    .flatpickr-day:focus {
+      background: #2e2e2e !important;
+      border-color: #2e2e2e !important;
+      color: #fff !important;
+    }
+    /* Today */
+    .flatpickr-day.today {
+      border-color: var(--amber) !important;
+      color: var(--amber) !important;
+      font-weight: 700 !important;
+      background: transparent !important;
+    }
+    .flatpickr-day.today:hover {
+      background: rgba(245,158,11,0.12) !important;
+    }
+    /* Selected */
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange {
+      background: var(--amber) !important;
+      border-color: var(--amber) !important;
+      color: #111 !important;
+      font-weight: 700 !important;
+    }
+    /* Disabled / past dates */
+    .flatpickr-day.flatpickr-disabled,
+    .flatpickr-day.flatpickr-disabled:hover,
+    .flatpickr-day.prevMonthDay,
+    .flatpickr-day.nextMonthDay {
+      color: #3a3a3a !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      cursor: not-allowed !important;
+      text-decoration: line-through !important;
+    }
+    /* Nav arrows */
+    .flatpickr-prev-month,
+    .flatpickr-next-month { color: #888 !important; fill: #888 !important; }
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg { fill: #888 !important; }
+    .flatpickr-prev-month:hover svg,
+    .flatpickr-next-month:hover svg { fill: var(--amber) !important; }
+    #ride-date { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -474,8 +568,12 @@
             <option value="5">5 passengers</option>
             <option value="6">6 passengers</option>
             <option value="7">7 passengers</option>
-            <option value="8">8+ passengers</option>
+            <option value="8+">8+ passengers</option>
           </select>
+          <div id="pax-custom-wrap" style="display:none; margin-top:10px;">
+            <input type="number" id="pax-custom" min="8" max="50" placeholder="Enter exact number (e.g. 10)"
+              style="background:var(--dark-3);border:1.5px solid var(--dark-4);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:15px;font-weight:500;padding:13px 14px;width:100%;outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;appearance:none;">
+          </div>
         </div>
       </div>
 
@@ -534,11 +632,16 @@
     var waBtn           = document.getElementById('wa-btn');
     var helperText      = document.getElementById('helper-text');
 
-    // Min date = today
-    var today = new Date();
-    dateInput.min = today.getFullYear() + '-'
-      + String(today.getMonth() + 1).padStart(2, '0') + '-'
-      + String(today.getDate()).padStart(2, '0');
+    // Flatpickr — replaces native date input on all platforms including iOS.
+    // disableMobile:true forces Flatpickr's own calendar on iOS (native picker ignores minDate visually).
+    // defaultDate:"today" auto-selects today on load.
+    flatpickr(dateInput, {
+      minDate:       'today',
+      defaultDate:   'today',
+      dateFormat:    'Y-m-d',
+      disableMobile: true,
+      onChange: function() { update(); }
+    });
 
     // Populate time select with 30-min slots, default 6:00 AM
     (function() {
@@ -564,9 +667,38 @@
       return p[2] + ' ' + months[+p[1] - 1] + ' ' + p[0];
     }
 
+    var paxCustomWrap = document.getElementById('pax-custom-wrap');
+    var paxCustom     = document.getElementById('pax-custom');
+
+    function getPax() {
+      if (passengerSelect.value === '8+') {
+        var n = parseInt(paxCustom.value, 10);
+        return (n >= 8) ? String(n) : '';
+      }
+      return passengerSelect.value;
+    }
+
+    passengerSelect.addEventListener('change', function() {
+      if (this.value === '8+') {
+        paxCustomWrap.style.display = 'block';
+        paxCustom.focus();
+      } else {
+        paxCustomWrap.style.display = 'none';
+        paxCustom.value = '';
+      }
+      update();
+    });
+
+    paxCustom.addEventListener('input', function() {
+      // Style focus like other inputs
+      this.style.borderColor = this.value ? 'var(--amber)' : 'var(--dark-4)';
+      this.style.boxShadow   = this.value ? '0 0 0 3px rgba(245,158,11,0.15)' : '';
+      update();
+    });
+
     function buildWAUrl() {
       var time = timeSelect.options[timeSelect.selectedIndex].text;
-      var pax  = passengerSelect.value;
+      var pax  = getPax();
       var dest = document.getElementById('destination').value.trim();
 
       // Emoji as hardcoded percent-encoded UTF-8 bytes — immune to file encoding
@@ -587,7 +719,7 @@
     }
 
     function update() {
-      var ok = dateInput.value && timeSelect.value && passengerSelect.value;
+      var ok = dateInput.value && timeSelect.value && getPax();
       if (ok) {
         locationSection.classList.add('visible');
         waBtn.disabled = false;
@@ -600,18 +732,7 @@
       }
     }
 
-    // iOS Safari ignores the `min` attribute on date pickers — validate on change
-    dateInput.addEventListener('change', function() {
-      var todayStr = today.getFullYear() + '-'
-        + String(today.getMonth() + 1).padStart(2, '0') + '-'
-        + String(today.getDate()).padStart(2, '0');
-      if (this.value && this.value < todayStr) {
-        this.value = todayStr;
-      }
-      update();
-    });
     timeSelect.addEventListener('change', update);
-    passengerSelect.addEventListener('change', update);
     document.getElementById('destination').addEventListener('input', update);
 
     document.getElementById('footer-year').textContent = new Date().getFullYear();
