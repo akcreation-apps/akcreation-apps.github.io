@@ -1,0 +1,120 @@
+{
+  "menu": [
+    {
+      "category": "Chinese",
+      "subcategories": [
+        {
+          "name": "Soup",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 11, "name": "Clear", "price": 39 },
+            { "id": 12, "name": "Manchow", "price": 49 }
+          ]
+        },
+        {
+          "name": "Starter",
+          "type": "Veg",
+          "dishes": [
+            { "id": 101, "name": "Paneer Chilli", "price": 99 },
+            { "id": 102, "name": "Paneer Salt N Peper", "price": 109 },
+            { "id": 103, "name": "Paneer 65", "price": 129 },
+            { "id": 104, "name": "Paneer Chatpati", "price": 129 },
+            { "id": 105, "name": "Mushroom Chatpati", "price": 99 },
+            { "id": 106, "name": "Mushroom Chilli", "price": 109 },
+            { "id": 107, "name": "Mushroom 65", "price": 139 }
+          ]
+        },
+        {
+          "name": "Starter",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 201, "name": "Chicken Pakoda", "price": 139 },
+            { "id": 202, "name": "Egg Chap", "price": 109 },
+            { "id": 203, "name": "Chicken 65", "price": 129 },
+            { "id": 204, "name": "Chicken Lollipop", "price": 129 }
+          ]
+        },
+        {
+          "name": "MainCourse",
+          "type": "Veg",
+          "dishes": [
+            { "id": 301, "name": "Veg Chowmein", "price": 59 },
+            { "id": 302, "name": "Chowmein Roll", "price": 59 },
+            { "id": 303, "name": "Veg Roll", "price": 69 },
+            { "id": 304, "name": "Mix Veg Roll", "price": 69 },
+            { "id": 305, "name": "Paneer Roll", "price": 69 }
+          ]
+        },
+        {
+          "name": "MainCourse",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 401, "name": "Single Egg Chowmein", "price": 69 },
+            { "id": 402, "name": "Double Egg Chowmein", "price": 79 },
+            { "id": 403, "name": "Single Egg Roll", "price": 59 },
+            { "id": 404, "name": "Double Egg Roll", "price": 69 },
+            { "id": 405, "name": "Lachha Roll", "price": 89 },
+            { "id": 406, "name": "Special Mix Roll", "price": 89 }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Indian",
+      "subcategories": [
+        {
+          "name": "Roti N Paratha",
+          "dishes": [
+            { "id": 501, "name": "Plain Paratha", "price": 19 },
+            { "id": 502, "name": "Lachha Paratha", "price": 29 }
+          ]
+        },
+        {
+          "name": "Biryani",
+          "type": "Veg",
+          "dishes": [
+            { "id": 601, "name": "Veg Biryani (Full)", "price": 89 }
+          ]
+        },
+        {
+          "name": "Biryani",
+          "type": "NonVeg",
+          "dishes": [
+            { "id": 701, "name": "Chicken Biryani (3pc)", "price": 129 }
+          ]
+        },
+        {
+          "name": "Curry",
+          "type": "Veg",
+          "dishes": [
+            { "id": 801, "name": "Mix Veg", "price": 99 },
+            { "id": 802, "name": "Veg Hyderabadi", "price": 109 },
+            { "id": 803, "name": "Mushroom Masala", "price": 99 },
+            { "id": 804, "name": "Mushroom Butter Masala", "price": 129 },
+            { "id": 805, "name": "Mushroom Hyderabadi", "price": 129 },
+            { "id": 806, "name": "Kadai Mushroom", "price": 129 },
+            { "id": 807, "name": "Mushroom Do Pyaja", "price": 139 },
+            { "id": 808, "name": "Paneer Masala", "price": 109 },
+            { "id": 809, "name": "Paneer Butter Masala", "price": 119 },
+            { "id": 810, "name": "Paneer Hyderabadi", "price": 129 },
+            { "id": 811, "name": "Kadai Paneer", "price": 129 },
+            { "id": 812, "name": "Paneer Do Pyaja", "price": 129 }
+          ]
+        },
+        {
+          "name": "Curry",
+          "type": "NonVeg",
+          "dishes": [
+
+            { "id": 901, "name": "Chicken Kasa", "price": 129 },
+            { "id": 902, "name": "Chicken Butter Masala", "price": 139 },
+            { "id": 903, "name": "Chicken Hyderabadi", "price": 139 },
+            { "id": 904, "name": "Kadai Chicken", "price": 139 },
+            { "id": 905, "name": "Chicken Do Pyaja", "price": 139 },
+            { "id": 906, "name": "Chicken Mughlai", "price": 139 }
+          ]
+        }
+      ]
+    }
+  ]
+}

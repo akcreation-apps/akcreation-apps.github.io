@@ -1,4 +1,4 @@
-function get_dish_url(dish_name) {
+﻿function get_dish_url(dish_name) {
     // Split the string into words by spaces, then join with an underscore
     return '../food_src/'+dish_name.split(' ').join('_')+'.webp';
 }
@@ -35,16 +35,16 @@ function store_data(){
     const urlParams = new URLSearchParams(window.location.search);
     const table_no = urlParams.get('table');
     if(table_no){
-        localStorage.setItem('table', table_no);
+        localStorage.setItem('tcd_table', table_no);
         if (/^\d+$/.test(table_no)) {
             // Numeric table → Dine-In session, set place immediately
-            localStorage.setItem('place', 'Dine-In');
+            localStorage.setItem('tcd_place', 'Dine-In');
         } else {
             // Non-numeric (COD, etc.)
-            const existingPlace = localStorage.getItem('place');
+            const existingPlace = localStorage.getItem('tcd_place');
             if (existingPlace === 'Dine-In') {
                 // Switching from a dine-in session — clear stale Dine-In so location is asked
-                localStorage.removeItem('place');
+                localStorage.removeItem('tcd_place');
             }
             // Any real delivery location already stored → keep it untouched
         }
@@ -122,7 +122,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
                 otherInput.focus();
                 return;
             }
-            localStorage.setItem('place', custom);
+            localStorage.setItem('tcd_place', custom);
             closeModal(custom);
         }
 
@@ -143,7 +143,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
                 } else {
                     otherWrapper.style.display = 'none';
                     errorMsg.style.display = 'none';
-                    localStorage.setItem('place', value);
+                    localStorage.setItem('tcd_place', value);
                     closeModal(value);
                 }
             }, sig);
@@ -184,12 +184,12 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
 }
 
 function checkAndAskPlace() {
-    const table = localStorage.getItem('table');
-    const place = localStorage.getItem('place');
+    const table = localStorage.getItem('tcd_table');
+    const place = localStorage.getItem('tcd_place');
     if (!table || place) return Promise.resolve();
 
     if (/^\d+$/.test(table)) {
-        localStorage.setItem('place', 'Dine-In');
+        localStorage.setItem('tcd_place', 'Dine-In');
         return Promise.resolve();
     }
 
@@ -198,8 +198,8 @@ function checkAndAskPlace() {
 }
 
 function updateDeliveryBadge() {
-    const place = localStorage.getItem('place');
-    const table = localStorage.getItem('table');
+    const place = localStorage.getItem('tcd_place');
+    const table = localStorage.getItem('tcd_table');
     const strip = document.getElementById('deliveryStrip');
     if (!strip || !place || !table) return;
     const isDineIn = place === 'Dine-In';
@@ -218,7 +218,7 @@ function updateDeliveryBadge() {
     strip.style.display = 'block';
 
     document.getElementById('dsChangeBtn')?.addEventListener('click', async function() {
-        const current = localStorage.getItem('place') || '';
+        const current = localStorage.getItem('tcd_place') || '';
         await openPlacePicker(current, 'Change delivery location', true, this);
         updateDeliveryBadge();
     });

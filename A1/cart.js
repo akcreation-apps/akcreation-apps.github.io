@@ -4,7 +4,7 @@ const BACKUP_WP_NO = "+918920042482"
 const MINIMUM_ORDER_PRICE = 200
 const DELIVERY_CHARGES = 50
 // Retrieve the cart from localStorage
-let cart = JSON.parse(localStorage.getItem('tcd_cart')) || [];
+let cart = JSON.parse(localStorage.getItem('a1_cart')) || [];
 
 // Render the cart items on the cart page
 const renderCartItems = () => {
@@ -112,7 +112,7 @@ const updateTotalPrice = () => {
             total += dishItem.price * dishItem.quantity;
         });
     });
-    const table = localStorage.getItem('tcd_table');
+    const table = localStorage.getItem('a1_table');
 
     if (table === 'COD') {
         if (total > 0 && total < MINIMUM_ORDER_PRICE) {
@@ -138,16 +138,16 @@ const updateTotalPrice = () => {
 
 // Update session storage whenever cart changes
 const updateCartStorage = () => {
-    localStorage.setItem('tcd_cart', JSON.stringify(cart));
+    localStorage.setItem('a1_cart', JSON.stringify(cart));
 };
 
 // Load the cart items when the cart page is opened
 document.addEventListener('DOMContentLoaded', () => {
     showLoader();
-    const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
+    const storedExpirationTime = localStorage.getItem('a1_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
-        if (currentTime < storedExpirationTime || localStorage.getItem('tcd_table')==="COD") {
+        if (currentTime < storedExpirationTime || localStorage.getItem('a1_table')==="COD") {
             document.getElementById('invoiceIcon').style.display = 'flex';
         }
     }
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Function to get cart items from local storage
 function getCartItems() {
-    const cart = JSON.parse(localStorage.getItem('tcd_cart')) || [];
+    const cart = JSON.parse(localStorage.getItem('a1_cart')) || [];
     return cart;
 }
 
@@ -174,7 +174,7 @@ function createOrderMessage(cartItems) {
       now.getDate().toString().padStart(2, '0') +
       now.getHours().toString().padStart(2, '0') +
       now.getMinutes().toString().padStart(2, '0');
-    let message = "*The Cafe Darbar*\nHello, I would like to place an order for the following items:\n\n";
+    let message = "*A1 Amul Fast Food*\nHello, I would like to place an order for the following items:\n\n";
     message += "Ordered ID: "+orderId+"\n\n";
     message += "Ordered Items:\n\n";
 
@@ -234,9 +234,9 @@ function calculateTotal(cartItems, message) {
         }, 0);
     }, 0);
     let deliveryNote = "";
-    const table = localStorage.getItem('tcd_table');
+    const table = localStorage.getItem('a1_table');
 
-    const place = localStorage.getItem('tcd_place') || '';
+    const place = localStorage.getItem('a1_place') || '';
     if (table === 'COD') {
         // Apply delivery charge if below 200
         if (total > 0 && total < MINIMUM_ORDER_PRICE) {
@@ -264,12 +264,12 @@ const placeOrderButton = document.getElementById('place-order-btn');
 placeOrderButton.addEventListener('click', () => {
     showLoader();
     const cartItems = getCartItems(); // Get cart items
-    const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
-    const storedShopStatus = localStorage.getItem('tcd_shop_status');
-    const storedOpeningTime = localStorage.getItem('tcd_opening_time');
-    const storedClosingTime = localStorage.getItem('tcd_closing_time');
+    const storedExpirationTime = localStorage.getItem('a1_urlExpiration');
+    const storedShopStatus = localStorage.getItem('a1_shop_status');
+    const storedOpeningTime = localStorage.getItem('a1_opening_time');
+    const storedClosingTime = localStorage.getItem('a1_closing_time');
     const currentHour = new Date().getHours();
-    if (storedExpirationTime && localStorage.getItem('tcd_table')!=="COD") {
+    if (storedExpirationTime && localStorage.getItem('a1_table')!=="COD") {
         const currentTime = Date.now();
         if (currentTime >= storedExpirationTime) {
             Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error');
@@ -305,11 +305,11 @@ placeOrderButton.addEventListener('click', () => {
         return;
     }
     const today = new Date().toDateString();
-    const lastOrderDate = localStorage.getItem('tcd_order_date');
-    let ordersToday = parseInt(localStorage.getItem('tcd_order_count') || '0', 10);
+    const lastOrderDate = localStorage.getItem('a1_order_date');
+    let ordersToday = parseInt(localStorage.getItem('a1_order_count') || '0', 10);
     if (lastOrderDate && lastOrderDate !== today) {
-        localStorage.removeItem('tcd_order_date');
-        localStorage.removeItem('tcd_order_count');
+        localStorage.removeItem('a1_order_date');
+        localStorage.removeItem('a1_order_count');
         ordersToday = 0;
     }
     if (ordersToday >= 5) {
@@ -319,14 +319,14 @@ placeOrderButton.addEventListener('click', () => {
     }
     const orderMessage = createOrderMessage(cartItems);
     let phoneNo = ''
-    if (!localStorage.getItem('tcd_whatsapp_no')) {
+    if (!localStorage.getItem('a1_whatsapp_no')) {
         phoneNo = BACKUP_WP_NO;
     } else{
-        phoneNo = localStorage.getItem('tcd_whatsapp_no');
+        phoneNo = localStorage.getItem('a1_whatsapp_no');
     }
     collect_data()
-    localStorage.setItem('tcd_order_date', today);
-    localStorage.setItem('tcd_order_count', ordersToday + 1);
+    localStorage.setItem('a1_order_date', today);
+    localStorage.setItem('a1_order_count', ordersToday + 1);
     sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
     hideLoader();
     Swal.fire('Success', 'Order Placed Successfully.', 'success').then(() => {
@@ -335,7 +335,7 @@ placeOrderButton.addEventListener('click', () => {
 });
 
 function collect_data(){
-    let order_history = JSON.parse(localStorage.getItem('tcd_order_history')) || [];
+    let order_history = JSON.parse(localStorage.getItem('a1_order_history')) || [];
     get_credentials().then(credentials => {  // Return the promise here
         const firebaseConfig = {
             apiKey: decrypt_values(credentials.API_KEY, _cfg),
@@ -353,10 +353,10 @@ function collect_data(){
         const cartTotalNumber = parseFloat(cartTotalValue.replace(/[^0-9.-]+/g,"")); // Removes currency symbols, etc.
         let data = {
             'order_details':getCartItems(),
-            'triggered_to':localStorage.getItem('tcd_whatsapp_no'),
+            'triggered_to':localStorage.getItem('a1_whatsapp_no'),
             'total_cart_value':cartTotalNumber,
-            'table_no':localStorage.getItem('tcd_table'),
-            'tcd_place':localStorage.getItem('tcd_place') || '',
+            'table_no':localStorage.getItem('a1_table'),
+            'a1_place':localStorage.getItem('a1_place') || '',
             'status':'In Progress',
             'created_at':Timestamp.now()}
         if (deliveryNoteValue.includes("delivery charge")) {
@@ -372,12 +372,12 @@ function collect_data(){
                     'api_call': 'Initiated',
                     'order_details': data // Instead of fetching it again, use the data you just sent
                 });
-                localStorage.setItem('tcd_order_history', JSON.stringify(order_history)); // Store as string
+                localStorage.setItem('a1_order_history', JSON.stringify(order_history)); // Store as string
             })
             .catch(error => {
                 console.error("Error adding document: ", error);
             });
-        localStorage.removeItem('tcd_cart')
+        localStorage.removeItem('a1_cart')
 
     });
 }

@@ -1,9 +1,9 @@
-// Import the necessary Firebase services
+﻿// Import the necessary Firebase services
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 // Initialize cart array to store selected items
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = JSON.parse(localStorage.getItem('tcd_cart')) || [];
 
 const searchBar = document.getElementById('searchBar');
 const clearSearchButton = document.getElementById('clearSearch');
@@ -103,7 +103,7 @@ const updateItemQty = (subcategory, dish, delta) => {
             }
         });
     }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('tcd_cart', JSON.stringify(cart));
     updateCartCount();
 };
 
@@ -250,19 +250,19 @@ document.addEventListener('DOMContentLoaded', async() => {
     const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
     if (storedExpirationTime) {
         const currentTime = Date.now();
-        if (currentTime <= storedExpirationTime || localStorage.getItem('table')==="COD") {
+        if (currentTime <= storedExpirationTime || localStorage.getItem('tcd_table')==="COD") {
             document.getElementById('invoiceIcon').style.display = 'flex';
             await fetch_data();
         }
         else{
-            localStorage.removeItem('disable_item_ids')
+            localStorage.removeItem('tcd_disable_item_ids')
         }
     } else{
-        localStorage.removeItem('disable_item_ids')
+        localStorage.removeItem('tcd_disable_item_ids')
     }
 
     // Get disabled item ids from localStorage
-    let disable_ids = localStorage.getItem('disable_item_ids');
+    let disable_ids = localStorage.getItem('tcd_disable_item_ids');
     if (disable_ids === null) {
         disable_ids = [];
     } else {
@@ -275,8 +275,8 @@ document.addEventListener('DOMContentLoaded', async() => {
     // Load checkbox states from localStorage
     const onlyVegCheckbox = document.getElementById('vegFilter');
     const onlyNonVegCheckbox = document.getElementById('nonVegFilter');
-    onlyVegCheckbox.checked = localStorage.getItem('onlyVeg') === 'true';
-    onlyNonVegCheckbox.checked = localStorage.getItem('onlyNonVeg') === 'true';
+    onlyVegCheckbox.checked = localStorage.getItem('tcd_onlyVeg') === 'true';
+    onlyNonVegCheckbox.checked = localStorage.getItem('tcd_onlyNonVeg') === 'true';
 
     const renderMenu = () => {
         menuContainer.innerHTML = ''; // Clear previous content
@@ -415,8 +415,8 @@ document.addEventListener('DOMContentLoaded', async() => {
 
     // Setup filter functionality
     const saveCheckboxState = () => {
-        localStorage.setItem('onlyVeg', onlyVegCheckbox.checked);
-        localStorage.setItem('onlyNonVeg', onlyNonVegCheckbox.checked);
+        localStorage.setItem('tcd_onlyVeg', onlyVegCheckbox.checked);
+        localStorage.setItem('tcd_onlyNonVeg', onlyNonVegCheckbox.checked);
         searchBar.value = ''; // Set the search bar value to empty
         renderMenu(); // Re-render menu when checkbox state changes
     };
@@ -452,31 +452,31 @@ function fetch_data(){
             .then(querySnapshot => {
                 querySnapshot.forEach(doc => {
                     if (doc.data().whatsapp_no !== undefined) {
-                        localStorage.setItem('whatsapp_no', doc.data().whatsapp_no);
+                        localStorage.setItem('tcd_whatsapp_no', doc.data().whatsapp_no);
                     }
                     if (doc.data().disabled_items !== undefined) {
-                        localStorage.setItem('disable_item_ids', doc.data().disabled_items);
+                        localStorage.setItem('tcd_disable_item_ids', doc.data().disabled_items);
                     }
                     if (doc.data().shop_status !== undefined) {
-                        localStorage.setItem('shop_status', doc.data().shop_status);
+                        localStorage.setItem('tcd_shop_status', doc.data().shop_status);
                     }
                     if (doc.data().opening_time !== undefined) {
-                        localStorage.setItem('opening_time', doc.data().opening_time);
+                        localStorage.setItem('tcd_opening_time', doc.data().opening_time);
                     }
                     if (doc.data().closing_time !== undefined) {
-                        localStorage.setItem('closing_time', doc.data().closing_time);
+                        localStorage.setItem('tcd_closing_time', doc.data().closing_time);
                     }
                 });
                
                 // Remove disabled dishes from the cart
-                const disableIdsRaw = localStorage.getItem('disable_item_ids');
+                const disableIdsRaw = localStorage.getItem('tcd_disable_item_ids');
                 const currentDisableIds = disableIdsRaw ? JSON.parse(disableIdsRaw) : [];
                 cart.forEach(category => {
                     category.category.dish_details = category.category.dish_details.filter(dish => !currentDisableIds.includes(dish.id));
                 });
 
                 // Update the cart in localStorage
-                localStorage.setItem('cart', JSON.stringify(cart));
+                localStorage.setItem('tcd_cart', JSON.stringify(cart));
                 
                 updateCartCount(); // Update cart count after cleaning up
             })
