@@ -338,13 +338,13 @@ function collect_data(){
     let order_history = JSON.parse(localStorage.getItem('order_history')) || [];
     get_credentials().then(credentials => {  // Return the promise here
         const firebaseConfig = {
-            apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-            authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-            projectId: decrypt_values(credentials.ID, credentials.KEY),
-            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-            appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-            measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+            apiKey: decrypt_values(credentials.API_KEY, _cfg),
+            authDomain: decrypt_values(credentials.AUTH_DOMAIN, _cfg),
+            projectId: decrypt_values(credentials.ID, _cfg),
+            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, _cfg),
+            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, _cfg),
+            appId: decrypt_values(credentials.APP_ID, _cfg),
+            measurementId: decrypt_values(credentials.MEASUREMENT_ID, _cfg)
         };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -363,12 +363,12 @@ function collect_data(){
             data['delivery_charges'] = DELIVERY_CHARGES;
         }
         // Add the document to Firestore
-        addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)), data)
+        addDoc(collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, _cfg)), data)
             .then(docRef => {
                 // Add order details to localStorage
                 order_history.push({
                     'order_id': docRef.id,
-                    'admin_id': credentials.KEY,
+                    'admin_id': _cfg,
                     'api_call': 'Initiated',
                     'order_details': data // Instead of fetching it again, use the data you just sent
                 });

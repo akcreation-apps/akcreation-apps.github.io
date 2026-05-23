@@ -8,16 +8,16 @@ let admin_id = ''
 function initializeFirebase() {
     return get_credentials().then(credentials => {
         const firebaseConfig = {
-            apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-            authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-            projectId: decrypt_values(credentials.ID, credentials.KEY),
-            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-            appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-            measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+            apiKey: decrypt_values(credentials.API_KEY, _cfg),
+            authDomain: decrypt_values(credentials.AUTH_DOMAIN, _cfg),
+            projectId: decrypt_values(credentials.ID, _cfg),
+            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, _cfg),
+            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, _cfg),
+            appId: decrypt_values(credentials.APP_ID, _cfg),
+            measurementId: decrypt_values(credentials.MEASUREMENT_ID, _cfg)
         };
-        table_name = decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)
-        admin_id = credentials.KEY
+        table_name = decrypt_values(credentials.ORDER_TABLE_NAME, _cfg)
+        admin_id = _cfg
         return initializeApp(firebaseConfig);
     });
 }

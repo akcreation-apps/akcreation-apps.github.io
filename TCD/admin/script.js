@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let sessionTime = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
     let password = ''
     get_credentials().then(credentials => {
-        password = decrypt_values(credentials.PASS_KEY, credentials.KEY); // Example password
+        password = decrypt_values(credentials.PASS_KEY, _cfg); // Example password
     });
     const sessionExpiration = localStorage.getItem('tcd_sessionExpiration');
     const currentTime = new Date().getTime();
@@ -137,17 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
         get_credentials().then(credentials => {  // Return the promise here
         try {
             const firebaseConfig = {
-                apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-                authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-                projectId: decrypt_values(credentials.ID, credentials.KEY),
-                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-                appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-                measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+                apiKey: decrypt_values(credentials.API_KEY, _cfg),
+                authDomain: decrypt_values(credentials.AUTH_DOMAIN, _cfg),
+                projectId: decrypt_values(credentials.ID, _cfg),
+                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, _cfg),
+                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, _cfg),
+                appId: decrypt_values(credentials.APP_ID, _cfg),
+                measurementId: decrypt_values(credentials.MEASUREMENT_ID, _cfg)
             };
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
-            getDocs(collection(db, decrypt_values(credentials.DB_NAME, credentials.KEY))) // Return this promise
+            getDocs(collection(db, decrypt_values(credentials.DB_NAME, _cfg))) // Return this promise
                 .then(querySnapshot => {
                     querySnapshot.forEach(doc => {
                     window.doc_id = doc.id;
@@ -518,13 +518,13 @@ document.addEventListener('DOMContentLoaded', () => {
         get_credentials().then(credentials => {
             try {
                 const firebaseConfig = {
-                    apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-                    authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-                    projectId: decrypt_values(credentials.ID, credentials.KEY),
-                    storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-                    messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-                    appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-                    measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+                    apiKey: decrypt_values(credentials.API_KEY, _cfg),
+                    authDomain: decrypt_values(credentials.AUTH_DOMAIN, _cfg),
+                    projectId: decrypt_values(credentials.ID, _cfg),
+                    storageBucket: decrypt_values(credentials.STORAGE_BUCKET, _cfg),
+                    messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, _cfg),
+                    appId: decrypt_values(credentials.APP_ID, _cfg),
+                    measurementId: decrypt_values(credentials.MEASUREMENT_ID, _cfg)
                 };
 
                 const app = initializeApp(firebaseConfig);
@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert_message = "Action can't be changed once you approve!<br><br>Invoice will be access by customer."
                 }
 
-                const orderRef = doc(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY), orderId);
+                const orderRef = doc(db, decrypt_values(credentials.ORDER_TABLE_NAME, _cfg), orderId);
                 Swal.fire({
                     title: 'Are you sure?',
                     html: alert_message,
@@ -577,13 +577,13 @@ document.addEventListener('DOMContentLoaded', () => {
     get_credentials().then(credentials => {
         try {
             const firebaseConfig = {
-                apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-                authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-                projectId: decrypt_values(credentials.ID, credentials.KEY),
-                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-                appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-                measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+                apiKey: decrypt_values(credentials.API_KEY, _cfg),
+                authDomain: decrypt_values(credentials.AUTH_DOMAIN, _cfg),
+                projectId: decrypt_values(credentials.ID, _cfg),
+                storageBucket: decrypt_values(credentials.STORAGE_BUCKET, _cfg),
+                messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, _cfg),
+                appId: decrypt_values(credentials.APP_ID, _cfg),
+                measurementId: decrypt_values(credentials.MEASUREMENT_ID, _cfg)
             };
 
             const app = initializeApp(firebaseConfig);
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Create a query that filters by 'status' and orders by 'created_at' in descending order
             const ordersQuery = query(
-                collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, credentials.KEY)),
+                collection(db, decrypt_values(credentials.ORDER_TABLE_NAME, _cfg)),
                 where('status', '==', 'In Progress'), // Filter where 'status' is 'In Progress'
                 orderBy('created_at', 'desc') // Order by 'created_at' field in descending order
             );
@@ -759,13 +759,13 @@ async function update_changes() {
         }
 
         const firebaseConfig = {
-            apiKey: decrypt_values(credentials.API_KEY, credentials.KEY),
-            authDomain: decrypt_values(credentials.AUTH_DOMAIN, credentials.KEY),
-            projectId: decrypt_values(credentials.ID, credentials.KEY),
-            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, credentials.KEY),
-            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, credentials.KEY),
-            appId: decrypt_values(credentials.APP_ID, credentials.KEY),
-            measurementId: decrypt_values(credentials.MEASUREMENT_ID, credentials.KEY)
+            apiKey: decrypt_values(credentials.API_KEY, _cfg),
+            authDomain: decrypt_values(credentials.AUTH_DOMAIN, _cfg),
+            projectId: decrypt_values(credentials.ID, _cfg),
+            storageBucket: decrypt_values(credentials.STORAGE_BUCKET, _cfg),
+            messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, _cfg),
+            appId: decrypt_values(credentials.APP_ID, _cfg),
+            measurementId: decrypt_values(credentials.MEASUREMENT_ID, _cfg)
         };
 
         const app = initializeApp(firebaseConfig);
@@ -780,7 +780,7 @@ async function update_changes() {
         };
 
         console.log(credentials);
-        const foodItemRef = doc(db, decrypt_values(credentials.DB_NAME, credentials.KEY), window.doc_id);
+        const foodItemRef = doc(db, decrypt_values(credentials.DB_NAME, _cfg), window.doc_id);
 
         // Await for the updateDoc operation to complete
         await updateDoc(foodItemRef, updatedData);
@@ -809,7 +809,7 @@ async function update_changes() {
             created_at: Timestamp.now()
         };
 
-        await addDoc(collection(db, decrypt_values(credentials.ADMIN_HISTORY_TABLE_NAME, credentials.KEY)), data);
+        await addDoc(collection(db, decrypt_values(credentials.ADMIN_HISTORY_TABLE_NAME, _cfg)), data);
 
         return true; // Set success to true only after updateDoc completes successfully
     } catch (error) {
