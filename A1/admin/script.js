@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     get_credentials().then(credentials => {
         password = decrypt_values(credentials.PASS_KEY, _cfg); // Example password
     });
-    const sessionExpiration = localStorage.getItem('a1_sessionExpiration');
+    const sessionExpiration = localStorage.getItem(lsKey('sessionExpiration'));
     const currentTime = new Date().getTime();
 
     populateHours("openHour");
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let sessionExpired = false; // Flag to track if session has already expired
 
     setInterval(() => {
-        const storedExpirationTime = localStorage.getItem('a1_sessionExpiration');
+        const storedExpirationTime = localStorage.getItem(lsKey('sessionExpiration'));
         const currentTime = new Date().getTime(); // Get current time inside the interval
 
         // If the session has expired and hasn't been handled yet
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon: 'warning',
                 confirmButtonText: 'OK'
             }).then((result) => {
-                localStorage.removeItem('a1_sessionExpiration'); // Clear session on timeout
+                localStorage.removeItem(lsKey('sessionExpiration')); // Clear session on timeout
                 location.reload(); // Reload the page to prompt for the password again
             });
         }
@@ -153,10 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.doc_id = doc.id;
                     if (doc.data().whatsapp_no !== undefined) {
                         window.doc_whatsapp_no = doc.data().whatsapp_no;
-                        if(!localStorage.getItem('a1_whatsapp_no')){
-                            localStorage.setItem('a1_whatsapp_no', window.doc_whatsapp_no);
+                        if(!localStorage.getItem(lsKey('whatsapp_no'))){
+                            localStorage.setItem(lsKey('whatsapp_no'), window.doc_whatsapp_no);
                         } else{
-                            if(localStorage.getItem('a1_whatsapp_no') !== window.doc_whatsapp_no){
+                            if(localStorage.getItem(lsKey('whatsapp_no')) !== window.doc_whatsapp_no){
                                 numberContainer.style.backgroundColor = 'antiquewhite';
                                 validateButton.style.display = 'block';
                             }
@@ -164,38 +164,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     if (doc.data().shop_status !== undefined) {
                         window.doc_shop_status = doc.data().shop_status;
-                        if(!localStorage.getItem('a1_shop_status')){
-                            localStorage.setItem('a1_shop_status', window.doc_shop_status);
+                        if(!localStorage.getItem(lsKey('shop_status'))){
+                            localStorage.setItem(lsKey('shop_status'), window.doc_shop_status);
                         } else{
-                            if(localStorage.getItem('a1_shop_status') !== window.doc_shop_status){
+                            if(localStorage.getItem(lsKey('shop_status')) !== window.doc_shop_status){
                                 shopStatusContainer.style.backgroundColor = 'antiquewhite';
                             }
                         }
                     }
                     if (doc.data().opening_time !== undefined) {
                         window.doc_opening_time = doc.data().opening_time;
-                        if(!localStorage.getItem('a1_opening_time')){
-                            localStorage.setItem('a1_opening_time', window.doc_opening_time);
+                        if(!localStorage.getItem(lsKey('opening_time'))){
+                            localStorage.setItem(lsKey('opening_time'), window.doc_opening_time);
                         } else{
-                            if(localStorage.getItem('a1_opening_time') !== window.doc_opening_time){
+                            if(localStorage.getItem(lsKey('opening_time')) !== window.doc_opening_time){
                                 shopStatusContainer.style.backgroundColor = 'antiquewhite';
                             }
                         }
                     }
                     if (doc.data().closing_time !== undefined) {
                         window.doc_closing_time = doc.data().closing_time;
-                        if(!localStorage.getItem('a1_closing_time')){
-                            localStorage.setItem('a1_closing_time', window.doc_closing_time);
+                        if(!localStorage.getItem(lsKey('closing_time'))){
+                            localStorage.setItem(lsKey('closing_time'), window.doc_closing_time);
                         } else{
-                            if(localStorage.getItem('a1_closing_time') !== window.doc_closing_time){
+                            if(localStorage.getItem(lsKey('closing_time')) !== window.doc_closing_time){
                                 shopStatusContainer.style.backgroundColor = 'antiquewhite';
                             }
                         }
                     }
                     if (doc.data().disabled_items !== undefined) {
                         window.doc_disable_item_ids = JSON.parse(doc.data().disabled_items)
-                        if(!localStorage.getItem('a1_disable_item_ids')){
-                            localStorage.setItem('a1_disable_item_ids', doc.data().disabled_items);
+                        if(!localStorage.getItem(lsKey('disable_item_ids'))){
+                            localStorage.setItem(lsKey('disable_item_ids'), doc.data().disabled_items);
                         } else{
                             update_save_container()
                         }
@@ -226,10 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
-                numberInput.value = localStorage.getItem('a1_whatsapp_no').slice(3);
-                openHour.value = localStorage.getItem('a1_opening_time');
-                closeHour.value = localStorage.getItem('a1_closing_time');
-                shopOpenToggle.checked = (localStorage.getItem('a1_shop_status') === "open");
+                numberInput.value = localStorage.getItem(lsKey('whatsapp_no')).slice(3);
+                openHour.value = localStorage.getItem(lsKey('opening_time'));
+                closeHour.value = localStorage.getItem(lsKey('closing_time'));
+                shopOpenToggle.checked = (localStorage.getItem(lsKey('shop_status')) === "open");
                 const statusText = document.getElementById("shopStatusText");
                 if (shopOpenToggle.checked) {
                     statusText.textContent = "Open";
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dishesListAccess.innerHTML = ''; // Clear existing content
 
         // Retrieve disabled item IDs from localStorage
-        let disable_items = JSON.parse(localStorage.getItem('a1_disable_item_ids')) || [];
+        let disable_items = JSON.parse(localStorage.getItem(lsKey('disable_item_ids'))) || [];
 
         menuData.menu.forEach(category => {
         category.subcategories.forEach(subcategory => {
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     dishElement.style.backgroundColor = backgroundColor;
 
                     // Update disable_item_ids in localStorage
-                    localStorage.setItem('a1_disable_item_ids', JSON.stringify(disable_items));
+                    localStorage.setItem(lsKey('disable_item_ids'), JSON.stringify(disable_items));
 
                     update_save_container()
                 });
@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (enteredPassword === password) {
             // Set the session expiration time (30 minutes from now)
             const expirationTime = currentTime + sessionTime;
-            localStorage.setItem('a1_sessionExpiration', expirationTime);
+            localStorage.setItem(lsKey('sessionExpiration'), expirationTime);
             location.reload();
             passwordPopup.style.display = 'none';
         } else {
@@ -441,13 +441,13 @@ document.addEventListener('DOMContentLoaded', () => {
             validateButton.style.display = 'block';
             numberContainer.style.backgroundColor = 'antiquewhite';
         }
-        localStorage.setItem('a1_whatsapp_no', "+91"+numberInput.value)
+        localStorage.setItem(lsKey('whatsapp_no'), "+91"+numberInput.value)
         update_save_container()
     });
 
     shopOpenToggle.addEventListener('change', function () {
         const newStatus = shopOpenToggle.checked ? "open" : "closed";
-        localStorage.setItem('a1_shop_status', newStatus);
+        localStorage.setItem(lsKey('shop_status'), newStatus);
 
         // Background color feedback
         if (newStatus === window.doc_shop_status) {
@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     openHour.addEventListener('change', function () {
-        localStorage.setItem('a1_opening_time', openHour.value);
+        localStorage.setItem(lsKey('opening_time'), openHour.value);
         if (openHour.value === window.doc_opening_time) {
             shopStatusContainer.style.backgroundColor = 'azure';
         } else {
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     closeHour.addEventListener('change', function () {
-        localStorage.setItem('a1_closing_time', closeHour.value);
+        localStorage.setItem(lsKey('closing_time'), closeHour.value);
         if (closeHour.value === window.doc_closing_time) {
             shopStatusContainer.style.backgroundColor = 'azure';
         } else {
@@ -480,13 +480,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function update_save_container() {
-        const updated_disable_items = JSON.parse(localStorage.getItem('a1_disable_item_ids')) || [];
+        const updated_disable_items = JSON.parse(localStorage.getItem(lsKey('disable_item_ids'))) || [];
 
         // Get local values
-        const localWhatsapp = localStorage.getItem('a1_whatsapp_no');
-        const localShopStatus = localStorage.getItem('a1_shop_status');
-        const localOpenTime = localStorage.getItem('a1_opening_time');
-        const localCloseTime = localStorage.getItem('a1_closing_time');
+        const localWhatsapp = localStorage.getItem(lsKey('whatsapp_no'));
+        const localShopStatus = localStorage.getItem(lsKey('shop_status'));
+        const localOpenTime = localStorage.getItem(lsKey('opening_time'));
+        const localCloseTime = localStorage.getItem(lsKey('closing_time'));
 
         // Get Firestore values
         const docWhatsapp = window.doc_whatsapp_no;
@@ -731,7 +731,7 @@ async function get_credentials() {
     }
 }
 
-const _cfg = ['A1', 'AMUL', 'FAST', 'FOOD'].join('-');
+const _cfg = RESTAURANT.encKey;
 
 function decrypt_values(value, key){
     const decryptedBytes = CryptoJS.AES.decrypt(value, key);
@@ -741,7 +741,7 @@ function decrypt_values(value, key){
 // Function to send message via WhatsApp
 function verify_number() {
     const message = "Your dining order will be delivered to this WhatsApp number.\nSave your modifications to begin receiving orders."
-    const phoneNumber = localStorage.getItem('a1_whatsapp_no')
+    const phoneNumber = localStorage.getItem(lsKey('whatsapp_no'))
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.location.href = url;
 }
@@ -774,11 +774,11 @@ async function update_changes() {
         const db = getFirestore(app);
 
         let updatedData = {
-            'disabled_items': localStorage.getItem('a1_disable_item_ids'),
-            'whatsapp_no': localStorage.getItem('a1_whatsapp_no'),
-            'shop_status': localStorage.getItem('a1_shop_status'),
-            'opening_time': localStorage.getItem('a1_opening_time'),
-            'closing_time': localStorage.getItem('a1_closing_time')
+            'disabled_items': localStorage.getItem(lsKey('disable_item_ids')),
+            'whatsapp_no': localStorage.getItem(lsKey('whatsapp_no')),
+            'shop_status': localStorage.getItem(lsKey('shop_status')),
+            'opening_time': localStorage.getItem(lsKey('opening_time')),
+            'closing_time': localStorage.getItem(lsKey('closing_time'))
         };
 
         console.log(credentials);
@@ -790,23 +790,23 @@ async function update_changes() {
         let data = {
             disabled_items_changes: {
                 old_data: JSON.stringify(window.doc_disable_item_ids),
-                new_data: localStorage.getItem('a1_disable_item_ids')
+                new_data: localStorage.getItem(lsKey('disable_item_ids'))
             },
             whatsapp_no_changes: {
                 old_data: window.doc_whatsapp_no,
-                new_data: localStorage.getItem('a1_whatsapp_no')
+                new_data: localStorage.getItem(lsKey('whatsapp_no'))
             },
             shop_status_changes: {
                 old_data: window.doc_shop_status,
-                new_data: localStorage.getItem('a1_shop_status')
+                new_data: localStorage.getItem(lsKey('shop_status'))
             },
             shop_opening_time_changes: {
                 old_data: window.doc_opening_time,
-                new_data: localStorage.getItem('a1_opening_time')
+                new_data: localStorage.getItem(lsKey('opening_time'))
             },
             shop_closing_time_changes: {
                 old_data: window.doc_closing_time,
-                new_data: localStorage.getItem('a1_closing_time')
+                new_data: localStorage.getItem(lsKey('closing_time'))
             },
             created_at: Timestamp.now()
         };
@@ -848,11 +848,11 @@ async function save_changes() {
 }
 
 async function reset_changes() {
-    localStorage.removeItem('a1_shop_status');
-    localStorage.removeItem('a1_opening_time');
-    localStorage.removeItem('a1_closing_time');
-    localStorage.removeItem('a1_disable_item_ids');
-    localStorage.removeItem('a1_whatsapp_no');
+    localStorage.removeItem(lsKey('shop_status'));
+    localStorage.removeItem(lsKey('opening_time'));
+    localStorage.removeItem(lsKey('closing_time'));
+    localStorage.removeItem(lsKey('disable_item_ids'));
+    localStorage.removeItem(lsKey('whatsapp_no'));
     Swal.fire({
         title: 'Success',
         text: 'Changes Reset Successfully!',

@@ -1,4 +1,4 @@
-﻿function get_dish_url(dish_name) {
+function get_dish_url(dish_name) {
     // Split the string into words by spaces, then join with an underscore
     return '../food_src/'+dish_name.split(' ').join('_')+'.webp';
 }
@@ -35,21 +35,21 @@ function store_data(){
     const urlParams = new URLSearchParams(window.location.search);
     const table_no = urlParams.get('table');
     if(table_no){
-        localStorage.setItem('a1_table', table_no);
+        localStorage.setItem(lsKey('table'), table_no);
         if (/^\d+$/.test(table_no)) {
             // Numeric table → Dine-In session, set place immediately
-            localStorage.setItem('a1_place', 'Dine-In');
+            localStorage.setItem(lsKey('place'), 'Dine-In');
         } else {
             // Non-numeric (COD, etc.)
-            const existingPlace = localStorage.getItem('a1_place');
+            const existingPlace = localStorage.getItem(lsKey('place'));
             if (existingPlace === 'Dine-In') {
                 // Switching from a dine-in session — clear stale Dine-In so location is asked
-                localStorage.removeItem('a1_place');
+                localStorage.removeItem(lsKey('place'));
             }
             // Any real delivery location already stored → keep it untouched
         }
         const expirationTime = Date.now() + 60 * 60 * 1000;
-        localStorage.setItem('a1_urlExpiration', expirationTime);
+        localStorage.setItem(lsKey('urlExpiration'), expirationTime);
         window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname;
     }
 }
@@ -122,7 +122,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
                 otherInput.focus();
                 return;
             }
-            localStorage.setItem('a1_place', custom);
+            localStorage.setItem(lsKey('place'), custom);
             closeModal(custom);
         }
 
@@ -143,7 +143,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
                 } else {
                     otherWrapper.style.display = 'none';
                     errorMsg.style.display = 'none';
-                    localStorage.setItem('a1_place', value);
+                    localStorage.setItem(lsKey('place'), value);
                     closeModal(value);
                 }
             }, sig);
@@ -184,12 +184,12 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
 }
 
 function checkAndAskPlace() {
-    const table = localStorage.getItem('a1_table');
-    const place = localStorage.getItem('a1_place');
+    const table = localStorage.getItem(lsKey('table'));
+    const place = localStorage.getItem(lsKey('place'));
     if (!table || place) return Promise.resolve();
 
     if (/^\d+$/.test(table)) {
-        localStorage.setItem('a1_place', 'Dine-In');
+        localStorage.setItem(lsKey('place'), 'Dine-In');
         return Promise.resolve();
     }
 
@@ -198,8 +198,8 @@ function checkAndAskPlace() {
 }
 
 function updateDeliveryBadge() {
-    const place = localStorage.getItem('a1_place');
-    const table = localStorage.getItem('a1_table');
+    const place = localStorage.getItem(lsKey('place'));
+    const table = localStorage.getItem(lsKey('table'));
     const strip = document.getElementById('deliveryStrip');
     if (!strip || !place || !table) return;
     const isDineIn = place === 'Dine-In';
@@ -218,7 +218,7 @@ function updateDeliveryBadge() {
     strip.style.display = 'block';
 
     document.getElementById('dsChangeBtn')?.addEventListener('click', async function() {
-        const current = localStorage.getItem('a1_place') || '';
+        const current = localStorage.getItem(lsKey('place')) || '';
         await openPlacePicker(current, 'Change delivery location', true, this);
         updateDeliveryBadge();
     });
@@ -236,7 +236,7 @@ function redirect_to_cart(){
     window.location.href = 'cart.html';
 }
 
-var _cfg = ['A1', 'AMUL', 'FAST', 'FOOD'].join('-');
+var _cfg = RESTAURANT.encKey;
 
 function decrypt_values(value, key){
     const decryptedBytes = CryptoJS.AES.decrypt(value, key);

@@ -1,4 +1,4 @@
-﻿import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 let table_name = ''
@@ -35,7 +35,7 @@ async function fetchOrderDetails(orderId, allOrders) {
     let updatedOrders = allOrders.map(order =>
         order.order_id === orderId ? { ...order, api_call: order.api_call || "Initiated" } : order
     );
-    
+
     if (docSnap.exists()) {
         const orderData = docSnap.data(); // Get the data from the snapshot
 
@@ -44,13 +44,13 @@ async function fetchOrderDetails(orderId, allOrders) {
             updatedOrders = updatedOrders.map(order =>
                 order.order_id === orderId ? { ...order, api_call: "Approved" } : order
             );
-            localStorage.setItem("tcd_order_history", JSON.stringify(updatedOrders));
+            localStorage.setItem(lsKey('order_history'), JSON.stringify(updatedOrders));
             return orderData; // Return the order data if status is approved
         } else if(orderData.status === 'Rejected'){
             updatedOrders = updatedOrders.map(order =>
                 order.order_id === orderId ? { ...order, api_call: "Rejected" } : order
             );
-            localStorage.setItem("tcd_order_history", JSON.stringify(updatedOrders));
+            localStorage.setItem(lsKey('order_history'), JSON.stringify(updatedOrders));
             return null;
         }
         else {
@@ -60,14 +60,14 @@ async function fetchOrderDetails(orderId, allOrders) {
         updatedOrders = updatedOrders.map(order =>
             order.order_id === orderId ? { ...order, api_call: "Deleted" } : order
         );
-        localStorage.setItem("tcd_order_history", JSON.stringify(updatedOrders));
+        localStorage.setItem(lsKey('order_history'), JSON.stringify(updatedOrders));
         return null; // Handle document not found
     }
 }
 
 // Function to fetch all orders based on IDs in localStorage
 async function fetchOrders() {
-    const orders = JSON.parse(localStorage.getItem('tcd_order_history')) || [];
+    const orders = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
     const orderList = document.getElementById('orderList');
     await initializeFirebase()
     showLoader(); // Show loader while fetching data
@@ -75,7 +75,7 @@ async function fetchOrders() {
         let data_available = false;
         for (const order of orders) {
             if(!order.api_call || order.api_call === "Initiated"){
-                const allOrders = JSON.parse(localStorage.getItem('tcd_order_history')) || [];
+                const allOrders = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
                 const orderData = await fetchOrderDetails(order.order_id, allOrders);
                 if (orderData && order.admin_id === admin_id) {
                     const orderElement = createOrderElement(order, order.order_id);
@@ -167,10 +167,10 @@ function createOrderElement(order, order_id) {
 
 // Call function on page load
 document.addEventListener('DOMContentLoaded', () => {
-    const storedExpirationTime = localStorage.getItem('tcd_urlExpiration');
+    const storedExpirationTime = localStorage.getItem(lsKey('urlExpiration'));
     if (storedExpirationTime) {
         const currentTime = Date.now();
-        if (currentTime >= storedExpirationTime && localStorage.getItem('tcd_table')!=="COD") {
+        if (currentTime >= storedExpirationTime && localStorage.getItem(lsKey('table'))!=="COD") {
             Swal.fire('Error', 'The URL is expired. Please rescan the QR.', 'error').then(() => {
                 window.location.href = 'index.html'; // Replace 'index.html' with your home page URL
             });
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchOrders(); // Fetch orders on load
 });
 
-let cart = JSON.parse(localStorage.getItem('tcd_cart')) || [];
+let cart = JSON.parse(localStorage.getItem(lsKey('cart'))) || [];
 const updateCartCount = () => {
     const cartCount = document.querySelector('.cart-count');
 
@@ -221,13 +221,13 @@ function handleDelete(orderId) {
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            let orders = JSON.parse(localStorage.getItem('tcd_order_history')) || [];
+            let orders = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
 
             // Filter out the order with the specified orderId
             orders = orders.filter(order => order.order_id !== orderId);
 
             // Update localStorage with the remaining orders
-            localStorage.setItem('tcd_order_history', JSON.stringify(orders));
+            localStorage.setItem(lsKey('order_history'), JSON.stringify(orders));
 
             // Reload the page or remove the element dynamically
             location.reload(); // or dynamically remove the deleted order from DOM

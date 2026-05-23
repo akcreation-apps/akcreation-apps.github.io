@@ -209,8 +209,9 @@
 
     </div><!-- /.page-content -->
 
+    <script src="restaurant.js"></script>
     <script>
-    let orders = JSON.parse(localStorage.getItem('tcd_order_history')) || [];
+    let orders = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
     orders = orders.filter(order => order.order_id === orderId);
