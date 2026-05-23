@@ -24,7 +24,7 @@
       "opening_hour": "10",
       "closing_hour": "22",
       "address": "Banki College Road, Towards Sunadei, Banki 754008",
-      "is_active": true
+      "is_active": false
     }
   ]
 }

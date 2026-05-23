@@ -154,27 +154,19 @@
       --bg:           #F7F3EF;
       --card:         #FFFFFF;
       --text:         #111827;
-      --muted:        #6B7280;
+      --muted:        #55606E;
       --border:       #EDE8E3;
-      --accent:       #22c55e;
       --nav-h:        60px;
     }
 
     html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* ── TOPBAR ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
-      height: var(--nav-h);
-      background: var(--navy);
-      display: flex; align-items: center;
-      padding: 0 16px;
+      height: var(--nav-h); background: var(--navy);
+      display: flex; align-items: center; padding: 0 16px;
     }
     .topbar-inner {
       width: 100%; max-width: 960px; margin: 0 auto;
@@ -185,252 +177,224 @@
     .brand-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .brand-name { font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
     .brand-name span { color: var(--primary); }
-    .topbar-loc {
-      display: flex; align-items: center; gap: 5px;
-      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-      color: rgba(255,255,255,0.85); font-size: 0.72rem; font-weight: 600;
-      padding: 5px 10px; border-radius: 20px;
+    .topbar-link {
+      font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.7);
+      text-decoration: none; padding: 11px 14px;
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 20px;
+      transition: color 0.15s, border-color 0.15s;
     }
-    .topbar-loc i { color: var(--primary); font-size: 0.65rem; }
+    .topbar-link:hover { color: var(--primary); border-color: var(--primary); }
 
-    /* ── BANNER ── */
-    .banner {
+    /* ── HERO ── */
+    .hero {
       background: var(--navy);
-      padding: 28px 16px 36px;
+      padding: 40px 16px 60px;
       position: relative; overflow: hidden;
     }
-    .banner::after {
+    .hero::before {
       content: '';
-      position: absolute; bottom: 0; left: 0; right: 0; height: 28px;
-      background: var(--bg);
-      border-radius: 28px 28px 0 0;
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(255,107,53,0.12) 0%, transparent 65%);
+      pointer-events: none;
     }
-    .banner-inner {
-      max-width: 960px; margin: 0 auto;
-      display: flex; align-items: center; gap: 20px;
+    .hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 32px;
+      background: var(--bg); border-radius: 32px 32px 0 0;
     }
-    .banner-text { flex: 1; }
-    .banner-eyebrow {
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--primary);
-      margin-bottom: 6px;
-    }
-    .banner-text h1 {
-      font-size: clamp(1.3rem, 5vw, 2rem);
-      font-weight: 900; color: #fff; line-height: 1.15;
-      margin-bottom: 8px;
-    }
-    .banner-text h1 em { color: var(--primary); font-style: normal; }
-    .banner-sub { font-size: 0.78rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
-    .banner-badge {
-      flex-shrink: 0;
+    .hero-inner { max-width: 600px; margin: 0 auto; position: relative; text-align: center; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
       background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3);
-      border-radius: 14px; padding: 12px 16px; text-align: center;
+      color: var(--primary); font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.8px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 20px; margin-bottom: 20px;
     }
-    .banner-badge .num { font-size: 1.5rem; font-weight: 900; color: var(--primary); display: block; }
-    .banner-badge .lbl { font-size: 0.62rem; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
+    .hero h1 {
+      font-size: clamp(1.6rem, 6vw, 2.6rem);
+      font-weight: 900; color: #fff; line-height: 1.12; margin-bottom: 14px;
+    }
+    .hero h1 em { color: var(--primary); font-style: normal; }
+    .hero-sub {
+      font-size: 0.88rem; color: rgba(255,255,255,0.55);
+      line-height: 1.65; margin-bottom: 28px;
+    }
+    .btn-cta {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: var(--primary); color: #fff;
+      border: none; padding: 14px 28px; border-radius: 14px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+      text-decoration: none;
+    }
+    .btn-cta:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,107,53,0.5); }
+    .btn-cta:active { transform: translateY(0); }
+    .btn-cta.loading { opacity: 0.75; pointer-events: none; }
+    .hero-areas {
+      margin-top: 18px; font-size: 0.7rem; color: rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+    }
+    .hero-areas i { color: var(--primary); font-size: 0.65rem; }
 
-    /* ── SECTION ── */
+    /* ── SECTION WRAPPER ── */
     .section { max-width: 960px; margin: 0 auto; padding: 0 16px; }
 
-    /* ── FILTER PILLS ── */
-    .filter-bar {
-      display: flex; gap: 8px;
-      overflow-x: auto; padding: 20px 0 4px;
-      scrollbar-width: none;
+    /* ── WHAT WE SERVE ── */
+    .serve-block { padding-top: 28px; padding-bottom: 4px; }
+    .cuisine-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; list-style: none; padding: 0; }
+    .cuisine-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 20px; padding: 7px 14px;
+      font-size: 0.75rem; font-weight: 600; color: var(--text);
     }
-    .filter-bar::-webkit-scrollbar { display: none; }
-    .filter-pill {
-      flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
-      font-size: 0.75rem; font-weight: 600; cursor: pointer; border: none;
-      background: var(--card); color: var(--muted);
-      border: 1.5px solid var(--border);
-      transition: all 0.15s; font-family: 'Poppins', sans-serif;
+    .cuisine-chip i { color: var(--primary); font-size: 0.8rem; }
+    .area-chips { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; }
+    .area-chip {
+      background: #FFF0E8; border: 1px solid rgba(255,107,53,0.2);
+      border-radius: 8px; padding: 4px 10px;
+      font-size: 0.75rem; font-weight: 600; color: var(--primary);
     }
-    .filter-pill:hover { border-color: var(--primary); color: var(--primary); }
-    .filter-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .serve-sub { font-size: 0.75rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
 
-    /* ── SECTION HEADING ── */
-    .sec-head {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 0 12px;
+    /* ── HOW IT WORKS ── */
+    .how { padding-top: 36px; padding-bottom: 4px; }
+    .sec-title {
+      font-size: 1rem; font-weight: 800; color: var(--text);
+      margin-bottom: 18px;
     }
-    .sec-head h2 { font-size: 0.95rem; font-weight: 700; color: var(--text); }
-    .sec-head a { font-size: 0.75rem; color: var(--primary); font-weight: 600; text-decoration: none; }
-
-    /* ── RESTAURANT CARDS ── */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      padding-bottom: 8px;
+    .steps {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
     }
-    .rest-card {
-      background: var(--card); border-radius: 16px;
-      border: 1px solid var(--border);
-      overflow: hidden; cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.15s;
-      display: flex; flex-direction: column;
+    .step {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 12px; text-align: center;
     }
-    .rest-card:hover { box-shadow: 0 6px 24px rgba(255,107,53,0.13); transform: translateY(-2px); }
-
-    .card-top {
-      position: relative; height: 110px;
-      background: linear-gradient(135deg, #2a1a0e, #1a0e06);
-      overflow: hidden;
+    .step-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: #FFF0E8; color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; margin: 0 auto 10px;
     }
-    .card-top-logo {
-      width: 100%; height: 100%; object-fit: cover; opacity: 0.55;
-    }
-    .card-open-pill {
-      position: absolute; top: 10px; right: 10px;
+    .step-icon.wa { background: #e7faea; color: #25d366; }
+    .step-num {
       font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px;
-      text-transform: uppercase; padding: 3px 8px; border-radius: 8px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
     }
-    .card-open-pill.open { background: #dcfce7; color: #15803d; }
-    .card-open-pill.closed { background: #fee2e2; color: #dc2626; }
-    .card-avatar {
-      position: absolute; bottom: -20px; left: 14px;
-      width: 48px; height: 48px; border-radius: 12px;
-      border: 2px solid #fff; overflow: hidden;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .step-text { font-size: 0.75rem; font-weight: 600; color: var(--text); line-height: 1.35; }
 
-    .card-body {
-      padding: 26px 14px 14px;
-      flex: 1; display: flex; flex-direction: column;
+    /* ── WHY BANKIBITES ── */
+    .why { padding-top: 32px; padding-bottom: 4px; }
+    .why-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .why-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 16px;
+      display: flex; align-items: flex-start; gap: 14px;
     }
-    .card-name { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; }
-    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
-    .tag {
-      font-size: 0.62rem; font-weight: 600; padding: 2px 7px;
-      border-radius: 6px; background: #FFF0E8; color: var(--primary);
+    .why-icon {
+      flex-shrink: 0; width: 42px; height: 42px; border-radius: 11px;
+      background: #FFF0E8; color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
     }
-    .card-foot {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-top: auto;
-    }
-    .card-rating { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 700; color: var(--text); }
-    .card-rating i { color: #f59e0b; font-size: 0.7rem; }
-    .card-rating span { color: var(--muted); font-weight: 400; }
-    .card-hours { font-size: 0.68rem; color: var(--muted); }
-    .btn-order-card {
-      background: var(--primary); color: #fff;
-      border: none; padding: 8px 16px; border-radius: 10px;
-      font-size: 0.75rem; font-weight: 700; cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      transition: background 0.15s;
-      display: flex; align-items: center; gap: 5px;
-    }
-    .btn-order-card:hover { background: var(--primary-dark); }
+    .why-card h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 3px; }
+    .why-card p { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
 
-    /* ── SKELETON ── */
-    .skeleton-card {
-      background: var(--card); border-radius: 16px;
-      border: 1px solid var(--border); overflow: hidden;
+    /* ── BOTTOM CTA STRIP ── */
+    .bottom-cta {
+      margin-top: 40px;
+      background: var(--navy);
+      padding: 32px 16px;
+      text-align: center;
     }
-    .skel { background: linear-gradient(90deg, #ede8e3 25%, #f5f0eb 50%, #ede8e3 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 6px; }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .bottom-cta p {
+      color: rgba(255,255,255,0.55); font-size: 0.8rem;
+      margin-bottom: 14px;
+    }
 
-    /* ── LOCATION MODAL ── */
-    .loc-backdrop {
+    /* ── FOOTER ── */
+    footer {
+      background: #12111e; color: rgba(255,255,255,0.4);
+      text-align: center; padding: 18px 16px;
+      font-size: 0.73rem;
+    }
+    footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    footer a:hover { color: var(--primary); }
+
+    /* ── BOTTOM SHEET (shared by rest-picker & loc-picker) ── */
+    .sheet-backdrop {
       position: fixed; inset: 0; z-index: 500;
-      background: rgba(10, 8, 20, 0.6);
-      backdrop-filter: blur(3px);
+      background: rgba(10, 8, 20, 0.6); backdrop-filter: blur(3px);
       display: flex; align-items: flex-end; justify-content: center;
       opacity: 0; pointer-events: none;
       transition: opacity 0.22s ease;
     }
-    .loc-backdrop.open { opacity: 1; pointer-events: all; }
-    .loc-sheet {
-      background: var(--card); width: 100%; max-width: 480px;
+    .sheet-backdrop.open { opacity: 1; pointer-events: all; }
+    .sheet {
+      background: var(--card); width: 100%; max-width: 520px;
       border-radius: 22px 22px 0 0;
       padding: 0 0 env(safe-area-inset-bottom, 16px);
       transform: translateY(30px);
       transition: transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
       max-height: 90vh; overflow-y: auto;
     }
-    .loc-backdrop.open .loc-sheet { transform: translateY(0); }
-    .loc-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
+    .sheet-backdrop.open .sheet { transform: translateY(0); }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
+    .sheet-header { padding: 14px 18px 12px; }
+    .sheet-header h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+    .sheet-header p { font-size: 0.73rem; color: var(--muted); }
 
-    /* Map-style preview strip */
-    .loc-map-strip {
-      margin: 14px 18px 0;
-      border-radius: 14px; overflow: hidden;
-      border: 1.5px solid #e0e8f0; position: relative;
-      background: #e8f0f8;
-      height: 90px;
+    /* ── RESTAURANT PICKER ── */
+    .rp-list { padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .rp-item {
+      display: flex; align-items: center; gap: 13px;
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 12px 14px;
+      cursor: pointer; width: 100%;
+      font-family: 'Poppins', sans-serif; text-align: left;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .loc-map-strip iframe {
-      width: 100%; height: 100%; border: none; display: block;
-      pointer-events: none;
+    .rp-item:hover { border-color: var(--primary); box-shadow: 0 3px 12px rgba(255,107,53,0.12); }
+    .rp-logo {
+      width: 52px; height: 52px; border-radius: 12px;
+      object-fit: cover; border: 1px solid var(--border); flex-shrink: 0;
     }
-    .loc-map-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom, transparent 40%, rgba(255,255,255,0.7) 100%);
-    }
-    .loc-map-pill {
-      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-      background: #fff; border: 1px solid #dadce0;
-      border-radius: 20px; padding: 4px 12px;
-      font-size: 0.68rem; font-weight: 600; color: #1a73e8;
-      display: flex; align-items: center; gap: 5px;
-      white-space: nowrap; text-decoration: none;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-    }
-    .loc-map-pill:hover { background: #f8f9fa; }
-    .loc-map-pill img { width: 13px; height: 13px; }
+    .rp-info { flex: 1; min-width: 0; }
+    .rp-name { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .rp-tags { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rp-meta { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; }
+    .rp-rating { display: flex; align-items: center; gap: 3px; font-weight: 700; color: var(--text); }
+    .rp-rating i { color: #f59e0b; }
+    .rp-open { font-weight: 700; }
+    .rp-open.open  { color: #15803d; }
+    .rp-open.open::before  { content: '●'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
+    .rp-open.closed { color: #dc2626; }
+    .rp-open.closed::before { content: '○'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
+    .rp-arrow { color: var(--border); font-size: 0.85rem; flex-shrink: 0; }
+    .rp-item:hover .rp-arrow { color: var(--primary); }
+    .rp-item.rp-closed { opacity: 0.55; cursor: default; }
+    .rp-item.rp-closed:hover { border-color: var(--border); box-shadow: none; }
 
-    .loc-header { padding: 14px 18px 8px; }
-    .loc-header h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
-    .loc-header p { font-size: 0.73rem; color: var(--muted); }
-    .loc-dest {
-      margin: 0 18px 12px;
-      background: #FFF0E8; border: 1px solid rgba(255,107,53,0.2);
-      border-radius: 10px; padding: 9px 12px;
-      display: flex; align-items: center; gap: 8px;
-      font-size: 0.78rem; font-weight: 600; color: var(--primary);
-    }
-    .loc-dest i { font-size: 0.75rem; }
-    .loc-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 8px; padding: 0 18px 18px;
-    }
-    .loc-chip {
-      border: 1.5px solid #dadce0; background: #fff;
-      border-radius: 10px; padding: 10px 6px; text-align: center;
-      font-size: 0.7rem; font-weight: 600; color: #3c4043;
-      cursor: pointer; transition: all 0.15s;
-      font-family: 'Poppins', sans-serif;
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-    }
-    .loc-chip:hover { border-color: #1a73e8; color: #1a73e8; background: #e8f0fe; }
-    .loc-chip.selected { background: #1a73e8; color: #fff; border-color: #1a73e8; }
-    .loc-chip.selected .loc-pin { color: #fff; }
-    .loc-pin { font-size: 0.95rem; color: #ea4335; transition: color 0.15s; }
-    .loc-chip:hover .loc-pin { color: #1a73e8; }
+    /* skeleton inside rest picker */
+    .skel { background: linear-gradient(90deg, #ede8e3 25%, #f5f0eb 50%, #ede8e3 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-    /* ── FOOTER ── */
-    footer {
-      background: var(--navy); color: rgba(255,255,255,0.45);
-      text-align: center; padding: 20px 16px;
-      font-size: 0.75rem; margin-top: 40px;
-    }
-    footer a { color: rgba(255,255,255,0.65); text-decoration: none; }
-    footer a:hover { color: var(--primary); }
-
-    /* ── DESKTOP ── */
+    /* ── RESPONSIVE ── */
     @media (min-width: 600px) {
-      .cards-grid { grid-template-columns: repeat(2, 1fr); }
-      .loc-grid { grid-template-columns: repeat(4, 1fr); }
-      .loc-backdrop { align-items: center; }
-      .loc-sheet { border-radius: 20px; max-height: 80vh; }
-      .banner-inner { gap: 32px; }
+      .why-grid { grid-template-columns: repeat(3, 1fr); }
+      .steps { grid-template-columns: repeat(4, 1fr); }
+      .sheet-backdrop { align-items: center; }
+      .sheet { border-radius: 20px; max-height: 80vh; }
+      .serve-block { padding-top: 36px; }
     }
-    @media (min-width: 900px) {
-      .cards-grid { grid-template-columns: repeat(3, 1fr); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .skel { animation: none; background: #ede8e3; }
+      .sheet, .sheet-backdrop { transition: none; }
+      .btn-cta { transition: none; }
+      .rp-item { transition: none; }
     }
   </style>
 </head>
@@ -438,225 +402,293 @@
 
   <!-- Topbar -->
   <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="index.html" aria-label="BankiBites">
+    <nav class="topbar-inner" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="BankiBites home">
         <div class="brand-logo"><img src="banki-bites-logo.png" alt="BankiBites logo"></div>
         <span class="brand-name">Banki<span>Bites</span></span>
       </a>
-      <div class="topbar-loc" aria-label="Serving Banki, 5km radius">
-        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-        Banki · 5 km
-      </div>
-    </div>
+      <a class="topbar-link" href="dashboard.html">All Restaurants</a>
+    </nav>
   </header>
 
-  <!-- Banner -->
-  <div class="banner" role="banner">
-    <div class="banner-inner">
-      <div class="banner-text">
-        <div class="banner-eyebrow">Banki's First Food Delivery</div>
-        <h1>Hungry in <em>Banki?</em><br>Order Online Now</h1>
-        <p class="banner-sub">Fresh food from local restaurants,<br>delivered within 5 km — no app needed.</p>
+  <!-- Hero -->
+  <section class="hero" aria-label="Hero — order food in Banki, Cuttack">
+    <div class="hero-inner">
+      <div class="hero-eyebrow"><i class="fas fa-bolt" aria-hidden="true"></i> Banki's First Food Delivery</div>
+      <h1>Hungry in <em>Banki?</em><br>We've got you covered</h1>
+      <p class="hero-sub">
+        Order from the best local restaurants in Banki, Cuttack — Chinese, North Indian, Fast Food and more.
+        Hot food delivered right to your door, no app download needed.
+      </p>
+      <button class="btn-cta" id="orderBtn" aria-label="Find restaurants and order food">
+        <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Food Now
+      </button>
+      <p class="hero-areas">
+        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+        Banki · Harirajpur · Chakapada · Sisua · Bedapur · Khamaranga + more
+      </p>
+    </div>
+  </section>
+
+  <!-- What we serve -->
+  <div class="section">
+    <div class="serve-block">
+      <h2 class="sec-title">What's on the menu</h2>
+      <ul class="cuisine-chips" id="cuisineChips" aria-label="Available cuisines" role="list">
+        <li class="cuisine-chip" aria-hidden="true"><span class="skel" style="width:80px;height:14px;display:inline-block;border-radius:6px;"></span></li>
+        <li class="cuisine-chip" aria-hidden="true"><span class="skel" style="width:70px;height:14px;display:inline-block;border-radius:6px;"></span></li>
+        <li class="cuisine-chip" aria-hidden="true"><span class="skel" style="width:90px;height:14px;display:inline-block;border-radius:6px;"></span></li>
+      </ul>
+
+      <h2 class="sec-title">Where we deliver</h2>
+      <p class="serve-sub">Serving Banki and surrounding areas within 5 km, Cuttack, Odisha 754008</p>
+      <ul class="area-chips" id="areaChips" aria-label="Delivery areas in Banki" role="list">
+        <li class="area-chip skel" aria-hidden="true" style="width:70px;height:22px;border-radius:8px;display:inline-block;"></li>
+        <li class="area-chip skel" aria-hidden="true" style="width:80px;height:22px;border-radius:8px;display:inline-block;"></li>
+        <li class="area-chip skel" aria-hidden="true" style="width:65px;height:22px;border-radius:8px;display:inline-block;"></li>
+      </ul>
+    </div>
+
+    <!-- How it works -->
+    <div class="how">
+      <h2 class="sec-title">How it works</h2>
+      <div class="steps" role="list">
+        <div class="step" role="listitem">
+          <div class="step-icon"><i class="fas fa-store" aria-hidden="true"></i></div>
+          <div class="step-num">Step 1</div>
+          <div class="step-text">Choose a Restaurant</div>
+        </div>
+        <div class="step" role="listitem">
+          <div class="step-icon"><i class="fas fa-utensils" aria-hidden="true"></i></div>
+          <div class="step-num">Step 2</div>
+          <div class="step-text">Browse & Pick Your Food</div>
+        </div>
+        <div class="step" role="listitem">
+          <div class="step-icon wa"><i class="fab fa-whatsapp" aria-hidden="true"></i></div>
+          <div class="step-num">Step 3</div>
+          <div class="step-text">Order via WhatsApp</div>
+        </div>
+        <div class="step" role="listitem">
+          <div class="step-icon"><i class="fas fa-bowl-food" aria-hidden="true"></i></div>
+          <div class="step-num">Step 4</div>
+          <div class="step-text">Get it Delivered</div>
+        </div>
       </div>
-      <div class="banner-badge" aria-label="Serving 5km delivery radius">
-        <span class="num">5<span style="font-size:0.9rem">km</span></span>
-        <span class="lbl">Delivery<br>Radius</span>
+    </div>
+
+    <!-- Why BankiBites -->
+    <div class="why">
+      <h2 class="sec-title">Why BankiBites?</h2>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-heart" aria-hidden="true"></i></div>
+          <div>
+            <h3>Local Restaurants</h3>
+            <p>Discover and support the best restaurants right here in Banki, Cuttack, Odisha.</p>
+          </div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-motorcycle" aria-hidden="true"></i></div>
+          <div>
+            <h3>Fast Delivery</h3>
+            <p>Hot food delivered to your door within your area — no long waits, no cold food.</p>
+          </div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-mobile-screen" aria-hidden="true"></i></div>
+          <div>
+            <h3>No App Needed</h3>
+            <p>Order instantly from your browser. No sign-up, no download, no hassle.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Main content -->
-  <main class="section">
-
-    <!-- Filter pills -->
-    <div class="filter-bar" id="filterBar" role="group" aria-label="Filter by cuisine">
-      <button class="filter-pill active" data-filter="all">All</button>
-    </div>
-
-    <!-- Restaurant section -->
-    <div class="sec-head">
-      <h2>Restaurants near you</h2>
-      <a href="dashboard.html">See all</a>
-    </div>
-
-    <!-- Cards -->
-    <div class="cards-grid" id="cardsGrid" role="list" aria-label="Partner restaurants">
-      <!-- Skeletons -->
-      <div class="skeleton-card" aria-hidden="true">
-        <div class="skel" style="height:110px;border-radius:0;"></div>
-        <div style="padding:30px 14px 14px">
-          <div class="skel" style="height:14px;width:60%;margin-bottom:8px;"></div>
-          <div class="skel" style="height:10px;width:80%;margin-bottom:12px;"></div>
-          <div class="skel" style="height:32px;width:40%;margin-left:auto;border-radius:10px;"></div>
-        </div>
-      </div>
-      <div class="skeleton-card" aria-hidden="true">
-        <div class="skel" style="height:110px;border-radius:0;"></div>
-        <div style="padding:30px 14px 14px">
-          <div class="skel" style="height:14px;width:55%;margin-bottom:8px;"></div>
-          <div class="skel" style="height:10px;width:75%;margin-bottom:12px;"></div>
-          <div class="skel" style="height:32px;width:40%;margin-left:auto;border-radius:10px;"></div>
-        </div>
-      </div>
-    </div>
-
-  </main>
+  <!-- Bottom CTA -->
+  <div class="bottom-cta">
+    <p>Ready to order? Pick your favourite restaurant.</p>
+    <button class="btn-cta" id="orderBtn2" aria-label="Find restaurants">
+      <i class="fas fa-utensils" aria-hidden="true"></i> Find Restaurants Near You
+    </button>
+  </div>
 
   <!-- Footer -->
   <footer>
     <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
   </footer>
 
-  <!-- Location picker modal -->
-  <div class="loc-backdrop" id="locBackdrop" role="dialog" aria-modal="true" aria-labelledby="locTitle">
-    <div class="loc-sheet">
-      <div class="loc-handle" aria-hidden="true"></div>
-      <div class="loc-header">
-        <h3 id="locTitle">Select your delivery area</h3>
-        <p>We deliver within 5 km of Banki town</p>
+  <!-- Restaurant Picker Sheet -->
+  <div class="sheet-backdrop" id="restBackdrop" role="dialog" aria-modal="true" aria-labelledby="restTitle">
+    <div class="sheet">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <div>
+          <h3 id="restTitle">Choose a Restaurant</h3>
+          <p>Available now in Banki</p>
+        </div>
+        <button id="sheetClose" aria-label="Close restaurant picker" style="background:none;border:none;padding:0;cursor:pointer;color:var(--muted);font-size:1rem;flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
       </div>
-      <div class="loc-map-strip">
-        <iframe src="https://maps.google.com/maps?q=Banki,Cuttack,Odisha&output=embed&z=13" loading="lazy" title="Banki service area map"></iframe>
-        <div class="loc-map-overlay"></div>
-        <a class="loc-map-pill" href="https://maps.google.com/maps?q=Banki,Cuttack,Odisha" target="_blank" rel="noopener noreferrer">
-          <img src="https://www.google.com/favicon.ico" alt="Google Maps"> View service area
-        </a>
+      <div class="rp-list" id="rpList" role="list" aria-live="polite" aria-busy="true">
+        <!-- skeleton -->
+        <div class="rp-item" aria-hidden="true" style="pointer-events:none">
+          <div class="skel" style="width:52px;height:52px;border-radius:12px;flex-shrink:0;"></div>
+          <div style="flex:1">
+            <div class="skel" style="height:13px;width:55%;margin-bottom:7px;"></div>
+            <div class="skel" style="height:10px;width:80%;margin-bottom:7px;"></div>
+            <div class="skel" style="height:10px;width:40%;"></div>
+          </div>
+        </div>
+        <div class="rp-item" aria-hidden="true" style="pointer-events:none">
+          <div class="skel" style="width:52px;height:52px;border-radius:12px;flex-shrink:0;"></div>
+          <div style="flex:1">
+            <div class="skel" style="height:13px;width:60%;margin-bottom:7px;"></div>
+            <div class="skel" style="height:10px;width:75%;margin-bottom:7px;"></div>
+            <div class="skel" style="height:10px;width:35%;"></div>
+          </div>
+        </div>
       </div>
-      <div class="loc-dest" id="locDest" style="display:none">
-        <i class="fas fa-utensils" aria-hidden="true"></i>
-        <span id="locDestName"></span>
-      </div>
-      <div class="loc-grid" id="locGrid" role="group" aria-label="Delivery areas"></div>
     </div>
   </div>
 
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
 
-    const backdrop   = document.getElementById('locBackdrop');
-    const locGrid    = document.getElementById('locGrid');
-    const locDest    = document.getElementById('locDest');
-    const locDestName = document.getElementById('locDestName');
-    const filterBar  = document.getElementById('filterBar');
-    const cardsGrid  = document.getElementById('cardsGrid');
+    const restBackdrop = document.getElementById('restBackdrop');
+    const rpList       = document.getElementById('rpList');
+    const cuisineChips = document.getElementById('cuisineChips');
+    const areaChips    = document.getElementById('areaChips');
 
-    let allPartners  = [];
-    let activeFilter = 'all';
-    let pendingUrl   = '';
+    const SERVICE_ICONS = {
+      'Chinese':      'fa-bowl-rice',
+      'Indian':       'fa-leaf',
+      'North Indian': 'fa-leaf',
+      'Continental':  'fa-plate-wheat',
+      'Tandoor':      'fa-fire',
+      'Fast Food':    'fa-burger',
+      'Snacks':       'fa-cookie-bite',
+      'Beverages':    'fa-mug-hot',
+      'Drinks':       'fa-martini-glass-citrus',
+    };
 
-    // Close modal on backdrop click
-    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeLocModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLocModal(); });
+    let cachedData = null;
+    let sheetTriggerEl = null;
 
-    function closeLocModal() {
-      backdrop.classList.remove('open');
-      pendingUrl = '';
+    function closeSheet() {
+      restBackdrop.classList.remove('open');
+      if (sheetTriggerEl) { sheetTriggerEl.focus(); sheetTriggerEl = null; }
     }
 
-    function openLocModal(partner) {
-      pendingUrl = partner.url;
-      locDestName.textContent = partner.name;
-      locDest.style.display = 'flex';
-      backdrop.classList.add('open');
-      const first = locGrid.querySelector('.loc-chip');
-      if (first) first.focus();
+    document.getElementById('sheetClose').addEventListener('click', closeSheet);
+    restBackdrop.addEventListener('click', e => { if (e.target === restBackdrop) closeSheet(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && restBackdrop.classList.contains('open')) closeSheet(); });
+
+    // Focus trap inside the sheet
+    restBackdrop.addEventListener('keydown', e => {
+      if (e.key !== 'Tab' || !restBackdrop.classList.contains('open')) return;
+      const focusable = [...restBackdrop.querySelectorAll(
+        'button:not([disabled]):not([aria-disabled="true"]),a[href],[tabindex]:not([tabindex="-1"])'
+      )];
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    function isOpen(p) {
+      const h = new Date().getHours();
+      return h >= parseInt(p.opening_hour, 10) && h < parseInt(p.closing_hour, 10);
     }
 
-    function buildLocChips(locations) {
-      locGrid.innerHTML = locations.map(loc => `
-        <button class="loc-chip" data-loc="${loc}" aria-label="Deliver to ${loc}">
-          <i class="fas fa-map-marker-alt loc-pin" aria-hidden="true"></i>
-          ${loc}
-        </button>
-      `).join('');
-
-      locGrid.querySelectorAll('.loc-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          locGrid.querySelectorAll('.loc-chip').forEach(c => c.classList.remove('selected'));
-          chip.classList.add('selected');
-          // Brief delay so user sees selection, then redirect
-          setTimeout(() => {
-            closeLocModal();
-            window.location.href = pendingUrl;
-          }, 220);
-        });
-      });
+    function formatHours(p) {
+      const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
+      return `${fmt(parseInt(p.opening_hour, 10))} – ${fmt(parseInt(p.closing_hour, 10))}`;
     }
 
-    function buildCards(partners) {
-      if (!partners.length) {
-        cardsGrid.innerHTML = '<p style="color:var(--muted);font-size:0.85rem;grid-column:1/-1;text-align:center;padding:40px 0">No restaurants found.</p>';
+    function buildInfoSection(data) {
+      const seen = new Set();
+      data.partners.filter(p => p.is_active).forEach(p => p.services.forEach(s => seen.add(s)));
+      cuisineChips.innerHTML = [...seen].map(s => {
+        const icon = SERVICE_ICONS[s] || 'fa-utensils';
+        return `<li class="cuisine-chip"><i class="fas ${icon}" aria-hidden="true"></i> ${s}</li>`;
+      }).join('');
+
+      areaChips.innerHTML = data.locations.map(loc =>
+        `<li class="area-chip">${loc}</li>`
+      ).join('');
+    }
+
+    function buildRestPicker(partners) {
+      const visible = partners.filter(p => p.is_active);
+      if (!visible.length) {
+        rpList.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0">No restaurants are registered yet. Check back soon!</p>';
         return;
       }
-      cardsGrid.innerHTML = partners.map(p => `
-        <article class="rest-card" role="listitem" tabindex="0" aria-label="${p.name}">
-          <div class="card-top">
-            <img class="card-top-logo" src="${p.logo}" alt="" aria-hidden="true" loading="lazy">
-            <span class="card-open-pill ${p.open ? 'open' : 'closed'}">${p.open ? 'Open' : 'Closed'}</span>
-            <div class="card-avatar"><img src="${p.logo}" alt="${p.name} logo" loading="lazy"></div>
-          </div>
-          <div class="card-body">
-            <div class="card-name">${p.name}</div>
-            <div class="card-tags">${p.services.map(s => `<span class="tag">${s}</span>`).join('')}</div>
-            <div class="card-foot">
-              <div>
-                <div class="card-rating"><i class="fas fa-star" aria-hidden="true"></i> ${p.rating} <span>/ 5</span></div>
-                <div class="card-hours">${p.hours}</div>
-              </div>
-              <button class="btn-order-card" data-url="${p.url}" data-name="${p.name}" aria-label="Order from ${p.name}">
-                <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order
-              </button>
+      const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
+      rpList.innerHTML = visible.map(p => {
+        const open = isOpen(p);
+        const opensAt = fmt(parseInt(p.opening_hour, 10));
+        return `
+        <button class="rp-item${open ? '' : ' rp-closed'}"
+                data-url="${open ? p.url : ''}"
+                aria-label="${open ? `Order from ${p.name}` : `${p.name} is closed — opens at ${opensAt}`}"
+                ${open ? '' : 'aria-disabled="true"'}>
+          <img class="rp-logo" src="${p.logo}" alt="${p.name} logo" loading="lazy">
+          <div class="rp-info">
+            <div class="rp-name">${p.name}</div>
+            <div class="rp-tags">${p.services.join(' · ')}</div>
+            <div class="rp-meta">
+              <span class="rp-rating"><i class="fas fa-star" aria-hidden="true"></i> ${p.rating}</span>
+              <span class="rp-open ${open ? 'open' : 'closed'}">${open ? 'Open' : `Closed · Opens ${opensAt}`}</span>
             </div>
           </div>
-        </article>
-      `).join('');
+          <i class="fas fa-chevron-right rp-arrow" aria-hidden="true"></i>
+        </button>
+      `;
+      }).join('');
 
-      cardsGrid.querySelectorAll('.btn-order-card').forEach(btn => {
-        const partner = allPartners.find(p => p.name === btn.dataset.name);
-        btn.addEventListener('click', e => { e.stopPropagation(); openLocModal(partner); });
+      rpList.querySelectorAll('.rp-item').forEach(item => {
+        item.addEventListener('click', () => { if (item.dataset.url) window.location.href = item.dataset.url; });
       });
-      cardsGrid.querySelectorAll('.rest-card').forEach(card => {
-        card.addEventListener('keydown', e => {
-          if (e.key === 'Enter') card.querySelector('.btn-order-card').click();
+    }
+
+    function loadData() {
+      if (cachedData) return Promise.resolve(cachedData);
+      return fetch('https://akcreation-apps.com/banki-bites-partners.json')
+        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+        .then(data => {
+          cachedData = data;
+          buildInfoSection(data);
+          buildRestPicker(data.partners);
+          rpList.removeAttribute('aria-busy');
+          return data;
         });
+    }
+
+    function handleOrderClick(e) {
+      sheetTriggerEl = e ? e.currentTarget : document.activeElement;
+      restBackdrop.classList.add('open');
+      if (!cachedData) rpList.setAttribute('aria-busy', 'true');
+      setTimeout(() => {
+        const firstOpen = rpList.querySelector('.rp-item:not([aria-disabled="true"])');
+        const closeBtn  = document.getElementById('sheetClose');
+        (firstOpen || closeBtn).focus();
+      }, 50);
+      if (cachedData) return;
+      loadData().catch(() => {
+        rpList.removeAttribute('aria-busy');
+        rpList.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0"><i class="fas fa-wifi-slash" aria-hidden="true"></i> Could not load. Please refresh.</p>';
+        cuisineChips.innerHTML = '';
+        areaChips.innerHTML = '';
       });
     }
 
-    function buildFilters(partners) {
-      const cuisines = new Set();
-      partners.forEach(p => p.services.forEach(s => cuisines.add(s)));
-      cuisines.forEach(c => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-pill';
-        btn.dataset.filter = c;
-        btn.textContent = c;
-        filterBar.appendChild(btn);
-      });
+    document.getElementById('orderBtn').addEventListener('click', handleOrderClick);
+    document.getElementById('orderBtn2').addEventListener('click', handleOrderClick);
 
-      filterBar.addEventListener('click', e => {
-        const pill = e.target.closest('.filter-pill');
-        if (!pill) return;
-        filterBar.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        activeFilter = pill.dataset.filter;
-        const filtered = activeFilter === 'all'
-          ? allPartners
-          : allPartners.filter(p => p.services.includes(activeFilter));
-        buildCards(filtered);
-      });
-    }
-
-    fetch('https://akcreation-apps.com/banki-bites-partners.json')
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(data => {
-        allPartners = data.partners;
-        buildLocChips(data.locations || []);
-        buildFilters(allPartners);
-        buildCards(allPartners);
-      })
-      .catch(() => {
-        cardsGrid.innerHTML = '<p style="color:var(--muted);font-size:0.85rem;grid-column:1/-1;text-align:center;padding:40px 0"><i class="fas fa-wifi-slash"></i> Could not load restaurants. Please refresh.</p>';
-      });
+    loadData().catch(() => { cuisineChips.innerHTML = ''; areaChips.innerHTML = ''; });
   </script>
 </body>
 </html>

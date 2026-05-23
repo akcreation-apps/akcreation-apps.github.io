@@ -214,7 +214,7 @@
       --bg:           #FFF8F3;
       --card:         #FFFFFF;
       --text:         #1A1A2E;
-      --muted:        #6B7280;
+      --muted:        #55606E;
       --border:       #F0E6DE;
       --accent:       #22c55e;
       --nav-h:        64px;
@@ -324,7 +324,7 @@
     }
     .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
     .tag {
-      font-size: 0.65rem; font-weight: 600; padding: 2px 8px;
+      font-size: 0.72rem; font-weight: 600; padding: 2px 8px;
       border-radius: 10px; background: #FFF0E8; color: var(--primary);
       border: 1px solid rgba(255,107,53,0.15);
     }
@@ -332,11 +332,13 @@
     .rating { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 600; color: #f59e0b; }
     .rating span { color: var(--muted); font-weight: 400; }
     .open-badge {
-      font-size: 0.65rem; font-weight: 700; padding: 2px 8px;
+      font-size: 0.72rem; font-weight: 700; padding: 2px 8px;
       border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .open-badge.open { background: #dcfce7; color: #15803d; }
-    .open-badge.closed { background: #fee2e2; color: #dc2626; }
+    .open-badge.open  { background: #dcfce7; color: #15803d; }
+    .open-badge.open::before  { content: '●'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
+    .open-badge.closed { background: #fee2e2; color: #b91c1c; }
+    .open-badge.closed::before { content: '○'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
     .card-chevron {
       color: var(--muted); font-size: 0.85rem; flex-shrink: 0;
       transition: transform 0.2s;
@@ -400,7 +402,7 @@
 
     .modal-close {
       margin-left: auto; background: var(--bg); border: none;
-      width: 34px; height: 34px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; color: var(--muted); font-size: 0.85rem;
       flex-shrink: 0; transition: background 0.15s;
@@ -445,6 +447,9 @@
     footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
     footer a:hover { color: var(--primary); }
 
+    /* ── Closed card — suppress hover lift ── */
+    .rest-card-closed:hover { box-shadow: 0 1px 6px rgba(0,0,0,0.06); transform: none; cursor: default; }
+
     /* ── Desktop modal centering ── */
     @media (min-width: 600px) {
       .modal-backdrop { align-items: center; }
@@ -455,6 +460,13 @@
     }
     @media (min-width: 960px) {
       .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-logo-skeleton, .skel-text { animation: none; background: #f0e6de; }
+      .dot { animation: none; }
+      .modal, .modal-backdrop { transition: none; }
+      .rest-card, .btn-order { transition: none; }
     }
   </style>
 </head>
@@ -502,7 +514,7 @@
 
   <!-- Error state -->
   <div class="error-state" id="errorState" role="alert" aria-live="polite">
-    <i class="fas fa-wifi" aria-hidden="true"></i>
+    <i class="fas fa-wifi-slash" aria-hidden="true"></i>
     <p>Could not load restaurants. Please check your connection and try again.</p>
   </div>
 
@@ -513,8 +525,7 @@
       <div class="modal-header">
         <img class="modal-logo" id="modalLogo" src="" alt="">
         <div>
-          <div class="modal-title" id="modalTitle"></div>
-          <div class="modal-addr" id="modalAddr"></div>
+          <h2 class="modal-title" id="modalTitle"></h2>
         </div>
         <button class="modal-close" id="modalClose" aria-label="Close restaurant details">
           <i class="fas fa-times" aria-hidden="true"></i>
@@ -551,49 +562,91 @@
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
 
-    const grid      = document.getElementById('cardGrid');
+    const grid       = document.getElementById('cardGrid');
     const errorState = document.getElementById('errorState');
-    const backdrop  = document.getElementById('modalBackdrop');
+    const backdrop   = document.getElementById('modalBackdrop');
     const modalClose = document.getElementById('modalClose');
+
+    function isOpen(p) {
+      const h = new Date().getHours();
+      return h >= parseInt(p.opening_hour, 10) && h < parseInt(p.closing_hour, 10);
+    }
+
+    function formatHours(p) {
+      const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
+      return `${fmt(parseInt(p.opening_hour, 10))} – ${fmt(parseInt(p.closing_hour, 10))}`;
+    }
+
+    let modalTriggerEl = null;
 
     function renderStars(rating) {
       const full = Math.floor(rating);
       const half = rating % 1 >= 0.5;
       let stars = '';
-      for (let i = 0; i < full; i++) stars += '<i class="fas fa-star"></i>';
-      if (half) stars += '<i class="fas fa-star-half-alt"></i>';
+      for (let i = 0; i < full; i++) stars += '<i class="fas fa-star" aria-hidden="true"></i>';
+      if (half) stars += '<i class="fas fa-star-half-alt" aria-hidden="true"></i>';
       return `<span style="color:#f59e0b">${stars}</span> ${rating}`;
     }
 
-    function openModal(p) {
-      document.getElementById('modalLogo').src    = p.logo;
-      document.getElementById('modalLogo').alt    = p.name + ' logo';
-      document.getElementById('modalTitle').textContent  = p.name;
-      document.getElementById('modalAddr').textContent   = p.address;
-      document.getElementById('modalHours').textContent  = p.hours;
-      document.getElementById('modalAddress').textContent = p.address;
-      document.getElementById('modalRating').innerHTML   = renderStars(p.rating) + ' / 5';
-      document.getElementById('modalTags').innerHTML     = p.services.map(s => `<span class="modal-tag">${s}</span>`).join('');
-      document.getElementById('modalOrderBtn').href      = p.url;
+    function openModal(p, triggerEl) {
+      modalTriggerEl = triggerEl || document.activeElement;
+      const open = isOpen(p);
+      document.getElementById('modalLogo').src             = p.logo;
+      document.getElementById('modalLogo').alt             = p.name + ' logo';
+      document.getElementById('modalTitle').textContent    = p.name;
+      document.getElementById('modalHours').innerHTML      = `${formatHours(p)} &nbsp;<span class="open-badge ${open ? 'open' : 'closed'}">${open ? 'Open' : 'Closed'}</span>`;
+      document.getElementById('modalAddress').textContent  = p.address;
+      document.getElementById('modalRating').innerHTML     = renderStars(p.rating) + ' / 5';
+      document.getElementById('modalTags').innerHTML       = p.services.map(s => `<span class="modal-tag">${s}</span>`).join('');
+      document.getElementById('modalOrderBtn').href        = p.url;
       backdrop.classList.add('open');
       document.body.style.overflow = 'hidden';
+      setTimeout(() => modalClose.focus(), 50);
     }
 
     function closeModal() {
       backdrop.classList.remove('open');
       document.body.style.overflow = '';
+      if (modalTriggerEl) { modalTriggerEl.focus(); modalTriggerEl = null; }
     }
+
+    // Focus trap inside modal
+    document.getElementById('modal').addEventListener('keydown', e => {
+      if (e.key !== 'Tab' || !backdrop.classList.contains('open')) return;
+      const focusable = [...document.getElementById('modal').querySelectorAll(
+        'button:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])'
+      )];
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
 
     modalClose.addEventListener('click', closeModal);
     backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal(); });
 
     fetch('https://akcreation-apps.com/banki-bites-partners.json')
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => {
-        grid.innerHTML = data.partners.map(p => `
-          <div class="rest-card" role="listitem" tabindex="0"
-               aria-label="${p.name}" data-id="${p.id}">
+        const visible = data.partners.filter(p => p.is_active);
+
+        if (!visible.length) {
+          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);font-size:0.85rem">No restaurants are registered yet. Check back soon!</p>';
+          return;
+        }
+
+        const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
+
+        grid.innerHTML = visible.map((p, i) => {
+          const open = isOpen(p);
+          const opensAt = fmt(parseInt(p.opening_hour, 10));
+          return `
+          <div class="rest-card${open ? '' : ' rest-card-closed'}" role="listitem"
+               tabindex="${open ? '0' : '-1'}"
+               aria-label="${p.name}${open ? '' : `, currently closed — opens at ${opensAt}`}"
+               aria-disabled="${open ? 'false' : 'true'}"
+               data-idx="${i}" style="${open ? '' : 'opacity:0.6;pointer-events:none;'}">
             <div class="card-inner">
               <img class="card-logo" src="${p.logo}" alt="${p.name} logo" loading="lazy">
               <div class="card-body">
@@ -606,21 +659,22 @@
                     <i class="fas fa-star" aria-hidden="true"></i>
                     ${p.rating} <span>/ 5</span>
                   </div>
-                  <span class="open-badge ${p.open ? 'open' : 'closed'}">
-                    ${p.open ? 'Open' : 'Closed'}
-                  </span>
+                  <span class="open-badge ${open ? 'open' : 'closed'}">${open ? 'Open' : `Closed · Opens ${opensAt}`}</span>
                 </div>
               </div>
               <i class="fas fa-chevron-right card-chevron" aria-hidden="true"></i>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
 
-        // Attach click + keyboard handlers
-        grid.querySelectorAll('.rest-card').forEach((card, i) => {
-          const p = data.partners[i];
-          card.addEventListener('click', () => openModal(p));
-          card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(p); });
+        visible.forEach((p, i) => {
+          if (!isOpen(p)) return;
+          const card = grid.querySelectorAll('.rest-card')[i];
+          card.addEventListener('click', () => openModal(p, card));
+          card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(p, card); }
+          });
         });
       })
       .catch(() => {
