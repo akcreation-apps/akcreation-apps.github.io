@@ -236,7 +236,7 @@ function redirect_to_cart(){
     window.location.href = 'cart.html';
 }
 
-const _cfg = ['TCD', 'FOOD', 'CAFE'].join('-');
+var _cfg = ['TCD', 'FOOD', 'CAFE'].join('-');
 
 function decrypt_values(value, key){
     const decryptedBytes = CryptoJS.AES.decrypt(value, key);
