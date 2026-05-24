@@ -13,7 +13,7 @@
       "opening_hour": "10",
       "closing_hour": "22",
       "address": "BJP Party Office Side, Banki College Road, Banki 754008",
-      "is_active": true
+      "is_active": false
     },
     {
       "name": "A1 Amul Fast Food",
@@ -22,9 +22,9 @@
       "services": ["Chinese", "Indian"],
       "rating": 4.5,
       "opening_hour": "10",
-      "closing_hour": "00",
+      "closing_hour": "22",
       "address": "Banki College Road, Towards Sunadei, Banki 754008",
-      "is_active": true
+      "is_active": false
     }
   ]
 }
