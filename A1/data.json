@@ -7,8 +7,8 @@
           "name": "Soup",
           "type": "NonVeg",
           "dishes": [
-            { "id": 11, "name": "Clear", "price": 69 },
-            { "id": 12, "name": "Manchow", "price": 79 }
+            { "id": 11, "name": "Clear", "price": 49 },
+            { "id": 12, "name": "Manchow", "price": 59 }
           ]
         },
         {
@@ -28,23 +28,25 @@
           "name": "Starter",
           "type": "NonVeg",
           "dishes": [
-            { "id": 201, "name": "Egg Chap", "price": 149 },
-            { "id": 202, "name": "Chilli Chicken", "price": 179 },
-            { "id": 203, "name": "Chicken 65", "price": 179 },
-            { "id": 204, "name": "Chicken Lollipop", "price": 179 },
-            { "id": 205, "name": "Chicken Manchurian", "price": 189 },
-            { "id": 206, "name": "Chicken Pakoda", "price": 189 }
+            { "id": 201, "name": "Egg Chap (4Pc)", "price": 89 },
+            { "id": 202, "name": "Egg Chap (7Pc)", "price": 149 },
+            { "id": 203, "name": "Chicken Pakoda (5Pc)", "price": 109 },
+            { "id": 204, "name": "Chilli Chicken", "price": 179 },
+            { "id": 205, "name": "Chicken 65", "price": 179 },
+            { "id": 206, "name": "Chicken Lollipop", "price": 179 },
+            { "id": 207, "name": "Chicken Manchurian", "price": 189 },
+            { "id": 208, "name": "Chicken Pakoda (10Pc)", "price": 189 }
           ]
         },
         {
           "name": "MainCourse",
           "type": "Veg",
           "dishes": [
-            { "id": 301, "name": "Veg Chowmein", "price": 99 },
-            { "id": 302, "name": "Veg Roll", "price": 89 },
-            { "id": 303, "name": "Mix Veg Roll", "price": 89 },
-            { "id": 304, "name": "Paneer Roll", "price": 89 },
-            { "id": 305, "name": "Chowmein Roll", "price": 99 },
+            { "id": 301, "name": "Veg Chowmein", "price": 79 },
+            { "id": 302, "name": "Chowmein Roll", "price": 79 },
+            { "id": 303, "name": "Veg Roll", "price": 89 },
+            { "id": 304, "name": "Mix Veg Roll", "price": 89 },
+            { "id": 305, "name": "Paneer Roll", "price": 89 },
             { "id": 306, "name": "Special Mix Veg Roll", "price": 109 }
           ]
         },
@@ -83,7 +85,7 @@
           "name": "Biryani",
           "type": "NonVeg",
           "dishes": [
-            { "id": 701, "name": "Chicken Biryani (3pc)", "price": 179 }
+            { "id": 701, "name": "Chicken Biryani (3pc 1Egg)", "price": 179 }
           ]
         },
         {
