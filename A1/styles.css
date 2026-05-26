@@ -808,3 +808,8 @@ display: block;
   background: #fff;        /* white inner circle */
   border-radius: 50%;
 }
+
+body.is-loading footer,
+body.is-loading .view-cart-bar {
+    visibility: hidden;
+}

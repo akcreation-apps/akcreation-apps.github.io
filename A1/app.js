@@ -391,6 +391,13 @@ document.addEventListener('DOMContentLoaded', async() => {
                     }
                 });
 
+                // Build tagline from data.json categories
+                const taglineEl = document.getElementById('local-info-tagline');
+                if (taglineEl && data.menu.length) {
+                    const cats = data.menu.map(c => c.category).join(', ');
+                    taglineEl.textContent = `Best restaurant in Banki, Cuttack district — serving ${cats} and more. Delivering to Harirajpur, Chakapada, Sisua, Bedapur, Ranapur, Charchika & nearby areas.`;
+                }
+
                 // Update cart count on page load
                 updateCartCount();
                 setupScrollSpy();

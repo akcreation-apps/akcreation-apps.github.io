@@ -24,11 +24,17 @@ async function get_credentials() {
 }
 
 function showLoader() {
+    document.body.classList.add('is-loading');
     document.getElementById('loaderOverlay').style.display = 'flex';
 }
 
 function hideLoader() {
     document.getElementById('loaderOverlay').style.display = 'none';
+    document.body.classList.remove('is-loading');
+    const footer = document.querySelector('footer');
+    const cartBar = document.getElementById('viewCartBar');
+    if (footer) footer.style.visibility = '';
+    if (cartBar) cartBar.style.visibility = '';
 }
 
 function store_data(){
