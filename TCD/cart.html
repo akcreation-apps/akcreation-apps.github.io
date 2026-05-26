@@ -40,6 +40,29 @@
             --shadow-md: 0 4px 14px rgba(0,0,0,0.13);
             --r:         12px;
             --nav-h:     56px;
+            --loader-bg:       #F5F0EB;
+            --loader-border:   rgba(0,0,0,0.1);
+            --modal-handle-bg: #DDD;
+            --delete-hover:    #fdecea;
+            --error-clr:       #E53935;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --navy:      #100F18;
+                --bg:        #0D0C13;
+                --card:      #181720;
+                --text:      #EDE9FF;
+                --muted:     #7A748F;
+                --border:    #2A273D;
+                --shadow-sm: 0 1px 6px rgba(0,0,0,0.55);
+                --shadow-md: 0 4px 20px rgba(0,0,0,0.65);
+                --loader-bg:       #0D0C13;
+                --loader-border:   rgba(255,255,255,0.08);
+                --modal-handle-bg: #3A3650;
+                --delete-hover:    rgba(255,80,80,0.12);
+                --error-clr:       #FF6B6B;
+            }
         }
 
         html { scroll-behavior: smooth; }
@@ -55,14 +78,14 @@
         .loader-overlay {
             display: none;
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45);
+            background: var(--loader-bg);
             z-index: 9999;
             justify-content: center;
             align-items: center;
         }
         .loader {
             width: 44px; height: 44px;
-            border: 4px solid rgba(255,255,255,0.25);
+            border: 4px solid var(--loader-border);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.75s linear infinite;
@@ -170,7 +193,7 @@
         /* ── Page title ── */
         .cart-page-title {
             font-size: 1.1rem; font-weight: 700;
-            color: var(--navy);
+            color: var(--text);
             padding: 16px 4px 10px;
             display: flex; align-items: center; gap: 8px;
         }
@@ -282,7 +305,7 @@
             display: flex; align-items: center; justify-content: center;
             transition: background 0.15s;
         }
-        .delete-item:hover { background: #fdecea; }
+        .delete-item:hover { background: var(--delete-hover); }
 
         /* ── Total section ── */
         #cart-total-container {
@@ -401,7 +424,7 @@
         }
         .place-modal-handle {
             width: 40px; height: 4px;
-            background: #DDD; border-radius: 2px;
+            background: var(--modal-handle-bg); border-radius: 2px;
             margin: 10px auto 0;
         }
         .place-modal-body { padding: 18px 20px 8px; }
@@ -417,7 +440,7 @@
             flex-shrink: 0;
         }
         .place-modal-icon i { color: var(--primary); font-size: 1.15rem; }
-        .place-modal-header h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin: 0 0 2px; }
+        .place-modal-header h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 2px; }
         .place-modal-sub { font-size: 0.74rem; color: var(--muted); margin: 0; }
         .place-chips-grid {
             display: grid;
@@ -486,7 +509,7 @@
         .place-other-confirm:hover  { background: #E64A19; }
         .place-other-confirm:active { transform: scale(0.93); }
         .place-other-confirm:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-        .place-error { font-size: 0.74rem; color: #E53935; margin-top: 8px; display: none; }
+        .place-error { font-size: 0.74rem; color: var(--error-clr); margin-top: 8px; display: none; }
 
         /* ── Screen reader only ── */
         .sr-only {
@@ -526,6 +549,22 @@
             .refer-btn::after { animation: none; }
             .loader { animation: none; }
             .place-modal { animation: none; }
+        }
+
+        /* ── Dark-mode structural overrides ── */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-image:
+                    radial-gradient(ellipse 60% 40% at 15% 60%, rgba(255,107,53,0.05) 0%, transparent 70%),
+                    radial-gradient(ellipse 50% 60% at 85% 10%, rgba(120,80,255,0.04) 0%, transparent 70%);
+            }
+            .navbar {
+                background: rgba(13,12,19,0.88);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+                border-bottom: 1px solid rgba(255,107,53,0.15);
+                box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            }
         }
     </style>
 </head>
