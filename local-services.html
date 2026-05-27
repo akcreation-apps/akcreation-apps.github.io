@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Local Services – AK Creation | Cab, Website, Brand Collab & Videos</title>
+  <meta name="description" content="AK Creation Local Services — book a cab with Anvisha Travels, get a custom website or app, start a brand collaboration, or order a personalised video in Banki, Cuttack, Odisha.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://akcreation-apps.com/local-services.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Local Services – AK Creation">
+  <meta property="og:description" content="Book a cab, get a custom website, start a brand collab, or order a personalised video — all from AK Creation, Banki, Odisha.">
+  <meta property="og:image" content="https://akcreation-apps.com/assets/img/banner.png">
+  <meta property="og:url" content="https://akcreation-apps.com/local-services.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AK Creation">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" href="/favicon.ico">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 4 -->
+  <link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Analytics -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+  <style>
+    /* ===== THEME TOKENS ===== */
+    :root {
+      --bg:        #f5f3ff;
+      --bg2:       #eef2ff;
+      --card:      #ffffff;
+      --text:      #1e1b4b;
+      --muted:     #64748b;
+      --border:    #e0e7ff;
+      --shadow:    0 4px 24px rgba(79,70,229,.08);
+      --shadow-lg: 0 16px 48px rgba(79,70,229,.18);
+      --radius:    20px;
+      --nav-h:     62px;
+      --brand:     #4f46e5;
+      --brand-d:   #3730a3;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:        #0D0C13;
+        --bg2:       #110f1e;
+        --card:      #1A1A2E;
+        --text:      #EDE9FF;
+        --muted:     #7A748F;
+        --border:    #2A273D;
+        --shadow:    0 4px 20px rgba(0,0,0,.55);
+        --shadow-lg: 0 16px 48px rgba(0,0,0,.75);
+        --brand:     #818cf8;
+        --brand-d:   #a5b4fc;
+      }
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--nav-h);
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ===== NAV ===== */
+    .site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: #0f0e1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      object-fit: cover;
+      display: block;
+    }
+    .nav-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: .97rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .nav-name span { color: #f59e0b; }
+    .nav-tagline {
+      font-size: .62rem;
+      color: #a5b4fc;
+      font-weight: 400;
+      letter-spacing: .03em;
+      margin-top: 2px;
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #25d366;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 50px;
+      transition: background .2s, transform .15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .nav-cta:hover { background: #1da851; transform: scale(1.04); color: #fff; text-decoration: none; }
+    @media (max-width: 600px) {
+      .nav-tagline  { display: none; }
+      .nav-cta-text { display: none; }
+      .nav-cta      { padding: 9px 11px; font-size: .9rem; }
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, #0f0720 0%, #1e1040 40%, #2d1b69 75%, #3b0764 100%);
+      padding: 48px 24px 52px;
+      text-align: center;
+    }
+    .hero-content {
+      max-width: 620px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Logo ring treatment */
+    .hero-logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 88px; height: 88px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.07);
+      border: 1.5px solid rgba(255,255,255,.14);
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.35), 0 0 0 8px rgba(245,158,11,.08);
+    }
+    .hero-logo-img {
+      width: 60px; height: 60px;
+      border-radius: 14px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245,158,11,.14);
+      border: 1px solid rgba(245,158,11,.32);
+      color: #fcd34d;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(1.5); }
+    }
+
+    .hero h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.9rem, 6.5vw, 3rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(90deg, #f59e0b 0%, #fb923c 50%, #f43f5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(.88rem, 2.4vw, 1rem);
+      color: #c4b5fd;
+      line-height: 1.75;
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+
+    /* trust pills */
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .trust-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #e0e7ff;
+      font-size: .73rem;
+      font-weight: 500;
+      padding: 5px 13px;
+      border-radius: 50px;
+    }
+    .trust-pill i { color: #f59e0b; font-size: .8rem; }
+
+    /* ===== SERVICES SECTION ===== */
+    .section-label {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .section-label h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.3rem, 4vw, 1.7rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .section-label p {
+      font-size: .9rem;
+      color: var(--muted);
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+    .services-section {
+      flex: 1;
+      padding: 52px 16px 64px;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    @media (min-width: 600px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ===== SERVICE CARD ===== */
+    .service-card {
+      position: relative;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px 26px 26px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform .3s ease, box-shadow .3s ease, border-color .25s ease;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--accent);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    /* subtle inner glow on hover */
+    .service-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background: radial-gradient(ellipse at top left, rgba(255,255,255,.04), transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+    .service-card:hover { transform: translateY(-7px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+    .service-card:hover::after { opacity: 1; }
+
+    .card-icon {
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      background: var(--icon-bg);
+      color: var(--icon-text);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem;
+      margin-bottom: 18px;
+      flex-shrink: 0;
+      transition: transform .25s;
+    }
+    .service-card:hover .card-icon { transform: scale(1.1) rotate(-4deg); }
+
+    .card-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 9px;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: .875rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 18px;
+      flex: 1;
+    }
+    /* powered-by tag on cab card */
+    .powered-by {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 14px;
+      letter-spacing: .02em;
+    }
+    .powered-by span { color: #f59e0b; }
+
+    /* ===== INSTAGRAM BADGE ===== */
+    .insta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      color: #fff !important;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 5px 13px;
+      border-radius: 50px;
+      margin-bottom: 14px;
+      align-self: flex-start;
+      transition: opacity .2s, transform .2s;
+    }
+    .insta-badge:hover { opacity: .88; transform: scale(1.04); color: #fff !important; text-decoration: none; }
+
+    /* ===== CTA BUTTON ===== */
+    .btn-service {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: .85rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 50px;
+      margin-top: auto;
+      align-self: flex-start;
+      transition: opacity .2s, transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    }
+    .btn-service:hover { opacity: .9; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.25); color: #fff; text-decoration: none; }
+    .btn-service i { font-size: .78rem; transition: transform .2s; }
+    .btn-service:hover i { transform: translateX(4px); }
+
+    /* ===== DARK MODE: icon-bg soft overrides ===== */
+    @media (prefers-color-scheme: dark) {
+      .card-cab   { --icon-bg: rgba(245,158,11,.15);  --icon-text: #fde68a; }
+      .card-web   { --icon-bg: rgba(99,102,241,.18);  --icon-text: #a5b4fc; }
+      .card-brand { --icon-bg: rgba(225,29,72,.15);   --icon-text: #fda4af; }
+      .card-video { --icon-bg: rgba(13,148,136,.15);  --icon-text: #5eead4; }
+    }
+
+    /* ===== BRAND STRIP ===== */
+    .brand-strip {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .brand-strip-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .strip-logo-img {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .strip-text {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .strip-text strong { color: var(--text); }
+    .strip-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .strip-link {
+      font-size: .73rem;
+      font-weight: 600;
+      color: var(--brand);
+      padding: 4px 12px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      transition: background .2s, color .2s;
+    }
+    .strip-link:hover { background: var(--brand); color: #fff; text-decoration: none; }
+
+    /* ===== SCROLL FADE-IN ===== */
+    .fi { opacity: 1; transform: none; }
+    .fi.on { opacity: 1; transform: none; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 28px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-logo-img {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      object-fit: cover;
+    }
+    .footer-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .footer-name span { color: #f59e0b; }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .footer-links a {
+      font-size: .78rem;
+      color: var(--muted);
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy {
+      font-size: .76rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .footer-copy a { color: var(--muted); font-weight: 600; }
+    .footer-copy a:hover { color: var(--text); text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="site-nav">
+    <a class="nav-brand" href="/">
+      <img src="/logo.webp" alt="AK Creation logo" class="nav-logo-img" width="36" height="36">
+      <div>
+        <div class="nav-name">AK <span>Creation</span></div>
+        <div class="nav-tagline">Local · Digital · Personal</div>
+      </div>
+    </a>
+    <a class="nav-cta" href="https://wa.me/917749984274?text=Hi%20AK%20Creation%2C%20I%20want%20to%20know%20more%20about%20your%20services" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-whatsapp"></i> <span class="nav-cta-text">WhatsApp</span>
+    </a>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="hero-content">
+
+      <div class="hero-logo-wrap">
+        <img src="/logo.webp" alt="AK Creation" class="hero-logo-img" width="60" height="60">
+      </div>
+
+      <div class="hero-badge">
+        <span class="dot"></span>
+        AK Creation &nbsp;·&nbsp; Local Services
+      </div>
+      <h1>Everything You Need,<br><span class="grad">Right Here</span></h1>
+      <p class="hero-sub">Book a ride, build your brand, get a custom digital presence, or order a personalised video — all local, all personal, all from one place.</p>
+
+      <div class="trust-row">
+        <span class="trust-pill"><i class="fas fa-star"></i> Trusted by 50+ businesses</span>
+        <span class="trust-pill"><i class="fas fa-map-marker-alt"></i> Based in Banki, Odisha</span>
+        <span class="trust-pill"><i class="fas fa-bolt"></i> 24-hr delivery</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== SERVICES GRID ===== -->
+  <main class="services-section">
+    <div class="section-label">
+      <h2>Our Services</h2>
+      <p>Pick what you need — we'll take care of the rest, fast and personally.</p>
+    </div>
+    <div class="services-grid">
+
+      <!-- Card 1: Book A Cab -->
+      <div class="service-card card-cab fi"
+           style="--accent:#f59e0b; --icon-bg:#fef3c7; --icon-text:#92400e;">
+        <div class="card-icon"><i class="fas fa-taxi"></i></div>
+        <div class="powered-by"><i class="fas fa-circle" style="font-size:.45rem;color:#f59e0b;"></i> Powered by <span>Anvisha Travels</span></div>
+        <h3 class="card-title">Book A Cab</h3>
+        <p class="card-desc">Fast, reliable cab bookings in Banki and beyond — no waiting, no haggling. Available for local trips, outstation, and airport runs.</p>
+        <a class="btn-service" href="/anvisha-travels/">Book a Ride <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Card 2: Personalized Website / App -->
+      <div class="service-card card-web fi"
+           style="--accent:#6366f1; --icon-bg:#e0e7ff; --icon-text:#3730a3;">
+        <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
+        <h3 class="card-title">Personalized Website / App</h3>
+        <p class="card-desc">Your custom digital presence — built fast, mobile-first, and designed to grow your business. Restaurants, shops, transport, portfolios & more.</p>
+        <a class="btn-service" href="/services.html">Explore Services <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Card 3: Brand Collab -->
+      <div class="service-card card-brand fi"
+           style="--accent:#e11d48; --icon-bg:#ffe4e6; --icon-text:#9f1239;">
+        <div class="card-icon"><i class="fas fa-handshake"></i></div>
+        <h3 class="card-title">Brand Collab</h3>
+        <p class="card-desc">Partner with us for creative collaborations — content, branding, and audience reach that connects your product to real people.</p>
+        <a class="insta-badge"
+           href="https://www.instagram.com/golu_molu.stories/"
+           target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-instagram"></i> @golu_molu.stories
+        </a>
+        <a class="btn-service" href="/brand_form.html">Start a Collab <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Card 4: Personalized Video -->
+      <div class="service-card card-video fi"
+           style="--accent:#0d9488; --icon-bg:#ccfbf1; --icon-text:#115e59;">
+        <div class="card-icon"><i class="fas fa-video"></i></div>
+        <h3 class="card-title">Personalized Video</h3>
+        <p class="card-desc">Order a custom video made just for you — birthdays, shoutouts, promotions, or any special occasion. Memorable and personal.</p>
+        <a class="insta-badge"
+           href="https://www.instagram.com/golu_molu.stories/"
+           target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-instagram"></i> @golu_molu.stories
+        </a>
+        <a class="btn-service" href="/personal_form.html">Request a Video <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="/logo.webp" alt="AK Creation logo" class="footer-logo-img" width="34" height="34">
+        <div class="footer-name">AK <span>Creation</span></div>
+      </div>
+      <p class="footer-copy">
+        &copy; <span id="footer-year"></span>
+        <a href="https://akcreation-apps.com/services.html">AK Creation</a>.
+        All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('on'), i * 90);
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fi').forEach(el => io.observe(el));
+  </script>
+
+</body>
+</html>
