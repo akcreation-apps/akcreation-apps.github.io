@@ -37,21 +37,21 @@
             {
               "id": 91,
               "name": "Hot And Sour",
-              "price": 99,
+              "price": 109,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 92,
               "name": "Manchow",
-              "price": 99,
+              "price": 109,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 93,
               "name": "Clear",
-              "price": 99,
+              "price": 109,
               "available_time": "",
               "not_available_time": ""
             }
@@ -64,70 +64,70 @@
             {
               "id": 101,
               "name": "Crispy Corn",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 102,
               "name": "Veg Salt And Pepper",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 103,
               "name": "Stir Fried Baby Corn",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 104,
               "name": "Veg Manchurian",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 105,
               "name": "Paneer Chilli",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 106,
               "name": "Paneer Manchurian",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 107,
               "name": "Honey Chilli Potato",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 108,
               "name": "Mashroom 65",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 109,
               "name": "Mashroom Manchurian",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 110,
               "name": "Mashroom Chilli",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             }
@@ -140,63 +140,63 @@
             {
               "id": 201,
               "name": "Chilli Chicken",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 202,
               "name": "Chicken 65",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 203,
               "name": "Chicken Majestic",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 204,
               "name": "Chicken Lollipop",
-              "price": 199,
+              "price": 219,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 205,
               "name": "Crispy Chicken Wings",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 206,
               "name": "Chicken 555",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 207,
               "name": "Chilli Fish",
-              "price": 199,
+              "price": 219,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 208,
               "name": "Garlic Chicken",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 209,
               "name": "Loose Prawns",
-              "price": 189,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             }
@@ -209,49 +209,49 @@
             {
               "id": 301,
               "name": "Hakka Noodles",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 302,
               "name": "Sezwan Noodles",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 303,
               "name": "Singapore Noodles",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 304,
               "name": "Sezwan Fried Rice",
-              "price": 119,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 305,
               "name": "Paneer Fried Rice",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 306,
               "name": "Kaju Fried Rice",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 307,
               "name": "Mix Veg Fried Rice",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             }
@@ -264,42 +264,42 @@
             {
               "id": 401,
               "name": "Chicken Hakka Noodles",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 402,
               "name": "Chicken Sezwan Noodles",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 403,
               "name": "Egg Fried Rice",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 404,
               "name": "Chicken Sezwan Fried Rice",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 405,
               "name": "Chicken Fried Rice",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 406,
               "name": "NonVeg Mix Fried Rice",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             }
@@ -324,7 +324,7 @@
             {
               "id": 502,
               "name": "Paneer Cheese Burger",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             }
@@ -344,7 +344,7 @@
             {
               "id": 602,
               "name": "Chicken Cheese Burger",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             }
@@ -364,14 +364,14 @@
             {
               "id": 702,
               "name": "Corn Cheese",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 703,
               "name": "Peri Peri Paneer",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             }
@@ -384,7 +384,7 @@
             {
               "id": 801,
               "name": "Casun Chicken",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             }
@@ -397,21 +397,21 @@
             {
               "id": 831,
               "name": "Red Sauce",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 832,
               "name": "White Sauce",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 833,
               "name": "Pink Sauce",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             }
@@ -424,21 +424,21 @@
             {
               "id": 851,
               "name": "Red Sauce",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 852,
               "name": "White Sauce",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 853,
               "name": "Pink Sauce",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             }
@@ -451,28 +451,28 @@
             {
               "id": 901,
               "name": "Margarita(6 inch)",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 902,
               "name": "Margarita(9 inch)",
-              "price": 189,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 903,
               "name": "Farm House(6 inch)",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 904,
               "name": "Farm House(9 inch)",
-              "price": 199,
+              "price": 219,
               "available_time": "",
               "not_available_time": ""
             },
@@ -486,7 +486,7 @@
             {
               "id": 906,
               "name": "Corn Paneer(9 inch)",
-              "price": 219,
+              "price": 229,
               "available_time": "",
               "not_available_time": ""
             }
@@ -499,28 +499,28 @@
             {
               "id": 1001,
               "name": "Italian Chicken(6 inch)",
-              "price": 159,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1002,
               "name": "Italian Chicken(9 inch)",
-              "price": 219,
+              "price": 229,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1003,
               "name": "Bombay Prawn(6 inch)",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1004,
               "name": "Bombay Prawn(9 inch)",
-              "price": 239,
+              "price": 259,
               "available_time": "",
               "not_available_time": ""
             }
@@ -537,28 +537,28 @@
             {
               "id": 1101,
               "name": "Kit Kat",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1102,
               "name": "Mix Fruit",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1103,
               "name": "Pineapple",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1104,
               "name": "Kiwi",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             }
@@ -570,14 +570,14 @@
             {
               "id": 1201,
               "name": "Sweet Lassi",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1202,
               "name": "Salted Lassi",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             }
@@ -589,63 +589,63 @@
             {
               "id": 1301,
               "name": "Virgin Mojito",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1302,
               "name": "Blue Lagoon",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1303,
               "name": "Fresh Lime Soda",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1304,
               "name": "Pineapple Mojito",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1305,
               "name": "Kiwi Cooler",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1306,
               "name": "Mango Cooler",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1307,
               "name": "Green Apple Mojito",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1308,
               "name": "Orange Mojito",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1309,
               "name": "TCD Special Guava Lagoon",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             }
@@ -657,49 +657,49 @@
             {
               "id": 1401,
               "name": "Vanila Milk Shake",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1402,
               "name": "Kit Kat Milk Shake",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1403,
               "name": "Chocolate Milk Shake",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1404,
               "name": "Mango Milk Shake",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1405,
               "name": "Mix Fruit Milk Shake",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1406,
               "name": "Banana Milk Shake",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1407,
               "name": "Guava Milk Shake",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             }
@@ -725,7 +725,7 @@
             {
               "id": 1503,
               "name": "Cold Coffee",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             }
@@ -749,28 +749,28 @@
             {
               "id": 2202,
               "name": "Mango Tango",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2203,
               "name": "Pink Berry",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2204,
               "name": "Magic Fruit",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2205,
               "name": "Brownie Smashed",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             }
@@ -848,7 +848,7 @@
             {
               "id": 2607,
               "name": "Veg Pulao",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             }
@@ -861,14 +861,14 @@
             {
               "id": 2701,
               "name": "Veg Biryani (Half)",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2702,
               "name": "Veg Biryani (Full)",
-              "price": 199,
+              "price": 219,
               "available_time": "",
               "not_available_time": ""
             }
@@ -881,21 +881,21 @@
             {
               "id": 2801,
               "name": "Chicken Biryani (2pc)",
-              "price": 109,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2802,
               "name": "Chicken Biryani (3pc)",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2803,
               "name": "Chicken Biryani (5pc)",
-              "price": 219,
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             }
@@ -943,77 +943,77 @@
             {
               "id": 2906,
               "name": "Veg Hyderabadi",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2907,
               "name": "Mili Jhuli Veg",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2908,
               "name": "Kadai Paneer",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2909,
               "name": "Methi Paneer",
-              "price": 149,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2910,
               "name": "Mushroom Do Pyaja",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2911,
               "name": "Sunheri Veg",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2912,
               "name": "Paneer Lababdar",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2913,
               "name": "Paneer Butter Masala",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2914,
               "name": "Mushroom Masala",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2915,
               "name": "Mushroom Butter Masala",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2916,
               "name": "Paneer Tikka Masala",
-              "price": 189,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             }
@@ -1026,98 +1026,98 @@
             {
               "id": 3001,
               "name": "Fish Masala",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3002,
               "name": "Fish Besar",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3003,
               "name": "Fish Kalia",
-              "price": 89,
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3004,
               "name": "Chicken Kasa",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3005,
               "name": "Kadai Chicken",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3006,
               "name": "Chicken Jelfrezi",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3007,
               "name": "Chicken Butter Masala",
-              "price": 189,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3008,
               "name": "TCD Special Chicken Rawa Punjabi",
-              "price": 189,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3009,
               "name": "Chicken Tikka Masala",
-              "price": 199,
+              "price": 219,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3010,
               "name": "TCD Special Mutton Masala",
-              "price": 219,
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3011,
               "name": "Prawns Masala",
-              "price": 219,
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3012,
               "name": "Spicy Prawns",
-              "price": 219,
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3013,
               "name": "Mutton Rogan Josh",
-              "price": 239,
+              "price": 259,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 3014,
               "name": "Malai Prawns",
-              "price": 239,
+              "price": 259,
               "available_time": "",
               "not_available_time": ""
             }
