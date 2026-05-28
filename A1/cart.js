@@ -118,7 +118,7 @@ const updateTotalPrice = () => {
         if (total > 0 && total < MINIMUM_ORDER_PRICE) {
             deliveryNoteElement.innerHTML = `
                 <span style="color:red;">₹${DELIVERY_CHARGES} delivery charge added for orders below ₹${MINIMUM_ORDER_PRICE}.</span><br>
-                Current Total: ₹${total.toFixed(2)} <br>
+                Current Total: ₹${total.toFixed(0)} <br>
                 Delivery Charges: ₹${DELIVERY_CHARGES}
             `;
             total += DELIVERY_CHARGES;
@@ -132,7 +132,7 @@ const updateTotalPrice = () => {
     }
 
     // Update the displayed total price
-    totalPriceElement.textContent = `₹${total.toFixed(2)}`;
+    totalPriceElement.textContent = `₹${total.toFixed(0)}`;
 };
 
 
@@ -244,9 +244,9 @@ function calculateTotal(cartItems, message) {
             deliveryNote = `\n(₹${DELIVERY_CHARGES} delivery charge applied for orders below ₹${MINIMUM_ORDER_PRICE})`;
         }
         const placeNote = place ? `\nDelivering at: ${place}` : '';
-        message += `Total Price: ₹${total.toFixed(2)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Cash On Delivery`;
+        message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Cash On Delivery`;
     } else {
-        message += `Total Price: ₹${total.toFixed(2)}/-\n${deliveryNote}\nTable Number: ${table}`;
+        message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}\nTable Number: ${table}`;
     }
 
     return message;

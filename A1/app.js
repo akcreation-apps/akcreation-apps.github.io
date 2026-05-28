@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', async() => {
                                         ${bestsellerNames.has(dish.name) ? '<span class="bestseller-badge">🔥 Bestseller</span>' : ''}
                                         <div class="dish-overlay">
                                             <h5 class="dish-name">${dish.name}</h5>
-                                            <p class="price">₹${dish.price.toFixed(2)}/-</p>
+                                            <p class="price">₹${dish.price.toFixed(0)}/-</p>
                                         </div>
                                         <div class="item-control"></div>
                                     </div>

@@ -652,11 +652,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${orderDetails.order_details.map(cat => `
                                 <li><strong>${cat.category.name}</strong></li>
                                 ${cat.category.dish_details.map(dish => `
-                                    <li>${dish.quantity} x ${dish.name} - ₹${(dish.price * dish.quantity).toFixed(2)}</li>
+                                    <li>${dish.quantity} x ${dish.name} - ₹${(dish.price * dish.quantity).toFixed(0)}</li>
                                 `).join('')}
                             `).join('')}
                             ${orderDetails.delivery_charges && orderDetails.delivery_charges > 0
-                            ? `<li style="color: red; font-weight: 600;">Delivery Charges - ₹${orderDetails.delivery_charges.toFixed(2)}</li>`
+                            ? `<li style="color: red; font-weight: 600;">Delivery Charges - ₹${orderDetails.delivery_charges.toFixed(0)}</li>`
                             : ''}
                         </ul>
                         <div class="order-actions" style="display: flex; justify-content: space-between; margin-top: 10px;">
