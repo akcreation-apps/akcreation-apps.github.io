@@ -317,10 +317,22 @@ document.addEventListener('DOMContentLoaded', async() => {
                         const dishGrid = document.createElement('div');
                         dishGrid.classList.add('dish-grid');
 
+                        const currentHour = new Date().getHours();
+
                         subcategory.dishes.forEach(dish => {
                             // Skip rendering the dish if its id is in disable_ids
                             if (disable_ids.includes(dish.id)) {
-                                return; // Skip the disabled dish
+                                return;
+                            }
+
+                            // Skip if before available_time window (only when a number is set)
+                            if (typeof dish.available_time === 'number' && currentHour < dish.available_time) {
+                                return;
+                            }
+
+                            // Skip if past not_available_time window
+                            if (typeof dish.not_available_time === 'number' && currentHour >= dish.not_available_time) {
+                                return;
                             }
 
                             // Filter logic: Show items with no subcategory type or based on filters
@@ -328,9 +340,9 @@ document.addEventListener('DOMContentLoaded', async() => {
                                 (!onlyVegCheckbox.checked && !onlyNonVegCheckbox.checked)) {
                                 // Both checkboxes are checked (or none), show all items
                             } else if (onlyVegCheckbox.checked && subcategory.type !== 'Veg' && subcategory.type) {
-                                return; // Filter out non-Veg items if Veg is checked
+                                return;
                             } else if (onlyNonVegCheckbox.checked && subcategory.type !== 'NonVeg' && subcategory.type) {
-                                return; // Filter out Veg items if Non-Veg is checked
+                                return;
                             }
 
                             const menuItem = document.createElement('div');
@@ -356,7 +368,7 @@ document.addEventListener('DOMContentLoaded', async() => {
                             renderControl(menuItem.querySelector('.item-control'), subcategory, dish);
 
                             dishGrid.appendChild(menuItem);
-                            hasVisibleDishes = true; // Mark that there's at least one visible dish
+                            hasVisibleDishes = true;
                         });
 
                         if (dishGrid.children.length > 0) {
