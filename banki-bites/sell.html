@@ -29,7 +29,9 @@
   <meta name="twitter:title" content="Sell Homemade Food in Banki — BankiBites Banki Flavours">
   <meta name="twitter:description" content="List your homemade food for ₹149. BankiBites handles delivery, orders & payments. Just prepare — we do the rest.">
 
-  <meta name="theme-color" content="#1A1A2E">
+  <meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F0E15" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" sizes="180x180" href="banki-bites-logo.png">
@@ -59,6 +61,19 @@
       --wa:           #25D366;
       --wa-dark:      #128C4A;
       --nav-h:        60px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:          #0F0E15;
+        --card:        #1C1929;
+        --text:        #F0EAE3;
+        --muted:       #7D7585;
+        --border:      #2B2638;
+        --green:       #22c55e;
+        --green-light: rgba(34,197,94,0.12);
+        --green-mid:   #16a34a;
+      }
+      footer { background: #0A090F; }
     }
 
     html { scroll-behavior: smooth; }

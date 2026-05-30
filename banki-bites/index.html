@@ -35,7 +35,9 @@
   <meta name="twitter:image" content="https://akcreation-apps.com/banki-bites/banner.jpg">
   <meta name="twitter:image:alt" content="BankiBites — Food Delivery in Banki, Cuttack, Odisha 754008">
 
-  <meta name="theme-color" content="#FF6B35">
+  <meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F0E15" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" sizes="180x180" href="banki-bites-logo.png">
@@ -184,6 +186,20 @@
       --muted:        #55606E;
       --border:       #EDE8E3;
       --nav-h:        60px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:    #0F0E15;
+        --card:  #1C1929;
+        --text:  #F0EAE3;
+        --muted: #7D7585;
+        --border:#2B2638;
+      }
+      .area-chip  { background: rgba(255,107,53,0.12); }
+      .cuisine-chip { background: var(--card); }
+      .step, .why-card { background: var(--card); }
+      .rp-item { background: var(--card); }
+      footer { background: #0A090F; }
     }
 
     html { scroll-behavior: smooth; }
