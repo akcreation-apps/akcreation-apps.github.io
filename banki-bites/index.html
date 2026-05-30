@@ -209,8 +209,10 @@
       text-decoration: none; padding: 11px 14px;
       border: 1px solid rgba(255,255,255,0.2); border-radius: 20px;
       transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap; flex-shrink: 0;
     }
     .topbar-link:hover { color: var(--primary); border-color: var(--primary); }
+    .brand { flex-shrink: 0; }
 
     /* ── HERO ── */
     .hero {
@@ -434,7 +436,6 @@
         <div class="brand-logo"><img src="banki-bites-logo.png" alt="BankiBites logo"></div>
         <span class="brand-name">Banki<span>Bites</span></span>
       </a>
-      <a class="topbar-link" href="sell.html" style="color:#4ade80;border-color:rgba(74,222,128,0.3);" onmouseover="this.style.color='#4ade80';this.style.borderColor='rgba(74,222,128,0.6)'" onmouseout="this.style.color='#4ade80';this.style.borderColor='rgba(74,222,128,0.3)'">🌿 Banki Flavours</a>
       <a class="topbar-link" href="dashboard.html">All Restaurants</a>
     </nav>
   </header>
@@ -565,6 +566,7 @@
   <footer>
     <p class="footer-brand-note">BankiBites — popularly searched as <em>Banki Bites</em> — is Banki's first online food delivery platform, Cuttack, Odisha 754008.</p>
     <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+    <p style="margin-top:8px;">Powered by <a href="https://akcreation-apps.com/services.html">AK Creation</a></p>
   </footer>
 
   <!-- Restaurant Picker Sheet -->
