@@ -1,7 +1,7 @@
 {
   "locations": [
     "Harirajpur", "Chakapada", "Sisua", "Bedapur", "Khamaranga",
-    "Charchika", "Ranapur", "Banki", "Sahadapada", "Gopalapur", "Patapur"
+    "Charchika", "Ranapur", "Banki", "Sahadapada", "Gopalapur", "Patapur", "Ragadi"
   ],
   "partners": [
     {
@@ -23,7 +23,7 @@
       "rating": 4.5,
       "opening_hour": "10",
       "closing_hour": "22",
-      "address": "Banki College Road, Towards Sunadei, Banki 754008",
+      "address": "Banki College Road, Banki 754008",
       "is_active": true
     }
   ]
