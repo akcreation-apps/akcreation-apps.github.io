@@ -29,6 +29,7 @@ Evaluate against these criteria:
 - **Visual Hierarchy**: Clear primary vs. secondary actions, focal point direction
 - **Feedback States**: Hover, focus, active, disabled, loading, error, success states
 - **Consistency**: Alignment with existing site design language (Bootstrap 4 conventions, `#4f46e5` palette, Inter/Poppins fonts)
+- **System Theme Support**: Every page must respect the user's OS preference via `@media (prefers-color-scheme: dark)`. Check that CSS custom properties in `:root` have a dark-mode override block, that `<meta name="theme-color">` uses separate `media="(prefers-color-scheme: light/dark)"` variants, and that `<meta name="color-scheme" content="light dark">` is present. Hardcoded light-only colors (`#fff`, `#f5f5f5`, `color: #111`, etc.) that aren't wrapped in a variable are a failure. Flag absence of dark mode support as **Critical**.
 
 ### Step 3 — User Experience Audit
 Evaluate against these criteria:
@@ -51,6 +52,7 @@ Evaluate against these criteria:
 - **Forms**: Every input has an associated `<label>`; required fields indicated; error messages linked via `aria-describedby`
 - **Color Independence**: Information never conveyed by color alone
 - **Motion**: Animations respect `prefers-reduced-motion`
+- **System Theme**: Page must respond to `prefers-color-scheme: dark` — verify dark-mode CSS variable overrides exist, contrast ratios hold in both modes, and no element is invisible or unreadable when the OS is in dark mode
 - **Touch Targets**: Minimum 44×44px for all interactive elements
 
 ### Step 5 — Prioritize & Format Findings
@@ -103,6 +105,7 @@ Severity: 🔴 / 🟡 / 🟢
 - Respect the project's existing conventions: Bootstrap 4 grid, no framework JS, CDN-loaded assets, mobile-first approach
 - When a component does something well, acknowledge it — feedback should be balanced
 - If the component is missing required project boilerplate (standard `<head>`, footer with dynamic year), flag it as Critical
+- **Always audit for system theme support**: if `@media (prefers-color-scheme: dark)` is absent, or CSS variables have no dark-mode override, or `<meta name="color-scheme">` is missing — flag it as Critical and provide the corrected variable block as a code snippet
 - Never recommend changes that would break the vanilla JS / no-bundler architecture
 - If you need the actual code to review, ask for it clearly before proceeding
 
@@ -114,6 +117,10 @@ Before delivering your review, confirm:
 - [ ] Findings are prioritized by severity
 - [ ] Quick wins section is included
 - [ ] Feedback respects Bootstrap 4 and vanilla JS constraints
+- [ ] Verified `@media (prefers-color-scheme: dark)` block exists with CSS variable overrides
+- [ ] Verified `<meta name="color-scheme" content="light dark">` is present in `<head>`
+- [ ] Verified `<meta name="theme-color">` has separate `media` variants for light and dark
+- [ ] Confirmed contrast ratios pass WCAG AA in **both** light and dark modes
 
 **Update your agent memory** as you discover recurring patterns, common issues, and design conventions in this codebase. This builds institutional knowledge across reviews.
 
