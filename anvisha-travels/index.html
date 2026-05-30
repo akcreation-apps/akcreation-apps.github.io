@@ -325,7 +325,7 @@
     /* Text content on solid dark — zero readability issues */
     .hero-inner {
       background: var(--bg);
-      padding: 36px var(--page-pad) 40px;
+      padding: 36px var(--page-pad) 20px;
       text-align: center;
     }
 
@@ -399,12 +399,8 @@
     .h-rule { height: 1px; background: var(--border); }
 
     /* ──────────────────────────────────────────
-       MAIN COLUMNS
-       Mobile: stacked. Desktop: side-by-side.
+       BOOKING FORM
     ────────────────────────────────────────── */
-    .main-cols {
-      display: block;
-    }
 
     /* ── SERVICES ── */
     .services {
@@ -471,7 +467,7 @@
 
     /* ── BOOKING FORM ── */
     .booking-section {
-      padding: 36px var(--page-pad) 8px;
+      padding: 20px var(--page-pad) 8px;
       scroll-margin-top: 62px;
     }
 
@@ -767,45 +763,23 @@
 
       /* Hero: show banner on desktop, taller */
       .hero-banner { display: block; height: 340px; }
-      .hero-inner  { padding: 28px var(--page-pad) 44px; }
+      .hero-inner  { padding: 28px var(--page-pad) 20px; }
 
       .hero-title { font-size: clamp(2.8rem, 3.8vw, 3.8rem); white-space: nowrap; }
       .hero-body  { font-size: 15px; max-width: 480px; }
 
-      /* Two-column grid */
-      .main-cols {
-        display: grid;
-        grid-template-columns: 1fr 400px;
-        align-items: start;
-        border-top: 1px solid var(--border);
+      /* Constrain form width on desktop */
+      .booking-section {
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
       }
-
-      .col-left {
-        border-right: 1px solid var(--border);
-      }
-
-      /* Sticky form on the right */
-      .col-right .booking-section {
-        position: sticky;
-        top: 62px;
-        padding: 36px 40px 36px 32px;
-        scroll-margin-top: 0;
-      }
-
-      /* Services section: remove bottom pad since it's adjacent to form */
-      .services { padding-bottom: 44px; }
 
       /* How-it-works & footer full-width visual balance */
       .how { padding-left: var(--page-pad); padding-right: var(--page-pad); }
-      .h-rule { display: none; } /* suppressed between hero and two-col grid */
     }
 
-    /* Very large screens */
-    @media (min-width: 1200px) {
-      .main-cols { grid-template-columns: 1fr 440px; }
-    }
-
-    /* ── Skip link ── */
+/* ── Skip link ── */
     .sr-skip {
       position: absolute;
       top: -100%;
@@ -866,121 +840,114 @@
 
   <div class="h-rule"></div>
 
-  <!-- ── Two-column area ── -->
-  <div class="main-cols">
+  <!-- ── Booking Form ── -->
+  <div class="booking-section" id="booking-form">
+    <div class="form-card">
 
-    <!-- Left: Services -->
-    <div class="col-left">
-      <section class="services">
-        <p class="eyebrow">What we offer</p>
+      <div class="form-head">
+        <div class="form-head-icon"><i class="fas fa-route"></i></div>
+        <p class="form-head-title">Plan your ride</p>
+      </div>
 
-        <div class="svc-row">
-          <span class="svc-num">01</span>
-          <div class="svc-text">
-            <h3>Local Cab Rides in Banki</h3>
-            <p>Quick, affordable cab trips within Banki and the surrounding Cuttack district area.</p>
+      <div class="form-body">
+
+        <div class="f-row">
+          <div class="f-group">
+            <label class="f-label" for="ride-date"><i class="fas fa-calendar" aria-hidden="true"></i>Date</label>
+            <input type="date" class="f-input" id="ride-date" min="">
           </div>
-          <span class="svc-badge" aria-hidden="true">🚗</span>
-        </div>
-
-        <div class="svc-row">
-          <span class="svc-num">02</span>
-          <div class="svc-text">
-            <h3>Outstation Cab from Banki &amp; Cuttack</h3>
-            <p>Comfortable long-distance taxi rides from Banki to Bhubaneswar, Puri, Konark &amp; beyond.</p>
-          </div>
-          <span class="svc-badge" aria-hidden="true">🛣️</span>
-        </div>
-
-        <div class="svc-row">
-          <span class="svc-num">03</span>
-          <div class="svc-text">
-            <h3>Airport &amp; Railway Station Cab Transfers</h3>
-            <p>Timely cab pickups and drops to Bhubaneswar Airport &amp; Cuttack Railway Station — never miss a flight or train again.</p>
-          </div>
-          <span class="svc-badge" aria-hidden="true">✈️</span>
-        </div>
-
-        <div class="svc-row">
-          <span class="svc-num">04</span>
-          <div class="svc-text">
-            <h3>Wedding &amp; Event Cab Hire in Banki</h3>
-            <p>Group cab and taxi transport for weddings and special events in Banki, Cuttack — reliable, presentable, on time.</p>
-          </div>
-          <span class="svc-badge" aria-hidden="true">💒</span>
-        </div>
-      </section>
-    </div>
-
-    <!-- Right: Booking Form (sticky on desktop) -->
-    <div class="col-right">
-      <div class="booking-section" id="booking-form">
-        <div class="form-card">
-
-          <div class="form-head">
-            <div class="form-head-icon"><i class="fas fa-route"></i></div>
-            <p class="form-head-title">Plan your ride</p>
-          </div>
-
-          <div class="form-body">
-
-            <div class="f-row">
-              <div class="f-group">
-                <label class="f-label" for="ride-date"><i class="fas fa-calendar" aria-hidden="true"></i>Date</label>
-                <input type="date" class="f-input" id="ride-date" min="">
-              </div>
-              <div class="f-group">
-                <label class="f-label" for="ride-time"><i class="fas fa-clock" aria-hidden="true"></i>Time</label>
-                <select class="f-select" id="ride-time"></select>
-              </div>
-            </div>
-
-            <div class="f-full">
-              <label class="f-label" for="passengers"><i class="fas fa-users" aria-hidden="true"></i>Passengers</label>
-              <select class="f-select" id="passengers">
-                <option value="">How many?</option>
-                <option value="1">1 passenger</option>
-                <option value="2">2 passengers</option>
-                <option value="3">3 passengers</option>
-                <option value="4">4 passengers</option>
-                <option value="5">5 passengers</option>
-                <option value="6">6 passengers</option>
-                <option value="7">7 passengers</option>
-                <option value="8+">8+ passengers</option>
-              </select>
-              <div id="pax-custom-wrap" style="display:none;margin-top:10px;">
-                <input type="number" id="pax-custom" min="8" max="50"
-                  placeholder="Enter exact number (e.g. 10)"
-                  aria-describedby="pax-error"
-                  style="background:var(--surface);border:1.5px solid var(--border-hi);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;padding:12px 14px;width:100%;outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;appearance:none;">
-                <p id="pax-error" role="alert" aria-live="polite"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> Number must be 8 or more</p>
-              </div>
-            </div>
-
-            <div class="opt-wrap" id="location-section">
-              <div class="f-sep"></div>
-              <p class="opt-head">
-                <i class="fas fa-map-pin" style="color:var(--gold)"></i> Where to?
-                <span class="opt-tag">optional</span>
-              </p>
-              <input type="text" class="f-input" id="destination" placeholder="e.g. Cuttack Railway Station">
-            </div>
-
-            <button class="btn-wa" id="wa-btn" onclick="openWhatsApp()">
-              <i class="fab fa-whatsapp"></i>
-              Book via WhatsApp
-            </button>
-
-            <p class="helper" id="helper-text">
-              <i class="fas fa-info-circle"></i> Select date, time &amp; passengers to continue
-            </p>
-
+          <div class="f-group">
+            <label class="f-label" for="ride-time"><i class="fas fa-clock" aria-hidden="true"></i>Time</label>
+            <select class="f-select" id="ride-time"></select>
           </div>
         </div>
+
+        <div class="f-full">
+          <label class="f-label" for="passengers"><i class="fas fa-users" aria-hidden="true"></i>Passengers</label>
+          <select class="f-select" id="passengers">
+            <option value="">How many?</option>
+            <option value="1">1 passenger</option>
+            <option value="2">2 passengers</option>
+            <option value="3">3 passengers</option>
+            <option value="4">4 passengers</option>
+            <option value="5">5 passengers</option>
+            <option value="6">6 passengers</option>
+            <option value="7">7 passengers</option>
+            <option value="8+">8+ passengers</option>
+          </select>
+          <div id="pax-custom-wrap" style="display:none;margin-top:10px;">
+            <input type="number" id="pax-custom" min="8" max="50"
+              placeholder="Enter exact number (e.g. 10)"
+              aria-describedby="pax-error"
+              style="background:var(--surface);border:1.5px solid var(--border-hi);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;padding:12px 14px;width:100%;outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;appearance:none;">
+            <p id="pax-error" role="alert" aria-live="polite"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> Number must be 8 or more</p>
+          </div>
+        </div>
+
+        <div class="opt-wrap" id="location-section">
+          <div class="f-sep"></div>
+          <p class="opt-head">
+            <i class="fas fa-map-pin" style="color:var(--gold)"></i> Where to?
+            <span class="opt-tag">optional</span>
+          </p>
+          <input type="text" class="f-input" id="destination" placeholder="e.g. Cuttack Railway Station">
+        </div>
+
+        <button class="btn-wa" id="wa-btn" onclick="openWhatsApp()">
+          <i class="fab fa-whatsapp"></i>
+          Book via WhatsApp
+        </button>
+
+        <p class="helper" id="helper-text">
+          <i class="fas fa-info-circle"></i> Select date, time &amp; passengers to continue
+        </p>
+
       </div>
     </div>
+  </div>
 
-  </div><!-- /main-cols -->
+  <div class="h-rule"></div>
+
+  <!-- ── Services ── -->
+  <section class="services">
+    <p class="eyebrow">What we offer</p>
+
+    <div class="svc-row">
+      <span class="svc-num">01</span>
+      <div class="svc-text">
+        <h3>Local Cab Rides in Banki</h3>
+        <p>Quick, affordable cab trips within Banki and the surrounding Cuttack district area.</p>
+      </div>
+      <span class="svc-badge" aria-hidden="true">🚗</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-num">02</span>
+      <div class="svc-text">
+        <h3>Outstation Cab from Banki &amp; Cuttack</h3>
+        <p>Comfortable long-distance taxi rides from Banki to Bhubaneswar, Puri, Konark &amp; beyond.</p>
+      </div>
+      <span class="svc-badge" aria-hidden="true">🛣️</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-num">03</span>
+      <div class="svc-text">
+        <h3>Airport &amp; Railway Station Cab Transfers</h3>
+        <p>Timely cab pickups and drops to Bhubaneswar Airport &amp; Cuttack Railway Station — never miss a flight or train again.</p>
+      </div>
+      <span class="svc-badge" aria-hidden="true">✈️</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-num">04</span>
+      <div class="svc-text">
+        <h3>Wedding &amp; Event Cab Hire in Banki</h3>
+        <p>Group cab and taxi transport for weddings and special events in Banki, Cuttack — reliable, presentable, on time.</p>
+      </div>
+      <span class="svc-badge" aria-hidden="true">💒</span>
+    </div>
+  </section>
 
   <!-- ── How it works ── -->
   <div class="h-rule"></div>
@@ -1168,7 +1135,13 @@
 
   function openWhatsApp() {
     if (waBtn.disabled) return;
-    window.open(buildWAUrl(), '_blank');
+    var a = document.createElement('a');
+    a.href = buildWAUrl();
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   /* ── Form state ── */
