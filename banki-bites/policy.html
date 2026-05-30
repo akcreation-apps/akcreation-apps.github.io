@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Partner Policies — BankiBites</title>
+  <meta name="description" content="BankiBites partner onboarding policies for restaurant owners and delivery riders in Banki, Cuttack, Odisha 754008.">
+  <meta name="author" content="AkCreation">
+  <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F0E15" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="banki-bites-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary:  #FF6B35;
+      --navy:     #1A1A2E;
+      --bg:       #F7F3EF;
+      --card:     #FFFFFF;
+      --text:     #111827;
+      --muted:    #55606E;
+      --border:   #EDE8E3;
+      --red:      #dc2626;   --red-bg:   #fef2f2;
+      --amber:    #d97706;   --amber-bg: #fffbeb;
+      --green:    #16a34a;   --green-bg: #f0fdf4;
+      --blue:     #2563eb;   --blue-bg:  #eff6ff;
+      --nav-h:    60px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0F0E15; --card: #1C1929; --text: #F0EAE3;
+        --muted: #7D7585; --border: #2B2638;
+        --red-bg: rgba(220,38,38,.12); --amber-bg: rgba(217,119,6,.12);
+        --green-bg: rgba(22,163,74,.12); --blue-bg: rgba(37,99,235,.12);
+      }
+      footer { background: #0A090F !important; }
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 100; height: var(--nav-h);
+      background: var(--navy); display: flex; align-items: center; padding: 0 16px;
+    }
+    .topbar-inner { width: 100%; max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; flex-shrink: 0; }
+    .brand-logo { width: 34px; height: 34px; border-radius: 9px; overflow: hidden; }
+    .brand-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .brand-name { font-size: 1.1rem; font-weight: 800; color: #fff; }
+    .brand-name span { color: var(--primary); }
+    .topbar-link {
+      font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,.7);
+      text-decoration: none; padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,.2); border-radius: 20px;
+      transition: color .15s, border-color .15s;
+    }
+    .topbar-link:hover { color: var(--primary); border-color: var(--primary); }
+
+    /* PAGE */
+    .page { max-width: 860px; margin: 0 auto; padding: 28px 16px 60px; }
+
+    /* TAB BAR */
+    .tab-bar {
+      display: flex; gap: 6px; margin-bottom: 24px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 5px;
+    }
+    .tab-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 14px; border-radius: 10px; border: none; cursor: pointer;
+      font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 700;
+      background: transparent; color: var(--muted); transition: background .18s, color .18s;
+    }
+    .tab-btn.active { background: var(--navy); color: #fff; }
+    .tab-btn.active i { color: var(--primary); }
+    .tab-btn:not(.active):hover { background: var(--bg); color: var(--text); }
+    @media (max-width: 400px) { .tab-label { display: none; } .tab-btn { gap: 0; } }
+
+    /* POLICY SECTION */
+    .policy-section { display: none; }
+    .policy-section.active { display: block; }
+
+    /* DOC HEADER */
+    .doc-header {
+      background: var(--navy); border-radius: 16px;
+      padding: 26px 24px; margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    .doc-header::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 85% 50%, rgba(255,107,53,.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .doc-header-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .doc-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,107,53,.15); border: 1px solid rgba(255,107,53,.3);
+      color: var(--primary); font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 11px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .doc-header h1 { font-size: clamp(1.1rem, 3.5vw, 1.6rem); font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 6px; }
+    .doc-header h1 em { color: var(--primary); font-style: normal; }
+    .doc-header p { font-size: 0.72rem; color: rgba(255,255,255,.45); line-height: 1.5; max-width: 480px; }
+    .doc-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+    .doc-meta-item { font-size: 0.65rem; color: rgba(255,255,255,.4); display: flex; align-items: center; gap: 5px; }
+    .doc-meta-item i { color: var(--primary); }
+    .print-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--primary); color: #fff; border: none;
+      padding: 8px 16px; border-radius: 9px; font-family: 'Poppins', sans-serif;
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; flex-shrink: 0;
+      transition: background .15s; align-self: flex-start; margin-top: 4px;
+    }
+    .print-btn:hover { background: #e64a19; }
+
+    /* CARDS */
+    .policy-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; margin-bottom: 12px;
+    }
+    .card-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+    }
+    .card-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .card-icon.orange { background: #fff0e8; color: var(--primary); }
+    .card-icon.amber  { background: var(--amber-bg); color: var(--amber); }
+    .card-icon.red    { background: var(--red-bg);   color: var(--red); }
+    .card-icon.green  { background: var(--green-bg); color: var(--green); }
+    .card-icon.blue   { background: var(--blue-bg);  color: var(--blue); }
+    @media (prefers-color-scheme: dark) {
+      .card-icon.orange { background: rgba(255,107,53,.15); }
+      .card-icon.blue   { background: rgba(37,99,235,.15); }
+      .card-icon.green  { background: rgba(22,163,74,.15); }
+      .card-icon.amber  { background: rgba(217,119,6,.15); }
+      .card-icon.red    { background: rgba(220,38,38,.15); }
+    }
+    .card-head-text .clause-num { font-size: 0.6rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+    .card-head-text h2 { font-size: 0.85rem; font-weight: 800; color: var(--text); }
+    .mandatory-pill {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: var(--red-bg); color: var(--red);
+      border: 1px solid #fecaca; border-radius: 5px;
+      font-size: 0.55rem; font-weight: 700; text-transform: uppercase;
+      padding: 1px 6px; letter-spacing: .4px; margin-left: 6px; vertical-align: middle;
+    }
+    @media (prefers-color-scheme: dark) {
+      .mandatory-pill { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); }
+    }
+    .card-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .card-body ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+    .card-body ul li {
+      position: relative; padding-left: 14px;
+      font-size: 0.78rem; color: var(--text); line-height: 1.55;
+      word-break: break-word; overflow-wrap: break-word;
+    }
+    .card-body ul li::before {
+      content: ''; position: absolute; left: 0; top: 7px;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--primary);
+    }
+    .penalty-strip {
+      display: flex; align-items: flex-start; gap: 7px;
+      background: var(--red-bg); border: 1px solid #fecaca; border-radius: 8px;
+      padding: 8px 12px; font-size: 0.72rem; font-weight: 600;
+      color: var(--red); line-height: 1.5; word-break: break-word;
+    }
+    .penalty-strip i { flex-shrink: 0; margin-top: 2px; font-size: 0.65rem; }
+
+    /* PRICING TABLE */
+    .price-table { width: 100%; border-collapse: collapse; }
+    .price-table th {
+      background: var(--navy); color: #fff;
+      font-size: 0.65rem; font-weight: 700; padding: 8px 12px; text-align: left;
+    }
+    .price-table th:last-child { text-align: right; }
+    .price-table td { font-size: 0.75rem; color: var(--text); padding: 9px 12px; border-bottom: 1px solid var(--border); word-break: break-word; }
+    .price-table td:last-child { text-align: right; white-space: nowrap; }
+    .price-table tr:last-child td { border-bottom: none; }
+    .price-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 7px; font-size: 0.75rem; font-weight: 800;
+    }
+    .price-badge.green { background: var(--green-bg); color: var(--green); }
+    .price-badge.amber { background: var(--amber-bg); color: var(--amber); }
+
+    /* DOC CHIPS */
+    .doc-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .doc-chip {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 9px 12px;
+    }
+    .doc-chip i { font-size: 1rem; flex-shrink: 0; }
+    .doc-chip i.c-blue   { color: var(--blue); }
+    .doc-chip i.c-orange { color: var(--primary); }
+    .doc-chip strong { font-size: 0.75rem; display: block; }
+    .doc-chip span   { font-size: 0.65rem; color: var(--muted); }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted); margin: 18px 0 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* SIGNATURE */
+    .signature-section {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px; margin-top: 16px;
+    }
+    .sig-note { font-size: 0.72rem; color: var(--muted); line-height: 1.55; margin-bottom: 14px; }
+    .sig-divider { height: 1px; background: var(--border); margin: 14px 0; }
+    .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 480px) { .sig-grid { grid-template-columns: 1fr; gap: 20px; } }
+    .sig-block { display: flex; flex-direction: column; gap: 5px; }
+    .sig-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); }
+    .sig-name-big {
+      font-size: 1.25rem; font-weight: 900; font-style: italic;
+      color: var(--navy); letter-spacing: -.4px; line-height: 1; margin: 4px 0;
+    }
+    @media (prefers-color-scheme: dark) { .sig-name-big { color: var(--text); } }
+    .sig-name-big span { color: var(--primary); }
+    .sig-role { font-size: 0.68rem; color: var(--muted); }
+    .sig-stamp {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--navy); color: #fff;
+      border-radius: 8px; padding: 6px 12px;
+      font-size: 0.65rem; font-weight: 700; margin-top: 8px; width: fit-content;
+    }
+    .sig-stamp img { width: 16px; height: 16px; border-radius: 4px; object-fit: cover; }
+    .sig-dashed { height: 44px; border-bottom: 1.5px dashed #d1d5db; margin-bottom: 6px; }
+    @media (prefers-color-scheme: dark) { .sig-dashed { border-color: var(--border); } }
+    .sig-partner-name { font-size: 0.75rem; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+    .sig-field { display: flex; flex-direction: column; gap: 2px; margin-top: 5px; }
+    .sig-field span { font-size: 0.58rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+    .sig-field .sig-line { height: 1px; background: #d1d5db; }
+    @media (prefers-color-scheme: dark) { .sig-field .sig-line { background: var(--border); } }
+
+    .policy-foot { text-align: center; margin-top: 12px; font-size: 0.65rem; color: var(--muted); line-height: 1.7; }
+    .policy-foot a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+    /* FOOTER */
+    footer { background: #12111e; color: rgba(255,255,255,.4); text-align: center; padding: 16px; font-size: 0.72rem; }
+    footer a { color: rgba(255,255,255,.6); text-decoration: none; }
+    footer a:hover { color: var(--primary); }
+
+    /* PRINT */
+    @media print {
+      @page { size: A4 portrait; margin: 12mm; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body { background: #fff; color: #111; }
+      .topbar, footer, .tab-bar, .print-btn { display: none !important; }
+      .page { padding: 0; max-width: 100%; }
+
+      /* only print the active tab */
+      .policy-section { display: none !important; }
+      .policy-section.active { display: block !important; }
+
+      /* doc header */
+      .doc-header { border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; }
+      .doc-badge  { font-size: 0.58rem; padding: 3px 9px; margin-bottom: 8px; }
+      .doc-header h1 { font-size: 1.05rem; line-height: 1.2; margin-bottom: 5px; }
+      .doc-header p  { font-size: 0.66rem; line-height: 1.45; }
+      .doc-meta      { margin-top: 10px; gap: 10px; }
+      .doc-meta-item { font-size: 0.6rem; }
+
+      /* cards */
+      .policy-card   { border-radius: 8px; margin-bottom: 8px; }
+      .card-head     { padding: 9px 14px; }
+      .card-head-text h2 { font-size: 0.75rem; }
+      .card-head-text .clause-num { font-size: 0.55rem; }
+      .card-icon     { width: 30px; height: 30px; font-size: 0.8rem; border-radius: 7px; }
+      .card-body     { padding: 10px 14px; gap: 6px; }
+      .card-body ul  { gap: 5px; }
+      .card-body ul li { font-size: 0.66rem; line-height: 1.5; padding-left: 12px; }
+      .card-body ul li::before { width: 5px; height: 5px; top: 6px; }
+      .penalty-strip { font-size: 0.62rem; padding: 7px 11px; border-radius: 6px; }
+
+      .price-table th  { font-size: 0.6rem; padding: 6px 11px; }
+      .price-table td  { font-size: 0.66rem; padding: 7px 11px; }
+      .price-badge     { font-size: 0.66rem; padding: 2px 8px; }
+
+      .doc-chips       { gap: 7px; }
+      .doc-chip        { padding: 8px 11px; border-radius: 7px; }
+      .doc-chip i      { font-size: 0.9rem; }
+      .doc-chip strong { font-size: 0.68rem; }
+      .doc-chip span   { font-size: 0.6rem; }
+
+      .section-label { font-size: 0.55rem; margin: 11px 0 7px; }
+      .section-label::after { display: none; }
+      .mandatory-pill { font-size: 0.5rem; padding: 1px 5px; }
+
+      /* signature */
+      .signature-section { border-radius: 8px; padding: 13px 16px; margin-top: 10px; }
+      .sig-note          { font-size: 0.63rem; margin-bottom: 9px; line-height: 1.5; }
+      .sig-divider       { margin: 9px 0; }
+      .sig-grid          { gap: 20px; }
+      .sig-name-big      { font-size: 1.1rem; margin: 3px 0; }
+      .sig-role          { font-size: 0.6rem; }
+      .sig-label         { font-size: 0.55rem; }
+      .sig-stamp         { font-size: 0.58rem; padding: 5px 10px; margin-top: 7px; }
+      .sig-stamp img     { width: 13px; height: 13px; }
+      .sig-partner-name  { font-size: 0.66rem; margin-bottom: 7px; }
+      .sig-field         { margin-top: 6px !important; }
+      .sig-field span    { font-size: 0.52rem; }
+      .sig-dashed        { height: 36px; }
+      .policy-foot       { font-size: 0.58rem; margin-top: 9px; }
+
+      /* delivery section has more content — tighten selectively */
+      #sec-delivery .doc-header    { padding: 10px 14px; margin-bottom: 8px; }
+      #sec-delivery .doc-header h1 { font-size: 0.9rem; }
+      #sec-delivery .doc-header p  { font-size: 0.6rem; }
+      #sec-delivery .doc-meta      { margin-top: 7px; }
+      #sec-delivery .policy-card   { margin-bottom: 6px; }
+      #sec-delivery .card-head     { padding: 7px 12px; }
+      #sec-delivery .card-body     { padding: 8px 12px; gap: 5px; }
+      #sec-delivery .card-body ul  { gap: 4px; }
+      #sec-delivery .card-body ul li { font-size: 0.62rem; line-height: 1.42; }
+      #sec-delivery .penalty-strip { font-size: 0.58rem; padding: 6px 9px; }
+      #sec-delivery .price-table th { font-size: 0.56rem; padding: 5px 9px; }
+      #sec-delivery .price-table td { font-size: 0.62rem; padding: 5px 9px; }
+      #sec-delivery .doc-chips      { gap: 5px; margin-bottom: 2px; }
+      #sec-delivery .doc-chip       { padding: 6px 9px; }
+      #sec-delivery .doc-chip strong { font-size: 0.62rem; }
+      #sec-delivery .doc-chip span   { font-size: 0.55rem; }
+      #sec-delivery .section-label  { margin: 8px 0 5px; }
+      #sec-delivery .signature-section { padding: 10px 14px; margin-top: 7px; }
+      #sec-delivery .sig-note       { font-size: 0.58rem; margin-bottom: 7px; }
+      #sec-delivery .sig-divider    { margin: 7px 0; }
+      #sec-delivery .sig-dashed     { height: 28px; }
+      #sec-delivery .sig-name-big   { font-size: 0.95rem; }
+      #sec-delivery .sig-field      { margin-top: 5px !important; }
+      #sec-delivery .policy-foot    { margin-top: 7px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { .tab-btn, .topbar-link, .print-btn { transition: none; } }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <nav class="topbar-inner" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="BankiBites home">
+        <div class="brand-logo"><img src="banki-bites-logo.png" alt="BankiBites logo"></div>
+        <span class="brand-name">Banki<span>Bites</span></span>
+      </a>
+      <a class="topbar-link" href="dashboard.html">All Restaurants</a>
+    </nav>
+  </header>
+
+  <main class="page" role="main">
+
+    <!-- Tab switcher -->
+    <div class="tab-bar" role="tablist" aria-label="Policy type">
+      <button class="tab-btn active" role="tab" aria-selected="true"
+              aria-controls="sec-restaurant" id="tab-restaurant"
+              onclick="switchTab('restaurant')">
+        <i class="fas fa-store" aria-hidden="true"></i>
+        <span class="tab-label">Restaurant Partner</span>
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="sec-delivery" id="tab-delivery"
+              onclick="switchTab('delivery')">
+        <i class="fas fa-motorcycle" aria-hidden="true"></i>
+        <span class="tab-label">Delivery Partner</span>
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         RESTAURANT PARTNER POLICY
+         ══════════════════════════════════════════ -->
+    <section class="policy-section active" id="sec-restaurant"
+             role="tabpanel" aria-labelledby="tab-restaurant">
+
+      <div class="doc-header">
+        <div class="doc-header-inner">
+          <div>
+            <div class="doc-badge"><i class="fas fa-store" aria-hidden="true"></i> Restaurant Partner Policy</div>
+            <h1>Restaurant Partner<br><em>Onboarding Guidelines</em></h1>
+            <p>Mandatory standards every restaurant partner must agree to before listing on BankiBites, Banki, Cuttack, Odisha 754008.</p>
+            <div class="doc-meta">
+              <div class="doc-meta-item"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Banki, Cuttack, Odisha 754008</div>
+              <div class="doc-meta-item"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Effective: <span class="eff-date"></span></div>
+              <div class="doc-meta-item"><i class="fas fa-rotate" aria-hidden="true"></i> Version 1.0</div>
+            </div>
+          </div>
+          <button class="print-btn" onclick="window.print()"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
+        </div>
+      </div>
+
+      <div class="section-label"><i class="fas fa-shield-halved" aria-hidden="true"></i> Core Policies</div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon orange"><i class="fas fa-box" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 1 — Packaging Standards</div>
+            <h2>Premium Packaging is Mandatory</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>All food must be packed in <strong>food-grade sealed containers</strong> or <strong>aluminium foil paper</strong> — no newspaper or open packets.</li>
+            <li>Liquids and gravies must use <strong>leak-proof containers</strong> with sealed lids.</li>
+            <li>Packaging must keep food fresh, hot, and intact throughout delivery.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon amber"><i class="fas fa-bell" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 2 — Menu Availability</div>
+            <h2>Notify BankiBites of Any Unavailable Items</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Inform BankiBites <strong>every morning</strong> about items you cannot prepare before orders are placed.</li>
+            <li>If an item is permanently removed from your menu, update BankiBites immediately to delist it.</li>
+          </ul>
+          <div class="penalty-strip">
+            <i class="fas fa-ban" aria-hidden="true"></i>
+            Penalty: Failure to notify unavailability → restaurant <strong>delisted for 24 hours</strong>. 3+ violations in 30 days → <strong>permanent removal</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon red"><i class="fas fa-utensils" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 3 — Food Quality &amp; Customer Satisfaction</div>
+            <h2>Restaurant Bears Full Responsibility</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>All food quality, taste, hygiene, and safety is <strong>entirely the restaurant's responsibility</strong>. BankiBites is not liable.</li>
+            <li>Refunds or replacements due to food complaints are <strong>fully borne by the restaurant</strong>.</li>
+            <li>Maintain a clean, hygienic kitchen and comply with all local food safety norms at all times.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-label"><i class="fas fa-handshake" aria-hidden="true"></i> General Conduct</div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon green"><i class="fas fa-list-check" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 4 — Partner Code of Conduct</div>
+            <h2>Platform Rules</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Be ready to accept orders during your listed operating hours at all times.</li>
+            <li>Never collect direct payments from BankiBites customers outside the platform.</li>
+            <li>Treat BankiBites delivery staff and coordinators with respect.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="signature-section" aria-label="Restaurant partner signature">
+        <p class="sig-note">By signing below, the restaurant partner confirms they have read, understood, and agreed to all terms and conditions stated in this document issued by <strong>BankiBites</strong>, operated under <strong>AkCreation</strong>.</p>
+        <div class="sig-divider"></div>
+        <div class="sig-grid">
+          <div class="sig-block">
+            <div class="sig-label">Issued &amp; Authorised By</div>
+            <div class="sig-name-big">Anil Kr.<span> Sahoo</span></div>
+            <div class="sig-role">Founder &amp; Owner, BankiBites</div>
+            <div class="sig-role">AkCreation · Banki, Cuttack, Odisha 754008</div>
+            <div class="sig-stamp"><img src="banki-bites-logo.png" alt=""> BankiBites — Official</div>
+          </div>
+          <div class="sig-block">
+            <div class="sig-label">Restaurant Partner Signature</div>
+            <div class="sig-dashed"></div>
+            <div class="sig-partner-name">Restaurant Owner / Authorised Representative</div>
+            <div class="sig-field"><span>Restaurant Name</span><div class="sig-line"></div></div>
+            <div class="sig-field" style="margin-top:7px;"><span>Phone</span><div class="sig-line"></div></div>
+            <div class="sig-field" style="margin-top:7px;"><span>Date</span><div class="sig-line"></div></div>
+          </div>
+        </div>
+        <div class="sig-divider"></div>
+        <p class="policy-foot">
+          Effective <span class="eff-date"></span> &nbsp;·&nbsp; BankiBites, Banki, Cuttack, Odisha 754008 &nbsp;·&nbsp;
+          Powered by <a href="https://akcreation-apps.com/services.html">AkCreation</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         DELIVERY PARTNER POLICY
+         ══════════════════════════════════════════ -->
+    <section class="policy-section" id="sec-delivery"
+             role="tabpanel" aria-labelledby="tab-delivery">
+
+      <div class="doc-header">
+        <div class="doc-header-inner">
+          <div>
+            <div class="doc-badge"><i class="fas fa-motorcycle" aria-hidden="true"></i> Delivery Partner Policy</div>
+            <h1>Delivery Partner<br><em>Onboarding Guidelines</em></h1>
+            <p>Mandatory rules and requirements every delivery rider must agree to before joining BankiBites, Banki, Cuttack, Odisha 754008.</p>
+            <div class="doc-meta">
+              <div class="doc-meta-item"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Banki, Cuttack, Odisha 754008</div>
+              <div class="doc-meta-item"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Effective: <span class="eff-date"></span></div>
+              <div class="doc-meta-item"><i class="fas fa-rotate" aria-hidden="true"></i> Version 1.0</div>
+            </div>
+          </div>
+          <button class="print-btn" onclick="window.print()"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
+        </div>
+      </div>
+
+      <div class="section-label"><i class="fas fa-shield-halved" aria-hidden="true"></i> Core Policies</div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon amber"><i class="fas fa-clock" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 1 — Availability Notification <span class="mandatory-pill">Mandatory</span></div>
+            <h2>Inform BankiBites by 10:00 AM if Unavailable</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Notify BankiBites <strong>before 10:00 AM</strong> every day you cannot work. No notification = you are considered <strong>on duty</strong>.</li>
+            <li>Any delivery assigned after 10:00 AM without prior notice is <strong>your full responsibility</strong> to complete.</li>
+          </ul>
+          <div class="penalty-strip">
+            <i class="fas fa-ban" aria-hidden="true"></i>
+            Penalty: Abandoning an assigned delivery without prior notice → <strong>48-hour suspension</strong> (first offence). Repeated violations → <strong>permanent removal</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon green"><i class="fas fa-indian-rupee-sign" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 2 — Delivery Pricing <span class="mandatory-pill">Mandatory</span></div>
+            <h2>Fixed Zone-Based Delivery Charges</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <table class="price-table" aria-label="Delivery pricing by zone">
+            <thead>
+              <tr><th>Zone</th><th>Coverage Area</th><th>Charge</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Zone A</strong></td>
+                <td>All locations within Banki incl. <strong>Bedapur &amp; Gopalapur</strong></td>
+                <td><span class="price-badge green">₹ 30</span></td>
+              </tr>
+              <tr>
+                <td><strong>Zone B</strong></td>
+                <td>Beyond Bedapur &amp; Gopalapur</td>
+                <td><span class="price-badge amber">₹ 40</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:0.68rem;color:var(--muted);margin-top:6px;">All charges are inclusive. No extra collection from customers is permitted under any circumstance.</p>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon blue"><i class="fas fa-id-card" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 3 — Required Documents <span class="mandatory-pill">Mandatory</span></div>
+            <h2>Aadhaar &amp; Driving Licence Required</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="doc-chips">
+            <div class="doc-chip">
+              <i class="fas fa-id-card c-blue" aria-hidden="true"></i>
+              <div><strong>Aadhaar Card</strong><span>Front &amp; back copy required</span></div>
+            </div>
+            <div class="doc-chip">
+              <i class="fas fa-car c-orange" aria-hidden="true"></i>
+              <div><strong>Driving Licence</strong><span>Valid copy for your vehicle</span></div>
+            </div>
+          </div>
+          <ul style="margin-top:8px;">
+            <li>Submit documents to the BankiBites coordinator <strong>before your first delivery</strong>. Onboarding will not proceed without them.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-label"><i class="fas fa-handshake" aria-hidden="true"></i> General Conduct</div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon orange"><i class="fas fa-list-check" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 4 — Rider Code of Conduct</div>
+            <h2>Platform Rules</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Handle all food packages with care — do not tilt, squeeze, or mishandle during transit.</li>
+            <li>Maintain polite, professional behaviour with customers and restaurant staff at all times.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="signature-section" aria-label="Delivery partner signature">
+        <p class="sig-note">By signing below, the delivery partner confirms they have read, understood, and agreed to all terms and conditions stated in this document issued by <strong>BankiBites</strong>, operated under <strong>AkCreation</strong>.</p>
+        <div class="sig-divider"></div>
+        <div class="sig-grid">
+          <div class="sig-block">
+            <div class="sig-label">Issued &amp; Authorised By</div>
+            <div class="sig-name-big">Anil Kr.<span> Sahoo</span></div>
+            <div class="sig-role">Founder &amp; Owner, BankiBites</div>
+            <div class="sig-role">AkCreation · Banki, Cuttack, Odisha 754008</div>
+            <div class="sig-stamp"><img src="banki-bites-logo.png" alt=""> BankiBites — Official</div>
+          </div>
+          <div class="sig-block">
+            <div class="sig-label">Delivery Partner Declaration</div>
+            <div class="sig-dashed"></div>
+            <div class="sig-partner-name">Delivery Partner Signature</div>
+            <div class="sig-field"><span>Full Name</span><div class="sig-line"></div></div>
+            <div class="sig-field" style="margin-top:7px;"><span>Permanent Address</span><div class="sig-line"></div><div class="sig-line" style="margin-top:6px;"></div></div>
+            <div class="sig-field" style="margin-top:7px;"><span>Contact Number</span><div class="sig-line"></div></div>
+            <div class="sig-field" style="margin-top:7px;"><span>Date</span><div class="sig-line"></div></div>
+          </div>
+        </div>
+        <div class="sig-divider"></div>
+        <p class="policy-foot">
+          Effective <span class="eff-date"></span> &nbsp;·&nbsp; BankiBites, Banki, Cuttack, Odisha 754008 &nbsp;·&nbsp;
+          Powered by <a href="https://akcreation-apps.com/services.html">AkCreation</a>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AkCreation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+  </footer>
+
+  <script>
+    const fmt = d => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.querySelectorAll('.eff-date').forEach(el => el.textContent = fmt(new Date()));
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'tab-' + tab);
+        b.setAttribute('aria-selected', b.id === 'tab-' + tab ? 'true' : 'false');
+      });
+      document.querySelectorAll('.policy-section').forEach(s => {
+        s.classList.toggle('active', s.id === 'sec-' + tab);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
