@@ -1,4 +1,299 @@
 {
+    "Kry0IwqYcwCXya9BkOKd": {
+        "total_cart_value": 1311,
+        "created_at": "2026-05-30T14:48:41.195000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 5,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Peri_Peri_Paneer.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 703,
+                            "name": "Peri Peri Paneer"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Sunheri_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2911,
+                            "name": "Sunheri Veg"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 103,
+                            "name": "Stir Fried Baby Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "KeGHkEr6rhT7X0ijmhN9": {
+        "total_cart_value": 318,
+        "created_at": "2026-05-24T04:51:43.338000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Harirajpur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "image_src": "../food_src/Crispy_Chicken_Wings.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 205,
+                            "name": "Crispy Chicken Wings"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_555.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 206,
+                            "name": "Chicken 555"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "GRtgVEFRIAdeCDHuzB6w": {
+        "total_cart_value": 277,
+        "created_at": "2026-05-23T15:20:06.805000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Hot_And_Sour.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 71,
+                            "name": "Hot And Sour"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Manchow.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 72,
+                            "name": "Manchow"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Chicken_Cheese_Burger.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 602,
+                            "name": "Chicken Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "jxwPTt15We0mKPSI0e9m": {
+        "total_cart_value": 119,
+        "created_at": "2026-05-23T08:45:37.698000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Khamaranga",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Manchow.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 72,
+                            "name": "Manchow"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "98uEYBSW61giGXsGNYBA": {
+        "total_cart_value": 347,
+        "created_at": "2026-05-22T11:59:43.361000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Farm_House(6_inch).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 903,
+                            "name": "Farm House(6 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 109,
+                            "image_src": "../food_src/Kit_Kat_Milk_Shake.webp",
+                            "quantity": 1,
+                            "id": 1402,
+                            "name": "Kit Kat Milk Shake"
+                        }
+                    ],
+                    "name": "Shake"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 109,
+                            "image_src": "../food_src/Cold_Coffee.webp",
+                            "quantity": 1,
+                            "id": 1503,
+                            "name": "Cold Coffee"
+                        }
+                    ],
+                    "name": "Refreshment"
+                }
+            }
+        ],
+        "status": "Rejected",
+        "place": "Banki"
+    },
+    "EYqsZLRsN2fnSPdjmfv2": {
+        "total_cart_value": 298,
+        "created_at": "2026-05-14T12:47:31.134000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "image_src": "../food_src/Veg_Manchurian.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 104,
+                            "name": "Veg Manchurian"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Rejected",
+        "place": "Chakapada"
+    },
+    "78s01Byw2P7tnLZRimM9": {
+        "total_cart_value": 218,
+        "created_at": "2026-05-13T13:45:32.775000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 149,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Rejected",
+        "place": "Sahadapada"
+    },
     "wxQ0pkk3HwXpRizg1kBd": {
         "total_cart_value": 239,
         "created_at": "2026-05-10T12:10:35.895000+00:00",
