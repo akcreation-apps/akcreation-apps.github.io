@@ -4,60 +4,6 @@
       "category": "Chinese",
       "subcategories": [
         {
-          "name": "Soup",
-          "type": "Veg",
-          "dishes": [
-            {
-              "id": 71,
-              "name": "Hot And Sour",
-              "price": 69,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 72,
-              "name": "Manchow",
-              "price": 69,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 73,
-              "name": "Clear",
-              "price": 69,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Soup",
-          "type": "NonVeg",
-          "dishes": [
-            {
-              "id": 91,
-              "name": "Hot And Sour",
-              "price": 109,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 92,
-              "name": "Manchow",
-              "price": 109,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 93,
-              "name": "Clear",
-              "price": 109,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
           "name": "Starter",
           "type": "Veg",
           "dishes": [
@@ -70,62 +16,48 @@
             },
             {
               "id": 102,
-              "name": "Veg Salt And Pepper",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 103,
               "name": "Stir Fried Baby Corn",
               "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 104,
-              "name": "Veg Manchurian",
-              "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 105,
+              "id": 103,
               "name": "Paneer Chilli",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 106,
+              "id": 104,
               "name": "Paneer Manchurian",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 107,
+              "id": 105,
               "name": "Honey Chilli Potato",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 108,
+              "id": 106,
               "name": "Mashroom 65",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 109,
+              "id": 107,
               "name": "Mashroom Manchurian",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 110,
+              "id": 108,
               "name": "Mashroom Chilli",
               "price": 169,
               "available_time": "",
@@ -174,29 +106,15 @@
             },
             {
               "id": 206,
-              "name": "Chicken 555",
-              "price": 179,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 207,
               "name": "Chilli Fish",
               "price": 219,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 208,
+              "id": 207,
               "name": "Garlic Chicken",
               "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 209,
-              "name": "Loose Prawns",
-              "price": 199,
               "available_time": "",
               "not_available_time": ""
             }
@@ -734,51 +652,6 @@
       ]
     },
     {
-      "category": "Ice Cream",
-      "subcategories": [
-        {
-          "name": "Ice Cream",
-          "dishes": [
-            {
-              "id": 2201,
-              "name": "Vanilla 2scoop",
-              "price": 59,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2202,
-              "name": "Mango Tango",
-              "price": 139,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2203,
-              "name": "Pink Berry",
-              "price": 139,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2204,
-              "name": "Magic Fruit",
-              "price": 139,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2205,
-              "name": "Brownie Smashed",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
       "category": "Indian",
       "subcategories": [
         {
@@ -814,41 +687,6 @@
               "id": 2602,
               "name": "Basmati Rice",
               "price": 59,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2603,
-              "name": "Tomato Rice",
-              "price": 79,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2604,
-              "name": "Lemon Rice",
-              "price": 79,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2605,
-              "name": "Peas Pulao",
-              "price": 79,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2606,
-              "name": "Peas Corn Pulao",
-              "price": 79,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2607,
-              "name": "Veg Pulao",
-              "price": 99,
               "available_time": "",
               "not_available_time": ""
             }
@@ -907,111 +745,90 @@
           "dishes": [
             {
               "id": 2901,
-              "name": "Dal Tadka",
-              "price": 59,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2902,
               "name": "Dal Fry",
               "price": 59,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2903,
+              "id": 2902,
               "name": "Dal Lasooni",
               "price": 69,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2904,
-              "name": "Dal Palak",
-              "price": 69,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2905,
-              "name": "TCD Special Maa Ki Dal",
-              "price": 69,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 2906,
+              "id": 2903,
               "name": "Veg Hyderabadi",
               "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2907,
+              "id": 2904,
               "name": "Mili Jhuli Veg",
               "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2908,
+              "id": 2905,
               "name": "Kadai Paneer",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2909,
+              "id": 2906,
               "name": "Methi Paneer",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2910,
+              "id": 2907,
               "name": "Mushroom Do Pyaja",
               "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2911,
+              "id": 2908,
               "name": "Sunheri Veg",
               "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2912,
+              "id": 2909,
               "name": "Paneer Lababdar",
               "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2913,
+              "id": 2910,
               "name": "Paneer Butter Masala",
               "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2914,
+              "id": 2911,
               "name": "Mushroom Masala",
               "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2915,
+              "id": 2912,
               "name": "Mushroom Butter Masala",
               "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2916,
+              "id": 2913,
               "name": "Paneer Tikka Masala",
               "price": 199,
               "available_time": "",
@@ -1025,132 +842,64 @@
           "dishes": [
             {
               "id": 3001,
-              "name": "Fish Masala",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3002,
-              "name": "Fish Besar",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3003,
-              "name": "Fish Kalia",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3004,
               "name": "Chicken Kasa",
               "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3005,
+              "id": 3002,
               "name": "Kadai Chicken",
               "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3006,
-              "name": "Chicken Jelfrezi",
-              "price": 189,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3007,
+              "id": 3003,
               "name": "Chicken Butter Masala",
               "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3008,
-              "name": "TCD Special Chicken Rawa Punjabi",
-              "price": 199,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3009,
+              "id": 3004,
               "name": "Chicken Tikka Masala",
               "price": 219,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3010,
+              "id": 3005,
               "name": "TCD Special Mutton Masala",
               "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3011,
+              "id": 3006,
               "name": "Prawns Masala",
               "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3012,
+              "id": 3007,
               "name": "Spicy Prawns",
               "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3013,
+              "id": 3008,
               "name": "Mutton Rogan Josh",
               "price": 259,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 3014,
+              "id": 3009,
               "name": "Malai Prawns",
               "price": 259,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Others",
-          "dishes": [
-            {
-              "id": 3301,
-              "name": "Mix Veg Raita",
-              "price": 39,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3302,
-              "name": "Bundi Raita",
-              "price": 39,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3303,
-              "name": "Burhani Raita",
-              "price": 39,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3304,
-              "name": "Masala Pampad",
-              "price": 39,
               "available_time": "",
               "not_available_time": ""
             }
