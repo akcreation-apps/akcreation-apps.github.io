@@ -24,7 +24,7 @@
             {
               "id": 103,
               "name": "Paneer Chilli",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
@@ -38,7 +38,7 @@
             {
               "id": 105,
               "name": "Honey Chilli Potato",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
@@ -59,7 +59,7 @@
             {
               "id": 108,
               "name": "Mashroom Chilli",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             }
@@ -72,7 +72,7 @@
             {
               "id": 201,
               "name": "Chilli Chicken",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
@@ -107,7 +107,7 @@
             {
               "id": 206,
               "name": "Chilli Fish",
-              "price": 219,
+              "price": 229,
               "available_time": "",
               "not_available_time": ""
             },
@@ -148,14 +148,14 @@
             {
               "id": 304,
               "name": "Sezwan Fried Rice",
-              "price": 129,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 305,
               "name": "Paneer Fried Rice",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
@@ -196,21 +196,21 @@
             {
               "id": 403,
               "name": "Egg Fried Rice",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 404,
               "name": "Chicken Sezwan Fried Rice",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 405,
               "name": "Chicken Fried Rice",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
@@ -369,7 +369,7 @@
             {
               "id": 901,
               "name": "Margarita(6 inch)",
-              "price": 119,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
@@ -383,7 +383,7 @@
             {
               "id": 903,
               "name": "Farm House(6 inch)",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
@@ -397,7 +397,7 @@
             {
               "id": 905,
               "name": "Corn Paneer(6 inch)",
-              "price": 139,
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
@@ -405,6 +405,27 @@
               "id": 906,
               "name": "Corn Paneer(9 inch)",
               "price": 229,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 907,
+              "name": "Margarita(12 inch)",
+              "price": 359,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 908,
+              "name": "Farm House(12 inch)",
+              "price": 359,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 909,
+              "name": "Corn Paneer(12 inch)",
+              "price": 359,
               "available_time": "",
               "not_available_time": ""
             }
@@ -417,21 +438,21 @@
             {
               "id": 1001,
               "name": "Italian Chicken(6 inch)",
-              "price": 179,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1002,
               "name": "Italian Chicken(9 inch)",
-              "price": 229,
+              "price": 299,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1003,
               "name": "Bombay Prawn(6 inch)",
-              "price": 189,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
@@ -439,6 +460,20 @@
               "id": 1004,
               "name": "Bombay Prawn(9 inch)",
               "price": 259,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1005,
+              "name": "Italian Chicken(12 inch)",
+              "price": 419,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1006,
+              "name": "Bombay Prawn(12 inch)",
+              "price": 359,
               "available_time": "",
               "not_available_time": ""
             }
@@ -746,84 +781,84 @@
             {
               "id": 2901,
               "name": "Dal Fry",
-              "price": 59,
+              "price": 79,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2902,
               "name": "Dal Lasooni",
-              "price": 69,
+              "price": 79,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2903,
               "name": "Veg Hyderabadi",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2904,
               "name": "Mili Jhuli Veg",
-              "price": 139,
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2905,
               "name": "Kadai Paneer",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2906,
               "name": "Methi Paneer",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2907,
               "name": "Mushroom Do Pyaja",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2908,
               "name": "Sunheri Veg",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2909,
               "name": "Paneer Lababdar",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2910,
               "name": "Paneer Butter Masala",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2911,
               "name": "Mushroom Masala",
-              "price": 179,
+              "price": 189,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2912,
               "name": "Mushroom Butter Masala",
-              "price": 189,
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
@@ -878,7 +913,7 @@
             {
               "id": 3006,
               "name": "Prawns Masala",
-              "price": 239,
+              "price": 259,
               "available_time": "",
               "not_available_time": ""
             },
