@@ -709,7 +709,7 @@
           ]
         },
         {
-          "name": "Rice N Pulao",
+          "name": "Rice",
           "dishes": [
             {
               "id": 2601,
@@ -754,7 +754,7 @@
             {
               "id": 2801,
               "name": "Chicken Biryani (2pc)",
-              "price": 119,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
