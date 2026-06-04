@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BankiBites — One-time Seed</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 24px; max-width: 720px; margin: auto; }
+    pre { background: #f4f4f4; padding: 12px; max-height: 320px; overflow: auto; font-size: 12px; }
+    .row-actions button { margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <h1>BankiBites — One-time Seed</h1>
+  <p class="text-muted">Run each step once. Delete this file from the repo afterwards.</p>
+
+  <hr>
+  <h4>1. Sign in to claim admin</h4>
+  <p>Sign in with the Google account you want to use as the admin. The first time you click this, the script will write your UID into <code>bankibites_meta/admins</code>. After that, only that UID can write to BankiBites collections.</p>
+  <p><strong>Important:</strong> Before clicking, temporarily set Firestore rules to <code>allow read, write: if true;</code> in the Firebase console, run this once, then deploy the proper <code>firestore.rules</code>.</p>
+  <button class="btn btn-primary row-actions" id="signinBtn">Sign in with Google</button>
+  <button class="btn btn-outline-dark row-actions" id="claimBtn" disabled>Write my UID as admin</button>
+  <p id="userInfo" class="mt-2 text-muted"></p>
+
+  <hr>
+  <h4>2. Import partners from JSON</h4>
+  <button class="btn btn-success" id="seedBtn" disabled>Seed bankibites_partners + locations</button>
+
+  <hr>
+  <h4>Log</h4>
+  <pre id="log">Ready.</pre>
+
+  <script type="module">
+    import { getBankiBitesApp, getDb, getAuthInstance, COL } from '/banki-bites/firebase-config.js';
+    import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
+    import { doc, setDoc, collection, writeBatch } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+
+    const log = (...m) => {
+      const el = document.getElementById('log');
+      el.textContent += '\n' + m.map(x => typeof x === 'object' ? JSON.stringify(x) : x).join(' ');
+      el.scrollTop = el.scrollHeight;
+    };
+
+    let currentUser = null;
+    const auth = await getAuthInstance();
+    onAuthStateChanged(auth, u => {
+      currentUser = u;
+      if (u) {
+        document.getElementById('userInfo').textContent = `Signed in as ${u.email} (uid: ${u.uid})`;
+        document.getElementById('claimBtn').disabled = false;
+        document.getElementById('seedBtn').disabled = false;
+      } else {
+        document.getElementById('userInfo').textContent = 'Not signed in.';
+      }
+    });
+
+    // Complete any pending redirect sign-in from a previous page load.
+    try {
+      const r = await getRedirectResult(auth);
+      if (r?.user) log('Redirect sign-in completed for', r.user.email);
+    } catch (e) { log('Redirect result error:', e.message); }
+
+    document.getElementById('signinBtn').addEventListener('click', () => {
+      // Full-page redirect — avoids COOP popup-close issues on GitHub Pages.
+      signInWithRedirect(auth, new GoogleAuthProvider());
+    });
+
+    document.getElementById('claimBtn').addEventListener('click', async () => {
+      if (!currentUser) return;
+      const db = await getDb();
+      await setDoc(doc(db, COL.META, 'admins'), { uids: [currentUser.uid] }, { merge: true });
+      log('Wrote admin UID:', currentUser.uid);
+    });
+
+    document.getElementById('seedBtn').addEventListener('click', async () => {
+      try {
+        const db = await getDb();
+        const res = await fetch('/banki-bites-partners.json?v=' + Date.now());
+        const data = await res.json();
+        const batch = writeBatch(db);
+
+        data.partners.forEach((p, i) => {
+          const id = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          batch.set(doc(db, COL.PARTNERS, id), { ...p, sort_order: i });
+        });
+        batch.set(doc(db, COL.META, 'locations'), { items: data.locations });
+
+        await batch.commit();
+        log(`Seeded ${data.partners.length} partners and ${data.locations.length} locations.`);
+      } catch (e) {
+        log('Seed failed:', e.message);
+      }
+    });
+  </script>
+</body>
+</html>
