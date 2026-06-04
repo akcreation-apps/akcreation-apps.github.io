@@ -34,7 +34,7 @@
 
   <script type="module">
     import { getBankiBitesApp, getDb, getAuthInstance, COL } from '/banki-bites/firebase-config.js';
-    import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
+    import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
     import { doc, setDoc, collection, writeBatch } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
     const log = (...m) => {
@@ -56,15 +56,13 @@
       }
     });
 
-    // Complete any pending redirect sign-in from a previous page load.
-    try {
-      const r = await getRedirectResult(auth);
-      if (r?.user) log('Redirect sign-in completed for', r.user.email);
-    } catch (e) { log('Redirect result error:', e.message); }
-
-    document.getElementById('signinBtn').addEventListener('click', () => {
-      // Full-page redirect — avoids COOP popup-close issues on GitHub Pages.
-      signInWithRedirect(auth, new GoogleAuthProvider());
+    document.getElementById('signinBtn').addEventListener('click', async () => {
+      try {
+        const r = await signInWithPopup(auth, new GoogleAuthProvider());
+        log('Signed in as', r.user.email);
+      } catch (e) {
+        log('Sign-in failed:', e.code || '', e.message);
+      }
     });
 
     document.getElementById('claimBtn').addEventListener('click', async () => {
