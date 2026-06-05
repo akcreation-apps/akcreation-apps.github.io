@@ -110,10 +110,44 @@ function renderOrderCard(db, o, staff) {
       </div>
     </div>
 
-    <div class="ec-actions" style="justify-content:flex-end">
+    <div class="ec-actions" style="justify-content:space-between; flex-wrap:wrap; gap:6px">
+      <div style="display:flex; gap:6px">
+        <button class="btn btn-sm btn-outline-success" data-act="deliver" ${status === 'delivered' ? 'disabled' : ''}>
+          <i class="fas fa-check-circle mr-1"></i> Mark delivered
+        </button>
+        <button class="btn btn-sm btn-outline-danger" data-act="cancel" ${status === 'cancelled' ? 'disabled' : ''}>
+          <i class="fas fa-ban mr-1"></i> Cancel
+        </button>
+      </div>
       <button class="btn btn-sm btn-primary" data-act="save"><i class="fas fa-save mr-1"></i> Save</button>
     </div>
   `;
+
+  async function quickStatusUpdate(newStatus, confirmText) {
+    const ok = await Swal.fire({
+      title: confirmText,
+      icon: newStatus === 'cancelled' ? 'warning' : 'question',
+      showCancelButton: true,
+      confirmButtonText: newStatus === 'cancelled' ? 'Yes, cancel' : 'Yes, mark delivered',
+      confirmButtonColor: newStatus === 'cancelled' ? '#dc3545' : '#16a34a',
+    });
+    if (!ok.isConfirmed) return;
+    const patch = { status: newStatus };
+    if (newStatus === 'delivered' && !o.delivered_at) patch.delivered_at = Timestamp.now();
+    try {
+      await updateDoc(doc(db, COL.ORDERS, o.id), patch);
+      Swal.fire({ icon: 'success', title: 'Updated', timer: 1000, showConfirmButton: false });
+    } catch (e) {
+      Swal.fire({ icon: 'error', title: 'Update failed', text: e.message });
+    }
+  }
+
+  card.querySelector('[data-act="deliver"]').addEventListener('click', () => {
+    quickStatusUpdate('delivered', `Mark order from ${o.restaurant_name || o.restaurant_id || '?'} as delivered?`);
+  });
+  card.querySelector('[data-act="cancel"]').addEventListener('click', () => {
+    quickStatusUpdate('cancelled', `Cancel order from ${o.restaurant_name || o.restaurant_id || '?'}?`);
+  });
 
   card.querySelector('[data-act="save"]').addEventListener('click', async () => {
     const name = card.querySelector('[data-f="name"]').value.trim();
