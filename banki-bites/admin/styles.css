@@ -526,6 +526,41 @@ details.entity-card[open] > .order-summary .order-chevron {
   background: var(--brand-soft);
   font-weight: 700;
 }
+
+/* Auto fully-paid hint — shown inline under the billing block when discount +
+   prepayment fully cover the cart. Replaces the regular help text. */
+.fully-paid-hint {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--chip-dlv-fg);
+  background: var(--chip-dlv-bg);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.fully-paid-hint[hidden] { display: none; }
+.fully-paid-hint i { flex: 0 0 auto; }
+.fully-paid-hint strong { font-weight: 700; }
+
+/* Read-only "this fully-paid order had a discount / prepayment" history strip
+   shown under the toggle when payment_collected is true but discount or
+   paid_already is on record. */
+.paid-history {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--surface-soft);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+.paid-history i { color: var(--brand); font-size: 0.85rem; }
+.paid-history span {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0; flex: 1 1 auto;
+  font-feature-settings: "tnum" 1;
+}
 @media (max-width: 419px) {
   .billing-input .form-control { max-width: 90px; }
   .billing-input .billing-method { max-width: 92px; }

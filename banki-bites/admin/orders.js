@@ -337,6 +337,18 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
           <strong class="toggle-off">Collect on delivery</strong>
         </span>
       </label>
+      ${(() => {
+        // Read-only history strip — shown when an order is fully paid but had
+        // discount or prepayment recorded. Lets the admin see the financial
+        // breakdown at a glance without flipping the toggle.
+        const d = Number.isFinite(+o.discount)     ? +o.discount     : 0;
+        const p = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
+        if (!paymentCollected || (d <= 0 && p <= 0)) return '';
+        const parts = [];
+        if (d > 0) parts.push(`Discount ₹${d}`);
+        if (p > 0) parts.push(`Prepaid ₹${p}${o.paid_method ? ' via ' + String(o.paid_method).toUpperCase() : ''}`);
+        return `<div class="paid-history"><i class="fas fa-receipt"></i> <span>${escapeHtml(parts.join(' · '))}</span></div>`;
+      })()}
       <div class="billing-block" data-el="billingBlock" ${paymentCollected ? 'hidden' : ''}>
         <div class="billing-row">
           <span class="billing-label">Cart total</span>
@@ -374,7 +386,11 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
                    value="${(o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : (Number.isFinite(+o.total) ? +o.total : '')}">
           </div>
         </div>
-        <small class="text-muted">Auto-computed as cart total minus discount and any prepayment. Editable if the partner is collecting a different amount.</small>
+        <small class="text-muted" data-el="collectHelp">Auto-computed as cart total minus discount and any prepayment. Editable if the partner is collecting a different amount.</small>
+        <div class="fully-paid-hint" data-el="fullyPaidHint" hidden>
+          <i class="fas fa-circle-check"></i>
+          <span>Nothing to collect at the door — this order will be saved as <strong>Fully paid</strong>. Discount &amp; prepayment stay on record.</span>
+        </div>
       </div>
     </div>
 
@@ -408,13 +424,23 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     if (o.collect_amount == null || !Number.isFinite(+o.collect_amount)) return false;
     return Math.abs((+o.collect_amount) - computeCollect()) > 0.001;
   })();
+  const fullyPaidHint = card.querySelector('[data-el="fullyPaidHint"]');
+  const collectHelp   = card.querySelector('[data-el="collectHelp"]');
+  function reflectFullyPaidHint() {
+    const n = parseFloat(collectInput.value);
+    const isZero = Number.isFinite(n) && n === 0;
+    if (fullyPaidHint) fullyPaidHint.hidden = !isZero;
+    if (collectHelp)   collectHelp.hidden   = isZero;
+  }
   function recomputeCollect() {
-    if (collectOverridden) return;
-    collectInput.value = computeCollect();
+    if (!collectOverridden) collectInput.value = computeCollect();
+    reflectFullyPaidHint();
   }
   discountInput.addEventListener('input', recomputeCollect);
   prepaidInput .addEventListener('input', recomputeCollect);
-  collectInput .addEventListener('input', () => { collectOverridden = true; });
+  collectInput .addEventListener('input', () => { collectOverridden = true; reflectFullyPaidHint(); });
+  // Initial paint of the hint state.
+  reflectFullyPaidHint();
 
   paymentToggle.addEventListener('change', () => {
     const collected = paymentToggle.checked;
@@ -610,6 +636,10 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
       patch.paid_already  = prepaid;
       patch.paid_method   = prepaid > 0 ? method : null;
       patch.collect_amount = collect;
+      // Auto-flip to "Fully paid" when discount + prepayment already covers the
+      // full cart, while keeping the discount/prepaid record so revenue charts
+      // (netRevenue = total − discount) and reconciliation stay accurate.
+      if (collect === 0) patch.payment_collected = true;
     } else {
       patch.discount       = null;
       patch.paid_already   = null;
