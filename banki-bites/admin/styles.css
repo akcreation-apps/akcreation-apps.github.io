@@ -125,6 +125,73 @@ body {
   font-size: 0.88rem; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
 }
 
+/* ===== Buttons (visibility overrides) =====
+   Bootstrap's btn-outline-* variants render almost invisible on white cards
+   because their interior is transparent and the border is thin. Give them a
+   tinted background and a thicker, opaque border so every action is legible.
+*/
+.entity-card .btn,
+.section-header .btn,
+.form-section .btn {
+  font-weight: 600;
+  border-width: 1.5px;
+}
+
+.btn-outline-secondary {
+  color: #374151;
+  border-color: #9ca3af;
+  background: #f3f4f6;
+}
+.btn-outline-secondary:hover {
+  color: #fff;
+  background: #6b7280;
+  border-color: #6b7280;
+}
+
+.btn-outline-danger {
+  color: #b91c1c;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+.btn-outline-danger:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-outline-success {
+  color: #15803d;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+.btn-outline-success:hover {
+  color: #fff;
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.btn-outline-warning {
+  color: #b45309;
+  border-color: #fcd34d;
+  background: #fffbeb;
+}
+.btn-outline-warning:hover {
+  color: #fff;
+  background: var(--warn);
+  border-color: var(--warn);
+}
+
+/* The light sign-out chip in the topbar against the dark gradient */
+.topbar .btn-outline-light {
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+}
+.topbar .btn-outline-light:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: #fff;
+}
+
 /* ===== Floating action button ===== */
 .fab {
   position: fixed; right: 16px; bottom: 80px;
