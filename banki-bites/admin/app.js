@@ -6,11 +6,12 @@ const getAuthInstance = () => getAuthBase(APP_NAME);
 import {
   GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { doc, getDoc, collection, query, where, limit, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 import { renderPartners } from './partners.js';
 import { renderOrders }   from './orders.js';
 import { renderStaff }    from './staff.js';
+import { renderDashboard } from './dashboard.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -77,7 +78,10 @@ let renderedTabs = {};
       $('#userEmail').textContent = user.email;
       authGate.hidden = true;
       appShell.hidden = false;
-      activateTab('orders');
+      // Land on Orders when there are active deliveries to triage; otherwise
+      // open the Dashboard for a high-level read of the business.
+      const landing = await pickLandingTab(await getDb());
+      activateTab(landing);
     });
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -90,6 +94,22 @@ let renderedTabs = {};
   }
 })();
 
+async function pickLandingTab(db) {
+  // "Active" = anything not yet delivered or cancelled. We probe each non-terminal
+  // status with a 1-doc limit query so we bail out as soon as the first match is
+  // found — no full collection scan.
+  const ACTIVE = ['new', 'assigned', 'out_for_delivery'];
+  try {
+    for (const s of ACTIVE) {
+      const snap = await getDocs(query(collection(db, COL.ORDERS), where('status', '==', s), limit(1)));
+      if (!snap.empty) return 'orders';
+    }
+  } catch (err) {
+    console.warn('[admin] landing-tab probe failed, defaulting to dashboard:', err.message);
+  }
+  return 'dashboard';
+}
+
 async function activateTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
@@ -97,7 +117,8 @@ async function activateTab(name) {
   if (renderedTabs[name]) return;
   renderedTabs[name] = true;
   const db = await getDb();
-  if (name === 'orders')   await renderOrders(panel, db, APP_NAME);
-  if (name === 'partners') await renderPartners(panel, db, APP_NAME);
-  if (name === 'staff')    await renderStaff(panel, db, APP_NAME);
+  if (name === 'dashboard') await renderDashboard(panel, db, APP_NAME);
+  if (name === 'orders')    await renderOrders(panel, db, APP_NAME);
+  if (name === 'partners')  await renderPartners(panel, db, APP_NAME);
+  if (name === 'staff')     await renderStaff(panel, db, APP_NAME);
 }

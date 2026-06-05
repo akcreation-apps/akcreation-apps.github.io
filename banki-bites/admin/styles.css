@@ -142,7 +142,7 @@ select.form-control, textarea.form-control {
   position: sticky; top: 41px; z-index: 49;
 }
 .tab-btn {
-  flex: 1; border: 0; background: transparent;
+  flex: 1; min-width: 0; border: 0; background: transparent;
   padding: 8px 4px;
   font-size: 0.72rem; font-weight: 600;
   color: var(--muted);
@@ -152,6 +152,7 @@ select.form-control, textarea.form-control {
   transition: color .15s, border-color .15s, background .15s;
 }
 .tab-btn i { font-size: 1rem; }
+.tab-btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); background: var(--brand-soft); }
 .tab-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
 
@@ -184,7 +185,10 @@ select.form-control, textarea.form-control {
   padding-top: 2px; padding-bottom: 2px;
   font-size: 0.8rem;
 }
-.section-header--compact { margin: 0 0 4px; min-height: 0; padding: 0; }
+.section-header--compact { margin: 0 0 6px; min-height: 0; padding: 0; align-items: center; }
+.section-header--compact > h3,
+.section-header--compact > h4 { font-size: 0.95rem; }
+.section-header--compact > .btn-sm { flex: 0 0 auto; }
 .section-header--end { justify-content: flex-end; }
 .section-header--sticky {
   position: sticky;
@@ -804,4 +808,275 @@ details.entity-card[open] > .order-summary .order-chevron {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ===========================================================================
+   Dashboard / charts / payouts — mobile-first
+   =========================================================================== */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+.kpi-grid--compact { gap: 8px; margin: 8px 0 10px; }
+.kpi-grid.is-loading .kpi-value { opacity: 0.4; }
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.kpi-card--sm { padding: 8px 10px; }
+.kpi-card--sm .kpi-icon { display: none; }
+.kpi-icon {
+  width: 32px; height: 32px; flex: 0 0 32px;
+  border-radius: 9px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+}
+.kpi-body { min-width: 0; flex: 1; }
+.kpi-label {
+  font-size: 0.66rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kpi-value {
+  font-size: 1.05rem; font-weight: 700; color: var(--text-strong);
+  line-height: 1.15; margin-top: 2px;
+  overflow-wrap: anywhere; word-break: break-word;
+}
+.kpi-sub   {
+  font-size: 0.68rem; color: var(--muted); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kpi-up    { color: var(--success); }
+.kpi-down  { color: var(--danger); }
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 4px 0 14px;
+}
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  min-width: 0;
+}
+.chart-card-head {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-soft);
+  display: flex; align-items: center; gap: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.chart-card-head i { color: var(--brand); flex: 0 0 auto; }
+.chart-card-body {
+  padding: 8px;
+  height: 220px;
+  position: relative;
+  min-width: 0;
+}
+/* Chart.js sizes the canvas itself (responsive + maintainAspectRatio:false).
+   We must NOT force width/height via CSS — doing so de-syncs the canvas's
+   bitmap coordinate system from its display size, which breaks tooltip
+   hit-detection and responsive resizing. Just keep it a block element. */
+.chart-card-body canvas {
+  display: block;
+  max-width: 100%;
+}
+
+.stats-block {
+  background: transparent;
+  border: 0;
+  margin: 4px 0 12px;
+}
+.stats-block-head {
+  cursor: pointer; user-select: none;
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--muted);
+  padding: 6px 0;
+  list-style: none;
+}
+.stats-block-head::-webkit-details-marker { display: none; }
+.stats-block-head i { color: var(--brand); margin-right: 6px; }
+.stats-block[open] > .stats-block-head { color: var(--text-strong); }
+
+/* Payouts UI */
+.payout-summary {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 0 10px 10px;
+}
+.payout-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 600;
+  padding: 4px 10px; border-radius: 999px;
+  background: var(--surface-2); color: var(--text);
+}
+.payout-chip i { color: var(--muted); }
+.payout-chip--ok   { background: var(--chip-dlv-bg); color: var(--chip-dlv-fg); }
+.payout-chip--ok i { color: var(--chip-dlv-fg); }
+.payout-chip--warn { background: var(--chip-new-bg); color: var(--chip-new-fg); }
+.payout-chip--warn i { color: var(--chip-new-fg); }
+
+.payouts-block {
+  margin: 0 10px 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.payouts-body { min-width: 0; max-width: 100%; }
+.payouts-list { min-width: 0; max-width: 100%; }
+.payouts-block > summary {
+  cursor: pointer; user-select: none;
+  font-size: 0.8rem; font-weight: 600;
+  color: var(--text-strong);
+  list-style: none;
+  padding: 4px 0;
+}
+.payouts-block > summary::-webkit-details-marker { display: none; }
+.payouts-block > summary i { color: var(--brand); margin-right: 6px; }
+.payouts-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+  padding: 8px 0;
+}
+.payouts-toolbar .btn { flex: 0 0 auto; }
+.toggle-inline {
+  font-size: 0.78rem; color: var(--muted);
+  display: inline-flex; align-items: center; gap: 6px; margin: 0;
+  flex: 1 1 auto; min-width: 0; min-height: 32px;
+}
+.toggle-inline input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--brand); }
+.payouts-list { display: flex; flex-direction: column; gap: 6px; }
+
+.payout-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer; user-select: none;
+  margin: 0;
+  min-height: 48px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.payout-row.is-paid { opacity: 0.62; }
+.payout-row.is-pending { background: var(--surface); }
+.payout-row input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--brand); }
+.payout-row-main { flex: 1 1 auto; min-width: 0; max-width: 100%; }
+.payout-row-title {
+  font-size: 0.85rem; font-weight: 600; color: var(--text-strong);
+  /* Long restaurant+customer names wrap to a second line instead of pushing
+     the row wider than its card. Two-line clamp keeps each entry compact. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.25;
+}
+.payout-row-meta  {
+  font-size: 0.72rem; color: var(--muted);
+  display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.payout-row-fee   { font-size: 0.95rem; font-weight: 700; color: var(--text-strong); white-space: nowrap; flex: 0 0 auto; }
+
+.tag {
+  display: inline-block;
+  font-size: 0.66rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 1px 6px; border-radius: 999px;
+}
+.tag-far  { background: var(--chip-ofd-bg); color: var(--chip-ofd-fg); }
+.tag-near { background: var(--brand-soft); color: var(--brand-dark); }
+
+/* Segmented control (delivery) */
+.segmented {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3px;
+  margin: 8px 0 12px;
+  gap: 3px;
+  box-shadow: var(--shadow-sm);
+}
+.seg-btn {
+  flex: 1 1 0; min-width: 0;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer;
+  min-height: 44px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: background 0.15s, color 0.15s;
+}
+.seg-btn i { font-size: 0.85rem; }
+.seg-btn:hover { color: var(--text); }
+.seg-btn.active {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(255,107,53,0.35);
+}
+
+/* Very narrow phones (<= iPhone SE): KPI cards single-column so 4-digit
+   currency values never truncate. */
+@media (max-width: 359px) {
+  .kpi-grid, .kpi-grid--compact { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+}
+
+/* Tablet: 4 KPI columns + 2 chart columns */
+@media (min-width: 640px) {
+  .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kpi-grid--compact { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .chart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chart-card-body { height: 240px; }
+  .kpi-value { font-size: 1.2rem; }
+  .kpi-label { font-size: 0.72rem; }
+  .kpi-sub   { font-size: 0.72rem; }
+  .kpi-card  { padding: 12px; gap: 10px; }
+  .kpi-icon  { width: 36px; height: 36px; flex: 0 0 36px; font-size: 1rem; border-radius: 10px; }
+}
+
+/* Desktop: wider charts, taller body */
+@media (min-width: 992px) {
+  .chart-grid { gap: 16px; }
+  .chart-card-body { height: 280px; }
+  .chart-card--wide { grid-column: span 2; }
+}
+@media (min-width: 1280px) {
+  .chart-card-body { height: 300px; }
 }

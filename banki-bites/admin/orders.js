@@ -3,6 +3,21 @@ import { loadCustomers, searchCustomers, openCustomerModal } from './customers.j
 import {
   collection, query, onSnapshot, doc, updateDoc, setDoc, getDoc, getDocs, where, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import {
+  loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
+  wireStatsBlockResize, startOfLastMonth,
+} from '../analytics.js';
+
+const orderCharts = new Map();
+function mountOrderChart(id, config) {
+  const old = orderCharts.get(id);
+  if (old) { try { old.destroy(); } catch {} }
+  const el = document.getElementById(id);
+  if (!el || !window.Chart) return null;
+  const c = new Chart(el.getContext('2d'), config);
+  orderCharts.set(id, c);
+  return c;
+}
 
 const STATUSES = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled'];
 const ETA_MINUTES_FROM_ASSIGN = 45;
@@ -30,6 +45,23 @@ function isValidPhone(raw) {
 
 export async function renderOrders(root, db) {
   root.innerHTML = `
+    <details class="stats-block">
+      <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Today snapshot</summary>
+      <div class="stats-block-body">
+        <div id="ordersKpis" class="kpi-grid kpi-grid--compact"></div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-card-head"><i class="fas fa-clock"></i> Orders by hour (today)</div>
+            <div class="chart-card-body"><canvas id="ordersByHour"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-head"><i class="fas fa-circle-half-stroke"></i> Status mix (filter)</div>
+            <div class="chart-card-body"><canvas id="ordersStatusMix"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
     <div class="section-header section-header--compact section-header--end section-header--sticky">
       <select id="orderFilter" class="form-control form-control-sm" style="width:auto;min-width:140px;max-width:200px">
         <option value="active">Active</option>
@@ -41,6 +73,10 @@ export async function renderOrders(root, db) {
     </div>
     <div id="ordersList" class="card-list grid-2"><p class="text-muted">Listening for orders…</p></div>
   `;
+
+  await whenChartReady();
+  wireStatsBlockResize(root.querySelector('.stats-block'));
+  const feeRules = await loadFeeRules(db);
 
   // Pre-load staff for the dropdown
   const staffSnap = await getDocs(collection(db, COL.STAFF));
@@ -64,14 +100,19 @@ export async function renderOrders(root, db) {
     });
     if (!filtered.length) {
       listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders match.</p></div>`;
-      return;
+    } else {
+      listEl.innerHTML = '';
+      filtered.forEach(o => listEl.appendChild(renderOrderCard(db, o, staff, customers, feeRules)));
     }
-    listEl.innerHTML = '';
-    filtered.forEach(o => listEl.appendChild(renderOrderCard(db, o, staff, customers)));
+    renderOrdersStats(allOrders, filtered);
   }
   filter.addEventListener('change', render);
 
-  const q = query(collection(db, COL.ORDERS));
+  // Only fetch orders from the first day of the previous calendar month onward
+  // so admin never pulls years of history into memory. Single-field range query
+  // → no composite index needed.
+  const sinceTs = Timestamp.fromDate(startOfLastMonth());
+  const q = query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs));
   onSnapshot(q, snap => {
     allOrders = [];
     snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
@@ -86,7 +127,67 @@ export async function renderOrders(root, db) {
   });
 }
 
-function renderOrderCard(db, o, staff, customers) {
+function renderOrdersStats(all, filtered) {
+  const p = chartPalette();
+  const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
+  const todays = all.filter(o => {
+    const t = toDateSafe(o.created_at);
+    return t && t.getTime() >= startOfToday.getTime();
+  });
+  const todaysRevenue = todays.filter(isDelivered).reduce((s, o) => s + (+o.total || 0), 0);
+
+  // ETA delay (mins) for delivered orders today, when both delivered_at and eta exist.
+  let delaySum = 0, delayN = 0;
+  for (const o of todays) {
+    if (!isDelivered(o)) continue;
+    const dl = toDateSafe(o.delivered_at);
+    const eta = toDateSafe(o.eta);
+    if (dl && eta) { delaySum += (dl.getTime() - eta.getTime()) / 60000; delayN++; }
+  }
+  const avgDelay = delayN ? Math.round(delaySum / delayN) : null;
+
+  const kpis = document.getElementById('ordersKpis');
+  if (kpis) {
+    kpis.innerHTML = `
+      <div class="kpi-card kpi-card--sm"><div class="kpi-label">Today orders</div><div class="kpi-value">${todays.length}</div></div>
+      <div class="kpi-card kpi-card--sm"><div class="kpi-label">Today revenue</div><div class="kpi-value">${fmtINR(todaysRevenue)}</div></div>
+      <div class="kpi-card kpi-card--sm"><div class="kpi-label">Avg ETA delay</div><div class="kpi-value">${avgDelay == null ? '—' : (avgDelay >= 0 ? '+' : '') + avgDelay + ' min'}</div></div>
+      <div class="kpi-card kpi-card--sm"><div class="kpi-label">In filter</div><div class="kpi-value">${filtered.length}</div></div>
+    `;
+  }
+
+  // Orders by hour (today).
+  const hours = Array.from({ length: 24 }, () => 0);
+  for (const o of todays) {
+    const t = toDateSafe(o.created_at);
+    if (t) hours[t.getHours()]++;
+  }
+  mountOrderChart('ordersByHour', {
+    type: 'bar',
+    data: {
+      labels: hours.map((_, h) => `${String(h).padStart(2,'0')}h`),
+      datasets: [{ label: 'Orders', data: hours, backgroundColor: p.brand, borderWidth: 0 }],
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { autoSkip: true, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+
+  // Status mix of currently-filtered list.
+  const statusKeys = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled'];
+  const counts = statusKeys.map(s => filtered.filter(o => (o.status || 'new') === s).length);
+  mountOrderChart('ordersStatusMix', {
+    type: 'doughnut',
+    data: {
+      labels: statusKeys.map(s => s.replace(/_/g, ' ')),
+      datasets: [{ data: counts, backgroundColor: statusKeys.map(s => p.status[s]), borderWidth: 0 }],
+    },
+    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+  });
+}
+
+function renderOrderCard(db, o, staff, customers, feeRules) {
   const card = document.createElement('details');
   card.className = 'entity-card order-card';
   const created = o.created_at?.toDate ? o.created_at.toDate() : new Date();
@@ -419,6 +520,12 @@ function renderOrderCard(db, o, staff, customers) {
     }
 
     if (newStatus === 'delivered' && !o.delivered_at) patch.delivered_at = Timestamp.now();
+    // Snapshot the courier payout fee at the moment the order is marked delivered
+    // so historical earnings stay stable even if fee_rules change later.
+    if (newStatus === 'delivered' && !Number.isFinite(o.payout_amount)) {
+      patch.payout_amount = feeForOrder({ ...o, ...patch }, feeRules);
+      if (o.payout_paid !== true) patch.payout_paid = false;
+    }
 
     try {
       // Attach GPS to the order itself (denormalised) so the delivery partner

@@ -7,10 +7,27 @@ import {
   signInWithEmailAndPassword, signOut, onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
 import {
-  collection, query, where, onSnapshot, doc, updateDoc, getDoc, Timestamp,
+  collection, query, where, onSnapshot, doc, updateDoc, getDoc, getDocs, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import {
+  loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
+  toDateSafe, bucketByDay, chartPalette, whenChartReady, fmtINR, startOfDay, startOfLastMonth,
+} from '../analytics.js';
 
 const $ = sel => document.querySelector(sel);
+let _feeRules = null;
+let _allOrders = [];
+let _currentView = 'active';
+const _earnCharts = new Map();
+function mountEarnChart(id, config) {
+  const old = _earnCharts.get(id);
+  if (old) { try { old.destroy(); } catch {} }
+  const el = document.getElementById(id);
+  if (!el || !window.Chart) return null;
+  const c = new Chart(el.getContext('2d'), config);
+  _earnCharts.set(id, c);
+  return c;
+}
 
 let unsub = null;
 let currentUser = null;
@@ -36,6 +53,24 @@ let currentUser = null;
   });
 
   $('#filter').addEventListener('change', () => listenOrders(currentUser));
+  document.querySelectorAll('.seg-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.seg-btn').forEach(x => x.classList.toggle('active', x === b));
+      _currentView = b.dataset.view;
+      const ordersListEl = $('#ordersList');
+      const earningsEl = $('#earningsView');
+      if (_currentView === 'earnings') {
+        ordersListEl.hidden = true;
+        earningsEl.hidden = false;
+        renderEarnings();
+      } else {
+        ordersListEl.hidden = false;
+        earningsEl.hidden = true;
+        $('#filter').value = _currentView === 'delivered' ? 'delivered' : 'active';
+        listenOrders(currentUser);
+      }
+    });
+  });
 
   window.addEventListener('beforeunload', () => console.warn('[delivery] page is about to unload'));
 
@@ -72,6 +107,7 @@ let currentUser = null;
     $('#userEmail').textContent = staffDoc.data().name || user.email;
     $('#authGate').hidden = true;
     $('#appShell').hidden = false;
+    try { _feeRules = await loadFeeRules(db); } catch {}
     listenOrders(user);
   });
 })();
@@ -90,24 +126,33 @@ async function listenOrders(user) {
     where('delivery_staff_id', '==', user.uid),
   );
   unsub = onSnapshot(q, snap => {
-    const orders = [];
-    snap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+    const allOrders = [];
+    snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
+    // Cap everything client-side at the start of the previous month — that's the
+    // canonical "fetch window" used across admin + delivery views.
+    const since = startOfLastMonth();
+    const orders = allOrders.filter(o => {
+      const t = toDateSafe(o.created_at) || toDateSafe(o.delivered_at);
+      return !t || t >= since;
+    });
+    _allOrders = orders;
+    if (_currentView === 'earnings') renderEarnings();
     orders.sort((a, b) => {
       const ta = a.created_at?.toMillis?.() || 0;
       const tb = b.created_at?.toMillis?.() || 0;
       return tb - ta;
     });
-    const today = new Date(); today.setHours(0,0,0,0);
     const filtered = orders.filter(o => {
       if (filter === 'delivered') {
         if (o.status !== 'delivered') return false;
-        const t = o.delivered_at?.toDate?.() || o.created_at?.toDate?.();
-        return t && t >= today;
+        const t = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+        return t && t >= since;
       }
       return o.status !== 'delivered' && o.status !== 'cancelled';
     });
     if (!filtered.length) {
-      listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>${filter === 'delivered' ? 'Nothing delivered today.' : 'No active deliveries.'}</p></div>`;
+      const sinceLabel = since.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+      listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>${filter === 'delivered' ? `Nothing delivered since ${sinceLabel}.` : 'No active deliveries.'}</p></div>`;
       return;
     }
     listEl.innerHTML = '';
@@ -381,25 +426,144 @@ function toWaNumber(raw) {
   return null;
 }
 
-// Outlying villages take ~15 min from pick-up; everywhere else in/near
-// Banki we estimate ~10 min. Match is case-insensitive and matches as a
-// whole word against o.place first, then the customer address as a
-// fallback (some orders only carry the area name inside the address).
-const FAR_PLACES = ['Bedapur', 'Sisua', 'Chakapada', 'Harirajpur', 'Gopalpur', 'Patapur', 'Ragadi'];
-
+// Outlying villages take ~15 min from pick-up; everywhere else in/near Banki
+// we estimate ~10 min. The "far" list is sourced from `bankibites_meta/fee_rules`
+// (loaded into _feeRules at sign-in), so admin can edit the list without code.
 function pickupEtaMinutes(o) {
-  const haystack = [o.place, o.customer?.address].filter(Boolean).join(' ').toLowerCase();
-  const isFar = FAR_PLACES.some(p => {
-    const re = new RegExp(`\\b${p.toLowerCase()}\\b`);
-    return re.test(haystack);
-  });
-  return isFar ? 15 : 10;
+  return isFarPlace(o, _feeRules) ? 15 : 10;
 }
 
 // Customer-facing ETA: computed at pick-up time from "now" + a delivery
 // window that depends on the place — see pickupEtaMinutes().
 function pickupArrival(o) {
   return new Date(Date.now() + pickupEtaMinutes(o) * 60 * 1000);
+}
+
+async function renderEarnings() {
+  const root = $('#earningsView');
+  if (!root) return;
+  root.innerHTML = `
+    <div class="section-header section-header--compact">
+      <h3 class="m-0"><i class="fas fa-coins text-primary mr-1"></i> My Earnings</h3>
+    </div>
+    <div id="earnKpis" class="kpi-grid kpi-grid--compact"></div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-calendar-days"></i> Deliveries per day (7d)</div>
+        <div class="chart-card-body"><canvas id="earnPerDay"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-indian-rupee-sign"></i> Earnings per day (₹30 vs ₹40)</div>
+        <div class="chart-card-body"><canvas id="earnSplit"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-hand-holding-dollar"></i> Paid vs Pending</div>
+        <div class="chart-card-body"><canvas id="earnPaidMix"></canvas></div>
+      </div>
+    </div>
+    <div class="section-header section-header--compact mt-3">
+      <h4 class="m-0"><i class="fas fa-hourglass-half text-warning mr-1"></i> Awaiting payout</h4>
+    </div>
+    <div id="earnPending" class="card-list"></div>
+  `;
+  await whenChartReady();
+  const p = chartPalette();
+  const orders = (_allOrders || []).filter(isDelivered);
+
+  // KPI window helpers
+  const now = new Date();
+  const startToday = startOfDay(now);
+  const startWeek = new Date(startToday); startWeek.setDate(startWeek.getDate() - 6);
+  const startMonth = new Date(startToday); startMonth.setDate(1);
+
+  function statsFor(filterFn) {
+    const subset = orders.filter(filterFn);
+    const total = subset.reduce((s, o) => s + feeForOrder(o, _feeRules), 0);
+    const paid  = subset.filter(isPayoutPaid).reduce((s, o) => s + feeForOrder(o, _feeRules), 0);
+    return { count: subset.length, total, paid, pending: total - paid };
+  }
+  const inRange = (start) => (o) => {
+    const t = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+    return t && t.getTime() >= start.getTime();
+  };
+
+  const today = statsFor(inRange(startToday));
+  const week  = statsFor(inRange(startWeek));
+  const month = statsFor(inRange(startMonth));
+  const life  = statsFor(() => true);
+
+  $('#earnKpis').innerHTML = `
+    <div class="kpi-card kpi-card--sm"><div class="kpi-label">Today</div><div class="kpi-value">${fmtINR(today.total)}</div><div class="kpi-sub">${today.count} delivered</div></div>
+    <div class="kpi-card kpi-card--sm"><div class="kpi-label">This week</div><div class="kpi-value">${fmtINR(week.total)}</div><div class="kpi-sub">${week.count} delivered</div></div>
+    <div class="kpi-card kpi-card--sm"><div class="kpi-label">This month</div><div class="kpi-value">${fmtINR(month.total)}</div><div class="kpi-sub">${month.count} delivered</div></div>
+    <div class="kpi-card kpi-card--sm"><div class="kpi-label">Pending payout</div><div class="kpi-value">${fmtINR(life.pending)}</div><div class="kpi-sub">Paid ${fmtINR(life.paid)}</div></div>
+  `;
+
+  // Deliveries per day
+  const days = bucketByDay(orders, o => toDateSafe(o.delivered_at) || toDateSafe(o.created_at), 7);
+  mountEarnChart('earnPerDay', {
+    type: 'bar',
+    data: {
+      labels: days.labels,
+      datasets: [{ label: 'Deliveries', data: days.keys.map(k => days.buckets.get(k).length), backgroundColor: p.brand, borderWidth: 0 }],
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { autoSkip: true, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+
+  // Earnings per day split ₹30 (near) vs ₹40 (far)
+  const nearByDay = days.keys.map(k => days.buckets.get(k).filter(o => !isFarPlace(o, _feeRules)).reduce((s, o) => s + feeForOrder(o, _feeRules), 0));
+  const farByDay  = days.keys.map(k => days.buckets.get(k).filter(o =>  isFarPlace(o, _feeRules)).reduce((s, o) => s + feeForOrder(o, _feeRules), 0));
+  mountEarnChart('earnSplit', {
+    type: 'bar',
+    data: {
+      labels: days.labels,
+      datasets: [
+        { label: `Near (₹${_feeRules?.fee_near ?? 30})`, data: nearByDay, backgroundColor: p.brand,     stack: 'e', borderWidth: 0 },
+        { label: `Far (₹${_feeRules?.fee_far ?? 40})`,   data: farByDay,  backgroundColor: p.series[3], stack: 'e', borderWidth: 0 },
+      ],
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtINR(ctx.parsed.y)}` } } },
+      scales: { x: { stacked: true, ticks: { autoSkip: true, maxRotation: 0 } }, y: { stacked: true, beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+    },
+  });
+
+  // Paid vs Pending doughnut (lifetime)
+  mountEarnChart('earnPaidMix', {
+    type: 'doughnut',
+    data: {
+      labels: ['Paid', 'Pending'],
+      datasets: [{ data: [life.paid, life.pending], backgroundColor: [p.status.delivered, p.status.cancelled], borderWidth: 0 }],
+    },
+    options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmtINR(ctx.parsed)}` } } }, cutout: '60%' },
+  });
+
+  // Awaiting payout list
+  const pending = orders.filter(isPayoutPending)
+    .sort((a, b) => (toDateSafe(b.delivered_at)?.getTime() || 0) - (toDateSafe(a.delivered_at)?.getTime() || 0));
+  const pendingEl = $('#earnPending');
+  if (!pending.length) {
+    pendingEl.innerHTML = `<div class="empty-state"><i class="fas fa-circle-check"></i><p>All your deliveries have been settled. 🎉</p></div>`;
+  } else {
+    pendingEl.innerHTML = pending.map(o => {
+      const fee = feeForOrder(o, _feeRules);
+      const when = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+      const whenTxt = when ? when.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+      const far = isFarPlace(o, _feeRules);
+      return `
+        <div class="entity-card payout-row payout-row--card is-pending">
+          <div class="payout-row-main">
+            <div class="payout-row-title">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}</div>
+            <div class="payout-row-meta">${escapeHtml(whenTxt)} · ${far ? '<span class="tag tag-far">far</span>' : '<span class="tag tag-near">near</span>'} · ${escapeHtml(o.place || o.customer?.address || '')}</div>
+          </div>
+          <div class="payout-row-fee">${fmtINR(fee)}</div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 function openPickupWhatsApp(o, restaurantLabel) {

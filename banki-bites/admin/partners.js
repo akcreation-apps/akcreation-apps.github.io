@@ -1,7 +1,19 @@
 import { COL } from '../firebase-config.js';
 import {
-  collection, getDocs, doc, setDoc, deleteDoc, orderBy, query, writeBatch,
+  collection, getDocs, doc, setDoc, deleteDoc, orderBy, query, where, writeBatch, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, startOfLastMonth } from '../analytics.js';
+
+const partnerCharts = new Map();
+function mountPartnerChart(id, config) {
+  const old = partnerCharts.get(id);
+  if (old) { try { old.destroy(); } catch {} }
+  const el = document.getElementById(id);
+  if (!el || !window.Chart) return null;
+  const c = new Chart(el.getContext('2d'), config);
+  partnerCharts.set(id, c);
+  return c;
+}
 
 const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
@@ -25,13 +37,88 @@ function isValidPhone(raw) {
 
 export async function renderPartners(root, db) {
   root.innerHTML = `
+    <details class="stats-block">
+      <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Partner insights</summary>
+      <div class="stats-block-body">
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-card-head"><i class="fas fa-store"></i> Top restaurants by orders</div>
+            <div class="chart-card-body"><canvas id="partnersOrders"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-head"><i class="fas fa-eye"></i> Active vs hidden</div>
+            <div class="chart-card-body"><canvas id="partnersActive"></canvas></div>
+          </div>
+          <div class="chart-card chart-card--wide">
+            <div class="chart-card-head"><i class="fas fa-star"></i> Ratings</div>
+            <div class="chart-card-body"><canvas id="partnersRatings"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
     <div class="section-header section-header--compact section-header--end">
       <button id="addPartnerBtn" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i> Add partner</button>
     </div>
     <div id="partnersList" class="card-list"><p class="text-muted">Loading…</p></div>
   `;
   document.getElementById('addPartnerBtn').addEventListener('click', () => openEditor(db, null, root));
+  await whenChartReady();
+  wireStatsBlockResize(root.querySelector('.stats-block'));
   await loadPartners(db, root);
+  await renderPartnerCharts(db);
+}
+
+async function renderPartnerCharts(db) {
+  const p = chartPalette();
+  // Same window as the rest of the admin panel: from the 1st of last month.
+  const sinceTs = Timestamp.fromDate(startOfLastMonth());
+  const [partnersSnap, ordersSnap] = await Promise.all([
+    getDocs(query(collection(db, COL.PARTNERS), orderBy('sort_order'))),
+    getDocs(query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs))),
+  ]);
+  const partners = []; partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
+  const orders = []; ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+
+  const g = groupBy(orders, o => o.restaurant_name || o.restaurant_id || 'Unknown');
+  const top = topN(g, 8);
+
+  mountPartnerChart('partnersOrders', {
+    type: 'bar',
+    data: {
+      labels: top.map(([k]) => k),
+      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+
+  const active = partners.filter(x => x.is_active !== false).length;
+  const hidden = partners.length - active;
+  mountPartnerChart('partnersActive', {
+    type: 'doughnut',
+    data: {
+      labels: ['Active', 'Hidden'],
+      datasets: [{ data: [active, hidden], backgroundColor: [p.status.delivered, p.muted], borderWidth: 0 }],
+    },
+    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+  });
+
+  const sorted = [...partners].sort((a, b) => (+b.rating || 0) - (+a.rating || 0));
+  mountPartnerChart('partnersRatings', {
+    type: 'bar',
+    data: {
+      labels: sorted.map(x => x.name),
+      datasets: [{ label: 'Rating', data: sorted.map(x => +x.rating || 0), backgroundColor: p.brand, borderWidth: 0 }],
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } }, x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 30 } } },
+    },
+  });
 }
 
 async function loadPartners(db, root) {
