@@ -53,10 +53,37 @@ details.delivery-order > .delivery-summary {
 }
 details.delivery-order > .delivery-summary::-webkit-details-marker { display: none; }
 details.delivery-order > .delivery-summary::marker { display: none; }
-details.delivery-order .delivery-summary .ec-row { align-items: center; gap: 8px; }
-.delivery-summary-main { min-width: 0; flex: 1; }
+details.delivery-order .delivery-summary .ec-row {
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.delivery-summary-main {
+  min-width: 0;
+  flex: 1 1 60%;
+}
 .delivery-summary-main .ec-title {
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+/* Keep the status pill compact and never let it shrink/wrap text — pair with
+   the JS-side abbreviation (out_for_delivery → "on the way") so long
+   restaurant names don't crash into the pill on narrow screens. */
+details.delivery-order .delivery-summary .status-pill {
+  flex-shrink: 0;
+  white-space: nowrap;
+  max-width: 45%;
+}
+.history-title .status-pill {
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+.history-title {
+  word-break: break-word;
 }
 .delivery-chevron {
   color: var(--muted);
@@ -106,9 +133,21 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   margin-top: 6px;
   font-size: 0.88rem;
   line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
 }
-.addr-block .name { font-weight: 600; color: var(--text-strong); }
-.addr-block .addr { color: var(--muted); white-space: pre-wrap; }
+.addr-block .name {
+  font-weight: 600;
+  color: var(--text-strong);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.addr-block .addr {
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
 
 .call-btn { background: var(--success); color: #fff; border: 0; }
 .call-btn:hover { background: #15803d; color: #fff; }
@@ -203,7 +242,11 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   color: var(--muted);
   margin-top: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
 }
+.history-row { min-width: 0; }
+.history-row .history-main > * { max-width: 100%; }
 .history-detail {
   font-size: 0.82rem;
   background: var(--surface-soft);

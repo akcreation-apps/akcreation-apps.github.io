@@ -117,6 +117,20 @@ async function listenOrders(user) {
   });
 }
 
+// Short, single-token-ish labels for the status pill. Long phrases like
+// "out for delivery" wreck the responsive layout when paired with a long
+// restaurant name, so we abbreviate to keep the pill narrow.
+const STATUS_PILL_LABEL = {
+  new: 'new',
+  assigned: 'assigned',
+  out_for_delivery: 'on the way',
+  delivered: 'delivered',
+  cancelled: 'cancelled',
+};
+function pillLabel(status) {
+  return STATUS_PILL_LABEL[status] || String(status || '').replace(/_/g, ' ');
+}
+
 function renderCard(db, o) {
   // Active orders use a collapsible <details>; closed/history orders stay
   // as a static <div> so their compact summary is always visible.
@@ -180,7 +194,7 @@ function renderCard(db, o) {
         <div class="history-main">
           <div class="history-title">
             ${escapeHtml(restaurantLabel || '—')}${totalLabel}
-            <span class="status-pill status-${o.status}" style="margin-left:6px">${(o.status||'').replace('_',' ')}</span>
+            <span class="status-pill status-${o.status}" style="margin-left:6px">${pillLabel(o.status)}</span>
           </div>
           <div class="history-meta">${metaParts.join(' · ')}</div>
         </div>
@@ -254,7 +268,7 @@ function renderCard(db, o) {
           <div class="ec-meta">${created.toLocaleString('en-IN')}${hasItems ? ' · ' + items.length + ' items' : ''}</div>
           ${deliveredMeta}
         </div>
-        <span class="status-pill status-${o.status}">${(o.status||'').replace('_',' ')}</span>
+        <span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>
         <i class="fas fa-chevron-down delivery-chevron" aria-hidden="true"></i>
       </div>
     </summary>
@@ -399,13 +413,17 @@ function openPickupWhatsApp(o, restaurantLabel) {
   }
 
   const displayName = prettyCustomerName(c.name);
+  // Note: U+23F1 (⏱) is a text-default codepoint — it needs the U+FE0F
+  // variation selector to render as an emoji on Android/WhatsApp; otherwise
+  // it shows as a plain mono glyph or an empty box. Same precaution applied
+  // to all the symbol-like emojis below.
   const greeting = !isBlank(displayName) ? `Hi ${displayName}! 👋` : 'Hi there! 👋';
   const fromLine = !isBlank(restaurantLabel)
     ? `Your *BankiBites* 🛵 order from *${restaurantLabel}* is on the way.`
     : `Your *BankiBites* 🛵 order is on the way.`;
 
   const eta = pickupArrival(o);
-  const etaLine = `⏱ Arriving by *${eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}* (~${pickupEtaMinutes(o)} min).`;
+  const etaLine = `⏱️ Arriving by *${eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}* (~${pickupEtaMinutes(o)} min).`;
 
   const collectLine = o.payment_collected === false && !isBlank(o.total)
     ? `💵 Please keep *₹${o.total}* ready (cash on delivery).`
@@ -420,7 +438,11 @@ function openPickupWhatsApp(o, restaurantLabel) {
     `Thanks for ordering with us! 🙏`,
   ].filter(Boolean).join('\n');
 
-  const url = `https://wa.me/${wa}?text=${encodeURIComponent(message)}`;
+  // api.whatsapp.com/send is the official endpoint and handles UTF-8 text
+  // (including multi-codepoint emoji like 👋, 🛵, 📍) more reliably than
+  // wa.me when opened via location.href — wa.me sometimes drops bytes when
+  // the host browser hands the URL to the WhatsApp app.
+  const url = `https://api.whatsapp.com/send?phone=${wa}&text=${encodeURIComponent(message)}`;
   // Same-tab navigation: avoids popup blockers and works inside installed PWAs.
   window.location.href = url;
 }

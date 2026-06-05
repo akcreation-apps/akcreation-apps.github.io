@@ -117,8 +117,16 @@ function renderOrderCard(db, o, staff, customers) {
     : '<span class="status-pill status-unpaid">UNPAID</span>';
 
   // Friendlier status labels — "out for delivery" overflows the pill on
-  // narrow screens, so abbreviate it for the summary chip.
+  // narrow screens, so abbreviate it for the summary chip. Status dropdown
+  // (below) keeps the longer, more descriptive form.
   const STATUS_LABEL = {
+    new: 'new',
+    assigned: 'assigned',
+    out_for_delivery: 'on the way',
+    delivered: 'delivered',
+    cancelled: 'cancelled',
+  };
+  const STATUS_DROPDOWN_LABEL = {
     new: 'new',
     assigned: 'assigned',
     out_for_delivery: 'out for delivery',
@@ -208,7 +216,7 @@ function renderOrderCard(db, o, staff, customers) {
         <label class="field">
           <span class="field-label">Status</span>
           <select class="form-control form-control-sm" data-f="status">
-            ${STATUSES.map(s => `<option value="${s}" ${s===status?'selected':''}>${STATUS_LABEL[s] || s.replace('_',' ')}</option>`).join('')}
+            ${STATUSES.map(s => `<option value="${s}" ${s===status?'selected':''}>${STATUS_DROPDOWN_LABEL[s] || s.replace(/_/g,' ')}</option>`).join('')}
           </select>
         </label>
         <label class="field">
@@ -272,7 +280,7 @@ function renderOrderCard(db, o, staff, customers) {
     nameInput.value = c.name || '';
     phoneInput.value = c.phone || '';
     addrInput.value = c.address || '';
-    chipTextEl.textContent = `${c.name || '—'} · ${c.phone || ''}`;
+    chipTextEl.textContent = chipLabel(c.name, c.phone);
     chipEl.hidden = false;
     searchInput.value = '';
     resultsEl.hidden = true;
@@ -292,7 +300,7 @@ function renderOrderCard(db, o, staff, customers) {
   // record hasn't been loaded for some reason.
   if (cust.phone && customers.has(cust.phone)) {
     showGps(customers.get(cust.phone).gps || cust.gps);
-    chipTextEl.textContent = `${cust.name || customers.get(cust.phone).name || '—'} · ${cust.phone}`;
+    chipTextEl.textContent = chipLabel(cust.name || customers.get(cust.phone).name, cust.phone);
     chipEl.hidden = false;
   } else if (cust.gps) {
     showGps(cust.gps);
@@ -479,3 +487,13 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+// Name shown inside the customer chip is hard-truncated so it never breaks
+// the card layout on narrow screens. The full name remains visible in the
+// "Customer name" input directly below the chip, so nothing is lost.
+const CHIP_NAME_MAX = 14;
+function chipLabel(name, phone) {
+  const n = String(name || '').trim() || '—';
+  const trimmed = n.length > CHIP_NAME_MAX ? n.slice(0, CHIP_NAME_MAX - 1).trimEnd() + '…' : n;
+  return phone ? `${trimmed} · ${phone}` : trimmed;
+}

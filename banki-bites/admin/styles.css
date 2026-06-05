@@ -346,7 +346,7 @@ details.entity-card > .order-summary {
   align-items: flex-start;
   gap: 10px;
 }
-.order-summary-main { min-width: 0; flex: 1; }
+.order-summary-main { min-width: 0; flex: 1 1 0%; max-width: 100%; overflow: hidden; }
 .order-summary-main .ec-title {
   display: flex;
   align-items: baseline;
@@ -357,10 +357,13 @@ details.entity-card > .order-summary {
   line-height: 1.25;
 }
 .order-summary-main .restaurant-name {
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
   max-width: 100%;
+  min-width: 0;
 }
 .order-summary-main .order-total {
   color: var(--brand);
@@ -373,7 +376,7 @@ details.entity-card > .order-summary {
   gap: 4px;
   flex-shrink: 0;
 }
-.order-summary-side .status-pill { white-space: nowrap; }
+.order-summary-side .status-pill { white-space: nowrap; flex-shrink: 0; max-width: 100%; }
 .order-chevron {
   color: var(--muted);
   font-size: 0.85rem;
@@ -399,6 +402,10 @@ details.entity-card[open] > .order-summary .order-chevron {
   border-radius: 8px;
   padding: 8px 10px;
   margin-bottom: 8px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .order-section-head {
   font-size: 0.72rem;
@@ -418,7 +425,12 @@ details.entity-card[open] > .order-summary .order-chevron {
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
 }
+.dispatch-grid .field { min-width: 0; }
+.dispatch-grid select,
+.dispatch-grid input { max-width: 100%; min-width: 0; }
 @media (min-width: 480px) {
   .dispatch-grid { grid-template-columns: 1fr 1fr; }
   .dispatch-grid .field:nth-child(3) { grid-column: 1 / -1; }
@@ -485,6 +497,10 @@ details.entity-card[open] > .order-summary .order-chevron {
   padding: 10px 12px;
   box-shadow: var(--shadow-sm);
   display: flex; flex-direction: column; gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .entity-card .ec-row {
   display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
@@ -592,7 +608,11 @@ details.entity-card[open] > .order-summary .order-chevron {
   border-radius: 8px;
   margin-top: 2px;
   position: relative;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
+.customer-picker > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
 .customer-picker-search {
   display: flex;
   gap: 6px;
@@ -616,6 +636,9 @@ details.entity-card[open] > .order-summary .order-chevron {
   font-size: 0.85rem;
   color: var(--text);
   cursor: pointer;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 .customer-result:last-child { border-bottom: 0; }
 .customer-result:hover,
@@ -623,7 +646,7 @@ details.entity-card[open] > .order-summary .order-chevron {
 .customer-result .small { font-size: 0.75rem; }
 
 .customer-chip {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
@@ -632,11 +655,20 @@ details.entity-card[open] > .order-summary .order-chevron {
   border-radius: 999px;
   font-size: 0.85rem;
   color: var(--text);
-  align-self: flex-start;
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
-.customer-chip > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.customer-chip .icon-btn { width: 26px; height: 26px; min-width: 26px; }
+.customer-chip > i { flex-shrink: 0; }
+.customer-chip > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.customer-chip .icon-btn { width: 26px; height: 26px; min-width: 26px; flex-shrink: 0; }
 
 .customer-fields {
   display: grid;
@@ -757,7 +789,8 @@ details.entity-card[open] > .order-summary .order-chevron {
 }
 
 @media (min-width: 992px) {
-  .card-list.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card-list.grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .card-list.grid-2 > .entity-card { min-width: 0; }
   .fab { right: 24px; bottom: 32px; }
 }
 
