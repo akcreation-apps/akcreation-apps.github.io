@@ -390,7 +390,7 @@ function collect_data(){
                 mirrorToBankiBites({
                     restaurant_id:   'TCD',
                     restaurant_name: RESTAURANT.name,
-                    items:           flattenCartForMirror(getCartItems()),
+                    items:           flattenCartForMirror(data.order_details),
                     subtotal:        cartTotalNumber - (data.delivery_charges || 0),
                     total:           cartTotalNumber,
                     delivery_charges: data.delivery_charges || 0,

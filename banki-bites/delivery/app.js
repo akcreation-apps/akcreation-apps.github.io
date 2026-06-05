@@ -33,7 +33,10 @@ let currentUser = null;
 
   $('#filter').addEventListener('change', () => listenOrders(currentUser));
 
+  window.addEventListener('beforeunload', () => console.warn('[delivery] page is about to unload'));
+
   onAuthStateChanged(auth, async user => {
+    console.log('[delivery] auth state changed:', user?.email, user?.uid, 'at', new Date().toISOString());
     if (!user) {
       $('#authGate').hidden = false;
       $('#appShell').hidden = true;
