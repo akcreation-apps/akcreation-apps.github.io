@@ -95,6 +95,20 @@ export async function openCustomerModal(db, existing) {
         <textarea class="form-control" name="address" rows="2" required
                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">${escapeHtml(c.address || '')}</textarea>
       </div>
+      <div class="form-group">
+        <label>Paste Google Maps link <small class="text-muted">(optional)</small></label>
+        <div class="input-group input-group-sm">
+          <input class="form-control" id="mapsLink" type="url" placeholder="https://maps.google.com/?q=..." autocomplete="off" autocapitalize="off" spellcheck="false">
+          <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary" id="mapsParseBtn">
+              <i class="fas fa-location-crosshairs"></i> Use
+            </button>
+          </div>
+        </div>
+        <small id="mapsHint" class="text-muted">
+          Open Google Maps → drop a pin → <strong>Share → Copy link</strong> → paste here. Lat/lng fields below fill in automatically.
+        </small>
+      </div>
       <div class="form-row">
         <div class="form-group col-6">
           <label>GPS latitude <small class="text-muted">(optional)</small></label>
@@ -107,7 +121,6 @@ export async function openCustomerModal(db, existing) {
                  value="${gps.lng ?? ''}" placeholder="e.g. 85.5135" autocomplete="off">
         </div>
       </div>
-      <small class="text-muted">Tip: open the location in Google Maps, long-press the pin, copy the two numbers it shows.</small>
     </form>
   `;
   const res = await Swal.fire({
@@ -116,6 +129,35 @@ export async function openCustomerModal(db, existing) {
     showCancelButton: true,
     confirmButtonText: 'Save',
     width: 520,
+    didOpen: () => {
+      const linkInput = document.getElementById('mapsLink');
+      const parseBtn  = document.getElementById('mapsParseBtn');
+      const hintEl    = document.getElementById('mapsHint');
+      const latInput  = document.querySelector('#customerForm [name="lat"]');
+      const lngInput  = document.querySelector('#customerForm [name="lng"]');
+
+      function setHint(msg, ok) {
+        hintEl.innerHTML = msg;
+        hintEl.style.color = ok === true ? 'var(--success)' : (ok === false ? 'var(--danger)' : '');
+      }
+      function applyLink() {
+        const raw = linkInput.value.trim();
+        if (!raw) { setHint('Paste a Maps link to auto-fill.'); return; }
+        const coords = parseMapsLink(raw);
+        if (!coords) {
+          setHint('Could not find coordinates in that link. Open the short link once in your browser so it expands, then paste the full URL.', false);
+          return;
+        }
+        latInput.value = coords.lat.toFixed(6);
+        lngInput.value = coords.lng.toFixed(6);
+        setHint(`<i class="fas fa-circle-check"></i> Got it — ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`, true);
+      }
+      parseBtn.addEventListener('click', applyLink);
+      linkInput.addEventListener('paste', () => setTimeout(applyLink, 0));
+      linkInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); applyLink(); }
+      });
+    },
     preConfirm: () => {
       const f = document.getElementById('customerForm');
       const fd = new FormData(f);
@@ -155,6 +197,40 @@ export async function openCustomerModal(db, existing) {
     Swal.fire({ icon: 'error', title: 'Save failed', text: err.message });
     return null;
   }
+}
+
+// Best-effort extraction of {lat, lng} from a pasted Google Maps URL.
+// Covers the common share-link shapes the Maps mobile/web apps produce:
+//   https://www.google.com/maps?q=20.3741,85.5135
+//   https://www.google.com/maps/@20.3741,85.5135,17z
+//   https://www.google.com/maps/place/Foo/@20.3741,85.5135,17z/data=...
+//   https://maps.google.com/?ll=20.3741,85.5135
+//   geo:20.3741,85.5135
+// Note: short links (maps.app.goo.gl/...) do NOT contain the coords — they
+// resolve to a long URL via a redirect, which we can't follow client-side
+// without CORS. The hint asks the user to expand short links first.
+export function parseMapsLink(raw) {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  // Try a series of patterns in order — first one that matches a sane
+  // lat/lng pair wins.
+  const patterns = [
+    /[?&](?:q|ll|destination|center)=(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)/i,
+    /[!]?@?(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)(?:,\d+(?:\.\d+)?z)?/, // @lat,lng or !1d, !2d, etc.
+    /^geo:(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/i,
+    /(-?\d{1,3}\.\d{3,}),\s*(-?\d{1,3}\.\d{3,})/, // bare "20.3741, 85.5135"
+  ];
+  for (const re of patterns) {
+    const m = s.match(re);
+    if (!m) continue;
+    const lat = parseFloat(m[1]);
+    const lng = parseFloat(m[2]);
+    if (Number.isFinite(lat) && Number.isFinite(lng) &&
+        lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return { lat, lng };
+    }
+  }
+  return null;
 }
 
 function escapeHtml(s) {

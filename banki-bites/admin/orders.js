@@ -152,7 +152,7 @@ function renderOrdersStats(all, filtered) {
       <div class="kpi-card kpi-card--sm"><div class="kpi-label">Today orders</div><div class="kpi-value">${todays.length}</div></div>
       <div class="kpi-card kpi-card--sm"><div class="kpi-label">Today revenue</div><div class="kpi-value">${fmtINR(todaysRevenue)}</div></div>
       <div class="kpi-card kpi-card--sm"><div class="kpi-label">Avg ETA delay</div><div class="kpi-value">${avgDelay == null ? '—' : (avgDelay >= 0 ? '+' : '') + avgDelay + ' min'}</div></div>
-      <div class="kpi-card kpi-card--sm"><div class="kpi-label">In filter</div><div class="kpi-value">${filtered.length}</div></div>
+      <div class="kpi-card kpi-card--sm"><div class="kpi-label">Showing</div><div class="kpi-value">${filtered.length}</div></div>
     `;
   }
 

@@ -272,14 +272,25 @@ function renderCard(db, o) {
       </div>`;
   }
 
+  // GPS pin from the customer record (set by admin from the customer modal).
+  // Renders a Maps link button so the driver can navigate without copy-pasting.
+  const gps = c.gps;
+  const hasGps = gps && Number.isFinite(+gps.lat) && Number.isFinite(+gps.lng);
+  const mapsHref = hasGps ? `https://www.google.com/maps?q=${gps.lat},${gps.lng}` : '';
+
   // Once delivered, the partner is read-only: no call, no status update.
   // Call button is only rendered when a phone number is actually present.
   const actionsBlock = isClosed
     ? ''
     : `<div class="delivery-actions">
-         ${hasPhone
-           ? `<a class="btn call-btn" href="tel:${escapeAttr(c.phone)}"><i class="fas fa-phone"></i> Call</a>`
-           : ''}
+         <div class="delivery-quick-actions">
+           ${hasPhone
+             ? `<a class="icon-action call-btn" href="tel:${escapeAttr(c.phone)}" aria-label="Call customer" title="Call customer"><i class="fas fa-phone" aria-hidden="true"></i></a>`
+             : ''}
+           ${hasGps
+             ? `<a class="icon-action map-btn" href="${mapsHref}" target="_blank" rel="noopener noreferrer" aria-label="Open customer location in Google Maps" title="Open in Google Maps"><i class="fas fa-map-location-dot" aria-hidden="true"></i></a>`
+             : ''}
+         </div>
          <button class="btn done-btn" data-act="next">
            <i class="fas fa-check"></i> ${o.status === 'assigned' ? 'Pick up' : (o.status === 'out_for_delivery' ? 'Delivered' : 'Update')}
          </button>
@@ -601,17 +612,15 @@ function openPickupWhatsApp(o, restaurantLabel) {
     greeting,
     fromLine,
     etaLine,
-    `📍 To reach you quickly with minimal disturbance, please share your *current location*.`,
     collectLine,
     `Thanks for ordering with us! 🙏`,
   ].filter(Boolean).join('\n');
 
-  // api.whatsapp.com/send is the official endpoint and handles UTF-8 text
-  // (including multi-codepoint emoji like 👋, 🛵, 📍) more reliably than
-  // wa.me when opened via location.href — wa.me sometimes drops bytes when
-  // the host browser hands the URL to the WhatsApp app.
-  const url = `https://api.whatsapp.com/send?phone=${wa}&text=${encodeURIComponent(message)}`;
-  // Open in a new tab so the delivery partner stays on the app and doesn't
-  // have to press Back after WhatsApp launches.
-  window.open(url, '_blank', 'noopener,noreferrer');
+  // Same flow as the customer-side cart checkout (TCD/cart.js): use wa.me
+  // and navigate the current tab. WhatsApp's deep-link handler reliably
+  // intercepts wa.me on mobile and the host browser does the right thing
+  // on desktop too. Matching this app to the existing order-placement flow
+  // keeps the delivery partner's experience consistent with the customer's.
+  const url = `https://wa.me/${wa}?text=${encodeURIComponent(message)}`;
+  window.location.href = url;
 }
