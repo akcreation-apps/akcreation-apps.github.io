@@ -59,7 +59,7 @@ export async function renderStaff(root, db) {
     <div id="staffList" class="card-list"><p class="text-muted">Loading…</p></div>
   `;
   document.getElementById('addStaffBtn').addEventListener('click', () => openEditor(db, null, root));
-  await whenChartReady();
+  try { await whenChartReady(); } catch (e) { console.warn('[staff] Chart.js unavailable:', e.message); }
   wireStatsBlockResize(root.querySelector('.stats-block'));
   _staffFeeRules = await loadFeeRules(db);
   await refreshStaffOrders(db);
@@ -224,7 +224,7 @@ function renderCard(db, root, uid, s) {
       <div class="payouts-body">
         <div class="payouts-toolbar">
           <label class="toggle-inline"><input type="checkbox" data-act="onlyPending" checked> Only pending</label>
-          <button class="btn btn-sm btn-success" data-act="markPaid"><i class="fas fa-check"></i> Mark selected as paid</button>
+          <button class="btn btn-sm btn-pay" data-act="markPaid"><i class="fas fa-check-circle mr-1"></i>Mark selected as paid</button>
         </div>
         <div class="payouts-list" data-el="payouts"></div>
       </div>

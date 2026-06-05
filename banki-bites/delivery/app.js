@@ -55,7 +55,11 @@ let currentUser = null;
   $('#filter').addEventListener('change', () => listenOrders(currentUser));
   document.querySelectorAll('.seg-btn').forEach(b => {
     b.addEventListener('click', () => {
-      document.querySelectorAll('.seg-btn').forEach(x => x.classList.toggle('active', x === b));
+      document.querySelectorAll('.seg-btn').forEach(x => {
+        const isActive = x === b;
+        x.classList.toggle('active', isActive);
+        x.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
       _currentView = b.dataset.view;
       const ordersListEl = $('#ordersList');
       const earningsEl = $('#earningsView');
@@ -466,7 +470,7 @@ async function renderEarnings() {
     </div>
     <div id="earnPending" class="card-list"></div>
   `;
-  await whenChartReady();
+  try { await whenChartReady(); } catch (e) { console.warn('[earnings] Chart.js unavailable:', e.message); }
   const p = chartPalette();
   const orders = (_allOrders || []).filter(isDelivered);
 
@@ -607,6 +611,7 @@ function openPickupWhatsApp(o, restaurantLabel) {
   // wa.me when opened via location.href — wa.me sometimes drops bytes when
   // the host browser hands the URL to the WhatsApp app.
   const url = `https://api.whatsapp.com/send?phone=${wa}&text=${encodeURIComponent(message)}`;
-  // Same-tab navigation: avoids popup blockers and works inside installed PWAs.
-  window.location.href = url;
+  // Open in a new tab so the delivery partner stays on the app and doesn't
+  // have to press Back after WhatsApp launches.
+  window.open(url, '_blank', 'noopener,noreferrer');
 }

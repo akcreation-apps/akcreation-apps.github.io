@@ -74,7 +74,7 @@ export async function renderOrders(root, db) {
     <div id="ordersList" class="card-list grid-2"><p class="text-muted">Listening for orders…</p></div>
   `;
 
-  await whenChartReady();
+  try { await whenChartReady(); } catch (e) { console.warn('[orders] Chart.js unavailable:', e.message); }
   wireStatsBlockResize(root.querySelector('.stats-block'));
   const feeRules = await loadFeeRules(db);
 

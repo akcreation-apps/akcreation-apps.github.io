@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <meta name="theme-color" content="#FF6B35">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FF6B35">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0b0d12">
   <meta name="robots" content="noindex, nofollow">
 
   <title>BankiBites — Delivery</title>
@@ -49,6 +51,7 @@
   </div>
 
   <div id="appShell" hidden>
+    <h1 class="sr-only">BankiBites Delivery</h1>
     <header class="topbar">
       <div class="topbar-brand">
         <img src="/banki-bites/banki-bites-logo.png" alt="" class="topbar-logo">
@@ -64,16 +67,16 @@
 
     <main class="content">
       <div class="segmented" role="tablist" aria-label="View">
-        <button class="seg-btn active" data-view="active" role="tab"><i class="fas fa-bolt"></i> Active</button>
-        <button class="seg-btn" data-view="delivered" role="tab"><i class="fas fa-clock-rotate-left"></i> History</button>
-        <button class="seg-btn" data-view="earnings" role="tab"><i class="fas fa-coins"></i> Earnings</button>
+        <button id="seg-btn-active"    class="seg-btn active" data-view="active"    role="tab" aria-selected="true"  aria-controls="ordersList"><i class="fas fa-bolt"             aria-hidden="true"></i> Active</button>
+        <button id="seg-btn-delivered" class="seg-btn"        data-view="delivered" role="tab" aria-selected="false" aria-controls="ordersList"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i> History</button>
+        <button id="seg-btn-earnings"  class="seg-btn"        data-view="earnings"  role="tab" aria-selected="false" aria-controls="earningsView"><i class="fas fa-coins"           aria-hidden="true"></i> Earnings</button>
       </div>
-      <select id="filter" class="d-none">
+      <select id="filter" class="d-none" aria-hidden="true" tabindex="-1">
         <option value="active">Active</option>
         <option value="delivered">Delivered today</option>
       </select>
-      <div id="ordersList" class="card-list"><p class="text-muted">Loading…</p></div>
-      <div id="earningsView" hidden></div>
+      <div id="ordersList" class="card-list" role="tabpanel" aria-labelledby="seg-btn-active" tabindex="-1"><p class="text-muted">Loading…</p></div>
+      <div id="earningsView" hidden role="tabpanel" aria-labelledby="seg-btn-earnings" tabindex="-1"></div>
     </main>
 
     <footer class="admin-footer">

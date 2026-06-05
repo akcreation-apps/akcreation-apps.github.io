@@ -63,7 +63,7 @@ export async function renderPartners(root, db) {
     <div id="partnersList" class="card-list"><p class="text-muted">Loading…</p></div>
   `;
   document.getElementById('addPartnerBtn').addEventListener('click', () => openEditor(db, null, root));
-  await whenChartReady();
+  try { await whenChartReady(); } catch (e) { console.warn('[partners] Chart.js unavailable:', e.message); }
   wireStatsBlockResize(root.querySelector('.stats-block'));
   await loadPartners(db, root);
   await renderPartnerCharts(db);

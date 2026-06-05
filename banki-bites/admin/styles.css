@@ -256,9 +256,13 @@ select.form-control, textarea.form-control {
   }
 }
 
-/* ===== Icon-only action buttons (Partners cards) ===== */
+/* ===== Icon-only action buttons (Partners cards) =====
+   Visual size stays 32×32px; the touch target is expanded to 44×44px via
+   min-width/min-height + transparent padding so the interactive area meets
+   WCAG 2.5.5 / project spec without affecting surrounding layout. */
 .icon-btn {
   width: 32px; height: 32px;
+  min-width: 44px; min-height: 44px;
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: 8px;
   border: 1.5px solid var(--border);
@@ -837,8 +841,21 @@ details.entity-card[open] > .order-summary .order-chevron {
   overflow: hidden;
   box-sizing: border-box;
 }
-.kpi-card--sm { padding: 8px 10px; }
+/* Compact variant (used in Orders/Staff/Delivery Earnings KPI strips). No
+   icon, and the label / value / sub stack VERTICALLY — the base .kpi-card
+   uses flex-row for the icon + body layout, which would render the three
+   text elements side-by-side and squish them on narrow screens. */
+.kpi-card--sm {
+  padding: 10px 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 72px;
+}
 .kpi-card--sm .kpi-icon { display: none; }
+.kpi-card--sm .kpi-label { margin: 0; }
+.kpi-card--sm .kpi-value { margin-top: 2px; }
+.kpi-card--sm .kpi-sub { margin-top: 1px; }
 .kpi-icon {
   width: 32px; height: 32px; flex: 0 0 32px;
   border-radius: 9px;
@@ -854,9 +871,14 @@ details.entity-card[open] > .order-summary .order-chevron {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .kpi-value {
-  font-size: 1.05rem; font-weight: 700; color: var(--text-strong);
+  /* Fluid sizing so a 5-6 digit currency value never wraps and never has to be
+     truncated with an ellipsis on phone widths. Floor 0.88rem keeps the digits
+     readable; ceiling 1.1rem matches the desktop look. */
+  font-size: clamp(0.88rem, 4.2vw, 1.1rem);
+  font-weight: 700; color: var(--text-strong);
   line-height: 1.15; margin-top: 2px;
-  overflow-wrap: anywhere; word-break: break-word;
+  white-space: nowrap;
+  font-feature-settings: "tnum" 1;
 }
 .kpi-sub   {
   font-size: 0.68rem; color: var(--muted); margin-top: 2px;
@@ -916,10 +938,12 @@ details.entity-card[open] > .order-summary .order-chevron {
   color: var(--muted);
   padding: 6px 0;
   list-style: none;
+  border-radius: 4px;
 }
 .stats-block-head::-webkit-details-marker { display: none; }
 .stats-block-head i { color: var(--brand); margin-right: 6px; }
 .stats-block[open] > .stats-block-head { color: var(--text-strong); }
+.stats-block-head:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 /* Payouts UI */
 .payout-summary {
@@ -954,15 +978,43 @@ details.entity-card[open] > .order-summary .order-chevron {
   color: var(--text-strong);
   list-style: none;
   padding: 4px 0;
+  border-radius: 4px;
 }
 .payouts-block > summary::-webkit-details-marker { display: none; }
 .payouts-block > summary i { color: var(--brand); margin-right: 6px; }
+.payouts-block > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .payouts-toolbar {
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 8px;
   padding: 8px 0;
 }
 .payouts-toolbar .btn { flex: 0 0 auto; }
+
+/* Softer "Mark selected as paid" affirm button — Bootstrap's btn-success is
+   too saturated when it sits next to the muted "Only pending" toggle. Use a
+   tinted-green pill instead, with a clear hover/active state. */
+.btn-pay {
+  background: var(--chip-dlv-bg);
+  color: var(--chip-dlv-fg);
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  line-height: 1.2;
+  border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 4px;
+  min-height: 0;
+  transition: background 0.15s, color 0.15s, transform 0.05s;
+}
+.btn-pay:hover, .btn-pay:focus {
+  background: var(--success);
+  color: #fff;
+  text-decoration: none;
+}
+.btn-pay:active { transform: translateY(1px); }
+.btn-pay:focus-visible { outline: 2px solid var(--success); outline-offset: 2px; }
+.btn-pay[disabled], .btn-pay.disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-pay i { font-size: 0.78rem; }
 .toggle-inline {
   font-size: 0.78rem; color: var(--muted);
   display: inline-flex; align-items: center; gap: 6px; margin: 0;
@@ -985,7 +1037,8 @@ details.entity-card[open] > .order-summary .order-chevron {
   box-sizing: border-box;
   overflow: hidden;
 }
-.payout-row.is-paid { opacity: 0.62; }
+.payout-row.is-paid { opacity: 0.62; cursor: default; }
+.payout-row.is-paid input[type="checkbox"] { pointer-events: none; }
 .payout-row.is-pending { background: var(--surface); }
 .payout-row input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--brand); }
 .payout-row-main { flex: 1 1 auto; min-width: 0; max-width: 100%; }
