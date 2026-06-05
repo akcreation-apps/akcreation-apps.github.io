@@ -442,6 +442,14 @@
       .rp-item { transition: none; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    // Shim so non-module inline scripts can call window.bankiBitesLoad() before
+    // the module below finishes parsing. Real impl is set by public-loader.js.
+    window._bankiBitesReady = new Promise(r => { window._bankiBitesReadyResolve = r; });
+    window.bankiBitesLoad = () => window._bankiBitesReady.then(() => window._bankiBitesImpl());
+  </script>
+  <script type="module" src="public-loader.js"></script>
 </head>
 <body>
 
@@ -723,8 +731,7 @@
 
     function loadData() {
       if (cachedData) return Promise.resolve(cachedData);
-      return fetch('https://akcreation-apps.com/banki-bites-partners.json')
-        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      return window.bankiBitesLoad()
         .then(data => {
           cachedData = data;
           buildInfoSection(data);

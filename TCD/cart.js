@@ -1,5 +1,6 @@
 ﻿import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { mirrorToBankiBites } from '../banki-bites/order-mirror.js';
 const BACKUP_WP_NO = RESTAURANT.wpFallback;
 const MINIMUM_ORDER_PRICE = RESTAURANT.minOrder;
 const DELIVERY_CHARGES = RESTAURANT.deliveryCharge;
@@ -335,6 +336,16 @@ placeOrderButton.addEventListener('click', () => {
     });
 });
 
+function flattenCartForMirror(cartItems) {
+    const out = [];
+    (cartItems || []).forEach(cat => {
+        (cat.category?.dish_details || []).forEach(d => {
+            out.push({ name: d.name, qty: d.quantity, price: d.price });
+        });
+    });
+    return out;
+}
+
 function collect_data(){
     let order_history = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
     get_credentials().then(credentials => {  // Return the promise here
@@ -374,6 +385,19 @@ function collect_data(){
                     'order_details': data // Instead of fetching it again, use the data you just sent
                 });
                 localStorage.setItem(lsKey('order_history'), JSON.stringify(order_history)); // Store as string
+
+                // Mirror to BankiBites central orders feed (failures must not block)
+                mirrorToBankiBites({
+                    restaurant_id:   'TCD',
+                    restaurant_name: RESTAURANT.name,
+                    items:           flattenCartForMirror(getCartItems()),
+                    subtotal:        cartTotalNumber - (data.delivery_charges || 0),
+                    total:           cartTotalNumber,
+                    delivery_charges: data.delivery_charges || 0,
+                    place:           data.tcd_place || '',
+                    table_no:        data.table_no || '',
+                    source_doc_path: `${decrypt_values(credentials.ORDER_TABLE_NAME, _cfg)}/${docRef.id}`,
+                }).catch(err => console.warn('BankiBites mirror failed:', err));
             })
             .catch(error => {
                 console.error("Error adding document: ", error);

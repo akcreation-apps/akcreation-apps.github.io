@@ -1,0 +1,16 @@
+.delivery-actions {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;
+}
+.delivery-actions .btn { font-weight: 600; padding: 10px; }
+.addr-block {
+  background: #f9fafb; border-radius: 8px; padding: 10px 12px; margin-top: 8px;
+  font-size: 0.92rem; line-height: 1.4;
+}
+.addr-block .name { font-weight: 600; color: var(--text); }
+.addr-block .addr { color: var(--muted); white-space: pre-wrap; }
+.call-btn { background: var(--success); color: #fff; border: 0; }
+.call-btn:hover { background: #15803d; color: #fff; }
+.done-btn { background: var(--brand); color: #fff; border: 0; }
+.done-btn:hover { background: var(--brand-dark); color: #fff; }
+
+.tab-panel { display: block; }

@@ -486,6 +486,14 @@
       .rest-card, .btn-order { transition: none; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    // Shim so non-module inline scripts can call window.bankiBitesLoad() before
+    // the module below finishes parsing. Real impl is set by public-loader.js.
+    window._bankiBitesReady = new Promise(r => { window._bankiBitesReadyResolve = r; });
+    window.bankiBitesLoad = () => window._bankiBitesReady.then(() => window._bankiBitesImpl());
+  </script>
+  <script type="module" src="public-loader.js"></script>
 </head>
 <body>
 
@@ -643,8 +651,7 @@
     backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal(); });
 
-    fetch('https://akcreation-apps.com/banki-bites-partners.json')
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    window.bankiBitesLoad()
       .then(data => {
         const visible = data.partners.filter(p => p.is_active);
 
