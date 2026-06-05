@@ -1,4 +1,8 @@
-import { getDb, getAuthInstance, COL } from '../firebase-config.js';
+import { getDb as getDbBase, getAuthInstance as getAuthBase, COL } from '../firebase-config.js';
+
+const APP_NAME = 'bankibites-delivery';
+const getDb = () => getDbBase(APP_NAME);
+const getAuthInstance = () => getAuthBase(APP_NAME);
 import {
   signInWithEmailAndPassword, signOut, onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';

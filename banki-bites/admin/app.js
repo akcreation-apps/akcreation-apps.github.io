@@ -1,4 +1,8 @@
-import { getDb, getAuthInstance, COL } from '../firebase-config.js';
+import { getDb as getDbBase, getAuthInstance as getAuthBase, COL } from '../firebase-config.js';
+
+const APP_NAME = 'bankibites-admin';
+const getDb = () => getDbBase(APP_NAME);
+const getAuthInstance = () => getAuthBase(APP_NAME);
 import {
   GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
@@ -93,7 +97,7 @@ async function activateTab(name) {
   if (renderedTabs[name]) return;
   renderedTabs[name] = true;
   const db = await getDb();
-  if (name === 'orders')   await renderOrders(panel, db);
-  if (name === 'partners') await renderPartners(panel, db);
-  if (name === 'staff')    await renderStaff(panel, db);
+  if (name === 'orders')   await renderOrders(panel, db, APP_NAME);
+  if (name === 'partners') await renderPartners(panel, db, APP_NAME);
+  if (name === 'staff')    await renderStaff(panel, db, APP_NAME);
 }
