@@ -581,6 +581,86 @@ details.entity-card[open] > .order-summary .order-chevron {
   color: var(--text);
 }
 
+/* ===== Customer picker ===== */
+.customer-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface-soft);
+  border: 1px dashed var(--border);
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 2px;
+  position: relative;
+}
+.customer-picker-search {
+  display: flex;
+  gap: 6px;
+}
+.customer-picker-search input { flex: 1; }
+.customer-picker-results {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-height: 220px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.customer-result {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.customer-result:last-child { border-bottom: 0; }
+.customer-result:hover,
+.customer-result:focus { background: var(--surface-soft); outline: none; }
+.customer-result .small { font-size: 0.75rem; }
+
+.customer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(22,163,74,0.10);
+  border: 1px solid rgba(22,163,74,0.4);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--text);
+  align-self: flex-start;
+  max-width: 100%;
+}
+.customer-chip > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.customer-chip .icon-btn { width: 26px; height: 26px; min-width: 26px; }
+
+.customer-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+.customer-fields input,
+.customer-fields textarea {
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+.customer-gps {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.customer-gps a { color: var(--brand); text-decoration: underline; }
+
 /* ===== Buttons (legible outline variants on every theme) ===== */
 .entity-card .btn,
 .section-header .btn,
@@ -656,6 +736,9 @@ details.entity-card[open] > .order-summary .order-chevron {
   .section-header h3 { font-size: 1.1rem; }
   .customer-row { grid-template-columns: 1fr 1fr; }
   .customer-row textarea { grid-column: 1 / -1; }
+  .customer-fields { grid-template-columns: 1fr 1fr; }
+  .customer-fields textarea,
+  .customer-fields .customer-gps { grid-column: 1 / -1; }
   .section-header--sticky { top: 98px; }
 }
 

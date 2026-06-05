@@ -5,8 +5,23 @@ import {
 
 const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
-  opening_hour: '08', closing_hour: '22', address: '', is_active: true, sort_order: 0,
+  opening_hour: '08', closing_hour: '22', address: '', point_of_contact: '',
+  is_active: true, sort_order: 0,
 };
+
+// Normalise a typed Indian phone to 10 digits (strip +91/91/0 prefix, spaces,
+// dashes, parens). Returns the trailing 10 digits if recognisable, else ''.
+function normalisePhone(raw) {
+  if (!raw) return '';
+  let s = String(raw).replace(/[\s\-()]/g, '');
+  if (s.startsWith('+91')) s = s.slice(3);
+  else if (s.startsWith('91') && s.length === 12) s = s.slice(2);
+  else if (s.startsWith('0') && s.length === 11) s = s.slice(1);
+  return s;
+}
+function isValidPhone(raw) {
+  return /^\d{10}$/.test(normalisePhone(raw));
+}
 
 export async function renderPartners(root, db) {
   root.innerHTML = `
@@ -39,6 +54,13 @@ function renderCard(db, root, id, p) {
   const hideLabel = p.is_active ? 'Hide' : 'Show';
   const hideClass = p.is_active ? 'icon-btn--warn' : 'icon-btn--success';
 
+  const pocPhone = normalisePhone(p.point_of_contact);
+  const callBtn = pocPhone
+    ? `<a class="icon-btn icon-btn--success" href="tel:${escapeAttr(pocPhone)}" title="Call ${escapeAttr(p.point_of_contact)}" aria-label="Call point of contact for ${escapeAttr(p.name)}">
+         <i class="fas fa-phone"></i>
+       </a>`
+    : '';
+
   el.innerHTML = `
     <div class="ec-row">
       <div style="min-width:0;flex:1">
@@ -49,6 +71,7 @@ function renderCard(db, root, id, p) {
         </div>
         <div class="ec-meta">${(p.services || []).join(' · ')} · ★ ${p.rating} · ${p.opening_hour}–${p.closing_hour}</div>
         <div class="ec-meta">${escapeHtml(p.address || '')}</div>
+        ${p.point_of_contact ? `<div class="ec-meta"><i class="fas fa-user-tie"></i> ${escapeHtml(p.point_of_contact)}</div>` : ''}
       </div>
       <button class="icon-btn icon-btn--secondary" data-act="edit" title="Edit" aria-label="Edit ${escapeAttr(p.name)}">
         <i class="fas fa-pen"></i>
@@ -58,6 +81,7 @@ function renderCard(db, root, id, p) {
       <button class="icon-btn ${hideClass}" data-act="toggle" title="${hideLabel}" aria-label="${hideLabel} ${escapeAttr(p.name)}">
         <i class="fas ${hideIcon}"></i>
       </button>
+      ${callBtn}
       <button class="icon-btn icon-btn--danger" data-act="del" title="Delete" aria-label="Delete ${escapeAttr(p.name)}">
         <i class="fas fa-trash"></i>
       </button>
@@ -153,6 +177,12 @@ async function openEditor(db, existing, root) {
         <div class="form-group col-6"><label>Close hour (0-23)</label><input class="form-control" name="closing_hour" value="${escapeAttr(p.closing_hour)}"></div>
       </div>
       <div class="form-group"><label>Address</label><textarea class="form-control" name="address" rows="2">${escapeHtml(p.address)}</textarea></div>
+      <div class="form-group">
+        <label>Point of contact (10-digit mobile) <span class="text-danger">*</span></label>
+        <input class="form-control" name="point_of_contact" inputmode="tel" maxlength="15"
+               value="${escapeAttr(p.point_of_contact || '')}" required>
+        <small class="text-muted">Phone number to call when an order needs follow-up.</small>
+      </div>
       <div class="form-group form-check">
         <input class="form-check-input" type="checkbox" id="paIsActive" name="is_active" ${p.is_active ? 'checked' : ''}>
         <label class="form-check-label" for="paIsActive">Active (visible on public page)</label>
@@ -162,9 +192,21 @@ async function openEditor(db, existing, root) {
   const res = await Swal.fire({
     title: existing ? `Edit: ${p.name}` : 'Add partner',
     html, showCancelButton: true, confirmButtonText: 'Save', width: 560,
+    didOpen: () => {
+      // Auto-normalise the point-of-contact phone on blur so the visible value
+      // mirrors what gets saved (strips +91 / spaces / dashes / parens etc.).
+      const phoneInput = document.querySelector('#partnerForm [name="point_of_contact"]');
+      if (phoneInput) {
+        phoneInput.addEventListener('blur', () => {
+          const n = normalisePhone(phoneInput.value);
+          if (n) phoneInput.value = n;
+        });
+      }
+    },
     preConfirm: () => {
       const f = document.getElementById('partnerForm');
       const fd = new FormData(f);
+      const pocRaw = (fd.get('point_of_contact') || '').toString().trim();
       const data = {
         name: fd.get('name').trim(),
         logo: fd.get('logo').trim(),
@@ -175,10 +217,21 @@ async function openEditor(db, existing, root) {
         opening_hour: fd.get('opening_hour').trim(),
         closing_hour: fd.get('closing_hour').trim(),
         address: fd.get('address').trim(),
+        point_of_contact: pocRaw ? normalisePhone(pocRaw) : '',
         is_active: f.querySelector('#paIsActive').checked,
       };
       if (!data.name || !data.url) {
         Swal.showValidationMessage('Name and URL are required');
+        return false;
+      }
+      // Point of contact is mandatory for both add and edit — every partner
+      // must have a reachable phone before the record can be saved.
+      if (!pocRaw) {
+        Swal.showValidationMessage('Point of contact phone is required');
+        return false;
+      }
+      if (!isValidPhone(pocRaw)) {
+        Swal.showValidationMessage('Point of contact must be a valid 10-digit mobile number');
         return false;
       }
       return data;

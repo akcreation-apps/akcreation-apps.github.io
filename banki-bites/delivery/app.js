@@ -136,6 +136,9 @@ function renderCard(db, o) {
   const restaurantLabel = !isBlank(o.restaurant_name)
     ? o.restaurant_name
     : (!isBlank(o.restaurant_id) ? o.restaurant_id : '');
+  // Some customers are stored with names like "BB Anil (Anil Kumar)" — strip
+  // the BB prefix and show just the inner-bracket name to the delivery partner.
+  const displayCustomerName = prettyCustomerName(c.name);
   const totalLabel = !isBlank(o.total) ? ` · ₹${o.total}` : '';
   const mustCollect = o.payment_collected === false;
   if (mustCollect) card.classList.add('must-collect');
@@ -155,7 +158,7 @@ function renderCard(db, o) {
     card.classList.add('history-card');
     const when = o.delivered_at?.toDate?.() || o.created_at?.toDate?.() || new Date();
     const metaParts = [];
-    if (hasName) metaParts.push(escapeHtml(c.name));
+    if (hasName) metaParts.push(escapeHtml(displayCustomerName));
     if (hasPhone) metaParts.push(escapeHtml(c.phone));
     metaParts.push(when.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }));
 
@@ -225,7 +228,7 @@ function renderCard(db, o) {
 
   const addrBlock = (hasName || hasAddress)
     ? `<div class="addr-block">
-         ${hasName ? `<div class="name">${escapeHtml(c.name)}</div>` : ''}
+         ${hasName ? `<div class="name">${escapeHtml(displayCustomerName)}</div>` : ''}
          ${hasAddress ? `<div class="addr">${escapeHtml(c.address)}</div>` : ''}
        </div>`
     : '';
@@ -279,7 +282,7 @@ function renderCard(db, o) {
       const ok = await Swal.fire({
         icon: 'question',
         title: 'Mark as delivered?',
-        html: `Confirm that you've handed the order to <strong>${escapeHtml(c.name || 'the customer')}</strong>.${collectNote}`,
+        html: `Confirm that you've handed the order to <strong>${escapeHtml(displayCustomerName || 'the customer')}</strong>.${collectNote}`,
         showCancelButton: true,
         confirmButtonText: 'Yes, delivered',
         cancelButtonText: 'Not yet',
@@ -315,6 +318,23 @@ function renderCard(db, o) {
   });
 
   return card;
+}
+
+// If a customer name starts with "BB" (case-insensitive, e.g. internal alias
+// tags like "BB Anil") and contains a parenthesised segment, return what is
+// inside the first pair of brackets so the delivery partner sees the real
+// customer name. Otherwise return the original name.
+// Examples:
+//   "BB Anil (Anil Kumar)" → "Anil Kumar"
+//   "BBAnil(Anil Kumar)"   → "Anil Kumar"
+//   "Anil Kumar"           → "Anil Kumar"
+function prettyCustomerName(name) {
+  if (isBlank(name)) return '';
+  const s = String(name).trim();
+  if (!/^bb/i.test(s)) return s;
+  const m = s.match(/\(([^)]+)\)/);
+  if (m && m[1].trim()) return m[1].trim();
+  return s;
 }
 
 function escapeHtml(s) {
@@ -378,7 +398,8 @@ function openPickupWhatsApp(o, restaurantLabel) {
     return;
   }
 
-  const greeting = !isBlank(c.name) ? `Hi ${c.name}! 👋` : 'Hi there! 👋';
+  const displayName = prettyCustomerName(c.name);
+  const greeting = !isBlank(displayName) ? `Hi ${displayName}! 👋` : 'Hi there! 👋';
   const fromLine = !isBlank(restaurantLabel)
     ? `Your *BankiBites* 🛵 order from *${restaurantLabel}* is on the way.`
     : `Your *BankiBites* 🛵 order is on the way.`;

@@ -1,6 +1,7 @@
 import { COL } from '../firebase-config.js';
+import { loadCustomers, searchCustomers, openCustomerModal } from './customers.js';
 import {
-  collection, query, onSnapshot, doc, updateDoc, setDoc, getDocs, where, Timestamp,
+  collection, query, onSnapshot, doc, updateDoc, setDoc, getDoc, getDocs, where, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 const STATUSES = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled'];
@@ -46,6 +47,10 @@ export async function renderOrders(root, db) {
   const staff = [];
   staffSnap.forEach(d => staff.push({ uid: d.id, ...d.data() }));
 
+  // Pre-load customers for the picker. Held in a Map<phone, customer> and
+  // mutated in-place when the admin creates/edits a customer from a card.
+  const customers = await loadCustomers(db);
+
   const listEl = document.getElementById('ordersList');
   const filter = document.getElementById('orderFilter');
 
@@ -62,7 +67,7 @@ export async function renderOrders(root, db) {
       return;
     }
     listEl.innerHTML = '';
-    filtered.forEach(o => listEl.appendChild(renderOrderCard(db, o, staff)));
+    filtered.forEach(o => listEl.appendChild(renderOrderCard(db, o, staff, customers)));
   }
   filter.addEventListener('change', render);
 
@@ -81,7 +86,7 @@ export async function renderOrders(root, db) {
   });
 }
 
-function renderOrderCard(db, o, staff) {
+function renderOrderCard(db, o, staff, customers) {
   const card = document.createElement('details');
   card.className = 'entity-card order-card';
   const created = o.created_at?.toDate ? o.created_at.toDate() : new Date();
@@ -157,10 +162,36 @@ function renderOrderCard(db, o, staff) {
 
     <div class="order-section">
       <div class="order-section-head"><i class="fas fa-user"></i> Customer &amp; address</div>
-      <div class="customer-row">
-        <input class="form-control form-control-sm" placeholder="Customer name" data-f="name" value="${escapeAttr(cust.name||'')}">
-        <input class="form-control form-control-sm" placeholder="Phone (10 digits)" data-f="phone" value="${escapeAttr(cust.phone||'')}" inputmode="tel" maxlength="15">
-        <textarea class="form-control form-control-sm" placeholder="Delivery address" data-f="address" rows="2">${escapeHtml(prefilledAddress)}</textarea>
+      <div class="customer-picker">
+        <div class="customer-picker-search">
+          <input class="form-control form-control-sm" data-f="custSearch"
+                 placeholder="Search by name or phone…"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 name="bb-custsearch-${o.id}">
+          <button type="button" class="btn btn-sm btn-outline-primary" data-act="newCustomer">
+            <i class="fas fa-plus"></i> New
+          </button>
+        </div>
+        <div class="customer-picker-results" data-el="results" hidden></div>
+        <div class="customer-chip" data-el="chip" hidden>
+          <i class="fas fa-user-check"></i>
+          <span data-el="chipText"></span>
+          <button type="button" class="icon-btn icon-btn--secondary" data-act="editCustomer" title="Edit customer">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button type="button" class="icon-btn icon-btn--secondary" data-act="clearCustomer" title="Change customer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="customer-fields">
+          <input class="form-control form-control-sm" placeholder="Customer name" data-f="name" value="${escapeAttr(cust.name||'')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="bb-cname-${o.id}">
+          <input class="form-control form-control-sm" placeholder="Phone (10 digits)" data-f="phone" value="${escapeAttr(cust.phone||'')}" inputmode="tel" maxlength="15" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="bb-cphone-${o.id}">
+          <textarea class="form-control form-control-sm" placeholder="Delivery address" data-f="address" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="bb-caddr-${o.id}">${escapeHtml(prefilledAddress)}</textarea>
+          <div class="customer-gps" data-el="gpsLine" hidden>
+            <i class="fas fa-location-dot"></i>
+            <a data-el="mapLink" target="_blank" rel="noopener">Open in Google Maps</a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -209,6 +240,116 @@ function renderOrderCard(db, o, staff) {
   phoneInput.addEventListener('blur', () => {
     const n = normalisePhone(phoneInput.value);
     if (n) phoneInput.value = n;
+  });
+
+  // ── Customer picker wiring ────────────────────────────────────────────
+  const nameInput = card.querySelector('[data-f="name"]');
+  const addrInput = card.querySelector('[data-f="address"]');
+  const searchInput = card.querySelector('[data-f="custSearch"]');
+  const resultsEl = card.querySelector('[data-el="results"]');
+  const chipEl = card.querySelector('[data-el="chip"]');
+  const chipTextEl = card.querySelector('[data-el="chipText"]');
+  const gpsLineEl = card.querySelector('[data-el="gpsLine"]');
+  const mapLinkEl = card.querySelector('[data-el="mapLink"]');
+  // Track the currently-selected customer's GPS (separate from the form
+  // inputs, which only hold name/phone/address). Updated when the admin
+  // picks an existing customer or creates a new one with GPS.
+  let selectedGps = null;
+
+  function showGps(gps) {
+    if (gps && Number.isFinite(gps.lat) && Number.isFinite(gps.lng)) {
+      selectedGps = { lat: gps.lat, lng: gps.lng };
+      mapLinkEl.href = `https://www.google.com/maps?q=${gps.lat},${gps.lng}`;
+      mapLinkEl.textContent = `Open in Maps (${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)})`;
+      gpsLineEl.hidden = false;
+    } else {
+      selectedGps = null;
+      gpsLineEl.hidden = true;
+    }
+  }
+
+  function applyCustomer(c) {
+    nameInput.value = c.name || '';
+    phoneInput.value = c.phone || '';
+    addrInput.value = c.address || '';
+    chipTextEl.textContent = `${c.name || '—'} · ${c.phone || ''}`;
+    chipEl.hidden = false;
+    searchInput.value = '';
+    resultsEl.hidden = true;
+    resultsEl.innerHTML = '';
+    showGps(c.gps);
+  }
+
+  function clearChip() {
+    chipEl.hidden = true;
+    chipTextEl.textContent = '';
+    showGps(null);
+  }
+
+  // If the order already has a phone and that customer exists in our map,
+  // hydrate the chip + GPS so the admin sees who's attached. Fall back to
+  // GPS embedded on the order doc itself (denormalised) if the customer
+  // record hasn't been loaded for some reason.
+  if (cust.phone && customers.has(cust.phone)) {
+    showGps(customers.get(cust.phone).gps || cust.gps);
+    chipTextEl.textContent = `${cust.name || customers.get(cust.phone).name || '—'} · ${cust.phone}`;
+    chipEl.hidden = false;
+  } else if (cust.gps) {
+    showGps(cust.gps);
+  }
+
+  searchInput.addEventListener('input', () => {
+    const matches = searchCustomers(customers, searchInput.value);
+    if (!matches.length) {
+      resultsEl.hidden = true;
+      resultsEl.innerHTML = '';
+      return;
+    }
+    resultsEl.innerHTML = matches.map(c => `
+      <button type="button" class="customer-result" data-phone="${escapeAttr(c.phone)}">
+        <strong>${escapeHtml(c.name || '—')}</strong>
+        <span class="text-muted">· ${escapeHtml(c.phone)}</span>
+        <div class="text-muted small">${escapeHtml((c.address || '').slice(0, 60))}</div>
+      </button>
+    `).join('');
+    resultsEl.hidden = false;
+  });
+
+  resultsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.customer-result');
+    if (!btn) return;
+    const c = customers.get(btn.dataset.phone);
+    if (c) applyCustomer(c);
+  });
+
+  document.addEventListener('click', e => {
+    if (!card.contains(e.target)) { resultsEl.hidden = true; }
+  });
+
+  card.querySelector('[data-act="newCustomer"]').addEventListener('click', async () => {
+    const saved = await openCustomerModal(db, null);
+    if (saved) {
+      customers.set(saved.phone, saved);
+      applyCustomer(saved);
+    }
+  });
+
+  card.querySelector('[data-act="editCustomer"]').addEventListener('click', async () => {
+    const phone = normalisePhone(phoneInput.value);
+    const existing = customers.get(phone) || { name: nameInput.value, phone, address: addrInput.value };
+    const saved = await openCustomerModal(db, existing);
+    if (saved) {
+      customers.set(saved.phone, saved);
+      applyCustomer(saved);
+    }
+  });
+
+  card.querySelector('[data-act="clearCustomer"]').addEventListener('click', () => {
+    nameInput.value = '';
+    phoneInput.value = '';
+    addrInput.value = '';
+    clearChip();
+    searchInput.focus();
   });
 
   card.querySelector('[data-act="save"]').addEventListener('click', async () => {
@@ -272,11 +413,21 @@ function renderOrderCard(db, o, staff) {
     if (newStatus === 'delivered' && !o.delivered_at) patch.delivered_at = Timestamp.now();
 
     try {
+      // Attach GPS to the order itself (denormalised) so the delivery partner
+      // view can show a Maps link without a second Firestore read.
+      if (selectedGps) patch.customer.gps = selectedGps;
+
       await updateDoc(doc(db, COL.ORDERS, o.id), patch);
       if (phone) {
-        await setDoc(doc(db, COL.CUSTOMERS, phone), {
-          name, phone, address, last_seen: Timestamp.now(),
-        }, { merge: true });
+        const custRef = doc(db, COL.CUSTOMERS, phone);
+        const custData = { name, phone, address, last_seen: Timestamp.now() };
+        if (selectedGps) custData.gps = selectedGps;
+        // Set created_at only on first insert so we don't overwrite the
+        // original signup time on every order save.
+        const existing = await getDoc(custRef);
+        if (!existing.exists()) custData.created_at = Timestamp.now();
+        await setDoc(custRef, custData, { merge: true });
+        customers.set(phone, { phone, ...custData });
       }
       // Cascade status back to the source restaurant order so the individual
       // TCD/A1 admin sees a synchronised state:
