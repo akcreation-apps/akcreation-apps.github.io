@@ -5,16 +5,22 @@
 
 /* Delivery has no tabbar, so the section-header (filter dropdown) would
    otherwise sit flush against the topbar — give it some breathing room. */
-#appShell > .content { padding-top: 12px; }
+#appShell > .content { padding-top: 14px; }
 .section-header {
   margin-bottom: 10px;
   align-items: center;
 }
-.section-header h3 {
+.section-header h3,
+.section-header h4 {
   font-size: 1rem;
   display: flex;
   align-items: center;
 }
+
+/* Override Bootstrap's blue `.text-primary` to match the brand orange — the
+   default blue looks out-of-place on an orange-branded app. */
+.delivery-quick-actions .text-primary,
+#appShell .text-primary { color: var(--brand) !important; }
 @media (min-width: 576px) {
   #appShell > .content { padding-top: 16px; }
 }
@@ -25,55 +31,64 @@
 .delivery-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 16px;
 }
 .delivery-actions .btn {
   font-weight: 600;
-  padding: 12px 8px;
+  padding: 12px 16px;
   font-size: 0.9rem;
   min-height: 48px;
   white-space: nowrap;
+  border-radius: 10px;
+  letter-spacing: 0.01em;
 }
 /* "Delivered / Pick up" is the primary action — full-width pill below the
    row of secondary icon-only quick actions (Call, Map). */
-.delivery-actions .done-btn { width: 100%; }
+.delivery-actions .done-btn {
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(255,107,53,0.25);
+}
+.delivery-actions .done-btn:hover { box-shadow: 0 2px 6px rgba(255,107,53,0.3); }
+.delivery-actions .done-btn i { margin-right: 4px; }
 
-/* Secondary icon-only quick-actions row (Call, Map). Icons are circular
-   tap targets that don't compete with the primary Done button for visual
-   weight. */
+/* Secondary icon-only quick actions (Call, Map). Outlined "ghost" buttons —
+   neutral surface, accent-coloured icon and border. Reads as a refined
+   secondary action instead of a bright primary one. Hover fills with the
+   accent for clear affordance. */
 .delivery-quick-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  /* Call sits at the left edge, Map at the right edge — easy thumb
-     mapping for the driver: dial with the left thumb, navigate with the
-     right. The map button uses margin-left:auto so it pins right even
-     when Call is hidden (rare). */
 }
 .delivery-quick-actions .map-btn { margin-left: auto; }
 .delivery-quick-actions:empty { display: none; }
 .icon-action {
-  width: 48px; height: 48px; flex: 0 0 48px;
+  width: 44px; height: 44px; flex: 0 0 44px;
   display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  border: 0;
-  color: #fff;
-  font-size: 1.05rem;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 1rem;
   text-decoration: none;
-  box-shadow: var(--shadow-sm);
-  transition: background 0.15s, transform 0.05s, color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.05s;
 }
-.icon-action:hover, .icon-action:focus {
-  color: #fff;
-  text-decoration: none;
-}
+.icon-action:hover, .icon-action:focus { text-decoration: none; }
 .icon-action:active { transform: translateY(1px); }
-.icon-action:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
-.icon-action.call-btn { background: var(--success); }
-.icon-action.call-btn:hover, .icon-action.call-btn:focus { background: #15803d; }
-.icon-action.map-btn  { background: #3b82f6; }
-.icon-action.map-btn:hover,  .icon-action.map-btn:focus  { background: #2563eb; }
+.icon-action:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.icon-action.call-btn { color: var(--success); border-color: rgba(22,163,74,0.35); }
+.icon-action.call-btn:hover,
+.icon-action.call-btn:focus { background: var(--success); border-color: var(--success); color: #fff; }
+
+.icon-action.map-btn  { color: #2563eb; border-color: rgba(37,99,235,0.35); }
+.icon-action.map-btn:hover,
+.icon-action.map-btn:focus  { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+@media (prefers-color-scheme: dark) {
+  .icon-action.call-btn { color: #4ade80; border-color: rgba(74,222,128,0.35); }
+  .icon-action.map-btn  { color: #60a5fa; border-color: rgba(96,165,250,0.35); }
+}
 /* Safety gap so the items list can never sit directly above the Call button. */
 .delivery-actions-spacer { height: 6px; }
 
@@ -83,12 +98,21 @@
   margin: 0 auto;
   width: 100%;
 }
-details.delivery-order { padding: 0; gap: 0; overflow: hidden; }
+details.delivery-order {
+  padding: 0; gap: 0; overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+details.delivery-order[open] {
+  border-color: rgba(255,107,53,0.3);
+  box-shadow: 0 2px 10px rgba(15,23,42,0.06);
+}
 details.delivery-order > .delivery-summary {
   list-style: none;
   cursor: pointer;
   user-select: none;
-  padding: 12px 14px;
+  padding: 14px 16px;
 }
 details.delivery-order > .delivery-summary::-webkit-details-marker { display: none; }
 details.delivery-order > .delivery-summary::marker { display: none; }
@@ -134,27 +158,29 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   transform: rotate(180deg);
 }
 .delivery-body {
-  padding: 0 14px 14px;
+  padding: 12px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   border-top: 1px solid var(--border-soft);
-  padding-top: 10px;
 }
 
 /* Items shown inline (not collapsible) inside the open card */
 .items-block {
   background: var(--surface-soft);
   border: 1px solid var(--border-soft);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: 10px;
+  padding: 10px 12px;
 }
 .items-block-head {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--muted);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
+.items-block-head i { color: var(--brand); margin-right: 4px; }
 .items-block .order-items {
   margin: 0;
   padding: 0;
@@ -162,16 +188,21 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   font-size: 0.88rem;
   color: var(--text);
   max-height: none;
+  list-style: none;
 }
+.items-block .order-items li {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.items-block .order-items li:last-child { border-bottom: 0; }
 
 .addr-block {
   background: var(--surface-soft);
   border: 1px solid var(--border-soft);
-  border-radius: 8px;
-  padding: 8px 10px;
-  margin-top: 6px;
+  border-radius: 10px;
+  padding: 10px 12px;
   font-size: 0.88rem;
-  line-height: 1.4;
+  line-height: 1.5;
   min-width: 0;
   overflow: hidden;
 }
@@ -180,6 +211,7 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   color: var(--text-strong);
   word-break: break-word;
   overflow-wrap: anywhere;
+  margin-bottom: 2px;
 }
 .addr-block .addr {
   color: var(--muted);
@@ -188,79 +220,94 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   overflow-wrap: anywhere;
 }
 
-.call-btn { background: var(--success); color: #fff; border: 0; }
-.call-btn:hover, .call-btn:focus { background: #15803d; color: #fff; text-decoration: none; }
-.map-btn  { background: #3b82f6; color: #fff; border: 0; }
-.map-btn:hover, .map-btn:focus  { background: #2563eb; color: #fff; text-decoration: none; }
 .done-btn { background: var(--brand); color: #fff; border: 0; }
-.done-btn:hover { background: var(--brand-dark); color: #fff; }
+.done-btn:hover, .done-btn:focus { background: var(--brand-dark); color: #fff; }
 
 .tab-panel { display: block; }
 
 /* ── Payment-collection alert ────────────────────────────────────────── */
 .entity-card.must-collect {
-  border: 2px solid var(--warn);
-  box-shadow: 0 0 0 3px rgba(245,158,11,0.18);
+  border-color: rgba(245,158,11,0.45);
+  box-shadow: 0 0 0 2px rgba(245,158,11,0.12);
 }
 .collect-banner {
-  display: flex; align-items: center; gap: 8px;
-  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+  display: flex; align-items: center; gap: 10px;
+  background: #fffaf0;
   color: #92400e;
-  border-left: 4px solid var(--warn);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 500;
+  font-size: 0.88rem;
 }
-.collect-banner i { font-size: 1.05rem; }
-.collect-banner strong { font-size: 1.05rem; color: #78350f; }
+.collect-banner i {
+  font-size: 0.95rem;
+  color: var(--warn);
+  flex-shrink: 0;
+}
+.collect-banner strong { font-weight: 700; color: #78350f; }
+.collect-banner-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.collect-banner-meta {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(146,64,14,0.78);
+  font-feature-settings: "tnum" 1;
+}
 
 @media (prefers-color-scheme: dark) {
   .collect-banner {
-    background: linear-gradient(90deg, #3a2b07 0%, #4a3408 100%);
+    background: rgba(245,158,11,0.08);
+    border-color: rgba(245,158,11,0.3);
     color: #fcd34d;
   }
   .collect-banner strong { color: #fde68a; }
+  .collect-banner-meta { color: rgba(252,211,77,0.78); }
 }
 
 /* ── ETA banner ──────────────────────────────────────────────────────── */
 .eta-banner {
-  display: flex; align-items: center; gap: 8px;
-  background: #eff6ff;
-  color: #1e3a8a;
-  border-left: 4px solid #3b82f6;
-  border-radius: 8px;
-  padding: 6px 10px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface-soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
   font-weight: 500;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
 }
-.eta-banner strong { color: #1e3a8a; }
+.eta-banner i { color: #3b82f6; flex-shrink: 0; font-size: 0.92rem; }
+.eta-banner strong { color: var(--text-strong); font-weight: 600; }
+
 .eta-banner.eta-soon {
-  background: #fff7ed;
+  background: #fffaf0;
+  border-color: rgba(251,146,60,0.35);
   color: #9a3412;
-  border-left-color: #fb923c;
 }
+.eta-banner.eta-soon i      { color: #f59e0b; }
 .eta-banner.eta-soon strong { color: #7c2d12; }
+
 .eta-banner.eta-late {
   background: #fef2f2;
+  border-color: rgba(220,38,38,0.35);
   color: #991b1b;
-  border-left-color: #dc2626;
-  animation: pulse 1.6s ease-in-out infinite;
 }
+.eta-banner.eta-late i      { color: #dc2626; }
 .eta-banner.eta-late strong { color: #7f1d1d; }
 
 @media (prefers-color-scheme: dark) {
-  .eta-banner          { background: #0f2540; color: #bfdbfe; }
-  .eta-banner strong   { color: #dbeafe; }
-  .eta-banner.eta-soon { background: #3a1e07; color: #fdba74; }
+  .eta-banner i        { color: #60a5fa; }
+  .eta-banner.eta-soon { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); color: #fdba74; }
+  .eta-banner.eta-soon i      { color: #fbbf24; }
   .eta-banner.eta-soon strong { color: #fed7aa; }
-  .eta-banner.eta-late { background: #3a1414; color: #fca5a5; }
+  .eta-banner.eta-late { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.35); color: #fca5a5; }
+  .eta-banner.eta-late i      { color: #f87171; }
   .eta-banner.eta-late strong { color: #fecaca; }
-}
-
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
-  50%      { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
 }
 
 /* ── Compact history card (delivered / cancelled) ────────────────────── */
@@ -308,4 +355,158 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
 @media (min-width: 992px) {
   /* Driver focus is one card at a time — keep delivery list narrow & centred */
   #ordersList.card-list { max-width: 720px; margin: 0 auto; }
+}
+
+/* ===========================================================================
+   Awaiting payout — driver-facing settlement list
+   =========================================================================== */
+#earnPending {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+/* Top summary "hero" card — the one number the driver actually wants */
+.pending-summary {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(255,107,53,0.25);
+}
+.pending-summary-line {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+}
+.pending-summary-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+.pending-summary-amount {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-feature-settings: "tnum" 1;
+}
+.pending-summary-meta {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  opacity: 0.88;
+}
+
+/* Day group */
+.pending-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.pending-group-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+.pending-group-day {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.pending-group-total {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  font-feature-settings: "tnum" 1;
+}
+
+/* List + rows */
+.pending-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pending-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  min-width: 0;
+}
+.pending-row:last-child { border-bottom: 0; }
+.pending-row-main { flex: 1 1 auto; min-width: 0; }
+.pending-row-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  min-width: 0;
+}
+.pending-row-restaurant {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.pending-row-time {
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+.pending-row-time i { font-size: 0.7rem; margin-right: 2px; }
+.pending-row-sub {
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pending-row-fee {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex: 0 0 auto;
+}
+.pending-row-amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-feature-settings: "tnum" 1;
+  white-space: nowrap;
+}
+
+/* "All settled" empty state */
+.empty-state--settled {
+  padding: 24px 16px;
+  text-align: center;
+}
+.empty-state--settled i {
+  font-size: 2.2rem;
+  color: var(--success);
+  margin-bottom: 10px;
+  display: block;
+}
+.empty-state--settled p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+@media (min-width: 576px) {
+  .pending-summary-amount { font-size: 1.8rem; }
 }

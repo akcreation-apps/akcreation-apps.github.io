@@ -26,8 +26,27 @@ function mountStaffChart(id, config) {
 
 let _staffOrdersCache = null;
 let _staffFeeRules = null;
+let _staffRoot = null;
+let _staffDb = null;
+
+// Public refresh entry-point so the Dashboard's refresh button can also
+// invalidate the staff/earnings cache. Re-fetches orders, force-reloads fee
+// rules, and re-renders the staff list + charts if the Staff tab has been
+// opened already. No-op until renderStaff() has been called once.
+export async function refreshStaffData(db) {
+  const targetDb = db || _staffDb;
+  if (!targetDb) return;
+  _staffFeeRules = await loadFeeRules(targetDb, { force: true });
+  await refreshStaffOrders(targetDb);
+  if (_staffRoot) {
+    await loadStaff(targetDb, _staffRoot);
+    renderStaffCharts();
+  }
+}
 
 export async function renderStaff(root, db) {
+  _staffRoot = root;
+  _staffDb = db;
   root.innerHTML = `
     <details class="stats-block">
       <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Delivery partner insights</summary>
@@ -56,7 +75,7 @@ export async function renderStaff(root, db) {
     <div class="text-muted mb-2" style="font-size:0.78rem">
       <i class="fas fa-info-circle"></i> Create the Auth account in Firebase Console first, then paste the UID here.
     </div>
-    <div id="staffList" class="card-list"><p class="text-muted">Loading…</p></div>
+    <div id="staffList" class="card-list"><div class="bb-loader-block">Loading delivery partners…</div></div>
   `;
   document.getElementById('addStaffBtn').addEventListener('click', () => openEditor(db, null, root));
   try { await whenChartReady(); } catch (e) { console.warn('[staff] Chart.js unavailable:', e.message); }
@@ -171,7 +190,7 @@ function renderStaffCharts() {
 
 async function loadStaff(db, root) {
   const list = root.querySelector('#staffList');
-  list.innerHTML = '<p class="text-muted">Loading…</p>';
+  list.innerHTML = '<div class="bb-loader-block">Loading delivery partners…</div>';
   const snap = await getDocs(collection(db, COL.STAFF));
   if (snap.empty) {
     list.innerHTML = `<div class="empty-state"><i class="fas fa-motorcycle"></i><p>No delivery partners yet.</p></div>`;

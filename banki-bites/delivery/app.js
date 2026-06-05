@@ -121,7 +121,7 @@ async function listenOrders(user) {
   const db = await getDb();
   const filter = $('#filter').value;
   const listEl = $('#ordersList');
-  listEl.innerHTML = '<p class="text-muted">Loading…</p>';
+  listEl.innerHTML = '<div class="bb-loader-block">Loading deliveries…</div>';
 
   // Filter server-side by assignee; sort/filter the rest client-side so we
   // don't need a composite Firestore index.
@@ -204,12 +204,28 @@ function renderCard(db, o) {
   const displayCustomerName = prettyCustomerName(c.name);
   const totalLabel = !isBlank(o.total) ? ` · ₹${o.total}` : '';
   const mustCollect = o.payment_collected === false;
+  // Admin can override how much the partner should collect at the door — falls
+  // back to the order total when no override is set.
+  const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
   if (mustCollect) card.classList.add('must-collect');
 
-  const collectBanner = (mustCollect && !isBlank(o.total))
+  // Optional breakdown line: shown when admin recorded a discount or a
+  // prepayment so the driver knows why the cash amount differs from the cart.
+  const discount  = Number.isFinite(+o.discount)     ? +o.discount     : 0;
+  const prepaid   = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
+  const breakdownParts = [];
+  if (Number.isFinite(+o.total)) breakdownParts.push(`Cart ₹${o.total}`);
+  if (discount > 0)              breakdownParts.push(`− Discount ₹${discount}`);
+  if (prepaid  > 0)              breakdownParts.push(`− Prepaid ₹${prepaid}${o.paid_method ? ` (${String(o.paid_method).toUpperCase()})` : ''}`);
+  const hasBreakdown = (discount > 0 || prepaid > 0) && breakdownParts.length > 1;
+
+  const collectBanner = (mustCollect && !isBlank(collectAmt))
     ? `<div class="collect-banner">
          <i class="fas fa-money-bill-wave"></i>
-         <span>Collect <strong>₹${o.total}</strong> on delivery</span>
+         <div class="collect-banner-body">
+           <span>Collect <strong>₹${collectAmt}</strong> on delivery</span>
+           ${hasBreakdown ? `<small class="collect-banner-meta">${escapeHtml(breakdownParts.join(' '))}</small>` : ''}
+         </div>
        </div>`
     : '';
 
@@ -350,8 +366,11 @@ function renderCard(db, o) {
     // Double-confirm before marking as delivered — once flipped, the order
     // moves to history and cascades "Approved" back to the restaurant admin.
     if (next === 'delivered') {
-      const collectNote = o.payment_collected === false && !isBlank(o.total)
-        ? `<br><br><strong>Make sure you've collected ₹${o.total}</strong> from the customer.`
+      const breakdownNote = hasBreakdown
+        ? `<br><small class="text-muted">${escapeHtml(breakdownParts.join(' '))}</small>`
+        : '';
+      const collectNote = o.payment_collected === false && !isBlank(collectAmt)
+        ? `<br><br><strong>Make sure you've collected ₹${collectAmt}</strong> from the customer.${breakdownNote}`
         : '';
       const ok = await Swal.fire({
         icon: 'question',
@@ -457,6 +476,15 @@ function pickupArrival(o) {
 async function renderEarnings() {
   const root = $('#earningsView');
   if (!root) return;
+  // Show a loader if the orders snapshot hasn't returned its first batch yet.
+  // _allOrders is reset on snapshot; an empty array could legitimately mean
+  // "no orders" — distinguish via the listen subscription's existence.
+  if (!unsub || _allOrders.length === 0 && root.dataset.firstRender !== 'done') {
+    root.innerHTML = `<div class="bb-loader-block">Loading earnings…</div>`;
+    // Defer real render until next paint so the spinner has a chance to show.
+    if (!unsub) return;
+  }
+  root.dataset.firstRender = 'done';
   root.innerHTML = `
     <div class="section-header section-header--compact">
       <h3 class="m-0"><i class="fas fa-coins text-primary mr-1"></i> My Earnings</h3>
@@ -561,23 +589,73 @@ async function renderEarnings() {
     .sort((a, b) => (toDateSafe(b.delivered_at)?.getTime() || 0) - (toDateSafe(a.delivered_at)?.getTime() || 0));
   const pendingEl = $('#earnPending');
   if (!pending.length) {
-    pendingEl.innerHTML = `<div class="empty-state"><i class="fas fa-circle-check"></i><p>All your deliveries have been settled. 🎉</p></div>`;
+    pendingEl.innerHTML = `
+      <div class="empty-state empty-state--settled">
+        <i class="fas fa-circle-check"></i>
+        <p>All settled — nothing pending.</p>
+      </div>`;
   } else {
-    pendingEl.innerHTML = pending.map(o => {
-      const fee = feeForOrder(o, _feeRules);
+    // Group by delivery day so the list reads chronologically and the driver
+    // can quickly verify a specific day's payout.
+    const groups = new Map();
+    for (const o of pending) {
       const when = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
-      const whenTxt = when ? when.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-      const far = isFarPlace(o, _feeRules);
+      const key = when
+        ? when.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' })
+        : 'Unknown date';
+      if (!groups.has(key)) groups.set(key, { items: [], total: 0 });
+      const g = groups.get(key);
+      g.items.push({ o, when, fee: feeForOrder(o, _feeRules) });
+      g.total += feeForOrder(o, _feeRules);
+    }
+    const totalPending = pending.reduce((s, o) => s + feeForOrder(o, _feeRules), 0);
+
+    const groupBlocks = [...groups.entries()].map(([day, g]) => {
+      const rows = g.items.map(({ o, when, fee }) => {
+        const timeTxt = when ? when.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+        const far = isFarPlace(o, _feeRules);
+        const cust = o.customer?.name || o.customer?.phone || '';
+        const place = o.place || o.customer?.address || '';
+        const subParts = [];
+        if (cust)  subParts.push(escapeHtml(cust));
+        if (place) subParts.push(escapeHtml(place));
+        return `
+          <li class="pending-row">
+            <div class="pending-row-main">
+              <div class="pending-row-head">
+                <span class="pending-row-restaurant">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}</span>
+                <span class="pending-row-time"><i class="far fa-clock" aria-hidden="true"></i> ${escapeHtml(timeTxt)}</span>
+              </div>
+              ${subParts.length ? `<div class="pending-row-sub">${subParts.join(' · ')}</div>` : ''}
+            </div>
+            <div class="pending-row-fee">
+              <span class="pending-row-amount">${fmtINR(fee)}</span>
+              <span class="tag ${far ? 'tag-far' : 'tag-near'}">${far ? 'far' : 'near'}</span>
+            </div>
+          </li>
+        `;
+      }).join('');
       return `
-        <div class="entity-card payout-row payout-row--card is-pending">
-          <div class="payout-row-main">
-            <div class="payout-row-title">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}</div>
-            <div class="payout-row-meta">${escapeHtml(whenTxt)} · ${far ? '<span class="tag tag-far">far</span>' : '<span class="tag tag-near">near</span>'} · ${escapeHtml(o.place || o.customer?.address || '')}</div>
+        <div class="pending-group">
+          <div class="pending-group-head">
+            <span class="pending-group-day">${escapeHtml(day)}</span>
+            <span class="pending-group-total">${fmtINR(g.total)} · ${g.items.length} order${g.items.length === 1 ? '' : 's'}</span>
           </div>
-          <div class="payout-row-fee">${fmtINR(fee)}</div>
+          <ul class="pending-list">${rows}</ul>
         </div>
       `;
     }).join('');
+
+    pendingEl.innerHTML = `
+      <div class="pending-summary">
+        <div class="pending-summary-line">
+          <span class="pending-summary-label">Total pending</span>
+          <span class="pending-summary-amount">${fmtINR(totalPending)}</span>
+        </div>
+        <div class="pending-summary-meta">${pending.length} order${pending.length === 1 ? '' : 's'} across ${groups.size} day${groups.size === 1 ? '' : 's'}</div>
+      </div>
+      ${groupBlocks}
+    `;
   }
 }
 
@@ -604,8 +682,12 @@ function openPickupWhatsApp(o, restaurantLabel) {
   const eta = pickupArrival(o);
   const etaLine = `⏱️ Arriving by *${eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}* (~${pickupEtaMinutes(o)} min).`;
 
-  const collectLine = o.payment_collected === false && !isBlank(o.total)
-    ? `💵 Please keep *₹${o.total}* ready (cash on delivery).`
+  const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
+  const prepaidWa  = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
+  const collectLine = o.payment_collected === false && !isBlank(collectAmt)
+    ? (prepaidWa > 0
+        ? `💵 Please keep *₹${collectAmt}* ready in cash (you've already paid ₹${prepaidWa}${o.paid_method ? ' via ' + String(o.paid_method).toUpperCase() : ''}).`
+        : `💵 Please keep *₹${collectAmt}* ready (cash on delivery).`)
     : '';
 
   const message = [

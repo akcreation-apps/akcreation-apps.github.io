@@ -4,8 +4,9 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
-  bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfLastMonth,
+  bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfLastMonth, netRevenue,
 } from '../analytics.js';
+import { refreshStaffData } from './staff.js';
 
 const charts = new Map(); // canvas-id -> Chart instance (so we destroy on re-render)
 
@@ -77,7 +78,19 @@ export async function renderDashboard(root, db) {
 
   try { await whenChartReady(); } catch (e) { console.warn('[dashboard] Chart.js unavailable:', e.message); }
   await refresh(root, db);
-  document.getElementById('dashRefresh').addEventListener('click', () => refresh(root, db));
+  document.getElementById('dashRefresh').addEventListener('click', async () => {
+    const btn = document.getElementById('dashRefresh');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    try {
+      // Refresh both this Dashboard's data AND the Staff/Earnings cache so the
+      // admin doesn't have to re-open the Delivery tab to see updated payouts.
+      await Promise.all([refresh(root, db), refreshStaffData(db).catch(e => console.warn('[dashboard] staff refresh skipped:', e.message))]);
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+    }
+  });
   document.getElementById('dashFeeRules').addEventListener('click', () => openFeeRulesEditor(db, root));
 }
 
@@ -180,6 +193,10 @@ function kpiSkeleton() {
 async function refresh(root, db) {
   const kpisEl = root.querySelector('#dashKpis');
   kpisEl.classList.add('is-loading');
+  // Mark all chart cards as loading so the spinner overlay appears on each
+  // while data is in flight. Cleared at the end of refresh().
+  const chartBodies = root.querySelectorAll('.chart-card-body');
+  chartBodies.forEach(el => el.classList.add('is-loading'));
 
   // Fetch window: orders since the 1st of last month (matches admin Orders +
   // staff/partners views). Single-field range query → no composite index.
@@ -210,12 +227,14 @@ async function refresh(root, db) {
   renderPaymentMix(orders, p);
   renderPartnerPayouts(orders, staff, rules, p);
   renderFarNear(orders, rules, p);
+
+  chartBodies.forEach(el => el.classList.remove('is-loading'));
 }
 
 function renderKpis(el, orders, partners, staff, rules) {
   // `orders` is already scoped to "since the 1st of last month" (fetch window).
   const windowLabel = startOfLastMonth().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-  const revenue = orders.filter(isDelivered).reduce((s, o) => s + (+o.total || 0), 0);
+  const revenue = orders.filter(isDelivered).reduce((s, o) => s + netRevenue(o), 0);
   const activePartners = partners.filter(p => p.is_active !== false).length;
   const activeStaff    = staff.filter(s => s.is_active !== false).length;
   const pendingPayoutOrders = orders.filter(isPayoutPending);
@@ -283,7 +302,7 @@ function renderOrdersPerDay(orders, p) {
 function renderRevenuePerDay(orders, p) {
   const delivered = orders.filter(isDelivered);
   const days = bucketByDay(delivered, o => toDateSafe(o.delivered_at) || toDateSafe(o.created_at), 7);
-  const data = days.keys.map(k => days.buckets.get(k).reduce((s, o) => s + (+o.total || 0), 0));
+  const data = days.keys.map(k => days.buckets.get(k).reduce((s, o) => s + netRevenue(o), 0));
   mountChart('dashRevenuePerDay', {
     type: 'line',
     data: {

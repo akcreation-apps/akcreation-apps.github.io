@@ -216,6 +216,15 @@ export function fmtINR(n) {
   return '₹' + Math.round(n).toLocaleString('en-IN');
 }
 
+// Net revenue for an order = cart total minus any admin-applied discount.
+// Prepayments (paid_already) are assumed to have gone into the BankiBites
+// account so they're already counted in `total` — do not subtract them.
+export function netRevenue(o) {
+  const total    = Number.isFinite(+o?.total)    ? +o.total    : 0;
+  const discount = Number.isFinite(+o?.discount) ? +o.discount : 0;
+  return Math.max(0, total - discount);
+}
+
 export function isDelivered(o)  { return o?.status === 'delivered'; }
 export function isCancelled(o)  { return o?.status === 'cancelled'; }
 export function isPayoutPaid(o) { return o?.payout_paid === true; }

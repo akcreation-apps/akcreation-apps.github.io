@@ -455,6 +455,82 @@ details.entity-card[open] > .order-summary .order-chevron {
 
 /* ===== Payment toggle switch ===== */
 .payment-section { padding: 10px 12px; }
+
+/* Billing block — Cart total / Discount / Prepaid / To collect rows. Shown
+   only when the toggle is set to Collect-on-delivery; reads as an indented
+   sub-block under that choice. */
+.billing-block {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.billing-block[hidden] { display: none; }
+.billing-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.billing-label {
+  flex: 0 0 auto;
+  min-width: 90px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  margin: 0;
+}
+.billing-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-feature-settings: "tnum" 1;
+  color: var(--text-strong);
+}
+.billing-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.billing-input .form-control {
+  max-width: 120px;
+  font-feature-settings: "tnum" 1;
+  font-weight: 600;
+}
+.billing-input .billing-method {
+  max-width: 110px;
+  font-size: 0.78rem;
+}
+.billing-sign {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.95rem;
+  width: 12px;
+  text-align: center;
+}
+.billing-input .rupee {
+  font-weight: 700;
+  color: var(--muted);
+}
+.billing-row--total {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-soft);
+}
+.billing-row--total .billing-label { color: var(--brand); font-weight: 700; }
+.billing-row--total .form-control {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  font-weight: 700;
+}
+@media (max-width: 419px) {
+  .billing-input .form-control { max-width: 90px; }
+  .billing-input .billing-method { max-width: 92px; }
+  .billing-label { min-width: 80px; font-size: 0.74rem; }
+}
 .toggle {
   display: flex;
   align-items: center;
@@ -826,6 +902,70 @@ details.entity-card[open] > .order-summary .order-chevron {
 }
 .kpi-grid--compact { gap: 8px; margin: 8px 0 10px; }
 .kpi-grid.is-loading .kpi-value { opacity: 0.4; }
+
+/* Spin the refresh-button icon while the Dashboard is re-fetching. */
+@keyframes bb-spin { to { transform: rotate(360deg); } }
+#dashRefresh.is-loading i { animation: bb-spin 0.9s linear infinite; }
+#dashRefresh[disabled] { opacity: 0.7; cursor: progress; }
+
+/* ===== Loading indicators ===== */
+
+/* Inline spinner — sits next to text, used inside small placeholders. */
+.bb-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.bb-loader::before {
+  content: '';
+  width: 14px; height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: bb-spin 0.7s linear infinite;
+  flex: 0 0 14px;
+}
+
+/* Block-level loader — replaces the "Loading…" / "Listening for orders…"
+   text placeholders that used to render in list containers. Centred spinner
+   plus a short helper label. */
+.bb-loader-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 12px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.bb-loader-block::before {
+  content: '';
+  width: 26px; height: 26px;
+  border: 3px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: bb-spin 0.7s linear infinite;
+}
+
+/* Subtle overlay shimmer on chart cards while their data is refetching.
+   Keeps the previous chart visible at low opacity so the user has context. */
+.chart-card-body.is-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 28px; height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 3px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: bb-spin 0.7s linear infinite;
+  z-index: 2;
+}
+.chart-card-body.is-loading canvas { opacity: 0.25; transition: opacity 0.15s; }
 
 .kpi-card {
   background: var(--surface);

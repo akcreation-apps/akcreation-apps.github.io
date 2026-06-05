@@ -60,7 +60,7 @@ export async function renderPartners(root, db) {
     <div class="section-header section-header--compact section-header--end">
       <button id="addPartnerBtn" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i> Add partner</button>
     </div>
-    <div id="partnersList" class="card-list"><p class="text-muted">Loading…</p></div>
+    <div id="partnersList" class="card-list"><div class="bb-loader-block">Loading restaurants…</div></div>
   `;
   document.getElementById('addPartnerBtn').addEventListener('click', () => openEditor(db, null, root));
   try { await whenChartReady(); } catch (e) { console.warn('[partners] Chart.js unavailable:', e.message); }
@@ -123,7 +123,7 @@ async function renderPartnerCharts(db) {
 
 async function loadPartners(db, root) {
   const list = root.querySelector('#partnersList');
-  list.innerHTML = '<p class="text-muted">Loading…</p>';
+  list.innerHTML = '<div class="bb-loader-block">Loading restaurants…</div>';
   const q = query(collection(db, COL.PARTNERS), orderBy('sort_order'));
   const snap = await getDocs(q);
   if (snap.empty) {

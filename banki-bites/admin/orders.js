@@ -5,7 +5,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
-  wireStatsBlockResize, startOfLastMonth,
+  wireStatsBlockResize, startOfLastMonth, netRevenue,
 } from '../analytics.js';
 
 const orderCharts = new Map();
@@ -71,7 +71,7 @@ export async function renderOrders(root, db) {
         <option value="all">All</option>
       </select>
     </div>
-    <div id="ordersList" class="card-list grid-2"><p class="text-muted">Listening for orders…</p></div>
+    <div id="ordersList" class="card-list grid-2"><div class="bb-loader-block">Listening for orders…</div></div>
   `;
 
   try { await whenChartReady(); } catch (e) { console.warn('[orders] Chart.js unavailable:', e.message); }
@@ -134,7 +134,7 @@ function renderOrdersStats(all, filtered) {
     const t = toDateSafe(o.created_at);
     return t && t.getTime() >= startOfToday.getTime();
   });
-  const todaysRevenue = todays.filter(isDelivered).reduce((s, o) => s + (+o.total || 0), 0);
+  const todaysRevenue = todays.filter(isDelivered).reduce((s, o) => s + netRevenue(o), 0);
 
   // ETA delay (mins) for delivered orders today, when both delivered_at and eta exist.
   let delaySum = 0, delayN = 0;
@@ -333,16 +333,98 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
         <input type="checkbox" data-f="payment" ${paymentCollected ? 'checked' : ''}>
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span class="toggle-text">
-          <strong class="toggle-on">Payment collected</strong>
+          <strong class="toggle-on">Fully paid</strong>
           <strong class="toggle-off">Collect on delivery</strong>
         </span>
       </label>
+      <div class="billing-block" data-el="billingBlock" ${paymentCollected ? 'hidden' : ''}>
+        <div class="billing-row">
+          <span class="billing-label">Cart total</span>
+          <span class="billing-value" data-el="billingTotal">₹${Number.isFinite(+o.total) ? +o.total : '?'}</span>
+        </div>
+        <div class="billing-row">
+          <label class="billing-label" for="discount-${o.id}">Discount</label>
+          <div class="billing-input">
+            <span class="billing-sign">−</span>
+            <span class="rupee">₹</span>
+            <input class="form-control form-control-sm" id="discount-${o.id}" data-f="discount"
+                   type="number" min="0" step="1" inputmode="numeric"
+                   value="${Number.isFinite(+o.discount) ? +o.discount : ''}" placeholder="0">
+          </div>
+        </div>
+        <div class="billing-row">
+          <label class="billing-label" for="prepaid-${o.id}">Already paid</label>
+          <div class="billing-input">
+            <span class="billing-sign">−</span>
+            <span class="rupee">₹</span>
+            <input class="form-control form-control-sm" id="prepaid-${o.id}" data-f="paidAlready"
+                   type="number" min="0" step="1" inputmode="numeric"
+                   value="${Number.isFinite(+o.paid_already) ? +o.paid_already : ''}" placeholder="0">
+            <select class="form-control form-control-sm billing-method" data-f="paidMethod" aria-label="Prepayment method">
+              ${['', 'upi', 'online', 'cash'].map(m => `<option value="${m}" ${(o.paid_method || '') === m ? 'selected' : ''}>${m ? m.toUpperCase() : 'method'}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="billing-row billing-row--total">
+          <label class="billing-label" for="collect-${o.id}">To collect</label>
+          <div class="billing-input">
+            <span class="rupee">₹</span>
+            <input class="form-control form-control-sm" id="collect-${o.id}" data-f="collectAmount"
+                   type="number" min="0" step="1" inputmode="numeric"
+                   value="${(o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : (Number.isFinite(+o.total) ? +o.total : '')}">
+          </div>
+        </div>
+        <small class="text-muted">Auto-computed as cart total minus discount and any prepayment. Editable if the partner is collecting a different amount.</small>
+      </div>
     </div>
 
     <div class="ec-actions order-actions">
       <button class="btn btn-sm btn-primary" data-act="save"><i class="fas fa-save mr-1"></i> Save</button>
     </div>
   `;
+
+  // ── Billing block: live recompute "To collect" from total − discount − prepaid ──
+  // Admin can manually override the auto-computed value; once they do, the
+  // auto-recompute stops touching that field for this session (sticky override).
+  const paymentToggle = card.querySelector('[data-f="payment"]');
+  const billingBox    = card.querySelector('[data-el="billingBlock"]');
+  const discountInput = card.querySelector('[data-f="discount"]');
+  const prepaidInput  = card.querySelector('[data-f="paidAlready"]');
+  const methodSelect  = card.querySelector('[data-f="paidMethod"]');
+  const collectInput  = card.querySelector('[data-f="collectAmount"]');
+
+  const orderTotal = Number.isFinite(+o.total) ? +o.total : 0;
+  // Treat the initial collect_amount as "user override" only if it doesn't
+  // match the computed value — otherwise let the live recompute drive it.
+  function computeCollect() {
+    const d = parseFloat(discountInput.value) || 0;
+    const p = parseFloat(prepaidInput.value)  || 0;
+    return Math.max(0, orderTotal - d - p);
+  }
+  let collectOverridden = (() => {
+    // Strict null check: a stored `collect_amount: null` (from a prior "Fully paid"
+     // save) must NOT be treated as the admin having overridden the value — it's
+     // an absence of override, so live recompute should drive the field.
+    if (o.collect_amount == null || !Number.isFinite(+o.collect_amount)) return false;
+    return Math.abs((+o.collect_amount) - computeCollect()) > 0.001;
+  })();
+  function recomputeCollect() {
+    if (collectOverridden) return;
+    collectInput.value = computeCollect();
+  }
+  discountInput.addEventListener('input', recomputeCollect);
+  prepaidInput .addEventListener('input', recomputeCollect);
+  collectInput .addEventListener('input', () => { collectOverridden = true; });
+
+  paymentToggle.addEventListener('change', () => {
+    const collected = paymentToggle.checked;
+    billingBox.hidden = collected;
+    if (!collected) {
+      // Re-entering collect-on-delivery: re-derive from current discount/prepaid
+      // unless the admin has set their own override during this edit session.
+      if (!collectOverridden) collectInput.value = computeCollect();
+    }
+  });
 
   // Auto-normalise phone on blur so the visible value matches what's saved.
   const phoneInput = card.querySelector('[data-f="phone"]');
@@ -499,6 +581,41 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
       status: newStatus,
       payment_collected: paymentCollectedNow,
     };
+
+    // Persist the billing breakdown only when the toggle says collect-on-delivery.
+    // When the admin flips to "fully paid", clear everything so future reads
+    // fall back to the order total.
+    if (!paymentCollectedNow) {
+      const discount = parseFloat(discountInput.value) || 0;
+      const prepaid  = parseFloat(prepaidInput.value)  || 0;
+      const method   = methodSelect.value || null;
+      const collect  = parseFloat(collectInput.value);
+      if (!Number.isFinite(collect) || collect < 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Collect amount required',
+          text: 'Enter the amount the delivery partner should collect (₹0 if fully prepaid), or flip the toggle to "Fully paid".',
+        });
+        return;
+      }
+      if (discount < 0 || prepaid < 0) {
+        Swal.fire({ icon: 'warning', title: 'Negative values not allowed', text: 'Discount and prepayment must be ₹0 or more.' });
+        return;
+      }
+      if (prepaid > 0 && !method) {
+        Swal.fire({ icon: 'warning', title: 'Pick a payment method', text: 'Select how the prepayment was made (UPI / Online / Cash).' });
+        return;
+      }
+      patch.discount      = discount;
+      patch.paid_already  = prepaid;
+      patch.paid_method   = prepaid > 0 ? method : null;
+      patch.collect_amount = collect;
+    } else {
+      patch.discount       = null;
+      patch.paid_already   = null;
+      patch.paid_method    = null;
+      patch.collect_amount = null;
+    }
     if (staffId && !o.assigned_at) patch.assigned_at = Timestamp.now();
 
     // ETA rules:
