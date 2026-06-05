@@ -38,23 +38,42 @@ function renderCard(db, root, id, p) {
   el.className = 'entity-card';
   el.innerHTML = `
     <div class="ec-row">
-      <div>
+      <div style="min-width:0;flex:1">
         <div class="ec-title">${escapeHtml(p.name)} ${p.is_active ? '' : '<span class="status-pill status-cancelled">Hidden</span>'}</div>
         <div class="ec-meta">${(p.services || []).join(' · ')} · ★ ${p.rating} · ${p.opening_hour}–${p.closing_hour}</div>
         <div class="ec-meta">${escapeHtml(p.address || '')}</div>
       </div>
-      <div class="ec-actions">
-        <button class="btn btn-outline-secondary btn-sm" data-act="edit"><i class="fas fa-pen"></i></button>
-        <button class="btn btn-outline-danger btn-sm" data-act="del"><i class="fas fa-trash"></i></button>
-      </div>
+    </div>
+    <div class="ec-actions" style="justify-content:flex-end;flex-wrap:wrap;gap:6px">
+      <button class="btn btn-sm btn-outline-${p.is_active ? 'warning' : 'success'}" data-act="toggle">
+        <i class="fas fa-${p.is_active ? 'eye-slash' : 'eye'} mr-1"></i> ${p.is_active ? 'Hide' : 'Show'}
+      </button>
+      <button class="btn btn-sm btn-outline-secondary" data-act="edit">
+        <i class="fas fa-pen mr-1"></i> Edit
+      </button>
+      <button class="btn btn-sm btn-outline-danger" data-act="del">
+        <i class="fas fa-trash mr-1"></i> Delete
+      </button>
     </div>
   `;
   el.querySelector('[data-act="edit"]').addEventListener('click', () => openEditor(db, { id, ...p }, root));
+  el.querySelector('[data-act="toggle"]').addEventListener('click', async () => {
+    try {
+      await setDoc(doc(db, COL.PARTNERS, id), { is_active: !p.is_active }, { merge: true });
+      loadPartners(db, root);
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Update failed', text: err.message });
+    }
+  });
   el.querySelector('[data-act="del"]').addEventListener('click', async () => {
     const ok = await Swal.fire({ title: `Delete ${p.name}?`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#dc3545' });
     if (!ok.isConfirmed) return;
-    await deleteDoc(doc(db, COL.PARTNERS, id));
-    loadPartners(db, root);
+    try {
+      await deleteDoc(doc(db, COL.PARTNERS, id));
+      loadPartners(db, root);
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Delete failed', text: err.message });
+    }
   });
   return el;
 }
