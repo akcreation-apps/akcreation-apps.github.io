@@ -1,16 +1,227 @@
+/* ===========================================================================
+   BankiBites — Delivery overrides
+   Inherits theme variables from ../admin/styles.css
+   =========================================================================== */
+
+/* Delivery has no tabbar, so the section-header (filter dropdown) would
+   otherwise sit flush against the topbar — give it some breathing room. */
+#appShell > .content { padding-top: 12px; }
+.section-header {
+  margin-bottom: 10px;
+  align-items: center;
+}
+.section-header h3 {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+@media (min-width: 576px) {
+  #appShell > .content { padding-top: 16px; }
+}
+@media (min-width: 768px) {
+  #appShell > .content { padding-top: 20px; }
+}
+
 .delivery-actions {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
 }
-.delivery-actions .btn { font-weight: 600; padding: 10px; }
+.delivery-actions .btn {
+  font-weight: 600;
+  padding: 12px 8px;
+  font-size: 0.9rem;
+  min-height: 48px;
+}
+.delivery-actions .btn:only-child { grid-column: 1 / -1; }
+/* Safety gap so the items list can never sit directly above the Call button. */
+.delivery-actions-spacer { height: 6px; }
+
+/* ===== Delivery order card (collapsible <details>) ===== */
+#ordersList.card-list {
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+}
+details.delivery-order { padding: 0; gap: 0; overflow: hidden; }
+details.delivery-order > .delivery-summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  padding: 12px 14px;
+}
+details.delivery-order > .delivery-summary::-webkit-details-marker { display: none; }
+details.delivery-order > .delivery-summary::marker { display: none; }
+details.delivery-order .delivery-summary .ec-row { align-items: center; gap: 8px; }
+.delivery-summary-main { min-width: 0; flex: 1; }
+.delivery-summary-main .ec-title {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.delivery-chevron {
+  color: var(--muted);
+  font-size: 0.85rem;
+  transition: transform .2s ease;
+  flex-shrink: 0;
+}
+details.delivery-order[open] > .delivery-summary .delivery-chevron {
+  transform: rotate(180deg);
+}
+.delivery-body {
+  padding: 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border-soft);
+  padding-top: 10px;
+}
+
+/* Items shown inline (not collapsible) inside the open card */
+.items-block {
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.items-block-head {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.items-block .order-items {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 0.88rem;
+  color: var(--text);
+  max-height: none;
+}
+
 .addr-block {
-  background: #f9fafb; border-radius: 8px; padding: 10px 12px; margin-top: 8px;
-  font-size: 0.92rem; line-height: 1.4;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 6px;
+  font-size: 0.88rem;
+  line-height: 1.4;
 }
-.addr-block .name { font-weight: 600; color: var(--text); }
+.addr-block .name { font-weight: 600; color: var(--text-strong); }
 .addr-block .addr { color: var(--muted); white-space: pre-wrap; }
+
 .call-btn { background: var(--success); color: #fff; border: 0; }
 .call-btn:hover { background: #15803d; color: #fff; }
 .done-btn { background: var(--brand); color: #fff; border: 0; }
 .done-btn:hover { background: var(--brand-dark); color: #fff; }
 
 .tab-panel { display: block; }
+
+/* ── Payment-collection alert ────────────────────────────────────────── */
+.entity-card.must-collect {
+  border: 2px solid var(--warn);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.18);
+}
+.collect-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border-left: 4px solid var(--warn);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.collect-banner i { font-size: 1.05rem; }
+.collect-banner strong { font-size: 1.05rem; color: #78350f; }
+
+@media (prefers-color-scheme: dark) {
+  .collect-banner {
+    background: linear-gradient(90deg, #3a2b07 0%, #4a3408 100%);
+    color: #fcd34d;
+  }
+  .collect-banner strong { color: #fde68a; }
+}
+
+/* ── ETA banner ──────────────────────────────────────────────────────── */
+.eta-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-left: 4px solid #3b82f6;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-weight: 500;
+  font-size: 0.88rem;
+}
+.eta-banner strong { color: #1e3a8a; }
+.eta-banner.eta-soon {
+  background: #fff7ed;
+  color: #9a3412;
+  border-left-color: #fb923c;
+}
+.eta-banner.eta-soon strong { color: #7c2d12; }
+.eta-banner.eta-late {
+  background: #fef2f2;
+  color: #991b1b;
+  border-left-color: #dc2626;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.eta-banner.eta-late strong { color: #7f1d1d; }
+
+@media (prefers-color-scheme: dark) {
+  .eta-banner          { background: #0f2540; color: #bfdbfe; }
+  .eta-banner strong   { color: #dbeafe; }
+  .eta-banner.eta-soon { background: #3a1e07; color: #fdba74; }
+  .eta-banner.eta-soon strong { color: #fed7aa; }
+  .eta-banner.eta-late { background: #3a1414; color: #fca5a5; }
+  .eta-banner.eta-late strong { color: #fecaca; }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
+}
+
+/* ── Compact history card (delivered / cancelled) ────────────────────── */
+.entity-card.history-card {
+  padding: 8px 10px;
+  gap: 0;
+  opacity: 0.9;
+}
+.history-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.history-main { min-width: 0; flex: 1; }
+.history-title {
+  font-size: 0.9rem; font-weight: 600;
+  color: var(--text-strong);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.history-meta {
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.history-detail {
+  font-size: 0.82rem;
+  background: var(--surface-soft);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-top: 6px;
+}
+.history-detail strong { color: var(--text-strong); }
+.history-card details summary { padding-top: 4px; }
+
+/* ── Responsive scale-ups ────────────────────────────────────────────── */
+@media (min-width: 576px) {
+  .delivery-actions { gap: 8px; }
+  .delivery-actions .btn { font-size: 0.92rem; padding: 10px; }
+  .addr-block { font-size: 0.92rem; padding: 10px 12px; }
+}
+
+@media (min-width: 992px) {
+  /* Driver focus is one card at a time — keep delivery list narrow & centred */
+  #ordersList.card-list { max-width: 720px; margin: 0 auto; }
+}

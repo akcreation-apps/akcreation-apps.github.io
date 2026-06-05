@@ -406,6 +406,9 @@
       width: 52px; height: 52px; border-radius: 12px;
       object-fit: cover; border: 1px solid var(--border); flex-shrink: 0;
     }
+    .rp-logo--placeholder {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    }
     .rp-info { flex: 1; min-width: 0; }
     .rp-name { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
     .rp-tags { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -672,52 +675,102 @@
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
 
+    // Treat empty strings, null/undefined, NaN and the literal word "pending"
+    // (case-insensitive) as "blank" — those fields are skipped in the UI.
+    function isBlank(v) {
+      if (v == null) return true;
+      if (typeof v === 'number') return !Number.isFinite(v);
+      const s = String(v).trim();
+      return s === '' || s.toLowerCase() === 'pending';
+    }
+
+    function hoursOf(p) {
+      const oh = parseInt(p.opening_hour, 10);
+      const ch = parseInt(p.closing_hour, 10);
+      return Number.isFinite(oh) && Number.isFinite(ch) ? { oh, ch } : null;
+    }
+
     function isOpen(p) {
+      const hrs = hoursOf(p);
+      if (!hrs) return false;
       const h = new Date().getHours();
-      return h >= parseInt(p.opening_hour, 10) && h < parseInt(p.closing_hour, 10);
+      return h >= hrs.oh && h < hrs.ch;
     }
 
     function formatHours(p) {
+      const hrs = hoursOf(p);
+      if (!hrs) return '';
       const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
-      return `${fmt(parseInt(p.opening_hour, 10))} – ${fmt(parseInt(p.closing_hour, 10))}`;
+      return `${fmt(hrs.oh)} – ${fmt(hrs.ch)}`;
     }
 
     function buildInfoSection(data) {
       const seen = new Set();
-      data.partners.filter(p => p.is_active).forEach(p => p.services.forEach(s => seen.add(s)));
+      data.partners.filter(p => p.is_active).forEach(p => {
+        (p.services || []).forEach(s => { if (!isBlank(s)) seen.add(s); });
+      });
       cuisineChips.innerHTML = [...seen].map(s => {
         const icon = SERVICE_ICONS[s] || 'fa-utensils';
         return `<li class="cuisine-chip"><i class="fas ${icon}" aria-hidden="true"></i> ${s}</li>`;
       }).join('');
 
-      areaChips.innerHTML = data.locations.map(loc =>
+      areaChips.innerHTML = (data.locations || []).filter(loc => !isBlank(loc)).map(loc =>
         `<li class="area-chip">${loc}</li>`
       ).join('');
     }
 
     function buildRestPicker(partners) {
-      const visible = partners.filter(p => p.is_active);
+      // Hide partners missing the bare minimum (name + url) — they're still
+      // being onboarded and can't be ordered from yet.
+      const visible = partners.filter(p =>
+        p.is_active && !isBlank(p.name) && !isBlank(p.url)
+      );
       if (!visible.length) {
         rpList.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0">No restaurants are registered yet. Check back soon!</p>';
         return;
       }
       const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
       rpList.innerHTML = visible.map(p => {
-        const open = isOpen(p);
-        const opensAt = fmt(parseInt(p.opening_hour, 10));
+        const hrs = hoursOf(p);
+        const hasHours = !!hrs;
+        const open = hasHours && isOpen(p);
+        const opensAt = hasHours ? fmt(hrs.oh) : '';
+
+        const services = (p.services || []).filter(s => !isBlank(s));
+        const tagsHtml = services.length
+          ? `<div class="rp-tags">${services.join(' · ')}</div>`
+          : '';
+        const ratingHtml = !isBlank(p.rating)
+          ? `<span class="rp-rating"><i class="fas fa-star" aria-hidden="true"></i> ${p.rating}</span>`
+          : '';
+        const openHtml = hasHours
+          ? `<span class="rp-open ${open ? 'open' : 'closed'}">${open ? 'Open' : `Closed · Opens ${opensAt}`}</span>`
+          : '';
+        const metaHtml = (ratingHtml || openHtml)
+          ? `<div class="rp-meta">${ratingHtml}${openHtml}</div>`
+          : '';
+
+        const logoHtml = !isBlank(p.logo)
+          ? `<img class="rp-logo" src="${p.logo}" alt="${p.name} logo" loading="lazy">`
+          : `<div class="rp-logo rp-logo--placeholder" aria-hidden="true"></div>`;
+
+        // If we have no hours info, treat the restaurant as orderable rather
+        // than locking the button — better UX than a permanent "Closed".
+        const clickable = !hasHours || open;
+        const ariaLabel = clickable
+          ? `Order from ${p.name}`
+          : `${p.name} is closed — opens at ${opensAt}`;
+
         return `
-        <button class="rp-item${open ? '' : ' rp-closed'}"
-                data-url="${open ? p.url : ''}"
-                aria-label="${open ? `Order from ${p.name}` : `${p.name} is closed — opens at ${opensAt}`}"
-                ${open ? '' : 'aria-disabled="true"'}>
-          <img class="rp-logo" src="${p.logo}" alt="${p.name} logo" loading="lazy">
+        <button class="rp-item${clickable ? '' : ' rp-closed'}"
+                data-url="${clickable ? p.url : ''}"
+                aria-label="${ariaLabel}"
+                ${clickable ? '' : 'aria-disabled="true"'}>
+          ${logoHtml}
           <div class="rp-info">
             <div class="rp-name">${p.name}</div>
-            <div class="rp-tags">${p.services.join(' · ')}</div>
-            <div class="rp-meta">
-              <span class="rp-rating"><i class="fas fa-star" aria-hidden="true"></i> ${p.rating}</span>
-              <span class="rp-open ${open ? 'open' : 'closed'}">${open ? 'Open' : `Closed · Opens ${opensAt}`}</span>
-            </div>
+            ${tagsHtml}
+            ${metaHtml}
           </div>
           <i class="fas fa-chevron-right rp-arrow" aria-hidden="true"></i>
         </button>

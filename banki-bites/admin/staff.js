@@ -11,13 +11,11 @@ import { Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-fi
 
 export async function renderStaff(root, db) {
   root.innerHTML = `
-    <div class="section-header">
-      <h3><i class="fas fa-motorcycle text-success mr-1"></i> Delivery Staff</h3>
-      <button id="addStaffBtn" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i> Add</button>
+    <div class="section-header section-header--compact section-header--end">
+      <button id="addStaffBtn" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i> Add staff</button>
     </div>
-    <div class="text-muted mb-2" style="font-size:0.82rem">
-      <i class="fas fa-info-circle"></i> Create the Auth account in Firebase Console first
-      (Authentication → Users → Add user, email + password). Then paste the resulting UID here.
+    <div class="text-muted mb-2" style="font-size:0.78rem">
+      <i class="fas fa-info-circle"></i> Create the Auth account in Firebase Console first, then paste the UID here.
     </div>
     <div id="staffList" class="card-list"><p class="text-muted">Loading…</p></div>
   `;
@@ -39,19 +37,31 @@ async function loadStaff(db, root) {
 
 function renderCard(db, root, uid, s) {
   const el = document.createElement('div');
-  el.className = 'entity-card';
+  el.className = 'entity-card staff-card';
+  const phoneClean = String(s.phone || '').replace(/[\s\-()+]/g, '');
+  const callable = /^\d{10,12}$/.test(phoneClean);
+  const telHref = callable ? `tel:${phoneClean}` : '';
+  const callBtn = callable
+    ? `<a class="icon-btn icon-btn--success" href="${telHref}" data-act="call" title="Call ${escapeAttr(s.name)}" aria-label="Call ${escapeAttr(s.name)}"><i class="fas fa-phone"></i></a>`
+    : `<button class="icon-btn icon-btn--secondary" data-act="call" disabled title="No phone on file"><i class="fas fa-phone-slash"></i></button>`;
+
   el.innerHTML = `
     <div class="ec-row">
-      <div>
+      <div style="min-width:0;flex:1">
         <div class="ec-title">${escapeHtml(s.name)} ${s.is_active === false ? '<span class="status-pill status-cancelled">Inactive</span>' : ''}</div>
         <div class="ec-meta"><i class="fas fa-envelope"></i> ${escapeHtml(s.email||'')}</div>
-        <div class="ec-meta"><i class="fas fa-phone"></i> ${escapeHtml(s.phone||'')}</div>
+        <div class="ec-meta"><i class="fas fa-phone"></i> ${escapeHtml(s.phone||'—')}</div>
         <div class="ec-meta" style="font-family:monospace;font-size:0.7rem">${uid}</div>
       </div>
-      <div class="ec-actions">
-        <button class="btn btn-outline-secondary btn-sm" data-act="edit"><i class="fas fa-pen"></i></button>
-        <button class="btn btn-outline-danger btn-sm" data-act="del"><i class="fas fa-trash"></i></button>
-      </div>
+      <button class="icon-btn icon-btn--secondary" data-act="edit" title="Edit ${escapeAttr(s.name)}" aria-label="Edit ${escapeAttr(s.name)}">
+        <i class="fas fa-pen"></i>
+      </button>
+    </div>
+    <div class="ec-actions ec-actions--bottom">
+      ${callBtn}
+      <button class="icon-btn icon-btn--danger" data-act="del" title="Remove ${escapeAttr(s.name)}" aria-label="Remove ${escapeAttr(s.name)}">
+        <i class="fas fa-trash"></i>
+      </button>
     </div>
   `;
   el.querySelector('[data-act="edit"]').addEventListener('click', () => openEditor(db, { uid, ...s }, root));
