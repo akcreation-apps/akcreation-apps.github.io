@@ -856,40 +856,57 @@ function openPickupWhatsApp(o, restaurantLabel) {
     return;
   }
 
+  // Pre-encoded UTF-8 byte sequences for emojis (mirrors the working
+  // anvisha-travels implementation). Building the URL this way avoids any
+  // platform-specific issues with encodeURIComponent dropping or mis-encoding
+  // multi-codepoint emoji sequences (especially symbol + VS-16 pairs like ⏱️)
+  // that previously caused emojis to appear as blank boxes in WhatsApp.
+  const E = {
+    wave:      '%F0%9F%91%8B',                 // 👋
+    scooter:   '%F0%9F%9B%B5',                 // 🛵
+    stopwatch: '%E2%8F%B1%EF%B8%8F',           // ⏱️  (U+23F1 + U+FE0F)
+    cash:      '%F0%9F%92%B5',                 // 💵
+    pray:      '%F0%9F%99%8F',                 // 🙏
+  };
+  const NL = '%0A'; // newline
+
   const displayName = prettyCustomerName(c.name);
-  // Note: U+23F1 (⏱) is a text-default codepoint — it needs the U+FE0F
-  // variation selector to render as an emoji on Android/WhatsApp; otherwise
-  // it shows as a plain mono glyph or an empty box. Same precaution applied
-  // to all the symbol-like emojis below.
-  const greeting = !isBlank(displayName) ? `Hi ${displayName}! 👋` : 'Hi there! 👋';
+  const greeting = !isBlank(displayName)
+    ? `Hi ${encodeURIComponent(displayName)}! ${E.wave}`
+    : `Hi there! ${E.wave}`;
+
   const fromLine = !isBlank(restaurantLabel)
-    ? `Your *BankiBites* 🛵 order from *${restaurantLabel}* is on the way.`
-    : `Your *BankiBites* 🛵 order is on the way.`;
+    ? `Your *BankiBites* ${E.scooter} order from *${encodeURIComponent(restaurantLabel)}* is on the way.`
+    : `Your *BankiBites* ${E.scooter} order is on the way.`;
 
   const eta = pickupArrival(o);
-  const etaLine = `⏱️ Arriving by *${eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}* (~${pickupEtaMinutes(o)} min).`;
+  const etaTime = encodeURIComponent(eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
+  const etaLine = `${E.stopwatch} Arriving by *${etaTime}* (~${pickupEtaMinutes(o)} min).`;
 
   const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
   const prepaidWa  = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
-  const collectLine = o.payment_collected === false && !isBlank(collectAmt)
-    ? (prepaidWa > 0
-        ? `💵 Please keep *₹${collectAmt}* ready in cash (you've already paid ₹${prepaidWa}${o.paid_method ? ' via ' + String(o.paid_method).toUpperCase() : ''}).`
-        : `💵 Please keep *₹${collectAmt}* ready (cash on delivery).`)
-    : '';
+  let collectLine = '';
+  if (o.payment_collected === false && !isBlank(collectAmt)) {
+    // Note: '₹' (U+20B9) safely encodes via encodeURIComponent.
+    const rs = (n) => `*${encodeURIComponent('₹' + n)}*`;
+    if (prepaidWa > 0) {
+      const via = o.paid_method ? ' via ' + encodeURIComponent(String(o.paid_method).toUpperCase()) : '';
+      collectLine = `${E.cash} Please keep ${rs(collectAmt)} ready in cash (you've already paid ${encodeURIComponent('₹' + prepaidWa)}${via}).`;
+    } else {
+      collectLine = `${E.cash} Please keep ${rs(collectAmt)} ready (cash on delivery).`;
+    }
+  }
 
-  const message = [
-    greeting,
-    fromLine,
-    etaLine,
-    collectLine,
-    `Thanks for ordering with us! 🙏`,
-  ].filter(Boolean).join('\n');
+  const thankYou = `Thanks for ordering with us! ${E.pray}`;
 
-  // Same flow as the customer-side cart checkout (TCD/cart.js): use wa.me
-  // and navigate the current tab. WhatsApp's deep-link handler reliably
-  // intercepts wa.me on mobile and the host browser does the right thing
-  // on desktop too. Matching this app to the existing order-placement flow
-  // keeps the delivery partner's experience consistent with the customer's.
-  const url = `https://wa.me/${wa}?text=${encodeURIComponent(message)}`;
+  // Assemble the message with URL-encoded newlines (%0A). Lines are already
+  // emoji-encoded; only the literal text portions need encodeURIComponent —
+  // but since we authored those parts in plain ASCII (no special chars beyond
+  // what's already encoded inline), they pass through safely as-is.
+  const text = [greeting, fromLine, etaLine, collectLine, thankYou]
+    .filter(Boolean)
+    .join(NL);
+
+  const url = `https://wa.me/${wa}?text=${text}`;
   window.location.href = url;
 }
