@@ -452,6 +452,14 @@
     }
     footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
     footer a:hover { color: var(--primary); }
+    .footer-app {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; flex-wrap: wrap;
+      padding-bottom: 14px;
+      color: rgba(255,255,255,0.6); font-size: 0.74rem; font-weight: 500;
+    }
+    .footer-app .fa-badge { display: inline-flex; padding: 2px; border-radius: 4px; }
+    .footer-app .fa-badge img { display: block; height: 44px; width: auto; }
 
     /* ── Closed card — suppress hover lift & disable navigation ── */
     .rest-card-closed { opacity: 0.55; pointer-events: none; }
@@ -530,6 +538,18 @@
 
   <!-- Footer -->
   <footer>
+    <div class="footer-app">
+      <span>Also available on Android &nbsp;—&nbsp;</span>
+      <a class="fa-badge"
+         href="https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki"
+         target="_blank" rel="noopener"
+         data-umami-event="bankibites-footer-playstore"
+         aria-label="Get BankiBites on Google Play">
+        <img alt="Get it on Google Play"
+             src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+             height="44" loading="lazy">
+      </a>
+    </div>
     <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AkCreation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
   </footer>
 
