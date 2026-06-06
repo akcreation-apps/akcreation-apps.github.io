@@ -189,9 +189,12 @@ function renderCard(db, root, id, p) {
     });
     if (!ok.isConfirmed) return;
     try {
+      window.bbBusy('Updating…');
       await setDoc(doc(db, COL.PARTNERS, id), { is_active: !p.is_active }, { merge: true });
+      window.bbDone();
       loadPartners(db, root);
     } catch (err) {
+      window.bbDone();
       Swal.fire({ icon: 'error', title: 'Update failed', text: err.message });
     }
   });
@@ -206,10 +209,13 @@ function renderCard(db, root, id, p) {
     });
     if (!ok.isConfirmed) return;
     try {
+      window.bbBusy('Deleting…');
       await deleteDoc(doc(db, COL.PARTNERS, id));
       await resequencePartners(db);
+      window.bbDone();
       loadPartners(db, root);
     } catch (err) {
+      window.bbDone();
       Swal.fire({ icon: 'error', title: 'Delete failed', text: err.message });
     }
   });
@@ -237,7 +243,13 @@ async function openEditor(db, existing, root) {
 
   // Pre-load the current partner list so we can clamp sort position and
   // auto-reorder siblings on save.
-  const allSnap = await getDocs(query(collection(db, COL.PARTNERS), orderBy('sort_order')));
+  window.bbBusy('Loading…');
+  let allSnap;
+  try {
+    allSnap = await getDocs(query(collection(db, COL.PARTNERS), orderBy('sort_order')));
+  } finally {
+    window.bbDone();
+  }
   const existingList = [];
   allSnap.forEach(d => existingList.push({ id: d.id, ...d.data() }));
   const isNew = !existing;
@@ -352,8 +364,11 @@ async function openEditor(db, existing, root) {
     }
   });
   try {
+    window.bbBusy('Saving restaurant…');
     await batch.commit();
+    window.bbDone();
   } catch (err) {
+    window.bbDone();
     Swal.fire({ icon: 'error', title: 'Save failed', text: err.message });
     return;
   }

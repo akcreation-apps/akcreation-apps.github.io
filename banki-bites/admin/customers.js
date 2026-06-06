@@ -50,6 +50,7 @@ export function searchCustomers(map, term) {
 export async function upsertCustomer(db, payload) {
   const phone = normalisePhone(payload.phone);
   if (!isValidPhone(phone)) throw new Error('Valid 10-digit phone is required');
+  window.bbBusy('Saving customer…');
   const ref = doc(db, COL.CUSTOMERS, phone);
   const existing = await getDoc(ref);
   const data = {
@@ -62,7 +63,11 @@ export async function upsertCustomer(db, payload) {
     data.gps = { lat: payload.gps.lat, lng: payload.gps.lng };
   }
   if (!existing.exists()) data.created_at = Timestamp.now();
-  await setDoc(ref, data, { merge: true });
+  try {
+    await setDoc(ref, data, { merge: true });
+  } finally {
+    window.bbDone();
+  }
   return { phone, ...data };
 }
 

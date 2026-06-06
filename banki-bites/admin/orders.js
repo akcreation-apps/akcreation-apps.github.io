@@ -675,6 +675,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     }
 
     try {
+      window.bbBusy('Saving order…');
       // Attach GPS to the order itself (denormalised) so the delivery partner
       // view can show a Maps link without a second Firestore read.
       if (selectedGps) patch.customer.gps = selectedGps;
@@ -728,8 +729,10 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
           }
         }
       }
+      window.bbDone();
       Swal.fire({ icon: 'success', title: 'Saved', timer: 1200, showConfirmButton: false });
     } catch (e) {
+      window.bbDone();
       Swal.fire({ icon: 'error', title: 'Save failed', text: e.message });
     }
   });

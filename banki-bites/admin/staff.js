@@ -259,7 +259,12 @@ function renderCard(db, root, uid, s) {
   el.querySelector('[data-act="del"]').addEventListener('click', async () => {
     const ok = await Swal.fire({ title: `Remove ${s.name}?`, text: 'This only removes the directory entry; delete the Auth user separately in Firebase Console.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Remove', confirmButtonColor: '#dc3545' });
     if (!ok.isConfirmed) return;
-    await deleteDoc(doc(db, COL.STAFF, uid));
+    try {
+      window.bbBusy('Removing…');
+      await deleteDoc(doc(db, COL.STAFF, uid));
+    } finally {
+      window.bbDone();
+    }
     loadStaff(db, root);
   });
 
@@ -311,6 +316,7 @@ function renderCard(db, root, uid, s) {
     });
     if (!ok.isConfirmed) return;
     try {
+      window.bbBusy('Saving payouts…');
       const batch = writeBatch(db);
       const now = Timestamp.now();
       const ids = checked.map(c => c.dataset.order);
@@ -318,6 +324,7 @@ function renderCard(db, root, uid, s) {
         batch.update(doc(db, COL.ORDERS, id), { payout_paid: true, payout_paid_at: now });
       }
       await batch.commit();
+      window.bbDone();
       // Reflect in cache and re-render
       for (const o of _staffOrdersCache) {
         if (ids.includes(o.id)) { o.payout_paid = true; o.payout_paid_at = now; }
@@ -326,6 +333,7 @@ function renderCard(db, root, uid, s) {
       loadStaff(db, root);
       renderStaffCharts();
     } catch (err) {
+      window.bbDone();
       Swal.fire({ icon: 'error', title: 'Update failed', text: err.message });
     }
   });
@@ -374,7 +382,12 @@ async function openEditor(db, existing, root) {
   if (!res.isConfirmed) return;
   const { uid, ...payload } = res.value;
   if (!existing) payload.created_at = Timestamp.now();
-  await setDoc(doc(db, COL.STAFF, uid), payload, { merge: true });
+  try {
+    window.bbBusy('Saving…');
+    await setDoc(doc(db, COL.STAFF, uid), payload, { merge: true });
+  } finally {
+    window.bbDone();
+  }
   loadStaff(db, root);
 }
 

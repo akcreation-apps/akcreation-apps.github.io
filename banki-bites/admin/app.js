@@ -15,6 +15,28 @@ import { renderDashboard } from './dashboard.js';
 
 const $ = sel => document.querySelector(sel);
 
+// Global busy overlay — used by every Firestore write/action-read in admin
+// so users always see a spinner during DB I/O instead of a frozen UI.
+// Pages share SweetAlert2 (loaded in admin/index.html), so we piggy-back on
+// its dialog. Window-attached so submodules (orders.js, staff.js, etc.) can
+// call it without an explicit import.
+window.bbBusy = function (message = 'Working…') {
+  if (!window.Swal) return;
+  Swal.fire({
+    title: message,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => Swal.showLoading(),
+  });
+};
+window.bbDone = function () {
+  if (!window.Swal) return;
+  // Only close if the busy dialog is the currently open one — avoids
+  // accidentally dismissing a confirm/error dialog the caller showed next.
+  if (Swal.isLoading && Swal.isLoading()) Swal.close();
+};
+
 const authGate = $('#authGate');
 const appShell = $('#appShell');
 const authError = $('#authError');

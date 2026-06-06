@@ -15,6 +15,25 @@ import {
 } from '../analytics.js';
 
 const $ = sel => document.querySelector(sel);
+
+// Global busy overlay — shown during every Firestore write/action-read so the
+// agent gets immediate feedback instead of a frozen card. Uses SweetAlert2
+// which is already loaded by delivery/index.html.
+window.bbBusy = function (message = 'Working…') {
+  if (!window.Swal) return;
+  Swal.fire({
+    title: message,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => Swal.showLoading(),
+  });
+};
+window.bbDone = function () {
+  if (!window.Swal) return;
+  if (Swal.isLoading && Swal.isLoading()) Swal.close();
+};
+
 let _feeRules = null;
 let _allOrders = [];
 let _currentView = 'active';
@@ -387,6 +406,7 @@ function renderCard(db, o) {
     const patch = { status: next };
     if (next === 'delivered') patch.delivered_at = Timestamp.now();
     try {
+      window.bbBusy('Updating status…');
       await updateDoc(doc(db, COL.ORDERS, o.id), patch);
       // Cascade terminal status back to the source restaurant order so the
       // individual TCD/A1 admin sees the same Approved outcome.
@@ -400,6 +420,7 @@ function renderCard(db, o) {
           }
         }
       }
+      window.bbDone();
       // On Pick up (assigned → out_for_delivery), prompt the agent to
       // notify the customer. The confirm button click is a fresh user
       // gesture so the wa.me deep-link launches WhatsApp directly on
@@ -418,6 +439,7 @@ function renderCard(db, o) {
         if (go.isConfirmed) openPickupWhatsApp(o, restaurantLabel);
       }
     } catch (e) {
+      window.bbDone();
       Swal.fire({ icon: 'error', title: 'Update failed', text: e.message });
     }
   });

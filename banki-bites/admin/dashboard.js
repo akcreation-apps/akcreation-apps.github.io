@@ -209,13 +209,16 @@ async function openFeeRulesEditor(db, root) {
   if (!res.isConfirmed) return;
 
   try {
+    window.bbBusy('Saving fee rules…');
     await setDoc(doc(db, COL.META, 'fee_rules'), res.value, { merge: false });
     // Force-reload the cached rules so subsequent renders (incl. this Dashboard
     // refresh) pick up the new values.
     await loadFeeRules(db, { force: true });
+    window.bbDone();
     Swal.fire({ icon: 'success', title: 'Saved', timer: 1100, showConfirmButton: false });
     await refresh(root, db);
   } catch (err) {
+    window.bbDone();
     Swal.fire({ icon: 'error', title: 'Save failed', text: err.message });
   }
 }
