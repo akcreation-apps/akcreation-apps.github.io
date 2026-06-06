@@ -856,57 +856,82 @@ function openPickupWhatsApp(o, restaurantLabel) {
     return;
   }
 
-  // Pre-encoded UTF-8 byte sequences for emojis (mirrors the working
-  // anvisha-travels implementation). Building the URL this way avoids any
-  // platform-specific issues with encodeURIComponent dropping or mis-encoding
-  // multi-codepoint emoji sequences (especially symbol + VS-16 pairs like ⏱️)
-  // that previously caused emojis to appear as blank boxes in WhatsApp.
-  const E = {
-    wave:      '%F0%9F%91%8B',                 // 👋
-    scooter:   '%F0%9F%9B%B5',                 // 🛵
-    stopwatch: '%E2%8F%B1%EF%B8%8F',           // ⏱️  (U+23F1 + U+FE0F)
-    cash:      '%F0%9F%92%B5',                 // 💵
-    pray:      '%F0%9F%99%8F',                 // 🙏
-  };
-  const NL = '%0A'; // newline
+  // ── WhatsApp URL construction — anvisha-travels pattern ─────────────
+  // Every byte of the URL query string is built explicitly:
+  //   - Emojis as literal percent-encoded UTF-8 byte sequences (%XX...)
+  //   - All other static characters as `encodeURIComponent(...)` outputs
+  //   - Dynamic data (name, restaurant, time, money) ALSO through
+  //     `encodeURIComponent(...)` so any character it contains is escaped
+  // The result is a fully URL-safe, no-literal-spaces string. We do NOT
+  // rely on the browser to encode anything on assignment to location.href,
+  // which removes the platform-specific edge cases where Android Chrome
+  // would drop or mangle multi-codepoint emoji sequences (notably ⏱️ =
+  // U+23F1 + U+FE0F variation selector) when re-normalising the URL.
+  // ────────────────────────────────────────────────────────────────────
+  const enc = encodeURIComponent;
+
+  // Emoji constants — raw UTF-8 byte sequences, already URL-encoded
+  const E_WAVE      = '%F0%9F%91%8B';        // 👋
+  const E_SCOOTER   = '%F0%9F%9B%B5';        // 🛵
+  const E_STOPWATCH = '%E2%8F%B1%EF%B8%8F';  // ⏱️ (U+23F1 + U+FE0F)
+  const E_CASH      = '%F0%9F%92%B5';        // 💵
+  const E_PRAY      = '%F0%9F%99%8F';        // 🙏
+  const NL = '%0A';
 
   const displayName = prettyCustomerName(c.name);
-  const greeting = !isBlank(displayName)
-    ? `Hi ${encodeURIComponent(displayName)}! ${E.wave}`
-    : `Hi there! ${E.wave}`;
 
-  const fromLine = !isBlank(restaurantLabel)
-    ? `Your *BankiBites* ${E.scooter} order from *${encodeURIComponent(restaurantLabel)}* is on the way.`
-    : `Your *BankiBites* ${E.scooter} order is on the way.`;
+  // greeting line
+  let text = !isBlank(displayName)
+    ? enc('Hi ') + enc(displayName) + enc('! ') + E_WAVE
+    : enc('Hi there! ') + E_WAVE;
 
+  // from-restaurant line
+  text += NL;
+  if (!isBlank(restaurantLabel)) {
+    text += enc('Your *BankiBites* ') + E_SCOOTER
+          + enc(' order from *') + enc(restaurantLabel) + enc('* is on the way.');
+  } else {
+    text += enc('Your *BankiBites* ') + E_SCOOTER + enc(' order is on the way.');
+  }
+
+  // ETA line
   const eta = pickupArrival(o);
-  const etaTime = encodeURIComponent(eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
-  const etaLine = `${E.stopwatch} Arriving by *${etaTime}* (~${pickupEtaMinutes(o)} min).`;
+  const etaTimeStr = eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  text += NL + E_STOPWATCH
+        + enc(' Arriving by *') + enc(etaTimeStr)
+        + enc('* (~' + pickupEtaMinutes(o) + ' min).');
 
+  // collect-cash line (optional)
   const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
   const prepaidWa  = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
-  let collectLine = '';
   if (o.payment_collected === false && !isBlank(collectAmt)) {
-    // Note: '₹' (U+20B9) safely encodes via encodeURIComponent.
-    const rs = (n) => `*${encodeURIComponent('₹' + n)}*`;
+    text += NL + E_CASH + enc(' Please keep *')
+          + enc('₹' + collectAmt) + enc('* ready');
     if (prepaidWa > 0) {
-      const via = o.paid_method ? ' via ' + encodeURIComponent(String(o.paid_method).toUpperCase()) : '';
-      collectLine = `${E.cash} Please keep ${rs(collectAmt)} ready in cash (you've already paid ${encodeURIComponent('₹' + prepaidWa)}${via}).`;
+      const via = o.paid_method
+        ? ' via ' + String(o.paid_method).toUpperCase()
+        : '';
+      text += enc(' in cash (you have already paid ' + '₹' + prepaidWa + via + ').');
     } else {
-      collectLine = `${E.cash} Please keep ${rs(collectAmt)} ready (cash on delivery).`;
+      text += enc(' (cash on delivery).');
     }
   }
 
-  const thankYou = `Thanks for ordering with us! ${E.pray}`;
+  // thank-you line
+  text += NL + enc('Thanks for ordering with us! ') + E_PRAY;
 
-  // Assemble the message with URL-encoded newlines (%0A). Lines are already
-  // emoji-encoded; only the literal text portions need encodeURIComponent —
-  // but since we authored those parts in plain ASCII (no special chars beyond
-  // what's already encoded inline), they pass through safely as-is.
-  const text = [greeting, fromLine, etaLine, collectLine, thankYou]
-    .filter(Boolean)
-    .join(NL);
+  const url = 'https://wa.me/' + wa + '?text=' + text;
 
-  const url = `https://wa.me/${wa}?text=${text}`;
-  window.location.href = url;
+  // Anchor-click navigation (mirrors anvisha-travels' working impl).
+  // location.href on Android Chrome re-normalises the URL and was found
+  // to corrupt multi-byte UTF-8 emoji sequences in transit (recipient sees
+  // U+FFFD replacement characters). Anchor click bypasses that normalisation
+  // and the byte-perfect URL reaches WhatsApp's deep-link handler.
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
