@@ -856,40 +856,59 @@ function openPickupWhatsApp(o, restaurantLabel) {
     return;
   }
 
+  const enc = encodeURIComponent;
+  const NL = '%0A';
+
   const displayName = prettyCustomerName(c.name);
-  // Note: U+23F1 (⏱) is a text-default codepoint — it needs the U+FE0F
-  // variation selector to render as an emoji on Android/WhatsApp; otherwise
-  // it shows as a plain mono glyph or an empty box. Same precaution applied
-  // to all the symbol-like emojis below.
-  const greeting = !isBlank(displayName) ? `Hi ${displayName}! 👋` : 'Hi there! 👋';
-  const fromLine = !isBlank(restaurantLabel)
-    ? `Your *BankiBites* 🛵 order from *${restaurantLabel}* is on the way.`
-    : `Your *BankiBites* 🛵 order is on the way.`;
 
+  const lines = [];
+
+  // greeting line
+  lines.push(!isBlank(displayName) ? 'Hi ' + displayName + '!' : 'Hi there!');
+
+  // from-restaurant line
+  if (!isBlank(restaurantLabel)) {
+    lines.push('Your *BankiBites* order from *' + restaurantLabel + '* is on the way.');
+  } else {
+    lines.push('Your *BankiBites* order is on the way.');
+  }
+
+  // ETA line
   const eta = pickupArrival(o);
-  const etaLine = `⏱️ Arriving by *${eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}* (~${pickupEtaMinutes(o)} min).`;
+  const etaTimeStr = eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  lines.push('Arriving by *' + etaTimeStr + '* (~' + pickupEtaMinutes(o) + ' min).');
 
+  // collect-cash line (optional)
   const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
   const prepaidWa  = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
-  const collectLine = o.payment_collected === false && !isBlank(collectAmt)
-    ? (prepaidWa > 0
-        ? `💵 Please keep *₹${collectAmt}* ready in cash (you've already paid ₹${prepaidWa}${o.paid_method ? ' via ' + String(o.paid_method).toUpperCase() : ''}).`
-        : `💵 Please keep *₹${collectAmt}* ready (cash on delivery).`)
-    : '';
+  if (o.payment_collected === false && !isBlank(collectAmt)) {
+    let cashLine = 'Please keep *₹' + collectAmt + '* ready';
+    if (prepaidWa > 0) {
+      const via = o.paid_method ? ' via ' + String(o.paid_method).toUpperCase() : '';
+      cashLine += ' in cash (you have already paid ₹' + prepaidWa + via + ').';
+    } else {
+      cashLine += ' (cash on delivery).';
+    }
+    lines.push(cashLine);
+  }
 
-  const message = [
-    greeting,
-    fromLine,
-    etaLine,
-    collectLine,
-    `Thanks for ordering with us! 🙏`,
-  ].filter(Boolean).join('\n');
+  // thank-you line
+  lines.push('Thanks for ordering with us!');
 
-  // Same flow as the customer-side cart checkout (TCD/cart.js): use wa.me
-  // and navigate the current tab. WhatsApp's deep-link handler reliably
-  // intercepts wa.me on mobile and the host browser does the right thing
-  // on desktop too. Matching this app to the existing order-placement flow
-  // keeps the delivery partner's experience consistent with the customer's.
-  const url = `https://wa.me/${wa}?text=${encodeURIComponent(message)}`;
-  window.location.href = url;
+  const text = lines.map(enc).join(NL);
+
+  const url = 'https://wa.me/' + wa + '?text=' + text;
+
+  // Anchor-click navigation (mirrors anvisha-travels' working impl).
+  // location.href on Android Chrome re-normalises the URL and was found
+  // to corrupt multi-byte UTF-8 emoji sequences in transit (recipient sees
+  // U+FFFD replacement characters). Anchor click bypasses that normalisation
+  // and the byte-perfect URL reaches WhatsApp's deep-link handler.
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
