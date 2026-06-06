@@ -4,7 +4,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
-  bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfLastMonth, netRevenue,
+  bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfDay, startOfLastMonth, netRevenue,
 } from '../analytics.js';
 import { refreshStaffData } from './staff.js';
 
@@ -72,6 +72,54 @@ export async function renderDashboard(root, db) {
       <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-route"></i> Far vs Near orders</div>
         <div class="chart-card-body"><canvas id="dashFarNear"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-clock"></i> Orders by hour of day</div>
+        <div class="chart-card-body"><canvas id="dashHourOfDay"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-stopwatch"></i> Avg delivery time (min, 7d)</div>
+        <div class="chart-card-body"><canvas id="dashAvgDeliveryTime"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-bullseye"></i> On-time delivery % (7d)</div>
+        <div class="chart-card-body"><canvas id="dashOnTimePct"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-ban"></i> Cancellation rate (7d)</div>
+        <div class="chart-card-body"><canvas id="dashCancelRate"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-basket-shopping"></i> Average order value (7d)</div>
+        <div class="chart-card-body"><canvas id="dashAovTrend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-user-plus"></i> New vs Repeat customers (7d)</div>
+        <div class="chart-card-body"><canvas id="dashRepeatNew"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-crown"></i> Top customers</div>
+        <div class="chart-card-body"><canvas id="dashTopCustomers"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-utensils"></i> Top items sold</div>
+        <div class="chart-card-body"><canvas id="dashTopItems"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-tag"></i> Discounts given (7d)</div>
+        <div class="chart-card-body"><canvas id="dashDiscountTrend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-credit-card"></i> Prepaid vs COD (delivered)</div>
+        <div class="chart-card-body"><canvas id="dashPrepaidCod"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-calendar-week"></i> Orders by day of week</div>
+        <div class="chart-card-body"><canvas id="dashDayOfWeek"></canvas></div>
+      </div>
+      <div class="chart-card chart-card--wide">
+        <div class="chart-card-head"><i class="fas fa-motorcycle"></i> Partner order count</div>
+        <div class="chart-card-body"><canvas id="dashPartnerOrders"></canvas></div>
       </div>
     </div>
   `;
@@ -227,6 +275,18 @@ async function refresh(root, db) {
   renderPaymentMix(orders, p);
   renderPartnerPayouts(orders, staff, rules, p);
   renderFarNear(orders, rules, p);
+  renderHourOfDay(orders, p);
+  renderAvgDeliveryTime(orders, p);
+  renderOnTimePct(orders, p);
+  renderCancelRate(orders, p);
+  renderAovTrend(orders, p);
+  renderRepeatNew(orders, p);
+  renderTopCustomers(orders, p);
+  renderTopItems(orders, p);
+  renderDiscountTrend(orders, p);
+  renderPrepaidCod(orders, p);
+  renderDayOfWeek(orders, p);
+  renderPartnerOrders(orders, staff, p);
 
   chartBodies.forEach(el => el.classList.remove('is-loading'));
 }
@@ -425,5 +485,296 @@ function renderFarNear(orders, rules, p) {
       datasets: [{ data: [far, near], backgroundColor: [p.series[3], p.brand], borderWidth: 0 }],
     },
     options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+  });
+}
+
+function renderHourOfDay(orders, p) {
+  const counts = new Array(24).fill(0);
+  for (const o of orders) {
+    const d = toDateSafe(o.created_at);
+    if (!d) continue;
+    counts[d.getHours()]++;
+  }
+  const labels = counts.map((_, h) => String(h).padStart(2, '0'));
+  mountChart('dashHourOfDay', {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Orders', data: counts, backgroundColor: p.brand, borderWidth: 0 }] },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { autoSkip: false, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+function renderAvgDeliveryTime(orders, p) {
+  const delivered = orders.filter(isDelivered);
+  const days = bucketByDay(delivered, o => toDateSafe(o.delivered_at) || toDateSafe(o.created_at), 7);
+  const data = days.keys.map(k => {
+    const bucket = days.buckets.get(k);
+    let sum = 0, n = 0;
+    for (const o of bucket) {
+      const c = toDateSafe(o.created_at);
+      const dl = toDateSafe(o.delivered_at);
+      if (c && dl) { sum += (dl.getTime() - c.getTime()) / 60000; n++; }
+    }
+    return n ? Math.round(sum / n) : 0;
+  });
+  mountChart('dashAvgDeliveryTime', {
+    type: 'line',
+    data: {
+      labels: days.labels,
+      datasets: [{
+        label: 'Minutes', data,
+        borderColor: p.brand, backgroundColor: p.brandSoft,
+        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
+      }],
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} min` } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: v => v + ' min' } } },
+    },
+  });
+}
+
+function renderOnTimePct(orders, p) {
+  const delivered = orders.filter(o => isDelivered(o) && toDateSafe(o.eta) && toDateSafe(o.delivered_at));
+  const days = bucketByDay(delivered, o => toDateSafe(o.delivered_at), 7);
+  const data = days.keys.map(k => {
+    const bucket = days.buckets.get(k);
+    if (!bucket.length) return 0;
+    const onTime = bucket.filter(o => toDateSafe(o.delivered_at).getTime() <= toDateSafe(o.eta).getTime()).length;
+    return Math.round((onTime / bucket.length) * 100);
+  });
+  mountChart('dashOnTimePct', {
+    type: 'line',
+    data: {
+      labels: days.labels,
+      datasets: [{
+        label: 'On-time %', data,
+        borderColor: p.status.delivered, backgroundColor: 'rgba(22,163,74,0.15)',
+        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
+      }],
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}%` } } },
+      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
+    },
+  });
+}
+
+function renderCancelRate(orders, p) {
+  const days = bucketByDay(orders, o => toDateSafe(o.created_at), 7);
+  const data = days.keys.map(k => {
+    const bucket = days.buckets.get(k);
+    if (!bucket.length) return 0;
+    const cancelled = bucket.filter(o => o.status === 'cancelled').length;
+    return Math.round((cancelled / bucket.length) * 100);
+  });
+  mountChart('dashCancelRate', {
+    type: 'line',
+    data: {
+      labels: days.labels,
+      datasets: [{
+        label: 'Cancel %', data,
+        borderColor: p.status.cancelled, backgroundColor: 'rgba(220,38,38,0.15)',
+        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
+      }],
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}%` } } },
+      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
+    },
+  });
+}
+
+function renderAovTrend(orders, p) {
+  const delivered = orders.filter(isDelivered);
+  const days = bucketByDay(delivered, o => toDateSafe(o.delivered_at) || toDateSafe(o.created_at), 7);
+  const data = days.keys.map(k => {
+    const bucket = days.buckets.get(k);
+    if (!bucket.length) return 0;
+    const total = bucket.reduce((s, o) => s + (Number(o.total) || 0), 0);
+    return Math.round(total / bucket.length);
+  });
+  mountChart('dashAovTrend', {
+    type: 'line',
+    data: {
+      labels: days.labels,
+      datasets: [{
+        label: 'AOV ₹', data,
+        borderColor: p.brand, backgroundColor: p.brandSoft,
+        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
+      }],
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.y) } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+    },
+  });
+}
+
+function renderRepeatNew(orders, p) {
+  // A customer (by phone) is "new" on the first day they appear in the window;
+  // every subsequent day they place an order they count as "repeat".
+  const firstSeen = new Map();
+  const sorted = [...orders].sort((a, b) => (toDateSafe(a.created_at)?.getTime() || 0) - (toDateSafe(b.created_at)?.getTime() || 0));
+  for (const o of sorted) {
+    const phone = o.customer?.phone;
+    const d = toDateSafe(o.created_at);
+    if (!phone || !d) continue;
+    if (!firstSeen.has(phone)) firstSeen.set(phone, d.getTime());
+  }
+  const days = bucketByDay(orders, o => toDateSafe(o.created_at), 7);
+  const newData = [], repData = [];
+  for (const k of days.keys) {
+    const bucket = days.buckets.get(k);
+    let n = 0, r = 0;
+    const seenToday = new Set();
+    for (const o of bucket) {
+      const phone = o.customer?.phone;
+      const d = toDateSafe(o.created_at);
+      if (!phone || !d) continue;
+      const dayStart = startOfDay(d).getTime();
+      const fs = firstSeen.get(phone);
+      // Count each customer once per day to keep "new" and "repeat" comparable.
+      if (seenToday.has(phone)) continue;
+      seenToday.add(phone);
+      if (fs >= dayStart && fs < dayStart + 86400000) n++; else r++;
+    }
+    newData.push(n);
+    repData.push(r);
+  }
+  mountChart('dashRepeatNew', {
+    type: 'bar',
+    data: {
+      labels: days.labels,
+      datasets: [
+        { label: 'New',    data: newData, backgroundColor: p.brand,     stack: 'c', borderWidth: 0 },
+        { label: 'Repeat', data: repData, backgroundColor: p.series[2], stack: 'c', borderWidth: 0 },
+      ],
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' } },
+      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+function renderTopCustomers(orders, p) {
+  const g = groupBy(orders, o => {
+    const c = o.customer || {};
+    return c.name || c.phone || '';
+  });
+  const top = topN(g, 5);
+  mountChart('dashTopCustomers', {
+    type: 'bar',
+    data: {
+      labels: top.map(([k]) => k),
+      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+function renderTopItems(orders, p) {
+  const counts = new Map();
+  for (const o of orders) {
+    if (!Array.isArray(o.items)) continue;
+    for (const it of o.items) {
+      const name = (it?.name || '').trim();
+      if (!name) continue;
+      const qty = Number(it.qty) || 1;
+      counts.set(name, (counts.get(name) || 0) + qty);
+    }
+  }
+  const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7);
+  mountChart('dashTopItems', {
+    type: 'bar',
+    data: {
+      labels: top.map(([k]) => k),
+      datasets: [{ label: 'Units sold', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+function renderDiscountTrend(orders, p) {
+  const days = bucketByDay(orders, o => toDateSafe(o.created_at), 7);
+  const data = days.keys.map(k => days.buckets.get(k).reduce((s, o) => s + (Number(o.discount) || 0), 0));
+  mountChart('dashDiscountTrend', {
+    type: 'bar',
+    data: {
+      labels: days.labels,
+      datasets: [{ label: 'Discount ₹', data, backgroundColor: p.series[3], borderWidth: 0 }],
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.y) } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+    },
+  });
+}
+
+function renderPrepaidCod(orders, p) {
+  const delivered = orders.filter(isDelivered);
+  let prepaid = 0, cod = 0;
+  for (const o of delivered) {
+    if ((Number(o.paid_already) || 0) > 0) prepaid++; else cod++;
+  }
+  mountChart('dashPrepaidCod', {
+    type: 'doughnut',
+    data: {
+      labels: ['Prepaid', 'COD'],
+      datasets: [{ data: [prepaid, cod], backgroundColor: [p.status.delivered, p.brand], borderWidth: 0 }],
+    },
+    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+  });
+}
+
+function renderDayOfWeek(orders, p) {
+  const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const counts = new Array(7).fill(0);
+  for (const o of orders) {
+    const d = toDateSafe(o.created_at);
+    if (!d) continue;
+    counts[d.getDay()]++;
+  }
+  mountChart('dashDayOfWeek', {
+    type: 'bar',
+    data: { labels: names, datasets: [{ label: 'Orders', data: counts, backgroundColor: p.brand, borderWidth: 0 }] },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+function renderPartnerOrders(orders, staff, p) {
+  const byStaff = new Map(staff.map(s => [s.uid, { name: s.name || s.email || s.uid, count: 0 }]));
+  for (const o of orders) {
+    if (!isDelivered(o)) continue;
+    const sid = o.delivery_staff_id;
+    if (!sid || !byStaff.has(sid)) continue;
+    byStaff.get(sid).count++;
+  }
+  const rows = [...byStaff.values()].filter(r => r.count > 0).sort((a, b) => b.count - a.count);
+  mountChart('dashPartnerOrders', {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r.name),
+      datasets: [{ label: 'Deliveries', data: rows.map(r => r.count), backgroundColor: p.series, borderWidth: 0 }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
   });
 }

@@ -503,6 +503,30 @@ async function renderEarnings() {
         <div class="chart-card-head"><i class="fas fa-hand-holding-dollar"></i> Paid vs Pending</div>
         <div class="chart-card-body"><canvas id="earnPaidMix"></canvas></div>
       </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-clock"></i> Deliveries by hour of day</div>
+        <div class="chart-card-body"><canvas id="earnHourOfDay"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-stopwatch"></i> Avg delivery time (min, 7d)</div>
+        <div class="chart-card-body"><canvas id="earnAvgDeliveryTime"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-bullseye"></i> On-time delivery % (7d)</div>
+        <div class="chart-card-body"><canvas id="earnOnTimePct"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-store"></i> Earnings by restaurant</div>
+        <div class="chart-card-body"><canvas id="earnByRestaurant"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-location-dot"></i> Earnings by area</div>
+        <div class="chart-card-body"><canvas id="earnByArea"></canvas></div>
+      </div>
+      <div class="chart-card chart-card--wide">
+        <div class="chart-card-head"><i class="fas fa-chart-line"></i> Cumulative earnings — this month vs last</div>
+        <div class="chart-card-body"><canvas id="earnCumulative"></canvas></div>
+      </div>
     </div>
     <div class="section-header section-header--compact mt-3">
       <h4 class="m-0"><i class="fas fa-hourglass-half text-warning mr-1"></i> Awaiting payout</h4>
@@ -535,11 +559,22 @@ async function renderEarnings() {
   const month = statsFor(inRange(startMonth));
   const life  = statsFor(() => true);
 
+  // Active-days streak over the last 30 days: count distinct delivery days.
+  const start30 = new Date(startToday); start30.setDate(start30.getDate() - 29);
+  const activeDaySet = new Set();
+  for (const o of orders) {
+    const t = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+    if (!t || t < start30) continue;
+    activeDaySet.add(startOfDay(t).getTime());
+  }
+  const activeDays = activeDaySet.size;
+
   $('#earnKpis').innerHTML = `
     <div class="kpi-card kpi-card--sm"><div class="kpi-label">Today</div><div class="kpi-value">${fmtINR(today.total)}</div><div class="kpi-sub">${today.count} delivered</div></div>
     <div class="kpi-card kpi-card--sm"><div class="kpi-label">This week</div><div class="kpi-value">${fmtINR(week.total)}</div><div class="kpi-sub">${week.count} delivered</div></div>
     <div class="kpi-card kpi-card--sm"><div class="kpi-label">This month</div><div class="kpi-value">${fmtINR(month.total)}</div><div class="kpi-sub">${month.count} delivered</div></div>
     <div class="kpi-card kpi-card--sm"><div class="kpi-label">Pending payout</div><div class="kpi-value">${fmtINR(life.pending)}</div><div class="kpi-sub">Paid ${fmtINR(life.paid)}</div></div>
+    <div class="kpi-card kpi-card--sm"><div class="kpi-label">Active days</div><div class="kpi-value">${activeDays}</div><div class="kpi-sub">last 30 days</div></div>
   `;
 
   // Deliveries per day
@@ -584,6 +619,158 @@ async function renderEarnings() {
     options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmtINR(ctx.parsed)}` } } }, cutout: '60%' },
   });
 
+  // Hour-of-day pattern — when this partner delivers most. Uses delivered_at
+  // (falls back to created_at) so the bar chart reflects on-road time, not
+  // when the order was placed by the customer.
+  const hourCounts = new Array(24).fill(0);
+  for (const o of orders) {
+    const t = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+    if (!t) continue;
+    hourCounts[t.getHours()]++;
+  }
+  mountEarnChart('earnHourOfDay', {
+    type: 'bar',
+    data: {
+      labels: hourCounts.map((_, h) => String(h).padStart(2, '0')),
+      datasets: [{ label: 'Deliveries', data: hourCounts, backgroundColor: p.brand, borderWidth: 0 }],
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { autoSkip: false, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+
+  // Avg delivery time per day — delivered_at minus created_at, averaged.
+  const avgTimeData = days.keys.map(k => {
+    const bucket = days.buckets.get(k);
+    let sum = 0, n = 0;
+    for (const o of bucket) {
+      const c = toDateSafe(o.created_at);
+      const dl = toDateSafe(o.delivered_at);
+      if (c && dl) { sum += (dl.getTime() - c.getTime()) / 60000; n++; }
+    }
+    return n ? Math.round(sum / n) : 0;
+  });
+  mountEarnChart('earnAvgDeliveryTime', {
+    type: 'line',
+    data: {
+      labels: days.labels,
+      datasets: [{
+        label: 'Minutes', data: avgTimeData,
+        borderColor: p.brand, backgroundColor: p.brandSoft,
+        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
+      }],
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} min` } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: v => v + ' min' } } },
+    },
+  });
+
+  // On-time % per day (requires both eta and delivered_at on each order).
+  const onTimeData = days.keys.map(k => {
+    const bucket = days.buckets.get(k).filter(o => toDateSafe(o.eta) && toDateSafe(o.delivered_at));
+    if (!bucket.length) return 0;
+    const onTime = bucket.filter(o => toDateSafe(o.delivered_at).getTime() <= toDateSafe(o.eta).getTime()).length;
+    return Math.round((onTime / bucket.length) * 100);
+  });
+  mountEarnChart('earnOnTimePct', {
+    type: 'line',
+    data: {
+      labels: days.labels,
+      datasets: [{
+        label: 'On-time %', data: onTimeData,
+        borderColor: p.status.delivered, backgroundColor: 'rgba(22,163,74,0.15)',
+        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
+      }],
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}%` } } },
+      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
+    },
+  });
+
+  // Earnings by restaurant (top 5).
+  const byRest = new Map();
+  for (const o of orders) {
+    const key = o.restaurant_name || o.restaurant_id || 'Unknown';
+    byRest.set(key, (byRest.get(key) || 0) + feeForOrder(o, _feeRules));
+  }
+  const topRest = [...byRest.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  mountEarnChart('earnByRestaurant', {
+    type: 'bar',
+    data: {
+      labels: topRest.map(([k]) => k),
+      datasets: [{ label: 'Earnings ₹', data: topRest.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.x) } } },
+      scales: { x: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+    },
+  });
+
+  // Earnings by area/place (top 5).
+  const byArea = new Map();
+  for (const o of orders) {
+    const key = o.place || o.customer?.address || 'Unknown';
+    byArea.set(key, (byArea.get(key) || 0) + feeForOrder(o, _feeRules));
+  }
+  const topArea = [...byArea.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  mountEarnChart('earnByArea', {
+    type: 'bar',
+    data: {
+      labels: topArea.map(([k]) => k),
+      datasets: [{ label: 'Earnings ₹', data: topArea.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.x) } } },
+      scales: { x: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+    },
+  });
+
+  // Cumulative earnings — month-to-date vs same length of last month, indexed
+  // by day-of-month so day N this month aligns with day N last month.
+  const today2 = new Date();
+  const thisMonthStart = new Date(today2.getFullYear(), today2.getMonth(), 1);
+  const lastMonthStart = new Date(today2.getFullYear(), today2.getMonth() - 1, 1);
+  const lastMonthEnd   = new Date(today2.getFullYear(), today2.getMonth(), 0); // last day of prev month
+  const daysInThisMonth = new Date(today2.getFullYear(), today2.getMonth() + 1, 0).getDate();
+  const cumThis = new Array(daysInThisMonth).fill(0);
+  const cumLast = new Array(daysInThisMonth).fill(0);
+  for (const o of orders) {
+    const t = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+    if (!t) continue;
+    const fee = feeForOrder(o, _feeRules);
+    if (t >= thisMonthStart && t <= today2) {
+      cumThis[t.getDate() - 1] += fee;
+    } else if (t >= lastMonthStart && t <= lastMonthEnd) {
+      const di = t.getDate() - 1;
+      if (di < cumLast.length) cumLast[di] += fee;
+    }
+  }
+  // Convert daily totals to running sums.
+  for (let i = 1; i < cumThis.length; i++) cumThis[i] += cumThis[i - 1];
+  for (let i = 1; i < cumLast.length; i++) cumLast[i] += cumLast[i - 1];
+  // Hide future days for "this month" so the line doesn't flatline forward.
+  const todayDom = today2.getDate();
+  const cumThisDisplay = cumThis.map((v, i) => i < todayDom ? v : null);
+  mountEarnChart('earnCumulative', {
+    type: 'line',
+    data: {
+      labels: cumThis.map((_, i) => String(i + 1).padStart(2, '0')),
+      datasets: [
+        { label: 'This month', data: cumThisDisplay, borderColor: p.brand, backgroundColor: p.brandSoft, fill: false, tension: 0.25, pointRadius: 2, borderWidth: 2 },
+        { label: 'Last month', data: cumLast,        borderColor: p.muted, backgroundColor: 'transparent', borderDash: [4, 4], fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 },
+      ],
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtINR(ctx.parsed.y)}` } } },
+      scales: { x: { ticks: { autoSkip: true, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+    },
+  });
+
   // Awaiting payout list
   const pending = orders.filter(isPayoutPending)
     .sort((a, b) => (toDateSafe(b.delivered_at)?.getTime() || 0) - (toDateSafe(a.delivered_at)?.getTime() || 0));
@@ -614,7 +801,7 @@ async function renderEarnings() {
       const rows = g.items.map(({ o, when, fee }) => {
         const timeTxt = when ? when.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
         const far = isFarPlace(o, _feeRules);
-        const cust = o.customer?.name || o.customer?.phone || '';
+        const cust = prettyCustomerName(o.customer?.name) || o.customer?.phone || '';
         const place = o.place || o.customer?.address || '';
         const subParts = [];
         if (cust)  subParts.push(escapeHtml(cust));
