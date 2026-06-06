@@ -1147,16 +1147,24 @@
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
 
-    // Android-only install banner (suppress on iOS, desktop, and in-app webview)
+    // Android-only install banner (suppress on iOS, desktop, in-app webview, and for 7 days after dismiss)
     (function () {
       const ua = navigator.userAgent || '';
-      const isAndroid   = /Android/i.test(ua);
-      const isIOS       = /iPad|iPhone|iPod/i.test(ua);
-      const isWebView   = /; wv\)/i.test(ua); // Chrome Android WebView marker
+      const isAndroid    = /Android/i.test(ua);
+      const isIOS        = /iPad|iPhone|iPod/i.test(ua);
+      const isWebView    = /; wv\)/i.test(ua); // Chrome Android WebView marker
       const isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
-      const dismissed   = (() => { try { return localStorage.getItem('bb_install_dismissed') === '1'; } catch (_) { return false; } })();
 
-      if (!isAndroid || isIOS || isWebView || isStandalone || dismissed) return;
+      const DISMISS_KEY = 'bb_install_dismissed_at';
+      const SNOOZE_MS   = 7 * 24 * 60 * 60 * 1000; // 7 days
+      const dismissedRecently = (() => {
+        try {
+          const ts = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
+          return ts && (Date.now() - ts) < SNOOZE_MS;
+        } catch (_) { return false; }
+      })();
+
+      if (!isAndroid || isIOS || isWebView || isStandalone || dismissedRecently) return;
 
       const banner = document.getElementById('installBanner');
       if (!banner) return;
@@ -1166,7 +1174,7 @@
       document.getElementById('installBannerClose').addEventListener('click', () => {
         banner.classList.remove('show');
         banner.hidden = true;
-        try { localStorage.setItem('bb_install_dismissed', '1'); } catch (_) {}
+        try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch (_) {}
       });
     })();
 
