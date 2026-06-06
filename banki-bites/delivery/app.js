@@ -879,6 +879,7 @@ function openPickupWhatsApp(o, restaurantLabel) {
   const E_CASH      = '%F0%9F%92%B5';        // 💵
   const E_SPARKLES  = '%E2%9C%A8';           // ✨
   const E_HEART     = '%E2%9D%A4%EF%B8%8F';  // ❤️
+  const E_PIN       = '%F0%9F%93%8D';        // 📍
 
   const displayName = prettyCustomerName(c.name);
 
@@ -913,6 +914,14 @@ function openPickupWhatsApp(o, restaurantLabel) {
       cashTxt += ' (cash on delivery)';
     }
     parts.push(E_CASH + enc(cashTxt));
+  }
+
+  // location request — only when the customer has no GPS pin on file,
+  // so the driver doesn't need to call and disturb them to find the address.
+  const gps = c.gps;
+  const hasGps = gps && Number.isFinite(+gps.lat) && Number.isFinite(+gps.lng);
+  if (!hasGps) {
+    parts.push(E_PIN + enc(' Please share your *current location* to help us reach you.'));
   }
 
   // thank-you
