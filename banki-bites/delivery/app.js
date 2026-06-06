@@ -871,43 +871,54 @@ function openPickupWhatsApp(o, restaurantLabel) {
   const enc = encodeURIComponent;
   const NL = '%0A';
 
+  // Pre-encoded UTF-8 byte sequences for emojis — survives any browser
+  // URL re-normalisation on the way to wa.me / the WhatsApp app.
+  const E_WAVE      = '%F0%9F%91%8B';        // 👋
+  const E_SCOOTER   = '%F0%9F%9B%B5';        // 🛵
+  const E_CLOCK     = '%E2%8F%B0';           // ⏰
+  const E_CASH      = '%F0%9F%92%B5';        // 💵
+  const E_SPARKLES  = '%E2%9C%A8';           // ✨
+  const E_HEART     = '%E2%9D%A4%EF%B8%8F';  // ❤️
+
   const displayName = prettyCustomerName(c.name);
 
-  const lines = [];
+  const parts = [];
 
-  // greeting line
-  lines.push(!isBlank(displayName) ? 'Hi ' + displayName + '!' : 'Hi there!');
+  // greeting
+  parts.push(
+    E_WAVE + enc(' ') +
+    (!isBlank(displayName) ? enc('Hi ' + displayName + '!') : enc('Hi there!'))
+  );
 
-  // from-restaurant line
-  if (!isBlank(restaurantLabel)) {
-    lines.push('Your *BankiBites* order from *' + restaurantLabel + '* is on the way.');
-  } else {
-    lines.push('Your *BankiBites* order is on the way.');
-  }
+  // on-the-way
+  const fromTxt = !isBlank(restaurantLabel)
+    ? enc(' Your *BankiBites* order from *' + restaurantLabel + '* is on the way!')
+    : enc(' Your *BankiBites* order is on the way!');
+  parts.push(E_SCOOTER + fromTxt);
 
-  // ETA line
+  // ETA
   const eta = pickupArrival(o);
   const etaTimeStr = eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-  lines.push('Arriving by *' + etaTimeStr + '* (~' + pickupEtaMinutes(o) + ' min).');
+  parts.push(E_CLOCK + enc(' Arriving by *' + etaTimeStr + '* (~' + pickupEtaMinutes(o) + ' min)'));
 
-  // collect-cash line (optional)
+  // cash collect (optional)
   const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
   const prepaidWa  = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
   if (o.payment_collected === false && !isBlank(collectAmt)) {
-    let cashLine = 'Please keep *₹' + collectAmt + '* ready';
+    let cashTxt = ' Keep *₹' + collectAmt + '* ready';
     if (prepaidWa > 0) {
       const via = o.paid_method ? ' via ' + String(o.paid_method).toUpperCase() : '';
-      cashLine += ' in cash (you have already paid ₹' + prepaidWa + via + ').';
+      cashTxt += ' (already paid ₹' + prepaidWa + via + ')';
     } else {
-      cashLine += ' (cash on delivery).';
+      cashTxt += ' (cash on delivery)';
     }
-    lines.push(cashLine);
+    parts.push(E_CASH + enc(cashTxt));
   }
 
-  // thank-you line
-  lines.push('Thanks for ordering with us!');
+  // thank-you
+  parts.push(E_SPARKLES + enc(' Thank you for choosing BankiBites ') + E_HEART);
 
-  const text = lines.map(enc).join(NL + NL);
+  const text = parts.join(NL + NL);
 
   const url = 'https://wa.me/' + wa + '?text=' + text;
   window.location.href = url;
