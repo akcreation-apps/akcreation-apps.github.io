@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <title>BankiBites — Banki Bites Food Delivery in Banki, Cuttack, Odisha</title>
-  <meta name="description" content="BankiBites — Banki's first food delivery platform. Order from The Cafe Darbar, A1 Amul Fast Food & more. Fast delivery in Banki, Cuttack, Odisha 754008. No app needed.">
-  <meta name="keywords" content="BankiBites, Banki Bites, food delivery Banki, Banki Bites food delivery, order food Banki, Banki restaurant delivery, food delivery Cuttack Banki, online food order Banki Odisha, Banki food app, Banki Bites app, restaurant near me Banki, food delivery 754008, home delivery Banki, swiggy Banki, zomato Banki, best restaurant Banki Cuttack">
+  <meta name="description" content="BankiBites — Banki's first food delivery platform. Order from The Cafe Darbar, A1 Amul Fast Food & more. Fast delivery in Banki, Cuttack, Odisha 754008. Order on our Android app or any browser.">
+  <meta name="keywords" content="BankiBites, Banki Bites, food delivery Banki, Banki Bites food delivery, order food Banki, Banki restaurant delivery, food delivery Cuttack Banki, online food order Banki Odisha, Banki food app, Banki Bites app, restaurant near me Banki, food delivery 754008, home delivery Banki, swiggy Banki, zomato Banki, best restaurant Banki Cuttack, food delivery near me Banki, Banki Cuttack food order online, restaurant delivery 754008, order food Banki Cuttack Odisha, delivery charge Banki, food order online Banki, Banki food home delivery, restaurant in Banki online order, online food ordering Banki Odisha, Banki local food delivery">
   <meta name="author" content="AkCreation">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://akcreation-apps.com/banki-bites/">
@@ -45,6 +45,13 @@
   <link rel="icon" type="image/png" sizes="16x16" href="banki-bites-logo.png">
   <link rel="icon" type="image/png" href="banki-bites-logo.png">
   <link rel="sitemap" type="application/xml" href="https://akcreation-apps.com/sitemap.xml">
+  <link rel="alternate" hreflang="en-IN" href="https://akcreation-apps.com/banki-bites/">
+  <link rel="alternate" hreflang="x-default" href="https://akcreation-apps.com/banki-bites/">
+
+  <link rel="dns-prefetch" href="https://wa.me">
+  <link rel="dns-prefetch" href="https://play.google.com">
+  <link rel="dns-prefetch" href="https://maps.google.com">
+  <link rel="prefetch" href="dashboard.html">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,11 +68,18 @@
         "@id": "https://akcreation-apps.com/banki-bites/#business",
         "name": "BankiBites",
         "alternateName": ["Banki Bites", "BankiBites Food Delivery", "Banki Food Delivery", "Banki Online Food Order"],
-        "description": "BankiBites is Banki's first online food delivery platform, connecting hungry customers with the best local restaurants in Banki, Cuttack, Odisha 754008. Order from The Cafe Darbar, A1 Amul Fast Food and more. Delivery within 5 km radius.",
+        "description": "BankiBites is Banki's first online food delivery platform, connecting hungry customers with the best local restaurants in Banki, Cuttack, Odisha 754008. Order food online from The Cafe Darbar, A1 Amul Fast Food and more. Home delivery within 5 km of Banki town.",
         "url": "https://akcreation-apps.com/banki-bites/",
         "logo": "https://akcreation-apps.com/banki-bites/banki-bites-logo.png",
-        "image": "https://akcreation-apps.com/banki-bites/banner.png",
-        "telephone": "+918920042482",
+        "image": "https://akcreation-apps.com/banki-bites/banner.jpg",
+        "telephone": "+917749984274",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+917749984274",
+          "contactType": "customer service",
+          "areaServed": "IN",
+          "availableLanguage": ["English", "Hindi", "Odia"]
+        },
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Banki",
@@ -86,23 +100,108 @@
         "currenciesAccepted": "INR",
         "paymentAccepted": "Cash, UPI, PhonePe, Google Pay",
         "servesCuisine": ["Chinese", "North Indian", "Fast Food", "Tandoor", "Snacks"],
+        "knowsAbout": [
+          "food delivery in Banki Cuttack Odisha",
+          "online food order Banki 754008",
+          "restaurant home delivery Banki",
+          "Chinese food delivery Banki",
+          "North Indian food delivery Banki",
+          "fast food delivery Banki Odisha",
+          "WhatsApp food ordering Banki",
+          "local restaurant delivery Cuttack district"
+        ],
         "aggregateRating": {
           "@type": "AggregateRating",
           "ratingValue": "4.8", "reviewCount": "3", "bestRating": "5", "worstRating": "1"
         },
         "areaServed": [
-          {"@type": "City", "name": "Banki"},
-          {"@type": "Place", "name": "Harirajpur"},
-          {"@type": "Place", "name": "Chakapada"},
-          {"@type": "Place", "name": "Sisua"},
-          {"@type": "Place", "name": "Bedapur"},
-          {"@type": "Place", "name": "Khamaranga"},
-          {"@type": "Place", "name": "Charchika"},
-          {"@type": "Place", "name": "Ranapur"},
-          {"@type": "Place", "name": "Sahadapada"},
-          {"@type": "Place", "name": "Gopalapur"},
-          {"@type": "Place", "name": "Patapur"}
-        ]
+          {
+            "@type": "City",
+            "name": "Banki",
+            "containedInPlace": {
+              "@type": "AdministrativeArea",
+              "name": "Cuttack",
+              "containedInPlace": {"@type": "State", "name": "Odisha"}
+            }
+          },
+          {"@type": "Place", "name": "Harirajpur", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Chakapada", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Sisua", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Bedapur", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Khamaranga", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Charchika", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Ranapur", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Sahadapada", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Gopalapur", "containedInPlace": {"@type": "City", "name": "Banki"}},
+          {"@type": "Place", "name": "Patapur", "containedInPlace": {"@type": "City", "name": "Banki"}}
+        ],
+        "potentialAction": [
+          {
+            "@type": "OrderAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://akcreation-apps.com/banki-bites/dashboard.html",
+              "inLanguage": "en-IN",
+              "actionPlatform": [
+                "http://schema.org/DesktopWebPlatform",
+                "http://schema.org/MobileWebPlatform"
+              ]
+            },
+            "description": "Order food online from restaurants in Banki, Cuttack, Odisha 754008"
+          },
+          {
+            "@type": "SearchAction",
+            "target": "https://akcreation-apps.com/banki-bites/dashboard.html?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        ],
+        "subjectOf": {
+          "@type": "MobileApplication",
+          "@id": "https://akcreation-apps.com/banki-bites/#android-app",
+          "name": "BankiBites — Food Delivery in Banki",
+          "operatingSystem": "Android",
+          "applicationCategory": "FoodEstablishment",
+          "url": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
+          "installUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
+          "downloadUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
+          "description": "Order food online from restaurants in Banki, Cuttack, Odisha. BankiBites Android app — food delivery in Banki 754008.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8", "reviewCount": "3", "bestRating": "5", "worstRating": "1"
+          }
+        }
+      },
+      {
+        "@type": "MobileApplication",
+        "@id": "https://akcreation-apps.com/banki-bites/#android-app",
+        "name": "BankiBites — Food Delivery in Banki",
+        "alternateName": "Banki Bites App",
+        "operatingSystem": "Android",
+        "applicationCategory": "FoodEstablishment",
+        "url": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
+        "installUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
+        "downloadUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
+        "description": "Order food online from the best restaurants in Banki, Cuttack, Odisha 754008. Free Android app for fast home delivery in Banki.",
+        "screenshot": "https://akcreation-apps.com/banki-bites/banner.jpg",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "AkCreation",
+          "url": "https://akcreation-apps.com/services.html"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8", "reviewCount": "3", "bestRating": "5", "worstRating": "1"
+        }
       },
       {
         "@type": "FAQPage",
@@ -114,23 +213,38 @@
           },
           {
             "@type": "Question",
-            "name": "Which restaurants are available on BankiBites?",
-            "acceptedAnswer": {"@type": "Answer", "text": "BankiBites currently partners with The Cafe Darbar (Chinese, North Indian, Tandoor) and A1 Amul Fast Food (Fast Food, Chinese, Snacks). More restaurants are being added regularly."}
+            "name": "Which restaurants are available on BankiBites in Banki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "BankiBites currently partners with The Cafe Darbar (Chinese, North Indian, Tandoor) and A1 Amul Fast Food (Fast Food, Chinese, Snacks) in Banki, Cuttack. More local Banki restaurants are being added regularly — you can request your favourite restaurant via WhatsApp."}
           },
           {
             "@type": "Question",
-            "name": "How do I order food on BankiBites?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Choose a restaurant, select your delivery area, browse the menu and place your order. No app download required."}
+            "name": "How do I order food online in Banki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "To order food online in Banki, open BankiBites on our Android app or any web browser at akcreation-apps.com/banki-bites/. Choose a restaurant, browse the menu, and place your order via WhatsApp. We deliver to your door within approximately 45 minutes."}
           },
           {
             "@type": "Question",
-            "name": "Is there a delivery charge on BankiBites?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Delivery is free for orders above ₹200. A small delivery charge of ₹50 applies for orders below ₹200."}
+            "name": "What is the delivery charge on BankiBites in Banki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Delivery in Banki is free for orders above ₹200. A small delivery charge of ₹50 applies for orders below ₹200. When you factor in petrol or auto fare to collect yourself (₹30–60), ordering on BankiBites is often cheaper overall."}
           },
           {
             "@type": "Question",
-            "name": "What are BankiBites delivery hours?",
-            "acceptedAnswer": {"@type": "Answer", "text": "BankiBites operates from 9:00 AM to 10:00 PM, 7 days a week."}
+            "name": "What are BankiBites delivery hours in Banki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "BankiBites delivers in Banki from 9:00 AM to 10:00 PM, 7 days a week, Cuttack, Odisha 754008."}
+          },
+          {
+            "@type": "Question",
+            "name": "Is there a BankiBites Android app for food delivery in Banki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. BankiBites has a free Android app available on Google Play. Search for 'BankiBites' or visit play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki. You can also order from any web browser — no app install required."}
+          },
+          {
+            "@type": "Question",
+            "name": "Is BankiBites available in Cuttack district villages near Banki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "BankiBites currently delivers within 5 km of Banki town, covering Harirajpur, Chakapada, Sisua, Bedapur, Khamaranga, Charchika, Ranapur, Sahadapada, Gopalapur and Patapur in Cuttack district, Odisha. We are expanding — contact us on WhatsApp at +91 77499 84274 to check availability in your area."}
+          },
+          {
+            "@type": "Question",
+            "name": "How do I get my restaurant listed on BankiBites for online orders in Banki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "If you run a restaurant in Banki, Cuttack, Odisha and want to receive online food orders through BankiBites, message us on WhatsApp at +91 77499 84274. There is no upfront tech cost — we handle the platform, you focus on cooking."}
           }
         ]
       },
@@ -138,36 +252,22 @@
         "@type": "BreadcrumbList",
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "AkCreation", "item": "https://akcreation-apps.com/"},
-          {"@type": "ListItem", "position": 2, "name": "BankiBites", "item": "https://akcreation-apps.com/banki-bites/"}
+          {"@type": "ListItem", "position": 2, "name": "BankiBites — Food Delivery Banki", "item": "https://akcreation-apps.com/banki-bites/"}
         ]
       },
       {
         "@type": "WebSite",
         "@id": "https://akcreation-apps.com/banki-bites/#website",
         "name": "BankiBites",
-        "alternateName": "Banki Bites",
+        "alternateName": ["Banki Bites", "Banki Bites Food Delivery"],
         "url": "https://akcreation-apps.com/banki-bites/",
+        "description": "Banki's first food delivery platform — order from local restaurants in Banki, Cuttack, Odisha 754008.",
+        "inLanguage": "en-IN",
         "potentialAction": {
           "@type": "SearchAction",
           "target": "https://akcreation-apps.com/banki-bites/dashboard.html?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://akcreation-apps.com/banki-bites/#organization",
-        "name": "BankiBites",
-        "alternateName": ["Banki Bites", "BankiBites Food Delivery"],
-        "url": "https://akcreation-apps.com/banki-bites/",
-        "logo": "https://akcreation-apps.com/banki-bites/banki-bites-logo.png",
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "telephone": "+918920042482",
-          "contactType": "customer service",
-          "areaServed": "IN",
-          "availableLanguage": ["English", "Hindi", "Odia"]
-        },
-        "sameAs": []
       }
     ]
   }
@@ -198,12 +298,16 @@
       .area-chip  { background: rgba(255,107,53,0.12); }
       .cuisine-chip { background: var(--card); }
       .step, .why-card { background: var(--card); }
-      .rp-item { background: var(--card); }
       footer { background: #0A090F; }
     }
 
     html { scroll-behavior: smooth; }
-    body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body {
+      font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    /* Sticky footer: push footer to viewport bottom when content is short */
+    body > footer { margin-top: auto; }
 
     /* ── TOPBAR ── */
     .topbar {
@@ -233,7 +337,7 @@
     /* ── HERO ── */
     .hero {
       background: var(--navy);
-      padding: 40px 16px 60px;
+      padding: 22px 16px 44px;
       position: relative; overflow: hidden;
     }
     .hero::before {
@@ -282,6 +386,106 @@
       display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
     }
     .hero-areas i { color: var(--primary); font-size: 0.65rem; }
+
+    /* ── ANDROID INSTALL BANNER (shown only via JS on Android phones) ── */
+    .install-banner {
+      background: linear-gradient(90deg, #1F8E3D 0%, #25D366 100%);
+      color: #fff;
+      padding: 10px 14px;
+      align-items: center; gap: 12px;
+      position: relative; z-index: 90;
+    }
+    .install-banner[hidden] { display: none; }
+    .install-banner.show { display: flex; }
+    .install-banner .ib-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem; flex-shrink: 0;
+    }
+    .install-banner .ib-text {
+      flex: 1; min-width: 0; line-height: 1.3;
+    }
+    .install-banner .ib-text strong {
+      display: block; font-size: 0.82rem; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .install-banner .ib-text small {
+      font-size: 0.68rem; opacity: 0.85;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+    }
+    .install-banner .ib-cta {
+      background: #fff; color: #1F8E3D;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.76rem; font-weight: 700;
+      padding: 11px 16px; border-radius: 8px;
+      text-decoration: none; flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .install-banner .ib-close {
+      background: none; border: none; color: #fff;
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 0.95rem; opacity: 0.85;
+      flex-shrink: 0;
+    }
+    .install-banner .ib-close:hover { opacity: 1; background: rgba(255,255,255,0.15); }
+
+    /* ── HERO SPLIT (Why above the fold) ── */
+    .hero-split { max-width: 1040px; display: grid; grid-template-columns: 1fr; gap: 18px; }
+    .hero-copy { text-align: center; }
+    .hero-copy .hero-eyebrow { margin-bottom: 12px; }
+    .hero-trust {
+      margin-top: 12px; font-size: 0.72rem; font-weight: 500;
+      color: rgba(255,255,255,0.78); display: inline-flex; gap: 6px;
+      align-items: center; flex-wrap: wrap; justify-content: center;
+    }
+    .hero-trust i { color: var(--primary); font-size: 0.75rem; }
+
+    .hero-why {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 14px 12px 12px;
+      position: relative;
+    }
+    .hero-why-title {
+      color: #fff; font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.3px; margin: 4px 0 10px; text-align: center;
+    }
+    .hero-why-visual {
+      position: relative; height: 64px; margin-bottom: 2px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hwv-bg {
+      position: absolute; width: 64px; height: 64px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,107,53,0.32) 0%, rgba(255,107,53,0) 70%);
+    }
+    .hwv-main { color: var(--primary); font-size: 2rem; position: relative; }
+    .hwv-acc-1, .hwv-acc-2 {
+      position: absolute; background: var(--card); color: var(--primary);
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    }
+    .hwv-acc-1 { right: calc(50% - 46px); top: 4px; }
+    .hwv-acc-2 { left: calc(50% - 46px); bottom: 4px; color: #ff5577; }
+
+    .hero-why-pills {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    }
+    .hero-why-pills li {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 8px 9px;
+      font-size: 0.74rem; line-height: 1.3;
+      color: rgba(255,255,255,0.88);
+    }
+    .hero-why-pills li i {
+      color: var(--primary); font-size: 0.78rem; flex-shrink: 0;
+    }
+    .hero-why-pills strong { color: #fff; font-weight: 700; }
 
     /* ── SECTION WRAPPER ── */
     .section { max-width: 960px; margin: 0 auto; padding: 0 16px; }
@@ -346,6 +550,145 @@
     }
     .why-card h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 3px; }
     .why-card p { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── Honest Math ledger (inside price why-card) ── */
+    .why-card.why-card--wide { grid-column: 1 / -1; flex-direction: column; align-items: stretch; }
+    .why-card--wide > .why-card-head { display: flex; align-items: flex-start; gap: 14px; }
+    .why-card--wide .why-card-head > .why-card-body { flex: 1; min-width: 0; }
+    .why-card--wide .why-icon { flex: 0 0 42px; }
+    .honest-math {
+      display: grid; grid-template-columns: 1fr; gap: 10px;
+      margin-top: 14px;
+    }
+    .hm-col {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px;
+    }
+    .hm-col--vs { border-color: rgba(255,107,53,0.4); background: #FFF7F1; }
+    @media (prefers-color-scheme: dark) {
+      .hm-col { background: rgba(255,255,255,0.03); }
+      .hm-col--vs { background: rgba(255,107,53,0.06); border-color: rgba(255,107,53,0.45); }
+    }
+    .hm-title {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.6px;
+      text-transform: uppercase; color: #4A5568; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .hm-title { color: #B8B0C2; }
+    }
+    .hm-col--vs .hm-title { color: var(--primary); }
+    .hm-title i { font-size: 0.78rem; }
+    .hm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+    .hm-list li {
+      font-size: 0.74rem; line-height: 1.4; color: var(--text);
+      display: flex; align-items: flex-start; gap: 7px;
+    }
+    .hm-list li i {
+      color: var(--primary); font-size: 0.65rem; margin-top: 4px; flex-shrink: 0;
+    }
+    .hm-col:not(.hm-col--vs) .hm-list li i { color: var(--muted); }
+    .hm-total {
+      margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--border);
+      font-size: 0.74rem; font-weight: 700; color: var(--text);
+    }
+    .hm-col--vs .hm-total { color: var(--primary); }
+    .hm-verdict {
+      margin-top: 14px; font-size: 0.78rem; line-height: 1.5;
+      color: var(--text); font-weight: 600;
+    }
+    .hm-verdict strong { color: var(--primary); }
+    @media (min-width: 600px) {
+      .honest-math { grid-template-columns: 1fr 1fr; gap: 12px; }
+    }
+
+    /* ── BANKI LOCALS PROMO STRIP ── */
+    .locals-strip { padding-top: 32px; padding-bottom: 32px; }
+    .locals-link { text-decoration: none; display: block; }
+    .locals-card {
+      background: linear-gradient(135deg, #0f3d24, #1a5c38);
+      border-radius: 18px; padding: 22px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 14px; flex-wrap: wrap;
+      position: relative; overflow: hidden;
+    }
+    .locals-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 0% 50%, rgba(74,222,128,0.15) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .locals-info { display: flex; align-items: center; gap: 14px; position: relative; }
+    .locals-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(74,222,128,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .locals-eyebrow {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #4ade80; margin-bottom: 4px;
+    }
+    .locals-title { font-size: 0.92rem; font-weight: 800; color: #fff; line-height: 1.25; }
+    .locals-sub { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin-top: 3px; }
+    .locals-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #25D366; color: #fff;
+      font-size: 0.78rem; font-weight: 700;
+      padding: 10px 18px; border-radius: 11px;
+      font-family: 'Poppins', sans-serif;
+      flex-shrink: 0; position: relative;
+    }
+    .locals-link:hover .locals-cta { filter: brightness(0.95); }
+
+    /* ── GROW STRIP (request + onboard CTAs) ── */
+    .grow { padding-top: 32px; padding-bottom: 4px; }
+    .grow-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .grow-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px 16px;
+      display: flex; flex-direction: column; gap: 10px;
+      position: relative; overflow: hidden;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    }
+    .grow-card:hover, .grow-card:focus-visible {
+      border-color: var(--primary);
+      box-shadow: 0 6px 24px rgba(255,107,53,0.12);
+      transform: translateY(-2px); outline: none;
+    }
+    .grow-card .grow-icon {
+      width: 40px; height: 40px; border-radius: 11px;
+      background: #FFF0E8; color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .grow-card--owner .grow-icon {
+      background: rgba(37,211,102,0.12); color: #25D366;
+    }
+    @media (prefers-color-scheme: dark) {
+      .grow-card .grow-icon { background: rgba(255,107,53,0.14); }
+      .grow-card--owner .grow-icon { background: rgba(37,211,102,0.16); }
+    }
+    .grow-card h3 {
+      font-size: 0.92rem; font-weight: 800; line-height: 1.3;
+      color: var(--text); margin: 0;
+    }
+    .grow-card p {
+      font-size: 0.76rem; color: var(--muted); line-height: 1.5; margin: 0;
+    }
+    .grow-cta {
+      display: inline-flex; align-items: center; gap: 7px;
+      align-self: flex-start; margin-top: 4px;
+      background: var(--primary); color: #fff;
+      font-size: 0.78rem; font-weight: 700;
+      padding: 9px 16px; border-radius: 10px;
+      pointer-events: none; user-select: none;
+    }
+    .grow-card--owner .grow-cta { background: #25D366; }
+    .grow-card:hover .grow-cta { filter: brightness(0.95); }
+    @media (min-width: 700px) {
+      .grow-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+    }
 
     /* ── BOTTOM CTA STRIP ── */
     .bottom-cta {
@@ -429,13 +772,49 @@
     .skel { background: linear-gradient(90deg, #ede8e3 25%, #f5f0eb 50%, #ede8e3 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+    /* ── PICKER DARK-MODE (placed after base rules so cascade wins) ── */
+    @media (prefers-color-scheme: dark) {
+      .sheet { background: #15121F; }
+      .sheet-header h3 { color: #F5F0E8; }
+      .sheet-header p { color: #A89FB5; }
+      .rp-item { background: #251F36; border-color: #3A3450; }
+      .rp-item:hover { border-color: var(--primary); box-shadow: 0 3px 12px rgba(255,107,53,0.18); }
+      .rp-name { color: #F5F0E8; }
+      .rp-tags { color: #A89FB5; }
+      .rp-rating { color: #F5F0E8; }
+      .rp-rating i { color: #FBBF24; }
+      .rp-arrow { color: #6B6480; }
+      .rp-logo { border-color: #3A3450; }
+      .rp-logo--placeholder { background: linear-gradient(135deg, #2B2540 0%, #1F1A30 100%); }
+      .rp-open.open   { color: #4ADE80; }
+      .rp-open.closed { color: #F87171; }
+      .skel {
+        background: linear-gradient(90deg, #2B2540 25%, #3A3450 50%, #2B2540 75%);
+        background-size: 200% 100%;
+      }
+    }
+
     /* ── RESPONSIVE ── */
     @media (min-width: 600px) {
-      .why-grid { grid-template-columns: repeat(3, 1fr); }
+      .why-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
       .steps { grid-template-columns: repeat(4, 1fr); }
       .sheet-backdrop { align-items: center; }
       .sheet { border-radius: 20px; max-height: 80vh; }
       .serve-block { padding-top: 36px; }
+    }
+
+    @media (min-width: 760px) {
+      .hero { padding: 44px 16px 70px; }
+      .hero-split { grid-template-columns: 1.15fr 0.85fr; gap: 36px; align-items: center; }
+      .hero-copy { text-align: left; }
+      .hero-copy .hero-trust { justify-content: flex-start; }
+      .hero-why-pills { grid-template-columns: 1fr; gap: 8px; }
+      .hero-why-pills li { font-size: 0.78rem; padding: 10px 12px; }
+      .hero-why-visual { height: 90px; }
+      .hwv-bg { width: 80px; height: 80px; }
+      .hwv-main { font-size: 2.6rem; }
+      .hwv-acc-1, .hwv-acc-2 { width: 30px; height: 30px; font-size: 0.78rem; }
+      .hero-why-title { font-size: 0.9rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -443,6 +822,8 @@
       .sheet, .sheet-backdrop { transition: none; }
       .btn-cta { transition: none; }
       .rp-item { transition: none; }
+      .grow-card { transition: none; transform: none; }
+      .grow-card:hover, .grow-card:focus-visible { transform: none; }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -456,33 +837,70 @@
 </head>
 <body>
 
+  <!-- Android install banner (JS reveals only on Android phones, not iOS/desktop/in-app webview) -->
+  <aside class="install-banner" id="installBanner" role="region" aria-label="Install BankiBites Android app" aria-live="polite" hidden>
+    <div class="ib-icon" aria-hidden="true"><i class="fab fa-google-play"></i></div>
+    <div class="ib-text">
+      <strong>Get the BankiBites app</strong>
+      <small>Faster ordering — free on Google Play</small>
+    </div>
+    <a class="ib-cta"
+       href="https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki"
+       target="_blank" rel="noopener"
+       data-umami-event="bankibites-install-android"
+       aria-label="Install BankiBites Android app from Google Play">
+      Install <i class="fas fa-arrow-right" aria-hidden="true"></i>
+    </a>
+    <button class="ib-close" id="installBannerClose" aria-label="Dismiss install prompt">
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </aside>
+
   <!-- Topbar -->
   <header class="topbar">
     <nav class="topbar-inner" aria-label="Main navigation">
-      <a class="brand" href="index.html" aria-label="BankiBites home">
-        <div class="brand-logo"><img src="banki-bites-logo.png" alt="BankiBites logo"></div>
+      <a class="brand" href="index.html" aria-label="BankiBites — food delivery in Banki, Cuttack">
+        <div class="brand-logo"><img src="banki-bites-logo.png" alt="BankiBites food delivery logo — Banki, Cuttack, Odisha"></div>
         <span class="brand-name">Banki<span>Bites</span></span>
       </a>
-      <a class="topbar-link" href="dashboard.html">All Restaurants</a>
+      <a class="topbar-link" href="dashboard.html" title="All restaurants delivering in Banki, Cuttack, Odisha">All Restaurants</a>
     </nav>
   </header>
 
+  <main id="main" tabindex="-1">
+
   <!-- Hero -->
   <section class="hero" aria-label="Hero — order food in Banki, Cuttack">
-    <div class="hero-inner">
-      <div class="hero-eyebrow"><i class="fas fa-bolt" aria-hidden="true"></i> Banki's First Food Delivery</div>
-      <h1>Hungry in <em>Banki?</em><br>We've got you covered</h1>
-      <p class="hero-sub">
-        <strong>BankiBites</strong> connects you with the best local restaurants in Banki, Cuttack — Chinese, North Indian, Fast Food and more.
-        Hot food delivered right to your door, no app download needed.
-      </p>
-      <button class="btn-cta" id="orderBtn" aria-label="Find restaurants and order food">
-        <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Food Now
-      </button>
-      <p class="hero-areas">
-        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-        Banki · Harirajpur · Chakapada · Sisua · Bedapur · Khamaranga + more
-      </p>
+    <div class="hero-inner hero-split">
+
+      <div class="hero-copy">
+        <div class="hero-eyebrow"><i class="fas fa-bolt" aria-hidden="true"></i> Banki's First Food Delivery</div>
+        <h1>Hungry in <em>Banki?</em> Order in 2 taps.</h1>
+        <button class="btn-cta" id="orderBtn" aria-label="Find restaurants and order food">
+          <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Food Now
+        </button>
+        <p class="hero-trust">
+          <i class="fas fa-shield-halved" aria-hidden="true"></i>
+          Fresh-cooked &middot; ~45 min to your door &middot; Use the app or any browser
+        </p>
+      </div>
+
+      <aside class="hero-why" aria-label="Why order via BankiBites">
+        <div class="hero-why-visual" aria-hidden="true">
+          <span class="hwv-bg"></span>
+          <i class="fas fa-bowl-food hwv-main"></i>
+          <i class="fas fa-motorcycle hwv-acc-1"></i>
+          <i class="fas fa-heart hwv-acc-2"></i>
+        </div>
+        <h2 class="hero-why-title">Why BankiBites?</h2>
+        <ul class="hero-why-pills">
+          <li><i class="fas fa-clock" aria-hidden="true"></i><span><strong>~45 min</strong> doorstep delivery</span></li>
+          <li><i class="fas fa-utensils" aria-hidden="true"></i><span><strong>Local kitchen</strong> cooks your order</span></li>
+          <li><i class="fas fa-store" aria-hidden="true"></i><span><strong>Banki's own</strong> restaurants</span></li>
+          <li><i class="fas fa-scale-balanced" aria-hidden="true"></i><span><strong>Honest math</strong> beats menu shock</span></li>
+        </ul>
+      </aside>
+
     </div>
   </section>
 
@@ -498,7 +916,7 @@
 
       <h2 class="sec-title">Where we deliver</h2>
       <p class="serve-sub">Serving Banki and surrounding areas within 5 km, Cuttack, Odisha 754008</p>
-      <ul class="area-chips" id="areaChips" aria-label="Delivery areas in Banki" role="list">
+      <ul class="area-chips" id="areaChips" aria-label="Food delivery areas in Banki, Cuttack, Odisha 754008" role="list">
         <li class="area-chip skel" aria-hidden="true" style="width:70px;height:22px;border-radius:8px;display:inline-block;"></li>
         <li class="area-chip skel" aria-hidden="true" style="width:80px;height:22px;border-radius:8px;display:inline-block;"></li>
         <li class="area-chip skel" aria-hidden="true" style="width:65px;height:22px;border-radius:8px;display:inline-block;"></li>
@@ -534,63 +952,131 @@
 
     <!-- Why BankiBites -->
     <div class="why">
-      <h2 class="sec-title">Why BankiBites?</h2>
+      <h2 class="sec-title">Why people in Banki choose BankiBites</h2>
       <div class="why-grid">
         <div class="why-card">
-          <div class="why-icon"><i class="fas fa-heart" aria-hidden="true"></i></div>
+          <div class="why-icon"><i class="fas fa-hourglass-half" aria-hidden="true"></i></div>
           <div>
-            <h3>Local Restaurants</h3>
-            <p>Discover and support the best restaurants right here in Banki, Cuttack, Odisha.</p>
+            <h3>Your time is worth more</h3>
+            <p>Skip the trip and the wait. Place an order, stay focused on what matters, and in about 45 minutes your favourite food is at your door.</p>
           </div>
         </div>
         <div class="why-card">
-          <div class="why-icon"><i class="fas fa-motorcycle" aria-hidden="true"></i></div>
+          <div class="why-icon"><i class="fas fa-utensils" aria-hidden="true"></i></div>
           <div>
-            <h3>Fast Delivery</h3>
-            <p>Hot food delivered to your door within your area — no long waits, no cold food.</p>
+            <h3>Real restaurants, made-to-order</h3>
+            <p>BankiBites is a service that connects you with Banki's own restaurants — not a ghost kitchen, not a stockroom. Your order is prepared at the restaurant after you place it, the same way they serve walk-in customers.</p>
           </div>
         </div>
         <div class="why-card">
-          <div class="why-icon"><i class="fas fa-mobile-screen" aria-hidden="true"></i></div>
+          <div class="why-icon"><i class="fas fa-cloud-showers-heavy" aria-hidden="true"></i></div>
           <div>
-            <h3>No App Needed</h3>
-            <p>Order instantly from your browser. No sign-up, no download, no hassle.</p>
+            <h3>Any weather, any mood</h3>
+            <p>Rain, heat, late night or simply tired? You don't need to step out to taste Banki's best — BankiBites brings the restaurant home.</p>
           </div>
+        </div>
+        <div class="why-card why-card--wide">
+          <div class="why-card-head">
+            <div class="why-icon"><i class="fas fa-scale-balanced" aria-hidden="true"></i></div>
+            <div class="why-card-body">
+              <h3>The Honest Math — why our price isn't really higher</h3>
+              <p>Looking at the menu online, you'll spot a small markup over the printed price at the counter. Fair question: why? Here's the side nobody bothers to show you.</p>
+            </div>
+          </div>
+          <div class="honest-math" role="group" aria-label="Cost comparison: going yourself vs ordering on BankiBites">
+            <div class="hm-col">
+              <div class="hm-title"><i class="fas fa-person-walking" aria-hidden="true"></i> If you go yourself</div>
+              <ul class="hm-list">
+                <li><i class="fas fa-circle"></i> Menu price at the counter</li>
+                <li><i class="fas fa-circle"></i> <strong>+ ₹30–60</strong> petrol or auto fare</li>
+                <li><i class="fas fa-circle"></i> <strong>+ 30–45 min</strong> of your time</li>
+                <li><i class="fas fa-circle"></i> + heat, rain, queue &amp; parking</li>
+                <li><i class="fas fa-circle"></i> + the trip back home</li>
+              </ul>
+              <div class="hm-total">Real cost: way more than the menu</div>
+            </div>
+            <div class="hm-col hm-col--vs">
+              <div class="hm-title"><i class="fas fa-motorcycle" aria-hidden="true"></i> If you order on BankiBites</div>
+              <ul class="hm-list">
+                <li><i class="fas fa-circle"></i> Menu price <em>(a small markup)</em></li>
+                <li><i class="fas fa-circle"></i> 30 seconds to order</li>
+                <li><i class="fas fa-circle"></i> Doorstep in ~45 minutes</li>
+                <li><i class="fas fa-circle"></i> Zero stepping out</li>
+              </ul>
+              <div class="hm-total">Real cost: lower &mdash; once you count your time</div>
+            </div>
+          </div>
+          <p class="hm-verdict">Same restaurant. Same food. The markup is the price of <strong>not spending your petrol, your time and your energy</strong> — and it keeps Banki's local restaurants growing.</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Banki Locals Promo Strip -->
-  <div class="section" style="padding-top:32px;padding-bottom:32px;">
-    <a href="sell.html" style="text-decoration:none;display:block;" aria-label="Learn about Banki Locals — sell homemade food">
-      <div style="background:linear-gradient(135deg,#0f3d24,#1a5c38);border-radius:18px;padding:22px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;position:relative;overflow:hidden;">
-        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 0% 50%,rgba(74,222,128,0.15) 0%,transparent 65%);pointer-events:none;"></div>
-        <div style="display:flex;align-items:center;gap:14px;position:relative;">
-          <div style="width:48px;height:48px;border-radius:14px;background:rgba(74,222,128,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;" aria-hidden="true">🌿</div>
+  <div class="section locals-strip">
+    <a href="sell.html" class="locals-link" aria-label="Learn about Banki Locals — sell homemade food">
+      <div class="locals-card">
+        <div class="locals-info">
+          <div class="locals-icon" aria-hidden="true">🌿</div>
           <div>
-            <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4ade80;margin-bottom:4px;">NEW — Banki Flavours</div>
-            <div style="font-size:0.92rem;font-weight:800;color:#fff;line-height:1.25;">Sell your homemade items from home</div>
-            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:3px;">Achar · Papad · Sweets · Snacks — list for ₹149, we handle the rest</div>
+            <div class="locals-eyebrow">NEW — Banki Flavours</div>
+            <div class="locals-title">Sell your homemade items from home</div>
+            <div class="locals-sub">Achar · Papad · Sweets · Snacks — list for ₹149, we handle the rest</div>
           </div>
         </div>
-        <div style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-size:0.78rem;font-weight:700;padding:10px 18px;border-radius:11px;font-family:'Poppins',sans-serif;flex-shrink:0;position:relative;">
+        <div class="locals-cta">
           <i class="fab fa-whatsapp" aria-hidden="true"></i> List Now
         </div>
       </div>
     </a>
   </div>
 
+  <!-- Help Banki's food scene grow — customer + restaurant onboarding -->
+  <div class="section grow">
+    <h2 class="sec-title">Help us bring more of Banki online</h2>
+    <div class="grow-grid">
+      <a class="grow-card"
+         href="https://wa.me/917749984274?text=Hi%20BankiBites%2C%20I%27d%20like%20to%20suggest%20a%20restaurant%20to%20add%20on%20your%20platform%20for%20Banki%20delivery.%0A%0ARestaurant%20name%3A%20%0ALocation%20in%20Banki%3A%20%0AWhy%20I%20love%20it%3A%20"
+         aria-label="Request your favourite restaurant to join BankiBites via WhatsApp"
+         data-umami-event="bankibites-request-restaurant">
+        <div class="grow-icon"><i class="fas fa-magnifying-glass-location" aria-hidden="true"></i></div>
+        <h3>Didn't find your favourite restaurant?</h3>
+        <p>Tell us the name and we'll personally reach out to onboard them. You become the reason your go-to spot in Banki comes online — and the first to order when it does.</p>
+        <span class="grow-cta">
+          <i class="fab fa-whatsapp" aria-hidden="true"></i> Request a Restaurant
+        </span>
+      </a>
+
+      <a class="grow-card grow-card--owner"
+         href="https://wa.me/917749984274?text=Hi%20BankiBites%2C%20I%20run%20a%20restaurant%20in%20Banki%20and%20would%20like%20to%20partner%20with%20you.%0A%0ARestaurant%20name%3A%20%0ALocation%20in%20Banki%3A%20%0ACuisines%20served%3A%20%0AOwner%20name%3A%20"
+         aria-label="Restaurant owner — contact BankiBites for onboarding via WhatsApp"
+         data-umami-event="bankibites-owner-onboard">
+        <div class="grow-icon"><i class="fas fa-store" aria-hidden="true"></i></div>
+        <h3>Run a restaurant in Banki? Join BankiBites.</h3>
+        <p>Start receiving online orders from across Banki — no app to build, no tech setup, no upfront cost. We handle the platform, you focus on the kitchen.</p>
+        <span class="grow-cta">
+          <i class="fab fa-whatsapp" aria-hidden="true"></i> Partner With Us
+        </span>
+      </a>
+    </div>
+  </div>
+
   <!-- Bottom CTA -->
   <div class="bottom-cta">
     <p>Ready to order on BankiBites? Pick your favourite restaurant.</p>
-    <button class="btn-cta" id="orderBtn2" aria-label="Find restaurants">
+    <button class="btn-cta" id="orderBtn2" aria-label="Find restaurants delivering in Banki, Cuttack, Odisha">
       <i class="fas fa-utensils" aria-hidden="true"></i> Find Restaurants Near You
     </button>
   </div>
 
+  </main>
+
   <!-- Footer -->
   <footer>
+    <address style="display:none" aria-hidden="true">
+      BankiBites (Banki Bites) — food delivery in Banki, Cuttack, Odisha 754008, India.
+      Tel: +91 77499 84274
+    </address>
     <p class="footer-brand-note">BankiBites — popularly searched as <em>Banki Bites</em> — is Banki's first online food delivery platform, Cuttack, Odisha 754008.</p>
     <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AkCreation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
     <p style="margin-top:8px;">Powered by <a href="https://akcreation-apps.com/services.html">AkCreation</a></p>
@@ -633,6 +1119,29 @@
 
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // Android-only install banner (suppress on iOS, desktop, and in-app webview)
+    (function () {
+      const ua = navigator.userAgent || '';
+      const isAndroid   = /Android/i.test(ua);
+      const isIOS       = /iPad|iPhone|iPod/i.test(ua);
+      const isWebView   = /; wv\)/i.test(ua); // Chrome Android WebView marker
+      const isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+      const dismissed   = (() => { try { return localStorage.getItem('bb_install_dismissed') === '1'; } catch (_) { return false; } })();
+
+      if (!isAndroid || isIOS || isWebView || isStandalone || dismissed) return;
+
+      const banner = document.getElementById('installBanner');
+      if (!banner) return;
+      banner.hidden = false;
+      banner.classList.add('show');
+
+      document.getElementById('installBannerClose').addEventListener('click', () => {
+        banner.classList.remove('show');
+        banner.hidden = true;
+        try { localStorage.setItem('bb_install_dismissed', '1'); } catch (_) {}
+      });
+    })();
 
     const restBackdrop = document.getElementById('restBackdrop');
     const rpList       = document.getElementById('rpList');

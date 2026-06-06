@@ -239,13 +239,23 @@
 
     html { scroll-behavior: smooth; }
 
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
       background: var(--bg);
       color: var(--text);
       padding-top: var(--nav-h);
       min-height: 100vh;
+      display: flex; flex-direction: column;
     }
+    /* Push footer to viewport bottom when content is short */
+    .grid { flex: 1 0 auto; }
+    footer { flex-shrink: 0; }
 
     /* ── Navbar (shared with index) ── */
     .navbar {
@@ -278,89 +288,141 @@
     }
     .nav-back:hover { color: #fff; }
 
-    /* ── Page header ── */
-    .page-header {
+    /* ── Sticky cuisine filter bar (replaces verbose page header) ── */
+    .filter-bar {
+      position: sticky; top: var(--nav-h); z-index: 50;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+    .filter-row {
       max-width: 1200px; margin: 0 auto;
-      padding: 28px 20px 8px;
+      display: flex; gap: 8px; padding-right: 32px;
+      overflow-x: auto; overflow-y: hidden;
+      scrollbar-width: none; -ms-overflow-style: none;
+      mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
     }
-    .page-header h1 {
-      font-size: 1.4rem; font-weight: 800; color: var(--text);
-      display: flex; align-items: center; gap: 10px;
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      flex-shrink: 0; white-space: nowrap;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.78rem; font-weight: 600;
+      padding: 7px 14px; border-radius: 20px;
+      background: var(--card); color: var(--text);
+      border: 1.5px solid var(--border);
+      cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
-    .page-header h1 .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent); display: inline-block;
-      animation: pulse 1.5s ease-in-out infinite;
+    .filter-chip:hover { border-color: var(--primary); color: var(--primary); }
+    .filter-chip.active {
+      background: var(--primary); border-color: var(--primary); color: #fff;
     }
-    @keyframes pulse {
-      0%,100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.4); }
+    .filter-chip .count {
+      margin-left: 4px; opacity: 0.7; font-weight: 500;
     }
-    .page-header p { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
 
-    /* ── Grid ── */
+    /* ── Grid (uniform card height across rows) ── */
     .grid {
       max-width: 1200px; margin: 0 auto;
       padding: 20px 20px 60px;
       display: grid;
       grid-template-columns: 1fr;
+      grid-auto-rows: max-content;
+      align-content: start;
       gap: 16px;
     }
 
-    /* ── Restaurant Card ── */
+    /* ── Restaurant Card (one-tap link) ── */
     .rest-card {
       background: var(--card); border-radius: 16px;
       border: 1px solid var(--border);
       box-shadow: 0 1px 6px rgba(0,0,0,0.06);
       overflow: hidden;
-      transition: box-shadow 0.2s, transform 0.2s;
-      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+      align-self: start;
     }
-    .rest-card:hover {
+    .rest-card:hover, .rest-card:focus-visible {
       box-shadow: 0 8px 32px rgba(255,107,53,0.14);
       transform: translateY(-2px);
+      border-color: var(--primary);
+      outline: none;
     }
-    .card-inner { display: flex; align-items: center; gap: 16px; padding: 18px; }
+    .card-inner { display: flex; align-items: center; gap: 12px; padding: 12px 14px; flex: 1; }
     .card-logo {
-      width: 72px; height: 72px; border-radius: 50%;
+      width: 52px; height: 52px; border-radius: 50%;
       object-fit: cover; flex-shrink: 0;
       border: 2px solid var(--border);
     }
     .card-logo-skeleton {
-      width: 72px; height: 72px; border-radius: 50%;
+      width: 52px; height: 52px; border-radius: 50%;
       background: linear-gradient(90deg, #f0e6de 25%, #ffe8db 50%, #f0e6de 75%);
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite; flex-shrink: 0;
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .card-body { flex: 1; min-width: 0; }
+    .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
     .card-name {
-      font-size: 1rem; font-weight: 700; color: var(--text);
+      font-size: 0.92rem; font-weight: 700; color: var(--text);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      margin-bottom: 6px;
+      line-height: 1.25;
     }
-    .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+    /* horizontal-scroll cuisine chip row — keeps card height constant
+       no matter how many services a restaurant has */
+    .card-tags {
+      display: flex; gap: 5px; flex-wrap: nowrap;
+      overflow-x: auto; overflow-y: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      mask-image: linear-gradient(to right, #000 calc(100% - 14px), transparent);
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 14px), transparent);
+      padding-right: 4px;
+    }
+    .card-tags::-webkit-scrollbar { display: none; }
     .tag {
-      font-size: 0.72rem; font-weight: 600; padding: 2px 8px;
-      border-radius: 10px; background: #FFF0E8; color: var(--primary);
+      font-size: 0.66rem; font-weight: 600; padding: 1px 7px;
+      border-radius: 9px; background: #FFF0E8; color: var(--primary);
       border: 1px solid rgba(255,107,53,0.15);
+      flex-shrink: 0; white-space: nowrap; line-height: 1.5;
     }
-    .card-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .rating { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 600; color: #f59e0b; }
-    .rating span { color: var(--muted); font-weight: 400; }
+    @media (prefers-color-scheme: dark) {
+      .tag { background: rgba(255,107,53,0.12); border-color: rgba(255,107,53,0.25); }
+    }
+    .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow: hidden; }
+    .rating { display: inline-flex; align-items: center; gap: 3px; font-size: 0.74rem; font-weight: 700; color: var(--text); flex-shrink: 0; }
+    .rating i { color: #f59e0b; font-size: 0.72rem; }
+    .rating span { color: var(--muted); font-weight: 400; font-size: 0.68rem; }
     .open-badge {
-      font-size: 0.72rem; font-weight: 700; padding: 2px 8px;
-      border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+      font-size: 0.62rem; font-weight: 700; padding: 1px 7px;
+      border-radius: 9px; text-transform: uppercase; letter-spacing: 0.3px;
+      flex-shrink: 0;
     }
     .open-badge.open  { background: #dcfce7; color: #15803d; }
     .open-badge.open::before  { content: '●'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
     .open-badge.closed { background: #fee2e2; color: #b91c1c; }
     .open-badge.closed::before { content: '○'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
-    .card-chevron {
-      color: var(--muted); font-size: 0.85rem; flex-shrink: 0;
-      transition: transform 0.2s;
+    @media (prefers-color-scheme: dark) {
+      .open-badge.open  { background: rgba(34,197,94,0.16); color: #4ADE80; }
+      .open-badge.closed { background: rgba(239,68,68,0.16); color: #F87171; }
     }
-    .rest-card:hover .card-chevron { transform: translateX(4px); }
+    .card-address {
+      font-size: 0.7rem; color: var(--muted); line-height: 1.3;
+      display: flex; gap: 5px; align-items: center;
+    }
+    .card-address i { color: var(--primary); font-size: 0.66rem; flex-shrink: 0; }
+    .card-address span {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      min-width: 0; flex: 1;
+    }
+    .card-cta {
+      border-top: 1px solid var(--border);
+      padding: 7px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.72rem; font-weight: 700; color: var(--primary);
+    }
+    .card-cta i { transition: transform 0.2s; }
+    .rest-card:hover .card-cta i, .rest-card:focus-visible .card-cta i { transform: translateX(4px); }
 
     /* ── Skeleton card ── */
     .skeleton-card {
@@ -382,79 +444,6 @@
     .error-state i { font-size: 2.5rem; color: var(--border); margin-bottom: 14px; display: block; }
     .error-state p { font-size: 0.85rem; color: var(--muted); }
 
-    /* ── Modal ── */
-    .modal-backdrop {
-      position: fixed; inset: 0; z-index: 2000;
-      background: rgba(10, 8, 20, 0.65);
-      backdrop-filter: blur(4px);
-      display: flex; align-items: flex-end; justify-content: center;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .modal-backdrop.open { opacity: 1; pointer-events: all; }
-
-    .modal {
-      background: var(--card); width: 100%; max-width: 480px;
-      border-radius: 24px 24px 0 0;
-      padding: 0 0 32px;
-      transform: translateY(40px);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      max-height: 92vh; overflow-y: auto;
-    }
-    .modal-backdrop.open .modal { transform: translateY(0); }
-
-    .modal-drag { width: 40px; height: 4px; border-radius: 2px; background: var(--border); margin: 14px auto 0; }
-
-    .modal-header {
-      display: flex; align-items: center; gap: 16px;
-      padding: 20px 22px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    .modal-logo {
-      width: 64px; height: 64px; border-radius: 50%;
-      object-fit: cover; border: 2px solid var(--border); flex-shrink: 0;
-    }
-    .modal-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 3px; }
-    .modal-addr { font-size: 0.75rem; color: var(--muted); line-height: 1.4; }
-
-    .modal-close {
-      margin-left: auto; background: var(--bg); border: none;
-      width: 44px; height: 44px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--muted); font-size: 0.85rem;
-      flex-shrink: 0; transition: background 0.15s;
-    }
-    .modal-close:hover { background: var(--border); }
-
-    .modal-body { padding: 18px 22px; }
-
-    .modal-row {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 10px 0; border-bottom: 1px solid var(--border);
-      font-size: 0.83rem;
-    }
-    .modal-row:last-of-type { border-bottom: none; }
-    .modal-row i { color: var(--primary); width: 16px; margin-top: 2px; flex-shrink: 0; }
-    .modal-row .label { color: var(--muted); font-size: 0.72rem; display: block; margin-bottom: 2px; font-weight: 500; }
-    .modal-row .val { color: var(--text); font-weight: 500; }
-
-    .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 4px; }
-    .modal-tag {
-      font-size: 0.72rem; font-weight: 600; padding: 4px 10px;
-      border-radius: 12px; background: #FFF0E8; color: var(--primary);
-      border: 1px solid rgba(255,107,53,0.2);
-    }
-
-    .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; padding: 0 22px; }
-    .btn-order {
-      background: var(--primary); color: #fff;
-      padding: 14px; border-radius: 12px;
-      font-size: 0.9rem; font-weight: 700; text-decoration: none;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: background 0.2s;
-    }
-    .btn-order:hover { background: var(--primary-dark); }
-
     /* ── Footer ── */
     footer {
       background: var(--navy); color: rgba(255,255,255,0.5);
@@ -464,14 +453,10 @@
     footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
     footer a:hover { color: var(--primary); }
 
-    /* ── Closed card — suppress hover lift ── */
-    .rest-card-closed:hover { box-shadow: 0 1px 6px rgba(0,0,0,0.06); transform: none; cursor: default; }
+    /* ── Closed card — suppress hover lift & disable navigation ── */
+    .rest-card-closed { opacity: 0.55; pointer-events: none; }
+    .rest-card-closed .card-cta { color: var(--muted); }
 
-    /* ── Desktop modal centering ── */
-    @media (min-width: 600px) {
-      .modal-backdrop { align-items: center; }
-      .modal { border-radius: 20px; max-height: 80vh; }
-    }
     @media (min-width: 640px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
     }
@@ -482,8 +467,8 @@
     @media (prefers-reduced-motion: reduce) {
       .card-logo-skeleton, .skel-text { animation: none; background: #f0e6de; }
       .dot { animation: none; }
-      .modal, .modal-backdrop { transition: none; }
-      .rest-card, .btn-order { transition: none; }
+      .rest-card, .card-cta i { transition: none; transform: none; }
+      .rest-card:hover, .rest-card:focus-visible { transform: none; }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -510,10 +495,10 @@
     </div>
   </nav>
 
-  <!-- Page header -->
-  <div class="page-header">
-    <h1><span class="dot" aria-hidden="true"></span> Restaurants in Banki, Cuttack</h1>
-    <p>Order food online in Banki, Odisha &nbsp;·&nbsp; 5 km delivery radius &nbsp;·&nbsp; Tap a restaurant to view details</p>
+  <!-- Cuisine filter (sticky, horizontal scroll) -->
+  <h1 class="sr-only">Restaurants in Banki, Cuttack — Order Food Online</h1>
+  <div class="filter-bar" role="region" aria-label="Filter restaurants by cuisine">
+    <div class="filter-row" id="filterRow" role="group" aria-label="Cuisine filters"></div>
   </div>
 
   <!-- Cards grid -->
@@ -543,42 +528,6 @@
     <p>Could not load restaurants. Please check your connection and try again.</p>
   </div>
 
-  <!-- Modal -->
-  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal" id="modal">
-      <div class="modal-drag" aria-hidden="true"></div>
-      <div class="modal-header">
-        <img class="modal-logo" id="modalLogo" src="" alt="">
-        <div>
-          <h2 class="modal-title" id="modalTitle"></h2>
-        </div>
-        <button class="modal-close" id="modalClose" aria-label="Close restaurant details">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-tags" id="modalTags"></div>
-        <div class="modal-row">
-          <i class="fas fa-clock" aria-hidden="true"></i>
-          <div><span class="label">Hours</span><span class="val" id="modalHours"></span></div>
-        </div>
-        <div class="modal-row">
-          <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-          <div><span class="label">Address</span><span class="val" id="modalAddress"></span></div>
-        </div>
-        <div class="modal-row">
-          <i class="fas fa-star" aria-hidden="true"></i>
-          <div><span class="label">Rating</span><span class="val" id="modalRating"></span></div>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <a class="btn-order" id="modalOrderBtn" href="#" target="_blank" rel="noopener">
-          <i class="fas fa-utensils" aria-hidden="true"></i> Order Now
-        </a>
-      </div>
-    </div>
-  </div>
-
   <!-- Footer -->
   <footer>
     <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AkCreation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
@@ -589,117 +538,131 @@
 
     const grid       = document.getElementById('cardGrid');
     const errorState = document.getElementById('errorState');
-    const backdrop   = document.getElementById('modalBackdrop');
-    const modalClose = document.getElementById('modalClose');
+    const filterRow  = document.getElementById('filterRow');
+    let activeCuisine = 'all';
 
+    function isBlank(v) {
+      return v === null || v === undefined || v === '' ||
+             (typeof v === 'number' && isNaN(v)) ||
+             (typeof v === 'string' && v.trim().toLowerCase() === 'pending');
+    }
+    function hours(p) {
+      const o = parseInt(p.opening_hour, 10), c = parseInt(p.closing_hour, 10);
+      if (isNaN(o) || isNaN(c)) return null;
+      return { o, c };
+    }
     function isOpen(p) {
-      const h = new Date().getHours();
-      return h >= parseInt(p.opening_hour, 10) && h < parseInt(p.closing_hour, 10);
+      const h = hours(p); if (!h) return false;
+      const now = new Date().getHours();
+      return now >= h.o && now < h.c;
+    }
+    function fmt(h) { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
-    function formatHours(p) {
-      const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
-      return `${fmt(parseInt(p.opening_hour, 10))} – ${fmt(parseInt(p.closing_hour, 10))}`;
+    function renderFilterChips(visible) {
+      const counts = new Map();
+      visible.forEach(p => (p.services || []).forEach(s => {
+        if (isBlank(s)) return;
+        counts.set(s, (counts.get(s) || 0) + 1);
+      }));
+      const cuisines = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+      const chips = [
+        `<button type="button" class="filter-chip active" aria-pressed="true" data-cuisine="all">All <span class="count">(${visible.length})</span></button>`,
+        ...cuisines.map(([name, n]) =>
+          `<button type="button" class="filter-chip" aria-pressed="false" data-cuisine="${escapeHtml(name)}">${escapeHtml(name)} <span class="count">(${n})</span></button>`
+        )
+      ];
+      filterRow.innerHTML = chips.join('');
+      filterRow.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          activeCuisine = chip.dataset.cuisine;
+          filterRow.querySelectorAll('.filter-chip').forEach(c => {
+            const on = c === chip;
+            c.classList.toggle('active', on);
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+          applyFilter();
+        });
+      });
     }
 
-    let modalTriggerEl = null;
-
-    function renderStars(rating) {
-      const full = Math.floor(rating);
-      const half = rating % 1 >= 0.5;
-      let stars = '';
-      for (let i = 0; i < full; i++) stars += '<i class="fas fa-star" aria-hidden="true"></i>';
-      if (half) stars += '<i class="fas fa-star-half-alt" aria-hidden="true"></i>';
-      return `<span style="color:#f59e0b">${stars}</span> ${rating}`;
+    function applyFilter() {
+      const cards = grid.querySelectorAll('[data-cuisines]');
+      let shown = 0;
+      cards.forEach(card => {
+        const list = (card.dataset.cuisines || '').split('|');
+        const match = activeCuisine === 'all' || list.includes(activeCuisine);
+        card.style.display = match ? '' : 'none';
+        if (match) shown++;
+      });
+      const empty = grid.querySelector('.filter-empty');
+      if (!shown) {
+        if (!empty) {
+          const p = document.createElement('p');
+          p.className = 'filter-empty';
+          p.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--muted);font-size:0.85rem';
+          p.textContent = 'No restaurants match this cuisine yet.';
+          grid.appendChild(p);
+        }
+      } else if (empty) {
+        empty.remove();
+      }
     }
-
-    function openModal(p, triggerEl) {
-      modalTriggerEl = triggerEl || document.activeElement;
-      const open = isOpen(p);
-      document.getElementById('modalLogo').src             = p.logo;
-      document.getElementById('modalLogo').alt             = p.name + ' logo';
-      document.getElementById('modalTitle').textContent    = p.name;
-      document.getElementById('modalHours').innerHTML      = `${formatHours(p)} &nbsp;<span class="open-badge ${open ? 'open' : 'closed'}">${open ? 'Open' : 'Closed'}</span>`;
-      document.getElementById('modalAddress').textContent  = p.address;
-      document.getElementById('modalRating').innerHTML     = renderStars(p.rating) + ' / 5';
-      document.getElementById('modalTags').innerHTML       = p.services.map(s => `<span class="modal-tag">${s}</span>`).join('');
-      document.getElementById('modalOrderBtn').href        = p.url;
-      backdrop.classList.add('open');
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => modalClose.focus(), 50);
-    }
-
-    function closeModal() {
-      backdrop.classList.remove('open');
-      document.body.style.overflow = '';
-      if (modalTriggerEl) { modalTriggerEl.focus(); modalTriggerEl = null; }
-    }
-
-    // Focus trap inside modal
-    document.getElementById('modal').addEventListener('keydown', e => {
-      if (e.key !== 'Tab' || !backdrop.classList.contains('open')) return;
-      const focusable = [...document.getElementById('modal').querySelectorAll(
-        'button:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])'
-      )];
-      if (!focusable.length) return;
-      const first = focusable[0], last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    });
-
-    modalClose.addEventListener('click', closeModal);
-    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal(); });
 
     window.bankiBitesLoad()
       .then(data => {
-        const visible = data.partners.filter(p => p.is_active);
+        const visible = (data.partners || []).filter(p =>
+          p && p.is_active !== false && !isBlank(p.name) && !isBlank(p.url)
+        );
 
         if (!visible.length) {
           grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);font-size:0.85rem">No restaurants are registered yet. Check back soon!</p>';
           return;
         }
 
-        const fmt = h => { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; };
+        renderFilterChips(visible);
 
-        grid.innerHTML = visible.map((p, i) => {
+        grid.innerHTML = visible.map(p => {
+          const h = hours(p);
           const open = isOpen(p);
-          const opensAt = fmt(parseInt(p.opening_hour, 10));
-          return `
-          <div class="rest-card${open ? '' : ' rest-card-closed'}" role="listitem"
-               tabindex="${open ? '0' : '-1'}"
-               aria-label="${p.name}${open ? '' : `, currently closed — opens at ${opensAt}`}"
-               aria-disabled="${open ? 'false' : 'true'}"
-               data-idx="${i}" style="${open ? '' : 'opacity:0.6;pointer-events:none;'}">
-            <div class="card-inner">
-              <img class="card-logo" src="${p.logo}" alt="${p.name} logo" loading="lazy">
-              <div class="card-body">
-                <div class="card-name">${p.name}</div>
-                <div class="card-tags">
-                  ${p.services.map(s => `<span class="tag">${s}</span>`).join('')}
-                </div>
-                <div class="card-meta">
-                  <div class="rating">
-                    <i class="fas fa-star" aria-hidden="true"></i>
-                    ${p.rating} <span>/ 5</span>
-                  </div>
-                  <span class="open-badge ${open ? 'open' : 'closed'}">${open ? 'Open' : `Closed · Opens ${opensAt}`}</span>
-                </div>
-              </div>
-              <i class="fas fa-chevron-right card-chevron" aria-hidden="true"></i>
-            </div>
-          </div>
-        `;
-        }).join('');
+          const opensAt = h ? fmt(h.o) : '';
+          const services = Array.isArray(p.services) ? p.services.filter(s => !isBlank(s)) : [];
+          const showRating = !isBlank(p.rating);
+          const showHours  = !!h;
+          const showAddr   = !isBlank(p.address);
+          const logo = isBlank(p.logo)
+            ? `<div class="card-logo card-logo-skeleton" aria-hidden="true"></div>`
+            : `<img class="card-logo" src="${escapeHtml(p.logo)}" alt="${escapeHtml(p.name)} logo" loading="lazy">`;
 
-        visible.forEach((p, i) => {
-          if (!isOpen(p)) return;
-          const card = grid.querySelectorAll('.rest-card')[i];
-          card.addEventListener('click', () => openModal(p, card));
-          card.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(p, card); }
-          });
-        });
+          return `
+          <a class="rest-card${open || !showHours ? '' : ' rest-card-closed'}"
+             href="${open || !showHours ? escapeHtml(p.url) : '#'}"
+             ${open || !showHours ? '' : 'aria-disabled="true" tabindex="-1"'}
+             role="listitem"
+             aria-label="${escapeHtml(p.name)}${open || !showHours ? ' — open menu' : `, currently closed, opens at ${opensAt}`}"
+             data-cuisines="${escapeHtml(services.join('|'))}"
+             data-umami-event="bankibites-open-menu" data-umami-event-restaurant="${escapeHtml(p.name)}">
+            <div class="card-inner">
+              ${logo}
+              <div class="card-body">
+                <div class="card-name">${escapeHtml(p.name)}</div>
+                ${services.length ? `<div class="card-tags">${services.map(s => `<span class="tag">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+                <div class="card-meta">
+                  ${showRating ? `<span class="rating"><i class="fas fa-star" aria-hidden="true"></i>${escapeHtml(p.rating)} <span>/ 5</span></span>` : ''}
+                  ${showHours ? `<span class="open-badge ${open ? 'open' : 'closed'}">${open ? 'Open now' : `Closed · Opens ${opensAt}`}</span>` : ''}
+                </div>
+                ${showAddr ? `<div class="card-address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${escapeHtml(p.address)}</span></div>` : ''}
+              </div>
+            </div>
+            <div class="card-cta">
+              <span>${open || !showHours ? 'View menu &amp; order' : 'Currently closed'}</span>
+              <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </div>
+          </a>`;
+        }).join('');
       })
       .catch(() => {
         grid.innerHTML = '';

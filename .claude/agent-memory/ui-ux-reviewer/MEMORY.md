@@ -1,2 +1,3 @@
 - [TCD App Design Patterns and Known Issues](project_tcd_patterns.md) — Recurring design/a11y issues in TCD restaurant POS; intentional navy+orange brand, FA 5.15.4
 - [Anvisha Travels Landing Page Patterns](project_anvisha_patterns.md) — Cab booking dark-theme page; amber brand, WhatsApp booking form, key contrast failures and a11y gaps
+- [BankiBites Landing Page and Dashboard Patterns](project_bankibites_patterns.md) — index.html + dashboard.html; orange #FF6B35 brand, hero-split, bottom-sheet picker, WhatsApp grow cards, recurring touch-target and ARIA gaps
