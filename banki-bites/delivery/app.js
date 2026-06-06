@@ -400,10 +400,22 @@ function renderCard(db, o) {
           }
         }
       }
-      // On Pick up (assigned → out_for_delivery), notify the customer via
-      // WhatsApp with the order ETA so they know it's on the way.
+      // On Pick up (assigned → out_for_delivery), prompt the agent to
+      // notify the customer. The confirm button click is a fresh user
+      // gesture so the wa.me deep-link launches WhatsApp directly on
+      // mobile (avoids the api.whatsapp.com web interstitial that
+      // appears when location.href runs after an `await`).
       if (next === 'out_for_delivery') {
-        openPickupWhatsApp(o, restaurantLabel);
+        const go = await Swal.fire({
+          icon: 'success',
+          title: 'Marked as picked up',
+          text: 'Notify customer on WhatsApp?',
+          showCancelButton: true,
+          confirmButtonText: 'Send WhatsApp',
+          cancelButtonText: 'Skip',
+          confirmButtonColor: '#16a34a',
+        });
+        if (go.isConfirmed) openPickupWhatsApp(o, restaurantLabel);
       }
     } catch (e) {
       Swal.fire({ icon: 'error', title: 'Update failed', text: e.message });
