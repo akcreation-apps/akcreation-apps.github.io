@@ -435,6 +435,17 @@
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite;
       border-radius: 6px;
+      display: block;
+    }
+    .skeleton-body { flex: 1; }
+    .skel-text--lg { height: 16px; margin-bottom: 10px; }
+    .skel-text--md { height: 12px; margin-bottom: 8px; }
+    .skel-text--md:last-child { margin-bottom: 0; }
+    @media (prefers-color-scheme: dark) {
+      .skel-text, .card-logo-skeleton {
+        background: linear-gradient(90deg, #2B2540 25%, #3A3450 50%, #2B2540 75%);
+        background-size: 200% 100%;
+      }
     }
 
     /* ── Error state ── */
@@ -493,8 +504,8 @@
   <!-- Navbar -->
   <nav class="navbar" aria-label="Main navigation">
     <div class="navbar-inner">
-      <a class="brand" href="index.html" aria-label="BankiBites Home">
-        <div class="brand-icon"><img src="banki-bites-logo.png" alt="BankiBites"></div>
+      <a class="brand" href="index.html" aria-label="BankiBites home — food delivery in Banki, Cuttack">
+        <div class="brand-icon"><img src="banki-bites-logo.png" alt="BankiBites food delivery logo — Banki, Cuttack, Odisha"></div>
         <span class="brand-name">Banki<span>Bites</span></span>
       </a>
       <a class="nav-back" href="index.html" aria-label="Back to homepage">
@@ -514,18 +525,18 @@
     <!-- Skeleton placeholders -->
     <div class="skeleton-card" aria-hidden="true">
       <div class="card-logo-skeleton"></div>
-      <div style="flex:1">
-        <div class="skel-text" style="height:16px;width:60%;margin-bottom:10px;"></div>
-        <div class="skel-text" style="height:12px;width:80%;margin-bottom:8px;"></div>
-        <div class="skel-text" style="height:12px;width:40%;"></div>
+      <div class="skeleton-body">
+        <div class="skel-text skel-text--lg" style="width:60%"></div>
+        <div class="skel-text skel-text--md" style="width:80%"></div>
+        <div class="skel-text skel-text--md" style="width:40%"></div>
       </div>
     </div>
     <div class="skeleton-card" aria-hidden="true">
       <div class="card-logo-skeleton"></div>
-      <div style="flex:1">
-        <div class="skel-text" style="height:16px;width:55%;margin-bottom:10px;"></div>
-        <div class="skel-text" style="height:12px;width:75%;margin-bottom:8px;"></div>
-        <div class="skel-text" style="height:12px;width:45%;"></div>
+      <div class="skeleton-body">
+        <div class="skel-text skel-text--lg" style="width:55%"></div>
+        <div class="skel-text skel-text--md" style="width:75%"></div>
+        <div class="skel-text skel-text--md" style="width:45%"></div>
       </div>
     </div>
   </div>
@@ -550,7 +561,11 @@
              height="44" loading="lazy">
       </a>
     </div>
-    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AkCreation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+    <p>
+      &copy; <span id="footer-year"></span> &middot;
+      Built &amp; powered by <a href="https://akcreation-apps.com/services.html">AkCreation</a> &middot;
+      Made in Odisha <span aria-hidden="true">❤️</span>
+    </p>
   </footer>
 
   <script>

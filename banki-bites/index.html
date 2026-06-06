@@ -18,8 +18,8 @@
   <meta name="ICBM" content="20.3700, 85.5300">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="BankiBites (Banki Bites) — Food Delivery in Banki, Cuttack, Odisha">
-  <meta property="og:description" content="Order food online from the best restaurants in Banki, Cuttack. Fast delivery within 5 km. BankiBites — Banki's first food delivery platform.">
+  <meta property="og:title" content="BankiBites — Food Delivery in Banki, Cuttack, Odisha (App & Browser)">
+  <meta property="og:description" content="Banki's first food delivery platform. Order in 2 taps from The Cafe Darbar, A1 Amul Fast Food & more. ~45 min doorstep delivery across 11+ Banki areas. Use the Android app or any browser.">
   <meta property="og:url" content="https://akcreation-apps.com/banki-bites/">
   <meta property="og:site_name" content="BankiBites">
   <meta property="og:locale" content="en_IN">
@@ -31,7 +31,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="BankiBites — Food Delivery in Banki, Cuttack">
-  <meta name="twitter:description" content="Order food online from the best restaurants in Banki, Cuttack, Odisha 754008. Fast home delivery within 5 km.">
+  <meta name="twitter:description" content="Order food online from Banki's best restaurants. ~45 min doorstep delivery across 11+ areas in Banki, Cuttack, Odisha 754008. Available on Android app or any browser.">
   <meta name="twitter:image" content="https://akcreation-apps.com/banki-bites/banner.jpg">
   <meta name="twitter:image:alt" content="BankiBites — Food Delivery in Banki, Cuttack, Odisha 754008">
 
@@ -155,26 +155,7 @@
             "query-input": "required name=search_term_string"
           }
         ],
-        "subjectOf": {
-          "@type": "MobileApplication",
-          "@id": "https://akcreation-apps.com/banki-bites/#android-app",
-          "name": "BankiBites — Food Delivery in Banki",
-          "operatingSystem": "Android",
-          "applicationCategory": "FoodEstablishment",
-          "url": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
-          "installUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
-          "downloadUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki",
-          "description": "Order food online from restaurants in Banki, Cuttack, Odisha. BankiBites Android app — food delivery in Banki 754008.",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "INR"
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8", "reviewCount": "3", "bestRating": "5", "worstRating": "1"
-          }
-        }
+        "subjectOf": {"@id": "https://akcreation-apps.com/banki-bites/#android-app"}
       },
       {
         "@type": "MobileApplication",
@@ -442,12 +423,6 @@
     .hero-split { max-width: 1040px; display: grid; grid-template-columns: 1fr; gap: 18px; }
     .hero-copy { text-align: center; }
     .hero-copy .hero-eyebrow { margin-bottom: 12px; }
-    .hero-trust {
-      margin-top: 12px; font-size: 0.72rem; font-weight: 500;
-      color: rgba(255,255,255,0.78); display: inline-flex; gap: 6px;
-      align-items: center; flex-wrap: wrap; justify-content: center;
-    }
-    .hero-trust i { color: var(--primary); font-size: 0.75rem; }
 
     .hero-why {
       background: rgba(255,255,255,0.04);
@@ -627,9 +602,9 @@
     .locals-info { display: flex; align-items: center; gap: 14px; position: relative; }
     .locals-icon {
       width: 48px; height: 48px; border-radius: 14px;
-      background: rgba(74,222,128,0.2);
+      background: rgba(74,222,128,0.2); color: #4ade80;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; flex-shrink: 0;
+      font-size: 1.35rem; flex-shrink: 0;
     }
     .locals-eyebrow {
       font-size: 0.62rem; font-weight: 700; letter-spacing: 1px;
@@ -711,12 +686,20 @@
 
     /* ── FOOTER ── */
     footer {
-      background: #12111e; color: rgba(255,255,255,0.4);
-      text-align: center; padding: 18px 16px;
-      font-size: 0.73rem;
+      background: #12111e; color: rgba(255,255,255,0.45);
+      text-align: center; padding: 22px 16px 24px;
+      font-size: 0.73rem; line-height: 1.6;
     }
-    footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
     footer a:hover { color: var(--primary); }
+    .footer-brand-note {
+      max-width: 580px; margin: 0 auto 8px;
+      color: rgba(255,255,255,0.55);
+    }
+    .footer-meta {
+      margin-top: 4px;
+      color: rgba(255,255,255,0.4);
+    }
 
     /* ── BOTTOM SHEET (shared by rest-picker & loc-picker) ── */
     .sheet-backdrop {
@@ -737,9 +720,20 @@
     }
     .sheet-backdrop.open .sheet { transform: translateY(0); }
     .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
-    .sheet-header { padding: 14px 18px 12px; }
+    .sheet-header {
+      padding: 14px 18px 12px;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    }
     .sheet-header h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
     .sheet-header p { font-size: 0.73rem; color: var(--muted); }
+    .sheet-close {
+      background: none; border: none; padding: 0; cursor: pointer;
+      color: var(--muted); font-size: 1rem; flex-shrink: 0;
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sheet-close:hover { background: var(--border); color: var(--text); }
 
     /* ── RESTAURANT PICKER ── */
     .rp-list { padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -775,8 +769,23 @@
     .rp-item.rp-closed { opacity: 0.55; cursor: default; }
     .rp-item.rp-closed:hover { border-color: var(--border); box-shadow: none; }
 
-    /* skeleton inside rest picker */
-    .skel { background: linear-gradient(90deg, #ede8e3 25%, #f5f0eb 50%, #ede8e3 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    /* Skeleton loader primitives */
+    .skel { background: linear-gradient(90deg, #ede8e3 25%, #f5f0eb 50%, #ede8e3 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; display: inline-block; }
+    .skel-line { display: block; height: 12px; border-radius: 6px; margin-bottom: 7px; }
+    .skel-line:last-child { margin-bottom: 0; }
+    .skel-chip { width: 80px; height: 24px; border-radius: 16px; }
+    .skel-pill { width: 72px; height: 22px; border-radius: 8px; }
+    .skel-block { width: 52px; height: 52px; border-radius: 12px; flex-shrink: 0; }
+    .rp-skeleton {
+      display: flex; align-items: center; gap: 13px;
+      padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: 14px;
+    }
+    .rp-skeleton-lines { flex: 1; }
+    @media (prefers-color-scheme: dark) {
+      .skel { background: linear-gradient(90deg, #2B2540 25%, #3A3450 50%, #2B2540 75%); background-size: 200% 100%; }
+      .rp-skeleton { border-color: #3A3450; }
+    }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
     /* ── PICKER DARK-MODE (placed after base rules so cascade wins) ── */
@@ -814,7 +823,6 @@
       .hero { padding: 44px 16px 70px; }
       .hero-split { grid-template-columns: 1.15fr 0.85fr; gap: 36px; align-items: center; }
       .hero-copy { text-align: left; }
-      .hero-copy .hero-trust { justify-content: flex-start; }
       .hero-why-pills { grid-template-columns: 1fr; gap: 8px; }
       .hero-why-pills li { font-size: 0.78rem; padding: 10px 12px; }
       .hero-why-visual { height: 90px; }
@@ -848,7 +856,7 @@
   <aside class="install-banner" id="installBanner" role="region" aria-label="Install BankiBites Android app" aria-live="polite" hidden>
     <div class="ib-text">
       <strong>Get the BankiBites app</strong>
-      <small>Faster ordering on your phone — it's free</small>
+      <small>Faster ordering on Android — free download</small>
     </div>
     <a class="ib-badge"
        href="https://play.google.com/store/apps/details?id=com.akcreation_apps.tcdbanki"
@@ -857,7 +865,7 @@
        aria-label="Get BankiBites on Google Play">
       <img alt="Get it on Google Play"
            src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-           height="48" loading="lazy">
+           height="44" loading="lazy">
     </a>
     <button class="ib-close" id="installBannerClose" aria-label="Dismiss install prompt">
       <i class="fas fa-times" aria-hidden="true"></i>
@@ -878,7 +886,7 @@
   <main id="main" tabindex="-1">
 
   <!-- Hero -->
-  <section class="hero" aria-label="Hero — order food in Banki, Cuttack">
+  <section class="hero" aria-label="Order food online in Banki, Cuttack">
     <div class="hero-inner hero-split">
 
       <div class="hero-copy">
@@ -887,10 +895,6 @@
         <button class="btn-cta" id="orderBtn" aria-label="Find restaurants and order food">
           <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Food Now
         </button>
-        <p class="hero-trust">
-          <i class="fas fa-shield-halved" aria-hidden="true"></i>
-          Fresh-cooked &middot; ~45 min to your door &middot; Use the app or any browser
-        </p>
       </div>
 
       <aside class="hero-why" aria-label="Why order via BankiBites">
@@ -917,17 +921,17 @@
     <div class="serve-block">
       <h2 class="sec-title">What's on the menu</h2>
       <ul class="cuisine-chips" id="cuisineChips" aria-label="Available cuisines" role="list">
-        <li class="cuisine-chip" aria-hidden="true"><span class="skel" style="width:80px;height:14px;display:inline-block;border-radius:6px;"></span></li>
-        <li class="cuisine-chip" aria-hidden="true"><span class="skel" style="width:70px;height:14px;display:inline-block;border-radius:6px;"></span></li>
-        <li class="cuisine-chip" aria-hidden="true"><span class="skel" style="width:90px;height:14px;display:inline-block;border-radius:6px;"></span></li>
+        <li class="cuisine-chip" aria-hidden="true"><span class="skel skel-chip"></span></li>
+        <li class="cuisine-chip" aria-hidden="true"><span class="skel skel-chip"></span></li>
+        <li class="cuisine-chip" aria-hidden="true"><span class="skel skel-chip"></span></li>
       </ul>
 
       <h2 class="sec-title">Where we deliver</h2>
       <p class="serve-sub">Serving Banki and surrounding areas within 5 km, Cuttack, Odisha 754008</p>
       <ul class="area-chips" id="areaChips" aria-label="Food delivery areas in Banki, Cuttack, Odisha 754008" role="list">
-        <li class="area-chip skel" aria-hidden="true" style="width:70px;height:22px;border-radius:8px;display:inline-block;"></li>
-        <li class="area-chip skel" aria-hidden="true" style="width:80px;height:22px;border-radius:8px;display:inline-block;"></li>
-        <li class="area-chip skel" aria-hidden="true" style="width:65px;height:22px;border-radius:8px;display:inline-block;"></li>
+        <li class="skel skel-pill" aria-hidden="true"></li>
+        <li class="skel skel-pill" aria-hidden="true"></li>
+        <li class="skel skel-pill" aria-hidden="true"></li>
       </ul>
     </div>
 
@@ -943,12 +947,12 @@
         <div class="step" role="listitem">
           <div class="step-icon"><i class="fas fa-utensils" aria-hidden="true"></i></div>
           <div class="step-num">Step 2</div>
-          <div class="step-text">Browse & Pick Your Food</div>
+          <div class="step-text">Browse the Menu</div>
         </div>
         <div class="step" role="listitem">
-          <div class="step-icon wa"><i class="fab fa-whatsapp" aria-hidden="true"></i></div>
+          <div class="step-icon"><i class="fas fa-bag-shopping" aria-hidden="true"></i></div>
           <div class="step-num">Step 3</div>
-          <div class="step-text">Order via WhatsApp</div>
+          <div class="step-text">Place Your Order</div>
         </div>
         <div class="step" role="listitem">
           <div class="step-icon"><i class="fas fa-bowl-food" aria-hidden="true"></i></div>
@@ -1025,7 +1029,7 @@
     <a href="sell.html" class="locals-link" aria-label="Learn about Banki Locals — sell homemade food">
       <div class="locals-card">
         <div class="locals-info">
-          <div class="locals-icon" aria-hidden="true">🌿</div>
+          <div class="locals-icon" aria-hidden="true"><i class="fas fa-seedling"></i></div>
           <div>
             <div class="locals-eyebrow">NEW — Banki Flavours</div>
             <div class="locals-title">Sell your homemade items from home</div>
@@ -1071,9 +1075,9 @@
 
   <!-- Bottom CTA -->
   <div class="bottom-cta">
-    <p>Ready to order on BankiBites? Pick your favourite restaurant.</p>
+    <p>Your next meal is one tap away &mdash; from a real Banki restaurant.</p>
     <button class="btn-cta" id="orderBtn2" aria-label="Find restaurants delivering in Banki, Cuttack, Odisha">
-      <i class="fas fa-utensils" aria-hidden="true"></i> Find Restaurants Near You
+      <i class="fas fa-utensils" aria-hidden="true"></i> Order Food Now
     </button>
   </div>
 
@@ -1097,40 +1101,43 @@
              height="44" loading="lazy">
       </a>
     </div>
-    <p class="footer-brand-note">BankiBites — popularly searched as <em>Banki Bites</em> — is Banki's first online food delivery platform, Cuttack, Odisha 754008.</p>
-    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AkCreation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
-    <p style="margin-top:8px;">Powered by <a href="https://akcreation-apps.com/services.html">AkCreation</a></p>
+    <p class="footer-brand-note">BankiBites — popularly searched as <em>Banki Bites</em> — is Banki's first online food delivery platform in Cuttack, Odisha 754008.</p>
+    <p class="footer-meta">
+      &copy; <span id="footer-year"></span> &middot;
+      Built &amp; powered by <a href="https://akcreation-apps.com/services.html">AkCreation</a> &middot;
+      Made in Odisha <span aria-hidden="true">❤️</span>
+    </p>
   </footer>
 
   <!-- Restaurant Picker Sheet -->
   <div class="sheet-backdrop" id="restBackdrop" role="dialog" aria-modal="true" aria-labelledby="restTitle">
     <div class="sheet">
       <div class="sheet-handle" aria-hidden="true"></div>
-      <div class="sheet-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div class="sheet-header">
         <div>
           <h3 id="restTitle">Choose a Restaurant</h3>
-          <p>Available now in Banki</p>
+          <p>Currently delivering across Banki</p>
         </div>
-        <button id="sheetClose" aria-label="Close restaurant picker" style="background:none;border:none;padding:0;cursor:pointer;color:var(--muted);font-size:1rem;flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+        <button id="sheetClose" class="sheet-close" aria-label="Close restaurant picker">
           <i class="fas fa-times" aria-hidden="true"></i>
         </button>
       </div>
       <div class="rp-list" id="rpList" role="list" aria-live="polite" aria-busy="true">
         <!-- skeleton -->
-        <div class="rp-item" aria-hidden="true" style="pointer-events:none">
-          <div class="skel" style="width:52px;height:52px;border-radius:12px;flex-shrink:0;"></div>
-          <div style="flex:1">
-            <div class="skel" style="height:13px;width:55%;margin-bottom:7px;"></div>
-            <div class="skel" style="height:10px;width:80%;margin-bottom:7px;"></div>
-            <div class="skel" style="height:10px;width:40%;"></div>
+        <div class="rp-skeleton" aria-hidden="true">
+          <div class="skel skel-block"></div>
+          <div class="rp-skeleton-lines">
+            <div class="skel skel-line" style="width:55%"></div>
+            <div class="skel skel-line" style="width:80%"></div>
+            <div class="skel skel-line" style="width:40%"></div>
           </div>
         </div>
-        <div class="rp-item" aria-hidden="true" style="pointer-events:none">
-          <div class="skel" style="width:52px;height:52px;border-radius:12px;flex-shrink:0;"></div>
-          <div style="flex:1">
-            <div class="skel" style="height:13px;width:60%;margin-bottom:7px;"></div>
-            <div class="skel" style="height:10px;width:75%;margin-bottom:7px;"></div>
-            <div class="skel" style="height:10px;width:35%;"></div>
+        <div class="rp-skeleton" aria-hidden="true">
+          <div class="skel skel-block"></div>
+          <div class="rp-skeleton-lines">
+            <div class="skel skel-line" style="width:60%"></div>
+            <div class="skel skel-line" style="width:75%"></div>
+            <div class="skel skel-line" style="width:35%"></div>
           </div>
         </div>
       </div>
