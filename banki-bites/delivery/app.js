@@ -882,7 +882,7 @@ function openPickupWhatsApp(o, restaurantLabel) {
 
   // greeting line
   let text = !isBlank(displayName)
-    ? enc('Hi ') + enc(displayName) + enc('! ') + E_WAVE
+    ? enc('Hi ') + enc(displayName) + enc('! %F0%9F%91%8B')
     : enc('Hi there! ') + E_WAVE;
 
   // from-restaurant line
