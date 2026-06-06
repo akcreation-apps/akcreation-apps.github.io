@@ -898,17 +898,5 @@ function openPickupWhatsApp(o, restaurantLabel) {
   const text = lines.map(enc).join(NL);
 
   const url = 'https://wa.me/' + wa + '?text=' + text;
-
-  // Anchor-click navigation (mirrors anvisha-travels' working impl).
-  // location.href on Android Chrome re-normalises the URL and was found
-  // to corrupt multi-byte UTF-8 emoji sequences in transit (recipient sees
-  // U+FFFD replacement characters). Anchor click bypasses that normalisation
-  // and the byte-perfect URL reaches WhatsApp's deep-link handler.
-  const a = document.createElement('a');
-  a.href = url;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  window.location.href = url;
 }
