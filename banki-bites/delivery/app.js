@@ -895,7 +895,7 @@ function openPickupWhatsApp(o, restaurantLabel) {
   // thank-you line
   lines.push('Thanks for ordering with us!');
 
-  const text = lines.map(enc).join(NL);
+  const text = lines.map(enc).join(NL + NL);
 
   const url = 'https://wa.me/' + wa + '?text=' + text;
   window.location.href = url;
