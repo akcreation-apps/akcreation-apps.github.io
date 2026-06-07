@@ -1,6 +1,7 @@
 ﻿import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { mirrorToBankiBites } from '../banki-bites/order-mirror.js';
+import { mirrorToBankiBites, warmMirrorConnection } from '../banki-bites/order-mirror.js';
+warmMirrorConnection();
 const BACKUP_WP_NO = RESTAURANT.wpFallback;
 const MINIMUM_ORDER_PRICE = RESTAURANT.minOrder;
 const DELIVERY_CHARGES = RESTAURANT.deliveryCharge;

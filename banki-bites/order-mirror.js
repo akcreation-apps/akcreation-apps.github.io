@@ -30,8 +30,24 @@ async function getMirrorDb() {
   return getFirestore(app);
 }
 
+async function withRetry(fn, retries = 3, baseDelayMs = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (i === retries - 1) throw e;
+      await new Promise(r => setTimeout(r, baseDelayMs * Math.pow(2, i)));
+    }
+  }
+}
+
+// Call once at page load to pre-initialise the Firebase app before any order
+// is placed — eliminates the credentials-fetch round-trip at order time.
+export function warmMirrorConnection() {
+  getMirrorDb().catch(() => {});
+}
+
 export async function mirrorToBankiBites(payload) {
-  const db = await getMirrorDb();
   const doc = {
     restaurant_id:   payload.restaurant_id,
     restaurant_name: payload.restaurant_name || '',
@@ -47,5 +63,8 @@ export async function mirrorToBankiBites(payload) {
     delivery_staff_id: null,
     created_at:      Timestamp.now(),
   };
-  return addDoc(collection(db, 'bankibites_orders'), doc);
+  return withRetry(async () => {
+    const db = await getMirrorDb();
+    return addDoc(collection(db, 'bankibites_orders'), doc);
+  });
 }
