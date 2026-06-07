@@ -13,6 +13,15 @@ import {
 // the Auth account in the Firebase console first, then paste the UID here.
 // Doc id MUST equal the Firebase Auth UID for security rules to authorise the user.
 
+function normalisePhone(raw) {
+  if (!raw) return '';
+  let s = String(raw).trim().replace(/[^\d+]/g, '');
+  if (s.startsWith('+91')) s = s.slice(3);
+  else if (s.startsWith('91') && s.length === 12) s = s.slice(2);
+  else if (s.startsWith('0') && s.length === 11) s = s.slice(1);
+  return s.replace(/\D/g, '');
+}
+
 const staffCharts = new Map();
 function mountStaffChart(id, config) {
   const old = staffCharts.get(id);
@@ -362,6 +371,14 @@ async function openEditor(db, existing, root) {
   const res = await Swal.fire({
     title: existing ? `Edit: ${s.name}` : 'Add delivery partner',
     html, showCancelButton: true, confirmButtonText: 'Save', width: 500,
+    didOpen: () => {
+      const phoneInput = document.querySelector('#staffForm [name="phone"]');
+      if (phoneInput) {
+        const norm = () => { const n = normalisePhone(phoneInput.value); if (n !== phoneInput.value) phoneInput.value = n; };
+        phoneInput.addEventListener('blur', norm);
+        phoneInput.addEventListener('paste', () => setTimeout(norm, 0));
+      }
+    },
     preConfirm: () => {
       const f = document.getElementById('staffForm');
       const fd = new FormData(f);
@@ -369,7 +386,7 @@ async function openEditor(db, existing, root) {
         uid: fd.get('uid').trim(),
         name: fd.get('name').trim(),
         email: fd.get('email').trim(),
-        phone: fd.get('phone').trim(),
+        phone: normalisePhone(fd.get('phone')),
         is_active: f.querySelector('#staffActive').checked,
       };
       if (!data.uid || !data.name || !data.email) {

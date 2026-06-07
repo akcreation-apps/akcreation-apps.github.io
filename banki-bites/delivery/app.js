@@ -326,9 +326,18 @@ function renderCard(db, o) {
              ? `<a class="icon-action map-btn" href="${mapsHref}" target="_blank" rel="noopener noreferrer" aria-label="Open customer location in Google Maps" title="Open in Google Maps"><i class="fas fa-map-location-dot" aria-hidden="true"></i></a>`
              : ''}
          </div>
-         <button class="btn done-btn" data-act="next">
-           <i class="fas fa-check"></i> ${o.status === 'assigned' ? 'Pick up' : (o.status === 'out_for_delivery' ? 'Delivered' : 'Update')}
-         </button>
+         ${o.status === 'out_for_delivery' ? `
+           <div class="delivery-dual-actions">
+             <button class="btn btn-not-picked" data-act="undo">
+               <i class="fas fa-times"></i> Not Picked Up
+             </button>
+             <button class="btn btn-delivered" data-act="next">
+               <i class="fas fa-check"></i> Delivered
+             </button>
+           </div>` : `
+           <button class="btn done-btn" data-act="next">
+             <i class="fas fa-check"></i> ${o.status === 'assigned' ? 'Pick up' : 'Update'}
+           </button>`}
        </div>`;
 
   const deliveredMeta = o.status === 'delivered' && o.delivered_at?.toDate
@@ -377,6 +386,27 @@ function renderCard(db, o) {
       ${actionsBlock}
     </div>
   `;
+
+  card.querySelector('[data-act="undo"]')?.addEventListener('click', async () => {
+    const ok = await Swal.fire({
+      icon: 'warning',
+      title: 'Not picked up?',
+      text: 'This will revert the order back to "Assigned". Continue?',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, revert',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626',
+    });
+    if (!ok.isConfirmed) return;
+    try {
+      window.bbBusy('Reverting status…');
+      await updateDoc(doc(db, COL.ORDERS, o.id), { status: 'assigned' });
+      window.bbDone();
+    } catch (e) {
+      window.bbDone();
+      Swal.fire({ icon: 'error', title: 'Update failed', text: e.message });
+    }
+  });
 
   card.querySelector('[data-act="next"]')?.addEventListener('click', async () => {
     let next = 'out_for_delivery';
@@ -538,18 +568,6 @@ async function renderEarnings() {
         <div class="chart-card-body"><canvas id="earnPaidMix"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-clock"></i> Deliveries by hour of day</div>
-        <div class="chart-card-body"><canvas id="earnHourOfDay"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-stopwatch"></i> Avg delivery time (min, 7d)</div>
-        <div class="chart-card-body"><canvas id="earnAvgDeliveryTime"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-bullseye"></i> On-time delivery % (7d)</div>
-        <div class="chart-card-body"><canvas id="earnOnTimePct"></canvas></div>
-      </div>
-      <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-store"></i> Earnings by restaurant</div>
         <div class="chart-card-body"><canvas id="earnByRestaurant"></canvas></div>
       </div>
@@ -569,7 +587,7 @@ async function renderEarnings() {
   `;
   try { await whenChartReady(); } catch (e) { console.warn('[earnings] Chart.js unavailable:', e.message); }
   const p = chartPalette();
-  const orders = (_allOrders || []).filter(isDelivered);
+  const orders = (_allOrders || []).filter(isDelivered).filter(o => o.payout_applicable !== false);
 
   // KPI window helpers
   const now = new Date();
@@ -651,77 +669,6 @@ async function renderEarnings() {
       datasets: [{ data: [life.paid, life.pending], backgroundColor: [p.status.delivered, p.status.cancelled], borderWidth: 0 }],
     },
     options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmtINR(ctx.parsed)}` } } }, cutout: '60%' },
-  });
-
-  // Hour-of-day pattern — when this partner delivers most. Uses delivered_at
-  // (falls back to created_at) so the bar chart reflects on-road time, not
-  // when the order was placed by the customer.
-  const hourCounts = new Array(24).fill(0);
-  for (const o of orders) {
-    const t = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
-    if (!t) continue;
-    hourCounts[t.getHours()]++;
-  }
-  mountEarnChart('earnHourOfDay', {
-    type: 'bar',
-    data: {
-      labels: hourCounts.map((_, h) => String(h).padStart(2, '0')),
-      datasets: [{ label: 'Deliveries', data: hourCounts, backgroundColor: p.brand, borderWidth: 0 }],
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: { x: { ticks: { autoSkip: false, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
-    },
-  });
-
-  // Avg delivery time per day — delivered_at minus created_at, averaged.
-  const avgTimeData = days.keys.map(k => {
-    const bucket = days.buckets.get(k);
-    let sum = 0, n = 0;
-    for (const o of bucket) {
-      const c = toDateSafe(o.created_at);
-      const dl = toDateSafe(o.delivered_at);
-      if (c && dl) { sum += (dl.getTime() - c.getTime()) / 60000; n++; }
-    }
-    return n ? Math.round(sum / n) : 0;
-  });
-  mountEarnChart('earnAvgDeliveryTime', {
-    type: 'line',
-    data: {
-      labels: days.labels,
-      datasets: [{
-        label: 'Minutes', data: avgTimeData,
-        borderColor: p.brand, backgroundColor: p.brandSoft,
-        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
-      }],
-    },
-    options: {
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} min` } } },
-      scales: { y: { beginAtZero: true, ticks: { callback: v => v + ' min' } } },
-    },
-  });
-
-  // On-time % per day (requires both eta and delivered_at on each order).
-  const onTimeData = days.keys.map(k => {
-    const bucket = days.buckets.get(k).filter(o => toDateSafe(o.eta) && toDateSafe(o.delivered_at));
-    if (!bucket.length) return 0;
-    const onTime = bucket.filter(o => toDateSafe(o.delivered_at).getTime() <= toDateSafe(o.eta).getTime()).length;
-    return Math.round((onTime / bucket.length) * 100);
-  });
-  mountEarnChart('earnOnTimePct', {
-    type: 'line',
-    data: {
-      labels: days.labels,
-      datasets: [{
-        label: 'On-time %', data: onTimeData,
-        borderColor: p.status.delivered, backgroundColor: 'rgba(22,163,74,0.15)',
-        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
-      }],
-    },
-    options: {
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}%` } } },
-      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
-    },
   });
 
   // Earnings by restaurant (top 5).

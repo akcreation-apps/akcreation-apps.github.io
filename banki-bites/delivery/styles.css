@@ -52,6 +52,36 @@
 .delivery-actions .done-btn:hover { box-shadow: 0 2px 6px rgba(255,107,53,0.3); }
 .delivery-actions .done-btn i { margin-right: 4px; }
 
+/* Two-button row shown when order is out_for_delivery — undo pickup + confirm delivered */
+.delivery-dual-actions { display: flex; gap: 10px; }
+.delivery-dual-actions .btn-not-picked {
+  flex: 1;
+  background: #fff;
+  color: #dc2626;
+  border: 1.5px solid #dc2626;
+  font-weight: 600;
+  padding: 12px 10px;
+  min-height: 48px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+.delivery-dual-actions .btn-not-picked:active { background: #fef2f2; }
+.delivery-dual-actions .btn-delivered {
+  flex: 2;
+  background: #16a34a;
+  color: #fff;
+  border: 0;
+  font-weight: 600;
+  padding: 12px 10px;
+  min-height: 48px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 2px rgba(22,163,74,0.25);
+}
+.delivery-dual-actions .btn-delivered:hover,
+.delivery-dual-actions .btn-delivered:focus { background: #15803d; color: #fff; }
+.delivery-dual-actions .btn-delivered:active { background: #166534; }
+
 /* Secondary icon-only quick actions (Call, Map). Outlined "ghost" buttons —
    neutral surface, accent-coloured icon and border. Reads as a refined
    secondary action instead of a bright primary one. Hover fills with the

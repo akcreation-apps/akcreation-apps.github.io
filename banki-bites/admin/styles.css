@@ -444,6 +444,10 @@ details.entity-card[open] > .order-summary .order-chevron {
   .dispatch-grid .field:nth-child(3) { grid-column: 1 / -1; }
 }
 .field { display: flex; flex-direction: column; gap: 3px; margin: 0; }
+
+.payout-toggle { margin-top: 12px; }
+.payout-toggle .toggle-on  { color: var(--success, #16a34a); }
+.payout-toggle .toggle-off { color: var(--muted, #6b7280); }
 .field-label {
   font-size: 0.74rem;
   font-weight: 600;
@@ -659,6 +663,10 @@ details.entity-card[open] > .order-summary .order-chevron {
 .status-out_for_delivery{ background: var(--chip-ofd-bg);  color: var(--chip-ofd-fg); }
 .status-delivered       { background: var(--chip-dlv-bg);  color: var(--chip-dlv-fg); }
 .status-cancelled       { background: var(--chip-cnl-bg);  color: var(--chip-cnl-fg); }
+.status-fake            { background: #fef3c7; color: #92400e; font-weight: 700; }
+
+.order-card--fake { border-left: 3px solid #f59e0b; opacity: 0.75; }
+.order-card--fake .order-summary { background: #fffbeb; }
 
 .empty-state {
   text-align: center;

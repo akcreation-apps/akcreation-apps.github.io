@@ -25,11 +25,11 @@ const EMPTY = {
 // dashes, parens). Returns the trailing 10 digits if recognisable, else ''.
 function normalisePhone(raw) {
   if (!raw) return '';
-  let s = String(raw).replace(/[\s\-()]/g, '');
+  let s = String(raw).trim().replace(/[^\d+]/g, '');
   if (s.startsWith('+91')) s = s.slice(3);
   else if (s.startsWith('91') && s.length === 12) s = s.slice(2);
   else if (s.startsWith('0') && s.length === 11) s = s.slice(1);
-  return s;
+  return s.replace(/\D/g, '');
 }
 function isValidPhone(raw) {
   return /^\d{10}$/.test(normalisePhone(raw));
@@ -296,10 +296,9 @@ async function openEditor(db, existing, root) {
       // mirrors what gets saved (strips +91 / spaces / dashes / parens etc.).
       const phoneInput = document.querySelector('#partnerForm [name="point_of_contact"]');
       if (phoneInput) {
-        phoneInput.addEventListener('blur', () => {
-          const n = normalisePhone(phoneInput.value);
-          if (n) phoneInput.value = n;
-        });
+        const norm = () => { const n = normalisePhone(phoneInput.value); if (n !== phoneInput.value) phoneInput.value = n; };
+        phoneInput.addEventListener('blur', norm);
+        phoneInput.addEventListener('paste', () => setTimeout(norm, 0));
       }
     },
     preConfirm: () => {

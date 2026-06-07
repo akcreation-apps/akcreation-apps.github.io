@@ -32,11 +32,11 @@ function formatEta(ts) {
 // parens. Returns just the trailing 10 digits if recognisable, else null.
 function normalisePhone(raw) {
   if (!raw) return '';
-  let s = String(raw).replace(/[\s\-()]/g, '');
+  let s = String(raw).trim().replace(/[^\d+]/g, '');
   if (s.startsWith('+91')) s = s.slice(3);
   else if (s.startsWith('91') && s.length === 12) s = s.slice(2);
   else if (s.startsWith('0') && s.length === 11) s = s.slice(1);
-  return s;
+  return s.replace(/\D/g, '');
 }
 function isValidPhone(raw) {
   const n = normalisePhone(raw);
@@ -68,6 +68,7 @@ export async function renderOrders(root, db) {
         <option value="new">New only</option>
         <option value="assigned">Assigned</option>
         <option value="delivered">Delivered</option>
+        <option value="fake">Fake orders</option>
         <option value="all">All</option>
       </select>
     </div>
@@ -94,9 +95,10 @@ export async function renderOrders(root, db) {
   function render() {
     const f = filter.value;
     const filtered = allOrders.filter(o => {
-      if (f === 'all') return true;
-      if (f === 'active') return o.status !== 'delivered' && o.status !== 'cancelled';
-      return o.status === f;
+      if (f === 'fake') return o.is_fake === true;
+      if (f === 'all')  return true;
+      if (f === 'active') return o.status !== 'delivered' && o.status !== 'cancelled' && !o.is_fake;
+      return o.status === f && !o.is_fake;
     });
     if (!filtered.length) {
       listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders match.</p></div>`;
@@ -188,8 +190,9 @@ function renderOrdersStats(all, filtered) {
 }
 
 function renderOrderCard(db, o, staff, customers, feeRules) {
+  const isFake = o.is_fake === true;
   const card = document.createElement('details');
-  card.className = 'entity-card order-card';
+  card.className = `entity-card order-card${isFake ? ' order-card--fake' : ''}`;
   const created = o.created_at?.toDate ? o.created_at.toDate() : new Date();
   const status = o.status || 'new';
   const itemsHtml = (o.items || []).map(i =>
@@ -203,6 +206,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
   // Default: payment was collected on delivery. Admin can flip to "not collected"
   // to flag it for the delivery partner.
   const paymentCollected = o.payment_collected === false ? false : true;
+  const payoutApplicable = o.payout_applicable !== false;
 
   const staffOptions = staff
     .filter(s => s.is_active !== false)
@@ -258,6 +262,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
         ${etaLine}
       </div>
       <div class="order-summary-side">
+        ${isFake ? '<span class="status-pill status-fake">FAKE</span>' : ''}
         <span class="status-pill status-${status}">${STATUS_LABEL[status] || status.replace('_', ' ')}</span>
         ${paymentBadge}
         <i class="fas fa-chevron-down order-chevron" aria-hidden="true"></i>
@@ -326,6 +331,14 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
           <small class="text-muted">Blank = auto +${ETA_MINUTES_FROM_ASSIGN} min after assignment.</small>
         </label>
       </div>
+      <label class="toggle payout-toggle">
+        <input type="checkbox" data-f="payoutApplicable" ${payoutApplicable ? 'checked' : ''}>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        <span class="toggle-text">
+          <strong class="toggle-on">Partner earns for this order</strong>
+          <strong class="toggle-off">No payout for this order</strong>
+        </span>
+      </label>
     </div>
 
     <div class="order-section payment-section">
@@ -396,6 +409,9 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
 
     <div class="ec-actions order-actions">
       <button class="btn btn-sm btn-primary" data-act="save"><i class="fas fa-save mr-1"></i> Save</button>
+      <button class="btn btn-sm ${isFake ? 'btn-warning' : 'btn-outline-danger'}" data-act="toggleFake">
+        <i class="fas fa-triangle-exclamation mr-1"></i>${isFake ? 'Unmark fake' : 'Flag as fake'}
+      </button>
     </div>
   `;
 
@@ -410,6 +426,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
   const collectInput  = card.querySelector('[data-f="collectAmount"]');
 
   const orderTotal = Number.isFinite(+o.total) ? +o.total : 0;
+
   // Treat the initial collect_amount as "user override" only if it doesn't
   // match the computed value — otherwise let the live recompute drive it.
   function computeCollect() {
@@ -452,12 +469,11 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     }
   });
 
-  // Auto-normalise phone on blur so the visible value matches what's saved.
+  // Auto-normalise phone on blur/paste so the visible value matches what's saved.
   const phoneInput = card.querySelector('[data-f="phone"]');
-  phoneInput.addEventListener('blur', () => {
-    const n = normalisePhone(phoneInput.value);
-    if (n) phoneInput.value = n;
-  });
+  const normPhone = () => { const n = normalisePhone(phoneInput.value); if (n !== phoneInput.value) phoneInput.value = n; };
+  phoneInput.addEventListener('blur', normPhone);
+  phoneInput.addEventListener('paste', () => setTimeout(normPhone, 0));
 
   // ── Customer picker wiring ────────────────────────────────────────────
   const nameInput = card.querySelector('[data-f="name"]');
@@ -574,7 +590,8 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     const rawPhone = card.querySelector('[data-f="phone"]').value.trim();
     const address = card.querySelector('[data-f="address"]').value.trim();
     const staffId = card.querySelector('[data-f="staff"]').value || null;
-    const paymentCollectedNow = card.querySelector('[data-f="payment"]').checked;
+    const paymentCollectedNow   = card.querySelector('[data-f="payment"]').checked;
+    const payoutApplicableNow   = card.querySelector('[data-f="payoutApplicable"]').checked;
     let newStatus = card.querySelector('[data-f="status"]').value;
     if (staffId && newStatus === 'new') newStatus = 'assigned';
 
@@ -606,6 +623,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
       delivery_staff_id: staffId,
       status: newStatus,
       payment_collected: paymentCollectedNow,
+      payout_applicable: payoutApplicableNow,
     };
 
     // Persist the billing breakdown only when the toggle says collect-on-delivery.
@@ -667,9 +685,9 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     }
 
     if (newStatus === 'delivered' && !o.delivered_at) patch.delivered_at = Timestamp.now();
-    // Snapshot the courier payout fee at the moment the order is marked delivered
-    // so historical earnings stay stable even if fee_rules change later.
-    if (newStatus === 'delivered' && !Number.isFinite(o.payout_amount)) {
+    // Snapshot the courier payout fee at the moment the order is marked delivered,
+    // but only when the admin has enabled payout for this order.
+    if (newStatus === 'delivered' && !Number.isFinite(o.payout_amount) && payoutApplicableNow) {
       patch.payout_amount = feeForOrder({ ...o, ...patch }, feeRules);
       if (o.payout_paid !== true) patch.payout_paid = false;
     }
@@ -734,6 +752,41 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     } catch (e) {
       window.bbDone();
       Swal.fire({ icon: 'error', title: 'Save failed', text: e.message });
+    }
+  });
+
+  card.querySelector('[data-act="toggleFake"]').addEventListener('click', async () => {
+    const nowFake = !o.is_fake;
+    const confirmed = await Swal.fire({
+      icon: nowFake ? 'warning' : 'question',
+      title: nowFake ? 'Mark as fake order?' : 'Remove fake flag?',
+      text: nowFake
+        ? 'This order will be flagged as fake (customer did not confirm on WhatsApp).'
+        : 'This order will be restored to normal.',
+      showCancelButton: true,
+      confirmButtonText: nowFake ? 'Yes, mark fake' : 'Yes, restore',
+      confirmButtonColor: nowFake ? '#dc2626' : '#16a34a',
+    });
+    if (!confirmed.isConfirmed) return;
+    try {
+      window.bbBusy('Updating…');
+      await updateDoc(doc(db, COL.ORDERS, o.id), { is_fake: nowFake });
+      if (nowFake && o.source_doc_path) {
+        const [coll, docId] = o.source_doc_path.split('/');
+        if (coll && docId) {
+          try {
+            await updateDoc(doc(db, coll, docId), { status: 'Rejected' });
+          } catch (err) {
+            console.warn('Source order cascade failed:', err);
+            Swal.fire({ icon: 'warning', title: 'Flagged, but source not updated', text: err.message });
+            return;
+          }
+        }
+      }
+      window.bbDone();
+    } catch (e) {
+      window.bbDone();
+      Swal.fire({ icon: 'error', title: 'Update failed', text: e.message });
     }
   });
 

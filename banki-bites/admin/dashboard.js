@@ -74,18 +74,6 @@ export async function renderDashboard(root, db) {
         <div class="chart-card-body"><canvas id="dashFarNear"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-clock"></i> Orders by hour of day</div>
-        <div class="chart-card-body"><canvas id="dashHourOfDay"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-stopwatch"></i> Avg delivery time (min, 7d)</div>
-        <div class="chart-card-body"><canvas id="dashAvgDeliveryTime"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-bullseye"></i> On-time delivery % (7d)</div>
-        <div class="chart-card-body"><canvas id="dashOnTimePct"></canvas></div>
-      </div>
-      <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-ban"></i> Cancellation rate (7d)</div>
         <div class="chart-card-body"><canvas id="dashCancelRate"></canvas></div>
       </div>
@@ -278,9 +266,6 @@ async function refresh(root, db) {
   renderPaymentMix(orders, p);
   renderPartnerPayouts(orders, staff, rules, p);
   renderFarNear(orders, rules, p);
-  renderHourOfDay(orders, p);
-  renderAvgDeliveryTime(orders, p);
-  renderOnTimePct(orders, p);
   renderCancelRate(orders, p);
   renderAovTrend(orders, p);
   renderRepeatNew(orders, p);
@@ -488,80 +473,6 @@ function renderFarNear(orders, rules, p) {
       datasets: [{ data: [far, near], backgroundColor: [p.series[3], p.brand], borderWidth: 0 }],
     },
     options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
-  });
-}
-
-function renderHourOfDay(orders, p) {
-  const counts = new Array(24).fill(0);
-  for (const o of orders) {
-    const d = toDateSafe(o.created_at);
-    if (!d) continue;
-    counts[d.getHours()]++;
-  }
-  const labels = counts.map((_, h) => String(h).padStart(2, '0'));
-  mountChart('dashHourOfDay', {
-    type: 'bar',
-    data: { labels, datasets: [{ label: 'Orders', data: counts, backgroundColor: p.brand, borderWidth: 0 }] },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: { x: { ticks: { autoSkip: false, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
-    },
-  });
-}
-
-function renderAvgDeliveryTime(orders, p) {
-  const delivered = orders.filter(isDelivered);
-  const days = bucketByDay(delivered, o => toDateSafe(o.delivered_at) || toDateSafe(o.created_at), 7);
-  const data = days.keys.map(k => {
-    const bucket = days.buckets.get(k);
-    let sum = 0, n = 0;
-    for (const o of bucket) {
-      const c = toDateSafe(o.created_at);
-      const dl = toDateSafe(o.delivered_at);
-      if (c && dl) { sum += (dl.getTime() - c.getTime()) / 60000; n++; }
-    }
-    return n ? Math.round(sum / n) : 0;
-  });
-  mountChart('dashAvgDeliveryTime', {
-    type: 'line',
-    data: {
-      labels: days.labels,
-      datasets: [{
-        label: 'Minutes', data,
-        borderColor: p.brand, backgroundColor: p.brandSoft,
-        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
-      }],
-    },
-    options: {
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} min` } } },
-      scales: { y: { beginAtZero: true, ticks: { callback: v => v + ' min' } } },
-    },
-  });
-}
-
-function renderOnTimePct(orders, p) {
-  const delivered = orders.filter(o => isDelivered(o) && toDateSafe(o.eta) && toDateSafe(o.delivered_at));
-  const days = bucketByDay(delivered, o => toDateSafe(o.delivered_at), 7);
-  const data = days.keys.map(k => {
-    const bucket = days.buckets.get(k);
-    if (!bucket.length) return 0;
-    const onTime = bucket.filter(o => toDateSafe(o.delivered_at).getTime() <= toDateSafe(o.eta).getTime()).length;
-    return Math.round((onTime / bucket.length) * 100);
-  });
-  mountChart('dashOnTimePct', {
-    type: 'line',
-    data: {
-      labels: days.labels,
-      datasets: [{
-        label: 'On-time %', data,
-        borderColor: p.status.delivered, backgroundColor: 'rgba(22,163,74,0.15)',
-        fill: true, tension: 0.32, pointRadius: 3, borderWidth: 2,
-      }],
-    },
-    options: {
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}%` } } },
-      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
-    },
   });
 }
 

@@ -5,11 +5,11 @@ import {
 
 function normalisePhone(raw) {
   if (!raw) return '';
-  let s = String(raw).replace(/[\s\-()]/g, '');
+  let s = String(raw).trim().replace(/[^\d+]/g, '');
   if (s.startsWith('+91')) s = s.slice(3);
   else if (s.startsWith('91') && s.length === 12) s = s.slice(2);
   else if (s.startsWith('0') && s.length === 11) s = s.slice(1);
-  return s;
+  return s.replace(/\D/g, '');
 }
 function isValidPhone(raw) {
   return /^\d{10}$/.test(normalisePhone(raw));
@@ -135,6 +135,13 @@ export async function openCustomerModal(db, existing) {
     confirmButtonText: 'Save',
     width: 520,
     didOpen: () => {
+      const phoneInput = document.querySelector('#customerForm [name="phone"]');
+      if (phoneInput && !phoneInput.readOnly) {
+        const norm = () => { const n = normalisePhone(phoneInput.value); if (n !== phoneInput.value) phoneInput.value = n; };
+        phoneInput.addEventListener('blur', norm);
+        phoneInput.addEventListener('paste', () => setTimeout(norm, 0));
+      }
+
       const linkInput = document.getElementById('mapsLink');
       const parseBtn  = document.getElementById('mapsParseBtn');
       const hintEl    = document.getElementById('mapsHint');
