@@ -95,10 +95,10 @@ export async function renderOrders(root, db) {
   function render() {
     const f = filter.value;
     const filtered = allOrders.filter(o => {
-      if (f === 'fake') return o.is_fake === true;
-      if (f === 'all')  return true;
-      if (f === 'active') return o.status !== 'delivered' && o.status !== 'cancelled' && !o.is_fake;
-      return o.status === f && !o.is_fake;
+      if (f === 'fake')   return o.status === 'fake' || o.is_fake === true;
+      if (f === 'all')    return true;
+      if (f === 'active') return o.status !== 'delivered' && o.status !== 'cancelled' && o.status !== 'fake';
+      return o.status === f;
     });
     if (!filtered.length) {
       listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders match.</p></div>`;
@@ -190,7 +190,7 @@ function renderOrdersStats(all, filtered) {
 }
 
 function renderOrderCard(db, o, staff, customers, feeRules) {
-  const isFake = o.is_fake === true;
+  const isFake = o.status === 'fake' || o.is_fake === true;
   const card = document.createElement('details');
   card.className = `entity-card order-card${isFake ? ' order-card--fake' : ''}`;
   const created = o.created_at?.toDate ? o.created_at.toDate() : new Date();
@@ -230,6 +230,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     out_for_delivery: 'on the way',
     delivered: 'delivered',
     cancelled: 'cancelled',
+    fake: 'fake',
   };
   const STATUS_DROPDOWN_LABEL = {
     new: 'new',
@@ -237,6 +238,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     out_for_delivery: 'out for delivery',
     delivered: 'delivered',
     cancelled: 'cancelled',
+    fake: 'fake',
   };
 
   const etaLine = o.eta
@@ -770,7 +772,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     if (!confirmed.isConfirmed) return;
     try {
       window.bbBusy('Updating…');
-      await updateDoc(doc(db, COL.ORDERS, o.id), { is_fake: nowFake });
+      await updateDoc(doc(db, COL.ORDERS, o.id), { is_fake: nowFake, status: nowFake ? 'fake' : 'new' });
       if (nowFake && o.source_doc_path) {
         const [coll, docId] = o.source_doc_path.split('/');
         if (coll && docId) {

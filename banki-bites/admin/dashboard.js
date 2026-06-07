@@ -285,7 +285,7 @@ function renderKpis(el, orders, partners, staff, rules) {
   const revenue = orders.filter(isDelivered).reduce((s, o) => s + netRevenue(o), 0);
   const activePartners = partners.filter(p => p.is_active !== false).length;
   const activeStaff    = staff.filter(s => s.is_active !== false).length;
-  const pendingPayoutOrders = orders.filter(isPayoutPending);
+  const pendingPayoutOrders = orders.filter(o => isPayoutPending(o) && o.payout_applicable !== false);
   const pendingPayoutTotal  = pendingPayoutOrders.reduce((s, o) => s + feeForOrder(o, rules), 0);
 
   el.innerHTML = `
@@ -326,7 +326,7 @@ function renderKpis(el, orders, partners, staff, rules) {
 
 function renderOrdersPerDay(orders, p) {
   const days = bucketByDay(orders, o => toDateSafe(o.created_at), 7);
-  const statusKeys = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled'];
+  const statusKeys = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled', 'fake'];
   const datasets = statusKeys.map(s => ({
     label: s.replace(/_/g, ' '),
     data: days.keys.map(k => days.buckets.get(k).filter(o => o.status === s).length),
@@ -433,6 +433,7 @@ function renderPartnerPayouts(orders, staff, rules, p) {
   const byStaff = new Map(staff.map(s => [s.uid, { name: s.name || s.email || s.uid, paid: 0, pending: 0 }]));
   for (const o of orders) {
     if (!isDelivered(o)) continue;
+    if (o.payout_applicable === false) continue;
     const sid = o.delivery_staff_id;
     if (!sid || !byStaff.has(sid)) continue;
     const fee = feeForOrder(o, rules);

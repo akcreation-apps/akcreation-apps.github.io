@@ -155,6 +155,7 @@ export function chartPalette() {
       out_for_delivery: '#a855f7',
       delivered:        '#16a34a',
       cancelled:        '#dc3545',
+      fake:             '#92400e',
     },
   };
 }

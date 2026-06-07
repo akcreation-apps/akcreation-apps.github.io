@@ -109,6 +109,7 @@ function renderStaffCharts() {
   const byStaff = new Map();
   for (const o of orders) {
     if (!isDelivered(o)) continue;
+    if (o.payout_applicable === false) continue;
     const sid = o.delivery_staff_id;
     if (!sid) continue;
     if (!byStaff.has(sid)) byStaff.set(sid, { name: sid, paid: 0, pending: 0, count: 0, far: 0, near: 0 });
@@ -210,7 +211,7 @@ async function loadStaff(db, root) {
 }
 
 function staffOrdersFor(uid) {
-  return (_staffOrdersCache || []).filter(o => o.delivery_staff_id === uid && isDelivered(o));
+  return (_staffOrdersCache || []).filter(o => o.delivery_staff_id === uid && isDelivered(o) && o.payout_applicable !== false);
 }
 
 function renderCard(db, root, uid, s) {
