@@ -229,6 +229,7 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
 .addr-block {
   background: var(--surface-soft);
   border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--brand);
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 0.88rem;
@@ -241,13 +242,24 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   color: var(--text-strong);
   word-break: break-word;
   overflow-wrap: anywhere;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 .addr-block .addr {
-  color: var(--muted);
+  display: flex;
+  gap: 5px;
+  align-items: flex-start;
+  color: var(--text-strong);
+  font-weight: 500;
+  font-size: 0.9rem;
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+.addr-block .addr i {
+  color: var(--brand);
+  font-size: 0.85rem;
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .done-btn { background: var(--brand); color: #fff; border: 0; }

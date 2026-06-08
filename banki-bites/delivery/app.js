@@ -347,7 +347,7 @@ function renderCard(db, o) {
   const addrBlock = (hasName || hasAddress)
     ? `<div class="addr-block">
          ${hasName ? `<div class="name">${escapeHtml(displayCustomerName)}</div>` : ''}
-         ${hasAddress ? `<div class="addr">${escapeHtml(c.address)}</div>` : ''}
+         ${hasAddress ? `<div class="addr"><i class="fas fa-location-dot" aria-hidden="true"></i><span>${escapeHtml(c.address)}</span></div>` : ''}
        </div>`
     : '';
 

@@ -410,7 +410,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     </div>
 
     <div class="ec-actions order-actions">
-      ${status === 'delivered' && (o.customer?.phone) ? `
+      ${status === 'delivered' && cust.phone ? `
       <button class="btn btn-sm btn-outline-success mr-auto" data-act="thankYou" title="Send thank-you coupon on WhatsApp">
         <i class="fab fa-whatsapp mr-1"></i> Thank You
       </button>` : ''}
@@ -611,19 +611,29 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
         const s = ['th','st','nd','rd'], v = n % 100;
         return n + (s[(v - 20) % 10] || s[v] || s[0]);
       }
+      const rawName = o.customer?.name;
+      const prettyName = (() => {
+        if (!rawName) return '';
+        const s = String(rawName).trim();
+        if (!/^bb/i.test(s)) return s;
+        const m = s.match(/\(([^)]+)\)/);
+        return (m && m[1].trim()) ? m[1].trim() : '';
+      })();
+
       function buildMsg(discount, dateStr) {
         const d = new Date(dateStr + 'T00:00:00');
         const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
-        return `Hey! 😊 Thank you for ordering from *BankiBites*!\n\nWe hope your meal was just as you imagined 🍽️ Your support truly means a lot to us! 🙏\n\nHere's a little thank-you gift from our side 🎁\n\n✅ *Flat ₹${discount}/- OFF* on your next order\n📅 Valid until *${label}*\n\nHungry again? We're always here for you — just place your order and we'll take care of the rest! 🛵❤️\n\n_– Team BankiBites_`;
+        const greeting = prettyName ? `Hi ${prettyName}!` : 'Hi there!';
+        return `${greeting} 🙏\n\nYour *BankiBites* order is delivered 🛵 Hope you enjoy every bite! 😋\n\n🧾 Your bill has been generated — check the *Bill* section in the app.\n\n🎁 *₹${discount} OFF* on your next order — valid till *${label}*\n\n_Team BankiBites_ ❤️`;
       }
 
       const defaultDiscount = Math.max(1, Math.round(netRevenue(o) * 0.10));
       const endDate = new Date();
-      endDate.setDate(endDate.getDate() + 7);
+      endDate.setDate(endDate.getDate() + 14);
       const defaultDateStr = endDate.toISOString().split('T')[0];
 
       const res = await Swal.fire({
-        title: '<i class="fab fa-whatsapp mr-1" style="color:#25d366"></i> Thank You message',
+        title: `<i class="fab fa-whatsapp mr-1" style="color:#25d366"></i> Thank You${prettyName ? ' — ' + prettyName : (o.customer?.phone ? ' — ' + o.customer.phone : '')}`,
         html: `
           <div class="text-left">
             <div class="form-row">
@@ -667,28 +677,8 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
       if (!res.isConfirmed) return;
       const { discount, dateStr } = res.value;
       const phone = normalisePhone(o.customer?.phone || '');
-      const d = new Date(dateStr + 'T00:00:00');
-      const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
-      const enc = encodeURIComponent;
-      const NL = '%0A';
-      const E_SMILE = '%F0%9F%98%8A';           // 😊
-      const E_PLATE = '%F0%9F%8D%BD%EF%B8%8F';  // 🍽️
-      const E_PRAY  = '%F0%9F%99%8F';            // 🙏
-      const E_GIFT  = '%F0%9F%8E%81';            // 🎁
-      const E_CHECK = '%E2%9C%85';               // ✅
-      const E_CAL   = '%F0%9F%93%85';            // 📅
-      const E_BIKE  = '%F0%9F%9B%B5';            // 🛵
-      const E_HEART = '%E2%9D%A4%EF%B8%8F';      // ❤️
-      const parts = [
-        enc('Hey! ') + E_SMILE + enc(' Thank you for ordering from *BankiBites*!'),
-        enc('We hope your meal was just as you imagined ') + E_PLATE + enc(' Your support truly means a lot to us! ') + E_PRAY,
-        enc("Here's a little thank-you gift from our side ") + E_GIFT,
-        E_CHECK + enc(` *Flat ₹${discount}/- OFF* on your next order`) + NL + E_CAL + enc(` Valid until *${label}*`),
-        enc("Hungry again? We're always here for you — just place your order and we'll take care of the rest! ") + E_BIKE + E_HEART,
-        enc('_– Team BankiBites_'),
-      ];
-      const text = parts.join(NL + NL);
-      window.location.href = 'https://wa.me/91' + phone + '?text=' + text;
+      const msg = buildMsg(discount, dateStr);
+      window.location.href = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
     });
   }
 
