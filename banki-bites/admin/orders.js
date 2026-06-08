@@ -410,10 +410,10 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     </div>
 
     <div class="ec-actions order-actions">
-      <button class="btn btn-sm btn-primary" data-act="save"><i class="fas fa-save mr-1"></i> Save</button>
       <button class="btn btn-sm ${isFake ? 'btn-warning' : 'btn-outline-danger'}" data-act="toggleFake">
         <i class="fas fa-triangle-exclamation mr-1"></i>${isFake ? 'Unmark fake' : 'Flag as fake'}
       </button>
+      <button class="btn btn-sm btn-primary" data-act="save"><i class="fas fa-save mr-1"></i> Save</button>
     </div>
   `;
 
