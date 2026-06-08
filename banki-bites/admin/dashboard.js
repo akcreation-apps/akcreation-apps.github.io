@@ -4,7 +4,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
-  bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfDay, startOfLastMonth, netRevenue,
+  bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfDay, startOfLastMonth, startOfCurrentMonth, netRevenue,
 } from '../analytics.js';
 import { refreshStaffData } from './staff.js';
 
@@ -52,6 +52,10 @@ export async function renderDashboard(root, db) {
       <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-circle-half-stroke"></i> Orders by status</div>
         <div class="chart-card-body"><canvas id="dashStatusMix"></canvas></div>
+      </div>
+      <div class="chart-card chart-card--wide">
+        <div class="chart-card-head"><i class="fas fa-calendar-alt"></i> Month over month</div>
+        <div class="chart-card-body"><canvas id="dashMonthOverMonth"></canvas></div>
       </div>
       <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-store"></i> Top restaurants</div>
@@ -261,6 +265,7 @@ async function refresh(root, db) {
   renderOrdersPerDay(orders, p);
   renderRevenuePerDay(orders, p);
   renderStatusMix(orders, p);
+  renderMonthOverMonth(orders, p);
   renderTopRestaurants(orders, p);
   renderTopAreas(orders, p);
   renderPaymentMix(orders, p);
@@ -282,27 +287,50 @@ async function refresh(root, db) {
 function renderKpis(el, orders, partners, staff, rules) {
   // `orders` is already scoped to "since the 1st of last month" (fetch window).
   const windowLabel = startOfLastMonth().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-  const revenue = orders.filter(isDelivered).reduce((s, o) => s + netRevenue(o), 0);
+
+  // Orders KPI — delivered count only; total shown in sub-line
+  const deliveredOrders = orders.filter(isDelivered);
+
+  // Revenue KPI — current month only with MoM comparison
+  const curStart = startOfCurrentMonth();
+  const curMonthDelivered  = orders.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) >= curStart);
+  const lastMonthDelivered = orders.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) < curStart);
+  const currentRevenue = curMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
+  const lastRevenue    = lastMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
+  let revBadge;
+  if (lastRevenue > 0) {
+    const pct = ((currentRevenue - lastRevenue) / lastRevenue * 100).toFixed(1);
+    if (pct > 0) revBadge = `<span style="color:#16a34a">↑${pct}%</span> vs last month`;
+    else if (pct < 0) revBadge = `<span style="color:#dc3545">↓${Math.abs(pct)}%</span> vs last month`;
+    else revBadge = `— vs last month`;
+  } else {
+    revBadge = `— vs last month`;
+  }
+
+  // Pending Payouts — mirror the Delivery section logic exactly:
+  // must be delivered, have a delivery_staff_id, not explicitly excluded, and not yet paid.
+  const eligibleDeliveries = orders.filter(o => isDelivered(o) && o.delivery_staff_id && o.payout_applicable !== false);
+  const pendingPayoutOrders = eligibleDeliveries.filter(o => !isPayoutPaid(o));
+  const pendingPayoutTotal  = pendingPayoutOrders.reduce((s, o) => s + feeForOrder(o, rules), 0);
+
   const activePartners = partners.filter(p => p.is_active !== false).length;
   const activeStaff    = staff.filter(s => s.is_active !== false).length;
-  const pendingPayoutOrders = orders.filter(o => isPayoutPending(o) && o.payout_applicable !== false);
-  const pendingPayoutTotal  = pendingPayoutOrders.reduce((s, o) => s + feeForOrder(o, rules), 0);
 
   el.innerHTML = `
     <div class="kpi-card">
       <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
       <div class="kpi-body">
         <div class="kpi-label">Orders</div>
-        <div class="kpi-value">${orders.length}</div>
-        <div class="kpi-sub">since ${windowLabel}</div>
+        <div class="kpi-value">${deliveredOrders.length}</div>
+        <div class="kpi-sub">${orders.length} total | since ${windowLabel}</div>
       </div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon"><i class="fas fa-indian-rupee-sign"></i></div>
       <div class="kpi-body">
         <div class="kpi-label">Revenue</div>
-        <div class="kpi-value">${fmtINR(revenue)}</div>
-        <div class="kpi-sub">delivered only</div>
+        <div class="kpi-value">${fmtINR(currentRevenue)}</div>
+        <div class="kpi-sub">${revBadge}</div>
       </div>
     </div>
     <div class="kpi-card">
@@ -381,8 +409,70 @@ function renderStatusMix(orders, p) {
   });
 }
 
+function renderMonthOverMonth(orders, p) {
+  const curStart = startOfCurrentMonth();
+  const lastStart = startOfLastMonth();
+  const now = new Date();
+
+  const lastMonthLabel = lastStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+  const curMonthLabel  = curStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+
+  const lastDelivered = orders.filter(o => {
+    if (!isDelivered(o)) return false;
+    const d = toDateSafe(o.created_at);
+    return d && d >= lastStart && d < curStart;
+  });
+  const curDelivered = orders.filter(o => {
+    if (!isDelivered(o)) return false;
+    const d = toDateSafe(o.created_at);
+    return d && d >= curStart;
+  });
+
+  const lastRevenue = lastDelivered.reduce((s, o) => s + netRevenue(o), 0);
+  const curRevenue  = curDelivered.reduce((s, o) => s + netRevenue(o), 0);
+
+  mountChart('dashMonthOverMonth', {
+    type: 'bar',
+    data: {
+      labels: [lastMonthLabel, curMonthLabel],
+      datasets: [
+        {
+          label: 'Delivered Orders',
+          data: [lastDelivered.length, curDelivered.length],
+          backgroundColor: [p.muted, p.brand],
+          yAxisID: 'y',
+          borderWidth: 0,
+        },
+        {
+          label: 'Revenue (₹)',
+          data: [lastRevenue, curRevenue],
+          backgroundColor: [p.muted + '99', p.brandSoft],
+          yAxisID: 'y1',
+          borderWidth: 0,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.datasetIndex === 1
+              ? `${ctx.dataset.label}: ${fmtINR(ctx.parsed.y)}`
+              : `${ctx.dataset.label}: ${ctx.parsed.y}`,
+          },
+        },
+      },
+      scales: {
+        y:  { beginAtZero: true, position: 'left',  ticks: { precision: 0 }, title: { display: true, text: 'Orders' } },
+        y1: { beginAtZero: true, position: 'right', ticks: { callback: v => '₹' + v }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Revenue' } },
+      },
+    },
+  });
+}
+
 function renderTopRestaurants(orders, p) {
-  const g = groupBy(orders, o => o.restaurant_name || o.restaurant_id || 'Unknown');
+  const g = groupBy(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown');
   const top = topN(g, 5);
   mountChart('dashTopRestaurants', {
     type: 'bar',
@@ -399,7 +489,7 @@ function renderTopRestaurants(orders, p) {
 }
 
 function renderTopAreas(orders, p) {
-  const g = groupBy(orders, o => o.place || 'Unknown');
+  const g = groupBy(orders.filter(isDelivered), o => o.place || 'Unknown');
   const top = topN(g, 5);
   mountChart('dashTopAreas', {
     type: 'bar',
@@ -531,15 +621,17 @@ function renderAovTrend(orders, p) {
 function renderRepeatNew(orders, p) {
   // A customer (by phone) is "new" on the first day they appear in the window;
   // every subsequent day they place an order they count as "repeat".
+  // Only delivered orders are analysed — mirrors the other customer/area charts.
+  const delivered = orders.filter(isDelivered);
   const firstSeen = new Map();
-  const sorted = [...orders].sort((a, b) => (toDateSafe(a.created_at)?.getTime() || 0) - (toDateSafe(b.created_at)?.getTime() || 0));
+  const sorted = [...delivered].sort((a, b) => (toDateSafe(a.created_at)?.getTime() || 0) - (toDateSafe(b.created_at)?.getTime() || 0));
   for (const o of sorted) {
     const phone = o.customer?.phone;
     const d = toDateSafe(o.created_at);
     if (!phone || !d) continue;
     if (!firstSeen.has(phone)) firstSeen.set(phone, d.getTime());
   }
-  const days = bucketByDay(orders, o => toDateSafe(o.created_at), 7);
+  const days = bucketByDay(delivered, o => toDateSafe(o.created_at), 7);
   const newData = [], repData = [];
   for (const k of days.keys) {
     const bucket = days.buckets.get(k);
@@ -576,7 +668,7 @@ function renderRepeatNew(orders, p) {
 }
 
 function renderTopCustomers(orders, p) {
-  const g = groupBy(orders, o => {
+  const g = groupBy(orders.filter(isDelivered), o => {
     const c = o.customer || {};
     return c.name || c.phone || '';
   });
@@ -597,7 +689,7 @@ function renderTopCustomers(orders, p) {
 
 function renderTopItems(orders, p) {
   const counts = new Map();
-  for (const o of orders) {
+  for (const o of orders.filter(isDelivered)) {
     if (!Array.isArray(o.items)) continue;
     for (const it of o.items) {
       const name = (it?.name || '').trim();
@@ -656,7 +748,7 @@ function renderPrepaidCod(orders, p) {
 function renderDayOfWeek(orders, p) {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const counts = new Array(7).fill(0);
-  for (const o of orders) {
+  for (const o of orders.filter(isDelivered)) {
     const d = toDateSafe(o.created_at);
     if (!d) continue;
     counts[d.getDay()]++;

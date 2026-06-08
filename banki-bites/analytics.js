@@ -88,6 +88,11 @@ export function startOfLastMonth(ref = new Date()) {
   return new Date(ref.getFullYear(), ref.getMonth() - 1, 1, 0, 0, 0, 0);
 }
 
+// First day (00:00 local) of the *current* calendar month.
+export function startOfCurrentMonth(ref = new Date()) {
+  return new Date(ref.getFullYear(), ref.getMonth(), 1, 0, 0, 0, 0);
+}
+
 // Build N consecutive day buckets ending today. Returns { labels: ['DD MMM',...],
 // keys: ['YYYY-MM-DD',...], buckets: Map<key, items[]> }.
 export function bucketByDay(items, getDate, days = 14) {

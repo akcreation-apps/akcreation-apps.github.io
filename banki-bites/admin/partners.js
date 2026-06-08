@@ -2,7 +2,7 @@ import { COL } from '../firebase-config.js';
 import {
   collection, getDocs, doc, setDoc, deleteDoc, orderBy, query, where, writeBatch, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, startOfLastMonth } from '../analytics.js';
+import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, startOfLastMonth, isDelivered } from '../analytics.js';
 
 const partnerCharts = new Map();
 function mountPartnerChart(id, config) {
@@ -80,7 +80,7 @@ async function renderPartnerCharts(db) {
   const partners = []; partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
   const orders = []; ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
 
-  const g = groupBy(orders, o => o.restaurant_name || o.restaurant_id || 'Unknown');
+  const g = groupBy(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown');
   const top = topN(g, 8);
 
   mountPartnerChart('partnersOrders', {

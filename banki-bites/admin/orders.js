@@ -19,7 +19,7 @@ function mountOrderChart(id, config) {
   return c;
 }
 
-const STATUSES = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled'];
+const STATUSES = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled', 'fake'];
 const ETA_MINUTES_FROM_ASSIGN = 45;
 
 function formatEta(ts) {
@@ -598,7 +598,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     if (staffId && newStatus === 'new') newStatus = 'assigned';
 
     // ── Validation ─────────────────────────────────────────────────────
-    if (newStatus !== 'new' && newStatus !== 'cancelled' && !isValidPhone(rawPhone)) {
+    if (newStatus !== 'new' && newStatus !== 'cancelled' && newStatus !== 'fake' && !isValidPhone(rawPhone)) {
       Swal.fire({
         icon: 'warning',
         title: 'Phone required',
