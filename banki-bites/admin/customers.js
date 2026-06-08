@@ -74,9 +74,10 @@ export async function upsertCustomer(db, payload) {
 // SweetAlert2 modal to create or edit a customer.
 // `existing` may be a partial customer object (or null for create).
 // Returns the saved customer object, or null if cancelled.
-export async function openCustomerModal(db, existing) {
+export async function openCustomerModal(db, existing, defaults = {}) {
   const c = existing || {};
   const gps = c.gps || {};
+  const initName = c.name || defaults.name || '';
   const html = `
     <form id="customerForm" class="text-left" autocomplete="off">
       <!-- decoy fields: some browsers ignore autocomplete="off" unless they
@@ -85,7 +86,7 @@ export async function openCustomerModal(db, existing) {
       <input type="password" name="bb-decoy-pass" autocomplete="new-password" style="display:none" tabindex="-1" aria-hidden="true">
       <div class="form-group">
         <label>Name</label>
-        <input class="form-control" name="name" value="${escapeAttr(c.name || '')}" required
+        <input class="form-control" name="name" value="${escapeAttr(initName)}" required
                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
       <div class="form-group">
@@ -139,7 +140,11 @@ export async function openCustomerModal(db, existing) {
       if (phoneInput && !phoneInput.readOnly) {
         const norm = () => { const n = normalisePhone(phoneInput.value); if (n !== phoneInput.value) phoneInput.value = n; };
         phoneInput.addEventListener('blur', norm);
-        phoneInput.addEventListener('paste', () => setTimeout(norm, 0));
+        phoneInput.addEventListener('paste', e => {
+          e.preventDefault();
+          const raw = (e.clipboardData || window.clipboardData).getData('text/plain');
+          phoneInput.value = normalisePhone(raw);
+        });
       }
 
       const linkInput = document.getElementById('mapsLink');

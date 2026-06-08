@@ -475,7 +475,13 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
   const phoneInput = card.querySelector('[data-f="phone"]');
   const normPhone = () => { const n = normalisePhone(phoneInput.value); if (n !== phoneInput.value) phoneInput.value = n; };
   phoneInput.addEventListener('blur', normPhone);
-  phoneInput.addEventListener('paste', () => setTimeout(normPhone, 0));
+  // Intercept paste directly so +91/spaces/dashes are stripped before the value
+  // lands in the field — avoids maxlength truncation of formatted numbers.
+  phoneInput.addEventListener('paste', e => {
+    e.preventDefault();
+    const raw = (e.clipboardData || window.clipboardData).getData('text/plain');
+    phoneInput.value = normalisePhone(raw);
+  });
 
   // ── Customer picker wiring ────────────────────────────────────────────
   const nameInput = card.querySelector('[data-f="name"]');
@@ -562,7 +568,14 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
   });
 
   card.querySelector('[data-act="newCustomer"]').addEventListener('click', async () => {
-    const saved = await openCustomerModal(db, null);
+    // Auto-suggest next BB N name based on highest existing BB-prefixed contact.
+    const bbRe = /^BB\s+(\d+)/i;
+    let nextBb = 1;
+    for (const c of customers.values()) {
+      const m = (c.name || '').match(bbRe);
+      if (m) { const n = parseInt(m[1], 10); if (n >= nextBb) nextBb = n + 1; }
+    }
+    const saved = await openCustomerModal(db, null, { name: `BB ${nextBb}` });
     if (saved) {
       customers.set(saved.phone, saved);
       applyCustomer(saved);
