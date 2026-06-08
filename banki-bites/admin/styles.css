@@ -376,6 +376,15 @@ details.entity-card > .order-summary {
 .order-summary-main .order-total {
   color: var(--brand);
   font-weight: 700;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.order-total-orig {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: line-through;
 }
 .order-summary-side {
   display: flex;
@@ -921,8 +930,120 @@ details.entity-card[open] > .order-summary .order-chevron {
   .fab { right: 24px; bottom: 32px; }
 }
 
+/* ===========================================================================
+   Desktop layout — sidebar navigation + full-width content
+   Breakpoint: ≥1024px. Everything below 1024px keeps the mobile tab-bar layout.
+   =========================================================================== */
+@media (min-width: 1024px) {
+
+  /* ── Grid shell: topbar spans both columns, sidebar + content below ── */
+  #appShell {
+    display: grid;
+    grid-template-areas:
+      "topbar  topbar"
+      "sidebar content"
+      "sidebar footer";
+    grid-template-columns: 230px 1fr;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+  }
+  /* Reset flex rules that only apply to the mobile column layout */
+  #appShell > .content      { flex: unset; }
+  #appShell > .admin-footer { flex-shrink: unset; margin-top: unset; }
+
+  .topbar       { grid-area: topbar; }
+  .tabbar       { grid-area: sidebar; }
+  .content      { grid-area: content; min-width: 0; }
+  .admin-footer { grid-area: footer; }
+
+  /* ── Topbar: more breathing room ── */
+  .topbar       { padding: 14px 28px; }
+  .topbar-brand { font-size: 1.1rem; gap: 10px; }
+  .topbar-logo  { width: 32px; height: 32px; }
+  .user-email   { max-width: none; font-size: 0.88rem; }
+
+  /* ── Sidebar nav ── */
+  .tabbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    padding: 14px 10px;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--surface);
+    position: sticky;
+    top: 60px;            /* topbar height at desktop padding (14px×2 + 32px logo) */
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  /* Tab buttons: icon + label side-by-side, left-aligned with left-border indicator */
+  .tab-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 10px;
+    padding: 11px 14px;
+    min-height: 46px;
+    font-size: 0.9rem;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+  }
+  .tab-btn i { font-size: 1rem; }
+  .tab-btn.active {
+    border-bottom-color: transparent;
+    border-left-color: var(--brand);
+    border-radius: 10px;
+  }
+
+  /* ── Content: full remaining width, no 1200px cap ── */
+  .content {
+    max-width: none;
+    margin: 0;
+    padding: 20px 32px 48px;
+  }
+
+  /* ── Footer: left-aligned under content ── */
+  .admin-footer {
+    padding: 16px 32px;
+    text-align: left;
+  }
+
+  /* ── Sticky section headers: only topbar to offset (tabbar is a sidebar now) ── */
+  .section-header--sticky { top: 60px; }
+
+  /* ── FAB: no tab-bar at bottom on desktop ── */
+  .fab { right: 32px; bottom: 32px; }
+
+  /* ── KPI cards: larger on desktop ── */
+  .kpi-card  { padding: 16px; gap: 14px; }
+  .kpi-icon  { width: 44px; height: 44px; flex: 0 0 44px; font-size: 1.15rem; border-radius: 12px; }
+  .kpi-value { font-size: 1.45rem; }
+  .kpi-label { font-size: 0.75rem; }
+  .kpi-sub   { font-size: 0.75rem; white-space: normal; }
+
+  /* ── Charts: taller on desktop ── */
+  .chart-grid    { gap: 16px; }
+  .chart-card-body { height: 280px; }
+  .chart-card--wide { grid-column: span 2; }
+
+  /* ── Card lists: 2-column for Partners and Delivery (not Orders — they expand) ── */
+  #tab-partners .card-list,
+  #tab-staff    .card-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+/* ── 3-column chart grid on very wide screens ── */
 @media (min-width: 1280px) {
-  .content { padding: 24px 32px; }
+  .content         { padding: 24px 40px 56px; }
+  .chart-grid      { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .chart-card--wide{ grid-column: span 3; }
+  .chart-card-body { height: 310px; }
+  .kpi-value       { font-size: 1.6rem; }
 }
 
 /* Reduced motion */

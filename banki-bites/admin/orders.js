@@ -258,7 +258,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
       <div class="order-summary-main">
         <div class="ec-title">
           <span class="restaurant-name">${escapeHtml(o.restaurant_name || o.restaurant_id || '?')}</span>
-          <span class="order-total">₹${o.total ?? '?'}</span>
+          <span class="order-total">${fmtINR(netRevenue(o))}${Number(o.discount) > 0 ? `<span class="order-total-orig">₹${o.total}</span>` : ''}</span>
         </div>
         <div class="ec-meta">${created.toLocaleString('en-IN')} · ${(o.items||[]).length} item${(o.items||[]).length === 1 ? '' : 's'}${o.place ? ' · ' + escapeHtml(o.place) : ''}</div>
         ${etaLine}
