@@ -1,0 +1,709 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="AK Creation">
+    <link rel="canonical" href="https://akcreation-apps.com/MCH/cart.html">
+    <link rel="apple-touch-icon" sizes="180x180" href="mch-logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="mch-logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="mch-logo.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" href="mch-logo.png">
+    <meta name="theme-color" content="#1A1A2E">
+    <title>Cart — Maa Charchika Hotel N Restaurant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Analytics -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+    <script src="restaurant.js"></script>
+    <script src="cart.js" type="module"></script>
+    <script src="common.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary:   #FF6B35;
+            --navy:      #1A1A2E;
+            --bg:        #F5F0EB;
+            --card:      #FFFFFF;
+            --text:      #2D2D2D;
+            --muted:     #6B6B6B;
+            --border:    #E2D9D0;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.13);
+            --r:         12px;
+            --nav-h:     56px;
+            --loader-bg:       #F5F0EB;
+            --loader-border:   rgba(0,0,0,0.1);
+            --modal-handle-bg: #DDD;
+            --delete-hover:    #fdecea;
+            --error-clr:       #E53935;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --navy:      #100F18;
+                --bg:        #0D0C13;
+                --card:      #181720;
+                --text:      #EDE9FF;
+                --muted:     #7A748F;
+                --border:    #2A273D;
+                --shadow-sm: 0 1px 6px rgba(0,0,0,0.55);
+                --shadow-md: 0 4px 20px rgba(0,0,0,0.65);
+                --loader-bg:       #0D0C13;
+                --loader-border:   rgba(255,255,255,0.08);
+                --modal-handle-bg: #3A3650;
+                --delete-hover:    rgba(255,80,80,0.12);
+                --error-clr:       #FF6B6B;
+            }
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding-top: calc(var(--nav-h) + var(--strip-h, 0px));
+        }
+
+        /* ── Loader ── */
+        .loader-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: var(--loader-bg);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader {
+            width: 44px; height: 44px;
+            border: 4px solid var(--loader-border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Navbar ── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--nav-h);
+            z-index: 1000;
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .logo {
+            cursor: pointer; flex: 1; min-width: 0;
+            display: flex; align-items: center; gap: 10px;
+            background: none; border: none; padding: 0;
+        }
+        .logo img { height: 40px; width: 40px; display: block; flex-shrink: 0; object-fit: contain; }
+        .logo-text {
+            font-size: 0.95rem; font-weight: 700; color: #fff;
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 15ch; display: inline-block; vertical-align: middle;
+        }
+        .logo-text .brand-accent { color: var(--primary); }
+        .icon-container { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+        .nav-icon {
+            color: rgba(255,255,255,0.88);
+            font-size: 1.1rem; cursor: pointer;
+            display: flex; align-items: center;
+            transition: color 0.2s, transform 0.2s;
+            background: none; border: none; padding: 0; text-decoration: none;
+        }
+        .nav-icon:hover { color: #fff; transform: scale(1.1); }
+        .refer-btn { position: relative; }
+        .refer-btn::after {
+            content: '';
+            position: absolute; top: -4px; right: -4px;
+            width: 8px; height: 8px;
+            background: #FFD700; border-radius: 50%;
+            animation: referPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes referPulse {
+            0%,100% { transform: scale(1);   opacity: 1; box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
+            50%      { transform: scale(1.25); opacity: 0.8; box-shadow: 0 0 0 5px rgba(255,215,0,0); }
+        }
+
+        /* ── Two-column wrapper (desktop only) ── */
+        .cart-wrapper {
+            display: block; /* mobile: stacked */
+        }
+
+        /* ── Page wrapper ── */
+        #cart {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 14px 160px;
+        }
+
+        /* ── Desktop: side-by-side layout ── */
+        @media (min-width: 900px) {
+            .cart-wrapper {
+                display: flex;
+                align-items: flex-start;
+                gap: 28px;
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 0 24px 40px;
+            }
+            #cart {
+                flex: 1;
+                max-width: none;
+                margin: 0;
+                padding: 0 0 30px;
+            }
+            #cart-total-container {
+                position: sticky !important;
+                top: calc(var(--nav-h) + 16px);
+                bottom: auto !important;
+                left: auto !important;
+                right: auto !important;
+                width: 300px;
+                flex-shrink: 0;
+                border-radius: var(--r);
+                border: 1px solid var(--border);
+                border-top: 1px solid var(--border) !important;
+                box-shadow: var(--shadow-md);
+                margin-top: 58px; /* visual align below cart title */
+            }
+        }
+
+        /* ── Page title ── */
+        .cart-page-title {
+            font-size: 1.1rem; font-weight: 700;
+            color: var(--text);
+            padding: 16px 4px 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* ── Empty cart ── */
+        #empty-cart-banner {
+            text-align: center;
+            padding: 60px 20px 30px;
+        }
+        #empty-cart-banner img {
+            max-width: 200px; height: auto;
+            opacity: 0.82; margin-bottom: 14px;
+            display: block; margin: 0 auto 14px;
+        }
+        #empty-cart-banner p {
+            font-size: 0.88rem; color: var(--muted);
+            margin-bottom: 18px;
+        }
+        .browse-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 24px;
+            padding: 10px 22px; font-size: 0.85rem;
+            font-weight: 600; font-family: 'Poppins', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .browse-btn:hover { background: #e64a19; }
+
+        /* ── Cart item ── */
+        .cart-item {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+        .cart-item img {
+            width: 56px; height: 56px;
+            border-radius: 8px; object-fit: cover;
+            flex-shrink: 0;
+        }
+        .cart-item-info {
+            flex: 1; min-width: 0;
+        }
+        .cart-item-info h5 {
+            font-size: 0.8rem; font-weight: 600;
+            margin: 0 0 3px; color: var(--text);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .cart-item-price {
+            font-size: 0.73rem; color: var(--primary);
+            font-weight: 600; margin: 0;
+        }
+
+        /* FSSAI diet badge — matches menu page */
+        .cart-diet-badge {
+            display: inline-flex; flex-shrink: 0;
+            width: 10px; height: 10px;
+            border-radius: 2px; border: 1.5px solid;
+            position: relative; vertical-align: middle;
+            background: rgba(255,255,255,0.92);
+        }
+        .cart-diet-badge::after {
+            content: ""; position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 5px; height: 5px; border-radius: 50%;
+        }
+        .cart-diet-badge.veg      { border-color: #00922A; }
+        .cart-diet-badge.veg::after   { background: #00922A; }
+        .cart-diet-badge.nonveg   { border-color: #963415; }
+        .cart-diet-badge.nonveg::after { background: #963415; }
+        .price-x { opacity: 0.55; font-weight: 400; }
+
+        /* ── Qty + delete controls ── */
+        .cart-item-controls {
+            display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+        }
+        .cart-item-quantity {
+            display: flex; align-items: center;
+            background: var(--bg); border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 0 2px;
+        }
+        .cart-item-quantity button {
+            width: 26px; height: 26px;
+            background: none; border: none;
+            font-size: 1rem; font-weight: 700;
+            cursor: pointer; color: var(--text);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: background 0.15s, color 0.15s;
+        }
+        .cart-item-quantity button:hover,
+        .cart-item-quantity button:active {
+            background: var(--primary); color: #fff;
+        }
+        .quantity {
+            min-width: 22px; text-align: center;
+            font-size: 0.8rem; font-weight: 700; color: var(--text);
+        }
+        .delete-item {
+            width: 30px; height: 30px;
+            background: none; border: none;
+            color: #dc3545; font-size: 0.8rem;
+            cursor: pointer; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .delete-item:hover { background: var(--delete-hover); }
+
+        /* ── Total section ── */
+        #cart-total-container {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 10px 16px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 800;
+        }
+        #delivery-note {
+            font-size: 0.72rem;
+            line-height: 1.5;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        #delivery-note:empty { display: none; }
+        .total-row {
+            display: flex;
+            justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .total-row .total-label {
+            font-size: 0.82rem; color: var(--muted); font-weight: 500;
+        }
+        #cart-total {
+            font-size: 1.2rem; font-weight: 700; color: var(--text);
+        }
+        #place-order-btn {
+            width: 100%;
+            background: #25D366; color: #fff;
+            border: none; border-radius: var(--r);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            cursor: pointer; font-family: 'Poppins', sans-serif;
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: 0 4px 12px rgba(37,211,102,0.25);
+        }
+        #place-order-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
+        #place-order-btn img { width: 22px; height: 22px; }
+        #place-order-btn .btn-text {
+            display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;
+        }
+        #place-order-btn .main-text { font-size: 0.9rem; font-weight: 600; }
+        #place-order-btn .sub-text { font-size: 0.63rem; opacity: 0.85; }
+
+        /* ── Delivery info strip — fixed below navbar ── */
+        .delivery-strip {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 6px 20px;
+        }
+        #deliveryStrip {
+            position: fixed;
+            top: var(--nav-h);
+            left: 0;
+            right: 0;
+            z-index: 999;
+        }
+        .delivery-strip-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        .ds-icon { color: var(--primary); font-size: 0.72rem; flex-shrink: 0; }
+        .ds-label { color: var(--muted); font-weight: 400; }
+        .ds-place { font-weight: 700; color: var(--text); }
+        .ds-change {
+            margin-left: auto;
+            flex-shrink: 0;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.72rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ds-change:hover { text-decoration: underline; }
+
+        /* ── Place selector — bottom sheet ── */
+        .place-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.52);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .place-modal {
+            background: var(--card);
+            border-radius: 22px 22px 0 0;
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto;
+            max-height: 90dvh;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+            box-shadow: 0 -6px 40px rgba(0,0,0,0.22);
+            animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1);
+        }
+        @keyframes sheetUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .place-modal-handle {
+            width: 40px; height: 4px;
+            background: var(--modal-handle-bg); border-radius: 2px;
+            margin: 10px auto 0;
+        }
+        .place-modal-body { padding: 18px 20px 8px; }
+        .place-modal-header {
+            display: flex; align-items: center;
+            gap: 14px; margin-bottom: 18px;
+        }
+        .place-modal-icon {
+            width: 44px; height: 44px;
+            background: rgba(255,107,53,0.12);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .place-modal-icon i { color: var(--primary); font-size: 1.15rem; }
+        .place-modal-header h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 2px; }
+        .place-modal-sub { font-size: 0.74rem; color: var(--muted); margin: 0; }
+        .place-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px; margin-bottom: 4px;
+        }
+        .place-chip {
+            padding: 13px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: var(--text);
+            background: var(--bg);
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+            user-select: none;
+        }
+        .place-chip:hover { border-color: var(--primary); background: rgba(255,107,53,0.06); }
+        .place-chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .place-chip.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff; font-weight: 600;
+            box-shadow: 0 3px 10px rgba(255,107,53,0.35);
+        }
+        .place-chip.other-chip {
+            grid-column: 1 / -1;
+            display: flex; align-items: center; justify-content: center;
+            gap: 7px; border-style: dashed; color: var(--muted);
+        }
+        .place-chip.other-chip i { font-size: 0.7rem; }
+        .place-chip.other-chip.selected { border-style: solid; color: #fff; }
+        .place-other-wrapper { margin-top: 12px; }
+        .place-other-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .place-other-input {
+            flex: 1; min-width: 0;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text); background: var(--bg);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .place-other-input:focus-visible {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+        .place-other-confirm {
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .place-other-confirm:hover  { background: #E64A19; }
+        .place-other-confirm:active { transform: scale(0.93); }
+        .place-other-confirm:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .place-error { font-size: 0.74rem; color: var(--error-clr); margin-top: 8px; display: none; }
+
+        /* ── Screen reader only ── */
+        .sr-only {
+            position: absolute;
+            width: 1px; height: 1px;
+            padding: 0; margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* ── Skip link ── */
+        .skip-link {
+            position: absolute;
+            top: -40px; left: 0;
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 16px;
+            z-index: 9999;
+            border-radius: 0 0 var(--r) 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: top 0.15s;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* ── Focus visibility ── */
+        :focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .refer-btn::after { animation: none; }
+            .loader { animation: none; }
+            .place-modal { animation: none; }
+        }
+
+        /* ── Dark-mode structural overrides ── */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-image:
+                    radial-gradient(ellipse 60% 40% at 15% 60%, rgba(255,107,53,0.05) 0%, transparent 70%),
+                    radial-gradient(ellipse 50% 60% at 85% 10%, rgba(120,80,255,0.04) 0%, transparent 70%);
+            }
+            .navbar {
+                background: rgba(13,12,19,0.88);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+                border-bottom: 1px solid rgba(255,107,53,0.15);
+                box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Skip link -->
+    <a href="#cart" class="skip-link">Skip to cart</a>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <button class="logo" onclick="redirect_to_home()" aria-label="Maa Charchika Hotel N Restaurant — go to menu">
+                <img src="mch-logo.png" alt="Maa Charchika Hotel N Restaurant logo" width="40" height="40" />
+                <span class="logo-text"><span class="brand-accent">Maa Charchika</span> Hotel N Restaurant</span>
+            </button>
+            <div class="icon-container">
+                <a class="nav-icon refer-btn" href="referral.html" title="Refer &amp; Earn" aria-label="Refer &amp; Earn">
+                    <i class="fas fa-share-alt" aria-hidden="true"></i>
+                </a>
+                <button class="nav-icon" id="invoiceIcon" style="display: none;" onclick="redirect_to_invoice()" aria-label="View order history">
+                    <i class="fas fa-receipt" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Delivery / table info strip -->
+    <div id="deliveryStrip" class="delivery-strip" style="display:none;" role="status" aria-live="polite"></div>
+
+    <!-- Wrapper: block on mobile, flex row on desktop -->
+    <div class="cart-wrapper">
+
+        <!-- Left / full-width: cart items -->
+        <div id="cart">
+            <h2 class="cart-page-title">
+                <i class="fas fa-shopping-cart" style="color:var(--primary);font-size:0.95rem;"></i>
+                Your Cart
+            </h2>
+
+            <!-- Empty state -->
+            <div id="empty-cart-banner" style="display: none;">
+                <img src="../food_src/empty_cart.webp" alt="Your cart is empty — browse the menu to add dishes" loading="lazy" width="200" height="200">
+                <p>Your cart is empty!</p>
+                <button class="browse-btn" onclick="redirect_to_home()">
+                    <i class="fas fa-utensils"></i> Browse Menu
+                </button>
+            </div>
+
+            <!-- Cart items (populated by cart.js) -->
+            <div id="cart-items"></div>
+        </div>
+
+        <!-- Right / sticky-bottom: order summary (shown/hidden by cart.js) -->
+        <div id="cart-total-container" style="display: none;">
+            <div id="delivery-note"></div>
+            <div class="total-row">
+                <span class="total-label">Grand Total</span>
+                <span id="cart-total">₹0.00</span>
+            </div>
+            <button id="place-order-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp logo" width="22" height="22" />
+                <span class="btn-text">
+                    <span class="main-text">Place Order</span>
+                    <span class="sub-text">via WhatsApp</span>
+                </span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Place selector bottom sheet -->
+    <div class="place-modal-overlay" id="placeModal" style="display:none;"
+         role="dialog" aria-modal="true"
+         aria-labelledby="placeModalTitle" aria-describedby="placeModalDesc">
+        <div class="place-modal">
+            <div class="place-modal-handle" aria-hidden="true"></div>
+            <div class="place-modal-body">
+                <div class="place-modal-header">
+                    <div class="place-modal-icon">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 id="placeModalTitle">Where are you ordering from?</h3>
+                        <p class="place-modal-sub" id="placeModalDesc">Choose your delivery area to continue</p>
+                    </div>
+                </div>
+                <div class="place-chips-grid" id="placeOptionsList" role="group" aria-labelledby="placeModalTitle">
+                    <button class="place-chip" data-value="Harirajpur" type="button" aria-pressed="false">Harirajpur</button>
+                    <button class="place-chip" data-value="Chakapada"  type="button" aria-pressed="false">Chakapada</button>
+                    <button class="place-chip" data-value="Sisua"      type="button" aria-pressed="false">Sisua</button>
+                    <button class="place-chip" data-value="Bedapur"    type="button" aria-pressed="false">Bedapur</button>
+                    <button class="place-chip" data-value="Khamaranga" type="button" aria-pressed="false">Khamaranga</button>
+                    <button class="place-chip" data-value="Charchika"  type="button" aria-pressed="false">Charchika</button>
+                    <button class="place-chip" data-value="Ranapur"    type="button" aria-pressed="false">Ranapur</button>
+                    <button class="place-chip" data-value="Banki"      type="button" aria-pressed="false">Banki</button>
+                    <button class="place-chip" data-value="Sahadapada" type="button" aria-pressed="false">Sahadapada</button>
+                    <button class="place-chip" data-value="Gopalapur"  type="button" aria-pressed="false">Gopalapur</button>
+                    <button class="place-chip" data-value="Patapur"    type="button" aria-pressed="false">Patapur</button>
+                    <button class="place-chip" data-value="Ragadi"    type="button" aria-pressed="false">Ragadi</button>
+                    <button class="place-chip other-chip" data-value="Other" type="button" aria-pressed="false">
+                        <i class="fas fa-pen" aria-hidden="true"></i> Other
+                    </button>
+                </div>
+                <div id="placeOtherWrapper" class="place-other-wrapper" style="display:none;">
+                    <div class="place-other-field">
+                        <input type="text" id="placeOtherInput" class="place-other-input"
+                               placeholder="Type your area name…" maxlength="60" aria-label="Enter your area name" />
+                        <button id="placeOtherConfirm" class="place-other-confirm" type="button" aria-label="Confirm location">
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <p id="placeError" class="place-error" role="alert"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var strip = document.getElementById('deliveryStrip');
+        if (!strip) return;
+        function sync() {
+            var h = strip.style.display !== 'none' ? strip.offsetHeight : 0;
+            document.documentElement.style.setProperty('--strip-h', h + 'px');
+        }
+        var mo = new MutationObserver(function () {
+            requestAnimationFrame(sync);
+        });
+        mo.observe(strip, { attributes: true, attributeFilter: ['style'] });
+        sync();
+    }());
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://akcreation-apps.com/MCH/viewInvoice.html">
+    <link rel="apple-touch-icon" sizes="180x180" href="mch-logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="mch-logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="mch-logo.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" href="mch-logo.png">
+    <meta name="theme-color" content="#1A1A2E">
+    <title>Bill - Maa Charchika Hotel N Restaurant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #e8e8e8;
+            min-height: 100vh;
+            padding: 20px 12px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ── Page content wrapper ── */
+        .page-content {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #444;
+            text-decoration: none;
+            margin-bottom: 12px;
+            padding: 4px 0;
+        }
+        .back-link:hover { color: #000; text-decoration: underline; }
+
+        /* ── Bill card ── */
+        #billContainer {
+            background: #fff;
+            width: 100%;
+            padding: 0;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.18);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #111;
+        }
+
+        /* Header */
+        .bill-header {
+            text-align: center;
+            padding: 16px 16px 10px;
+            border-bottom: 1px dashed #999;
+        }
+        .bill-title {
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .restaurant-info p {
+            font-size: 11px;
+            color: #333;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* Table + date row */
+        .table-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            font-size: 11px;
+            border-bottom: 1px dashed #999;
+        }
+        .table-info p { margin: 0; }
+
+        /* Dashed separator */
+        .separator {
+            border: none;
+            border-top: 1px dashed #aaa;
+            margin: 0;
+        }
+
+        /* Items list */
+        .bill-items {
+            list-style: none;
+            padding: 6px 16px;
+            margin: 0;
+        }
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            padding: 3px 0;
+            font-size: 12px;
+        }
+        .bill-item strong {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-top: 5px;
+            display: block;
+        }
+        .bill-item span:last-child {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .delivery-charge span { color: #c00; }
+
+        /* Total */
+        #billTotal {
+            font-size: 13px;
+            font-weight: bold;
+            text-align: right;
+            padding: 8px 16px 6px;
+            border-top: 1px solid #111;
+            margin-top: 2px;
+        }
+
+        /* Thank you note */
+        .thank-you {
+            text-align: center;
+            padding: 8px 16px 6px;
+            font-size: 11px;
+            color: #555;
+            border-top: 1px dashed #bbb;
+        }
+
+        /* Download button (inside billContainer, hidden before capture) */
+        .download-button {
+            display: block;
+            width: calc(100% - 32px);
+            margin: 10px 16px 16px;
+            background: #111;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+        .download-button:hover { background: #333; }
+    </style>
+</head>
+<body>
+
+    <div class="page-content">
+
+    <!-- Back navigation (outside billContainer, not captured) -->
+    <a class="back-link" href="invoice.html">
+        ← Back to Orders
+    </a>
+
+    <!-- Bill container — captured by html2canvas -->
+    <div id="billContainer">
+
+        <!-- Header -->
+        <div class="bill-header">
+            <div class="bill-title">Maa Charchika Hotel N Restaurant</div>
+            <div class="restaurant-info">
+                <p>Jail Road</p>
+                <p>Banki, Cuttack 754008</p>
+                <p>TEL: 91240 71084</p>
+            </div>
+        </div>
+
+        <!-- Table + date -->
+        <div class="table-info">
+            <p id="tableNo">Table No: 06</p>
+            <p id="billDate"></p>
+        </div>
+
+        <hr class="separator">
+
+        <!-- Line items -->
+        <ul id="billItems" class="bill-items"></ul>
+
+        <hr class="separator">
+
+        <!-- Total -->
+        <p id="billTotal">Total: &#8377;0</p>
+
+        <p class="thank-you">** Thank you, visit again! **</p>
+
+        <!-- Download button (hidden during html2canvas capture) -->
+        <button class="download-button" id="generateImageButton">
+            Download Bill
+        </button>
+    </div>
+
+    </div><!-- /.page-content -->
+
+    <script src="restaurant.js"></script>
+    <script>
+    let orders = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order_id');
+    orders = orders.filter(order => order.order_id === orderId);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const billItemsElement = document.getElementById('billItems');
+        let total = 0;
+
+        const order = orders[0];
+        if (!order) {
+            document.getElementById('billContainer').innerHTML = '<p style="padding:20px;text-align:center;">Order not found.</p>';
+            return;
+        }
+
+        document.getElementById('tableNo').textContent =
+            order.order_details.table_no === 'COD'
+                ? 'Payment: COD'
+                : `Table - ${order.order_details.table_no}`;
+
+        const createdAtSeconds = order.order_details.created_at.seconds;
+        const date = new Date(createdAtSeconds * 1000);
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        document.getElementById('billDate').textContent = formattedDate;
+
+        order.order_details.order_details.forEach(cat => {
+            const liCategory = document.createElement('li');
+            liCategory.classList.add('bill-item');
+            liCategory.innerHTML = `<strong>${cat.category.name}</strong>`;
+            billItemsElement.appendChild(liCategory);
+
+            cat.category.dish_details.forEach(dish => {
+                const liDish = document.createElement('li');
+                liDish.classList.add('bill-item');
+                const label = `${dish.quantity} × ${dish.name}${dish.type === "NonVeg" ? " (NV)" : ""}`;
+                const price = `₹${(dish.price * dish.quantity).toFixed(2)}`;
+                liDish.innerHTML = `<span>${label}</span><span>${price}</span>`;
+                billItemsElement.appendChild(liDish);
+                total += dish.price * dish.quantity;
+            });
+        });
+
+        if (order.order_details.delivery_charges && order.order_details.delivery_charges > 0) {
+            const liDelivery = document.createElement('li');
+            liDelivery.classList.add('bill-item', 'delivery-charge');
+            liDelivery.innerHTML = `<span>Delivery Charges</span><span>₹${order.order_details.delivery_charges.toFixed(2)}</span>`;
+            billItemsElement.appendChild(liDelivery);
+            total += order.order_details.delivery_charges;
+        }
+
+        document.getElementById('billTotal').textContent = `Total: ₹${total.toFixed(2)}`;
+    });
+
+    document.getElementById('generateImageButton').addEventListener('click', function() {
+        this.style.display = 'none';
+        const billContainer = document.getElementById('billContainer');
+        html2canvas(billContainer, { useCORS: true }).then(canvas => {
+            const link = document.createElement('a');
+            const now = new Date();
+            const tableNo = orders[0].order_details.table_no;
+            const filename = `${tableNo}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}_${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getFullYear()).slice(-2)}_Bill.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.download = filename;
+            link.click();
+            this.style.display = 'block';
+        });
+    });
+    </script>
+</body>
+</html>
