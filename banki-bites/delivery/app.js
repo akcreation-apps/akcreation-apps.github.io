@@ -255,6 +255,21 @@ function renderCard(db, o) {
   if (isClosed) {
     card.classList.add('history-card');
     const when = o.delivered_at?.toDate?.() || o.created_at?.toDate?.() || new Date();
+    // Payout state chip: Paid (settled), Pending (eligible & delivered but unsettled),
+    // or Not eligible (admin flagged payout_applicable === false). Cancelled orders
+    // with no payout flag show no chip.
+    const payoutChip = (() => {
+      if (o.payout_applicable === false) {
+        return '<span class="payout-chip" title="Not eligible for partner payout"><i class="fas fa-ban"></i> Not eligible</span>';
+      }
+      if (o.payout_paid === true) {
+        return '<span class="payout-chip payout-chip--ok" title="Partner payout settled"><i class="fas fa-circle-check"></i> Paid</span>';
+      }
+      if (isDelivered(o)) {
+        return '<span class="payout-chip payout-chip--warn" title="Partner payout pending"><i class="fas fa-hourglass-half"></i> Pending</span>';
+      }
+      return '';
+    })();
     const metaParts = [];
     if (hasName) metaParts.push(escapeHtml(displayCustomerName));
     if (hasPhone) metaParts.push(escapeHtml(c.phone));
@@ -277,8 +292,9 @@ function renderCard(db, o) {
       <div class="history-row">
         <div class="history-main">
           <div class="history-title">
-            ${escapeHtml(restaurantLabel || '—')}${totalLabel}
-            <span class="status-pill status-${o.status}" style="margin-left:6px">${pillLabel(o.status)}</span>
+            <span class="history-title-text">${escapeHtml(restaurantLabel || '—')}${totalLabel}</span>
+            <span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>
+            ${payoutChip}
           </div>
           <div class="history-meta">${metaParts.join(' · ')}</div>
         </div>

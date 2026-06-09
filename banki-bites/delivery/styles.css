@@ -365,7 +365,14 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
 .history-title {
   font-size: 0.9rem; font-weight: 600;
   color: var(--text-strong);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  min-width: 0;
+}
+.history-title > .status-pill,
+.history-title > .payout-chip { flex: 0 0 auto; }
+.history-title > .history-title-text {
+  flex: 1 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .history-meta {
   font-size: 0.74rem;
