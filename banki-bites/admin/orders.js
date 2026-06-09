@@ -104,7 +104,21 @@ export async function renderOrders(root, db) {
       listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders match.</p></div>`;
     } else {
       listEl.innerHTML = '';
-      filtered.forEach(o => listEl.appendChild(renderOrderCard(db, o, staff, customers, feeRules)));
+      // Auto-suggest "BB N" names for new unprocessed orders missing a customer
+      // name — increments past the highest existing BB-prefixed contact and
+      // stays unique across multiple unsaved new orders in this render pass.
+      const bbRe = /^BB\s+(\d+)/i;
+      let nextBb = 1;
+      for (const c of customers.values()) {
+        const m = (c.name || '').match(bbRe);
+        if (m) { const n = parseInt(m[1], 10); if (n >= nextBb) nextBb = n + 1; }
+      }
+      filtered.forEach(o => {
+        let suggestedName = '';
+        const isNewUnp = (o.status === 'new' || !o.status) && o.paid_already == null && o.paid_method == null;
+        if (isNewUnp && !o.customer?.name) suggestedName = `BB ${nextBb++}`;
+        listEl.appendChild(renderOrderCard(db, o, staff, customers, feeRules, suggestedName));
+      });
     }
     renderOrdersStats(allOrders, filtered);
   }
@@ -189,7 +203,7 @@ function renderOrdersStats(all, filtered) {
   });
 }
 
-function renderOrderCard(db, o, staff, customers, feeRules) {
+function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') {
   const isFake = o.status === 'fake' || o.is_fake === true;
   const card = document.createElement('details');
   card.className = `entity-card order-card${isFake ? ' order-card--fake' : ''}`;
@@ -200,6 +214,9 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
   ).join('');
 
   const cust = o.customer || {};
+  // For brand-new orders with no customer name yet, fall back to the
+  // caller-supplied "BB N" suggestion so the admin can review-and-save.
+  const effectiveName = cust.name || suggestedName || '';
   // Pre-populate delivery address from the order's "place" (where the customer
   // ordered from) when no explicit address has been entered yet.
   const prefilledAddress = cust.address || o.place || '';
@@ -215,8 +232,8 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
     .map(s => `<option value="${s.uid}" ${o.delivery_staff_id === s.uid ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('');
 
   // Contact summary line when collapsed
-  const contactSummary = cust.name || cust.phone
-    ? `${escapeHtml(cust.name || '')}${cust.phone ? ' · ' + escapeHtml(cust.phone) : ''}`
+  const contactSummary = effectiveName || cust.phone
+    ? `${escapeHtml(effectiveName)}${cust.phone ? ' · ' + escapeHtml(cust.phone) : ''}`
     : '<em>Not added</em>';
 
   const paymentBadge = paymentCollected
@@ -302,7 +319,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
           </button>
         </div>
         <div class="customer-fields">
-          <input class="form-control form-control-sm" placeholder="Customer name" data-f="name" value="${escapeAttr(cust.name||'')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="bb-cname-${o.id}">
+          <input class="form-control form-control-sm" placeholder="Customer name" data-f="name" value="${escapeAttr(effectiveName)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="bb-cname-${o.id}">
           <input class="form-control form-control-sm" placeholder="Phone (10 digits)" data-f="phone" value="${escapeAttr(cust.phone||'')}" inputmode="tel" maxlength="15" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="bb-cphone-${o.id}">
           <textarea class="form-control form-control-sm" placeholder="Delivery address" data-f="address" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="bb-caddr-${o.id}">${escapeHtml(prefilledAddress)}</textarea>
           <div class="customer-gps" data-el="gpsLine" hidden>
@@ -466,6 +483,9 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
   collectInput .addEventListener('input', () => { collectOverridden = true; reflectFullyPaidHint(); });
   // Initial paint of the hint state.
   reflectFullyPaidHint();
+  // Sync "To collect" with current discount/prepaid on first render so new orders
+  // (prepaid = total → collect = 0) don't show the stale full-total placeholder.
+  recomputeCollect();
 
   paymentToggle.addEventListener('change', () => {
     const collected = paymentToggle.checked;
