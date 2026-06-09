@@ -4,75 +4,91 @@
       "category": "Chinese",
       "subcategories": [
         {
-          "name": "Soup",
-          "type": "NonVeg",
-          "dishes": [
-            {
-              "id": 11,
-              "name": "Clear",
-              "price": 49,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 12,
-              "name": "Manchow",
-              "price": 59,
-              "available_time": 18,
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
           "name": "Starter",
           "type": "Veg",
           "dishes": [
+
             {
               "id": 101,
-              "name": "Paneer Chilli",
-              "price": 119,
+              "name": "Mushroom 65",
+              "price": 110,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 102,
-              "name": "Paneer Salt N Peper",
-              "price": 129,
+              "name": "Mushroom Chilli",
+              "price": 110,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 103,
-              "name": "Paneer 65",
-              "price": 159,
+              "name": "Mushroom Manchurian",
+              "price": 110,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 104,
-              "name": "Paneer Chatpati",
-              "price": 159,
+              "name": "Paper Mushroom",
+              "price": 110,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 105,
-              "name": "Mushroom Chatpati",
-              "price": 119,
+              "name": "Paneer 65",
+              "price": 120,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 106,
-              "name": "Mushroom Chilli",
-              "price": 129,
+              "name": "Paneer Chilli",
+              "price": 120,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 107,
-              "name": "Mushroom 65",
-              "price": 169,
+              "name": "Paneer Manchurian",
+              "price": 120,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 108,
+              "name": "Dragon Paneer",
+              "price": 120,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 109,
+              "name": "Paneer 555",
+              "price": 120,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 110,
+              "name": "Paper Paneer",
+              "price": 120,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 111,
+              "name": "Paneer Majestic",
+              "price": 130,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 112,
+              "name": "Hong Kong Paneer",
+              "price": 190,
               "available_time": "",
               "not_available_time": ""
             }
@@ -84,154 +100,126 @@
           "dishes": [
             {
               "id": 201,
-              "name": "Egg Chap (4Pc)",
-              "price": 79,
-              "available_time": 18,
+              "name": "Chicken 65",
+              "price": 100,
+              "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 202,
-              "name": "Egg Chap (7Pc)",
-              "price": 129,
-              "available_time": 18,
+              "name": "Chilli Chicken",
+              "price": 100,
+              "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 203,
-              "name": "Chicken Pakoda (5Pc)",
-              "price": 89,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 204,
-              "name": "Chilli Chicken",
-              "price": 159,
+              "name": "Chicken Manchurian",
+              "price": 100,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 205,
-              "name": "Chicken 65",
-              "price": 159,
+              "name": "Dragon Chicken",
+              "price": 110,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 206,
-              "name": "Chicken Lollipop",
-              "price": 159,
+              "name": "Lemon Chicken",
+              "price": 110,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 207,
-              "name": "Chicken Manchurian",
-              "price": 169,
+              "name": "Chicken Majestic",
+              "price": 110,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 208,
-              "name": "Chicken Pakoda (10Pc)",
-              "price": 169,
-              "available_time": 18,
+              "name": "Chicken Hongkong",
+              "price": 110,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 209,
+              "name": "Shewan Chicken",
+              "price": 120,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 210,
+              "name": "Paper Chicken",
+              "price": 120,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 211,
+              "name": "Chicken 555",
+              "price": 130,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 212,
+              "name": "Chicken Lollipop",
+              "price": 150,
+              "available_time": "",
               "not_available_time": ""
             }
           ]
         },
         {
-          "name": "MainCourse",
+          "name": "Main Course",
           "type": "Veg",
           "dishes": [
             {
               "id": 301,
-              "name": "Veg Chowmein",
-              "price": 69,
-              "available_time": 18,
+              "name": "Veg Fried Rice",
+              "price": 80,
+              "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 302,
-              "name": "Chowmein Roll",
-              "price": 69,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 303,
-              "name": "Veg Roll",
-              "price": 79,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 304,
-              "name": "Mix Veg Roll",
-              "price": 79,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 305,
-              "name": "Paneer Roll",
-              "price": 79,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 306,
-              "name": "Special Mix Veg Roll",
-              "price": 89,
-              "available_time": 18,
+              "name": "Mix Veg Fried Rice",
+              "price": 120,
+              "available_time": "",
               "not_available_time": ""
             }
           ]
         },
         {
-          "name": "MainCourse",
+          "name": "Main Course",
           "type": "NonVeg",
           "dishes": [
             {
               "id": 401,
-              "name": "Single Egg Chowmein",
-              "price": 79,
-              "available_time": 18,
+              "name": "Egg Fried Rice",
+              "price": 80,
+              "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 402,
-              "name": "Double Egg Chowmein",
-              "price": 89,
-              "available_time": 18,
+              "name": "Chicken Fried Rice",
+              "price": 100,
+              "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 403,
-              "name": "Single Egg Roll",
-              "price": 69,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 404,
-              "name": "Double Egg Roll",
-              "price": 79,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 405,
-              "name": "Lachha Roll",
-              "price": 99,
-              "available_time": 18,
-              "not_available_time": ""
-            },
-            {
-              "id": 406,
-              "name": "Special Mix Roll",
-              "price": 99,
-              "available_time": 18,
+              "name": "Chicken Sezwan Fried Rice",
+              "price": 120,
+              "available_time": "",
               "not_available_time": ""
             }
           ]
@@ -242,19 +230,20 @@
       "category": "Indian",
       "subcategories": [
         {
-          "name": "Roti N Paratha",
+          "name": "Biryani N Rice",
+          "type": "Veg",
           "dishes": [
             {
               "id": 501,
-              "name": "Plain Paratha",
-              "price": 19,
+              "name": "Jeera Rice",
+              "price": 80,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 502,
-              "name": "Lachha Paratha",
-              "price": 29,
+              "name": "Veg Biryani (Half)",
+              "price": 100,
               "available_time": "",
               "not_available_time": ""
             }
@@ -262,163 +251,33 @@
         },
         {
           "name": "Biryani",
-          "type": "Veg",
+          "type": "NonVeg",
           "dishes": [
             {
               "id": 601,
-              "name": "Veg Biryani (Full)",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Biryani",
-          "type": "NonVeg",
-          "dishes": [
-            {
-              "id": 701,
               "name": "Chicken Biryani (3pc 1Egg)",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Curry",
-          "type": "Veg",
-          "dishes": [
-            {
-              "id": 801,
-              "name": "Mix Veg Curry",
-              "price": 119,
+              "price": 120,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 802,
-              "name": "Veg Hyderabadi",
-              "price": 129,
+              "id": 602,
+              "name": "Chicken 65 Biryani (6pc)",
+              "price": 130,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 803,
-              "name": "Mushroom Masala",
-              "price": 119,
+              "id": 603,
+              "name": "Fry Pcs Biryani (4pc)",
+              "price": 150,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 804,
-              "name": "Mushroom Butter Masala",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 805,
-              "name": "Mushroom Hyderabadi",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 806,
-              "name": "Kadai Mushroom",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 807,
-              "name": "Mushroom Do Pyaja",
-              "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 808,
-              "name": "Paneer Masala",
-              "price": 129,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 809,
-              "name": "Paneer Butter Masala",
-              "price": 139,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 810,
-              "name": "Paneer Hyderabadi",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 811,
-              "name": "Kadai Paneer",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 812,
-              "name": "Paneer Do Pyaja",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Curry",
-          "type": "NonVeg",
-          "dishes": [
-            {
-              "id": 901,
-              "name": "Chicken Kasa",
-              "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 902,
-              "name": "Chicken Butter Masala",
-              "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 903,
-              "name": "Chicken Hyderabadi",
-              "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 904,
-              "name": "Kadai Chicken",
-              "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 905,
-              "name": "Chicken Do Pyaja",
-              "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 906,
-              "name": "Chicken Mughlai",
-              "price": 169,
+              "id": 604,
+              "name": "Maa Charchika Special Chicken Biryani",
+              "price": 180,
               "available_time": "",
               "not_available_time": ""
             }
