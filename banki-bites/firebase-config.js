@@ -16,13 +16,19 @@ function decrypt(value) {
   return CryptoJS.AES.decrypt(value, ENC_KEY).toString(CryptoJS.enc.Utf8);
 }
 
+let _rawCredsPromise = null;
+function loadRawCredentials() {
+  if (_rawCredsPromise) return _rawCredsPromise;
+  _rawCredsPromise = fetch(`https://akcreation-apps.com/TCD/credentials.json?v=${Date.now()}`)
+    .then(r => { if (!r.ok) throw new Error('Failed to load Firebase credentials'); return r.json(); });
+  return _rawCredsPromise;
+}
+
 let _configPromise = null;
 async function loadConfig() {
   if (_configPromise) return _configPromise;
   _configPromise = (async () => {
-    const res = await fetch(`https://akcreation-apps.com/TCD/credentials.json?v=${Date.now()}`);
-    if (!res.ok) throw new Error('Failed to load Firebase credentials');
-    const c = await res.json();
+    const c = await loadRawCredentials();
     return {
       apiKey:            decrypt(c.API_KEY),
       authDomain:        decrypt(c.AUTH_DOMAIN),
@@ -34,6 +40,11 @@ async function loadConfig() {
     };
   })();
   return _configPromise;
+}
+
+export async function getTcdDbName() {
+  const c = await loadRawCredentials();
+  return decrypt(c.DB_NAME);
 }
 
 const _appPromises = new Map();

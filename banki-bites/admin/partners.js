@@ -18,8 +18,25 @@ function mountPartnerChart(id, config) {
 const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
   opening_hour: '08', closing_hour: '22', address: '', point_of_contact: '',
-  is_active: true, sort_order: 0,
+  is_active: true, sort_order: 0, sync_collection: '', sync_doc_id: '',
 };
+
+async function syncToPartnerAdmin(db, syncCollection, syncDocId, updates) {
+  if (!syncCollection || !syncDocId) return;
+  try {
+    await setDoc(doc(db, syncCollection, syncDocId), updates, { merge: true });
+  } catch (err) {
+    console.warn('[BankiBites] Partner admin sync failed:', err.message);
+  }
+}
+
+function notifyPartnerWhatsApp(phone, type, name) {
+  const msgs = {
+    closed:  `Hi, this is BankiBites. Your restaurant *${name}* has been temporarily closed on our platform as per your request. Customers will not see your listing until you contact us to reactivate it.`,
+    blocked: `Hi, this is BankiBites. Your restaurant *${name}* has been blocked on our platform for *24 hours* because you missed fulfilling a customer order without informing us about food availability. Please contact us immediately to resolve this issue and reactivate your listing.`,
+  };
+  window.location.href = `https://wa.me/91${phone}?text=${encodeURIComponent(msgs[type])}`;
+}
 
 // Normalise a typed Indian phone to 10 digits (strip +91/91/0 prefix, spaces,
 // dashes, parens). Returns the trailing 10 digits if recognisable, else ''.
@@ -148,6 +165,18 @@ function renderCard(db, root, id, p) {
        </a>`
     : '';
 
+  const closedBtn = (!p.is_active && pocPhone)
+    ? `<button class="icon-btn icon-btn--warn" data-act="notify-closed" title="Notify: closed per request" aria-label="Notify ${escapeAttr(p.name)}: closed per request">
+         <i class="fas fa-store-slash"></i>
+       </button>`
+    : '';
+
+  const blockBtn = pocPhone
+    ? `<button class="icon-btn icon-btn--danger" data-act="notify-blocked" title="Block: notify restaurant for missing order" aria-label="Block notify ${escapeAttr(p.name)}">
+         <i class="fas fa-ban"></i>
+       </button>`
+    : '';
+
   el.innerHTML = `
     <div class="ec-row">
       <div style="min-width:0;flex:1">
@@ -169,6 +198,8 @@ function renderCard(db, root, id, p) {
         <i class="fas ${hideIcon}"></i>
       </button>
       ${callBtn}
+      ${closedBtn}
+      ${blockBtn}
       <button class="icon-btn icon-btn--danger" data-act="del" title="Delete" aria-label="Delete ${escapeAttr(p.name)}">
         <i class="fas fa-trash"></i>
       </button>
@@ -191,6 +222,7 @@ function renderCard(db, root, id, p) {
     try {
       window.bbBusy('Updating…');
       await setDoc(doc(db, COL.PARTNERS, id), { is_active: !p.is_active }, { merge: true });
+      await syncToPartnerAdmin(db, p.sync_collection, p.sync_doc_id, { shop_status: p.is_active ? 'closed' : 'open' });
       window.bbDone();
       loadPartners(db, root);
     } catch (err) {
@@ -198,6 +230,16 @@ function renderCard(db, root, id, p) {
       Swal.fire({ icon: 'error', title: 'Update failed', text: err.message });
     }
   });
+  if (!p.is_active && pocPhone) {
+    el.querySelector('[data-act="notify-closed"]').addEventListener('click', () => {
+      notifyPartnerWhatsApp(pocPhone, 'closed', p.name);
+    });
+  }
+  if (pocPhone) {
+    el.querySelector('[data-act="notify-blocked"]').addEventListener('click', () => {
+      notifyPartnerWhatsApp(pocPhone, 'blocked', p.name);
+    });
+  }
   el.querySelector('[data-act="del"]').addEventListener('click', async () => {
     const ok = await Swal.fire({
       title: `Delete ${p.name}?`,
@@ -286,6 +328,20 @@ async function openEditor(db, existing, root) {
         <input class="form-check-input" type="checkbox" id="paIsActive" name="is_active" ${p.is_active ? 'checked' : ''}>
         <label class="form-check-label" for="paIsActive">Active (visible on public page)</label>
       </div>
+      <details class="mt-2">
+        <summary class="text-muted" style="font-size:.85em;cursor:pointer">Advanced (admin panel sync)</summary>
+        <div class="form-row mt-2">
+          <div class="form-group col-6">
+            <label>Collection <small class="text-muted">(Firestore collection name)</small></label>
+            <input class="form-control" name="sync_collection" value="${escapeAttr(p.sync_collection || '')}">
+          </div>
+          <div class="form-group col-6">
+            <label>Document ID</label>
+            <input class="form-control" name="sync_doc_id" value="${escapeAttr(p.sync_doc_id || '')}">
+          </div>
+        </div>
+        <small class="text-muted d-block" style="margin-top:-.5rem">When both are set, hiding/showing this partner and editing hours will sync to that restaurant's own admin panel.</small>
+      </details>
     </form>
   `;
   const res = await Swal.fire({
@@ -317,11 +373,29 @@ async function openEditor(db, existing, root) {
         address: fd.get('address').trim(),
         point_of_contact: pocRaw ? normalisePhone(pocRaw) : '',
         is_active: f.querySelector('#paIsActive').checked,
+        sync_collection: (fd.get('sync_collection') || '').trim(),
+        sync_doc_id: (fd.get('sync_doc_id') || '').trim(),
       };
       if (!data.name || !data.url) {
         Swal.showValidationMessage('Name and URL are required');
         return false;
       }
+      const oh = parseInt(data.opening_hour);
+      const ch = parseInt(data.closing_hour);
+      if (isNaN(oh) || oh < 0 || oh > 23) {
+        Swal.showValidationMessage('Open hour must be between 0 and 23');
+        return false;
+      }
+      if (isNaN(ch) || ch < 0 || ch > 23) {
+        Swal.showValidationMessage('Close hour must be between 0 and 23');
+        return false;
+      }
+      if (oh >= ch) {
+        Swal.showValidationMessage('Open hour must be earlier than close hour');
+        return false;
+      }
+      data.opening_hour = String(oh).padStart(2, '0');
+      data.closing_hour = String(ch).padStart(2, '0');
       // Point of contact is mandatory for both add and edit — every partner
       // must have a reachable phone before the record can be saved.
       if (!pocRaw) {
@@ -365,6 +439,11 @@ async function openEditor(db, existing, root) {
   try {
     window.bbBusy('Saving restaurant…');
     await batch.commit();
+    await syncToPartnerAdmin(db, res.value.sync_collection, res.value.sync_doc_id, {
+      opening_time: String(parseInt(res.value.opening_hour) || 0),
+      closing_time: String(parseInt(res.value.closing_hour) || 0),
+      shop_status: res.value.is_active ? 'open' : 'closed',
+    });
     window.bbDone();
   } catch (err) {
     window.bbDone();

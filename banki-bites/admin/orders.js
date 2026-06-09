@@ -203,9 +203,11 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
   // Pre-populate delivery address from the order's "place" (where the customer
   // ordered from) when no explicit address has been entered yet.
   const prefilledAddress = cust.address || o.place || '';
-  // Default: payment was collected on delivery. Admin can flip to "not collected"
-  // to flag it for the delivery partner.
-  const paymentCollected = o.payment_collected === false ? false : true;
+  // For brand-new orders that haven't had any payment info recorded yet,
+  // pre-fill as UPI paid so the admin just reviews and saves rather than
+  // entering data from scratch. The toggle is disabled on these orders.
+  const isNewUnprocessed = o.status === 'new' && o.paid_already == null && o.paid_method == null;
+  const paymentCollected = isNewUnprocessed ? false : (o.payment_collected === false ? false : true);
   const payoutApplicable = o.payout_applicable !== false;
 
   const staffOptions = staff
@@ -345,7 +347,7 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
 
     <div class="order-section payment-section">
       <label class="toggle">
-        <input type="checkbox" data-f="payment" ${paymentCollected ? 'checked' : ''}>
+        <input type="checkbox" data-f="payment" ${paymentCollected ? 'checked' : ''} ${isNewUnprocessed ? 'disabled' : ''}>
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span class="toggle-text">
           <strong class="toggle-on">Fully paid</strong>
@@ -386,9 +388,9 @@ function renderOrderCard(db, o, staff, customers, feeRules) {
             <span class="rupee">₹</span>
             <input class="form-control form-control-sm" id="prepaid-${o.id}" data-f="paidAlready"
                    type="number" min="0" step="1" inputmode="numeric"
-                   value="${Number.isFinite(+o.paid_already) ? +o.paid_already : ''}" placeholder="0">
+                   value="${isNewUnprocessed ? (Number.isFinite(+o.total) ? +o.total : '') : (Number.isFinite(+o.paid_already) ? +o.paid_already : '')}" placeholder="0">
             <select class="form-control form-control-sm billing-method" data-f="paidMethod" aria-label="Prepayment method">
-              ${['', 'upi', 'online', 'cash'].map(m => `<option value="${m}" ${(o.paid_method || '') === m ? 'selected' : ''}>${m ? m.toUpperCase() : 'method'}</option>`).join('')}
+              ${['', 'upi', 'online', 'cash'].map(m => `<option value="${m}" ${(isNewUnprocessed ? 'upi' : (o.paid_method || '')) === m ? 'selected' : ''}>${m ? m.toUpperCase() : 'method'}</option>`).join('')}
             </select>
           </div>
         </div>

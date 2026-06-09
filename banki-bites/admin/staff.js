@@ -236,7 +236,6 @@ function renderCard(db, root, uid, s) {
         <div class="ec-title">${escapeHtml(s.name)} ${s.is_active === false ? '<span class="status-pill status-cancelled">Inactive</span>' : ''}</div>
         <div class="ec-meta"><i class="fas fa-envelope"></i> ${escapeHtml(s.email||'')}</div>
         <div class="ec-meta"><i class="fas fa-phone"></i> ${escapeHtml(s.phone||'—')}</div>
-        <div class="ec-meta" style="font-family:monospace;font-size:0.7rem">${uid}</div>
       </div>
       <button class="icon-btn icon-btn--secondary" data-act="edit" title="Edit ${escapeAttr(s.name)}" aria-label="Edit ${escapeAttr(s.name)}">
         <i class="fas fa-pen"></i>
