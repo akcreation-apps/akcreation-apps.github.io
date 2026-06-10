@@ -588,6 +588,20 @@ $phDialog.addEventListener('click', (e) => {
   if (e.target.closest('.ph-dialog-close') || e.target.closest('[data-cancel]')) closePhDialog();
 });
 
+// ---- Global body.dialog-open toggling -----------------------------
+// Add a `dialog-open` class on <body> whenever ANY ph-dialog is open so
+// CSS can hide overlapping fixed elements (user widget, anon counter)
+// that would otherwise render on top of the dialog on older iOS Safari.
+function refreshDialogOpenClass() {
+  const anyOpen = !!document.querySelector('dialog.ph-dialog[open]');
+  document.body.classList.toggle('dialog-open', anyOpen);
+}
+const _dialogObs = new MutationObserver(refreshDialogOpenClass);
+document.querySelectorAll('dialog.ph-dialog').forEach(d => {
+  _dialogObs.observe(d, { attributes: true, attributeFilter: ['open'] });
+});
+refreshDialogOpenClass();
+
 $phForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!activePrompt) return;
