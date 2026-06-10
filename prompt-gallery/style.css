@@ -29,9 +29,10 @@ a { color: var(--primary-dark); }
   overflow: hidden;
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
   color: #fff;
-  padding: 64px 0 56px;
+  padding: 28px 16px 22px;
   text-align: center;
 }
+@media (min-width: 700px) { .hero { padding: 64px 0 56px; } }
 .hero-orb {
   position: absolute;
   border-radius: 50%;
@@ -39,38 +40,47 @@ a { color: var(--primary-dark); }
   opacity: 0.5;
   pointer-events: none;
 }
-.hero-orb-1 { width: 320px; height: 320px; background: #ec4899; top: -80px; left: -60px; }
-.hero-orb-2 { width: 280px; height: 280px; background: #38bdf8; bottom: -100px; right: -40px; }
+.hero-orb-1 { width: 160px; height: 160px; background: #ec4899; top: -40px; left: -40px; }
+.hero-orb-2 { width: 140px; height: 140px; background: #38bdf8; bottom: -50px; right: -30px; }
+@media (min-width: 700px) {
+  .hero-orb-1 { width: 320px; height: 320px; top: -80px; left: -60px; }
+  .hero-orb-2 { width: 280px; height: 280px; bottom: -100px; right: -40px; }
+}
 .hero-inner { position: relative; z-index: 2; }
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.25);
-  padding: 8px 18px;
+  padding: 5px 12px;
   border-radius: 999px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   letter-spacing: 0.3px;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
+@media (min-width: 700px) { .hero-badge { gap: 8px; padding: 8px 18px; font-size: 0.85rem; margin-bottom: 18px; } }
+
 .hero h1 {
   font-family: 'Poppins', sans-serif;
   font-weight: 800;
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  margin: 0 0 14px;
-  line-height: 1.15;
+  font-size: clamp(1.35rem, 5.5vw, 3.4rem);
+  margin: 0 0 8px;
+  line-height: 1.18;
   letter-spacing: -0.5px;
 }
+@media (min-width: 700px) { .hero h1 { margin-bottom: 14px; line-height: 1.15; } }
+
 .hero-sub {
   max-width: 640px;
   margin: 0 auto;
-  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-size: clamp(0.85rem, 2.4vw, 1.15rem);
   opacity: 0.92;
-  line-height: 1.55;
+  line-height: 1.45;
 }
+@media (min-width: 700px) { .hero-sub { line-height: 1.55; } }
 
 /* ===== SEARCH ===== */
 .search-wrap {
