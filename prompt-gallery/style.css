@@ -135,13 +135,11 @@ a { color: var(--primary-dark); }
 }
 
 /* ===== Anonymous daily counter strip ===== */
+/* No longer sticky — was eating ~28% of the mobile viewport when stacked
+   under the sticky search bar. Sits once above the grid, scrolls away. */
 .anon-counter {
-  position: sticky;
-  top: 70px;
-  z-index: 40;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   border-bottom: 1px solid rgba(217,119,6,0.18);
-  box-shadow: 0 2px 8px rgba(217,119,6,0.08);
 }
 .anon-counter.warn {
   background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
@@ -200,7 +198,7 @@ a { color: var(--primary-dark); }
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 7px 14px;
+  padding: 10px 16px;
   background: #1f1b3b;
   color: #fff;
   border: 0;
@@ -209,7 +207,7 @@ a { color: var(--primary-dark); }
   font-weight: 700;
   font-size: 0.8rem;
   cursor: pointer;
-  min-height: 36px;
+  min-height: 44px;
   transition: transform 0.15s, box-shadow 0.2s;
 }
 .anon-counter-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(31,27,59,0.3); }
@@ -255,8 +253,8 @@ a { color: var(--primary-dark); }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  background: #fff;
+  padding: 9px 16px;
+  background: var(--card);
   border: 1.5px solid var(--border);
   color: var(--muted);
   border-radius: 999px;
@@ -264,7 +262,7 @@ a { color: var(--primary-dark); }
   font-weight: 600;
   font-size: 0.82rem;
   cursor: pointer;
-  min-height: 36px;
+  min-height: 44px;
   transition: all 0.18s;
 }
 .filter-chip:hover { color: var(--primary-dark); border-color: var(--primary); }
@@ -294,8 +292,8 @@ a { color: var(--primary-dark); }
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
-@media (min-width: 700px)  { .grid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
-@media (min-width: 1080px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 28px; } .gallery-wrap { max-width: 1200px; } }
+@media (min-width: 700px)  { .grid { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+@media (min-width: 1080px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 28px; } .gallery-wrap { max-width: 1280px; } }
 
 /* ===== CARD ===== */
 .card-p {
@@ -325,10 +323,10 @@ a { color: var(--primary-dark); }
 /* Favorite heart + member badge overlays */
 .fav-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 38px;
-  height: 38px;
+  top: 6px;
+  right: 6px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 0;
   background: rgba(255,255,255,0.92);
@@ -448,9 +446,9 @@ a { color: var(--primary-dark); }
   background: #fff8e1;
   border-left: 3px solid #f59e0b;
   color: #5b3f00;
-  font-size: 0.72rem;
-  line-height: 1.4;
-  padding: 6px 9px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  padding: 7px 10px;
   border-radius: 8px;
   word-break: break-word;
   /* Clamp to 2 lines on mobile; full text on hover via title attribute */
@@ -460,7 +458,7 @@ a { color: var(--primary-dark); }
   overflow: hidden;
 }
 @media (min-width: 700px) {
-  .card-notes { font-size: 0.78rem; padding: 8px 11px; line-height: 1.5; -webkit-line-clamp: 3; }
+  .card-notes { font-size: 0.85rem; padding: 9px 12px; line-height: 1.5; -webkit-line-clamp: 3; }
 }
 
 /* ===== Placeholder dialog ===== */
@@ -514,13 +512,14 @@ a { color: var(--primary-dark); }
   flex: 1;
 }
 .ph-dialog-close {
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   border: 0;
   border-radius: 50%;
   background: #f3f0ff;
   color: var(--primary-dark);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .ph-dialog-close:hover { background: #ede9fe; }
 .ph-dialog-sub {
@@ -653,8 +652,8 @@ body.dialog-open .anon-counter { display: none; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 38px;
-  padding: 8px 14px;
+  min-height: 44px;
+  padding: 10px 16px;
   background: rgba(124, 58, 237, 0.92);
   color: #fff;
   border: 1px solid rgba(255,255,255,0.35);
@@ -784,13 +783,13 @@ body.dialog-open .anon-counter { display: none; }
   background: #d97706;
   color: #fff;
   border: 0;
-  border-radius: 8px;
-  padding: 5px 12px;
+  border-radius: 10px;
+  padding: 10px 14px;
   font-family: inherit;
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   cursor: pointer;
-  min-height: 30px;
+  min-height: 44px;
   transition: background 0.2s;
 }
 .credit-line-buy:hover { background: #b45309; }
@@ -869,7 +868,24 @@ body.dialog-open .anon-counter { display: none; }
   white-space: nowrap;
 }
 .pack-card.best-value .pack-tag { background: #10b981; }
-.pack-tag.savings { background: #8b5cf6; }
+/* Cyan-teal — clearly distinct from the brand purple, fits the warm→cool
+   value progression (amber → teal → green). */
+.pack-tag.savings { background: #0891b2; }
+.pack-card[data-amount="250"] { border-color: #67e8f9; }
+.pack-card[data-amount="250"]:hover,
+.pack-card[data-amount="250"]:focus-visible { border-color: #0891b2; }
+.pack-card[data-amount="250"] .pack-rate { color: #0e7490; }
+
+/* Strong focus state for keyboard / touch — single-gesture commit means
+   the user needs a clear visual on the card they're about to commit to. */
+.pack-card:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+.pack-card:active {
+  transform: translateY(-1px) scale(0.985);
+  box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+}
 .pack-cred { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 800; color: var(--primary-dark); line-height: 1; }
 .pack-label { font-size: 0.72rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
 .pack-price { margin-top: 10px; font-weight: 800; color: var(--ink); font-size: 1.15rem; }
@@ -878,12 +894,18 @@ body.dialog-open .anon-counter { display: none; }
 .pack-card.best-value .pack-rate { color: #059669; }
 .buy-foot {
   margin: 0;
-  padding: 10px 20px 18px;
-  font-size: 0.78rem;
+  padding: 12px 20px 18px;
+  font-size: 0.82rem;
   color: var(--muted);
   text-align: center;
+  transition: color 0.2s, background 0.2s;
 }
 .buy-foot i { color: #25d366; }
+.buy-foot.active {
+  color: var(--ink);
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+}
+.buy-foot.active strong { color: #047857; }
 
 /* ===== Auth dialog ===== */
 .auth-dialog .auth-body { padding: 0 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; min-height: 0; }
@@ -1043,13 +1065,13 @@ body.dialog-open .anon-counter { display: none; }
   background: var(--primary-dark);
   color: #fff;
   border: 0;
-  border-radius: 8px;
-  padding: 7px 12px;
+  border-radius: 10px;
+  padding: 10px 14px;
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  min-height: 36px;
+  min-height: 44px;
 }
 .history-copy:hover { background: var(--primary); }
 .history-copy:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -1131,7 +1153,89 @@ footer {
   border-top: 1px solid var(--border);
   color: var(--muted);
   font-size: 0.9rem;
-  background: #fff;
+  background: var(--card);
 }
 footer a { color: var(--primary-dark); text-decoration: none; font-weight: 600; }
 footer a:hover { text-decoration: underline; }
+
+/* ============================================================
+   Reduced-motion preference — disables non-essential animation
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Dark mode — system preference (prefers-color-scheme: dark)
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary:      #a78bfa;
+    --primary-dark: #818cf8;
+    --ink:          #e7e4f5;
+    --muted:        #a8a4c9;
+    --bg:           #0f0e1a;
+    --card:         #1a1830;
+    --border:       #2d2a4a;
+    --shadow:       0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+  /* Containers / surfaces that referenced literal hex */
+  .ph-dialog                { background: var(--card); }
+  .ph-dialog-actions        { background: #15132b; border-top-color: var(--border); }
+  .ph-dialog-close          { background: #2a2748; color: #cfc9ee; }
+  .ph-dialog-close:hover    { background: #3a3760; }
+  .ph-field input,
+  .phone-row                { background: var(--bg); color: var(--ink); border-color: var(--border); }
+  .phone-prefix             { background: #2a2748; color: #cfc9ee; border-right-color: var(--border); }
+  .google-btn               { background: #1e1c38; color: #e7e4f5; border-color: #3d3a5a; }
+  .google-btn:hover         { background: #2a2748; }
+  .auth-profile             { background: #1e1c38; }
+  .stat-card                { background: linear-gradient(135deg, #1e1c38, #2a2748); }
+  .stat-value               { color: var(--primary); }
+  .danger-zone              { background: #2a1515; border-color: #5b1a1a; }
+  .danger-zone h4           { color: #fda4a4; }
+  .danger-zone p            { color: #f0a8a8; }
+  .history-item             { background: #1e1c38; border-color: var(--border); }
+  .history-title            { color: var(--ink); }
+  .user-menu                { background: var(--card); border-color: var(--border); }
+  .user-menu-head           { background: #15132b; border-bottom-color: var(--border); }
+  .user-menu-head > div > div:first-child { color: var(--ink); }
+  .user-menu-item           { background: var(--card); color: var(--ink); }
+  .user-menu-item:hover     { background: #2a2748; color: var(--primary); }
+  .user-menu-item i         { color: var(--primary); }
+  .search-wrap              { background: var(--bg); border-bottom-color: var(--border); }
+  .search-box input         { background: var(--card); color: var(--ink); border-color: var(--border); }
+  .filter-chip              { background: var(--card); color: var(--muted); border-color: var(--border); }
+  .filter-chip:not(.active):hover { color: var(--primary); border-color: var(--primary); }
+  .filter-chip:not(.active) .filter-count { background: #2a2748; color: var(--primary); }
+  footer                    { background: #0a0915; border-top-color: var(--border); }
+  .card-p                   { background: var(--card); border-color: var(--border); }
+  .card-img                 { background: linear-gradient(135deg, #2a2748, #1e1c38); }
+  .card-notes               { background: #2a1f00; border-left-color: #b45309; color: #fbbf24; }
+  .copy-stat                { background: linear-gradient(135deg, #2a1f00, #3d2e00); color: #fbbf24; border-color: rgba(217,119,6,0.35); }
+  .copy-stat i              { color: #fb923c; }
+  .pack-card                { background: var(--card); border-color: var(--border); }
+  .pack-card:hover          { border-color: var(--primary); }
+  .pack-price               { color: var(--ink); }
+  .pack-cred                { color: var(--primary); }
+  .toast                    { background: #2a2748; }
+  .user-chip-btn            { background: #2a2748; color: var(--ink); }
+  .user-chip-name           { color: var(--ink); }
+  .user-chip-caret          { color: var(--muted); }
+  .anon-counter             { background: linear-gradient(135deg, #2a1f00, #3d2e00); border-bottom-color: rgba(217,119,6,0.3); }
+  .anon-counter-text        { color: #fbbf24; }
+  .anon-counter-text strong { color: #fde68a; }
+  .anon-counter-icon        { background: rgba(251,191,36,0.18); color: #fbbf24; }
+  .anon-counter.warn        { background: linear-gradient(135deg, #3a1414, #4a1818); }
+  .anon-counter.warn .anon-counter-text,
+  .anon-counter.gone .anon-counter-text { color: #fda4a4; }
+  .anon-counter.gone        { background: linear-gradient(135deg, #4a1818, #5a1414); }
+  .credit-line              { background: linear-gradient(135deg, #2a1f00, #3d2e00); color: #fde68a; border-bottom-color: var(--border); }
+  .credit-line strong       { color: #fef3c7; }
+  .credit-line.low          { background: linear-gradient(135deg, #3a1414, #4a1818); color: #fda4a4; }
+}

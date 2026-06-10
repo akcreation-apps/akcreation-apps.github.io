@@ -441,7 +441,7 @@ function cardHTML(p) {
     : '<i class="far fa-copy"></i> Copy Prompt';
 
   const memberBadge = p.tier === 'member'
-    ? '<span class="member-badge" title="Members-only prompt" aria-label="Members-only prompt"><i class="fas fa-crown"></i></span>'
+    ? '<span class="member-badge" title="Members-only prompt" aria-label="Members-only prompt"><i class="fas fa-crown" aria-hidden="true"></i></span>'
     : '';
   const favActive = FAVORITES.has(p.id) ? ' active' : '';
   const favIcon = favActive ? 'fas' : 'far';
@@ -449,13 +449,13 @@ function cardHTML(p) {
   return `
     <article class="card-p" data-id="${p.id}">
       <div class="card-img-wrap">
-        <button class="card-img" data-img="${escapeHtml(p.image)}" data-title="${escapeHtml(p.title)}" aria-label="Preview ${escapeHtml(p.title)}">
-          <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)} demo" loading="lazy"
+        <button class="card-img" data-img="${escapeHtml(p.image)}" data-title="Demo preview for ${escapeHtml(p.title)}" aria-label="Preview ${escapeHtml(p.title)}">
+          <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)} AI image prompt demo result" loading="lazy"
                onerror="this.style.background='linear-gradient(135deg,#ede9fe,#e0e7ff)';this.removeAttribute('src');this.alt='Demo image coming soon';">
         </button>
         ${memberBadge}
         <button type="button" class="fav-btn${favActive}" data-fav="${p.id}" aria-label="Toggle favorite" aria-pressed="${favActive ? 'true' : 'false'}">
-          <i class="${favIcon} fa-heart"></i>
+          <i class="${favIcon} fa-heart" aria-hidden="true"></i>
         </button>
       </div>
       <div class="card-body">
@@ -1034,11 +1034,27 @@ function renderUserWidget() {
   }
 }
 
+function positionUserMenu() {
+  // Anchor below the chip button so the dropdown tracks the actual widget
+  // bounds (not a hardcoded top:60px that breaks if the chip grows).
+  const rect = $chipBtn.getBoundingClientRect();
+  $userMenu.style.top = `${rect.bottom + 8}px`;
+  $userMenu.style.right = `${Math.max(8, window.innerWidth - rect.right)}px`;
+}
+
 function toggleUserMenu(force) {
   const open = force ?? $userMenu.hidden;
   $userMenu.hidden = !open;
   $chipBtn.setAttribute('aria-expanded', String(open));
+  if (open) {
+    positionUserMenu();
+    // Focus the first menuitem so keyboard users land inside the menu.
+    const firstItem = $userMenu.querySelector('[role="menuitem"]');
+    requestAnimationFrame(() => firstItem?.focus());
+  }
 }
+// Keep the menu anchored to the chip if the window resizes while it's open.
+window.addEventListener('resize', () => { if (!$userMenu.hidden) positionUserMenu(); });
 
 $signinBtn.addEventListener('click', () => {
   // Manual sign-in — bypasses gating; opens the same auth dialog.
@@ -1053,7 +1069,33 @@ $chipBtn.addEventListener('click', (e) => {
 
 document.addEventListener('click', (e) => {
   if ($userMenu.hidden) return;
-  if (!e.target.closest('#user-chip')) toggleUserMenu(false);
+  // The menu was moved to <body>, so it's NOT inside #user-chip anymore.
+  // Check both ancestors before deciding it's an outside click.
+  if (e.target.closest('#user-chip') || e.target.closest('#user-menu')) return;
+  toggleUserMenu(false);
+});
+
+// Escape closes the menu and returns focus to the trigger.
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$userMenu.hidden) {
+    toggleUserMenu(false);
+    $chipBtn?.focus();
+    return;
+  }
+  // Arrow-key navigation within the menu (ARIA menu pattern).
+  if (!$userMenu.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End')) {
+    const items = Array.from($userMenu.querySelectorAll('[role="menuitem"]'));
+    if (!items.length) return;
+    const active = document.activeElement;
+    const idx = items.indexOf(active);
+    let next;
+    if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = items.length - 1;
+    else if (e.key === 'ArrowDown') next = idx < 0 ? 0 : (idx + 1) % items.length;
+    else /* ArrowUp */ next = idx < 0 ? items.length - 1 : (idx - 1 + items.length) % items.length;
+    items[next]?.focus();
+    e.preventDefault();
+  }
 });
 
 $userMenu.addEventListener('click', async (e) => {
@@ -1379,8 +1421,8 @@ async function openHistoryDialog() {
             <div class="history-title">${escapeHtml(data.title || data.promptId)}</div>
             <div class="history-time">${escapeHtml(formatRelative(when))}</div>
           </div>
-          <button type="button" class="history-copy" data-copy-history="${escapeHtml(data.promptId)}" ${stillExists ? '' : 'disabled title="Prompt removed"'}>
-            <i class="far fa-copy"></i> ${stillExists ? 'Copy' : 'Gone'}
+          <button type="button" class="history-copy" data-copy-history="${escapeHtml(data.promptId)}" ${stillExists ? '' : 'disabled title="This prompt is no longer available" aria-label="Prompt no longer available"'}>
+            <i class="${stillExists ? 'far fa-copy' : 'fas fa-ban'}" aria-hidden="true"></i> ${stillExists ? 'Copy' : 'Removed'}
           </button>
         </div>
       `);
@@ -1777,8 +1819,29 @@ const $buyCreditsNow   = document.getElementById('buy-credits-now');
 function openBuyDialog() {
   if (!readSavedUser()) { resetAuthDialog(); openAuthDialog(); return; }
   $buyCreditsNow.textContent = String(totalCredits());
+  // Reset the dynamic foot text to its default each time we open.
+  const foot = $buyDialog.querySelector('.buy-foot');
+  if (foot) foot.dataset.default = foot.textContent;
   if (typeof $buyDialog.showModal === 'function') $buyDialog.showModal();
   else $buyDialog.setAttribute('open', '');
+}
+
+// Micro-confirmation: as the user hovers/focuses a pack, the foot text
+// shows exactly what tapping that pack will do — without breaking the
+// single-gesture WhatsApp commit pattern.
+function setBuyFootForPack(pack) {
+  const foot = $buyDialog.querySelector('.buy-foot');
+  if (!foot) return;
+  if (!pack) {
+    foot.innerHTML = foot.dataset.default || foot.textContent;
+    foot.classList.remove('active');
+    return;
+  }
+  const amount  = parseInt(pack.dataset.amount, 10);
+  const credits = parseInt(pack.dataset.credits, 10);
+  if (!amount || !credits) return;
+  foot.innerHTML = `<i class="fab fa-whatsapp" aria-hidden="true"></i> Tap to send <strong>₹${amount}</strong> request for <strong>${credits} credits</strong>`;
+  foot.classList.add('active');
 }
 function closeBuyDialog() {
   if (typeof $buyDialog.close === 'function') $buyDialog.close();
@@ -1814,6 +1877,21 @@ $buyDialog.addEventListener('click', (e) => {
       window.location.href = whatsappBuyHref(amount, credits);
     }
   }
+});
+// Micro-confirmation: update the foot text as the user previews a pack.
+$buyDialog.addEventListener('mouseover', (e) => {
+  const pack = e.target.closest('.pack-card');
+  if (pack) setBuyFootForPack(pack);
+});
+$buyDialog.addEventListener('mouseout', (e) => {
+  if (e.target.closest('.pack-card')) setBuyFootForPack(null);
+});
+$buyDialog.addEventListener('focusin', (e) => {
+  const pack = e.target.closest('.pack-card');
+  if (pack) setBuyFootForPack(pack);
+});
+$buyDialog.addEventListener('focusout', (e) => {
+  if (e.target.closest('.pack-card')) setBuyFootForPack(null);
 });
 
 // Menu action wiring for "Buy"

@@ -4,3 +4,4 @@
 - [TCD SEO Audit Findings](project_tcd_seo.md) — 61 items fixed across all TCD pages through May 2026; cart.html CLS/footer/sr-only fixes May 2026; footer regression is recurring (3rd instance)
 - [BankiBites SEO Implementation](project_bankibites_seo.md) — Schema, geo meta, OG/Twitter, PWA meta for banki-bites/index.html and dashboard.html; Organization->LocalBusiness fix; dashboard had zero structured data
 - [Anvisha Travels SEO Implementation](project_anvisha_travels_seo.md) — TaxiService+LocalBusiness schema, full OG/Twitter, local keywords, sitemap entry added May 2026; first-ever SEO pass on this page
+- [Prompt Gallery SEO Implementation](project_prompt_gallery_seo.md) — CollectionPage+ItemList schema, full OG/Twitter, H1 fix, Firebase preconnect, alt text, internal link from index.html; June 2026
