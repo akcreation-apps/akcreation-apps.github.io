@@ -617,7 +617,9 @@ a { color: var(--primary-dark); }
   position: fixed;
   top: 12px;
   right: 12px;
-  z-index: 80;
+  /* Must sit above the sticky search bar (z-index 50) AND the anon-counter
+     strip (z-index 40). Native <dialog> top-layer beats any z-index. */
+  z-index: 200;
 }
 @media (min-width: 700px) {
   .user-widget { top: 18px; right: 22px; }
@@ -697,7 +699,9 @@ body.dialog-open .anon-counter { display: none; }
   box-shadow: 0 20px 50px rgba(15,13,35,0.25);
   border: 1px solid var(--border);
   overflow: hidden;
-  z-index: 60;
+  /* Local to .user-widget's stacking context (z-index 200) — guarantees
+     the dropdown sits above the sticky search bar and anon counter. */
+  z-index: 1;
 }
 /* On small screens the chip is at the screen edge, so anchor the menu
    to the viewport edge instead of relative to the chip — that keeps it
@@ -709,6 +713,9 @@ body.dialog-open .anon-counter { display: none; }
     right: 12px;
     left: auto;
     width: min(280px, calc(100vw - 24px));
+    /* When fixed, the menu escapes the widget's stacking context, so it
+       needs an explicit z-index high enough to beat the search bar (50). */
+    z-index: 210;
   }
 }
 .user-menu-head {
