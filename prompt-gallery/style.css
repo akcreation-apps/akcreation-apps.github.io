@@ -43,10 +43,15 @@ a { color: var(--primary-dark); }
   filter: blur(60px);
   opacity: 0.5;
   pointer-events: none;
+  /* iOS Safari composites blur layers in a way that can bleed across
+     stacking contexts into top-layer elements like <dialog>. Hide the
+     blur orbs entirely on mobile to eliminate that bug source. */
+  display: none;
 }
 .hero-orb-1 { width: 160px; height: 160px; background: #ec4899; top: -40px; left: -40px; }
 .hero-orb-2 { width: 140px; height: 140px; background: #38bdf8; bottom: -50px; right: -30px; }
 @media (min-width: 700px) {
+  .hero-orb { display: block; }
   .hero-orb-1 { width: 320px; height: 320px; top: -80px; left: -60px; }
   .hero-orb-2 { width: 280px; height: 280px; bottom: -100px; right: -40px; }
 }
@@ -55,9 +60,9 @@ a { color: var(--primary-dark); }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.25);
+  /* No backdrop-filter on mobile — same iOS bug surface as the orbs. */
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.28);
   padding: 5px 12px;
   border-radius: 999px;
   font-weight: 600;
@@ -65,7 +70,9 @@ a { color: var(--primary-dark); }
   letter-spacing: 0.3px;
   margin-bottom: 10px;
 }
-@media (min-width: 700px) { .hero-badge { gap: 8px; padding: 8px 18px; font-size: 0.85rem; margin-bottom: 18px; } }
+@media (min-width: 700px) {
+  .hero-badge { gap: 8px; padding: 8px 18px; font-size: 0.85rem; margin-bottom: 18px; backdrop-filter: blur(10px); }
+}
 
 .hero h1 {
   font-family: 'Poppins', sans-serif;
@@ -480,8 +487,20 @@ a { color: var(--primary-dark); }
 }
 /* Stack children vertically. Without this, dialogs that DON'T wrap their
    content in a <form> (buy-dialog, history-dialog, confirm-dialog) would
-   lay their children out in a row. */
-.ph-dialog[open] { display: flex; flex-direction: column; overflow-y: auto; }
+   lay their children out in a row.
+   We also force-position the dialog as fixed + centered with a very high
+   z-index. Older iOS Safari versions don't fully promote <dialog> into the
+   top layer, so it can end up *behind* fixed/sticky elements like the
+   user-widget or sticky search bar. This guarantees it sits on top. */
+.ph-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 1000;
+}
 .ph-dialog form { display: flex; flex-direction: column; width: 100%; flex: 1; min-height: 0; }
 .ph-dialog-head {
   display: flex;
@@ -617,6 +636,11 @@ a { color: var(--primary-dark); }
   .user-widget { top: 18px; right: 22px; }
 }
 .user-widget[data-state="loading"] > * { display: none !important; }
+/* Hide the user widget whenever a modal dialog is open. Avoids any chance
+   of it sitting on top of the dialog on iOS Safari (where the dialog's
+   top-layer promotion is unreliable). */
+body.dialog-open .user-widget { display: none; }
+body.dialog-open .anon-counter { display: none; }
 
 .user-signin-btn {
   display: inline-flex;
@@ -624,7 +648,7 @@ a { color: var(--primary-dark); }
   gap: 8px;
   min-height: 38px;
   padding: 8px 14px;
-  background: rgba(255,255,255,0.18);
+  background: rgba(124, 58, 237, 0.92);
   color: #fff;
   border: 1px solid rgba(255,255,255,0.35);
   border-radius: 999px;
@@ -632,10 +656,12 @@ a { color: var(--primary-dark); }
   font-weight: 600;
   font-size: 0.82rem;
   cursor: pointer;
-  backdrop-filter: blur(10px);
   transition: background 0.2s, transform 0.15s;
 }
-.user-signin-btn:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
+@media (min-width: 700px) {
+  .user-signin-btn { background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); }
+}
+.user-signin-btn:hover { background: rgba(124, 58, 237, 1); transform: translateY(-1px); }
 .user-signin-btn span { white-space: nowrap; }
 @media (max-width: 380px) {
   .user-signin-btn { padding: 8px 10px; font-size: 0.78rem; }
@@ -1050,7 +1076,10 @@ a { color: var(--primary-dark); }
   max-width: 92vw;
   max-height: 92vh;
 }
-.lightbox::backdrop { background: rgba(15, 13, 35, 0.85); backdrop-filter: blur(6px); }
+.lightbox::backdrop { background: rgba(15, 13, 35, 0.92); }
+@media (min-width: 700px) {
+  .lightbox::backdrop { background: rgba(15, 13, 35, 0.85); backdrop-filter: blur(6px); }
+}
 .lightbox[open] { display: flex; align-items: center; justify-content: center; }
 .lightbox img {
   display: block;
@@ -1067,14 +1096,16 @@ a { color: var(--primary-dark); }
   height: 44px;
   border-radius: 50%;
   border: 0;
-  background: rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.5);
   color: #fff;
   font-size: 1.2rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+}
+@media (min-width: 700px) {
+  .lightbox-close { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); }
 }
 .lightbox-close:hover { background: rgba(255,255,255,0.25); }
 
