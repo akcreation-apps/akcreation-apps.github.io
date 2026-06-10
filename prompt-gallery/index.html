@@ -35,7 +35,7 @@
   <!-- SweetAlert2 — for confirmations and rich alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <link rel="stylesheet" href="style.css?v=20260611">
+  <link rel="stylesheet" href="style.css?v=20260611b">
 </head>
 <body>
 
@@ -270,32 +270,37 @@
 
   <!-- ===== COPY HISTORY DIALOG ===== -->
   <dialog id="history-dialog" class="ph-dialog auth-dialog" aria-labelledby="history-dialog-title">
-    <div class="ph-dialog-head">
-      <h3 id="history-dialog-title">Copy history</h3>
-      <button type="button" class="ph-dialog-close" data-history-close aria-label="Close"><i class="fas fa-times"></i></button>
+    <div class="dialog-stack">
+      <div class="ph-dialog-head">
+        <h3 id="history-dialog-title">Copy history</h3>
+        <button type="button" class="ph-dialog-close" data-history-close aria-label="Close"><i class="fas fa-times"></i></button>
+      </div>
+      <p class="ph-dialog-sub">Your last 25 copied prompts. Click any to copy again.</p>
+      <div id="history-list" class="history-list"></div>
+      <footer class="ph-dialog-actions">
+        <button type="button" id="history-clear-btn" class="btn-ghost"><i class="fas fa-broom"></i> Clear history</button>
+        <button type="button" class="btn-primary" data-history-close>Done</button>
+      </footer>
     </div>
-    <p class="ph-dialog-sub">Your last 25 copied prompts. Click any to copy again.</p>
-    <div id="history-list" class="history-list"></div>
-    <footer class="ph-dialog-actions">
-      <button type="button" id="history-clear-btn" class="btn-ghost"><i class="fas fa-broom"></i> Clear history</button>
-      <button type="button" class="btn-primary" data-history-close>Done</button>
-    </footer>
   </dialog>
 
   <!-- ===== CONFIRM (delete-account) DIALOG ===== -->
   <dialog id="confirm-dialog" class="ph-dialog auth-dialog" aria-labelledby="confirm-dialog-title">
-    <div class="ph-dialog-head">
-      <h3 id="confirm-dialog-title">Delete your account?</h3>
+    <div class="dialog-stack">
+      <div class="ph-dialog-head">
+        <h3 id="confirm-dialog-title">Delete your account?</h3>
+      </div>
+      <p class="ph-dialog-sub" id="confirm-dialog-msg">This will erase your profile, favorites and copy history. You'll be asked to re-confirm with Google for security.</p>
+      <footer class="ph-dialog-actions">
+        <button type="button" class="btn-ghost" data-confirm-cancel>Cancel</button>
+        <button type="button" id="confirm-dialog-ok" class="btn-danger"><i class="fas fa-trash-can"></i> Yes, delete</button>
+      </footer>
     </div>
-    <p class="ph-dialog-sub" id="confirm-dialog-msg">This will erase your profile, favorites and copy history. You'll be asked to re-confirm with Google for security.</p>
-    <footer class="ph-dialog-actions">
-      <button type="button" class="btn-ghost" data-confirm-cancel>Cancel</button>
-      <button type="button" id="confirm-dialog-ok" class="btn-danger"><i class="fas fa-trash-can"></i> Yes, delete</button>
-    </footer>
   </dialog>
 
   <!-- ===== BUY CREDITS DIALOG ===== -->
   <dialog id="buy-dialog" class="ph-dialog auth-dialog buy-dialog" aria-labelledby="buy-dialog-title">
+    <div class="dialog-stack">
     <div class="ph-dialog-head">
       <h3 id="buy-dialog-title"><i class="fas fa-bolt"></i> Buy credits</h3>
       <button type="button" class="ph-dialog-close" data-buy-close aria-label="Close"><i class="fas fa-times"></i></button>
@@ -340,6 +345,7 @@
     </div>
 
     <p class="buy-foot"><i class="fab fa-whatsapp"></i> Clicking a pack opens WhatsApp with a prefilled message to our team.</p>
+    </div>
   </dialog>
 
   <!-- ===== TOAST ===== -->
@@ -353,6 +359,6 @@
     document.getElementById('footer-year').textContent = new Date().getFullYear();
   </script>
 
-  <script type="module" src="script.js?v=20260611"></script>
+  <script type="module" src="script.js?v=20260611b"></script>
 </body>
 </html>

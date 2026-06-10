@@ -470,38 +470,25 @@ a { color: var(--primary-dark); }
   border-radius: 18px;
   width: min(460px, 92vw);
   max-height: 88vh;
-  /* Solid background + isolated stacking context so iOS Safari can't
-     composite the hero's blur filter through this element. */
   background: #ffffff;
   color: var(--ink);
   box-shadow: 0 30px 80px rgba(15, 13, 35, 0.35);
   overflow: hidden;
-  overscroll-behavior: contain;
-  isolation: isolate;
 }
 .ph-dialog::backdrop { background: rgba(15, 13, 35, 0.7); }
-/* Backdrop blur is buggy on iOS Safari (often bleeds onto the dialog
-   itself). Enable it only on wider screens where it renders reliably. */
 @media (min-width: 700px) {
   .ph-dialog::backdrop { background: rgba(15, 13, 35, 0.65); backdrop-filter: blur(4px); }
 }
-/* Stack children vertically. Without this, dialogs that DON'T wrap their
-   content in a <form> (buy-dialog, history-dialog, confirm-dialog) would
-   lay their children out in a row.
-   We also force-position the dialog as fixed + centered with a very high
-   z-index. Older iOS Safari versions don't fully promote <dialog> into the
-   top layer, so it can end up *behind* fixed/sticky elements like the
-   user-widget or sticky search bar. This guarantees it sits on top. */
-.ph-dialog[open] {
+/* Use a child wrapper for flex-column layout instead of putting it on the
+   dialog itself — applying display:flex / position:fixed directly on a
+   native <dialog> trips up iOS Safari's rendering. */
+.ph-dialog form,
+.ph-dialog .dialog-stack {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  position: fixed;
-  inset: 0;
-  margin: auto;
-  z-index: 1000;
+  width: 100%;
+  max-height: 88vh;
 }
-.ph-dialog form { display: flex; flex-direction: column; width: 100%; flex: 1; min-height: 0; }
 .ph-dialog-head {
   display: flex;
   align-items: center;
