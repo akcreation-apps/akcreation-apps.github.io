@@ -37,21 +37,21 @@ a { color: var(--primary-dark); }
   text-align: center;
 }
 @media (min-width: 700px) { .hero { padding: 88px 0 56px; } }
+/* IMPORTANT: do NOT declare `filter: blur(...)` outside the @media block.
+   iOS Safari has been observed to composite blur layers even on
+   display:none elements in some versions, which leaks the blur onto
+   <dialog> top-layer content. */
 .hero-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(60px);
   opacity: 0.5;
   pointer-events: none;
-  /* iOS Safari composites blur layers in a way that can bleed across
-     stacking contexts into top-layer elements like <dialog>. Hide the
-     blur orbs entirely on mobile to eliminate that bug source. */
   display: none;
 }
 .hero-orb-1 { width: 160px; height: 160px; background: #ec4899; top: -40px; left: -40px; }
 .hero-orb-2 { width: 140px; height: 140px; background: #38bdf8; bottom: -50px; right: -30px; }
 @media (min-width: 700px) {
-  .hero-orb { display: block; }
+  .hero-orb { display: block; filter: blur(60px); }
   .hero-orb-1 { width: 320px; height: 320px; top: -80px; left: -60px; }
   .hero-orb-2 { width: 280px; height: 280px; bottom: -100px; right: -40px; }
 }
