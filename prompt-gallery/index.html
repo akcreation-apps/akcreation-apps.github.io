@@ -35,7 +35,7 @@
   <!-- SweetAlert2 — for confirmations and rich alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <link rel="stylesheet" href="style.css?v=20260611c">
+  <link rel="stylesheet" href="style.css?v=20260611g">
 </head>
 <body>
 
@@ -305,46 +305,43 @@
       <h3 id="buy-dialog-title"><i class="fas fa-bolt"></i> Buy credits</h3>
       <button type="button" class="ph-dialog-close" data-buy-close aria-label="Close"><i class="fas fa-times"></i></button>
     </div>
-    <p class="ph-dialog-sub">Each credit unlocks one member-only prompt. <strong>₹5 per credit</strong>, minimum ₹50. After payment, your credits are added by our team within a few hours.</p>
+    <p class="ph-dialog-sub">Each credit unlocks one members-only prompt. Bigger packs save you more. After payment, credits are added by our team within a few hours.</p>
 
     <div class="buy-status">
       You currently have <strong id="buy-credits-now">—</strong> credits.
     </div>
 
     <div class="pack-grid">
-      <button type="button" class="pack-card" data-amount="50">
+      <button type="button" class="pack-card" data-amount="50" data-credits="10">
         <div class="pack-cred">10</div>
         <div class="pack-label">credits</div>
         <div class="pack-price">₹50</div>
+        <div class="pack-rate">₹5 / credit</div>
       </button>
-      <button type="button" class="pack-card popular" data-amount="100">
-        <span class="pack-tag">Popular</span>
-        <div class="pack-cred">20</div>
+      <button type="button" class="pack-card popular" data-amount="100" data-credits="25">
+        <span class="pack-tag">Popular · Save 20%</span>
+        <div class="pack-cred">25</div>
         <div class="pack-label">credits</div>
         <div class="pack-price">₹100</div>
+        <div class="pack-rate">₹4 / credit</div>
       </button>
-      <button type="button" class="pack-card" data-amount="250">
-        <div class="pack-cred">50</div>
+      <button type="button" class="pack-card" data-amount="250" data-credits="75">
+        <span class="pack-tag savings">Save 33%</span>
+        <div class="pack-cred">75</div>
         <div class="pack-label">credits</div>
         <div class="pack-price">₹250</div>
+        <div class="pack-rate">₹3.33 / credit</div>
       </button>
-      <button type="button" class="pack-card best-value" data-amount="500">
-        <span class="pack-tag">Best value</span>
-        <div class="pack-cred">100</div>
+      <button type="button" class="pack-card best-value" data-amount="500" data-credits="200">
+        <span class="pack-tag">Best value · Save 50%</span>
+        <div class="pack-cred">200</div>
         <div class="pack-label">credits</div>
         <div class="pack-price">₹500</div>
+        <div class="pack-rate">₹2.50 / credit</div>
       </button>
     </div>
 
-    <div class="pack-custom">
-      <label class="ph-field">
-        <span>Or enter a custom amount (₹)</span>
-        <input id="buy-custom-amount" type="number" inputmode="numeric" min="50" step="5" placeholder="Minimum ₹50">
-      </label>
-      <button type="button" id="buy-custom-btn" class="btn-primary"><i class="fab fa-whatsapp"></i> Pay via WhatsApp</button>
-    </div>
-
-    <p class="buy-foot"><i class="fab fa-whatsapp"></i> Clicking a pack opens WhatsApp with a prefilled message to our team.</p>
+    <p class="buy-foot"><i class="fab fa-whatsapp"></i> Tap a pack to confirm purchase over WhatsApp.</p>
     </div>
   </dialog>
 
@@ -359,6 +356,6 @@
     document.getElementById('footer-year').textContent = new Date().getFullYear();
   </script>
 
-  <script type="module" src="script.js?v=20260611c"></script>
+  <script type="module" src="script.js?v=20260611g"></script>
 </body>
 </html>

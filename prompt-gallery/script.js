@@ -998,6 +998,13 @@ const $chipBtn       = document.getElementById('user-chip-btn');
 const $chipAvatar    = document.getElementById('user-chip-avatar');
 const $chipName      = document.getElementById('user-chip-name');
 const $userMenu      = document.getElementById('user-menu');
+// Move the menu out of .user-widget so it sits as a direct child of <body>.
+// Otherwise its z-index is trapped inside the widget's stacking context,
+// which the sticky search bar can occasionally render over on certain
+// viewport widths.
+if ($userMenu && $userMenu.parentElement !== document.body) {
+  document.body.appendChild($userMenu);
+}
 const $menuAvatar    = document.getElementById('user-menu-avatar');
 const $menuName      = document.getElementById('user-menu-name');
 const $menuEmail     = document.getElementById('user-menu-email');
@@ -1766,13 +1773,10 @@ function renderCreditUI() {
 // ===== Buy credits dialog =====
 const $buyDialog       = document.getElementById('buy-dialog');
 const $buyCreditsNow   = document.getElementById('buy-credits-now');
-const $buyCustomAmount = document.getElementById('buy-custom-amount');
-const $buyCustomBtn    = document.getElementById('buy-custom-btn');
 
 function openBuyDialog() {
   if (!readSavedUser()) { resetAuthDialog(); openAuthDialog(); return; }
   $buyCreditsNow.textContent = String(totalCredits());
-  $buyCustomAmount.value = '';
   if (typeof $buyDialog.showModal === 'function') $buyDialog.showModal();
   else $buyDialog.setAttribute('open', '');
 }
@@ -1781,9 +1785,8 @@ function closeBuyDialog() {
   else $buyDialog.removeAttribute('open');
 }
 
-function whatsappBuyHref(amount) {
+function whatsappBuyHref(amount, credits) {
   const u = readSavedUser() || {};
-  const credits = Math.floor(amount / 5);
   const lines = [
     `Hi! I'd like to buy *${credits} credits* for the Prompt Gallery.`,
     `Amount: *₹${amount}*`,
@@ -1804,26 +1807,13 @@ $buyDialog.addEventListener('click', (e) => {
   if (e.target.closest('[data-buy-close]')) return closeBuyDialog();
   const pack = e.target.closest('.pack-card');
   if (pack) {
-    const amount = parseInt(pack.dataset.amount, 10);
-    if (amount >= 50) {
+    const amount  = parseInt(pack.dataset.amount, 10);
+    const credits = parseInt(pack.dataset.credits, 10);
+    if (amount > 0 && credits > 0) {
       // Single user gesture → wa.me via location.href (no await between click and nav)
-      window.location.href = whatsappBuyHref(amount);
+      window.location.href = whatsappBuyHref(amount, credits);
     }
   }
-});
-
-$buyCustomBtn.addEventListener('click', () => {
-  const amt = parseInt($buyCustomAmount.value, 10);
-  if (!amt || amt < 50) {
-    $buyCustomAmount.focus();
-    showToast('Minimum amount is ₹50');
-    return;
-  }
-  if (amt % 5 !== 0) {
-    showToast('Amount must be a multiple of ₹5');
-    return;
-  }
-  window.location.href = whatsappBuyHref(amt);
 });
 
 // Menu action wiring for "Buy"
