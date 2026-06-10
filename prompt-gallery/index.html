@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="theme-color" content="#4f46e5">
+
+  <title>AI Image Prompt Gallery — AK Creation</title>
+  <meta name="description" content="Curated AI image prompts with demo previews. One-click copy, then paste into Gemini, ChatGPT, Midjourney or any image AI to transform your photos.">
+  <link rel="canonical" href="https://akcreation-apps.com/prompt-gallery/">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" href="/favicon.ico">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 4 -->
+  <link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Analytics -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="container hero-inner">
+      <span class="hero-badge"><i class="fas fa-wand-magic-sparkles"></i> AI Image Prompts</span>
+      <h1>Copy. Paste. Transform.</h1>
+      <p class="hero-sub">A growing gallery of image-modifier prompts. Upload a clear photo to your favourite AI image tool, paste the prompt, and watch it transform.</p>
+    </div>
+  </header>
+
+  <!-- ===== SEARCH ===== -->
+  <div class="search-wrap">
+    <div class="container">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input id="search" type="search" placeholder="Search prompts, styles or models…" aria-label="Search prompts">
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GRID ===== -->
+  <main class="container gallery-wrap">
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <p id="empty" class="empty-state" hidden>No prompts match your search.</p>
+  </main>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <dialog id="lightbox" class="lightbox" aria-label="Image preview">
+    <button class="lightbox-close" aria-label="Close preview"><i class="fas fa-times"></i></button>
+    <img id="lightbox-img" alt="">
+  </dialog>
+
+  <!-- ===== PLACEHOLDER DIALOG ===== -->
+  <dialog id="ph-dialog" class="ph-dialog" aria-labelledby="ph-dialog-title">
+    <form id="ph-form" method="dialog">
+      <header class="ph-dialog-head">
+        <h3 id="ph-dialog-title">Fill in the details</h3>
+        <button type="button" class="ph-dialog-close" aria-label="Cancel"><i class="fas fa-times"></i></button>
+      </header>
+      <p class="ph-dialog-sub">These values will replace the placeholders in your prompt.</p>
+      <div id="ph-dialog-fields" class="ph-dialog-fields"></div>
+      <footer class="ph-dialog-actions">
+        <button type="button" class="btn-ghost" data-cancel>Cancel</button>
+        <button type="submit" class="btn-primary"><i class="fas fa-wand-magic-sparkles"></i> Generate &amp; Copy</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+  </footer>
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
