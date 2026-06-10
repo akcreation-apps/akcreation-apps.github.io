@@ -1,6 +1,12 @@
 // Import the necessary Firebase services
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { initCrossSearch } from '../banki-bites/cross-search.js';
+
+const crossSearch = initCrossSearch({
+    noResultsEl: document.getElementById('noResults'),
+    getSearchTerm: () => document.getElementById('searchBar')?.value || ''
+});
 
 // Initialize cart array to store selected items
 let cart = JSON.parse(localStorage.getItem(lsKey('cart'))) || [];
@@ -541,6 +547,7 @@ function applyFilters() {
     });
 
     if (noResultsDiv) noResultsDiv.style.display = anyVisibleDish ? 'none' : 'block';
+    if (anyVisibleDish) crossSearch.clear(); else crossSearch.update();
 
     const shortcutsGrid = document.querySelector('.shortcuts-grid');
     if (searchTerm) {
