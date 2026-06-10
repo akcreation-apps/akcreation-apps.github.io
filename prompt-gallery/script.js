@@ -1254,15 +1254,76 @@ async function recordCopy(p) {
       title: p.title || '',
       copiedAt: serverTimestamp(),
     });
-    // Bump user copy_count
+    // Bump per-user lifetime copy counter
     setDoc(doc(db, PG_COLLECTION, u.uid), {
       copy_count: increment(1),
       last_seen: serverTimestamp(),
     }, { merge: true }).catch(() => {});
+    // Bump GLOBAL per-prompt copy counter — used for "trending" badges
+    // and sorting / analytics. Fire-and-forget; not blocking the copy.
+    setDoc(doc(db, 'prompt_stats', p.id), {
+      title: p.title || '',
+      tier: p.tier || 'free',
+      copy_count: increment(1),
+      last_copied_at: serverTimestamp(),
+    }, { merge: true }).then(() => {
+      // Optimistically bump local cache so the badge updates without refetch
+      const prev = PROMPT_STATS.get(p.id) || { copy_count: 0 };
+      PROMPT_STATS.set(p.id, { ...prev, copy_count: (prev.copy_count || 0) + 1 });
+      updateCardStat(p.id);
+    }).catch(err => console.warn('[prompt-gallery] prompt_stats bump failed', err));
   } catch (err) {
     console.warn('[prompt-gallery] recordCopy failed', err);
   }
 }
+
+// ============================================================
+// ===== Global per-prompt copy stats (trending) ==============
+// ============================================================
+const PROMPT_STATS = new Map();   // promptId -> { copy_count }
+const TRENDING_THRESHOLD = 5;     // show "used N times" once a prompt
+                                  //   has been copied at least this much
+
+async function loadPromptStats() {
+  try {
+    const { db } = await getFirebase();
+    const snap = await getDocs(collection(db, 'prompt_stats'));
+    PROMPT_STATS.clear();
+    snap.forEach(d => PROMPT_STATS.set(d.id, d.data() || {}));
+    // Re-render every card so the "used N times" tag appears
+    document.querySelectorAll('.card-p').forEach(card => {
+      updateCardStat(card.dataset.id);
+    });
+  } catch (err) {
+    // Failing silently is acceptable — stats are a nice-to-have, not critical.
+    console.warn('[prompt-gallery] loadPromptStats failed', err);
+  }
+}
+
+function updateCardStat(promptId) {
+  if (!promptId) return;
+  const card = document.querySelector(`.card-p[data-id="${cssEscape(promptId)}"]`);
+  if (!card) return;
+  const count = (PROMPT_STATS.get(promptId)?.copy_count) || 0;
+  let tag = card.querySelector('.copy-stat');
+  if (count < TRENDING_THRESHOLD) {
+    if (tag) tag.remove();
+    return;
+  }
+  const label = `<i class="fas fa-fire"></i> Used ${count.toLocaleString('en-IN')} time${count === 1 ? '' : 's'}`;
+  if (tag) { tag.innerHTML = label; return; }
+  tag = document.createElement('div');
+  tag.className = 'copy-stat';
+  tag.innerHTML = label;
+  // Insert right after the title for a natural reading flow
+  const title = card.querySelector('.card-title');
+  if (title) title.insertAdjacentElement('afterend', tag);
+  else card.querySelector('.card-body')?.prepend(tag);
+}
+
+// Initial fetch — works for both signed-in and anonymous visitors thanks to
+// the public read rule on prompt_stats.
+loadPromptStats();
 
 const $historyDialog = document.getElementById('history-dialog');
 const $historyList   = document.getElementById('history-list');

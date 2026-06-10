@@ -27,6 +27,9 @@ a { color: var(--primary-dark); }
 .hero {
   position: relative;
   overflow: hidden;
+  /* Contain the blur orbs' filter so they don't leak across stacking
+     contexts on iOS Safari (causes the whole signup dialog to look blurred). */
+  isolation: isolate;
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
   color: #fff;
   /* Top padding leaves room for the fixed user-widget (~52px tall + breathing) */
@@ -88,10 +91,12 @@ a { color: var(--primary-dark); }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250, 249, 255, 0.92);
-  backdrop-filter: blur(10px);
+  background: #faf9ff;
   border-bottom: 1px solid var(--border);
   padding: 14px 0;
+}
+@media (min-width: 700px) {
+  .search-wrap { background: rgba(250, 249, 255, 0.92); backdrop-filter: blur(10px); }
 }
 .search-box {
   position: relative;
@@ -394,6 +399,24 @@ a { color: var(--primary-dark); }
 }
 .chip i { font-size: 0.7rem; }
 
+/* Trending / global copy count — only renders for prompts with >= TRENDING_THRESHOLD copies */
+.copy-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 1px solid rgba(217,119,6,0.25);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  line-height: 1.1;
+}
+.copy-stat i { color: #ea580c; font-size: 0.7rem; }
+@media (min-width: 700px) { .copy-stat { font-size: 0.75rem; padding: 4px 11px; } }
+
 /* "Best results in {agent}" line — replaces the model chip row on cards */
 .best-in {
   display: flex;
@@ -440,13 +463,21 @@ a { color: var(--primary-dark); }
   border-radius: 18px;
   width: min(460px, 92vw);
   max-height: 88vh;
-  background: #fff;
+  /* Solid background + isolated stacking context so iOS Safari can't
+     composite the hero's blur filter through this element. */
+  background: #ffffff;
   color: var(--ink);
   box-shadow: 0 30px 80px rgba(15, 13, 35, 0.35);
   overflow: hidden;
   overscroll-behavior: contain;
+  isolation: isolate;
 }
-.ph-dialog::backdrop { background: rgba(15, 13, 35, 0.65); backdrop-filter: blur(4px); }
+.ph-dialog::backdrop { background: rgba(15, 13, 35, 0.7); }
+/* Backdrop blur is buggy on iOS Safari (often bleeds onto the dialog
+   itself). Enable it only on wider screens where it renders reliably. */
+@media (min-width: 700px) {
+  .ph-dialog::backdrop { background: rgba(15, 13, 35, 0.65); backdrop-filter: blur(4px); }
+}
 /* Stack children vertically. Without this, dialogs that DON'T wrap their
    content in a <form> (buy-dialog, history-dialog, confirm-dialog) would
    lay their children out in a row. */
