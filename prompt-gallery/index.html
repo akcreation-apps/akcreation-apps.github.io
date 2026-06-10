@@ -32,6 +32,9 @@
   <!-- Analytics -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
 
+  <!-- SweetAlert2 — for confirmations and rich alerts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -40,6 +43,48 @@
   <header class="hero">
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
+
+    <!-- User widget (top-right) -->
+    <div id="user-widget" class="user-widget" data-state="loading">
+      <!-- Signed-out state -->
+      <button type="button" id="user-signin-btn" class="user-signin-btn" hidden>
+        <i class="fas fa-user-plus"></i> <span>Sign up / Log in</span>
+      </button>
+      <!-- Signed-in state -->
+      <div id="user-chip" class="user-chip" hidden>
+        <button type="button" id="user-chip-btn" class="user-chip-btn" aria-haspopup="true" aria-expanded="false">
+          <img id="user-chip-avatar" class="user-chip-avatar" alt="" referrerpolicy="no-referrer">
+          <span id="user-chip-name" class="user-chip-name">Account</span>
+          <i class="fas fa-chevron-down user-chip-caret"></i>
+        </button>
+        <div id="user-menu" class="user-menu" role="menu" hidden>
+          <div class="user-menu-head">
+            <img id="user-menu-avatar" alt="" referrerpolicy="no-referrer">
+            <div>
+              <div id="user-menu-name"></div>
+              <div id="user-menu-email" class="user-menu-email"></div>
+            </div>
+          </div>
+          <div class="credit-line">
+            <span><i class="fas fa-bolt"></i> <strong id="credit-line-count">—</strong> credits left</span>
+            <button type="button" class="credit-line-buy" data-action="buy-credits">Buy</button>
+          </div>
+          <button type="button" class="user-menu-item" data-action="edit-profile" role="menuitem">
+            <i class="fas fa-user-pen"></i> Edit profile
+          </button>
+          <button type="button" class="user-menu-item" data-action="favorites" role="menuitem">
+            <i class="fas fa-heart"></i> My favorites
+          </button>
+          <button type="button" class="user-menu-item" data-action="history" role="menuitem">
+            <i class="fas fa-clock-rotate-left"></i> Copy history
+          </button>
+          <button type="button" class="user-menu-item" data-action="logout" role="menuitem">
+            <i class="fas fa-right-from-bracket"></i> Log out
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="container hero-inner">
       <span class="hero-badge"><i class="fas fa-wand-magic-sparkles"></i> AI Image Prompts</span>
       <h1>Copy. Paste. Transform.</h1>
@@ -54,7 +99,37 @@
         <i class="fas fa-search"></i>
         <input id="search" type="search" placeholder="Search prompts, styles or models…" aria-label="Search prompts">
       </div>
+      <div class="filter-row" role="tablist" aria-label="Filter prompts">
+        <button type="button" class="filter-chip active" data-filter="all" role="tab" aria-selected="true">
+          <i class="fas fa-th"></i> All
+        </button>
+        <button type="button" class="filter-chip" data-filter="member" role="tab" aria-selected="false">
+          <i class="fas fa-crown"></i> Members
+        </button>
+        <button type="button" class="filter-chip" data-filter="favorites" role="tab" aria-selected="false" hidden>
+          <i class="fas fa-heart"></i> Favorites <span class="filter-count" id="filter-fav-count" hidden>0</span>
+        </button>
+      </div>
     </div>
+  </div>
+
+  <!-- ===== ANONYMOUS DAILY COUNTER (free copies left) ===== -->
+  <div id="anon-counter" class="anon-counter" hidden>
+    <div class="container anon-counter-inner">
+      <div class="anon-counter-left">
+        <span class="anon-counter-icon"><i class="fas fa-bolt"></i></span>
+        <span class="anon-counter-text">
+          <strong id="anon-counter-num">3</strong>
+          <span id="anon-counter-label">free copies left today</span>
+        </span>
+      </div>
+      <button type="button" id="anon-counter-cta" class="anon-counter-cta">
+        <i class="fas fa-arrow-right"></i>
+        <span class="cta-long">Sign up free for unlimited</span>
+        <span class="cta-short">Sign up</span>
+      </button>
+    </div>
+    <div class="anon-counter-bar"><div id="anon-counter-bar-fill" class="anon-counter-bar-fill"></div></div>
   </div>
 
   <!-- ===== GRID ===== -->
@@ -85,6 +160,188 @@
     </form>
   </dialog>
 
+  <!-- ===== AUTH / SIGNUP DIALOG ===== -->
+  <dialog id="auth-dialog" class="ph-dialog auth-dialog" aria-labelledby="auth-dialog-title">
+    <form id="auth-form" method="dialog">
+      <header class="ph-dialog-head">
+        <h3 id="auth-dialog-title">Unlock free prompts</h3>
+        <button type="button" class="ph-dialog-close" data-auth-cancel aria-label="Cancel"><i class="fas fa-times"></i></button>
+      </header>
+      <p class="ph-dialog-sub">One-time signup. We use your Gmail and phone only to share new prompts and updates — no spam.</p>
+
+      <div class="auth-body">
+        <div id="auth-step-google" class="auth-step">
+          <button type="button" id="auth-google-btn" class="google-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+            <span>Sign in with Google</span>
+          </button>
+          <p class="auth-tiny">Verified email lets us send you new prompts as we publish them.</p>
+        </div>
+
+        <div id="auth-step-phone" class="auth-step" hidden>
+          <div class="auth-profile">
+            <img id="auth-avatar" alt="" referrerpolicy="no-referrer">
+            <div>
+              <div id="auth-name" class="auth-name"></div>
+              <div id="auth-email" class="auth-email"></div>
+            </div>
+          </div>
+          <label class="ph-field">
+            <span>Phone number (India)</span>
+            <div class="phone-row">
+              <span class="phone-prefix">+91</span>
+              <input id="auth-phone" name="phone" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel-national" required>
+            </div>
+          </label>
+          <p id="auth-error" class="auth-error" hidden></p>
+        </div>
+      </div>
+
+      <footer class="ph-dialog-actions">
+        <button type="button" class="btn-ghost" data-auth-cancel>Cancel</button>
+        <button type="submit" id="auth-submit" class="btn-primary" disabled><i class="fas fa-unlock"></i> Unlock prompts</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ===== PROFILE EDIT DIALOG ===== -->
+  <dialog id="profile-dialog" class="ph-dialog auth-dialog" aria-labelledby="profile-dialog-title">
+    <form id="profile-form" method="dialog">
+      <header class="ph-dialog-head">
+        <h3 id="profile-dialog-title">Edit profile</h3>
+        <button type="button" class="ph-dialog-close" data-profile-cancel aria-label="Cancel"><i class="fas fa-times"></i></button>
+      </header>
+      <p class="ph-dialog-sub">Update your details. Email is managed by Google and can't be changed here.</p>
+
+      <div class="auth-body">
+        <div class="auth-profile">
+          <img id="profile-avatar" alt="" referrerpolicy="no-referrer">
+          <div>
+            <div id="profile-name-readonly" class="auth-name"></div>
+            <div id="profile-email-readonly" class="auth-email"></div>
+          </div>
+        </div>
+
+        <div class="stats-grid" id="profile-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-copies">0</div>
+            <div class="stat-label">Copies</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-favs">0</div>
+            <div class="stat-label">Favorites</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-since">—</div>
+            <div class="stat-label">Member since</div>
+          </div>
+        </div>
+
+        <label class="ph-field">
+          <span>Full name</span>
+          <input id="profile-name" name="name" type="text" maxlength="80" placeholder="Your name" required>
+        </label>
+
+        <label class="ph-field">
+          <span>Phone number (India)</span>
+          <div class="phone-row">
+            <span class="phone-prefix">+91</span>
+            <input id="profile-phone" name="phone" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel-national" required>
+          </div>
+        </label>
+
+        <p id="profile-error" class="auth-error" hidden></p>
+
+        <div class="danger-zone">
+          <h4>Danger zone</h4>
+          <p>Permanently delete your account and all saved favorites &amp; copy history. This can't be undone.</p>
+          <button type="button" id="profile-delete-btn" class="btn-danger">
+            <i class="fas fa-trash-can"></i> Delete my account
+          </button>
+        </div>
+      </div>
+
+      <footer class="ph-dialog-actions">
+        <button type="button" class="btn-ghost" data-profile-cancel>Cancel</button>
+        <button type="submit" id="profile-submit" class="btn-primary"><i class="fas fa-save"></i> Save changes</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ===== COPY HISTORY DIALOG ===== -->
+  <dialog id="history-dialog" class="ph-dialog auth-dialog" aria-labelledby="history-dialog-title">
+    <div class="ph-dialog-head">
+      <h3 id="history-dialog-title">Copy history</h3>
+      <button type="button" class="ph-dialog-close" data-history-close aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <p class="ph-dialog-sub">Your last 25 copied prompts. Click any to copy again.</p>
+    <div id="history-list" class="history-list"></div>
+    <footer class="ph-dialog-actions">
+      <button type="button" id="history-clear-btn" class="btn-ghost"><i class="fas fa-broom"></i> Clear history</button>
+      <button type="button" class="btn-primary" data-history-close>Done</button>
+    </footer>
+  </dialog>
+
+  <!-- ===== CONFIRM (delete-account) DIALOG ===== -->
+  <dialog id="confirm-dialog" class="ph-dialog auth-dialog" aria-labelledby="confirm-dialog-title">
+    <div class="ph-dialog-head">
+      <h3 id="confirm-dialog-title">Delete your account?</h3>
+    </div>
+    <p class="ph-dialog-sub" id="confirm-dialog-msg">This will erase your profile, favorites and copy history. You'll be asked to re-confirm with Google for security.</p>
+    <footer class="ph-dialog-actions">
+      <button type="button" class="btn-ghost" data-confirm-cancel>Cancel</button>
+      <button type="button" id="confirm-dialog-ok" class="btn-danger"><i class="fas fa-trash-can"></i> Yes, delete</button>
+    </footer>
+  </dialog>
+
+  <!-- ===== BUY CREDITS DIALOG ===== -->
+  <dialog id="buy-dialog" class="ph-dialog auth-dialog buy-dialog" aria-labelledby="buy-dialog-title">
+    <div class="ph-dialog-head">
+      <h3 id="buy-dialog-title"><i class="fas fa-bolt"></i> Buy credits</h3>
+      <button type="button" class="ph-dialog-close" data-buy-close aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <p class="ph-dialog-sub">Each credit unlocks one member-only prompt. <strong>₹5 per credit</strong>, minimum ₹50. After payment, your credits are added by our team within a few hours.</p>
+
+    <div class="buy-status">
+      You currently have <strong id="buy-credits-now">—</strong> credits.
+    </div>
+
+    <div class="pack-grid">
+      <button type="button" class="pack-card" data-amount="50">
+        <div class="pack-cred">10</div>
+        <div class="pack-label">credits</div>
+        <div class="pack-price">₹50</div>
+      </button>
+      <button type="button" class="pack-card popular" data-amount="100">
+        <span class="pack-tag">Popular</span>
+        <div class="pack-cred">20</div>
+        <div class="pack-label">credits</div>
+        <div class="pack-price">₹100</div>
+      </button>
+      <button type="button" class="pack-card" data-amount="250">
+        <div class="pack-cred">50</div>
+        <div class="pack-label">credits</div>
+        <div class="pack-price">₹250</div>
+      </button>
+      <button type="button" class="pack-card best-value" data-amount="500">
+        <span class="pack-tag">Best value</span>
+        <div class="pack-cred">100</div>
+        <div class="pack-label">credits</div>
+        <div class="pack-price">₹500</div>
+      </button>
+    </div>
+
+    <div class="pack-custom">
+      <label class="ph-field">
+        <span>Or enter a custom amount (₹)</span>
+        <input id="buy-custom-amount" type="number" inputmode="numeric" min="50" step="5" placeholder="Minimum ₹50">
+      </label>
+      <button type="button" id="buy-custom-btn" class="btn-primary"><i class="fab fa-whatsapp"></i> Pay via WhatsApp</button>
+    </div>
+
+    <p class="buy-foot"><i class="fab fa-whatsapp"></i> Clicking a pack opens WhatsApp with a prefilled message to our team.</p>
+  </dialog>
+
   <!-- ===== TOAST ===== -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -96,6 +353,6 @@
     document.getElementById('footer-year').textContent = new Date().getFullYear();
   </script>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
