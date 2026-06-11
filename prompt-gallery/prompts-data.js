@@ -220,14 +220,5 @@ export const PROMPTS = [
     notes: 'Upload a clear photo of the child — front-facing works best.',
     models: ['ChatGPT (DALL·E)', 'Gemini'],
     tags: ['portrait', 'kids', 'cozy', 'cinematic']
-  },
-  {
-    id: 'bali-gate-mirror',
-    tier: 'member',
-    title: 'Bali Gate Mirror Reflection',
-    image: 'prompts/thailand-pose.jpeg',
-    notes: 'Upload one or two photos — subjects appear as small figures in the gateway.',
-    models: ['ChatGPT (DALL·E)', 'Gemini'],
-    tags: ['travel', 'cinematic', 'symmetry', 'temple']
   }
 ];
