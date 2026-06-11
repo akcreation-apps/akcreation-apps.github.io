@@ -128,7 +128,6 @@ export const PROMPTS = [
   },
   {
     id: 'maternity-glow',
-    tier: 'member',
     title: 'Maternity Glow Portrait',
     image: 'prompts/maternity-1.png',
     notes: 'Upload two clear photos — one of the expectant mother and one of the partner.',
@@ -176,7 +175,6 @@ export const PROMPTS = [
   },
   {
     id: 'mirror-reflection',
-    tier: 'member',
     title: 'Mirror Reflection Portrait',
     image: 'prompts/mirror-effect.png',
     notes: 'Upload a clear front-facing photo — the face will appear in the mirror reflection.',
@@ -185,7 +183,6 @@ export const PROMPTS = [
   },
   {
     id: 'dual-saree-dance',
-    tier: 'member',
     title: 'Twin Saree Dance Poster',
     image: 'prompts/slaze-pose.png',
     notes: 'Upload a clear front-facing photo — used as identity for both versions.',
@@ -223,7 +220,6 @@ export const PROMPTS = [
   },
   {
     id: 'bali-gate-mirror',
-    tier: 'member',
     title: 'Bali Gate Mirror Reflection',
     image: 'prompts/thailand-pose.jpeg',
     notes: 'Upload one or two photos — subjects appear as small figures in the gateway.',
