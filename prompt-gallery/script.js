@@ -3,7 +3,7 @@
 // Catalog data lives in prompts-data.js (free prompts) + Firestore (member).
 // ============================================================
 
-import { PROMPTS } from "./prompts-data.js?v=20260611j";
+import { PROMPTS } from "./prompts-data.js?v=20260611k";
 
 
 // ============================================================
@@ -144,7 +144,37 @@ function applyFilter() {
 }
 
 // ===== Copy =====
-async function copyText(text) {
+// Robust clipboard write. Accepts either a string OR a Promise<string>.
+// When a Promise is passed, we use the deferred-ClipboardItem API so the
+// user-gesture token survives awaits (Firestore reads, credit consume, etc).
+// Without this, member-prompt copies fail on iOS Safari & strict browsers
+// because navigator.clipboard.writeText rejects after any await boundary.
+async function copyText(textOrPromise) {
+  const isPromise = textOrPromise && typeof textOrPromise.then === 'function';
+  const hasDeferred = typeof window.ClipboardItem !== 'undefined' &&
+                      navigator.clipboard && typeof navigator.clipboard.write === 'function';
+
+  if (isPromise && hasDeferred) {
+    try {
+      const blobPromise = Promise.resolve(textOrPromise).then(t =>
+        new Blob([String(t == null ? '' : t)], { type: 'text/plain' })
+      );
+      // Browsers preserve the gesture token until this promise resolves.
+      await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blobPromise })]);
+      return true;
+    } catch (err) {
+      // If the inner promise rejected, propagate so the caller can show
+      // a meaningful toast (e.g. "out of credits"). Plain clipboard
+      // failures fall through to the legacy writeText path below.
+      const innerError = await Promise.resolve(textOrPromise).catch(e => e);
+      if (innerError instanceof Error) throw innerError;
+      console.warn('[prompt-gallery] deferred clipboard write failed; falling back', err);
+    }
+  }
+
+  const text = isPromise ? await Promise.resolve(textOrPromise) : textOrPromise;
+  if (text == null) return false;
+
   try {
     await navigator.clipboard.writeText(text);
     return true;
@@ -244,23 +274,34 @@ $phForm.addEventListener('submit', async (e) => {
   const values = {};
   for (const [k, v] of data.entries()) values[k] = String(v).trim();
   const copiedPrompt = activePrompt;
-  const access = await ensureCopyAccess(copiedPrompt);
-  if (!access.ok) { closePhDialog(); return; }
-  let rawText;
-  try {
-    rawText = await getPromptText(copiedPrompt);
-  } catch (err) {
-    console.error('[prompt-gallery] failed to load prompt text', err);
-    closePhDialog();
+
+  // Use deferred-ClipboardItem so the user-gesture survives the Firestore
+  // credit-consume and prompt-fetch awaits below.
+  let accessResult = null;
+  let loadError = null;
+  const textPromise = ensureCopyAccess(copiedPrompt).then(access => {
+    accessResult = access;
+    if (!access.ok) throw new Error('access-denied');
+    return getPromptText(copiedPrompt);
+  }).then(rawText => fillPrompt(rawText, values))
+    .catch(err => {
+      if (err && err.message !== 'access-denied') loadError = err;
+      throw err;
+    });
+
+  let ok = false;
+  try { ok = await copyText(textPromise); } catch { ok = false; }
+  closePhDialog();
+
+  if (accessResult && !accessResult.ok) return;
+  if (loadError) {
+    console.error('[prompt-gallery] failed to load prompt text', loadError);
     showToast('Could not load this prompt. Please try again.');
     return;
   }
-  const text = fillPrompt(rawText, values);
-  const ok = await copyText(text);
-  closePhDialog();
   if (ok) {
-    showToast(access.creditUsed
-      ? `Prompt copied! ${access.creditsLeft} credit${access.creditsLeft === 1 ? '' : 's'} left.`
+    showToast(accessResult && accessResult.creditUsed
+      ? `Prompt copied! ${accessResult.creditsLeft} credit${accessResult.creditsLeft === 1 ? '' : 's'} left.`
       : 'Prompt generated & copied!');
     if (typeof recordCopy === 'function') recordCopy(copiedPrompt);
   } else {
@@ -290,20 +331,37 @@ $grid.addEventListener('click', async (e) => {
       openPhDialog(p);
       return;
     }
-    const access = await ensureCopyAccess(p);
-    if (!access.ok) return;
-    let rawText;
+    // Run access check + text fetch as a Promise that resolves with the
+    // raw prompt text. Pass the *promise* (not the resolved text) into
+    // copyText so the deferred-ClipboardItem API preserves the user-gesture
+    // across the Firestore credit-consume and prompt-fetch awaits.
+    let accessResult = null;
+    let loadError = null;
+    const textPromise = ensureCopyAccess(p).then(access => {
+      accessResult = access;
+      if (!access.ok) throw new Error('access-denied');
+      return getPromptText(p);
+    }).catch(err => {
+      if (err && err.message !== 'access-denied') loadError = err;
+      throw err;
+    });
+
+    let ok = false;
     try {
-      rawText = await getPromptText(p);
-    } catch (err) {
-      console.error('[prompt-gallery] failed to load prompt text', err);
+      ok = await copyText(textPromise);
+    } catch {
+      ok = false;
+    }
+
+    if (accessResult && !accessResult.ok) return; // ensureCopyAccess already toasted
+    if (loadError) {
+      console.error('[prompt-gallery] failed to load prompt text', loadError);
       showToast('Could not load this prompt. Please try again.');
       return;
     }
-    const ok = await copyText(rawText);
     if (ok) {
-      showToast(access.creditUsed
-        ? `Prompt copied! ${access.creditsLeft} credit${access.creditsLeft === 1 ? '' : 's'} left.`
+      showToast(accessResult && accessResult.creditUsed
+        ? `Prompt copied! ${accessResult.creditsLeft} credit${accessResult.creditsLeft === 1 ? '' : 's'} left.`
         : 'Prompt copied — paste into your AI image tool');
       copyBtn.classList.add('copied');
       const original = copyBtn.innerHTML;

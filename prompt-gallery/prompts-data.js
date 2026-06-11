@@ -130,6 +130,7 @@ export const PROMPTS = [
     id: 'maternity-glow',
     title: 'Maternity Glow Portrait',
     image: 'prompts/maternity-1.png',
+    prompt: "A photorealistic cinematic Indian maternity portrait with a magical fantasy womb-glow effect.\n\nSUBJECT 1 — WOMAN (use uploaded photo 1 as facial identity reference, 100% face preservation, identity lock ON):\nA pregnant South Asian woman standing upright, smiling warmly and gazing downward with joy. She wears a rich deep crimson/maroon Kanjivaram silk saree with intricate gold zari embroidery border and a matching embroidered blouse with traditional motifs. She is adorned with a layered gold long necklace (haar), maang tikka, gold jhumka earrings, a red bindi, and multiple stacked green and gold bangles on both wrists. Her dark wavy hair is styled with a white jasmine gajra flower garland pinned to the side.\n\nSUBJECT 2 — MAN (use uploaded photo 2 as facial identity reference, 100% face preservation, identity lock ON):\nA South Asian man with short curly dark hair and a light beard, wearing a clean white full-sleeve shirt and a watch. He is crouching or kneeling in front of the woman, facing toward her pregnant belly, looking at it with an expression of love and wonder. His hands gently hold the woman's hands near her belly.\n\nKEY FANTASY EFFECT — GLOWING WOMB VISUALIZATION:\nOn the woman's pregnant belly, render a magical glowing translucent orb effect — as if the womb is visible through the saree in a fantastical, non-graphic way. Inside the orb, show a beautifully rendered sleeping newborn baby in a peaceful curled fetal position, surrounded by warm golden light, swirling cosmic sparkle particles, starlight dust, and soft energy rings. The glow emanates outward from the belly in warm amber and golden tones, blending softly with the saree fabric. The effect should feel sacred, magical, and divine — like a celestial soul arriving.\n\nBACKGROUND:\nA richly decorated traditional South Indian interior space. Elements include: a large detailed Pichwai or Mughal-style painted mural on the wall featuring a colorful peacock on a flowering tree branch (cream/beige background); hanging jasmine flower garland torana on both sides; a lit traditional brass oil lamp (diya/vilakku) on a stand glowing in the background; fresh pink and white flower arrangements scattered throughout; soft bokeh background.\n\nLIGHTING: Warm golden candlelight ambiance, soft diffused studio light on subjects, glowing ember light from the womb effect, shallow depth of field.\n\nCOLOR GRADE: Deep crimson and gold tones for the woman; clean white for the man; warm amber and cream for the background; sparkling gold for the womb fantasy effect.\n\nMOOD: Sacred, tender, joyful, culturally traditional, deeply emotional.\n\nSTYLE: Ultra-realistic cinematic maternity photography with magical fantasy compositing, 8K, HDR, professional Indian wedding/maternity photography style.",
     notes: 'Upload two clear photos — one of the expectant mother and one of the partner.',
     models: ['ChatGPT (DALL·E)', 'Gemini'],
     tags: ['maternity', 'couple', 'cinematic', 'traditional']
@@ -175,6 +176,7 @@ export const PROMPTS = [
   },
   {
     id: 'mirror-reflection',
+    tier: 'member',
     title: 'Mirror Reflection Portrait',
     image: 'prompts/mirror-effect.png',
     notes: 'Upload a clear front-facing photo — the face will appear in the mirror reflection.',
@@ -183,6 +185,7 @@ export const PROMPTS = [
   },
   {
     id: 'dual-saree-dance',
+    tier: 'member',
     title: 'Twin Saree Dance Poster',
     image: 'prompts/slaze-pose.png',
     notes: 'Upload a clear front-facing photo — used as identity for both versions.',
@@ -220,6 +223,7 @@ export const PROMPTS = [
   },
   {
     id: 'bali-gate-mirror',
+    tier: 'member',
     title: 'Bali Gate Mirror Reflection',
     image: 'prompts/thailand-pose.jpeg',
     notes: 'Upload one or two photos — subjects appear as small figures in the gateway.',
