@@ -11,14 +11,14 @@
               "id": 11,
               "name": "Clear",
               "price": 49,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 12,
               "name": "Manchow",
               "price": 59,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             }
           ]
@@ -86,21 +86,21 @@
               "id": 201,
               "name": "Egg Chap (4Pc)",
               "price": 79,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 202,
               "name": "Egg Chap (7Pc)",
               "price": 129,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 203,
               "name": "Chicken Pakoda (5Pc)",
               "price": 89,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
@@ -135,7 +135,7 @@
               "id": 208,
               "name": "Chicken Pakoda (10Pc)",
               "price": 169,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             }
           ]
@@ -148,42 +148,42 @@
               "id": 301,
               "name": "Veg Chowmein",
               "price": 69,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 302,
               "name": "Chowmein Roll",
               "price": 69,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 303,
               "name": "Veg Roll",
               "price": 79,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 304,
               "name": "Mix Veg Roll",
               "price": 79,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 305,
               "name": "Paneer Roll",
               "price": 79,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 306,
               "name": "Special Mix Veg Roll",
               "price": 89,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             }
           ]
@@ -196,42 +196,42 @@
               "id": 401,
               "name": "Single Egg Chowmein",
               "price": 79,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 402,
               "name": "Double Egg Chowmein",
               "price": 89,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 403,
               "name": "Single Egg Roll",
               "price": 69,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 404,
               "name": "Double Egg Roll",
               "price": 79,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 405,
               "name": "Lachha Roll",
               "price": 99,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 406,
               "name": "Special Mix Roll",
               "price": 99,
-              "available_time": 18,
+              "available_time": 16,
               "not_available_time": ""
             }
           ]
