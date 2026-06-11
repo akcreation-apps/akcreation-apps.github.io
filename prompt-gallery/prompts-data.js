@@ -56,7 +56,7 @@ export const PROMPTS = [
   {
     id: 'siva-poster',
     title: 'Shiva Mural Portrait',
-    image: 'prompts/siva-poster.png',
+    image: 'prompts/siva-poster.jpeg',
     prompt: 'A photorealistic full-body portrait of [REFERENCE PERSON — use uploaded image as facial identity reference with 100% face preservation, identity lock ON], a young South Asian man with curly black hair, beard, and glasses, standing barefoot with arms crossed and one leg casually crossed over the other, leaning against a large textured outdoor wall. He is wearing a slightly open-collar cream linen shirt with sleeves rolled up and ripped light-wash denim jeans.\n\nThe background is a massive, hyper-detailed painted mural covering the entire wall — depicting Lord Shiva with deep blue skin, flowing dark hair, a prominent third eye, white horizontal forehead markings with an orange bindi, large golden hoop earrings, a coiled cobra around the neck, rudraksha bead necklaces, and a golden trishul (trident) with a red cloth tied to it held in one hand. The mural has a weathered, aged paint texture with dark teal, burnt orange, and gold tones.\n\nThe subject stands confidently in front of the mural, positioned slightly left of center, gazing contemplatively to his right. The mural\'s face is directly behind and above him, creating a powerful visual alignment between the two figures.\n\nCinematic moody lighting — dark ambient with warm golden rim light. Shallow depth of field with the subject in sharp focus and the mural slightly textured but vivid. Editorial street photography style, portrait orientation, film grain, ultra-realistic, 8K.',
     notes: 'Upload a clear photo of a single person — full body or three-quarter shot works best.',
     models: ['ChatGPT (DALL·E)', 'Gemini'],
