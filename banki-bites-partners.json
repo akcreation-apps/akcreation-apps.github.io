@@ -10,7 +10,7 @@
       "url": "https://akcreation-apps.com/TCD/?table=COD",
       "services": ["Chinese", "Continental", "Drinks", "Indian"],
       "rating": 4.6,
-      "opening_hour": "08",
+      "opening_hour": "10",
       "closing_hour": "22",
       "address": "BJP Party Office Side, Banki College Road, Banki 754008",
       "is_active": true
@@ -21,9 +21,20 @@
       "url": "https://akcreation-apps.com/A1/?table=COD",
       "services": ["Chinese", "Indian"],
       "rating": 4.5,
-      "opening_hour": "08",
+      "opening_hour": "10",
       "closing_hour": "22",
       "address": "Banki College Road, Banki 754008",
+      "is_active": true
+    },
+    {
+      "name": "Maa Charchika Hotel N Restaurant",
+      "logo": "https://akcreation-apps.com/MCH/mch-logo.png",
+      "url": "https://akcreation-apps.com/MCH/?table=COD",
+      "services": ["Chinese", "Indian"],
+      "rating": 4,
+      "opening_hour": "10",
+      "closing_hour": "22",
+      "address": "Jail Road, Banki, Odisha 754008",
       "is_active": true
     }
   ]
