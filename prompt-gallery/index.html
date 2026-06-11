@@ -143,51 +143,54 @@
 </head>
 <body>
 
+  <!-- User widget (top-right, fixed). Lives at the body root so it
+       isn't trapped inside .hero's `isolation: isolate` stacking
+       context — otherwise it gets painted under the gallery cards
+       as soon as .hero scrolls offscreen. -->
+  <div id="user-widget" class="user-widget" data-state="loading">
+    <!-- Signed-out state -->
+    <button type="button" id="user-signin-btn" class="user-signin-btn" hidden>
+      <i class="fas fa-user-plus"></i> <span>Sign up / Log in</span>
+    </button>
+    <!-- Signed-in state -->
+    <div id="user-chip" class="user-chip" hidden>
+      <button type="button" id="user-chip-btn" class="user-chip-btn" aria-haspopup="true" aria-expanded="false">
+        <img id="user-chip-avatar" class="user-chip-avatar" alt="" referrerpolicy="no-referrer">
+        <span id="user-chip-name" class="user-chip-name">Account</span>
+        <i class="fas fa-chevron-down user-chip-caret"></i>
+      </button>
+      <div id="user-menu" class="user-menu" role="menu" hidden>
+        <div class="user-menu-head">
+          <img id="user-menu-avatar" alt="" referrerpolicy="no-referrer">
+          <div>
+            <div id="user-menu-name"></div>
+            <div id="user-menu-email" class="user-menu-email"></div>
+          </div>
+        </div>
+        <div class="credit-line">
+          <span><i class="fas fa-bolt"></i> <strong id="credit-line-count">—</strong> credits left</span>
+          <button type="button" class="credit-line-buy" data-action="buy-credits">Buy</button>
+        </div>
+        <button type="button" class="user-menu-item" data-action="edit-profile" role="menuitem">
+          <i class="fas fa-user-pen"></i> Edit profile
+        </button>
+        <button type="button" class="user-menu-item" data-action="favorites" role="menuitem">
+          <i class="fas fa-heart"></i> My favorites
+        </button>
+        <button type="button" class="user-menu-item" data-action="history" role="menuitem">
+          <i class="fas fa-clock-rotate-left"></i> Copy history
+        </button>
+        <button type="button" class="user-menu-item" data-action="logout" role="menuitem">
+          <i class="fas fa-right-from-bracket"></i> Log out
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== HERO ===== -->
   <header class="hero">
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
-
-    <!-- User widget (top-right) -->
-    <div id="user-widget" class="user-widget" data-state="loading">
-      <!-- Signed-out state -->
-      <button type="button" id="user-signin-btn" class="user-signin-btn" hidden>
-        <i class="fas fa-user-plus"></i> <span>Sign up / Log in</span>
-      </button>
-      <!-- Signed-in state -->
-      <div id="user-chip" class="user-chip" hidden>
-        <button type="button" id="user-chip-btn" class="user-chip-btn" aria-haspopup="true" aria-expanded="false">
-          <img id="user-chip-avatar" class="user-chip-avatar" alt="" referrerpolicy="no-referrer">
-          <span id="user-chip-name" class="user-chip-name">Account</span>
-          <i class="fas fa-chevron-down user-chip-caret"></i>
-        </button>
-        <div id="user-menu" class="user-menu" role="menu" hidden>
-          <div class="user-menu-head">
-            <img id="user-menu-avatar" alt="" referrerpolicy="no-referrer">
-            <div>
-              <div id="user-menu-name"></div>
-              <div id="user-menu-email" class="user-menu-email"></div>
-            </div>
-          </div>
-          <div class="credit-line">
-            <span><i class="fas fa-bolt"></i> <strong id="credit-line-count">—</strong> credits left</span>
-            <button type="button" class="credit-line-buy" data-action="buy-credits">Buy</button>
-          </div>
-          <button type="button" class="user-menu-item" data-action="edit-profile" role="menuitem">
-            <i class="fas fa-user-pen"></i> Edit profile
-          </button>
-          <button type="button" class="user-menu-item" data-action="favorites" role="menuitem">
-            <i class="fas fa-heart"></i> My favorites
-          </button>
-          <button type="button" class="user-menu-item" data-action="history" role="menuitem">
-            <i class="fas fa-clock-rotate-left"></i> Copy history
-          </button>
-          <button type="button" class="user-menu-item" data-action="logout" role="menuitem">
-            <i class="fas fa-right-from-bracket"></i> Log out
-          </button>
-        </div>
-      </div>
-    </div>
 
     <div class="container hero-inner">
       <span class="hero-badge"><i class="fas fa-wand-magic-sparkles"></i> AI Image Prompts</span>
