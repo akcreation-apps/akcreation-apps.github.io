@@ -253,6 +253,68 @@ $phDialog.addEventListener('click', (e) => {
   if (e.target.closest('.ph-dialog-close') || e.target.closest('[data-cancel]')) closePhDialog();
 });
 
+// ===== How-to-use dialog (shown after a successful copy) =====
+const $howto       = document.getElementById('howto-dialog');
+const $howtoText   = document.getElementById('howto-prompt-text');
+const $howtoNote   = document.getElementById('howto-image-note');
+const $howtoSub    = document.getElementById('howto-sub');
+const $howtoCopyBtn = document.getElementById('howto-copy-again');
+
+function openHowToDialog(p, promptText, extraSub) {
+  if (!p) return;
+  if (!promptText) {
+    // Defensive — copy succeeded but text was unexpectedly empty. Toast
+    // so the user at least gets confirmation instead of total silence.
+    showToast(extraSub ? `Prompt copied! ${extraSub}` : 'Prompt copied!');
+    return;
+  }
+  $howtoText.value = promptText;
+  const noteSpan = $howtoNote.querySelector('span');
+  if (p.notes && p.notes.trim()) {
+    noteSpan.textContent = p.notes;
+    $howtoNote.hidden = false;
+  } else {
+    noteSpan.textContent = 'Upload a clear, well-lit photo for best results.';
+    $howtoNote.hidden = false;
+  }
+  $howtoSub.innerHTML = (extraSub ? `<span class="howto-extra">${escapeHtml(extraSub)}</span> &middot; ` : '')
+    + `Heads up — this is a <strong>prompt-only tool</strong>. We don't make the image for you. Use ChatGPT (or Gemini) to generate it from your photo + this prompt.`;
+  if (typeof $howto.showModal === 'function') $howto.showModal();
+  else $howto.setAttribute('open', '');
+}
+
+function closeHowToDialog() {
+  if (typeof $howto.close === 'function') $howto.close();
+  else $howto.removeAttribute('open');
+}
+
+$howto.addEventListener('click', (e) => {
+  if (e.target === $howto) closeHowToDialog();
+  if (e.target.closest('[data-howto-close]') || e.target.closest('.ph-dialog-close')) closeHowToDialog();
+});
+
+const _howtoCopyOriginalHTML = $howtoCopyBtn.innerHTML;
+let _howtoCopyResetTimer = null;
+$howtoCopyBtn.addEventListener('click', async () => {
+  const text = $howtoText.value;
+  if (!text) return;
+  $howtoText.select();
+  try {
+    const ok = await copyText(text);
+    if (ok) {
+      $howtoCopyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      clearTimeout(_howtoCopyResetTimer);
+      _howtoCopyResetTimer = setTimeout(() => {
+        $howtoCopyBtn.innerHTML = _howtoCopyOriginalHTML;
+      }, 1400);
+    } else {
+      showToast('Could not copy — select the text and press Ctrl+C');
+    }
+  } catch {
+    showToast('Could not copy — select the text and press Ctrl+C');
+  }
+});
+
 // ---- Global body.dialog-open toggling -----------------------------
 // Add a `dialog-open` class on <body> whenever ANY ph-dialog is open so
 // CSS can hide overlapping fixed elements (user widget, anon counter)
@@ -274,6 +336,13 @@ $phForm.addEventListener('submit', async (e) => {
   const values = {};
   for (const [k, v] of data.entries()) values[k] = String(v).trim();
   const copiedPrompt = activePrompt;
+  const phSubmitBtn = $phForm.querySelector('button[type="submit"]');
+  const _phOrigLabel = phSubmitBtn ? phSubmitBtn.innerHTML : '';
+  if (phSubmitBtn) {
+    phSubmitBtn.classList.add('loading');
+    phSubmitBtn.disabled = true;
+    phSubmitBtn.innerHTML = '<span class="spinner"></span> Working…';
+  }
 
   // Use deferred-ClipboardItem so the user-gesture survives the Firestore
   // credit-consume and prompt-fetch awaits below.
@@ -291,6 +360,11 @@ $phForm.addEventListener('submit', async (e) => {
 
   let ok = false;
   try { ok = await copyText(textPromise); } catch { ok = false; }
+  if (phSubmitBtn) {
+    phSubmitBtn.classList.remove('loading');
+    phSubmitBtn.disabled = false;
+    phSubmitBtn.innerHTML = _phOrigLabel;
+  }
   closePhDialog();
 
   if (accessResult && !accessResult.ok) return;
@@ -299,10 +373,19 @@ $phForm.addEventListener('submit', async (e) => {
     showToast('Could not load this prompt. Please try again.');
     return;
   }
+  const subInfo = accessResult && accessResult.creditUsed
+    ? `${accessResult.creditsLeft} credit${accessResult.creditsLeft === 1 ? '' : 's'} left`
+    : '';
+  let resolvedText = '';
+  try { resolvedText = await Promise.resolve(textPromise); } catch {}
   if (ok) {
-    showToast(accessResult && accessResult.creditUsed
-      ? `Prompt copied! ${accessResult.creditsLeft} credit${accessResult.creditsLeft === 1 ? '' : 's'} left.`
-      : 'Prompt generated & copied!');
+    openHowToDialog(copiedPrompt, resolvedText, subInfo);
+    if (typeof recordCopy === 'function') recordCopy(copiedPrompt);
+  } else if (resolvedText) {
+    // Clipboard write failed but the prompt text loaded — still show the
+    // dialog so the user can select & copy manually from the textarea.
+    showToast('Auto-copy blocked — copy from the box below');
+    openHowToDialog(copiedPrompt, resolvedText, subInfo);
     if (typeof recordCopy === 'function') recordCopy(copiedPrompt);
   } else {
     showToast('Could not copy — please copy manually');
@@ -331,6 +414,15 @@ $grid.addEventListener('click', async (e) => {
       openPhDialog(p);
       return;
     }
+    // Use a stable label rather than the current innerHTML — if the user
+    // re-clicks while the button is still showing "Copied!" from a previous
+    // run, capturing innerHTML would lock it as "Copied!" forever.
+    const _origLabel = '<i class="far fa-copy"></i> Copy Prompt';
+    if (copyBtn._copyResetTimer) { clearTimeout(copyBtn._copyResetTimer); copyBtn._copyResetTimer = null; }
+    copyBtn.classList.remove('copied');
+    copyBtn.classList.add('loading');
+    copyBtn.disabled = true;
+    copyBtn.innerHTML = '<span class="spinner"></span> Working…';
     // Run access check + text fetch as a Promise that resolves with the
     // raw prompt text. Pass the *promise* (not the resolved text) into
     // copyText so the deferred-ClipboardItem API preserves the user-gesture
@@ -352,6 +444,11 @@ $grid.addEventListener('click', async (e) => {
     } catch {
       ok = false;
     }
+    // Always clear the loading state — even on access-denied or load-error
+    // early returns, otherwise the button stays stuck on "Working…".
+    copyBtn.classList.remove('loading');
+    copyBtn.disabled = false;
+    copyBtn.innerHTML = _origLabel;
 
     if (accessResult && !accessResult.ok) return; // ensureCopyAccess already toasted
     if (loadError) {
@@ -359,17 +456,24 @@ $grid.addEventListener('click', async (e) => {
       showToast('Could not load this prompt. Please try again.');
       return;
     }
+    const subInfo = accessResult && accessResult.creditUsed
+      ? `${accessResult.creditsLeft} credit${accessResult.creditsLeft === 1 ? '' : 's'} left`
+      : '';
+    let resolvedText = '';
+    try { resolvedText = await Promise.resolve(textPromise); } catch {}
     if (ok) {
-      showToast(accessResult && accessResult.creditUsed
-        ? `Prompt copied! ${accessResult.creditsLeft} credit${accessResult.creditsLeft === 1 ? '' : 's'} left.`
-        : 'Prompt copied — paste into your AI image tool');
+      openHowToDialog(p, resolvedText, subInfo);
       copyBtn.classList.add('copied');
-      const original = copyBtn.innerHTML;
       copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-      setTimeout(() => {
+      copyBtn._copyResetTimer = setTimeout(() => {
         copyBtn.classList.remove('copied');
-        copyBtn.innerHTML = original;
+        copyBtn.innerHTML = _origLabel;
+        copyBtn._copyResetTimer = null;
       }, 1600);
+      if (typeof recordCopy === 'function') recordCopy(p);
+    } else if (resolvedText) {
+      showToast('Auto-copy blocked — copy from the box below');
+      openHowToDialog(p, resolvedText, subInfo);
       if (typeof recordCopy === 'function') recordCopy(p);
     } else {
       showToast('Could not copy — please copy manually');
@@ -398,7 +502,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
 import {
   getFirestore, doc, getDoc, setDoc, deleteDoc, serverTimestamp, increment,
-  collection, addDoc, getDocs, query, orderBy, limit, writeBatch
+  collection, addDoc, getDocs, query, orderBy, limit, writeBatch, runTransaction
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 const PG_COLLECTION = 'prompt_gallery_users';
@@ -608,6 +712,7 @@ $authForm.addEventListener('submit', async (e) => {
       payload.free_credits = FREE_CREDITS_PER_MONTH;
       payload.paid_credits = 0;
       payload.credits_reset_at = serverTimestamp();
+      payload.signup_day = new Date().getDate();
     }
     await setDoc(ref, payload, { merge: true });
     saveUser({
@@ -809,7 +914,7 @@ async function logoutUser() {
   }
   try { localStorage.removeItem(LS_KEY); } catch {}
   FAVORITES.clear();
-  creditState = { free: 0, paid: 0, resetAt: 0, loaded: false };
+  creditState = { free: 0, paid: 0, resetAt: 0, nextRefillAt: 0, signupDay: 0, loaded: false, loading: false };
   if (typeof memberTextCache !== 'undefined') memberTextCache.clear();
   if (typeof renderCreditUI === 'function') renderCreditUI();
   if (currentFilter === 'favorites') {
@@ -1379,39 +1484,161 @@ updateFavoritesUI();
 // ===== Credits (member-tier prompts cost 1 credit) ==========
 // ============================================================
 const FREE_CREDITS_PER_MONTH = 10;
-const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const BIZ_WHATSAPP = '917749984274'; // BankiBites / AK Creation contact
-let creditState = { free: 0, paid: 0, resetAt: 0, loaded: false };
+let creditState = { free: 0, paid: 0, resetAt: 0, nextRefillAt: 0, signupDay: 0, loaded: false, loading: false };
 
 function totalCredits() { return (creditState.free || 0) + (creditState.paid || 0); }
 
+// Coerce a Firestore field value into a safe non-negative integer.
+// Handles both numbers and numeric strings (in case wallet credits were
+// added via the Firebase Console as a string instead of a number).
+function asCreditNumber(v) {
+  if (typeof v === 'number' && Number.isFinite(v)) return Math.max(0, Math.floor(v));
+  if (typeof v === 'string') {
+    const n = Number(v.trim());
+    if (Number.isFinite(n)) return Math.max(0, Math.floor(n));
+  }
+  return 0;
+}
+
+// Returns the next monthly anniversary date AFTER fromMs, anchored to signupDay.
+// Handles short months: e.g. signupDay 31 → 30/29/28 in shorter months.
+function nextAnniversaryAfter(signupDay, fromMs) {
+  const from = new Date(fromMs);
+  let y = from.getFullYear();
+  let m = from.getMonth();
+  for (let i = 0; i < 25; i++) {
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const day = Math.min(signupDay, daysInMonth);
+    const candidate = new Date(y, m, day, 0, 0, 0, 0);
+    if (candidate.getTime() > fromMs) return candidate;
+    m++; if (m > 11) { m = 0; y++; }
+  }
+  return null;
+}
+
+let _loadCreditsInFlight = null;
 async function loadCredits() {
+  if (_loadCreditsInFlight) return _loadCreditsInFlight;
+  _loadCreditsInFlight = (async () => {
   const u = readSavedUser();
-  if (!u) { creditState = { free: 0, paid: 0, resetAt: 0, loaded: false }; renderCreditUI(); return; }
+  if (!u) {
+    creditState = { free: 0, paid: 0, resetAt: 0, nextRefillAt: 0, signupDay: 0, loaded: false, loading: false };
+    renderCreditUI();
+    return;
+  }
+  creditState.loading = true;
+  renderCreditUI();
+  const loadingForUid = u.uid;
   try {
     const { db } = await getFirebase();
     const ref = doc(db, PG_COLLECTION, u.uid);
     const snap = await getDoc(ref);
+    // Bail out if the user signed out (or switched) while we were waiting.
+    const currentUser = readSavedUser();
+    if (!currentUser || currentUser.uid !== loadingForUid) {
+      creditState.loading = false;
+      renderCreditUI();
+      return;
+    }
     const data = snap.exists() ? snap.data() : {};
-    let free = (typeof data.free_credits === 'number') ? data.free_credits : FREE_CREDITS_PER_MONTH;
-    const paid = (typeof data.paid_credits === 'number') ? data.paid_credits : 0;
-    const resetAt = data.credits_reset_at?.toMillis?.() || 0;
-    // Monthly reset: if last reset was >30 days ago (or never), bump free to allowance.
-    if (!resetAt || Date.now() - resetAt > MONTH_MS) {
-      free = FREE_CREDITS_PER_MONTH;
-      await setDoc(ref, {
-        free_credits: free,
-        credits_reset_at: serverTimestamp(),
-      }, { merge: true });
-      creditState = { free, paid, resetAt: Date.now(), loaded: true };
-    } else {
-      creditState = { free, paid, resetAt, loaded: true };
+    let free = (data.free_credits === undefined) ? FREE_CREDITS_PER_MONTH : asCreditNumber(data.free_credits);
+    const paid = asCreditNumber(data.paid_credits);
+    const createdAtMs = data.created_at?.toMillis?.() || Date.now();
+    // For legacy accounts that predate this field, treat the cycle as
+    // starting NOW — otherwise we'd back-fill every anniversary since
+    // they signed up (potentially +60, +120 credits).
+    const hasResetAtField = !!data.credits_reset_at?.toMillis;
+    let resetAt = hasResetAtField ? data.credits_reset_at.toMillis() : Date.now();
+    const signupDay = (typeof data.signup_day === 'number' && data.signup_day >= 1 && data.signup_day <= 31)
+      ? data.signup_day
+      : new Date(createdAtMs).getDate();
+
+    // Monthly free-credit refill, "top-up" semantics: at each missed
+    // anniversary we ensure free is at least FREE_CREDITS_PER_MONTH (10).
+    // If the user already has more than 10 free credits, no top-up happens
+    // (so users never feel punished by the refill). Paid (wallet) credits
+    // are never touched here — they accumulate separately via Buy.
+    // Persist via a transaction so two tabs / devices can't double-grant.
+    let creditsAdded = 0;
+    let next = nextAnniversaryAfter(signupDay, resetAt);
+    const needsSignupDay = typeof data.signup_day !== 'number';
+    const needsSeed = !hasResetAtField;
+    if ((next && next.getTime() <= Date.now()) || needsSignupDay || needsSeed) {
+      try {
+        const txResult = await runTransaction(db, async (tx) => {
+          const fresh = await tx.get(ref);
+          const fd = fresh.exists() ? fresh.data() : {};
+          let fResetAt = fd.credits_reset_at?.toMillis?.() || resetAt;
+          let fFree = (fd.free_credits === undefined) ? free : asCreditNumber(fd.free_credits);
+          let cyclesPassed = 0;
+          let n = nextAnniversaryAfter(signupDay, fResetAt);
+          const t = Date.now();
+          while (n && n.getTime() <= t) {
+            cyclesPassed++;
+            fResetAt = n.getTime();
+            n = nextAnniversaryAfter(signupDay, fResetAt);
+          }
+          // Apply top-up once if any cycle passed — repeating it is the
+          // same as doing it once because the floor is FREE_CREDITS_PER_MONTH.
+          let added = 0;
+          if (cyclesPassed > 0 && fFree < FREE_CREDITS_PER_MONTH) {
+            added = FREE_CREDITS_PER_MONTH - fFree;
+            fFree = FREE_CREDITS_PER_MONTH;
+          }
+          const patch = {};
+          if (typeof fd.signup_day !== 'number') patch.signup_day = signupDay;
+          if (cyclesPassed > 0) {
+            if (added > 0) patch.free_credits = increment(added);
+            patch.credits_reset_at = new Date(fResetAt);
+          } else if (!fd.credits_reset_at?.toMillis) {
+            patch.credits_reset_at = new Date(fResetAt);
+          }
+          if (Object.keys(patch).length > 0) tx.set(ref, patch, { merge: true });
+          return { added, fResetAt, fFree, nextAfter: n };
+        });
+        creditsAdded = txResult.added;
+        free = txResult.fFree;
+        resetAt = txResult.fResetAt;
+        next = txResult.nextAfter;
+      } catch (e) {
+        console.warn('[prompt-gallery] persist refill failed', e);
+        // Fall back to client-computed numbers.
+        const t = Date.now();
+        let cyclesPassed = 0;
+        while (next && next.getTime() <= t) {
+          cyclesPassed++;
+          resetAt = next.getTime();
+          next = nextAnniversaryAfter(signupDay, resetAt);
+        }
+        if (cyclesPassed > 0 && free < FREE_CREDITS_PER_MONTH) {
+          creditsAdded = FREE_CREDITS_PER_MONTH - free;
+          free = FREE_CREDITS_PER_MONTH;
+        }
+      }
+    }
+
+    creditState = {
+      free, paid,
+      resetAt,
+      nextRefillAt: next ? next.getTime() : 0,
+      signupDay,
+      loaded: true,
+      loading: false,
+      justAdded: creditsAdded,
+    };
+
+    if (creditsAdded > 0) {
+      showToast(`Monthly free credits topped up to ${FREE_CREDITS_PER_MONTH} (+${creditsAdded})`);
     }
   } catch (err) {
     console.warn('[prompt-gallery] loadCredits failed', err);
-    creditState.loaded = true; // best-effort — keep going so UI doesn't hang
+    creditState.loaded = true;
+    creditState.loading = false;
   }
   renderCreditUI();
+  })();
+  try { await _loadCreditsInFlight; } finally { _loadCreditsInFlight = null; }
 }
 
 async function consumeCredit() {
@@ -1422,15 +1649,37 @@ async function consumeCredit() {
   try {
     const { db } = await getFirebase();
     const ref = doc(db, PG_COLLECTION, u.uid);
-    const updates = {};
-    if (creditState.free > 0) {
-      updates.free_credits = increment(-1);
-      creditState.free = Math.max(0, creditState.free - 1);
-    } else {
-      updates.paid_credits = increment(-1);
-      creditState.paid = Math.max(0, creditState.paid - 1);
+    // Use a transaction so two tabs / devices can't decrement below zero.
+    // The transaction re-reads inside the critical section and bails if
+    // credits have already been spent elsewhere.
+    const result = await runTransaction(db, async (tx) => {
+      const fresh = await tx.get(ref);
+      if (!fresh.exists()) return { ok: false, free: 0, paid: 0 };
+      const fd = fresh.data();
+      const freeNow = asCreditNumber(fd.free_credits);
+      const paidNow = asCreditNumber(fd.paid_credits);
+      if (freeNow + paidNow <= 0) return { ok: false, free: freeNow, paid: paidNow };
+      const patch = {};
+      let newFree = freeNow, newPaid = paidNow;
+      if (freeNow > 0) {
+        patch.free_credits = increment(-1);
+        newFree = freeNow - 1;
+      } else {
+        patch.paid_credits = increment(-1);
+        newPaid = paidNow - 1;
+      }
+      tx.set(ref, patch, { merge: true });
+      return { ok: true, free: newFree, paid: newPaid };
+    });
+    if (!result.ok) {
+      // Re-sync local state — another tab spent our last credit.
+      creditState.free = result.free;
+      creditState.paid = result.paid;
+      renderCreditUI();
+      return false;
     }
-    await setDoc(ref, updates, { merge: true });
+    creditState.free = result.free;
+    creditState.paid = result.paid;
     renderCreditUI();
     return true;
   } catch (err) {
@@ -1475,32 +1724,83 @@ async function ensureCopyAccess(p) {
     return { ok: false, creditUsed: false, creditsLeft: 0 };
   }
   const ok = await consumeCredit();
+  if (!ok) {
+    // Transaction-safe consumeCredit refused — another tab/device likely
+    // spent our last credit. Tell the user instead of silently failing.
+    showToast("Out of credits — open a new tab? Refresh to re-sync.");
+    openBuyDialog();
+  }
   return { ok, creditUsed: ok, creditsLeft: totalCredits() };
 }
 
 // ===== Credit UI rendering =====
+function formatRefillDate(ms) {
+  if (!ms) return '';
+  try {
+    return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  } catch { return ''; }
+}
+
 function renderCreditUI() {
   const total = totalCredits();
+  const $stack  = document.querySelector('.credit-stack');
   const $line   = document.querySelector('.credit-line');
+  const $wallet = document.querySelector('.wallet-line');
   const $count  = document.getElementById('credit-line-count');
+  const $wcount = document.getElementById('wallet-line-count');
+  const $next   = document.getElementById('credit-line-next');
+  const $nextDate = document.getElementById('credit-line-next-date');
+  const $buyNow = document.getElementById('buy-credits-now');
+  const $buyMonthly = document.getElementById('buy-monthly-now');
   const $chipName = document.getElementById('user-chip-name');
-  // Drop any existing pill so we re-render cleanly
   document.querySelector('.user-chip-credit')?.remove();
   if (!readSavedUser()) {
-    if ($line) $line.style.display = 'none';
+    if ($stack) $stack.style.display = 'none';
     return;
   }
+  if ($stack) $stack.style.display = 'flex';
   if ($line) {
     $line.style.display = 'flex';
-    $line.classList.toggle('low', total <= 3);
+    // "Low" highlight on the monthly row: free credits at/below 3 = low.
+    $line.classList.toggle('low', !creditState.loading && (creditState.free || 0) <= 3);
   }
-  if ($count) $count.textContent = String(total);
-  // Add a tiny credit pill next to the user-chip name (visible in hero)
+  if ($wallet) $wallet.style.display = 'flex';
+  const spinner = '<span class="spinner credit-loading" aria-label="Loading credits"></span>';
+  if ($count) {
+    $count.innerHTML = creditState.loading ? spinner : String(creditState.free || 0);
+  }
+  if ($wcount) {
+    $wcount.innerHTML = creditState.loading ? spinner : String(creditState.paid || 0);
+  }
+  if ($buyMonthly) {
+    $buyMonthly.innerHTML = creditState.loading ? spinner : String(creditState.free || 0);
+  }
+  if ($buyNow) {
+    $buyNow.innerHTML = creditState.loading ? spinner : String(creditState.paid || 0);
+  }
+  if ($next && $nextDate) {
+    if (!creditState.loading && creditState.nextRefillAt) {
+      $nextDate.textContent = formatRefillDate(creditState.nextRefillAt);
+      $next.hidden = false;
+    } else {
+      $next.hidden = true;
+    }
+  }
+  // Tiny credit pill next to the user-chip name (visible in hero).
+  // Shows TOTAL — tooltip breaks down the split.
   if ($chipName) {
     const pill = document.createElement('span');
-    pill.className = 'user-chip-credit' + (total <= 3 ? ' low' : '');
-    pill.innerHTML = `<i class="fas fa-bolt"></i> ${total}`;
-    pill.title = `${total} credits remaining`;
+    pill.className = 'user-chip-credit' + (!creditState.loading && total <= 3 ? ' low' : '');
+    if (creditState.loading) {
+      pill.innerHTML = '<span class="spinner" aria-label="Loading credits"></span>';
+      pill.title = 'Loading credits…';
+    } else {
+      pill.innerHTML = `<i class="fas fa-bolt"></i> ${total}`;
+      const refillNote = creditState.nextRefillAt
+        ? ` · refills on ${formatRefillDate(creditState.nextRefillAt)}`
+        : '';
+      pill.title = `Monthly ${creditState.free || 0}/${FREE_CREDITS_PER_MONTH} · Wallet ${creditState.paid || 0}${refillNote}`;
+    }
     $chipName.insertAdjacentElement('afterend', pill);
   }
 }
@@ -1511,7 +1811,12 @@ const $buyCreditsNow   = document.getElementById('buy-credits-now');
 
 function openBuyDialog() {
   if (!readSavedUser()) { resetAuthDialog(); openAuthDialog(); return; }
-  $buyCreditsNow.textContent = String(totalCredits());
+  // Refresh credits in case admin just topped up after a WhatsApp payment.
+  // The single-flight guard inside loadCredits prevents duplicate work.
+  loadCredits();
+  // renderCreditUI keeps both #buy-monthly-now and #buy-credits-now in sync
+  // with the split state, including the loading spinner.
+  renderCreditUI();
   // Reset the dynamic foot text to its default each time we open.
   const foot = $buyDialog.querySelector('.buy-foot');
   if (foot) foot.dataset.default = foot.textContent;
@@ -1600,6 +1905,21 @@ getFirebase().then(({ auth }) => {
   onAuthStateChanged(auth, () => loadCredits());
 });
 if (readSavedUser()) loadCredits();
+
+// Refresh credits when the tab regains focus — so admin top-ups (after a
+// WhatsApp purchase) show up without the user having to hard-refresh.
+// Rate-limited to one fetch per 5 seconds.
+let _lastCreditsRefreshAt = 0;
+function maybeRefreshCredits() {
+  if (document.visibilityState !== 'visible') return;
+  if (!readSavedUser()) return;
+  const now = Date.now();
+  if (now - _lastCreditsRefreshAt < 5000) return;
+  _lastCreditsRefreshAt = now;
+  loadCredits();
+}
+document.addEventListener('visibilitychange', maybeRefreshCredits);
+window.addEventListener('focus', maybeRefreshCredits);
 renderCreditUI();
 
 // ============================================================
