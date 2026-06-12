@@ -714,7 +714,17 @@ function renderPrepaidCod(orders, p) {
   const delivered = orders.filter(isDelivered);
   let prepaid = 0, cod = 0;
   for (const o of delivered) {
-    if ((Number(o.paid_already) || 0) > 0) prepaid++; else cod++;
+    // Classify by paid_method, not paid_already. After the delivery-partner
+    // patch, every COD order ends up with paid_already > 0 once collected at
+    // the door, so the old paid_already check incorrectly counted COD as
+    // Prepaid. paid_method captures the true channel: cash = COD,
+    // upi/online = Prepaid. Legacy delivered orders without a paid_method
+    // fall back to the paid_already heuristic.
+    const method = String(o.paid_method || '').toLowerCase();
+    if (method === 'upi' || method === 'online') prepaid++;
+    else if (method === 'cash') cod++;
+    else if ((Number(o.paid_already) || 0) > 0) prepaid++;
+    else cod++;
   }
   mountChart('dashPrepaidCod', {
     type: 'doughnut',
