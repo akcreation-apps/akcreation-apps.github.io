@@ -289,9 +289,70 @@ function closeHowToDialog() {
 }
 
 $howto.addEventListener('click', (e) => {
+  // App-first opener for the ChatGPT / Gemini links inside this dialog.
+  // Tries the native app, falls back to the browser if it isn't installed.
+  const appLink = e.target.closest('[data-open-app]');
+  if (appLink) {
+    e.preventDefault();
+    openAppOrWeb({
+      scheme: appLink.dataset.appScheme,
+      androidPkg: appLink.dataset.androidPkg,
+      webUrl: appLink.dataset.webUrl,
+    });
+    return;
+  }
   if (e.target === $howto) closeHowToDialog();
   if (e.target.closest('[data-howto-close]') || e.target.closest('.ph-dialog-close')) closeHowToDialog();
 });
+
+// Try to open the native app for the given URL scheme; fall back to the
+// browser URL if the app isn't installed (or on desktop where custom
+// schemes don't apply).
+function openAppOrWeb({ scheme, androidPkg, webUrl }) {
+  const ua = navigator.userAgent || '';
+  const isAndroid = /android/i.test(ua);
+  const isIOS = /iphone|ipad|ipod/i.test(ua);
+
+  // Desktop / unknown: just open the web URL in a new tab.
+  if (!isAndroid && !isIOS) {
+    window.open(webUrl, '_blank', 'noopener');
+    return;
+  }
+
+  // Android: use an Intent URL — the OS opens the app if installed
+  // (matching the package), otherwise navigates to browser_fallback_url.
+  if (isAndroid && androidPkg) {
+    const host = webUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const fallback = encodeURIComponent(webUrl);
+    const intentUrl = `intent://${host}/#Intent;scheme=https;package=${androidPkg};S.browser_fallback_url=${fallback};end`;
+    window.location.href = intentUrl;
+    return;
+  }
+
+  // iOS: try the custom scheme; if nothing handles it within ~1.2s,
+  // fall back to the web URL. We watch document.visibilityState — when
+  // the app takes over, the page becomes hidden and we cancel the fallback.
+  if (isIOS && scheme) {
+    let cancelled = false;
+    const onHide = () => {
+      if (document.hidden) cancelled = true;
+    };
+    document.addEventListener('visibilitychange', onHide, { once: true });
+    const start = Date.now();
+    setTimeout(() => {
+      document.removeEventListener('visibilitychange', onHide);
+      if (cancelled) return;
+      // If the user has been on the page the whole time, the scheme
+      // didn't open anything — fall through to the browser URL.
+      if (Date.now() - start < 1500) window.location.href = webUrl;
+    }, 1200);
+    window.location.href = scheme;
+    return;
+  }
+
+  // Last resort: just open the web URL.
+  window.open(webUrl, '_blank', 'noopener');
+}
 
 const _howtoCopyOriginalHTML = $howtoCopyBtn.innerHTML;
 let _howtoCopyResetTimer = null;

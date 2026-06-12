@@ -139,7 +139,7 @@
   <!-- SweetAlert2 — for confirmations and rich alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <link rel="stylesheet" href="style.css?v=20260612a">
+  <link rel="stylesheet" href="style.css?v=20260612b">
 </head>
 <body>
 
@@ -482,8 +482,22 @@
           <div>
             <strong>Open ChatGPT</strong> (or Gemini) on your phone or computer.
             <div class="howto-actions">
-              <a href="https://chatgpt.com/" target="_blank" rel="noopener" class="howto-link"><i class="fas fa-arrow-up-right-from-square"></i> Open ChatGPT</a>
-              <a href="https://gemini.google.com/app" target="_blank" rel="noopener" class="howto-link"><i class="fas fa-arrow-up-right-from-square"></i> Open Gemini</a>
+              <a class="howto-link"
+                 data-open-app="chatgpt"
+                 data-app-scheme="chatgpt://"
+                 data-android-pkg="com.openai.chatgpt"
+                 data-web-url="https://chatgpt.com/"
+                 href="https://chatgpt.com/" target="_blank" rel="noopener">
+                <i class="fas fa-arrow-up-right-from-square"></i> Open ChatGPT
+              </a>
+              <a class="howto-link"
+                 data-open-app="gemini"
+                 data-app-scheme="googlegemini://"
+                 data-android-pkg="com.google.android.apps.bard"
+                 data-web-url="https://gemini.google.com/app"
+                 href="https://gemini.google.com/app" target="_blank" rel="noopener">
+                <i class="fas fa-arrow-up-right-from-square"></i> Open Gemini
+              </a>
             </div>
           </div>
         </li>
@@ -528,6 +542,6 @@
     document.getElementById('footer-year').textContent = new Date().getFullYear();
   </script>
 
-  <script type="module" src="script.js?v=20260612a"></script>
+  <script type="module" src="script.js?v=20260612b"></script>
 </body>
 </html>
