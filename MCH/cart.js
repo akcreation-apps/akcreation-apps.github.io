@@ -327,13 +327,39 @@ placeOrderButton.addEventListener('click', () => {
     } else{
         phoneNo = localStorage.getItem(lsKey('whatsapp_no'));
     }
-    collect_data()
-    localStorage.setItem(lsKey('order_date'), today);
-    localStorage.setItem(lsKey('order_count'), ordersToday + 1);
-    sendWhatsAppMessage(orderMessage, phoneNo); // Send WhatsApp message
     hideLoader();
-    Swal.fire('Success', 'Order Placed Successfully.', 'success').then(() => {
-        location.reload(); // Reload the page after clicking OK
+    // Gate the wa.me navigation behind a Swal confirm so the confirm-button
+    // click is a fresh, dedicated user gesture. Without this, Android Chrome
+    // intermittently drops the cross-app navigation (Firebase still writes
+    // because collect_data fires here, but WhatsApp never opens — the bug
+    // some customers hit on attempt 1 & 2). The post-send "Success" modal
+    // is gone for the same reason: a Swal opening right after location.href
+    // can cancel the pending navigation. Reload runs only when the customer
+    // returns from WhatsApp.
+    const etaTime = new Date(Date.now() + 60 * 60 * 1000)
+        .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    Swal.fire({
+        title: 'Place order?',
+        icon: 'question',
+        html: `<div style="font-size:.95rem;line-height:1.5">We'll do our best to reach you by <b>${etaTime}</b>.<br><small>Thank you for your patience 🙏</small></div>`,
+        showCancelButton: true,
+        confirmButtonText: 'Send on WhatsApp',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#16a34a',
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+        localStorage.setItem(lsKey('order_date'), today);
+        localStorage.setItem(lsKey('order_count'), ordersToday + 1);
+        const onReturn = () => {
+            if (document.visibilityState !== 'visible') return;
+            document.removeEventListener('visibilitychange', onReturn);
+            window.removeEventListener('pageshow', onReturn);
+            location.reload();
+        };
+        document.addEventListener('visibilitychange', onReturn);
+        window.addEventListener('pageshow', onReturn);
+        collect_data();
+        sendWhatsAppMessage(orderMessage, phoneNo);
     });
 });
 

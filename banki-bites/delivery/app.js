@@ -450,7 +450,22 @@ function renderCard(db, o) {
     }
 
     const patch = { status: next };
-    if (next === 'delivered') patch.delivered_at = Timestamp.now();
+    if (next === 'delivered') {
+      patch.delivered_at = Timestamp.now();
+      // If there was still an amount to collect at the door, roll it into
+      // paid_already so history reflects "this is now fully paid" instead of
+      // leaving the order looking like it still owes money. Discount is left
+      // untouched so net-revenue math stays correct. When nothing was owed
+      // (already fully paid), touch no payment fields — the admin-recorded
+      // breakdown (discount / paid_already / paid_method) must survive.
+      const collectNum = Number.isFinite(+collectAmt) ? +collectAmt : 0;
+      if (mustCollect && collectNum > 0) {
+        patch.paid_already      = prepaid + collectNum;
+        patch.paid_method       = o.paid_method || 'cash';
+        patch.collect_amount    = 0;
+        patch.payment_collected = true;
+      }
+    }
     try {
       window.bbBusy('Updating status…');
       await updateDoc(doc(db, COL.ORDERS, o.id), patch);
