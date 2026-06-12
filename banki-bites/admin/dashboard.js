@@ -65,10 +65,6 @@ export async function renderDashboard(root, db) {
         <div class="chart-card-head"><i class="fas fa-location-dot"></i> Top areas</div>
         <div class="chart-card-body"><canvas id="dashTopAreas"></canvas></div>
       </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-money-check-dollar"></i> Payment collected (delivered)</div>
-        <div class="chart-card-body"><canvas id="dashPaymentMix"></canvas></div>
-      </div>
       <div class="chart-card chart-card--wide">
         <div class="chart-card-head"><i class="fas fa-motorcycle"></i> Delivery partner payouts (₹)</div>
         <div class="chart-card-body"><canvas id="dashPartnerPayouts"></canvas></div>
@@ -268,7 +264,6 @@ async function refresh(root, db) {
   renderMonthOverMonth(orders, p);
   renderTopRestaurants(orders, p);
   renderTopAreas(orders, p);
-  renderPaymentMix(orders, p);
   renderPartnerPayouts(orders, staff, rules, p);
   renderFarNear(orders, rules, p);
   renderCancelRate(orders, p);
@@ -502,20 +497,6 @@ function renderTopAreas(orders, p) {
       plugins: { legend: { display: false } },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
-  });
-}
-
-function renderPaymentMix(orders, p) {
-  const delivered = orders.filter(isDelivered);
-  const paid   = delivered.filter(o => o.payment_collected !== false).length;
-  const unpaid = delivered.length - paid;
-  mountChart('dashPaymentMix', {
-    type: 'doughnut',
-    data: {
-      labels: ['Collected', 'Pending'],
-      datasets: [{ data: [paid, unpaid], backgroundColor: [p.status.delivered, p.status.cancelled], borderWidth: 0 }],
-    },
-    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
   });
 }
 
