@@ -62,8 +62,11 @@ export async function renderOrders(root, db) {
       </div>
     </details>
 
-    <div class="section-header section-header--compact section-header--end section-header--sticky">
-      <select id="orderFilter" class="form-control form-control-sm" style="width:auto;min-width:140px;max-width:200px">
+    <div class="section-header section-header--compact section-header--end section-header--sticky orders-filter-bar">
+      <select id="restaurantFilter" class="form-control form-control-sm orders-filter-bar__select" aria-label="Filter by restaurant">
+        <option value="all">All restaurants</option>
+      </select>
+      <select id="orderFilter" class="form-control form-control-sm orders-filter-bar__select" aria-label="Filter by status">
         <option value="active">Active</option>
         <option value="new">New only</option>
         <option value="assigned">Assigned</option>
@@ -90,11 +93,38 @@ export async function renderOrders(root, db) {
 
   const listEl = document.getElementById('ordersList');
   const filter = document.getElementById('orderFilter');
+  const restaurantFilter = document.getElementById('restaurantFilter');
+
+  // Rebuild the restaurant <option> list from the orders we've loaded, while
+  // preserving the admin's current selection if that restaurant is still
+  // present. Cheap to rerun on every snapshot — there are only a handful of
+  // restaurants in practice.
+  function refreshRestaurantOptions() {
+    const names = new Set();
+    for (const o of allOrders) {
+      const label = (o.restaurant_name || o.restaurant_id || '').trim();
+      if (label) names.add(label);
+    }
+    const sorted = [...names].sort((a, b) => a.localeCompare(b));
+    const prev = restaurantFilter.value || 'all';
+    // Trim the visible label to keep mobile dropdowns from blowing out the row;
+    // the full restaurant name lives on the `title` so it's still discoverable.
+    const trimLabel = n => (n.length > 10 ? n.slice(0, 10) + '…' : n);
+    restaurantFilter.innerHTML =
+      '<option value="all">All restaurants</option>' +
+      sorted.map(n => `<option value="${escapeAttr(n)}" title="${escapeAttr(n)}">${escapeHtml(trimLabel(n))}</option>`).join('');
+    restaurantFilter.value = sorted.includes(prev) ? prev : 'all';
+  }
 
   let allOrders = [];
   function render() {
     const f = filter.value;
+    const r = restaurantFilter.value;
     const filtered = allOrders.filter(o => {
+      if (r !== 'all') {
+        const label = (o.restaurant_name || o.restaurant_id || '').trim();
+        if (label !== r) return false;
+      }
       if (f === 'fake')   return o.status === 'fake' || o.is_fake === true;
       if (f === 'all')    return true;
       if (f === 'active') return o.status !== 'delivered' && o.status !== 'cancelled' && o.status !== 'fake';
@@ -123,6 +153,7 @@ export async function renderOrders(root, db) {
     renderOrdersStats(allOrders, filtered);
   }
   filter.addEventListener('change', render);
+  restaurantFilter.addEventListener('change', render);
 
   // Only fetch orders from the first day of the previous calendar month onward
   // so admin never pulls years of history into memory. Single-field range query
@@ -137,6 +168,7 @@ export async function renderOrders(root, db) {
       const tb = b.created_at?.toMillis?.() || 0;
       return tb - ta;
     });
+    refreshRestaurantOptions();
     render();
   }, err => {
     listEl.innerHTML = `<div class="empty-state"><i class="fas fa-triangle-exclamation"></i><p>${err.message}</p></div>`;
@@ -236,9 +268,13 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     ? `${escapeHtml(effectiveName)}${cust.phone ? ' · ' + escapeHtml(cust.phone) : ''}`
     : '<em>Not added</em>';
 
-  const paymentBadge = paymentCollected
-    ? '<span class="status-pill status-paid">PAID</span>'
-    : '<span class="status-pill status-unpaid">UNPAID</span>';
+  // Fake orders never had a real transaction — hide the PAID/UNPAID chip
+  // entirely so the row doesn't misleadingly read as collected money.
+  const paymentBadge = isFake
+    ? ''
+    : (paymentCollected
+        ? '<span class="status-pill status-paid">PAID</span>'
+        : '<span class="status-pill status-unpaid">UNPAID</span>');
 
   // Friendlier status labels — "out for delivery" overflows the pill on
   // narrow screens, so abbreviate it for the summary chip. Status dropdown
@@ -890,17 +926,41 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     try {
       window.bbBusy('Updating…');
       await updateDoc(doc(db, COL.ORDERS, o.id), { is_fake: nowFake, status: nowFake ? 'fake' : 'new' });
-      if (nowFake && o.source_doc_path) {
-        const [coll, docId] = o.source_doc_path.split('/');
-        if (coll && docId) {
-          try {
-            await updateDoc(doc(db, coll, docId), { status: 'Rejected' });
-          } catch (err) {
-            console.warn('Source order cascade failed:', err);
-            Swal.fire({ icon: 'warning', title: 'Flagged, but source not updated', text: err.message });
-            return;
-          }
+      // Cascade source restaurant doc both ways:
+      //   mark fake   → source becomes 'Rejected'
+      //   unmark fake → source restored to 'In Progress' (best-effort; we don't
+      //                 know its pre-fake status, so this is the safe default
+      //                 that re-opens the row in the source admin queue).
+      const targetSourceStatus = nowFake ? 'Rejected' : 'In Progress';
+      // Normalise the stored path — trim whitespace and strip stray leading/
+      // trailing slashes so `doc(db, path)` always gets a clean Firestore path.
+      // (Previously a single leading `/` made split('/')[0] an empty string,
+      // which silently skipped the cascade.)
+      const rawPath = String(o.source_doc_path || '').trim().replace(/^\/+|\/+$/g, '');
+      if (rawPath) {
+        try {
+          await updateDoc(doc(db, rawPath), { status: targetSourceStatus });
+        } catch (err) {
+          console.warn('Source order cascade failed for path:', rawPath, err);
+          window.bbDone();
+          Swal.fire({
+            icon: 'warning',
+            title: nowFake ? 'Flagged, but source not updated' : 'Restored, but source not updated',
+            html: `Path: <code>${escapeHtml(rawPath)}</code><br>${escapeHtml(err.message)}`,
+          });
+          return;
         }
+      } else {
+        // Older orders placed before the mirror's source_doc_path was deployed
+        // have nothing to cascade to — surface this so the admin knows to flip
+        // the matching row in the restaurant's own admin manually.
+        window.bbDone();
+        Swal.fire({
+          icon: 'warning',
+          title: nowFake ? 'Flagged here, but source not linked' : 'Restored here, but source not linked',
+          html: `This order has no <code>source_doc_path</code> — likely placed before the mirror was deployed.<br>Mark it as <strong>${targetSourceStatus}</strong> manually in the restaurant's admin.`,
+        });
+        return;
       }
       window.bbDone();
     } catch (e) {

@@ -674,8 +674,50 @@ details.entity-card[open] > .order-summary .order-chevron {
 .status-cancelled       { background: var(--chip-cnl-bg);  color: var(--chip-cnl-fg); }
 .status-fake            { background: #fef3c7; color: #92400e; font-weight: 700; }
 
-.order-card--fake { border-left: 3px solid #f59e0b; opacity: 0.75; }
-.order-card--fake .order-summary { background: #fffbeb; }
+/* Orders filter bar: two dropdowns sit on the same row at every breakpoint —
+   restaurant filter pinned left, status filter pinned right. On wider screens
+   they keep a compact intrinsic width; on mobile they split the row 50/50 so
+   nothing wraps onto a second line. */
+.orders-filter-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+.orders-filter-bar__select {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  max-width: 220px;
+}
+@media (min-width: 576px) {
+  .orders-filter-bar__select {
+    flex: 0 0 auto;
+    min-width: 140px;
+  }
+}
+
+/* Fake orders: warm amber tint + readable text in BOTH light and dark themes.
+   Previously the hardcoded #fffbeb summary background looked unreadable in
+   dark mode (light text on near-white background = invisible restaurant
+   name) and the 0.75 opacity dimmed everything including text. We keep the
+   visual "muted" cue via the border and a subtle background, but force
+   text colours so contrast is always WCAG-safe. */
+.order-card--fake { border-left: 3px solid #f59e0b; }
+.order-card--fake .order-summary { background: #fef3c7; color: #78350f; }
+.order-card--fake .order-summary .restaurant-name,
+.order-card--fake .order-summary .ec-meta,
+.order-card--fake .order-summary .order-total,
+.order-card--fake .order-summary .order-total-orig { color: #78350f; }
+@media (prefers-color-scheme: dark) {
+  .order-card--fake .order-summary { background: #3a2e0c; color: #fde68a; }
+  .order-card--fake .order-summary .restaurant-name,
+  .order-card--fake .order-summary .ec-meta,
+  .order-card--fake .order-summary .order-total,
+  .order-card--fake .order-summary .order-total-orig { color: #fde68a; }
+}
 
 .empty-state {
   text-align: center;
