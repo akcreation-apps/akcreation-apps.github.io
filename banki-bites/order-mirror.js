@@ -3,8 +3,8 @@
 // restaurant's existing app stays untouched. Failures here must NEVER block
 // the restaurant's primary order flow — callers should swallow rejections.
 
-import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
-import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 const APP_NAME = 'bankibites-mirror';
 const ENC_KEY = ['TCD', 'FOOD', 'CAFE'].join('-');
@@ -47,8 +47,22 @@ export function warmMirrorConnection() {
   getMirrorDb().catch(() => {});
 }
 
+export function bankiBitesMirrorDocId(restaurantId, sourceDocId) {
+  return `${String(restaurantId || '').toLowerCase()}_${sourceDocId}`;
+}
+
+export async function mirrorExists(restaurantId, sourceDocId) {
+  const db = await getMirrorDb();
+  const snap = await getDoc(doc(db, 'bankibites_orders', bankiBitesMirrorDocId(restaurantId, sourceDocId)));
+  return snap.exists();
+}
+
 export async function mirrorToBankiBites(payload) {
-  const doc = {
+  if (!payload || !payload.restaurant_id || !payload.source_doc_id) {
+    throw new Error('mirrorToBankiBites requires restaurant_id and source_doc_id');
+  }
+  const docId = bankiBitesMirrorDocId(payload.restaurant_id, payload.source_doc_id);
+  const data = {
     restaurant_id:   payload.restaurant_id,
     restaurant_name: payload.restaurant_name || '',
     items:           payload.items || [],
@@ -61,10 +75,17 @@ export async function mirrorToBankiBites(payload) {
     status:          'new',
     customer:        null,
     delivery_staff_id: null,
-    created_at:      Timestamp.now(),
+    created_at:      payload.created_at || Timestamp.now(),
   };
+  // No pre-read here — unauthenticated customers can `create` per Firestore
+  // rules but cannot `read`. Existence is guaranteed unique on the customer
+  // path because docId derives from a freshly-generated restaurant docRef.id.
+  // Admin-side resync calls `mirrorExists` (read-permitted) BEFORE this, so
+  // it also never collides.
   return withRetry(async () => {
     const db = await getMirrorDb();
-    return addDoc(collection(db, 'bankibites_orders'), doc);
+    const ref = doc(db, 'bankibites_orders', docId);
+    await setDoc(ref, data);
+    return { id: docId };
   });
 }

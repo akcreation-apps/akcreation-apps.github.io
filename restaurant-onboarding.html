@@ -1376,21 +1376,30 @@ git push origin main
 
                 <div class="code-block">
                     <div class="code-header">
-                        <span class="code-lang">/MFC/cart.js — inside addDoc(...).then(docRef =&gt; { ... }), AFTER the localStorage push</span>
+                        <span class="code-lang">/MFC/cart.js — inside collect_data(), AFTER the addDoc resolves and localStorage push</span>
                         <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
                     </div>
-                    <pre><code><span class="cmt">// Mirror to BankiBites central orders feed (failures must not block)</span>
-mirrorToBankiBites({
-    restaurant_id:   <span class="str">'MFC'</span>,                           <span class="cmt">// ← unique short code, UPPERCASE</span>
-    restaurant_name: <span class="var">RESTAURANT</span>.name,
-    items:           <span class="fn">flattenCartForMirror</span>(data.order_details),
-    subtotal:        cartTotalNumber - (data.delivery_charges || 0),
-    total:           cartTotalNumber,
-    delivery_charges: data.delivery_charges || 0,
-    place:           data.mfc_place || <span class="str">''</span>,            <span class="cmt">// ← match the &lt;prefix&gt;_place field you saved</span>
-    table_no:        data.table_no || <span class="str">''</span>,
-    source_doc_path: <span class="str">`</span>${<span class="fn">decrypt_values</span>(credentials.ORDER_TABLE_NAME, _cfg)}<span class="str">/</span>${docRef.id}<span class="str">`</span>,
-}).<span class="fn">catch</span>(err =&gt; <span class="var">console</span>.<span class="fn">warn</span>(<span class="str">'BankiBites mirror failed:'</span>, err));</code></pre>
+                    <pre><code><span class="cmt">// Mirror to BankiBites central orders feed. Awaited so both tables are stable</span>
+<span class="cmt">// before the customer is sent to WhatsApp; failures are caught so the primary</span>
+<span class="cmt">// order is never lost even if the mirror is down.</span>
+<span class="kw">let</span> mirrored = <span class="kw">false</span>;
+<span class="kw">try</span> {
+    <span class="kw">await</span> <span class="fn">mirrorToBankiBites</span>({
+        restaurant_id:   <span class="str">'MFC'</span>,                           <span class="cmt">// ← unique short code, UPPERCASE</span>
+        restaurant_name: <span class="var">RESTAURANT</span>.name,
+        source_doc_id:   docRef.id,                       <span class="cmt">// ← required; becomes mirror doc id mfc_&lt;docRef.id&gt;</span>
+        items:           <span class="fn">flattenCartForMirror</span>(data.order_details),
+        subtotal:        cartTotalNumber - (data.delivery_charges || 0),
+        total:           cartTotalNumber,
+        delivery_charges: data.delivery_charges || 0,
+        place:           data.mfc_place || <span class="str">''</span>,            <span class="cmt">// ← match the &lt;prefix&gt;_place field you saved</span>
+        table_no:        data.table_no || <span class="str">''</span>,
+        source_doc_path: <span class="str">`</span>${orderTable}<span class="str">/</span>${docRef.id}<span class="str">`</span>,
+    });
+    mirrored = <span class="kw">true</span>;
+} <span class="kw">catch</span> (err) {
+    <span class="var">console</span>.<span class="fn">warn</span>(<span class="str">'BankiBites mirror failed:'</span>, err);
+}</code></pre>
                 </div>
 
                 <ul class="step-list">

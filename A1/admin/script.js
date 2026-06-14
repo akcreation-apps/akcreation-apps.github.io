@@ -1,6 +1,61 @@
 ﻿// Import the necessary Firebase services
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, Timestamp, orderBy, query, where } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { mirrorExists, mirrorToBankiBites } from '../../banki-bites/order-mirror.js';
+
+function flattenCartForMirror(cartItems) {
+    const out = [];
+    (cartItems || []).forEach(cat => {
+        (cat.category?.dish_details || []).forEach(d => {
+            out.push({ name: d.name, qty: d.quantity, price: d.price });
+        });
+    });
+    return out;
+}
+
+async function syncOrderToBankiBites(orderId, orderDetails) {
+    const restaurantId = RESTAURANT.prefix.toUpperCase();
+    const placeField = `${RESTAURANT.prefix}_place`;
+    Swal.fire({
+        title: 'Syncing to BankiBites…',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+    });
+    // We don't pre-check existence — the BankiBites Firestore rules only allow
+    // `create` for unauthenticated callers. If the doc already exists, setDoc
+    // becomes an `update` and is rejected with permission-denied. We treat
+    // that specific case as "already synced".
+    const total = Number(orderDetails.total_cart_value) || 0;
+    const deliveryCharges = Number(orderDetails.delivery_charges) || 0;
+    try {
+        // Match the path cart.js writes so bankibites admin's status cascade
+        // (delivered/cancelled/etc → source order) resolves to the real
+        // restaurant collection name, not a hardcoded guess.
+        const credentials = await get_credentials();
+        const orderTable = decrypt_values(credentials.ORDER_TABLE_NAME, _cfg);
+        await mirrorToBankiBites({
+            restaurant_id:   restaurantId,
+            restaurant_name: RESTAURANT.name,
+            source_doc_id:   orderId,
+            items:           flattenCartForMirror(orderDetails.order_details),
+            subtotal:        total - deliveryCharges,
+            total:           total,
+            delivery_charges: deliveryCharges,
+            place:           orderDetails[placeField] || '',
+            table_no:        orderDetails.table_no || '',
+            source_doc_path: `${orderTable}/${orderId}`,
+            created_at:      orderDetails.created_at,
+        });
+        await Swal.fire({ icon: 'success', title: 'Synced', text: 'Order added to BankiBites.' });
+    } catch (err) {
+        console.error('Sync failed:', err);
+        if (err && (err.code === 'permission-denied' || /permission/i.test(err.message || ''))) {
+            await Swal.fire({ icon: 'info', title: 'Already synced', text: 'This order looks like it is already in BankiBites.' });
+        } else {
+            await Swal.fire({ icon: 'error', title: 'Sync failed', text: 'Please try again or check the console.' });
+        }
+    }
+}
 
 
 window.doc_id = '';
@@ -659,11 +714,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             ? `<li style="color: red; font-weight: 600;">Delivery Charges - ₹${orderDetails.delivery_charges.toFixed(0)}</li>`
                             : ''}
                         </ul>
-                        <div class="order-actions" style="display: flex; justify-content: space-between; margin-top: 10px;">
-                            <button class="cross-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" data-action="cross">
+                        <div class="order-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            <button class="cross-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" data-action="cross" title="Reject order">
                                 <i class="fas fa-times" style="font-size: 20px; color: red;"></i>
                             </button>
-                            <button class="correct-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" data-action="correct">
+                            <button class="sync-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" title="Sync to BankiBites">
+                                <i class="fas fa-sync" style="font-size: 18px; color: #6b7280;"></i>
+                            </button>
+                            <button class="correct-icon" style="background: none; border: none; cursor: pointer;" data-order-id="${orderId}" data-action="correct" title="Approve order">
                                 <i class="fas fa-check" style="font-size: 20px; color: green;"></i>
                             </button>
                         </div>
@@ -689,6 +747,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const action = this.getAttribute('data-action');
                 const orderId = this.getAttribute('data-order-id');
                 logOrderId(action, orderId); // Call the logging function
+            });
+        });
+
+        // Sync-to-BankiBites icon — checks existence on click (no read at render time)
+        document.querySelectorAll('.sync-icon').forEach(icon => {
+            icon.addEventListener('click', function () {
+                const orderId = this.getAttribute('data-order-id');
+                const order = orders.find(o => o.order_id === orderId);
+                if (!order) return;
+                syncOrderToBankiBites(orderId, order.order_details);
             });
         });
     });
