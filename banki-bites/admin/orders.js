@@ -781,6 +781,15 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       payout_applicable: payoutApplicableNow,
     };
 
+    // Keep `is_fake` aligned with the chosen status so the Mark-as-Fake button
+    // and the status dropdown produce identical end-state. Selecting "fake"
+    // flags the order; switching away from "fake" clears the flag.
+    if (newStatus === 'fake') {
+      patch.is_fake = true;
+    } else if (o.is_fake) {
+      patch.is_fake = false;
+    }
+
     // Persist the billing breakdown only when the toggle says collect-on-delivery.
     // When the admin flips to "fully paid", clear everything so future reads
     // fall back to the order total.
@@ -874,10 +883,15 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       const SOURCE_STATUS_MAP = {
         delivered: 'Approved',
         cancelled: 'Rejected',
+        fake: 'Rejected',
         assigned: 'In Progress',
         out_for_delivery: 'In Progress',
       };
-      const sourceStatus = SOURCE_STATUS_MAP[newStatus];
+      // Mirror the toggleFake button's un-fake cascade: if this save is
+      // clearing a previously-fake order, restore the source to 'In Progress'
+      // even if the new status itself wouldn't normally cascade.
+      const isUnfaking = o.is_fake === true && newStatus !== 'fake';
+      const sourceStatus = isUnfaking ? 'In Progress' : SOURCE_STATUS_MAP[newStatus];
       if (sourceStatus) {
         if (!o.source_doc_path) {
           // Only nag for terminal states — "In Progress" mirroring is best-effort.
