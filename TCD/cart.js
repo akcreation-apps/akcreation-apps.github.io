@@ -157,6 +157,48 @@ const renderCartItems = () => {
 };
 
 
+// COD-only: surface the estimated arrival time as the Place Order button's
+// sub-text. For dine-in / empty cart, falls back to "via WhatsApp".
+// Driven by RESTAURANT.etaMinutes; refreshed on every cart change and on a
+// 30s ticker so the displayed clock stays current.
+const updateEtaRow = () => {
+    const btn = document.getElementById('place-order-btn');
+    const chip = document.getElementById('place-order-eta');
+    const timeEl = document.getElementById('place-order-sub');
+    if (!btn || !chip || !timeEl) return;
+    const table = (() => { try { return localStorage.getItem(_safeLsKey('table')); } catch (e) { return null; } })();
+    const hasItems = Array.isArray(cart) && cart.some(c => (c.category?.dish_details || []).some(d => (d.quantity || 0) > 0));
+    if (table !== 'COD' || !hasItems) {
+        btn.classList.remove('eta-on');
+        return;
+    }
+    const mins = (typeof RESTAURANT !== 'undefined' && Number(RESTAURANT.etaMinutes)) || 60;
+    let rel, clock;
+    try {
+        clock = new Date(Date.now() + mins * 60 * 1000)
+            .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        rel = `~${mins} min`;
+    } catch (e) {
+        btn.classList.remove('eta-on');
+        return;
+    }
+    const fullLabel = `${rel} · ${clock}`;
+    const changed = chip.dataset.label !== fullLabel;
+    if (changed) {
+        chip.dataset.label = fullLabel;
+        timeEl.innerHTML =
+            `<span class="eta-rel">${rel}</span>` +
+            `<span class="eta-sep"> · </span>` +
+            `<span class="eta-abs">${clock}</span>`;
+    }
+    btn.classList.add('eta-on');
+    if (changed) {
+        chip.classList.remove('is-shimmer');
+        void chip.offsetWidth; // force reflow so the animation restarts
+        chip.classList.add('is-shimmer');
+    }
+};
+
 // Calculate and update the total price
 const updateTotalPrice = () => {
     const totalPriceElement = document.getElementById('cart-total');
@@ -190,6 +232,7 @@ const updateTotalPrice = () => {
 
     // Update the displayed total price
     totalPriceElement.textContent = `₹${total.toFixed(0)}`;
+    updateEtaRow();
 };
 
 
@@ -210,6 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     renderCartItems();
     updateDeliveryBadge();
+    updateEtaRow();
+    setInterval(updateEtaRow, 30000);
     hideLoader();
 });
 
@@ -427,17 +472,6 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
         console.error('All navigation attempts to WhatsApp failed.');
     };
 
-    let etaTime;
-    try {
-        const mins = (typeof RESTAURANT !== 'undefined' && Number(RESTAURANT.etaMinutes)) || 60;
-        etaTime = new Date(Date.now() + mins * 60 * 1000)
-            .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-    } catch (e) {
-        etaTime = 'shortly';
-    }
-
-    // Step 1: best-effort save behind the loader Swal — must never abort the
-    // confirm Swal that follows.
     try {
         Swal.fire({
             title: 'Saving your order…',
@@ -446,27 +480,24 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
             allowEscapeKey: false,
             didOpen: () => Swal.showLoading(),
         });
+
+        // Bound the save so a hung Firestore can never trap the customer on
+        // the loader. The write may still complete in the background; if it
+        // doesn't, the admin sync icon is the recovery path.
         await Promise.race([
-            Promise.resolve()
-                .then(() => collect_data())
-                .catch(err => console.error('Order save failed (customer not notified):', err)),
+            collect_data().catch(err => console.error('Order save failed (customer not notified):', err)),
             new Promise(resolve => setTimeout(resolve, 10000)),
         ]);
-    } catch (err) {
-        console.error('Save phase errored — continuing to WhatsApp confirm:', err);
-    }
 
-    // Step 2: ALWAYS show the ETA confirm Swal — its click is the fresh user
-    // gesture mobile Chrome needs for the wa.me navigation. Small delay lets
-    // the loader Swal finish its open transition before we replace it (slow
-    // mobile devices sometimes drop the second modal otherwise).
-    await new Promise(r => setTimeout(r, 200));
-    try {
+        // Lock the second Swal so the ONLY way out is the "Open WhatsApp"
+        // button — that click is the fresh user gesture mobile Chrome needs.
+        // The Promise.race with a 60s safety net guarantees we never hang
+        // here forever even if Swal somehow returns a non-resolving promise.
         await Promise.race([
             Swal.fire({
                 title: 'Open WhatsApp to send your order',
                 icon: 'success',
-                html: `<div style="font-size:.95rem;line-height:1.5">We'll do our best to reach you by <b>${etaTime}</b>.<br><small>Thank you for your patience 🙏</small></div>`,
+                html: `<div style="font-size:.95rem;line-height:1.5">Tap below to send your order on WhatsApp.<br><small>Thank you for your patience 🙏</small></div>`,
                 confirmButtonText: 'Open WhatsApp',
                 confirmButtonColor: '#16a34a',
                 allowOutsideClick: false,
@@ -475,7 +506,7 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
             new Promise(resolve => setTimeout(resolve, 60000)),
         ]);
     } catch (err) {
-        console.error('Confirm Swal errored — sending anyway:', err);
+        console.error('Unexpected error in order flow (sending to WhatsApp anyway):', err);
     }
 
     goToWhatsApp();
