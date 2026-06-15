@@ -6,7 +6,8 @@ const RESTAURANT = {
     mapsUrl:        "https://maps.app.goo.gl/91yZ8VNZGZgkwAEs6",
     wpFallback:     "+917749984274",
     minOrder:       200,
-    deliveryCharge: 50
+    deliveryCharge: 50,
+    etaMinutes:     60
 };
 
 function lsKey(key) { return RESTAURANT.prefix + '_' + key; }

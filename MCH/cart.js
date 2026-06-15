@@ -429,12 +429,15 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
 
     let etaTime;
     try {
-        etaTime = new Date(Date.now() + 60 * 60 * 1000)
+        const mins = (typeof RESTAURANT !== 'undefined' && Number(RESTAURANT.etaMinutes)) || 60;
+        etaTime = new Date(Date.now() + mins * 60 * 1000)
             .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
     } catch (e) {
         etaTime = 'shortly';
     }
 
+    // Step 1: best-effort save behind the loader Swal — must never abort the
+    // confirm Swal that follows.
     try {
         Swal.fire({
             title: 'Saving your order…',
@@ -443,19 +446,19 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
             allowEscapeKey: false,
             didOpen: () => Swal.showLoading(),
         });
-
-        // Bound the save so a hung Firestore can never trap the customer on
-        // the loader. The write may still complete in the background; if it
-        // doesn't, the admin sync icon is the recovery path.
         await Promise.race([
-            collect_data().catch(err => console.error('Order save failed (customer not notified):', err)),
+            Promise.resolve()
+                .then(() => collect_data())
+                .catch(err => console.error('Order save failed (customer not notified):', err)),
             new Promise(resolve => setTimeout(resolve, 10000)),
         ]);
+    } catch (err) {
+        console.error('Save phase errored — continuing to WhatsApp confirm:', err);
+    }
 
-        // Lock the second Swal so the ONLY way out is the "Open WhatsApp"
-        // button — that click is the fresh user gesture mobile Chrome needs.
-        // The Promise.race with a 60s safety net guarantees we never hang
-        // here forever even if Swal somehow returns a non-resolving promise.
+    // Step 2: ALWAYS show the ETA confirm Swal — its click is the fresh user
+    // gesture mobile Chrome needs for the wa.me navigation.
+    try {
         await Promise.race([
             Swal.fire({
                 title: 'Open WhatsApp to send your order',
@@ -469,7 +472,7 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
             new Promise(resolve => setTimeout(resolve, 60000)),
         ]);
     } catch (err) {
-        console.error('Unexpected error in order flow (sending to WhatsApp anyway):', err);
+        console.error('Confirm Swal errored — sending anyway:', err);
     }
 
     goToWhatsApp();
