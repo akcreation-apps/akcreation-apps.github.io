@@ -5,7 +5,7 @@ import {
 import { loadCustomers } from './customers.js';
 
 const OFFER_URL = 'https://akcreation-apps.com/banki-bites/offer.jpg';
-const FOOTER = 'Reply "Stop" to stop receiving future advertisements.';
+const FOOTER = 'Reply "Stop" to stop receiving future advertisements.\n\n_Team BankiBites_ ❤️';
 const QUEUE_KEY = 'bb_broadcast_queue_v1';
 const NAME_FALLBACK = 'Friend';
 

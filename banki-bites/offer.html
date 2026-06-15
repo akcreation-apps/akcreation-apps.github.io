@@ -1,4 +1,25 @@
 <!DOCTYPE html>
+<!--
+  =====================================================================
+  BankiBites — Offer Landing Page
+  =====================================================================
+  Quick edit guide (search the file for ★):
+
+    ★ BADGE          → Small pill above the headline (e.g. "Today only")
+    ★ HEADLINE       → Big bold offer headline
+    ★ SUBLINE        → One supporting sentence under the headline
+    ★ OFFER IMAGE    → Replace banki-bites/offer.jpg (1200×628 recommended)
+    ★ EXPIRY DATE    → "YYYY-MM-DDTHH:mm" — the countdown ticks down to it
+    ★ PERKS          → 3 small benefit bullets under the image
+    ★ TERMS          → Fine print at the bottom
+    ★ APP LINK       → Play Store URL of the BankiBites app
+    ★ OG META        → Title / description used by WhatsApp link preview
+
+  Everything else handles itself: dark mode, mobile responsiveness,
+  countdown, footer year, OG/Twitter cards for big-image WhatsApp
+  preview. Push to main → GitHub Pages serves it.
+  =====================================================================
+-->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -7,19 +28,33 @@
   <meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0F0E15" media="(prefers-color-scheme: dark)">
 
-  <title>BankiBites — Today's Offer</title>
-  <meta name="description" content="Today's special BankiBites offer for Banki, Cuttack, Odisha. Order now from our Android app or web browser.">
+  <title>BankiBites — Today's Special Offer in Banki, Cuttack</title>
+  <meta name="description" content="Grab today's exclusive BankiBites offer. Fast doorstep delivery across Banki, Cuttack, Odisha 754008. Order in 2 taps on the Android app or browser.">
   <link rel="canonical" href="https://akcreation-apps.com/banki-bites/offer.html">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-image-preview:large">
 
+  <!-- ★ OG META — WhatsApp / FB / LinkedIn link preview.
+       For a *large* image preview in WhatsApp the image must be
+       at least 300×200 (1200×628 is ideal). og:image:type and
+       og:image:secure_url help WhatsApp render the big card. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="BankiBites">
-  <meta property="og:title" content="BankiBites — Today's Offer">
-  <meta property="og:description" content="Today's special BankiBites offer for Banki, Cuttack, Odisha.">
-  <meta property="og:image" content="https://akcreation-apps.com/banki-bites/offer.jpg">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="BankiBites — Today's Special Offer">
+  <meta property="og:description" content="Limited-time offer for BankiBites customers in Banki, Cuttack, Odisha. Order in 2 taps.">
   <meta property="og:url" content="https://akcreation-apps.com/banki-bites/offer.html">
+  <meta property="og:image" content="https://akcreation-apps.com/banki-bites/offer.jpg">
+  <meta property="og:image:secure_url" content="https://akcreation-apps.com/banki-bites/offer.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="628">
+  <meta property="og:image:alt" content="BankiBites — special offer banner for Banki, Cuttack, Odisha 754008">
+
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BankiBites — Today's Special Offer">
+  <meta name="twitter:description" content="Limited-time offer in Banki, Cuttack. Order on the BankiBites app or web.">
   <meta name="twitter:image" content="https://akcreation-apps.com/banki-bites/offer.jpg">
+  <meta name="twitter:image:alt" content="BankiBites offer banner">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/banki-bites/banki-bites-logo.png">
   <link rel="icon" type="image/png" href="/banki-bites/banki-bites-logo.png">
@@ -27,36 +62,45 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
 
   <style>
     :root {
-      --brand: #FF6B35;
-      --brand-dark: #d8552a;
-      --bg: #fff8f3;
-      --surface: #ffffff;
-      --text: #1a1a2e;
-      --muted: #6b7280;
-      --border: #f1d9c6;
+      --brand:        #FF6B35;
+      --brand-dark:   #d8552a;
+      --brand-soft:   rgba(255,107,53,0.12);
+      --accent:       #25D366;
+      --gold:         #FFB400;
+      --bg:           #fff8f3;
+      --surface:      #ffffff;
+      --surface-2:    #fff1e6;
+      --text:         #1a1a2e;
+      --text-strong:  #0f0e15;
+      --muted:        #6b7280;
+      --border:       #f1d9c6;
+      --shadow-md:    0 12px 32px rgba(255, 107, 53, 0.18);
+      --shadow-sm:    0 4px 14px rgba(15, 23, 42, 0.08);
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #0f0e15;
-        --surface: #18141d;
-        --text: #f3f4f6;
-        --muted: #9aa3b2;
-        --border: #2a2330;
+        --bg:          #0f0e15;
+        --surface:     #18141d;
+        --surface-2:   #1f1822;
+        --text:        #f3f4f6;
+        --text-strong: #ffffff;
+        --muted:       #9aa3b2;
+        --border:      #2a2330;
+        --shadow-md:   0 12px 32px rgba(0, 0, 0, 0.55);
+        --shadow-sm:   0 4px 14px rgba(0, 0, 0, 0.4);
       }
     }
+
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
+    html, body { margin: 0; padding: 0; overflow-x: hidden; max-width: 100%; }
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
@@ -64,79 +108,308 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
+      text-rendering: optimizeLegibility;
     }
-    .offer-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      background: var(--surface);
+    img { max-width: 100%; height: auto; display: block; }
+
+    /* ── Sticky header ───────────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 30;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
       border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
     }
-    .offer-header img { width: 36px; height: 36px; border-radius: 8px; }
-    .offer-header strong {
+    .nav__brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: inherit;
+      min-width: 0;
+    }
+    .nav__brand img { width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0; }
+    .nav__brand strong {
+      display: block;
       font-family: 'Poppins', sans-serif;
-      font-size: 1.05rem;
+      font-size: 0.98rem;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
       color: var(--brand);
     }
-    main.offer-main {
-      flex: 1 0 auto;
-      width: 100%;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 20px 16px 32px;
+    .nav__brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+    .nav__link {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.82rem;
+      transition: background .15s ease, transform .05s ease;
+    }
+    .nav__link:hover, .nav__link:focus { background: var(--brand-dark); color: #fff; text-decoration: none; }
+    .nav__link:active { transform: translateY(1px); }
+
+    /* ── Hero ────────────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(24px, 6vw, 48px) 16px clamp(12px, 3vw, 20px);
       text-align: center;
     }
-    .offer-title {
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,107,53,0.22), transparent 45%),
+        radial-gradient(circle at 80% 90%, rgba(37,211,102,0.15), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero > * { position: relative; z-index: 1; }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      box-shadow: var(--shadow-sm);
+      max-width: 100%;
+    }
+    .badge-pill i { color: #fff; font-size: 0.7rem; }
+
+    .hero h1 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      font-size: clamp(1.65rem, 7vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--text-strong);
+      margin: 14px auto 10px;
+      max-width: 720px;
+      padding: 0 4px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .hero h1 .brand-orange { color: var(--brand); }
+    .hero h1 .brand-green  { color: var(--accent); }
+
+    .hero__sub {
+      color: var(--muted);
+      font-size: clamp(0.92rem, 2.4vw, 1.1rem);
+      margin: 0 auto;
+      max-width: 540px;
+      padding: 0 8px;
+      line-height: 1.5;
+    }
+
+    /* ── Countdown ───────────────────────────────────────────────────── */
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin: 18px auto 0;
+      flex-wrap: nowrap;
+      max-width: 100%;
+      padding: 0 8px;
+    }
+    .countdown__cell {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 6px;
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 80px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .countdown__num {
       font-family: 'Poppins', sans-serif;
       font-weight: 800;
-      font-size: 1.5rem;
-      margin: 8px 0 14px;
+      font-size: clamp(1.15rem, 4.5vw, 1.6rem);
+      color: var(--brand);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
     }
-    .offer-image-wrap {
+    .countdown__lbl {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+    .countdown__ended {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    /* ── Offer image ─────────────────────────────────────────────────── */
+    .offer-card {
+      max-width: 720px;
+      margin: 18px auto 0;
+      padding: 0 16px;
+    }
+    .offer-card__img {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+    .offer-card__corner {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: var(--gold);
+      color: #0f0e15;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    }
+
+    /* ── Perks ───────────────────────────────────────────────────────── */
+    .perks {
+      max-width: 720px;
+      margin: 22px auto 0;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .perk {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 14px 10px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      min-width: 0;
     }
-    .offer-image-wrap img {
-      display: block;
+    .perk i {
+      display: inline-grid; place-items: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+    .perk__title {
+      font-weight: 700;
+      font-size: clamp(0.78rem, 2.2vw, 0.9rem);
+      color: var(--text-strong);
+      line-height: 1.25;
+    }
+    .perk__sub {
+      font-size: clamp(0.66rem, 1.8vw, 0.75rem);
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    /* ── CTA ─────────────────────────────────────────────────────────── */
+    .cta-wrap {
+      text-align: center;
+      padding: 26px 16px 12px;
+    }
+    .cta-row {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
       width: 100%;
-      height: auto;
+      max-width: 360px;
     }
-    .offer-cta {
+    .cta {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-top: 22px;
-      min-height: 48px;
-      padding: 12px 28px;
+      gap: 10px;
+      min-height: 52px;
+      padding: 12px 24px;
       background: var(--brand);
       color: #fff;
+      font-family: 'Poppins', sans-serif;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: clamp(0.95rem, 2.8vw, 1.1rem);
       border-radius: 999px;
       text-decoration: none;
-      box-shadow: 0 4px 12px rgba(255,107,53,0.35);
-      transition: background 0.15s ease;
+      box-shadow: 0 8px 22px rgba(255, 107, 53, 0.38);
+      transition: background .15s ease, transform .08s ease, box-shadow .15s ease;
     }
-    .offer-cta:hover, .offer-cta:focus {
+    .cta:hover, .cta:focus {
       background: var(--brand-dark);
       color: #fff;
       text-decoration: none;
+      box-shadow: 0 10px 26px rgba(255, 107, 53, 0.5);
     }
-    .offer-sub {
+    .cta:active { transform: translateY(1px); }
+    .cta--ghost {
+      background: transparent;
+      color: var(--brand);
+      border: 2px solid var(--brand);
+      box-shadow: none;
+    }
+    .cta--ghost:hover, .cta--ghost:focus {
+      background: var(--brand-soft);
+      color: var(--brand-dark);
+    }
+
+    /* ── Trust strip ─────────────────────────────────────────────────── */
+    .trust {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px 18px;
+      padding: 18px 16px 4px;
       color: var(--muted);
-      font-size: 0.95rem;
-      margin-top: 14px;
+      font-size: clamp(0.78rem, 2.2vw, 0.88rem);
     }
+    .trust span { display: inline-flex; align-items: center; gap: 6px; }
+    .trust i { color: var(--accent); }
+
+    /* ── Terms ───────────────────────────────────────────────────────── */
+    .terms {
+      max-width: 640px;
+      margin: 22px auto 0;
+      padding: 14px 16px 0;
+      color: var(--muted);
+      font-size: clamp(0.72rem, 2vw, 0.8rem);
+      line-height: 1.55;
+    }
+    .terms strong { color: var(--text); }
+
+    /* ── Footer ──────────────────────────────────────────────────────── */
     footer {
       flex-shrink: 0;
+      margin-top: 28px;
       padding: 16px;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--muted);
       border-top: 1px solid var(--border);
       background: var(--surface);
@@ -144,34 +417,182 @@
     footer a { color: var(--brand); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
 
+    /* ── Scale-ups ───────────────────────────────────────────────────── */
+    @media (min-width: 480px) {
+      .cta-row { flex-direction: row; max-width: none; }
+      .cta { flex: 1; }
+    }
     @media (min-width: 768px) {
-      .offer-title { font-size: 2rem; }
-      main.offer-main { padding: 32px 24px 48px; }
+      .nav { padding: 14px 22px; }
+      .nav__brand strong { font-size: 1.1rem; }
+      .perk { padding: 16px 14px; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .badge-pill { animation: pulse 2.4s ease-in-out infinite; }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50%      { transform: scale(1.04); }
+      }
     }
   </style>
 </head>
 <body>
-  <header class="offer-header">
-    <img src="banki-bites-logo.png" alt="BankiBites">
-    <strong>BankiBites</strong>
+
+  <!-- ────────── Header (logo + Order CTA) ────────── -->
+  <nav class="nav">
+    <a class="nav__brand" href="/banki-bites/">
+      <img src="banki-bites-logo.png" alt="BankiBites">
+      <div>
+        <strong>BankiBites</strong>
+        <small>Banki, Cuttack</small>
+      </div>
+    </a>
+    <a class="nav__link" href="/banki-bites/">
+      <i class="fas fa-utensils"></i> Order
+    </a>
+  </nav>
+
+  <!-- ────────── Hero ────────── -->
+  <header class="hero">
+    <!-- ★ BADGE — small pill above the headline -->
+    <span class="badge-pill"><i class="fas fa-bolt"></i> Limited time</span>
+
+    <!-- ★ HEADLINE — wrap accent words in <span class="brand-orange"> or brand-green -->
+    <h1>
+      Tasty deals,<br>
+      <span class="brand-orange">straight to your door</span>
+    </h1>
+
+    <!-- ★ SUBLINE -->
+    <p class="hero__sub">
+      Fresh local food from Banki's favourite restaurants — ordered in 2 taps, delivered in ~45 minutes.
+    </p>
+
+    <!-- Countdown (remove this block or set EXPIRY_AT to "" to hide). -->
+    <div class="countdown" id="countdown" aria-live="polite">
+      <div class="countdown__cell"><div class="countdown__num" id="cdDays">--</div><div class="countdown__lbl">Days</div></div>
+      <div class="countdown__cell"><div class="countdown__num" id="cdHours">--</div><div class="countdown__lbl">Hours</div></div>
+      <div class="countdown__cell"><div class="countdown__num" id="cdMins">--</div><div class="countdown__lbl">Mins</div></div>
+      <div class="countdown__cell"><div class="countdown__num" id="cdSecs">--</div><div class="countdown__lbl">Secs</div></div>
+    </div>
   </header>
 
-  <main class="offer-main">
-    <h1 class="offer-title">Today's Offer</h1>
-    <div class="offer-image-wrap">
-      <img src="offer.jpg" alt="BankiBites offer">
+  <!-- ────────── Offer image (★ replace banki-bites/offer.jpg, 1200×628) ────────── -->
+  <section class="offer-card">
+    <div class="offer-card__img">
+      <img src="offer.jpg" alt="BankiBites special offer banner" loading="eager">
+      <div class="offer-card__corner">New</div>
     </div>
-    <p class="offer-sub">Tap below to start ordering on BankiBites.</p>
-    <a class="offer-cta" href="index.html">
-      <i class="fas fa-utensils"></i> Order on BankiBites
-    </a>
-  </main>
+  </section>
+
+  <!-- ────────── ★ PERKS ────────── -->
+  <section class="perks">
+    <div class="perk">
+      <i class="fas fa-bolt"></i>
+      <div class="perk__title">~45 min delivery</div>
+      <div class="perk__sub">Doorstep across Banki</div>
+    </div>
+    <div class="perk">
+      <i class="fas fa-rupee-sign"></i>
+      <div class="perk__title">Pay on delivery</div>
+      <div class="perk__sub">Cash · UPI · Cards</div>
+    </div>
+    <div class="perk">
+      <i class="fas fa-shield-halved"></i>
+      <div class="perk__title">100% local</div>
+      <div class="perk__sub">From Banki kitchens</div>
+    </div>
+  </section>
+
+  <!-- ────────── CTAs ────────── -->
+  <div class="cta-wrap">
+    <div class="cta-row">
+      <a class="cta" href="/banki-bites/">
+        <i class="fas fa-utensils"></i> Order now
+      </a>
+      <!-- ★ APP LINK — Play Store URL of the BankiBites app -->
+      <a class="cta cta--ghost" href="https://play.google.com/store/apps/details?id=com.bankibites" rel="noopener">
+        <i class="fab fa-google-play"></i> Get the app
+      </a>
+    </div>
+
+    <div class="trust">
+      <span><i class="fas fa-check-circle"></i> Verified local restaurants</span>
+      <span><i class="fas fa-check-circle"></i> Real-time tracking</span>
+      <span><i class="fas fa-check-circle"></i> Friendly riders</span>
+    </div>
+  </div>
+
+  <!-- ────────── ★ TERMS ────────── -->
+  <aside class="terms">
+    <strong>Terms:</strong> Offer valid for orders placed via the BankiBites app or web only.
+    Discount applies before delivery fee and taxes. One redemption per customer per day.
+    Not combinable with other promos. BankiBites reserves the right to modify or end this
+    offer without prior notice. Service area: Banki, Cuttack, Odisha 754008.
+  </aside>
 
   <footer>
     <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
   </footer>
+
+  <!-- Structured data — auto-rendered, no edits needed. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Offer",
+    "name": "BankiBites Today's Special Offer",
+    "url": "https://akcreation-apps.com/banki-bites/offer.html",
+    "image": "https://akcreation-apps.com/banki-bites/offer.jpg",
+    "areaServed": "Banki, Cuttack, Odisha 754008, India",
+    "seller": {
+      "@type": "Organization",
+      "name": "BankiBites",
+      "url": "https://akcreation-apps.com/banki-bites/"
+    }
+  }
+  </script>
+
   <script>
+    // ===================================================================
+    // ★ EXPIRY DATE — countdown ticks down to this exact local time.
+    //   Format: "YYYY-MM-DDTHH:mm" (24-hour, local time).
+    //   Set to '' or delete the <div class="countdown"> block to hide.
+    // ===================================================================
+    const EXPIRY_AT = '2026-06-30T23:59';
+
     document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    (function () {
+      const wrap = document.getElementById('countdown');
+      if (!wrap || !EXPIRY_AT) { if (wrap) wrap.style.display = 'none'; return; }
+      const target = new Date(EXPIRY_AT).getTime();
+      if (Number.isNaN(target)) { wrap.style.display = 'none'; return; }
+      const els = {
+        d: document.getElementById('cdDays'),
+        h: document.getElementById('cdHours'),
+        m: document.getElementById('cdMins'),
+        s: document.getElementById('cdSecs'),
+      };
+      const pad = n => (n < 10 ? '0' + n : '' + n);
+      function tick() {
+        const diff = target - Date.now();
+        if (diff <= 0) {
+          wrap.innerHTML = '<div class="countdown__ended"><i class="fas fa-flag-checkered"></i> Offer ended — check the homepage for new deals.</div>';
+          clearInterval(timer);
+          return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor(diff / 3600000) % 24;
+        const m = Math.floor(diff / 60000) % 60;
+        const s = Math.floor(diff / 1000) % 60;
+        els.d.textContent = pad(d);
+        els.h.textContent = pad(h);
+        els.m.textContent = pad(m);
+        els.s.textContent = pad(s);
+      }
+      tick();
+      const timer = setInterval(tick, 1000);
+    })();
   </script>
 </body>
 </html>
