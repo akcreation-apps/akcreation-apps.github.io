@@ -457,7 +457,10 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
     }
 
     // Step 2: ALWAYS show the ETA confirm Swal — its click is the fresh user
-    // gesture mobile Chrome needs for the wa.me navigation.
+    // gesture mobile Chrome needs for the wa.me navigation. Small delay lets
+    // the loader Swal finish its open transition before we replace it (slow
+    // mobile devices sometimes drop the second modal otherwise).
+    await new Promise(r => setTimeout(r, 200));
     try {
         await Promise.race([
             Swal.fire({
