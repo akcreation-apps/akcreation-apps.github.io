@@ -62,6 +62,9 @@ export async function upsertCustomer(db, payload) {
   if (payload.gps && Number.isFinite(payload.gps.lat) && Number.isFinite(payload.gps.lng)) {
     data.gps = { lat: payload.gps.lat, lng: payload.gps.lng };
   }
+  if (typeof payload.not_interested === 'boolean') {
+    data.not_interested = payload.not_interested;
+  }
   if (!existing.exists()) data.created_at = Timestamp.now();
   try {
     await setDoc(ref, data, { merge: true });
@@ -127,6 +130,13 @@ export async function openCustomerModal(db, existing, defaults = {}) {
                  value="${gps.lng ?? ''}" placeholder="e.g. 85.5135" autocomplete="off">
         </div>
       </div>
+      <div class="form-group form-check">
+        <input class="form-check-input" type="checkbox" name="not_interested" id="cust_not_interested"
+               ${c.not_interested ? 'checked' : ''}>
+        <label class="form-check-label" for="cust_not_interested">
+          Customer is not interested in promotions (do not contact)
+        </label>
+      </div>
     </form>
   `;
   const res = await Swal.fire({
@@ -190,7 +200,8 @@ export async function openCustomerModal(db, existing, defaults = {}) {
         Swal.showValidationMessage('Enter both latitude and longitude, or leave both blank');
         return false;
       }
-      const payload = { name, phone, address };
+      const not_interested = !!fd.get('not_interested');
+      const payload = { name, phone, address, not_interested };
       if (latRaw !== '' && lngRaw !== '') {
         const lat = parseFloat(latRaw);
         const lng = parseFloat(lngRaw);

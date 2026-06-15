@@ -12,6 +12,7 @@ import { renderPartners } from './partners.js';
 import { renderOrders }   from './orders.js';
 import { renderStaff }    from './staff.js';
 import { renderDashboard } from './dashboard.js';
+import { renderBroadcast } from './broadcast.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -147,4 +148,5 @@ async function activateTab(name) {
   if (name === 'orders')    await renderOrders(panel, db, APP_NAME);
   if (name === 'partners')  await renderPartners(panel, db, APP_NAME);
   if (name === 'staff')     await renderStaff(panel, db, APP_NAME);
+  if (name === 'broadcast') await renderBroadcast(panel, db, APP_NAME);
 }
