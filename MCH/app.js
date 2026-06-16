@@ -113,12 +113,24 @@ const updateItemQty = (subcategory, dish, delta) => {
     updateCartCount();
 };
 
+// Formats an hour-of-day (0–24) as "11 AM" / "12 PM"
+const formatHour = (h) => {
+    const hr = ((h + 11) % 12) + 1;
+    const suffix = h < 12 || h === 24 ? 'AM' : 'PM';
+    return `${hr} ${suffix}`;
+};
+
 // Renders ADD bar or full-width qty stepper below the dish card
-const renderControl = (container, subcategory, dish, announce = false) => {
+const renderControl = (container, subcategory, dish, announce = false, unavailableNote = '') => {
     const qty = getItemQty(subcategory.name, dish.id);
     container.classList.toggle('in-cart', qty > 0);
+    container.classList.toggle('unavailable', !!unavailableNote);
     if (announce) announceCart(dish.name, qty);
     if (qty === 0) {
+        if (unavailableNote) {
+            container.innerHTML = `<span class="add-btn unavailable" aria-label="Available ${unavailableNote.toLowerCase()}">🕒 ${unavailableNote}</span>`;
+            return;
+        }
         container.innerHTML = `<button class="add-btn" aria-label="Add ${dish.name} to cart">+ ADD</button>`;
         container.querySelector('.add-btn').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -331,14 +343,12 @@ document.addEventListener('DOMContentLoaded', async() => {
                                 return;
                             }
 
-                            // Skip if before available_time window (only when a number is set)
+                            // Compute hourly-availability note (greys out dish instead of hiding)
+                            let unavailableNote = '';
                             if (typeof dish.available_time === 'number' && currentHour < dish.available_time) {
-                                return;
-                            }
-
-                            // Skip if past not_available_time window
-                            if (typeof dish.not_available_time === 'number' && currentHour >= dish.not_available_time) {
-                                return;
+                                unavailableNote = `From ${formatHour(dish.available_time)}`;
+                            } else if (typeof dish.not_available_time === 'number' && currentHour >= dish.not_available_time) {
+                                unavailableNote = `Till ${formatHour(dish.not_available_time)}`;
                             }
 
                             // Filter logic: Show items with no subcategory type or based on filters
@@ -353,6 +363,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
                             const menuItem = document.createElement('div');
                             menuItem.classList.add('menu-item');
+                            if (unavailableNote) menuItem.classList.add('unavailable');
                             menuItem.setAttribute('role', 'article');
                             menuItem.setAttribute('aria-label', `${dish.name} — ${subcategory.type === 'NonVeg' ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}`);
                             const url = get_dish_url(dish.name);
@@ -371,7 +382,7 @@ document.addEventListener('DOMContentLoaded', async() => {
                                     </div>
                               </div>
                             `;
-                            renderControl(menuItem.querySelector('.item-control'), subcategory, dish);
+                            renderControl(menuItem.querySelector('.item-control'), subcategory, dish, false, unavailableNote);
 
                             dishGrid.appendChild(menuItem);
                             hasVisibleDishes = true;

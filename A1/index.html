@@ -738,6 +738,21 @@
         }
         .add-btn:hover,
         .add-btn:active { background: rgba(255,255,255,0.18); }
+        .menu-item.unavailable .dish-img { filter: grayscale(0.8); opacity: 0.55; }
+        .menu-item.unavailable .dish-overlay { opacity: 0.7; }
+        .item-control.unavailable {
+            background: rgba(60,60,60,0.85);
+            border-color: rgba(120,120,120,0.6);
+            cursor: not-allowed;
+        }
+        .add-btn.unavailable {
+            color: #FFD166;
+            font-size: 0.68rem;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .add-btn.unavailable:hover,
+        .add-btn.unavailable:active { background: none; }
         .qty-stepper {
             display: flex;
             align-items: stretch;
