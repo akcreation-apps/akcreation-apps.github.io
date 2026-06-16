@@ -760,10 +760,21 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       })();
 
       function buildMsg(discount, dateStr) {
-        const d = new Date(dateStr + 'T00:00:00');
-        const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
         const greeting = prettyName ? `Hi ${prettyName}!` : 'Hi there!';
-        return `${greeting} 🙏\n\nYour *BankiBites* order is delivered 🛵 Hope you enjoy every bite! 😋\n\n🧾 Your bill has been generated — check the *Bill* section in the app.\n\n🎁 *₹${discount} OFF* on your next order — valid till *${label}*\n\n_Team BankiBites_ ❤️`;
+        const parts = [
+          `${greeting} 🙏`,
+          `Your *BankiBites* order is delivered 🛵 Hope you enjoy every bite! 😋`,
+          `🧾 Your bill has been generated — check the *Bill* section in the app.`,
+        ];
+        // Skip the offer line entirely when admin sets discount to 0 — no
+        // "₹0 OFF" message and no expiry date noise. Thank-you stands alone.
+        if (Number(discount) > 0 && dateStr) {
+          const d = new Date(dateStr + 'T00:00:00');
+          const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
+          parts.push(`🎁 *₹${discount} OFF* on your next order — valid till *${label}*`);
+        }
+        parts.push(`_Team BankiBites_ ❤️`);
+        return parts.join('\n\n');
       }
 
       const defaultDiscount = Math.max(1, Math.round(netRevenue(o) * 0.10));
@@ -808,7 +819,8 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           const discount = parseInt(document.getElementById('tyDiscount').value);
           const dateStr  = document.getElementById('tyDate').value;
           if (!Number.isFinite(discount) || discount < 0) { Swal.showValidationMessage('Enter a valid discount amount'); return false; }
-          if (!dateStr) { Swal.showValidationMessage('Pick a valid-until date'); return false; }
+          // Date is only required when there's actually a discount to expire.
+          if (discount > 0 && !dateStr) { Swal.showValidationMessage('Pick a valid-until date'); return false; }
           // Persist the offer inside preConfirm so the post-await code stays
           // synchronous — wa.me deep-links require a fresh user gesture, and
           // an await between the confirm click and location.href would push
