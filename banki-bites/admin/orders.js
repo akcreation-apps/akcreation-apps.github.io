@@ -1,5 +1,5 @@
 import { COL } from '../firebase-config.js';
-import { loadCustomers, searchCustomers, openCustomerModal } from './customers.js';
+import { loadCustomers, searchCustomers, openCustomerModal, setActiveOffer, clearActiveOffer } from './customers.js';
 import {
   collection, query, onSnapshot, doc, updateDoc, setDoc, getDoc, getDocs, where, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
@@ -246,6 +246,23 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   ).join('');
 
   const cust = o.customer || {};
+  // Active thank-you offer for this customer, if any. Sourced from the
+  // in-memory customers map already loaded for the picker — no extra read.
+  // Considered active only when the valid_until date hasn't passed.
+  const activeOffer = (() => {
+    const c = cust.phone ? customers.get(cust.phone) : null;
+    if (!c) return null;
+    const amt = Number(c.active_offer_amount);
+    const until = String(c.active_offer_valid_until || '');
+    if (!Number.isFinite(amt) || amt <= 0) return null;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(until)) return null;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    if (until < todayStr) return null;
+    const d = new Date(until + 'T00:00:00');
+    const expiryLabel = `${d.getDate()} ${d.toLocaleDateString('en-IN', { month: 'short' })}`;
+    return { amount: amt, validUntil: until, expiryLabel };
+  })();
   // For brand-new orders with no customer name yet, fall back to the
   // caller-supplied "BB N" suggestion so the admin can review-and-save.
   const effectiveName = cust.name || suggestedName || '';
@@ -434,6 +451,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
                    value="${Number.isFinite(+o.discount) ? +o.discount : ''}" placeholder="0">
           </div>
         </div>
+        <small class="text-success d-block" data-el="offerHint"
+               style="margin:-4px 0 6px 4px" hidden>
+          <i class="fas fa-gift mr-1"></i><span data-el="offerHintText"></span>
+        </small>
         <div class="billing-row">
           <label class="billing-label" for="prepaid-${o.id}">Already paid</label>
           <div class="billing-input">
@@ -514,7 +535,14 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     if (!collectOverridden) collectInput.value = computeCollect();
     reflectFullyPaidHint();
   }
-  discountInput.addEventListener('input', recomputeCollect);
+  discountInput.addEventListener('input', () => {
+    // Admin-typed value — release the auto-fill lock so customer changes
+    // no longer auto-overwrite or auto-clear this field.
+    if (autoFilledDiscount != null && discountInput.value !== String(autoFilledDiscount)) {
+      autoFilledDiscount = null;
+    }
+    recomputeCollect();
+  });
   prepaidInput .addEventListener('input', recomputeCollect);
   collectInput .addEventListener('input', () => { collectOverridden = true; reflectFullyPaidHint(); });
   // Initial paint of the hint state.
@@ -536,13 +564,15 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   // Auto-normalise phone on blur/paste so the visible value matches what's saved.
   const phoneInput = card.querySelector('[data-f="phone"]');
   const normPhone = () => { const n = normalisePhone(phoneInput.value); if (n !== phoneInput.value) phoneInput.value = n; };
-  phoneInput.addEventListener('blur', normPhone);
+  phoneInput.addEventListener('blur', () => { normPhone(); refreshOfferHint(phoneInput.value); });
+  phoneInput.addEventListener('input', () => refreshOfferHint(phoneInput.value));
   // Intercept paste directly so +91/spaces/dashes are stripped before the value
   // lands in the field — avoids maxlength truncation of formatted numbers.
   phoneInput.addEventListener('paste', e => {
     e.preventDefault();
     const raw = (e.clipboardData || window.clipboardData).getData('text/plain');
     phoneInput.value = normalisePhone(raw);
+    refreshOfferHint(phoneInput.value);
   });
 
   // ── Customer picker wiring ────────────────────────────────────────────
@@ -571,6 +601,53 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     }
   }
 
+  // Live-updating eligibility hint under the discount input. Reads from the
+  // in-memory customers map keyed by phone — re-runs whenever the customer
+  // changes (picker, manual phone edit, clear, save mirror). Also auto-
+  // populates the discount input with the eligible amount so admin can
+  // accept-or-override in one tap; `autoFilledDiscount` tracks the value
+  // we wrote so we never clobber an admin-typed override and we can clear
+  // it again when the customer is changed/cleared.
+  const offerHintEl = card.querySelector('[data-el="offerHint"]');
+  const offerHintTextEl = card.querySelector('[data-el="offerHintText"]');
+  let autoFilledDiscount = null;
+  function refreshOfferHint(rawPhone) {
+    const phone = normalisePhone(rawPhone || '');
+    const c = phone ? customers.get(phone) : null;
+    const amt = Number(c && c.active_offer_amount);
+    const until = String((c && c.active_offer_valid_until) || '');
+    const hasValid = Number.isFinite(amt) && amt > 0 && /^\d{4}-\d{2}-\d{2}$/.test(until);
+    let expired = false;
+    if (hasValid) {
+      const t = new Date(); t.setHours(0,0,0,0);
+      const todayStr = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+      expired = until < todayStr;
+    }
+    if (!hasValid || expired) {
+      offerHintEl.hidden = true;
+      // Roll back any previous auto-fill so leftover ₹ from a prior pick
+      // doesn't stick when the customer changes to one without an offer.
+      if (autoFilledDiscount != null && discountInput.value === String(autoFilledDiscount)) {
+        discountInput.value = '';
+        recomputeCollect();
+      }
+      autoFilledDiscount = null;
+      return;
+    }
+    const d = new Date(until + 'T00:00:00');
+    const expiryLabel = `${d.getDate()} ${d.toLocaleDateString('en-IN', { month: 'short' })}`;
+    offerHintTextEl.textContent = ` Eligible: ₹${amt} (expires ${expiryLabel})`;
+    offerHintEl.hidden = false;
+    // Auto-fill the discount input only when it's empty or still showing
+    // a previous auto-fill — never overwrite an admin-typed value.
+    const cur = discountInput.value;
+    if (cur === '' || cur === '0' || (autoFilledDiscount != null && cur === String(autoFilledDiscount))) {
+      discountInput.value = String(amt);
+      autoFilledDiscount = amt;
+      recomputeCollect();
+    }
+  }
+
   function applyCustomer(c) {
     nameInput.value = c.name || '';
     phoneInput.value = c.phone || '';
@@ -581,12 +658,14 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     resultsEl.hidden = true;
     resultsEl.innerHTML = '';
     showGps(c.gps);
+    refreshOfferHint(c.phone);
   }
 
   function clearChip() {
     chipEl.hidden = true;
     chipTextEl.textContent = '';
     showGps(null);
+    refreshOfferHint('');
   }
 
   // If the order already has a phone and that customer exists in our map,
@@ -600,6 +679,8 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   } else if (cust.gps) {
     showGps(cust.gps);
   }
+  // Initial hint for whatever phone is already on the card.
+  refreshOfferHint(cust.phone);
 
   searchInput.addEventListener('input', () => {
     const matches = searchCustomers(customers, searchInput.value);
@@ -723,18 +804,38 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           dateEl.addEventListener('input', refresh);
           refresh();
         },
-        preConfirm: () => {
+        preConfirm: async () => {
           const discount = parseInt(document.getElementById('tyDiscount').value);
           const dateStr  = document.getElementById('tyDate').value;
           if (!Number.isFinite(discount) || discount < 0) { Swal.showValidationMessage('Enter a valid discount amount'); return false; }
           if (!dateStr) { Swal.showValidationMessage('Pick a valid-until date'); return false; }
-          return { discount, dateStr };
+          // Persist the offer inside preConfirm so the post-await code stays
+          // synchronous — wa.me deep-links require a fresh user gesture, and
+          // an await between the confirm click and location.href would push
+          // mobile WhatsApp through the api.whatsapp.com interstitial.
+          const phone = normalisePhone(o.customer?.phone || '');
+          if (phone && discount > 0) {
+            try {
+              await setActiveOffer(db, phone, { amount: discount, validUntil: dateStr });
+            } catch (err) {
+              Swal.showValidationMessage('Could not save offer: ' + err.message);
+              return false;
+            }
+          }
+          return { discount, dateStr, phone };
         },
       });
 
       if (!res.isConfirmed) return;
-      const { discount, dateStr } = res.value;
-      const phone = normalisePhone(o.customer?.phone || '');
+      const { discount, dateStr, phone } = res.value;
+      // Mirror the persisted offer into the in-memory customers map so the
+      // eligibility hint reflects the new offer on subsequent renders.
+      if (phone && discount > 0) {
+        const c = customers.get(phone) || { phone };
+        c.active_offer_amount = discount;
+        c.active_offer_valid_until = dateStr;
+        customers.set(phone, c);
+      }
       const msg = buildMsg(discount, dateStr);
       window.location.href = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
     });
@@ -871,8 +972,22 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         // original signup time on every order save.
         const existing = await getDoc(custRef);
         if (!existing.exists()) custData.created_at = Timestamp.now();
+        // If this save records a real discount and the customer has an
+        // active thank-you offer pending, treat that offer as redeemed and
+        // clear it in the same write — regardless of whether the discount
+        // matched, exceeded, or undercut the eligible amount. Read from the
+        // freshly-fetched server doc so a concurrent thank-you send from
+        // another session isn't missed by the local in-memory map.
+        const persistedDiscount = Number(patch.discount);
+        const existingOfferAmount = Number(existing.exists() ? existing.data()?.active_offer_amount : 0);
+        if (Number.isFinite(persistedDiscount) && persistedDiscount > 0 && existingOfferAmount > 0) {
+          custData.active_offer_amount = null;
+          custData.active_offer_valid_until = null;
+          custData.active_offer_sent_at = null;
+        }
         await setDoc(custRef, custData, { merge: true });
-        customers.set(phone, { phone, ...custData });
+        const prevCust = customers.get(phone) || {};
+        customers.set(phone, { ...prevCust, phone, ...custData });
       }
       // Cascade status back to the source restaurant order so the individual
       // TCD/A1 admin sees a synchronised state:

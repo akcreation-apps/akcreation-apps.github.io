@@ -46,6 +46,37 @@ export function searchCustomers(map, term) {
   return out.map(x => x.c);
 }
 
+// Persists a freshly-issued thank-you offer onto the customer doc. Overwrites
+// any previous active offer — one offer per customer at a time, by design.
+// Called from the order card's Thank-You flow at the moment the admin
+// confirms "Open WhatsApp" so we never lose the offer if the tab navigates.
+export async function setActiveOffer(db, phone, { amount, validUntil }) {
+  const p = normalisePhone(phone);
+  if (!isValidPhone(p)) throw new Error('Valid 10-digit phone is required');
+  const amt = Number(amount);
+  if (!Number.isFinite(amt) || amt <= 0) throw new Error('Offer amount must be positive');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(validUntil || ''))) throw new Error('Offer valid_until must be YYYY-MM-DD');
+  await setDoc(doc(db, COL.CUSTOMERS, p), {
+    active_offer_amount: amt,
+    active_offer_valid_until: validUntil,
+    active_offer_sent_at: Timestamp.now(),
+  }, { merge: true });
+  return { amount: amt, validUntil };
+}
+
+// Clears the active offer fields. Called when a new order for this customer
+// is saved with a non-zero discount — the offer is considered redeemed
+// regardless of whether the admin gave more or less than the eligible amount.
+export async function clearActiveOffer(db, phone) {
+  const p = normalisePhone(phone);
+  if (!isValidPhone(p)) return;
+  await setDoc(doc(db, COL.CUSTOMERS, p), {
+    active_offer_amount: null,
+    active_offer_valid_until: null,
+    active_offer_sent_at: null,
+  }, { merge: true });
+}
+
 // Upsert a customer doc keyed by phone. Sets created_at on first insert.
 export async function upsertCustomer(db, payload) {
   const phone = normalisePhone(payload.phone);

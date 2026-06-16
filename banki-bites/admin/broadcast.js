@@ -6,6 +6,10 @@ import { loadCustomers } from './customers.js';
 
 const OFFER_URL = 'https://akcreation-apps.com/banki-bites/offer.jpg';
 const FOOTER = 'Reply "Stop" to stop receiving future advertisements.\n\n_Team BankiBites_ ❤️';
+// Default body for the "Offer expiring" segment — auto-loaded when the
+// admin picks that segment and the composer is empty. Uses the {name},
+// {discount}, {expiry} placeholders supported by personalize().
+const EXPIRING_TEMPLATE = 'Hi {name}! ⏰ Your *₹{discount} OFF* BankiBites coupon expires on *{expiry}* — today is a great day to use it 😋\n\nOrder on the BankiBites app or web before the offer ends.';
 const QUEUE_KEY = 'bb_broadcast_queue_v1';
 const NAME_FALLBACK = 'Friend';
 
@@ -17,11 +21,12 @@ const ORDER_LOOKBACK_DAYS = 180;
 // Win-back lifecycle segments, by days since last delivered order. Customers
 // with no order in the look-back window are folded into "Lost 60d+".
 const SEGMENTS = [
-  { id: 'all',     label: 'All',            icon: 'fa-users' },
-  { id: 'active',  label: 'Active ≤14d',    icon: 'fa-fire' },
-  { id: 'cooling', label: 'Cooling 15–30d', icon: 'fa-hourglass-half' },
-  { id: 'lapsed',  label: 'Lapsed 31–60d',  icon: 'fa-clock-rotate-left' },
-  { id: 'lost',    label: 'Lost 60d+',      icon: 'fa-heart-crack' },
+  { id: 'all',      label: 'All',            icon: 'fa-users' },
+  { id: 'active',   label: 'Active ≤14d',    icon: 'fa-fire' },
+  { id: 'cooling',  label: 'Cooling 15–30d', icon: 'fa-hourglass-half' },
+  { id: 'lapsed',   label: 'Lapsed 31–60d',  icon: 'fa-clock-rotate-left' },
+  { id: 'lost',     label: 'Lost 60d+',      icon: 'fa-heart-crack' },
+  { id: 'expiring', label: 'Offer expiring', icon: 'fa-gift' },
 ];
 
 function segmentOf(daysAgo) {
@@ -31,8 +36,34 @@ function segmentOf(daysAgo) {
   if (daysAgo <= 60) return 'lapsed';
   return 'lost';
 }
-function inSegment(daysAgo, segId) {
+// Returns YYYY-MM-DD for the local "today" and "tomorrow" — string compare
+// against the customer doc's active_offer_valid_until (which is stored in
+// the same shape) avoids any Timestamp/Date juggling.
+function todayStr() {
+  const t = new Date(); t.setHours(0,0,0,0);
+  const y = t.getFullYear(), m = String(t.getMonth()+1).padStart(2,'0'), d = String(t.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+function tomorrowStr() {
+  const t = new Date(); t.setHours(0,0,0,0); t.setDate(t.getDate()+1);
+  const y = t.getFullYear(), m = String(t.getMonth()+1).padStart(2,'0'), d = String(t.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+function hasExpiringOffer(c) {
+  const amt = Number(c && c.active_offer_amount);
+  const until = String((c && c.active_offer_valid_until) || '');
+  if (!Number.isFinite(amt) || amt <= 0) return false;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(until)) return false;
+  return until === todayStr() || until === tomorrowStr();
+}
+function formatExpiry(until) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(until || ''))) return '';
+  const d = new Date(until + 'T00:00:00');
+  return `${d.getDate()} ${d.toLocaleDateString('en-IN', { month: 'short' })}`;
+}
+function inSegment(daysAgo, segId, c) {
   if (segId === 'all') return true;
+  if (segId === 'expiring') return hasExpiringOffer(c);
   return segmentOf(daysAgo) === segId;
 }
 
@@ -57,15 +88,23 @@ function displayName(rawName) {
   return s;
 }
 
-function personalize(template, name) {
+function personalize(template, recipient) {
   if (!template) return '';
+  const r = recipient || {};
   // Support {name}, {Name}, { name } — case- and whitespace-tolerant.
-  return template.replace(/\{\s*name\s*\}/gi, displayName(name));
+  // {discount} and {expiry} are populated for the "Offer expiring" segment;
+  // for other segments they render as the empty string.
+  const discount = (r.discount != null && Number.isFinite(+r.discount)) ? String(+r.discount) : '';
+  const expiry = r.expiry || '';
+  return template
+    .replace(/\{\s*name\s*\}/gi, displayName(r.name))
+    .replace(/\{\s*discount\s*\}/gi, discount)
+    .replace(/\{\s*expiry\s*\}/gi, expiry);
 }
 
-function buildMessage(body, imageUrl, name) {
+function buildMessage(body, imageUrl, recipient) {
   const parts = [];
-  const t = personalize((body || '').trim(), name);
+  const t = personalize((body || '').trim(), recipient);
   if (t) parts.push(t);
   const u = (imageUrl || '').trim();
   if (u) parts.push(u);
@@ -168,6 +207,8 @@ export async function renderBroadcast(root, db) {
                   <i class="fas fa-user"></i> Insert {name}
                 </button>
                 — replaced with each customer's first name (falls back to "Friend").
+                For the <strong>Offer expiring</strong> segment, also use
+                <code>{discount}</code> and <code>{expiry}</code>.
                 Footer is appended automatically.
               </span>
               <span class="bb-bc__count"><span id="bcMsgCount">0</span> / 900</span>
@@ -283,30 +324,45 @@ export async function renderBroadcast(root, db) {
   const selInfo  = root.querySelector('#bcSelInfo');
 
   const selected = new Set();
-  let customers = []; // [{phone, name, address, not_interested, lastOrderAt, daysAgo, segment}]
+  let customers = []; // [{phone, name, address, not_interested, lastOrderAt, daysAgo, active_offer_amount, active_offer_valid_until}]
   let term = '';
   let activeSeg = 'all';
+  // Tracks whether the current composer body was auto-loaded from a segment
+  // template (vs. typed by the admin). We only auto-load and auto-clear
+  // when this flag matches — never clobber admin-typed content.
+  let autoFilled = false;
 
   function hasRealName(c) {
     // A "real" name is anything that survives the prettyName rule — i.e. not
     // empty and not an unaliased "BB N" placeholder.
     return displayName(c.name) !== NAME_FALLBACK;
   }
+  function toRecipient(c) {
+    return {
+      name: c.name || '',
+      discount: c.active_offer_amount,
+      expiry: formatExpiry(c.active_offer_valid_until),
+    };
+  }
   function pickSampleRecipient() {
     // Prefer the first selected eligible customer with a real name. Falls
-    // back to any eligible customer with a real name, then the fallback.
+    // back to any eligible customer with a real name in the active segment
+    // (so segments like "Offer expiring" preview with a real discount /
+    // expiry), then any eligible real-named customer, then the fallback.
     const selectedReal = customers.find(c => selected.has(c.phone) && eligible(c) && hasRealName(c));
-    if (selectedReal) return { name: selectedReal.name, source: 'selected' };
+    if (selectedReal) return { recipient: toRecipient(selectedReal), source: 'selected' };
+    const segReal = customers.find(c => eligible(c) && hasRealName(c) && matchesSeg(c));
+    if (segReal) return { recipient: toRecipient(segReal), source: 'sample' };
     const anyReal = customers.find(c => eligible(c) && hasRealName(c));
-    if (anyReal) return { name: anyReal.name, source: 'sample' };
-    return { name: NAME_FALLBACK, source: 'fallback' };
+    if (anyReal) return { recipient: toRecipient(anyReal), source: 'sample' };
+    return { recipient: { name: NAME_FALLBACK }, source: 'fallback' };
   }
 
   function updatePreview() {
     const sample = pickSampleRecipient();
-    previewEl.textContent = buildMessage(msgEl.value, imgEl.value, sample.name);
+    previewEl.textContent = buildMessage(msgEl.value, imgEl.value, sample.recipient);
     msgCount.textContent = msgEl.value.length;
-    previewName.textContent = displayName(sample.name);
+    previewName.textContent = displayName(sample.recipient.name);
     const hasPlaceholder = /\{\s*name\s*\}/i.test(msgEl.value);
     previewSrc.textContent = hasPlaceholder
       ? (sample.source === 'selected' ? '(first selected recipient)'
@@ -330,7 +386,7 @@ export async function renderBroadcast(root, db) {
     statOpted.textContent = opted;
   }
   function eligible(c) { return !c.not_interested; }
-  function matchesSeg(c) { return inSegment(c.daysAgo, activeSeg); }
+  function matchesSeg(c) { return inSegment(c.daysAgo, activeSeg, c); }
   function daysAgoLabel(daysAgo) {
     if (daysAgo === null) return 'Never ordered';
     if (daysAgo === 0) return 'Ordered today';
@@ -346,11 +402,12 @@ export async function renderBroadcast(root, db) {
     })[segmentOf(daysAgo)];
   }
   function updateSegments() {
-    const counts = { all: 0, active: 0, cooling: 0, lapsed: 0, lost: 0 };
+    const counts = { all: 0, active: 0, cooling: 0, lapsed: 0, lost: 0, expiring: 0 };
     for (const c of customers) {
       if (!eligible(c)) continue;
       counts.all += 1;
       counts[segmentOf(c.daysAgo)] += 1;
+      if (hasExpiringOffer(c)) counts.expiring += 1;
     }
     for (const id of Object.keys(counts)) {
       const el = segmentsEl.querySelector(`[data-seg-count="${id}"]`);
@@ -455,7 +512,9 @@ export async function renderBroadcast(root, db) {
     updateSegments();
   }
 
-  msgEl.addEventListener('input', updatePreview);
+  // Any typed change clears the auto-filled flag, so a later segment switch
+  // won't overwrite or erase the admin's custom message.
+  msgEl.addEventListener('input', () => { autoFilled = false; updatePreview(); });
   imgEl.addEventListener('input', updatePreview);
   useBtn.addEventListener('click', () => { imgEl.value = OFFER_URL; updatePreview(); });
 
@@ -491,8 +550,20 @@ export async function renderBroadcast(root, db) {
       b.classList.toggle('is-active', on);
       b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
+    // Auto-load the "Offer expiring" template when the admin enters that
+    // segment with an empty (or previously auto-filled) composer. Clear
+    // the template again on the way out. Never overwrites admin-typed
+    // content — `autoFilled` is cleared the moment they edit the message.
+    if (id === 'expiring' && (msgEl.value === '' || autoFilled)) {
+      msgEl.value = EXPIRING_TEMPLATE;
+      autoFilled = true;
+    } else if (id !== 'expiring' && autoFilled && msgEl.value === EXPIRING_TEMPLATE) {
+      msgEl.value = '';
+      autoFilled = false;
+    }
     updateSegments();
     renderList();
+    updatePreview();
   });
   clearBtn.addEventListener('click', () => { selected.clear(); renderList(); updateSelInfo(); });
 
@@ -520,14 +591,19 @@ export async function renderBroadcast(root, db) {
     const imageUrl = imgEl.value || '';
     // Validate using a fallback name so empty bodies with only a placeholder
     // don't slip past as "non-empty".
-    const sample = buildMessage(body, imageUrl, NAME_FALLBACK);
+    const sample = buildMessage(body, imageUrl, { name: NAME_FALLBACK });
     if (!sample.trim() || sample.trim() === FOOTER) {
       Swal.fire({ icon: 'warning', title: 'Empty message', text: 'Type a message or paste an offer image URL first.' });
       return;
     }
     const recipients = customers
       .filter(c => selected.has(c.phone) && eligible(c))
-      .map(c => ({ phone: c.phone, name: c.name || '' }));
+      .map(c => ({
+        phone: c.phone,
+        name: c.name || '',
+        discount: Number.isFinite(+c.active_offer_amount) ? +c.active_offer_amount : null,
+        expiry: formatExpiry(c.active_offer_valid_until),
+      }));
     if (!recipients.length) {
       Swal.fire({ icon: 'warning', title: 'No eligible recipients', text: 'All selected customers are opted out.' });
       return;
@@ -564,6 +640,8 @@ export async function renderBroadcast(root, db) {
         not_interested: !!c.not_interested,
         lastOrderAt: lastMs,
         daysAgo,
+        active_offer_amount: c.active_offer_amount,
+        active_offer_valid_until: c.active_offer_valid_until,
       };
     });
   } finally {
@@ -593,7 +671,7 @@ async function runNextInQueue() {
   // Build personalised message for this recipient. Old queues (created before
   // {name} support) carry a pre-built `message` string — honour that as-is.
   const finalMessage = (typeof q.body === 'string')
-    ? buildMessage(q.body, q.imageUrl || '', r.name)
+    ? buildMessage(q.body, q.imageUrl || '', { name: r.name, discount: r.discount, expiry: r.expiry })
     : (q.message || '');
   const headerName = displayName(r.name);
   const res = await Swal.fire({
