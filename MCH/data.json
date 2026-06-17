@@ -303,9 +303,7 @@
               "not_available_time": ""
             }
           ]
-        }
-      ],
-      "subcategories": [
+        },
         {
           "name": "Thali/Meal",
           "type": "Veg",
@@ -380,9 +378,7 @@
               "not_available_time": 16
             }
           ]
-        }
-      ],
-      "subcategories": [
+        },
         {
           "name": "Curry",
           "type": "Veg",
