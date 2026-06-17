@@ -337,7 +337,8 @@ document.addEventListener('DOMContentLoaded', async() => {
 
                         const currentHour = new Date().getHours();
 
-                        subcategory.dishes.forEach(dish => {
+                        const sortedDishes = [...subcategory.dishes].sort((a, b) => a.price - b.price);
+                        sortedDishes.forEach(dish => {
                             // Skip rendering the dish if its id is in disable_ids
                             if (disable_ids.includes(dish.id)) {
                                 return;

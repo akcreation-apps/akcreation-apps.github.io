@@ -91,6 +91,13 @@
               "price": 229,
               "available_time": "",
               "not_available_time": ""
+            },
+            {
+              "id": 113,
+              "name": "Chilli Kobi",
+              "price": 159,
+              "available_time": "",
+              "not_available_time": ""
             }
           ]
         },
@@ -172,6 +179,20 @@
               "id": 211,
               "name": "Chicken Lollipop",
               "price": 179,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 212,
+              "name": "Fish Fry (1pc)",
+              "price": 49,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 213,
+              "name": "Chicken Fry (1pc)",
+              "price": 99,
               "available_time": "",
               "not_available_time": ""
             }
@@ -278,6 +299,153 @@
               "id": 604,
               "name": "Maa Charchika Special Chicken Biryani",
               "price": 219,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Thali/Meal",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 701,
+              "name": "Veg Thali",
+              "price": 99,
+              "available_time": 12,
+              "not_available_time": 16
+            },
+            {
+              "id": 702,
+              "name": "Mix Veg Thali",
+              "price": 159,
+              "available_time": 12,
+              "not_available_time": 16
+            },
+            {
+              "id": 703,
+              "name": "Mushroom Thali",
+              "price": 159,
+              "available_time": 12,
+              "not_available_time": 16
+            },
+            {
+              "id": 704,
+              "name": "Paneer Thali",
+              "price": 159,
+              "available_time": 12,
+              "not_available_time": 16
+            }
+          ]
+        },
+        {
+          "name": "Thali/Meal",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 801,
+              "name": "Fish Thali",
+              "price": 99,
+              "available_time": 12,
+              "not_available_time": 16
+            },
+            {
+              "id": 802,
+              "name": "Chicken Thali",
+              "price": 159,
+              "available_time": 12,
+              "not_available_time": 16
+            },
+            {
+              "id": 803,
+              "name": "Pohada Thali",
+              "price": 179,
+              "available_time": 12,
+              "not_available_time": 16
+            },
+            {
+              "id": 804,
+              "name": "Prawn Thali",
+              "price": 219,
+              "available_time": 12,
+              "not_available_time": 16
+            },
+            {
+              "id": 805,
+              "name": "Mutton Thali",
+              "price": 229,
+              "available_time": 12,
+              "not_available_time": 16
+            }
+          ]
+        }
+      ],
+      "subcategories": [
+        {
+          "name": "Curry",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 901,
+              "name": "Paneer Mix Veg",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 902,
+              "name": "Mushroom Masala",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Curry",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 1001,
+              "name": "Chicken Curry",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1002,
+              "name": "Pohada Curry",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1003,
+              "name": "Chicken Kasa",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1004,
+              "name": "Crab Masala",
+              "price": 139,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1005,
+              "name": "Mutton Masala",
+              "price": 169,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1006,
+              "name": "Prawns Masala",
+              "price": 169,
               "available_time": "",
               "not_available_time": ""
             }
