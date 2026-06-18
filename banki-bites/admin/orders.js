@@ -1,7 +1,7 @@
 import { COL } from '../firebase-config.js';
 import { loadCustomers, searchCustomers, openCustomerModal, setActiveOffer, clearActiveOffer } from './customers.js';
 import {
-  collection, query, onSnapshot, doc, updateDoc, setDoc, getDoc, getDocs, where, Timestamp,
+  collection, query, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, where, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
@@ -490,6 +490,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       <button class="btn btn-sm btn-outline-success mr-auto" data-act="thankYou" title="Send thank-you coupon on WhatsApp">
         <i class="fab fa-whatsapp mr-1"></i> Thank You
       </button>` : ''}
+      <button class="btn btn-sm btn-outline-danger" data-act="deleteOrder" title="Delete order permanently">
+        <i class="fas fa-trash-alt mr-1"></i> Delete
+      </button>
       <button class="btn btn-sm ${isFake ? 'btn-warning' : 'btn-outline-danger'}" data-act="toggleFake">
         <i class="fas fa-triangle-exclamation mr-1"></i>${isFake ? 'Unmark fake' : 'Flag as fake'}
       </button>
@@ -1107,6 +1110,51 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     } catch (e) {
       window.bbDone();
       Swal.fire({ icon: 'error', title: 'Update failed', text: e.message });
+    }
+  });
+
+  card.querySelector('[data-act="deleteOrder"]').addEventListener('click', async () => {
+    const confirmed = await Swal.fire({
+      icon: 'warning',
+      title: 'Delete this order?',
+      html: 'This will permanently remove the order from BankiBites <strong>and</strong> from the source restaurant’s orders. This cannot be undone.',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      confirmButtonColor: '#dc2626',
+    });
+    if (!confirmed.isConfirmed) return;
+    try {
+      window.bbBusy('Deleting…');
+      // Delete the source restaurant doc first (best-effort) so the originating
+      // queue is cleared even if the mirror delete somehow fails afterwards.
+      const rawPath = String(o.source_doc_path || '').trim().replace(/^\/+|\/+$/g, '');
+      let sourceWarn = null;
+      if (rawPath) {
+        try {
+          await deleteDoc(doc(db, rawPath));
+        } catch (err) {
+          console.warn('Source order delete failed for path:', rawPath, err);
+          sourceWarn = { path: rawPath, message: err.message };
+        }
+      }
+      await deleteDoc(doc(db, COL.ORDERS, o.id));
+      window.bbDone();
+      if (sourceWarn) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Deleted here, but source delete failed',
+          html: `Path: <code>${escapeHtml(sourceWarn.path)}</code><br>${escapeHtml(sourceWarn.message)}<br>Remove the matching row in the restaurant’s admin manually.`,
+        });
+      } else if (!rawPath) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Deleted here only',
+          text: 'This order had no source_doc_path — nothing to delete in the source restaurant’s admin.',
+        });
+      }
+    } catch (e) {
+      window.bbDone();
+      Swal.fire({ icon: 'error', title: 'Delete failed', text: e.message });
     }
   });
 
