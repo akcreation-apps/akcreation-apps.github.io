@@ -548,6 +548,7 @@
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .place-other-input:focus-visible {
+            outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
         }
@@ -564,6 +565,8 @@
         .place-other-confirm:active { transform: scale(0.93); }
         .place-other-confirm:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
         .place-error { font-size: 0.74rem; color: var(--error-clr); margin-top: 8px; display: none; }
+        .place-other-note { margin-top: 8px; font-size: 0.78rem; color: var(--text-muted, #6b7280); font-style: italic; display: flex; align-items: center; gap: 6px; line-height: 1.35; }
+        .place-other-note i { color: var(--primary, #FF6B35); }
 
         /* ── Screen reader only ── */
         .sr-only {
@@ -739,6 +742,10 @@
                             <i class="fas fa-check" aria-hidden="true"></i>
                         </button>
                     </div>
+                    <p class="place-other-note">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
+                        Delivery charge will be added extra as per distance.
+                    </p>
                     <p id="placeError" class="place-error" role="alert"></p>
                 </div>
             </div>
