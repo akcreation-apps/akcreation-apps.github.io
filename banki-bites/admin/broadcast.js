@@ -696,7 +696,29 @@ async function runNextInQueue() {
   if (res.isConfirmed) {
     q.index += 1;
     saveQueue(q);
-    window.location.href = 'https://wa.me/91' + r.phone + '?text=' + encodeURIComponent(finalMessage);
+    // Resume the queue automatically when the admin returns to the tab. On
+    // mobile (especially iOS Safari) the bfcache restores the page without
+    // re-running renderBroadcast's bootstrap, so without this listener the
+    // next recipient's Swal never appears and the broadcast appears stuck
+    // after the first contact. visibilitychange covers the foreground hop;
+    // pageshow with persisted=true covers the bfcache restore. A small delay
+    // lets the tab finish transitioning before the next Swal opens.
+    try {
+      const onReturn = () => {
+        if (document.visibilityState !== 'visible') return;
+        document.removeEventListener('visibilitychange', onReturn);
+        window.removeEventListener('pageshow', onReturn);
+        setTimeout(() => { runNextInQueue(); }, 250);
+      };
+      document.addEventListener('visibilitychange', onReturn);
+      window.addEventListener('pageshow', onReturn);
+    } catch (e) { /* listener attach must never block the send */ }
+    const waUrl = 'https://wa.me/91' + r.phone + '?text=' + encodeURIComponent(finalMessage);
+    try { navigator.clipboard && navigator.clipboard.writeText(finalMessage).catch(() => {}); } catch (e) {}
+    try { window.location.href = waUrl; return; } catch (e) {}
+    try { window.location.assign(waUrl); return; } catch (e) {}
+    try { window.open(waUrl, '_self'); return; } catch (e) {}
+    try { window.open(waUrl, '_blank'); return; } catch (e) {}
     return;
   }
   if (res.isDenied) {
