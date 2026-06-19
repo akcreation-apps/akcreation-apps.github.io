@@ -805,10 +805,12 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
                 style="font-size:0.82rem;resize:none;background:var(--surface-soft)" readonly></textarea>
             </div>
           </div>`,
-        confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Open WhatsApp',
+        confirmButtonText: '<i class="fas fa-save mr-1"></i> Save Offer',
         confirmButtonColor: '#25d366',
         showCancelButton: true,
         width: 480,
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !Swal.isLoading(),
         didOpen: () => {
           const discEl = document.getElementById('tyDiscount');
           const dateEl = document.getElementById('tyDate');
@@ -822,12 +824,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           const discount = parseInt(document.getElementById('tyDiscount').value);
           const dateStr  = document.getElementById('tyDate').value;
           if (!Number.isFinite(discount) || discount < 0) { Swal.showValidationMessage('Enter a valid discount amount'); return false; }
-          // Date is only required when there's actually a discount to expire.
           if (discount > 0 && !dateStr) { Swal.showValidationMessage('Pick a valid-until date'); return false; }
-          // Persist the offer inside preConfirm so the post-await code stays
-          // synchronous — wa.me deep-links require a fresh user gesture, and
-          // an await between the confirm click and location.href would push
-          // mobile WhatsApp through the api.whatsapp.com interstitial.
           const phone = normalisePhone(o.customer?.phone || '');
           if (phone && discount > 0) {
             try {
@@ -843,8 +840,6 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
 
       if (!res.isConfirmed) return;
       const { discount, dateStr, phone } = res.value;
-      // Mirror the persisted offer into the in-memory customers map so the
-      // eligibility hint reflects the new offer on subsequent renders.
       if (phone && discount > 0) {
         const c = customers.get(phone) || { phone };
         c.active_offer_amount = discount;
@@ -852,6 +847,19 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         customers.set(phone, c);
       }
       const msg = buildMsg(discount, dateStr);
+
+      // Second prompt provides a fresh user gesture for wa.me — without it,
+      // mobile WhatsApp routes through the api.whatsapp.com interstitial.
+      const sendRes = await Swal.fire({
+        icon: 'success',
+        title: discount > 0 ? 'Offer saved ✓' : 'Ready to send',
+        text: 'Send the thank-you message on WhatsApp now?',
+        confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Send Message',
+        confirmButtonColor: '#25d366',
+        showCancelButton: true,
+        cancelButtonText: 'Skip',
+      });
+      if (!sendRes.isConfirmed) return;
       window.location.href = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
     });
   }
