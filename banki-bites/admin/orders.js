@@ -849,12 +849,25 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       const msg = buildMsg(discount, dateStr);
       const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
 
-      // Auto-redirect immediately after Swal closes. No intermediate toast —
-      // any extra await burns through the user-activation window and lets
-      // mobile browsers treat the navigation as programmatic (blocked or
-      // pushed through api.whatsapp.com interstitial). Fallback chain mirrors
-      // A1/cart.js `goToWhatsApp` so flaky Android WebViews still land.
+      // Confirm Swal with an explicit "Open WhatsApp" button — the click is
+      // the fresh user-gesture mobile browsers need to launch the wa.me
+      // deep-link cleanly. Auto-open via location.href after the form save
+      // was unreliable (user-gesture window was consumed by preConfirm's
+      // await), so we accept a single extra click as the price of reliability.
       try { Swal.close(); } catch (e) {}
+      await new Promise(r => setTimeout(r, 80));
+      const sendRes = await Swal.fire({
+        icon: 'success',
+        title: discount > 0 ? 'Offer saved ✓' : 'Ready to send',
+        html: '<div style="font-size:.95rem;line-height:1.5;color:#374151">Tap below to send the thank-you on WhatsApp.</div>',
+        confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Open WhatsApp',
+        confirmButtonColor: '#25d366',
+        showCancelButton: true,
+        cancelButtonText: 'Skip',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+      if (!sendRes.isConfirmed) return;
       try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
       try { window.location.href = waUrl; return; } catch (e) {}
       try { window.location.assign(waUrl); return; } catch (e) {}
