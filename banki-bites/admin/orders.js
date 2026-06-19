@@ -847,23 +847,19 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         customers.set(phone, c);
       }
       const msg = buildMsg(discount, dateStr);
+      const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
 
-      // Auto-redirect: brief "Opening WhatsApp" toast with a short auto-close
-      // timer, then fire the wa.me deep-link unconditionally. No confirm
-      // button — matches what the user wants the place-order flow to feel
-      // like (save → straight to WhatsApp).
+      // Auto-redirect immediately after Swal closes. No intermediate toast —
+      // any extra await burns through the user-activation window and lets
+      // mobile browsers treat the navigation as programmatic (blocked or
+      // pushed through api.whatsapp.com interstitial). Fallback chain mirrors
+      // A1/cart.js `goToWhatsApp` so flaky Android WebViews still land.
       try { Swal.close(); } catch (e) {}
-      await new Promise(r => setTimeout(r, 80));
-      await Swal.fire({
-        icon: 'success',
-        title: discount > 0 ? 'Offer saved ✓' : 'Ready to send',
-        html: '<div style="font-size:.95rem;color:#374151">Opening WhatsApp…</div>',
-        timer: 900,
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-      }).catch(() => {});
-      window.location.href = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
+      try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
+      try { window.location.href = waUrl; return; } catch (e) {}
+      try { window.location.assign(waUrl); return; } catch (e) {}
+      try { window.open(waUrl, '_self'); return; } catch (e) {}
+      try { window.open(waUrl, '_blank'); return; } catch (e) {}
     });
   }
 
