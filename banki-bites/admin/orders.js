@@ -848,24 +848,21 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       }
       const msg = buildMsg(discount, dateStr);
 
-      // Brief gesture-affirming prompt — the click is a fresh user-gesture so
-      // mobile bypasses the api.whatsapp.com interstitial. Wrapped in a race
-      // with a 60s timeout so the redirect auto-fires even if the admin
-      // ignores the prompt (mirrors the customer place-order flow).
+      // Auto-redirect: brief "Opening WhatsApp" toast with a short auto-close
+      // timer, then fire the wa.me deep-link unconditionally. No confirm
+      // button — matches what the user wants the place-order flow to feel
+      // like (save → straight to WhatsApp).
       try { Swal.close(); } catch (e) {}
       await new Promise(r => setTimeout(r, 80));
-      await Promise.race([
-        Swal.fire({
-          icon: 'success',
-          title: discount > 0 ? 'Offer saved ✓' : 'Ready to send',
-          html: '<div style="font-size:.95rem;line-height:1.5;color:#374151">Tap below — your thank-you message is ready.</div>',
-          confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Open WhatsApp',
-          confirmButtonColor: '#25d366',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-        }).catch(() => {}),
-        new Promise(resolve => setTimeout(resolve, 60000)),
-      ]);
+      await Swal.fire({
+        icon: 'success',
+        title: discount > 0 ? 'Offer saved ✓' : 'Ready to send',
+        html: '<div style="font-size:.95rem;color:#374151">Opening WhatsApp…</div>',
+        timer: 900,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      }).catch(() => {});
       window.location.href = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
     });
   }
