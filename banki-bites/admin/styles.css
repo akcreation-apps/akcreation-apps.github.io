@@ -2132,3 +2132,197 @@ button.fab:hover { background: var(--brand-dark); }
   .bb-bc__hero-icon { width: 56px; height: 56px; font-size: 1.6rem; border-radius: 14px; }
   .bb-bc__hero h2 { font-size: 1.35rem; }
 }
+
+/* ===== Customers tab — theme-aware table ===== */
+.cust-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cust-table thead th {
+  background: var(--surface-2);
+  color: var(--text-strong);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+.cust-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+  color: var(--text);
+}
+.cust-table tbody tr:last-child td { border-bottom: 0; }
+.cust-table tbody tr:hover td { background: var(--brand-soft); }
+.cust-table .text-right { text-align: right; }
+.cust-table .text-muted { color: var(--muted) !important; }
+.cust-table .small { font-size: 0.78rem; }
+.cust-row--orphan td { background: var(--chip-new-bg); color: var(--chip-new-fg); }
+.cust-row--orphan:hover td { background: var(--chip-new-bg); }
+.cust-row--orphan .text-muted { color: var(--chip-new-fg) !important; opacity: 0.85; }
+.cust-table__actions { white-space: nowrap; }
+
+/* Customer-details sub-header — stacks on mobile, inline on tablet+ */
+.cust-details-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0 8px;
+}
+.cust-details-title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-strong);
+  font-weight: 600;
+}
+.cust-details-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cust-details-search input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+@media (min-width: 720px) {
+  .cust-details-head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cust-details-search { flex: 0 1 auto; justify-content: flex-end; }
+  .cust-details-search input { flex: 0 1 320px; max-width: 320px; }
+}
+
+/* Mobile: compact two-line card per customer. Hide secondary fields. */
+@media (max-width: 719px) {
+  .cust-table { display: block; border: 0; border-radius: 0; background: transparent; overflow: visible; }
+  .cust-table thead { display: none; }
+  .cust-table tbody { display: block; }
+  .cust-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto auto;
+    grid-template-areas:
+      "name    spend  edit"
+      "orders  last   offer"
+      "address address address";
+    column-gap: 10px;
+    row-gap: 4px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .cust-table tbody tr:hover td { background: transparent; }
+  .cust-table tbody td {
+    padding: 0;
+    border: 0;
+    text-align: left;
+    min-width: 0;
+  }
+  .cust-table tbody td::before { display: none; }
+
+  .cust-table tbody td[data-label="Customer"] {
+    grid-area: name;
+    color: var(--text-strong);
+    min-width: 0;
+    line-height: 1.25;
+  }
+  .cust-table tbody td[data-label="Customer"] > div:first-child {
+    font-weight: 600;
+    font-size: 0.92rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cust-table tbody td[data-label="Customer"] .small {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .cust-table tbody td[data-label="Spend"] {
+    grid-area: spend;
+    font-weight: 700;
+    color: var(--brand);
+    text-align: right;
+    font-size: 0.92rem;
+    white-space: nowrap;
+  }
+
+  /* Meta row: orders, last order, offer — three small inline cells */
+  .cust-table tbody td[data-label="Orders"] {
+    grid-area: orders;
+    font-size: 0.74rem;
+    color: var(--muted);
+    white-space: nowrap;
+    text-align: left;
+  }
+  .cust-table tbody td[data-label="Orders"]::after {
+    content: " orders";
+    color: var(--muted);
+  }
+  .cust-table tbody td[data-label="Orders"] .small { display: none; }
+
+  .cust-table tbody td[data-label="Last order"] {
+    grid-area: last;
+    font-size: 0.74rem;
+    color: var(--muted);
+    white-space: nowrap;
+    text-align: center;
+  }
+  .cust-table tbody td[data-label="Last order"]::before {
+    content: "\f017"; /* fa-clock */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-right: 4px;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .cust-table tbody td[data-label="Offer"] {
+    grid-area: offer;
+    text-align: right;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+  .cust-table tbody td[data-label="Offer"] .text-muted { display: none; }
+
+  /* Address — only show if present, on its own bottom line, truncated */
+  .cust-table tbody td[data-label="Address"] {
+    grid-area: address;
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 4px;
+    border-top: 1px dashed var(--border-soft);
+    margin-top: 2px;
+  }
+  .cust-table tbody td[data-label="Address"] .small { display: inline; }
+  .cust-table tbody td[data-label="Address"] > div + div { display: none; }
+
+  .cust-table__actions {
+    grid-area: edit;
+    align-self: center;
+  }
+  .cust-table__actions .btn { padding: 4px 8px; }
+
+  .cust-row--orphan { border-color: var(--chip-new-fg); }
+  .cust-row--orphan td { background: transparent; color: inherit; }
+}
