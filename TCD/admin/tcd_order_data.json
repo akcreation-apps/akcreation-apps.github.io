@@ -1,4 +1,1751 @@
 {
+    "sLiforl7BagnOlPC0MKi": {
+        "total_cart_value": 169,
+        "created_at": "2026-06-21T14:05:07.369000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Kit_Kat.webp",
+                            "quantity": 1,
+                            "id": 1101,
+                            "name": "Kit Kat"
+                        }
+                    ],
+                    "name": "Smoothies"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "D8kXFYAk20YMZU6wXJdM": {
+        "total_cart_value": 219,
+        "created_at": "2026-06-21T12:40:06.758000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 219,
+                            "image_src": "../food_src/Veg_Biryani_(Full).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2702,
+                            "name": "Veg Biryani (Full)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "bX7JFwD8FELnNb0QVytI": {
+        "total_cart_value": 278,
+        "created_at": "2026-06-21T11:02:44.859000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Red_Sauce.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 831,
+                            "name": "Red Sauce"
+                        },
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/White_Sauce.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 832,
+                            "name": "White Sauce"
+                        }
+                    ],
+                    "name": "Pasta"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "7XwqMukp8MsJBfanRy6p": {
+        "total_cart_value": 219,
+        "created_at": "2026-06-21T09:50:14.754000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Biryani_(3pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 2802,
+                            "name": "Chicken Biryani (3pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "HWlR1bPkAcI4kKUVVFit": {
+        "total_cart_value": 258,
+        "created_at": "2026-06-21T08:44:20.787000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Chicken_Biryani_(2pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 2801,
+                            "name": "Chicken Biryani (2pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "9SiSVsh4lZEEAr8AzpQB": {
+        "total_cart_value": 169,
+        "created_at": "2026-06-20T16:39:18.069000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Corn_Cheese.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 702,
+                            "name": "Corn Cheese"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "hDupBgelBrkPubwpDDoo": {
+        "total_cart_value": 238,
+        "created_at": "2026-06-20T13:53:02.161000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Sahadapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "oYkS25vYMOgPcTPQBbjg": {
+        "total_cart_value": 717,
+        "created_at": "2026-06-20T12:31:42.716000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 359,
+                            "image_src": "../food_src/Corn_Paneer(12_inch).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 909,
+                            "name": "Corn Paneer(12 inch)"
+                        },
+                        {
+                            "price": 219,
+                            "image_src": "../food_src/Farm_House(9_inch).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 904,
+                            "name": "Farm House(9 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "3EGCZpD2R7D2BDvG7ZL6": {
+        "total_cart_value": 208,
+        "created_at": "2026-06-20T11:38:52.837000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        },
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "aa0UiaFH0IGF8YbBKftC": {
+        "total_cart_value": 338,
+        "created_at": "2026-06-20T08:09:23.086000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        },
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Mashroom_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 108,
+                            "name": "Mashroom Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "CerU4XElAul072clLcFD": {
+        "total_cart_value": 317,
+        "created_at": "2026-06-20T07:41:14.304000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 189,
+                            "image_src": "../food_src/Mushroom_Do_Pyaja.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2907,
+                            "name": "Mushroom Do Pyaja"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "p4rYyWi2ZKERJVNVEIyY": {
+        "total_cart_value": 179,
+        "created_at": "2026-06-20T05:36:46.820000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Harirajpur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Chicken_Biryani_(2pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 2801,
+                            "name": "Chicken Biryani (2pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "eW7WrSUE4mDjImY65tHI": {
+        "total_cart_value": 398,
+        "created_at": "2026-06-19T15:01:26.630000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 199,
+                            "image_src": "../food_src/Chicken_Butter_Masala.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 3003,
+                            "name": "Chicken Butter Masala"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "Qqg13mjAbKVDZx3Dsngr": {
+        "total_cart_value": 248,
+        "created_at": "2026-06-19T13:53:59.479000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Singapore_Noodles.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 303,
+                            "name": "Singapore Noodles"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "XzCgdmKiZIamYq5n2lpG": {
+        "total_cart_value": 189,
+        "created_at": "2026-06-19T11:36:23.204000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Dompada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "YdF2t8gwHgSDmOlelrZT": {
+        "total_cart_value": 258,
+        "created_at": "2026-06-19T07:11:47.795000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Dompada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Corn_Cheese.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 702,
+                            "name": "Corn Cheese"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "SYV9hCsHs5h2wBE9rKHQ": {
+        "total_cart_value": 238,
+        "created_at": "2026-06-19T06:30:12.476000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Sahadapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "Cjz3YrMBREejMvhSEL0x": {
+        "total_cart_value": 89,
+        "created_at": "2026-06-19T05:50:20.556000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Dompada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "../food_src/Lachha_Paratha.webp",
+                            "quantity": 1,
+                            "id": 2502,
+                            "name": "Lachha Paratha"
+                        }
+                    ],
+                    "name": "Roti N Paratha"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "7cKlojuPuq5evsfow8cd": {
+        "total_cart_value": 229,
+        "created_at": "2026-06-19T05:44:58.351000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Dompada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 103,
+                            "name": "Paneer Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "KhvKonivhoQVKYBLzaUx": {
+        "total_cart_value": 238,
+        "created_at": "2026-06-16T05:57:23.680000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Sahadapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "Mx4Nzyw2y0pIqAVqGZXZ": {
+        "total_cart_value": 226,
+        "created_at": "2026-06-14T05:36:26.641000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Biryani_(3pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 2802,
+                            "name": "Chicken Biryani (3pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "../food_src/Steam_Rice.webp",
+                            "quantity": 1,
+                            "id": 2601,
+                            "name": "Steam Rice"
+                        }
+                    ],
+                    "name": "Rice"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 9,
+                            "image_src": "../food_src/Chapati_(Roti).webp",
+                            "quantity": 2,
+                            "id": 2501,
+                            "name": "Chapati (Roti)"
+                        }
+                    ],
+                    "name": "Roti N Paratha"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "CuFPVNuD4dQaO5BNtPsa": {
+        "total_cart_value": 396,
+        "created_at": "2026-06-12T12:31:19.331000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Crispy_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 101,
+                            "name": "Crispy Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "H6aplRsvZogTHhtj5Qfu": {
+        "total_cart_value": 278,
+        "created_at": "2026-06-12T07:31:14.686000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Veg_Biryani_(Half).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2701,
+                            "name": "Veg Biryani (Half)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "eprDuN2PSJWqtcazEL9j": {
+        "total_cart_value": 238,
+        "created_at": "2026-06-12T05:57:39.151000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Sahadapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "FhRtgYZDMwGl5fDjoXP5": {
+        "total_cart_value": 228,
+        "created_at": "2026-06-09T13:54:42.454000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Sahadapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "lpM4oi8GEYO3lfCnSWLE": {
+        "total_cart_value": 318,
+        "created_at": "2026-06-09T10:10:47.374000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "OwCuwsGHg0h37i4FMByD": {
+        "total_cart_value": 229,
+        "created_at": "2026-06-08T16:15:00.911000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ranapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Chilli_Chicken.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chilli Chicken"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "6Ml2SSt3XYZF9aszUSzI": {
+        "total_cart_value": 209,
+        "created_at": "2026-06-08T10:53:47.076000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Charchika",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Farm_House(6_inch).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 903,
+                            "name": "Farm House(6 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "XQCKH5N4WsiBWmq94FGn": {
+        "total_cart_value": 219,
+        "created_at": "2026-06-08T05:50:27.524000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ranapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Mashroom_65.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 106,
+                            "name": "Mashroom 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "Oox3goA8SWQiJ4RvkDp3": {
+        "total_cart_value": 359,
+        "created_at": "2026-06-07T13:47:21.883000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Khamaranga",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 359,
+                            "image_src": "../food_src/Farm_House(12_inch).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 908,
+                            "name": "Farm House(12 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "yD6Y7eeMkmjpwxbt1Z5P": {
+        "total_cart_value": 229,
+        "created_at": "2026-06-07T09:11:56.384000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Chilli_Chicken.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chilli Chicken"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "1EFJU5V19S7AaY4LbZPY": {
+        "total_cart_value": 209,
+        "created_at": "2026-06-07T06:11:39.659000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Paneer_Fried_Rice.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 305,
+                            "name": "Paneer Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "VagnDDRil4UFYZi8Ga3Q": {
+        "total_cart_value": 209,
+        "created_at": "2026-06-07T06:10:31.936000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Paneer_Fried_Rice.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 305,
+                            "name": "Paneer Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "r05SGOHlYBYSLp3hCXy2": {
+        "total_cart_value": 298,
+        "created_at": "2026-06-07T05:56:27.479000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Sunadeipur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Crispy_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Crispy Corn"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "o7TMcfgPqff5RZ83yxll": {
+        "total_cart_value": 209,
+        "created_at": "2026-06-06T13:02:13.885000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "qWY8mWz9u8Km7g7qkvt6": {
+        "total_cart_value": 219,
+        "created_at": "2026-06-06T11:43:49.346000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Majestic.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 203,
+                            "name": "Chicken Majestic"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "exVUFfxKUdHDax0HunBH": {
+        "total_cart_value": 236,
+        "created_at": "2026-06-05T20:28:57.717000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Egg_Burger.webp",
+                            "type": "NonVeg",
+                            "quantity": 3,
+                            "id": 601,
+                            "name": "Egg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "zv2W9oCNi1bVv3KrGXfq": {
+        "total_cart_value": 415,
+        "created_at": "2026-06-05T20:28:07.200000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Farm_House(6_inch).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 903,
+                            "name": "Farm House(6 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "Gl5s3rOKB9a2XTHdXy1p": {
+        "total_cart_value": 1063,
+        "created_at": "2026-06-05T20:26:44.769000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        },
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 103,
+                            "name": "Paneer Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Mix_Veg_Fried_Rice.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 307,
+                            "name": "Mix Veg Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "../food_src/Lachha_Paratha.webp",
+                            "quantity": 1,
+                            "id": 2502,
+                            "name": "Lachha Paratha"
+                        }
+                    ],
+                    "name": "Roti N Paratha"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 189,
+                            "image_src": "../food_src/Sunheri_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2908,
+                            "name": "Sunheri Veg"
+                        },
+                        {
+                            "price": 189,
+                            "image_src": "../food_src/Paneer_Butter_Masala.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2910,
+                            "name": "Paneer Butter Masala"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "VWs9r4cjIU6Q11H3xw8X": {
+        "total_cart_value": 1321,
+        "created_at": "2026-06-05T20:23:57.159000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 5,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Peri_Peri_Paneer.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 703,
+                            "name": "Peri Peri Paneer"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 189,
+                            "image_src": "../food_src/Sunheri_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2908,
+                            "name": "Sunheri Veg"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "npffvEi59IEIfjg1MNCh": {
+        "total_cart_value": 415,
+        "created_at": "2026-06-04T13:47:06.259000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Mix_Veg_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 501,
+                            "name": "Mix Veg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Farm_House(6_inch).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 903,
+                            "name": "Farm House(6 inch)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "PuAQrvox12yo4zJ0htu6": {
+        "total_cart_value": 1033,
+        "created_at": "2026-06-03T06:26:49.027000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Paneer_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 103,
+                            "name": "Paneer Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Mix_Veg_Fried_Rice.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 307,
+                            "name": "Mix Veg Fried Rice"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "../food_src/Lachha_Paratha.webp",
+                            "quantity": 1,
+                            "id": 2502,
+                            "name": "Lachha Paratha"
+                        }
+                    ],
+                    "name": "Roti N Paratha"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Sunheri_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2908,
+                            "name": "Sunheri Veg"
+                        },
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Butter_Masala.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2910,
+                            "name": "Paneer Butter Masala"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "WPY697y3mP3CGXTHMCN6": {
+        "total_cart_value": 814,
+        "created_at": "2026-06-03T06:17:02.728000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        },
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Crispy_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Crispy Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Peri_Peri_Paneer.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 703,
+                            "name": "Peri Peri Paneer"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "../food_src/Lachha_Paratha.webp",
+                            "quantity": 1,
+                            "id": 2502,
+                            "name": "Lachha Paratha"
+                        }
+                    ],
+                    "name": "Roti N Paratha"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 199,
+                            "image_src": "../food_src/Paneer_Tikka_Masala.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 2913,
+                            "name": "Paneer Tikka Masala"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Paneer Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "886EHq0M47zxFBmXG5L4": {
+        "total_cart_value": 236,
+        "created_at": "2026-06-02T05:19:12.382000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Egg_Burger.webp",
+                            "type": "NonVeg",
+                            "quantity": 3,
+                            "id": 601,
+                            "name": "Egg Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Mix_Veg.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Mix Veg"
+                        }
+                    ],
+                    "name": "Sandwich"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "iv4DPZQFugU9kEbH3JvB": {
+        "total_cart_value": 298,
+        "created_at": "2026-05-31T12:55:44.103000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "tcd_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Crispy_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Crispy Corn"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Stir_Fried_Baby_Corn.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 102,
+                            "name": "Stir Fried Baby Corn"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
     "Kry0IwqYcwCXya9BkOKd": {
         "total_cart_value": 1311,
         "created_at": "2026-05-30T14:48:41.195000+00:00",
@@ -61,39 +1808,6 @@
                             "quantity": 1,
                             "id": 103,
                             "name": "Stir Fried Baby Corn"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "status": "Approved"
-    },
-    "KeGHkEr6rhT7X0ijmhN9": {
-        "total_cart_value": 318,
-        "created_at": "2026-05-24T04:51:43.338000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "tcd_place": "Harirajpur",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "image_src": "../food_src/Crispy_Chicken_Wings.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 205,
-                            "name": "Crispy Chicken Wings"
-                        },
-                        {
-                            "price": 169,
-                            "image_src": "../food_src/Chicken_555.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 206,
-                            "name": "Chicken 555"
                         }
                     ],
                     "name": "Starter"
@@ -687,1284 +2401,5 @@
         "triggered_to": "+917749984274",
         "status": "Rejected",
         "table_no": "COD"
-    },
-    "9jD2itW7PZ30DPXitUHO": {
-        "total_cart_value": 487,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 906,
-                            "name": "Corn Paneer(9 inch)"
-                        }
-                    ],
-                    "name": "Pizza"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 502,
-                            "name": "Paneer Cheese Burger"
-                        }
-                    ],
-                    "name": "Burger"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 139,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 103,
-                            "name": "Stir Fried Baby Corn"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "created_at": "2026-03-23T11:23:32.563000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "6bFgUn2GoLYgLTmo6aqO": {
-        "total_cart_value": 199,
-        "created_at": "2026-03-18T06:42:04.847000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2802,
-                            "name": "Chicken Biryani (3pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Approved"
-    },
-    "1k05HdShcO43uxG8h3Sf": {
-        "total_cart_value": 219,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2803,
-                            "name": "Chicken Biryani (5pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2026-03-12T06:54:27.904000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "n6sBe0y2N7rvQVmm7USW": {
-        "total_cart_value": 149,
-        "created_at": "2026-03-10T04:38:09.685000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 99,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 91,
-                            "name": "Hot And Sour"
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "ryTfZ5v3cQmpnVo95CBm": {
-        "total_cart_value": 258,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 2,
-                            "id": 305,
-                            "name": "Paneer Fried Rice"
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            }
-        ],
-        "created_at": "2026-03-01T13:02:19.437000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "1uLIsMkwRZg5NOWjHhTS": {
-        "total_cart_value": 278,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 2701,
-                            "name": "Veg Biryani (Half)"
-                        },
-                        {
-                            "price": 149,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2802,
-                            "name": "Chicken Biryani (3pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2026-02-17T04:39:52.415000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "BB559gzXJrqTyhBcf4xv": {
-        "total_cart_value": 218,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chicken 65"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 501,
-                            "name": "Mix Veg Burger"
-                        }
-                    ],
-                    "name": "Burger"
-                }
-            }
-        ],
-        "created_at": "2026-02-11T06:58:24.043000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "TwJJrOOx9fbTuBLtOcxH": {
-        "total_cart_value": 218,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chicken 65"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 501,
-                            "name": "Mix Veg Burger"
-                        }
-                    ],
-                    "name": "Burger"
-                }
-            }
-        ],
-        "created_at": "2026-02-01T13:14:05.007000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "0wjaJWXuVYLRJIkvyTFR": {
-        "total_cart_value": 208,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chicken 65"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 59,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 601,
-                            "name": "Egg Burger"
-                        }
-                    ],
-                    "name": "Burger"
-                }
-            }
-        ],
-        "created_at": "2026-01-27T13:57:18.598000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "nOgXCvd0xXaAChmAiHfo": {
-        "total_cart_value": 328,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2803,
-                            "name": "Chicken Biryani (5pc)"
-                        },
-                        {
-                            "price": 109,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2801,
-                            "name": "Chicken Biryani (2pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2026-01-24T08:11:26.809000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "wiudT4V9crtbl4c2T8Hm": {
-        "total_cart_value": 219,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2803,
-                            "name": "Chicken Biryani (5pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2026-01-24T07:44:58.112000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "6O7Nv0VHL7KM3RT3yhMl": {
-        "total_cart_value": 278,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 139,
-                            "type": "NonVeg",
-                            "quantity": 2,
-                            "id": 801,
-                            "name": "Casun Chicken"
-                        }
-                    ],
-                    "name": "Sandwich"
-                }
-            }
-        ],
-        "created_at": "2026-01-20T04:47:17.141000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "KybRPVtc1oJbQur4T7Up": {
-        "total_cart_value": 238,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 303,
-                            "name": "Singapore Noodles"
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 109,
-                            "quantity": 1,
-                            "id": 1503,
-                            "name": "Cold Coffee"
-                        }
-                    ],
-                    "name": "Refreshment"
-                }
-            }
-        ],
-        "created_at": "2026-01-17T08:17:33.983000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "x2puEXhAYYWMu6Ee8CDc": {
-        "total_cart_value": 218,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 109,
-                            "type": "NonVeg",
-                            "quantity": 2,
-                            "id": 2801,
-                            "name": "Chicken Biryani (2pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2026-01-17T08:14:44.228000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "SkAGvyq7xwK0w2BZYtY6": {
-        "total_cart_value": 238,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 109,
-                            "quantity": 1,
-                            "id": 1503,
-                            "name": "Cold Coffee"
-                        }
-                    ],
-                    "name": "Refreshment"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 303,
-                            "name": "Singapore Noodles"
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            }
-        ],
-        "created_at": "2026-01-17T08:03:31.237000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "YgPKIrjp9NitTh4QHuR4": {
-        "total_cart_value": 208,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chicken 65"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 59,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 701,
-                            "name": "Mix Veg"
-                        }
-                    ],
-                    "name": "Sandwich"
-                }
-            }
-        ],
-        "created_at": "2026-01-10T06:47:24.509000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "96dbflo1xJ5wIdqA0qkK": {
-        "total_cart_value": 227,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chicken 65"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 39,
-                            "quantity": 2,
-                            "id": 2509,
-                            "name": "Lachha Paratha"
-                        }
-                    ],
-                    "name": "Indian Breads / Roti"
-                }
-            }
-        ],
-        "created_at": "2026-01-09T15:28:31.094000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "LcoQsYJMAWXdeWy2Xxx9": {
-        "total_cart_value": 219,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2803,
-                            "name": "Chicken Biryani (5pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2026-01-09T08:37:59.858000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "GV9mALSFPBiXecT67ABp": {
-        "total_cart_value": 298,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "Veg",
-                            "quantity": 2,
-                            "id": 105,
-                            "name": "Paneer Chilli"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "created_at": "2026-01-04T06:12:43.909000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "6gJIcUYcKKkSyRKdEpNM": {
-        "total_cart_value": 218,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 303,
-                            "name": "Singapore Noodles"
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 89,
-                            "quantity": 1,
-                            "id": 1309,
-                            "name": "TCD Special Guava Lagoon"
-                        }
-                    ],
-                    "name": "Mocktails"
-                }
-            }
-        ],
-        "created_at": "2025-12-21T08:48:47.742000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "kJK6S99y03BRh5umoMIN": {
-        "total_cart_value": 119,
-        "created_at": "2025-12-11T03:35:31.734000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 71,
-                            "name": "Hot And Sour"
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "kiP9nn277VJ2Hi7aDdi7": {
-        "total_cart_value": 119,
-        "created_at": "2025-12-11T03:28:41.426000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 71,
-                            "name": "Hot And Sour"
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "c3Rdnp6l7SzPnHMlAo2e": {
-        "total_cart_value": 188,
-        "created_at": "2025-12-11T03:28:09.048000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 71,
-                            "name": "Hot And Sour"
-                        },
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 72,
-                            "name": "Manchow"
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "9Lt1RfJeTPqHVUo3zjA5": {
-        "total_cart_value": 199,
-        "created_at": "2025-12-04T12:46:31.633000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 107,
-                            "name": "Honey Chilli Potato"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "DYZoTSBQZpOZ1QKc1a8S": {
-        "total_cart_value": 119,
-        "created_at": "2025-11-28T06:24:09.143000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 73,
-                            "name": "Clear"
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "5NT9fgZWm9cM2E1eECMp": {
-        "total_cart_value": 179,
-        "created_at": "2025-11-13T13:43:58.491000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 301,
-                            "name": "Hakka Noodles"
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "4ME3tU5YonxqO7UjdUNS": {
-        "total_cart_value": 219,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 2803,
-                            "name": "Chicken Biryani (5pc)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2025-11-07T08:10:00.765000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "HCLaefZsCvfvNv2aUI73": {
-        "total_cart_value": 109,
-        "created_at": "2025-10-24T11:50:04.326000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 59,
-                            "quantity": 1,
-                            "id": 2201,
-                            "name": "Vanilla 2scoop"
-                        }
-                    ],
-                    "name": "Ice Cream"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "NxJjkqlgabqF5j3izx7I": {
-        "total_cart_value": 179,
-        "created_at": "2025-10-10T07:46:14.243000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 703,
-                            "name": "Peri Peri Paneer"
-                        }
-                    ],
-                    "name": "Sandwich"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "CF5dNQDtDw8AEEq0wQYv": {
-        "total_cart_value": 435,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "quantity": 2,
-                            "type": "Veg",
-                            "id": 73,
-                            "name": "Clear"
-                        },
-                        {
-                            "price": 99,
-                            "type": "NonVeg",
-                            "quantity": 2,
-                            "id": 91,
-                            "name": "Hot And Sour"
-                        },
-                        {
-                            "name": "Manchow",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 92,
-                            "price": 99
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "created_at": "2025-09-28T13:28:33.777000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "wABb9Iw3F9xF1n4ajrV1": {
-        "total_cart_value": 258,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chicken Fried Rice",
-                            "quantity": 2,
-                            "type": "NonVeg",
-                            "id": 405,
-                            "price": 129
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            }
-        ],
-        "created_at": "2025-09-26T06:32:29.353000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "ZF3cOBm0FiFSRv2hHbaD": {
-        "created_at": "2025-09-26T06:23:06.988000+00:00",
-        "total_cart_value": 179,
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 405,
-                            "name": "Chicken Fried Rice"
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "jOcskCPUlGAAN5A00HMP": {
-        "created_at": "2025-09-26T06:06:50.634000+00:00",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chicken Biryani (Full)",
-                            "quantity": 3,
-                            "type": "NonVeg",
-                            "id": 2803,
-                            "price": 219
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 189,
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 3007,
-                            "name": "Chicken Butter Masala"
-                        }
-                    ],
-                    "name": "Curry"
-                }
-            }
-        ],
-        "total_cart_value": 846,
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "tMQaYl3u3LzfUXSTbMk8": {
-        "total_cart_value": 119,
-        "created_at": "2025-09-26T05:59:54.518000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Hot And Sour",
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 71,
-                            "price": 69
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "ebJ7m986H3kBh0M71en7": {
-        "total_cart_value": 268,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 101,
-                            "name": "Crispy Corn"
-                        },
-                        {
-                            "name": "Stir Fried Baby Corn",
-                            "quantity": 1,
-                            "type": "Veg",
-                            "id": 103,
-                            "price": 139
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "created_at": "2025-09-26T05:59:33.289000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "tYLixTLxsLRf41oGn3A9": {
-        "total_cart_value": 208,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Hot And Sour",
-                            "quantity": 1,
-                            "type": "Veg",
-                            "id": 71,
-                            "price": 69
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 139,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 102,
-                            "name": "Veg Salt And Pepper"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "created_at": "2025-09-21T14:24:50.572000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "gp5KzhPRfjZwOjWIHCv4": {
-        "total_cart_value": 199,
-        "created_at": "2025-09-21T10:58:30.685000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 149,
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 2802,
-                            "name": "Chicken Biryani (Half)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "jdAKUAOupNtavF0F8gMh": {
-        "created_at": "2025-09-20T15:09:32.009000+00:00",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Hot And Sour",
-                            "quantity": 1,
-                            "type": "Veg",
-                            "id": 71,
-                            "price": 69
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Stir Fried Baby Corn",
-                            "quantity": 1,
-                            "type": "Veg",
-                            "id": 103,
-                            "price": 139
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "quantity": 1,
-                            "type": "Veg",
-                            "id": 301,
-                            "name": "Hakka Noodles"
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            }
-        ],
-        "total_cart_value": 337,
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "lBapv0RxzC88o5r2c9ua": {
-        "total_cart_value": 447,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chilli Chicken",
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 201,
-                            "price": 149
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chicken Biryani (Half)",
-                            "quantity": 2,
-                            "type": "NonVeg",
-                            "id": 2802,
-                            "price": 149
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "created_at": "2025-09-19T08:46:47.649000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "2zbepSdtrSFUFrRndB07": {
-        "created_at": "2025-09-19T08:39:49.690000+00:00",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chicken Biryani (Full)",
-                            "type": "NonVeg",
-                            "quantity": 2,
-                            "id": 2803,
-                            "price": 219
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chicken Butter Masala",
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 3007,
-                            "price": 189
-                        }
-                    ],
-                    "name": "Curry"
-                }
-            }
-        ],
-        "total_cart_value": 627,
-        "triggered_to": "+917749984274",
-        "status": "Approved",
-        "table_no": "COD"
-    },
-    "rIIPnpasfP84jLDnz5Zp": {
-        "total_cart_value": 368,
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chicken Biryani (Full)",
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 2803,
-                            "price": 219
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chilli Chicken",
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 201,
-                            "price": 149
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "created_at": "2025-09-19T07:12:26.036000+00:00",
-        "triggered_to": "+917749984274",
-        "status": "Rejected",
-        "table_no": "COD"
-    },
-    "78ak9R5zqhWl6mo1m1mk": {
-        "total_cart_value": 179,
-        "created_at": "2025-09-19T07:11:23.745000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "name": "Chicken Sezwan Fried Rice",
-                            "quantity": 1,
-                            "type": "NonVeg",
-                            "id": 404,
-                            "price": 129
-                        }
-                    ],
-                    "name": "MainCourse"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "Hf871n9iOs2gyUvlC9Dv": {
-        "created_at": "2025-09-19T06:35:32.958000+00:00",
-        "total_cart_value": 119,
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 69,
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 71,
-                            "name": "Hot And Sour"
-                        }
-                    ],
-                    "name": "Soup"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
     }
 }
