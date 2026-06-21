@@ -17,7 +17,7 @@
             {
               "id": 102,
               "name": "Stir Fried Baby Corn",
-              "price": 159,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
@@ -79,7 +79,7 @@
             {
               "id": 202,
               "name": "Chicken 65",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
@@ -741,7 +741,7 @@
             {
               "id": 2702,
               "name": "Veg Biryani (Full)",
-              "price": 219,
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             }
@@ -761,14 +761,14 @@
             {
               "id": 2802,
               "name": "Chicken Biryani (3pc)",
-              "price": 169,
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 2803,
               "name": "Chicken Biryani (5pc)",
-              "price": 239,
+              "price": 259,
               "available_time": "",
               "not_available_time": ""
             }
