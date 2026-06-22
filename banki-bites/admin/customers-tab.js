@@ -362,7 +362,7 @@ function renderFrequency(rows, p) {
     type: 'doughnut',
     data: {
       labels,
-      datasets: [{ data, backgroundColor: [p.muted, p.series[0], p.series[1], p.series[2], p.brand], borderWidth: 0 }],
+      datasets: [{ data, backgroundColor: [p.muted, p.series[1], p.series[2], p.series[3], p.brand], borderWidth: 0 }],
     },
     options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
   });
