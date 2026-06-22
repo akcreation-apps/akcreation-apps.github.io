@@ -861,13 +861,6 @@
               "price": 199,
               "available_time": "",
               "not_available_time": ""
-            },
-            {
-              "id": 2913,
-              "name": "Paneer Tikka Masala",
-              "price": 199,
-              "available_time": "",
-              "not_available_time": ""
             }
           ]
         },
@@ -893,13 +886,6 @@
               "id": 3003,
               "name": "Chicken Butter Masala",
               "price": 199,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3004,
-              "name": "Chicken Tikka Masala",
-              "price": 219,
               "available_time": "",
               "not_available_time": ""
             },
