@@ -72,6 +72,51 @@ export const PROMPTS = [
     tags: ['portrait', 'mural', 'cinematic', 'devotional']
   },
   {
+    id: 'krishna-poster',
+    tier: 'member',
+    title: 'Krishna Mural Portrait',
+    image: 'prompts/krishna-poster.webp',
+    notes: 'Upload a clear photo of a single person — full body or three-quarter shot works best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'mural', 'cinematic', 'devotional']
+  },
+  {
+    id: 'ganesha-poster',
+    tier: 'member',
+    title: 'Ganesha Mural Portrait',
+    image: 'prompts/ganesha-poster.webp',
+    notes: 'Upload a clear photo of a single person — full body or three-quarter shot works best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'mural', 'cinematic', 'devotional']
+  },
+  {
+    id: 'hanuman-poster',
+    tier: 'member',
+    title: 'Hanuman Mural Portrait',
+    image: 'prompts/hanuman-poster.webp',
+    notes: 'Upload a clear photo of a single person — full body or three-quarter shot works best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'mural', 'cinematic', 'devotional']
+  },
+  {
+    id: 'rama-poster',
+    tier: 'member',
+    title: 'Rama Mural Portrait',
+    image: 'prompts/rama-poster.webp',
+    notes: 'Upload a clear photo of a single person — full body or three-quarter shot works best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'mural', 'cinematic', 'devotional']
+  },
+  {
+    id: 'jagannath-poster',
+    tier: 'member',
+    title: 'Jagannath Mural Portrait',
+    image: 'prompts/jagannath-poster.webp',
+    notes: 'Upload a clear photo of a single person — full body or three-quarter shot works best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'mural', 'cinematic', 'devotional']
+  },
+  {
     id: 'couple-poster',
     title: 'Bollywood Couple Poster',
     prompt: "A cinematic Bollywood-style romantic couple portrait poster.\n\nSUBJECT 1 — MAN (use uploaded photo 1 as facial identity reference, 100% face preservation, identity lock ON): South Asian man with neatly styled dark hair and a well-groomed beard, wearing a deep burgundy/maroon full-sleeve fitted shirt. He stands behind the woman, arms gently wrapped around her, with a calm, intense forward gaze.\n\nSUBJECT 2 — WOMAN (use uploaded photo 2 as facial identity reference, 100% face preservation, identity lock ON): Young South Asian woman with softly curled and braided hair adorned with a small floral pin. She wears a rich red embroidered lehenga or kurta with a sheer dusty-rose dupatta, traditional gold jhumka earrings, a small red bindi, and red and gold bangles. She rests one hand gently near her chin, smiling softly with a dreamy upward gaze.\n\nPOSE: The man stands slightly behind and above, his arms wrapped lovingly around the woman from behind. The woman leans gently back into him. Half-body to three-quarter shot, centered composition.\n\nBACKGROUND: Warm cream/off-white softly textured background. Behind the couple are two large dramatic dark maroon-red profile silhouettes — the man's silhouette on the left side and the woman's silhouette on the right side — both fading softly into the background like a double-exposure shadow effect. Tiny floating red heart or rose petal particles scattered lightly across the image.\n\nLIGHTING: Soft warm studio lighting with a gentle vignette. Romantic, intimate mood.\n\nSTYLE: Bollywood movie poster, high-end romantic editorial photography, ultra-realistic, 8K, cinematic color grading in deep maroon and warm gold tones.\n\nTEXT OVERLAY: Add the small script text \"{input_text_1}\" above the large elegant calligraphy text \"{input_text_2}\" at the bottom center of the image, in off-white/cream color with a soft glow. Add a small decorative swirl flourish beneath the text.",
@@ -230,5 +275,177 @@ export const PROMPTS = [
     notes: 'Upload a clear photo of the child — front-facing works best.',
     models: ['ChatGPT (DALL·E)', 'Gemini'],
     tags: ['portrait', 'kids', 'cozy', 'cinematic']
+  },
+  {
+    id: 'teal-quad-portrait',
+    tier: 'member',
+    title: 'Teal Quad Portrait Poster',
+    image: 'prompts/teal-quad-portrait.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Top-left cursive (watermark/handle)', default: '@yourhandle' },
+      { name: 'input_text_2', label: 'Middle-left cursive line',            default: 'She is' },
+      { name: 'input_text_3', label: 'Middle-left bold display word',       default: 'STRENGTH' },
+      { name: 'input_text_4', label: 'Middle-left small-caps tagline',      default: 'IN EVERY STEP, GRACE IN EVERY MOMENT.' },
+      { name: 'input_text_5', label: 'Middle-right stacked word 1',         default: 'DREAMER.' },
+      { name: 'input_text_6', label: 'Middle-right stacked word 2',         default: 'BELIEVER.' },
+      { name: 'input_text_7', label: 'Middle-right teal accent word',       default: 'ACHIEVER.' },
+      { name: 'input_text_8', label: 'Bottom-left cursive line',            default: 'Be you. Do you. For you.' },
+      { name: 'input_text_9', label: 'Bottom-right italic quote',           default: 'She creates her own world with courage and kindness.' }
+    ],
+    notes: 'Upload a clear front-facing photo with even lighting and minimal background clutter.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'editorial', 'cinematic', 'teal']
+  },
+  {
+    id: 'maternity-orb-reveal',
+    tier: 'member',
+    title: 'Maternity Orb Reveal',
+    image: 'prompts/maternity-orb-reveal.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Top cursive line 1',           default: 'Dear Papa,' },
+      { name: 'input_text_2', label: 'Top cursive line 2',           default: "I can't wait to meet you♡" },
+      { name: 'input_text_3', label: 'Speech bubble text from belly', default: 'Hi Papa... I can feel your love already!' },
+      { name: 'input_text_4', label: 'Small subtitle below',         default: 'You are my first hero and forever my best friend.' }
+    ],
+    notes: 'Upload two clear photos — one of the expectant father and one of the expectant mother.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['maternity', 'couple', 'magical', 'announcement']
+  },
+  {
+    id: 'kids-streetwear-trio',
+    tier: 'member',
+    title: 'Kids Streetwear Trio Lookbook',
+    image: 'prompts/kids-streetwear-trio.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Large title line 1 (lavender-grey)', default: 'STAY' },
+      { name: 'input_text_2', label: 'Large title line 2 (hot pink)',      default: 'COOL' },
+      { name: 'input_text_3', label: 'Speech bubble 1 text',                default: 'GOOD VIBES' },
+      { name: 'input_text_4', label: 'Speech bubble 2 text',                default: 'BE YOU' },
+      { name: 'input_text_5', label: 'Scattered casual handwriting',        default: 'XOXO' }
+    ],
+    notes: 'Upload a clear photo of the child — front-facing works best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'kids', 'streetwear', 'lookbook']
+  },
+  {
+    id: 'enchanted-bridal-dreams',
+    tier: 'member',
+    title: 'Enchanted Bridal Dreams',
+    image: 'prompts/enchanted-bridal-dreams.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Top small caps line',            default: 'ENCHANTED' },
+      { name: 'input_text_2', label: 'Large bold display word',        default: 'BRIDAL' },
+      { name: 'input_text_3', label: 'Italic/script accent word',      default: 'Dreams' }
+    ],
+    notes: 'Upload a clear front-facing photo — close-up portraits work best for bridal detail.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['bridal', 'portrait', 'editorial', 'luxury']
+  },
+  {
+    id: 'speed-blur-editorial',
+    tier: 'member',
+    title: 'Speed Blur Fashion Editorial',
+    image: 'prompts/speed-blur-editorial.webp',
+    notes: 'Upload a clear full-body photo if possible — outfit and pose will be referenced.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'editorial', 'fashion', 'vfx']
+  },
+  {
+    id: 'birthday-gold-tribute',
+    tier: 'member',
+    title: 'Birthday Gold Tribute Poster',
+    image: 'prompts/birthday-gold-tribute.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Top small-caps line 1',          default: 'HAPPY' },
+      { name: 'input_text_2', label: 'Top small-caps line 2',          default: 'BIRTHDAY' },
+      { name: 'input_text_3', label: 'Large 3D gold name',             default: 'RAHUL' }
+    ],
+    notes: 'Upload a clear front-facing photo with even lighting and minimal background clutter.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['birthday', 'portrait', 'cinematic', 'luxury']
+  },
+  {
+    id: 'birthday-pink-bloom',
+    tier: 'member',
+    title: 'Pink Bloom Birthday Portrait',
+    image: 'prompts/birthday-pink-bloom.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Small caps greeting',         default: 'HAPPY BIRTHDAY' },
+      { name: 'input_text_2', label: 'First name (cursive)',        default: 'Bhagyashree' },
+      { name: 'input_text_3', label: 'Last name + ♡ (cursive)',     default: 'Bhorse ♡' }
+    ],
+    notes: 'Upload a clear front-facing photo — close-up portraits work best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['birthday', 'portrait', 'floral', 'feminine']
+  },
+  {
+    id: 'mono-color-tribute',
+    tier: 'member',
+    title: 'Mono + Color Tribute Portrait',
+    image: 'prompts/mono-color-tribute.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Large cursive name',         default: 'Priya' },
+      { name: 'input_text_2', label: 'Optional small tagline',     default: 'Forever Graceful' }
+    ],
+    notes: 'Upload a clear front-facing photo — close-up portraits work best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'editorial', 'monochrome', 'tribute']
+  },
+  {
+    id: 'birthday-amber-glow',
+    tier: 'member',
+    title: 'Amber Glow Birthday Portrait',
+    image: 'prompts/birthday-amber-glow.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Large cursive name',         default: 'Aryan' },
+      { name: 'input_text_2', label: 'Birthday subtext (cursive)', default: 'happy birthday' },
+      { name: 'input_text_3', label: '3D glowing letters',         default: 'hb' },
+      { name: 'input_text_4', label: 'Birth date (small caps)',    default: '17 - april' }
+    ],
+    notes: 'Upload a clear front-facing photo with even lighting and minimal background clutter.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['birthday', 'portrait', 'amber', 'cinematic']
+  },
+  {
+    id: 'tiny-chocolate-hug',
+    tier: 'member',
+    title: 'Tiny Chocolate Bar Hug',
+    image: 'prompts/tiny-chocolate-hug.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Chocolate bar brand',  default: 'KitKat' }
+    ],
+    notes: 'Upload a clear front-facing photo of the adult subject — face and head pose are referenced.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['fun', 'miniature', 'macro', 'whimsical']
+  },
+  {
+    id: 'sunset-sky-merge',
+    tier: 'member',
+    title: 'Sunset Sky Merge Portrait',
+    image: 'prompts/sunset-sky-merge.webp',
+    notes: 'Upload a clear front-facing photo — face and full-body pose will be referenced.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'cinematic', 'sunset', 'double-exposure']
+  },
+  {
+    id: 'baby-doodle-grid',
+    tier: 'member',
+    title: 'Baby Doodle 3x3 Grid',
+    image: 'prompts/baby-doodle-grid.webp',
+    placeholders: [
+      { name: 'input_text_1',  label: 'Panel 1 label (Runner)',           default: 'The Runner' },
+      { name: 'input_text_2',  label: 'Panel 2 label (Performer)',        default: 'The Performer' },
+      { name: 'input_text_3',  label: 'Panel 3 label (Foodie)',           default: 'The Foodie' },
+      { name: 'input_text_4',  label: 'Panel 4 label (Superhero)',        default: 'The Superhero' },
+      { name: 'input_text_5',  label: 'Panel 5 label (Vacationer)',       default: 'The Vacationer' },
+      { name: 'input_text_6',  label: 'Panel 6 label (Athlete)',          default: 'The Athlete' },
+      { name: 'input_text_7',  label: 'Panel 7 label (Gymnast)',          default: 'The Gymnast' },
+      { name: 'input_text_8',  label: 'Panel 8 label (Shopper)',          default: 'The Shopper' },
+      { name: 'input_text_9',  label: 'Shopping bag brand (panel 8)',     default: 'FirstCry' },
+      { name: 'input_text_10', label: 'Panel 9 label (Rockstar)',         default: 'The Rockstar' }
+    ],
+    notes: 'Upload a clear top-down photo of the baby — face fully visible works best.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['baby', 'collage', 'doodle', 'fun']
   }
 ];
