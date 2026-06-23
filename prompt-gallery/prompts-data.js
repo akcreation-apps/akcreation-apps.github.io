@@ -447,5 +447,22 @@ export const PROMPTS = [
     notes: 'Upload a clear top-down photo of the baby — face fully visible works best.',
     models: ['ChatGPT (DALL·E)', 'Gemini'],
     tags: ['baby', 'collage', 'doodle', 'fun']
+  },
+  {
+    id: 'personal-brand-poster',
+    tier: 'member',
+    title: 'Personal Brand Hero Poster',
+    image: 'prompts/personal-brand-poster.webp',
+    placeholders: [
+      { name: 'input_text_1', label: 'Top small-caps tagline',           default: 'DRIVEN BY VISION. POWERED BY GRIT.' },
+      { name: 'input_text_2', label: 'Bold center-right quote',          default: 'EVERY MOVE MATTERS.\nEVERY MOMENT MATTERS.' },
+      { name: 'input_text_3', label: 'Bottom-left stacked words',        default: 'FOCUS\nDISCIPLINE\nLEGACY' },
+      { name: 'input_text_4', label: 'Bottom-right stacked words',       default: 'BUILT IN SILENCE\nLEADING WITH PRIDE' },
+      { name: 'input_text_5', label: 'Cursive signature',                default: 'Your Name' },
+      { name: 'input_text_6', label: 'Giant background name text',       default: 'YOUR NAME' }
+    ],
+    notes: 'Upload a clear front-facing photo with even lighting and minimal background clutter.',
+    models: ['ChatGPT (DALL·E)', 'Gemini'],
+    tags: ['portrait', 'branding', 'cinematic', 'dark']
   }
 ];
