@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(python3 *)",
+      "Bash(node *)",
+      "Bash(xargs ls *)",
+      "Bash(awk '{print $9}')",
+      "Bash(cwebp -version)",
+      "Bash(magick -version)",
+      "Bash(python -c ' *)",
+      "Bash(python -c \"from PIL import Image; print\\('PIL ok'\\)\")",
+      "Bash(xargs grep *)",
+      "Bash(magick Peri_Peri_Chicken.png Peri_Peri_Chicken.webp)",
+      "Bash(ffmpeg -y -i Peri_Peri_Chicken.png -c:v libwebp -quality 85 Peri_Peri_Chicken.webp)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "code-review-graph"
+  ]
+}
