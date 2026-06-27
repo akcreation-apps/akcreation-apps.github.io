@@ -2,7 +2,7 @@
 //
 // SEED: on first use, if `bankibites_meta/fee_rules` is missing, an admin
 // caller is expected to seed it with:
-//   { far_places: ["Bedapur","Sisua","Chakapada","Harirajpur","Gopalpur","Patapur","Ragadi"],
+//   { far_places: ["Bedapur","Sisua","Chakapada","Harirajpur","Gopalpur","Patapur","Ragadi","Bheda"],
 //     fee_near: 30, fee_far: 40 }
 // Until then, callers fall back to the same defaults locally.
 
@@ -12,7 +12,7 @@ import {
 import { COL } from './firebase-config.js';
 
 const DEFAULT_RULES = {
-  far_places: ['Bedapur', 'Sisua', 'Chakapada', 'Harirajpur', 'Gopalpur', 'Patapur', 'Ragadi'],
+  far_places: ['Bedapur', 'Sisua', 'Chakapada', 'Harirajpur', 'Gopalpur', 'Patapur', 'Ragadi', 'Bheda'],
   fee_near: 30,
   fee_far: 40,
 };
