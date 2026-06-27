@@ -31,7 +31,6 @@ Deployment is via git push to `main` — GitHub Pages serves directly from the r
 | `/foodelo/` | Restaurant menu board display (menu data inline in `script.js`) |
 | `/anil-kr/` | Personal resume/portfolio for Anil Kumar Sahoo |
 | `/friendsXI/` | NGO/charity website for FriendsXI |
-| `/banki-transport/` | Transport service landing page |
 
 ### TCD App (most complex sub-app)
 - Uses Firebase Firestore for live data (`/TCD/credentials.json` holds the config)
@@ -109,11 +108,11 @@ Example prompt: "Would you like me to run the UI/UX reviewer agent to audit this
 
 ## SEO Workflow
 
-After completing **any** changes to files inside `/banki-transport/` or `/TCD/` — **ask the user** whether they would like to run the `seo-optimizer` agent before reporting the task as done. Do not run it automatically; wait for the user's confirmation.
+After completing **any** changes to files inside `/TCD/` — **ask the user** whether they would like to run the `seo-optimizer` agent before reporting the task as done. Do not run it automatically; wait for the user's confirmation.
 
 Example prompt: "Would you like me to run the SEO optimizer agent for this page?"
 
-Both `/banki-transport/` and `/TCD/` are local businesses physically located in **Banki, Cuttack, Odisha, 754008, India**. All SEO work on these pages must use hyper-local signals targeting that specific location.
+`/TCD/` is a local business physically located in **Banki, Cuttack, Odisha, 754008, India**. All SEO work on this page must use hyper-local signals targeting that specific location.
 
 ### Hosting / Routing
 - `CNAME` → `akcreation-apps.com` (GitHub Pages)
