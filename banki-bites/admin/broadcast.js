@@ -4,7 +4,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { loadCustomers } from './customers.js';
 
-const OFFER_URL = 'https://akcreation-apps.com/banki-bites/offer.jpg';
+const OFFER_URL = 'https://akcreation-apps.com/banki-bites/offer.html';
 const FOOTER = 'Reply "Stop" to stop receiving future advertisements.\n\n_Team BankiBites_ ❤️';
 // Default body for the "Offer expiring" segment — auto-loaded when the
 // admin picks that segment and the composer is empty. Uses the {name},
@@ -219,9 +219,9 @@ export async function renderBroadcast(root, db) {
             <label for="bcImg">Offer image URL <span class="bb-bc__optional">optional</span></label>
             <div class="bb-bc__input-row">
               <input id="bcImg" class="bb-bc__input" type="url"
-                placeholder="https://akcreation-apps.com/banki-bites/offer.jpg">
+                placeholder="https://akcreation-apps.com/banki-bites/offer.html">
               <button type="button" class="bb-bc__btn bb-bc__btn--ghost" id="bcUseOffer">
-                <i class="fas fa-image"></i> Use offer.jpg
+                <i class="fas fa-image"></i> Use offer.html
               </button>
             </div>
             <span class="bb-bc__hint">WhatsApp previews the URL — it can't attach images via a deep-link.</span>

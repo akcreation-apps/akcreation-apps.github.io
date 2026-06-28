@@ -12,7 +12,11 @@
       "Bash(python -c \"from PIL import Image; print\\('PIL ok'\\)\")",
       "Bash(xargs grep *)",
       "Bash(magick Peri_Peri_Chicken.png Peri_Peri_Chicken.webp)",
-      "Bash(ffmpeg -y -i Peri_Peri_Chicken.png -c:v libwebp -quality 85 Peri_Peri_Chicken.webp)"
+      "Bash(ffmpeg -y -i Peri_Peri_Chicken.png -c:v libwebp -quality 85 Peri_Peri_Chicken.webp)",
+      "Bash(python -c \"from PIL import Image; print\\('ok'\\)\")",
+      "Bash(python -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "Bash(python *)",
+      "Bash(PYTHONIOENCODING=utf-8 python *)"
     ]
   },
   "enableAllProjectMcpServers": true,
