@@ -1,182 +1,654 @@
 import { COL } from '../firebase-config.js';
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
-  lifecycleBucket, daysBetween, toDateSafe, normalisePhone, buildWaUrl, fmtDate, fmtNum,
-} from './analytics.js';
+  doc, setDoc, collection, query, where, getDocs, Timestamp,
+} from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
+const SITE_URL = 'https://akcreation-apps.com/anvisha-travels/';
+const FOOTER = 'Reply "Stop" to stop receiving future advertisements.\n\n_Team Anvisha Travels_ ❤️';
 const QUEUE_KEY = 'av_broadcast_queue_v1';
+const NAME_FALLBACK = 'Dear';
+
+// Look back this many days when computing "last booking". 180 days covers
+// every meaningful lifecycle cohort cheaply.
+const BOOKING_LOOKBACK_DAYS = 180;
 
 const SEGMENTS = [
-  { key: 'all',     label: 'All customers', match: () => true },
-  { key: 'active',  label: 'Active (≤30d)',  match: c => c._bucket === 'active' },
-  { key: 'cooling', label: 'Cooling (31–60d)', match: c => c._bucket === 'cooling' },
-  { key: 'lapsed',  label: 'Lapsed (61–120d)', match: c => c._bucket === 'lapsed' },
-  { key: 'lost',    label: 'Lost (>120d)',  match: c => c._bucket === 'lost' },
-  { key: 'never',   label: 'Never travelled', match: c => c._bucket === 'never' },
+  { id: 'all',      label: 'All',            icon: 'fa-users' },
+  { id: 'active',   label: 'Active ≤14d',    icon: 'fa-fire' },
+  { id: 'cooling',  label: 'Cooling 15–30d', icon: 'fa-hourglass-half' },
+  { id: 'lapsed',   label: 'Lapsed 31–60d',  icon: 'fa-clock-rotate-left' },
+  { id: 'lost',     label: 'Lost 60d+',      icon: 'fa-heart-crack' },
 ];
 
-export async function renderBroadcast(ctx) {
-  const { panel, db } = ctx;
-  panel.innerHTML = `
-    <h2 class="section-title"><i class="fas fa-bullhorn"></i> Broadcast</h2>
-    <div class="card-an">
-      <div class="card-head" style="margin-bottom:8px;"><h3 class="card-title">1 · Pick a segment</h3></div>
-      <div class="filter-bar" id="seg-bar"></div>
-      <div class="card-sub" id="seg-summary">Loading customers…</div>
-    </div>
-    <div class="card-an">
-      <div class="card-head" style="margin-bottom:8px;"><h3 class="card-title">2 · Compose message</h3></div>
-      <div class="f-group mb-12">
-        <label class="f-label">Message body — use <code>{name}</code> as a placeholder</label>
-        <textarea id="bc-text" class="f-textarea" rows="5">Hi {name}! This is Anvisha Travels. Need a cab? We're available 24/7 around Banki & Cuttack. Reply here to book.</textarea>
-      </div>
-      <div class="flex-row">
-        <button id="bc-queue" class="btn-an"><i class="fas fa-list-check"></i> Queue this segment</button>
-        <button id="bc-clear" class="btn-an btn-an-outline btn-an-sm"><i class="fas fa-times"></i> Clear queue</button>
-      </div>
-    </div>
-    <div class="card-an">
-      <div class="card-head" style="margin-bottom:8px;"><h3 class="card-title">3 · Send (one at a time)</h3></div>
-      <div id="bc-queue-view"></div>
-    </div>
-  `;
-
-  let customers = [];
-  let active = 'active';
-  try {
-    window.avBusy('Loading customers…');
-    const snap = await getDocs(collection(db, COL.CUSTOMERS));
-    customers = snap.docs.map(d => {
-      const c = { id: d.id, ...d.data() };
-      const last = toDateSafe(c.lastTripAt);
-      c._days = last ? daysBetween(last, new Date()) : null;
-      c._bucket = lifecycleBucket(c._days);
-      return c;
-    });
-    window.avDone();
-  } catch (e) {
-    window.avDone();
-    panel.innerHTML += `<div class="empty"><i class="fas fa-triangle-exclamation"></i> Failed: ${e.message}</div>`;
-    return;
-  }
-
-  const segBar = panel.querySelector('#seg-bar');
-  SEGMENTS.forEach(s => {
-    const b = document.createElement('button');
-    b.className = 'filter-chip' + (s.key === active ? ' active' : '');
-    b.textContent = s.label;
-    b.addEventListener('click', () => {
-      active = s.key;
-      segBar.querySelectorAll('.filter-chip').forEach(x => x.classList.toggle('active', x === b));
-      updateSummary();
-    });
-    segBar.appendChild(b);
-  });
-
-  const summary = panel.querySelector('#seg-summary');
-  function getSelected() {
-    const s = SEGMENTS.find(x => x.key === active);
-    return customers.filter(c => c.phone && s.match(c));
-  }
-  function updateSummary() {
-    const sel = getSelected();
-    summary.innerHTML = `<b>${fmtNum(sel.length)}</b> customer${sel.length === 1 ? '' : 's'} match this segment (with phone on file).`;
-  }
-  updateSummary();
-
-  panel.querySelector('#bc-queue').addEventListener('click', () => {
-    const sel = getSelected();
-    const text = panel.querySelector('#bc-text').value.trim();
-    if (!text) { Swal.fire('Empty message', 'Write a message first.', 'warning'); return; }
-    if (!sel.length) { Swal.fire('Empty segment', 'No customers in this segment.', 'info'); return; }
-    const queue = sel.map(c => ({
-      id: c.id,
-      name: c.name || '',
-      phone: c.phone || c.id,
-      text: text.replace(/\{name\}/g, c.name || 'there'),
-      sent: false,
-    }));
-    localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
-    renderQueue();
-    Swal.fire({ icon: 'success', title: `Queued ${queue.length}`, timer: 1200, showConfirmButton: false });
-  });
-  panel.querySelector('#bc-clear').addEventListener('click', () => {
-    localStorage.removeItem(QUEUE_KEY);
-    renderQueue();
-  });
-
-  renderQueue();
-
-  function renderQueue() {
-    const queueView = panel.querySelector('#bc-queue-view');
-    const raw = localStorage.getItem(QUEUE_KEY);
-    let queue = [];
-    try { queue = raw ? JSON.parse(raw) : []; } catch (_) { queue = []; }
-    if (!queue.length) {
-      queueView.innerHTML = `<div class="empty"><i class="fas fa-inbox"></i> Queue is empty.</div>`;
-      return;
-    }
-    const sent = queue.filter(x => x.sent).length;
-    queueView.innerHTML = `
-      <p class="card-sub mb-12"><b>${sent}</b> / ${queue.length} sent. Each send opens WhatsApp in this tab — confirm and return here to continue.</p>
-      <div class="row-list">
-        ${queue.map((q, i) => `
-          <div class="row-card">
-            <div class="row-top">
-              <div class="flex-row flex-grow">
-                <strong>${escapeHtml(q.name || 'Unnamed')}</strong>
-                <span class="text-muted-an">+91 ${escapeHtml(q.phone)}</span>
-              </div>
-              <span class="chip ${q.sent ? 'completed' : 'new'}">${q.sent ? 'Sent' : 'Pending'}</span>
-            </div>
-            <div class="row-meta">
-              <div style="white-space:pre-wrap; font-size:12px; color:var(--text-2);">${escapeHtml(q.text)}</div>
-            </div>
-            <div class="row-actions">
-              ${q.sent ? '' : `<button class="btn-an btn-an-sm" data-send="${i}"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>`}
-              <button class="btn-an btn-an-outline btn-an-sm" data-remove="${i}" style="margin-left:auto;"><i class="fas fa-trash"></i></button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-    queueView.querySelectorAll('[data-send]').forEach(el => {
-      el.addEventListener('click', () => sendAt(parseInt(el.dataset.send, 10)));
-    });
-    queueView.querySelectorAll('[data-remove]').forEach(el => {
-      el.addEventListener('click', () => { removeAt(parseInt(el.dataset.remove, 10)); });
-    });
-
-    async function sendAt(i) {
-      const raw2 = localStorage.getItem(QUEUE_KEY);
-      const queue2 = raw2 ? JSON.parse(raw2) : [];
-      const q = queue2[i];
-      if (!q) return;
-      const phone = normalisePhone(q.phone);
-      if (!phone) { Swal.fire('Bad phone', 'Phone is not valid.', 'warning'); return; }
-      // Mobile WhatsApp needs a fresh user gesture; the Swal confirm provides it.
-      const r = await Swal.fire({
-        title: 'Open WhatsApp?',
-        html: `Send to <b>+91${phone}</b>?<br><small class="text-muted-an">${escapeHtml(q.text)}</small>`,
-        showCancelButton: true,
-        confirmButtonText: 'Open',
-      });
-      if (!r.isConfirmed) return;
-      queue2[i].sent = true;
-      localStorage.setItem(QUEUE_KEY, JSON.stringify(queue2));
-      window.location.href = buildWaUrl('91' + phone, q.text);
-    }
-    function removeAt(i) {
-      const raw2 = localStorage.getItem(QUEUE_KEY);
-      const queue2 = raw2 ? JSON.parse(raw2) : [];
-      queue2.splice(i, 1);
-      localStorage.setItem(QUEUE_KEY, JSON.stringify(queue2));
-      renderQueue();
-    }
-  }
+function segmentOf(daysAgo) {
+  if (daysAgo === null) return 'lost';
+  if (daysAgo <= 14) return 'active';
+  if (daysAgo <= 30) return 'cooling';
+  if (daysAgo <= 60) return 'lapsed';
+  return 'lost';
+}
+function inSegment(daysAgo, segId) {
+  if (segId === 'all') return true;
+  return segmentOf(daysAgo) === segId;
 }
 
 function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  return String(s ?? '').replace(/[&<>"']/g, ch =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+// Anvisha names use the "AT N(real name)" convention (mirrors BB N in BankiBites).
+// Returns the parenthesised alias when available; falls back to NAME_FALLBACK.
+function displayName(rawName) {
+  if (!rawName) return NAME_FALLBACK;
+  const s = String(rawName).replace(/\s+/g, ' ').trim();
+  if (!s) return NAME_FALLBACK;
+  if (/^(at|bb)/i.test(s)) {
+    const m = s.match(/\(([^)]+)\)/);
+    const alias = m && m[1] ? m[1].trim() : '';
+    return alias || NAME_FALLBACK;
+  }
+  return s;
+}
+
+function personalize(template, recipient) {
+  if (!template) return '';
+  const r = recipient || {};
+  return template.replace(/\{\s*name\s*\}/gi, displayName(r.name));
+}
+
+function buildMessage(body, imageUrl, recipient) {
+  const parts = [];
+  const t = personalize((body || '').trim(), recipient);
+  if (t) parts.push(t);
+  const u = (imageUrl || '').trim();
+  if (u) parts.push(u);
+  parts.push(FOOTER);
+  return parts.join('\n\n');
+}
+
+function loadQueue() {
+  try {
+    const raw = sessionStorage.getItem(QUEUE_KEY);
+    if (!raw) return null;
+    const q = JSON.parse(raw);
+    if (!q || !Array.isArray(q.recipients)) return null;
+    if (typeof q.body !== 'string') return null;
+    return q;
+  } catch { return null; }
+}
+function saveQueue(q) { sessionStorage.setItem(QUEUE_KEY, JSON.stringify(q)); }
+function clearQueue() { sessionStorage.removeItem(QUEUE_KEY); }
+
+// Last completed booking per customer phone, within the look-back window.
+async function loadLastBookingByPhone(db) {
+  const cutoffMs = Date.now() - BOOKING_LOOKBACK_DAYS * 86400000;
+  const sinceTs = Timestamp.fromMillis(cutoffMs);
+  const out = new Map();
+  // Try the completedAt range query first.
+  try {
+    const snap = await getDocs(query(
+      collection(db, COL.BOOKINGS),
+      where('completedAt', '>=', sinceTs),
+    ));
+    snap.forEach(d => {
+      const o = d.data() || {};
+      if (o.status !== 'completed') return;
+      const phone = (o.customer && o.customer.phone) || '';
+      if (!phone) return;
+      const ms = o.completedAt && o.completedAt.toMillis ? o.completedAt.toMillis() : null;
+      if (!ms) return;
+      const prev = out.get(phone);
+      if (!prev || ms > prev) out.set(phone, ms);
+    });
+  } catch (_) {
+    // Fallback (e.g. missing index): scan all completed bookings client-side.
+    const snap = await getDocs(query(collection(db, COL.BOOKINGS), where('status', '==', 'completed')));
+    snap.forEach(d => {
+      const o = d.data() || {};
+      const phone = (o.customer && o.customer.phone) || '';
+      if (!phone) return;
+      const ms = (o.completedAt && o.completedAt.toMillis && o.completedAt.toMillis())
+              || (o.updatedAt   && o.updatedAt.toMillis   && o.updatedAt.toMillis())
+              || (o.createdAt   && o.createdAt.toMillis   && o.createdAt.toMillis())
+              || null;
+      if (!ms || ms < cutoffMs) return;
+      const prev = out.get(phone);
+      if (!prev || ms > prev) out.set(phone, ms);
+    });
+  }
+  return out;
+}
+
+async function loadCustomers(db) {
+  const snap = await getDocs(collection(db, COL.CUSTOMERS));
+  const map = new Map();
+  snap.forEach(d => map.set(d.id, { phone: d.id, ...d.data() }));
+  return map;
+}
+
+export async function renderBroadcast(ctx) {
+  const root = ctx.panel;
+  const db = ctx.db;
+  root.innerHTML = `
+    <section class="bb-bc">
+      <div class="bb-bc__stats">
+        <div class="bb-bc__stat">
+          <div class="bb-bc__stat-icon bb-bc__stat-icon--total"><i class="fas fa-users"></i></div>
+          <div class="bb-bc__stat-body">
+            <div class="bb-bc__stat-num" id="bcStatTotal">0</div>
+            <div class="bb-bc__stat-label">Total customers</div>
+          </div>
+        </div>
+        <div class="bb-bc__stat">
+          <div class="bb-bc__stat-icon bb-bc__stat-icon--ok"><i class="fas fa-paper-plane"></i></div>
+          <div class="bb-bc__stat-body">
+            <div class="bb-bc__stat-num" id="bcStatEligible">0</div>
+            <div class="bb-bc__stat-label">Eligible</div>
+          </div>
+        </div>
+        <div class="bb-bc__stat">
+          <div class="bb-bc__stat-icon bb-bc__stat-icon--off"><i class="fas fa-ban"></i></div>
+          <div class="bb-bc__stat-body">
+            <div class="bb-bc__stat-num" id="bcStatOpted">0</div>
+            <div class="bb-bc__stat-label">Opted out</div>
+          </div>
+        </div>
+        <div class="bb-bc__stat bb-bc__stat--accent">
+          <div class="bb-bc__stat-icon bb-bc__stat-icon--sel"><i class="fas fa-check-double"></i></div>
+          <div class="bb-bc__stat-body">
+            <div class="bb-bc__stat-num" id="bcStatSelected">0</div>
+            <div class="bb-bc__stat-label">Selected</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bb-bc__grid">
+        <!-- Composer card -->
+        <article class="bb-bc__card">
+          <div class="bb-bc__card-head">
+            <h3><i class="fas fa-pen-to-square"></i> Compose message</h3>
+            <span class="bb-bc__badge bb-bc__badge--soft">Step 1</span>
+          </div>
+
+          <div class="bb-bc__field">
+            <label for="bcMsg">Message text</label>
+            <textarea id="bcMsg" class="bb-bc__textarea" rows="5"
+              maxlength="900"
+              placeholder="e.g. Hi {name}, need a cab around Banki? Anvisha Travels — 24/7 service. Reply here to book."></textarea>
+            <div class="bb-bc__field-foot">
+              <span class="bb-bc__hint">
+                Use <button type="button" id="bcInsertName" class="bb-bc__chip">
+                  <i class="fas fa-user"></i> Insert {name}
+                </button>
+                — replaced with each customer's name (falls back to "Dear").
+                Footer is appended automatically.
+              </span>
+              <span class="bb-bc__count"><span id="bcMsgCount">0</span> / 900</span>
+            </div>
+          </div>
+
+          <div class="bb-bc__field">
+            <label for="bcImg">Offer image URL <span class="bb-bc__optional">optional</span></label>
+            <div class="bb-bc__input-row">
+              <input id="bcImg" class="bb-bc__input" type="url"
+                placeholder="${SITE_URL}">
+              <button type="button" class="bb-bc__btn bb-bc__btn--ghost" id="bcUseOffer">
+                <i class="fas fa-link"></i> Use site link
+              </button>
+            </div>
+            <span class="bb-bc__hint">WhatsApp previews the URL — it can't attach images via a deep-link.</span>
+          </div>
+
+          <div class="bb-bc__field">
+            <label>Final message preview</label>
+            <div class="bb-bc__preview-tag">
+              <i class="fas fa-eye"></i>
+              Previewing as <strong id="bcPreviewName">Dear</strong>
+              <span class="bb-bc__hint" id="bcPreviewSrc"></span>
+            </div>
+            <div class="bb-bc__phone">
+              <div class="bb-bc__bubble">
+                <pre id="bcPreview" class="bb-bc__bubble-text"></pre>
+                <div class="bb-bc__bubble-time"><i class="fas fa-check-double"></i> now</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Recipients card -->
+        <article class="bb-bc__card">
+          <div class="bb-bc__card-head">
+            <h3><i class="fas fa-address-book"></i> Recipients</h3>
+            <span class="bb-bc__badge bb-bc__badge--soft">Step 2</span>
+          </div>
+
+          <div class="bb-bc__segments" id="bcSegments" role="tablist" aria-label="Customer segments">
+            ${SEGMENTS.map(s => `
+              <button type="button"
+                      class="bb-bc__seg ${s.id === 'all' ? 'is-active' : ''}"
+                      data-seg="${s.id}"
+                      role="tab"
+                      aria-selected="${s.id === 'all' ? 'true' : 'false'}">
+                <i class="fas ${s.icon}"></i>
+                <span class="bb-bc__seg-label">${s.label}</span>
+                <span class="bb-bc__seg-count" data-seg-count="${s.id}">0</span>
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="bb-bc__toolbar">
+            <div class="bb-bc__search">
+              <i class="fas fa-search"></i>
+              <input id="bcSearch" type="search" placeholder="Search name, phone or address…">
+            </div>
+            <div class="bb-bc__toolbar-actions">
+              <button type="button" class="bb-bc__btn bb-bc__btn--ghost" id="bcSelectAll">
+                <i class="fas fa-check"></i> Select all in view
+              </button>
+              <button type="button" class="bb-bc__btn bb-bc__btn--ghost" id="bcClearSel">
+                <i class="fas fa-xmark"></i> Clear
+              </button>
+            </div>
+          </div>
+
+          <div class="bb-bc__list-head">
+            <span id="bcRecCount" class="bb-bc__list-count"></span>
+            <span id="bcSegHint" class="bb-bc__list-hint"></span>
+          </div>
+
+          <div id="bcList" class="bb-bc__list" role="list"></div>
+        </article>
+      </div>
+
+      <footer class="bb-bc__actionbar">
+        <div class="bb-bc__actionbar-info">
+          <i class="fas fa-circle-info"></i>
+          <span id="bcSelInfo">No recipients selected.</span>
+        </div>
+        <button id="bcStart" class="bb-bc__btn bb-bc__btn--primary" disabled>
+          <i class="fab fa-whatsapp"></i> Start broadcast
+        </button>
+      </footer>
+    </section>
+  `;
+
+  const statTotal    = root.querySelector('#bcStatTotal');
+  const statEligible = root.querySelector('#bcStatEligible');
+  const statOpted    = root.querySelector('#bcStatOpted');
+  const statSelected = root.querySelector('#bcStatSelected');
+  const msgCount     = root.querySelector('#bcMsgCount');
+  const insertNameBtn= root.querySelector('#bcInsertName');
+  const previewName  = root.querySelector('#bcPreviewName');
+  const previewSrc   = root.querySelector('#bcPreviewSrc');
+  const segmentsEl   = root.querySelector('#bcSegments');
+  const segHint      = root.querySelector('#bcSegHint');
+
+  const msgEl    = root.querySelector('#bcMsg');
+  const imgEl    = root.querySelector('#bcImg');
+  const useBtn   = root.querySelector('#bcUseOffer');
+  const previewEl= root.querySelector('#bcPreview');
+  const listEl   = root.querySelector('#bcList');
+  const searchEl = root.querySelector('#bcSearch');
+  const selAllBtn= root.querySelector('#bcSelectAll');
+  const clearBtn = root.querySelector('#bcClearSel');
+  const startBtn = root.querySelector('#bcStart');
+  const recCount = root.querySelector('#bcRecCount');
+  const selInfo  = root.querySelector('#bcSelInfo');
+
+  const selected = new Set();
+  let customers = [];
+  let term = '';
+  let activeSeg = 'all';
+
+  function hasRealName(c) {
+    return displayName(c.name) !== NAME_FALLBACK;
+  }
+  function toRecipient(c) { return { name: c.name || '' }; }
+  function pickSampleRecipient() {
+    const selectedReal = customers.find(c => selected.has(c.phone) && eligible(c) && hasRealName(c));
+    if (selectedReal) return { recipient: toRecipient(selectedReal), source: 'selected' };
+    const segReal = customers.find(c => eligible(c) && hasRealName(c) && matchesSeg(c));
+    if (segReal) return { recipient: toRecipient(segReal), source: 'sample' };
+    const anyReal = customers.find(c => eligible(c) && hasRealName(c));
+    if (anyReal) return { recipient: toRecipient(anyReal), source: 'sample' };
+    return { recipient: { name: NAME_FALLBACK }, source: 'fallback' };
+  }
+
+  function updatePreview() {
+    const sample = pickSampleRecipient();
+    previewEl.textContent = buildMessage(msgEl.value, imgEl.value, sample.recipient);
+    msgCount.textContent = msgEl.value.length;
+    previewName.textContent = displayName(sample.recipient.name);
+    const hasPlaceholder = /\{\s*name\s*\}/i.test(msgEl.value);
+    previewSrc.textContent = hasPlaceholder
+      ? (sample.source === 'selected' ? '(first selected recipient)'
+         : sample.source === 'sample'  ? '(sample — pick recipients to personalise)'
+         : '(fallback — no named customers yet)')
+      : '(add {name} to personalise per recipient)';
+  }
+  function updateSelInfo() {
+    const n = selected.size;
+    selInfo.textContent = n === 0
+      ? 'No recipients selected.'
+      : `${n} recipient${n === 1 ? '' : 's'} ready to broadcast.`;
+    startBtn.disabled = n === 0;
+    statSelected.textContent = n;
+  }
+  function updateStats() {
+    const total = customers.length;
+    const opted = customers.filter(c => c.not_interested).length;
+    statTotal.textContent = total;
+    statEligible.textContent = total - opted;
+    statOpted.textContent = opted;
+  }
+  function eligible(c) { return !c.not_interested; }
+  function matchesSeg(c) { return inSegment(c.daysAgo, activeSeg); }
+  function calendarDaysAgo(lastMs) {
+    if (lastMs === null || lastMs === undefined) return null;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const that  = new Date(lastMs); that.setHours(0, 0, 0, 0);
+    return Math.round((today - that) / 86400000);
+  }
+  function daysAgoLabel(daysAgo) {
+    if (daysAgo === null) return 'No trip yet';
+    if (daysAgo === 0) return 'Travelled today';
+    if (daysAgo === 1) return 'Travelled yesterday';
+    return `Travelled ${daysAgo}d ago`;
+  }
+  function daysAgoIcon(daysAgo) {
+    return ({
+      active:  'fa-fire',
+      cooling: 'fa-hourglass-half',
+      lapsed:  'fa-clock-rotate-left',
+      lost:    'fa-heart-crack',
+    })[segmentOf(daysAgo)];
+  }
+  function updateSegments() {
+    const counts = { all: 0, active: 0, cooling: 0, lapsed: 0, lost: 0 };
+    for (const c of customers) {
+      if (!eligible(c)) continue;
+      counts.all += 1;
+      counts[segmentOf(c.daysAgo)] += 1;
+    }
+    for (const id of Object.keys(counts)) {
+      const el = segmentsEl.querySelector(`[data-seg-count="${id}"]`);
+      if (el) el.textContent = counts[id];
+    }
+    const seg = SEGMENTS.find(s => s.id === activeSeg);
+    segHint.textContent = seg && seg.id !== 'all' ? `Filter: ${seg.label}` : '';
+  }
+  function initials(name, phone) {
+    const n = (name || '').trim();
+    if (n) {
+      const parts = n.split(/\s+/).slice(0, 2);
+      return parts.map(p => p[0]).join('').toUpperCase();
+    }
+    return (phone || '?').slice(-2);
+  }
+  function avatarHue(seed) {
+    let h = 0;
+    for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) & 0xffff;
+    return h % 360;
+  }
+  function matchesTerm(c) {
+    if (!term) return true;
+    const t = term.toLowerCase();
+    return (c.name || '').toLowerCase().includes(t)
+      || (c.phone || '').includes(t)
+      || (c.address || '').toLowerCase().includes(t);
+  }
+
+  function renderList() {
+    const rows = customers
+      .filter(matchesSeg)
+      .filter(matchesTerm)
+      .sort((a, b) => {
+        const ta = a.lastBookingAt ?? -Infinity;
+        const tb = b.lastBookingAt ?? -Infinity;
+        if (tb !== ta) return tb - ta;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+
+    recCount.textContent = `Showing ${rows.length} of ${customers.length}`;
+
+    if (!rows.length) {
+      listEl.innerHTML = `
+        <div class="bb-bc__empty">
+          <i class="fas fa-magnifying-glass"></i>
+          <div>No customers match your search.</div>
+        </div>`;
+      return;
+    }
+    listEl.innerHTML = rows.map(c => {
+      const opted = !!c.not_interested;
+      const checked = selected.has(c.phone) ? 'checked' : '';
+      const disabled = opted ? 'disabled' : '';
+      const hue = avatarHue(c.phone);
+      const init = initials(c.name, c.phone);
+      return `
+        <label class="bb-bc__row ${opted ? 'is-opted-out' : ''}" data-phone="${escapeHtml(c.phone)}">
+          <input type="checkbox" class="bb-bc__chk" ${checked} ${disabled}
+                 data-phone="${escapeHtml(c.phone)}">
+          <span class="bb-bc__avatar" style="background:hsl(${hue} 65% 45%);">${escapeHtml(init)}</span>
+          <div class="bb-bc__who">
+            <div class="bb-bc__name">
+              ${escapeHtml(c.name || '(no name)')}
+              ${opted ? `<span class="bb-bc__pill"><i class="fas fa-ban"></i> Opted out</span>` : ''}
+            </div>
+            <div class="bb-bc__meta">
+              <span class="bb-bc__meta-item"><i class="fas fa-phone"></i> ${escapeHtml(c.phone)}</span>
+              <span class="bb-bc__meta-item bb-bc__life bb-bc__life--${segmentOf(c.daysAgo)}">
+                <i class="fas ${daysAgoIcon(c.daysAgo)}"></i> ${escapeHtml(daysAgoLabel(c.daysAgo))}
+              </span>
+              ${c.address ? `<span class="bb-bc__meta-item bb-bc__addr"><i class="fas fa-location-dot"></i> ${escapeHtml(c.address)}</span>` : ''}
+            </div>
+          </div>
+          <button type="button" class="bb-bc__btn bb-bc__btn--toggle ${opted ? 'is-restore' : ''}"
+                  data-phone="${escapeHtml(c.phone)}" data-opt="${opted ? '1' : '0'}"
+                  title="${opted ? 'Restore' : 'Mark not interested'}">
+            <i class="fas ${opted ? 'fa-rotate-left' : 'fa-ban'}"></i>
+            <span>${opted ? 'Restore' : 'Mark not interested'}</span>
+          </button>
+        </label>
+      `;
+    }).join('');
+  }
+
+  async function setNotInterested(phone, value) {
+    window.avBusy(value ? 'Marking…' : 'Restoring…');
+    try {
+      await setDoc(doc(db, COL.CUSTOMERS, phone), { not_interested: !!value }, { merge: true });
+      const c = customers.find(x => x.phone === phone);
+      if (c) c.not_interested = !!value;
+      if (value) selected.delete(phone);
+    } finally {
+      window.avDone();
+    }
+    renderList();
+    updateSelInfo();
+    updateStats();
+    updateSegments();
+  }
+
+  msgEl.addEventListener('input', updatePreview);
+  imgEl.addEventListener('input', updatePreview);
+  useBtn.addEventListener('click', () => { imgEl.value = SITE_URL; updatePreview(); });
+
+  insertNameBtn.addEventListener('click', () => {
+    const start = msgEl.selectionStart ?? msgEl.value.length;
+    const end = msgEl.selectionEnd ?? msgEl.value.length;
+    const before = msgEl.value.slice(0, start);
+    const after = msgEl.value.slice(end);
+    const needsSpaceBefore = before && !/\s$/.test(before);
+    const insert = (needsSpaceBefore ? ' ' : '') + '{name}';
+    msgEl.value = before + insert + after;
+    const caret = (before + insert).length;
+    msgEl.focus();
+    msgEl.setSelectionRange(caret, caret);
+    updatePreview();
+  });
+
+  searchEl.addEventListener('input', () => { term = searchEl.value.trim(); renderList(); });
+
+  selAllBtn.addEventListener('click', () => {
+    customers.filter(eligible).filter(matchesSeg).filter(matchesTerm).forEach(c => selected.add(c.phone));
+    renderList(); updateSelInfo(); updatePreview();
+  });
+
+  segmentsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.bb-bc__seg');
+    if (!btn) return;
+    const id = btn.dataset.seg;
+    if (id === activeSeg) return;
+    activeSeg = id;
+    segmentsEl.querySelectorAll('.bb-bc__seg').forEach(b => {
+      const on = b.dataset.seg === id;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    updateSegments();
+    renderList();
+    updatePreview();
+  });
+  clearBtn.addEventListener('click', () => { selected.clear(); renderList(); updateSelInfo(); });
+
+  listEl.addEventListener('change', e => {
+    const cb = e.target.closest('.bb-bc__chk');
+    if (!cb) return;
+    const phone = cb.dataset.phone;
+    if (cb.checked) selected.add(phone); else selected.delete(phone);
+    updateSelInfo();
+    updatePreview();
+  });
+
+  listEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.bb-bc__btn--toggle');
+    if (!btn) return;
+    e.preventDefault();
+    const phone = btn.dataset.phone;
+    const opted = btn.dataset.opt === '1';
+    await setNotInterested(phone, !opted);
+  });
+
+  startBtn.addEventListener('click', async () => {
+    if (!selected.size) return;
+    const body = msgEl.value || '';
+    const imageUrl = imgEl.value || '';
+    const sample = buildMessage(body, imageUrl, { name: NAME_FALLBACK });
+    if (!sample.trim() || sample.trim() === FOOTER) {
+      Swal.fire({ icon: 'warning', title: 'Empty message', text: 'Type a message or paste a link first.' });
+      return;
+    }
+    const recipients = customers
+      .filter(c => selected.has(c.phone) && eligible(c))
+      .map(c => ({ phone: c.phone, name: c.name || '' }));
+    if (!recipients.length) {
+      Swal.fire({ icon: 'warning', title: 'No eligible recipients', text: 'All selected customers are opted out.' });
+      return;
+    }
+    const personalised = /\{\s*name\s*\}/i.test(body);
+    const confirm = await Swal.fire({
+      title: 'Start broadcast?',
+      html: `You're about to send this message to <strong>${recipients.length}</strong> recipient(s),
+             one at a time. WhatsApp opens for each — return to this tab to send the next one.
+             ${personalised ? '<br><br><i class="fas fa-user"></i> <em>Each message is personalised with the recipient\'s name.</em>' : ''}`,
+      showCancelButton: true,
+      confirmButtonText: 'Start',
+    });
+    if (!confirm.isConfirmed) return;
+    saveQueue({ body, imageUrl, recipients, index: 0 });
+    runNextInQueue();
+  });
+
+  // Initial load — customers + last-booking map for win-back segments.
+  window.avBusy('Loading customers…');
+  try {
+    const [map, lastBookingByPhone] = await Promise.all([
+      loadCustomers(db),
+      loadLastBookingByPhone(db),
+    ]);
+    customers = Array.from(map.values()).map(c => {
+      const lastMs = lastBookingByPhone.get(c.phone) ?? null;
+      const daysAgo = calendarDaysAgo(lastMs);
+      return {
+        phone: c.phone,
+        name: c.name || '',
+        address: c.address || '',
+        not_interested: !!c.not_interested,
+        lastBookingAt: lastMs,
+        daysAgo,
+      };
+    });
+  } finally {
+    window.avDone();
+  }
+  updatePreview();
+  updateSegments();
+  renderList();
+  updateSelInfo();
+  updateStats();
+
+  if (loadQueue()) runNextInQueue();
+}
+
+async function runNextInQueue() {
+  const q = loadQueue();
+  if (!q) return;
+  if (q.index >= q.recipients.length) {
+    clearQueue();
+    Swal.fire({ icon: 'success', title: 'Broadcast complete', text: 'All selected recipients have been sent.' });
+    return;
+  }
+  const r = q.recipients[q.index];
+  const remaining = q.recipients.length - q.index;
+  const finalMessage = buildMessage(q.body, q.imageUrl || '', { name: r.name });
+  const headerName = displayName(r.name);
+  const res = await Swal.fire({
+    title: `Send to ${headerName}`,
+    html: `
+      <div class="bb-bc__swal">
+        <div class="bb-bc__swal-who">
+          <strong>${escapeHtml(r.name || headerName)}</strong>
+          <code>${escapeHtml(r.phone)}</code>
+        </div>
+        <div class="bb-bc__swal-count">${remaining} of ${q.recipients.length} remaining</div>
+        <pre class="bb-bc__swal-msg">${escapeHtml(finalMessage)}</pre>
+      </div>
+    `,
+    showCancelButton: true,
+    showDenyButton: true,
+    confirmButtonText: '<i class="fab fa-whatsapp"></i> Send via WhatsApp',
+    denyButtonText: 'Skip',
+    cancelButtonText: 'Stop broadcast',
+    width: 560,
+  });
+  if (res.isConfirmed) {
+    q.index += 1;
+    saveQueue(q);
+    try {
+      const onReturn = () => {
+        if (document.visibilityState !== 'visible') return;
+        document.removeEventListener('visibilitychange', onReturn);
+        window.removeEventListener('pageshow', onReturn);
+        setTimeout(() => { runNextInQueue(); }, 250);
+      };
+      document.addEventListener('visibilitychange', onReturn);
+      window.addEventListener('pageshow', onReturn);
+    } catch (e) { /* listener attach must never block the send */ }
+    const waUrl = 'https://wa.me/91' + r.phone + '?text=' + encodeURIComponent(finalMessage);
+    try { navigator.clipboard && navigator.clipboard.writeText(finalMessage).catch(() => {}); } catch (e) {}
+    try { window.location.href = waUrl; return; } catch (e) {}
+    try { window.location.assign(waUrl); return; } catch (e) {}
+    try { window.open(waUrl, '_self'); return; } catch (e) {}
+    try { window.open(waUrl, '_blank'); return; } catch (e) {}
+    return;
+  }
+  if (res.isDenied) {
+    q.index += 1;
+    saveQueue(q);
+    runNextInQueue();
+    return;
+  }
+  clearQueue();
 }

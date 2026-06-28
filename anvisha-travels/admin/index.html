@@ -53,7 +53,7 @@
       <div class="topbar-user">
         <span id="userEmail" class="user-email"></span>
         <button id="signOutBtn" class="btn-icon" title="Sign out" aria-label="Sign out">
-          <i class="fas fa-sign-out-alt"></i>
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
         </button>
       </div>
     </header>
@@ -61,12 +61,13 @@
     <nav class="tabbar" id="tabbar" role="tablist" aria-label="Admin sections"></nav>
 
     <main class="content">
-      <section id="tab-dashboard" class="tab-panel" role="tabpanel" tabindex="-1"></section>
-      <section id="tab-bookings"  class="tab-panel" role="tabpanel" tabindex="-1"></section>
-      <section id="tab-trips"     class="tab-panel" role="tabpanel" tabindex="-1"></section>
-      <section id="tab-customers" class="tab-panel" role="tabpanel" tabindex="-1"></section>
-      <section id="tab-drivers"   class="tab-panel" role="tabpanel" tabindex="-1"></section>
-      <section id="tab-broadcast" class="tab-panel" role="tabpanel" tabindex="-1"></section>
+      <section id="tab-dashboard" class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-dashboard"></section>
+      <section id="tab-bookings"  class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-bookings"></section>
+      <section id="tab-trips"     class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-trips"></section>
+      <section id="tab-customers" class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-customers"></section>
+      <section id="tab-drivers"   class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-drivers"></section>
+      <section id="tab-expenses"  class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-expenses"></section>
+      <section id="tab-broadcast" class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-broadcast"></section>
     </main>
 
     <footer class="admin-footer">
@@ -75,6 +76,6 @@
   </div>
 
   <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=20260628-24"></script>
 </body>
 </html>

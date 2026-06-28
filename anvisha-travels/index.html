@@ -1296,14 +1296,24 @@
   import { getDb, COL } from './firebase-config.js';
   import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
+  // Trim every field client-side BEFORE write so the Firestore rule's strict
+  // schema check (size limits, allowed keys) never rejects a legit booking.
+  function clip(s, n) { return (s == null ? '' : String(s)).slice(0, n); }
+
   window.saveBookingDraft = async function (payload) {
     try {
       const db = await getDb();
       await addDoc(collection(db, COL.BOOKINGS), {
-        ...payload,
-        customer: null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        date:        clip(payload.date, 10),         // YYYY-MM-DD
+        time:        clip(payload.time, 5),          // HH:MM
+        timeLabel:   clip(payload.timeLabel, 12),
+        passengers:  clip(payload.passengers, 4),
+        destination: payload.destination ? clip(payload.destination, 200) : null,
+        source:      'web',
+        status:      'new',
+        customer:    null,
+        createdAt:   serverTimestamp(),
+        updatedAt:   serverTimestamp(),
       });
     } catch (e) {
       // Silent — booking still goes via WhatsApp, admin can recreate manually.

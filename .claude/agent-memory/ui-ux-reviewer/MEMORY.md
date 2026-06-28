@@ -2,3 +2,4 @@
 - [Anvisha Travels Landing Page Patterns](project_anvisha_patterns.md) — Cab booking dark-theme page; amber brand, WhatsApp booking form, key contrast failures and a11y gaps
 - [BankiBites Landing Page and Dashboard Patterns](project_bankibites_patterns.md) — index.html + dashboard.html; orange #FF6B35 brand, hero-split, bottom-sheet picker, WhatsApp grow cards, recurring touch-target and ARIA gaps
 - [Prompt Gallery Design Patterns and Known Issues](project_prompt_gallery_patterns.md) — Gated AI-prompt gallery; violet+amber brand, Firebase auth, credit system, WhatsApp buy; no dark-mode, multiple sub-44px targets
+- [Anvisha Travels Admin Panel and Driver Portal Patterns](project_anvisha_admin_driver_patterns.md) — Admin tabbar + driver trip-log; gold brand; touch-target failures, missing label `for` attrs, no reduced-motion, SweetAlert confirm button contrast in light mode

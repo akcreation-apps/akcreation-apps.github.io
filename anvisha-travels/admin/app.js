@@ -1,7 +1,6 @@
 import { getDb as getDbBase, getAuthInstance as getAuthBase, COL } from '../firebase-config.js';
 import {
-  GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
-  signOut, onAuthStateChanged,
+  GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
@@ -10,6 +9,7 @@ import { renderBookings }  from './bookings.js';
 import { renderTrips }     from './trips.js';
 import { renderCustomers } from './customers.js';
 import { renderDrivers }   from './drivers.js';
+import { renderExpenses }  from './expenses.js';
 import { renderBroadcast } from './broadcast.js';
 
 const APP_NAME = 'anvisha-admin';
@@ -37,6 +37,7 @@ const ADMIN_TABS = [
   { key: 'dashboard',  label: 'Dashboard',  icon: 'fa-chart-line',  render: renderDashboard },
   { key: 'bookings',   label: 'Bookings',   icon: 'fa-calendar',    render: renderBookings },
   { key: 'trips',      label: 'Trips',      icon: 'fa-road',        render: ctx => renderTrips(ctx, 'admin') },
+  { key: 'expenses',   label: 'Expenses',   icon: 'fa-receipt',     render: renderExpenses },
   { key: 'customers',  label: 'Customers',  icon: 'fa-users',       render: renderCustomers },
   { key: 'drivers',    label: 'Drivers',    icon: 'fa-id-card',     render: renderDrivers },
   { key: 'broadcast',  label: 'Broadcast',  icon: 'fa-bullhorn',    render: renderBroadcast },
@@ -54,41 +55,16 @@ let renderedTabs = {};
   try {
     const auth = await getAuthInstance();
 
-    // Pick up any pending redirect-based sign-in result first (used as a
-    // fallback when the popup is blocked by COOP / popup-blocker).
-    try {
-      await getRedirectResult(auth);
-    } catch (e) {
-      authError.textContent = (e.code ? e.code + ': ' : '') + (e.message || 'Sign-in failed.');
-      authError.hidden = false;
-    }
-
-    $('#googleSignInBtn').addEventListener('click', () => {
+    $('#googleSignInBtn').addEventListener('click', async () => {
       authError.hidden = true;
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      // Don't AWAIT the popup. Chrome's Cross-Origin-Opener-Policy blocks
-      // Firebase's window.closed polling, so signInWithPopup() can hang
-      // forever even when auth actually succeeded. onAuthStateChanged fires
-      // independently and drives the rest of the flow.
-      signInWithPopup(auth, provider).catch(e => {
-        const popupFailed = e && (
-          e.code === 'auth/popup-blocked'
-          || e.code === 'auth/popup-closed-by-user'
-          || e.code === 'auth/cancelled-popup-request'
-          || /Cross-Origin-Opener-Policy/i.test(e.message || '')
-        );
-        if (popupFailed) {
-          // Full-page redirect — works even when popups/COOP are hostile.
-          signInWithRedirect(auth, provider).catch(e2 => {
-            authError.textContent = (e2.code ? e2.code + ': ' : '') + (e2.message || 'Sign-in failed.');
-            authError.hidden = false;
-          });
-          return;
-        }
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (e) {
         authError.textContent = (e.code ? e.code + ': ' : '') + (e.message || 'Sign-in failed.');
         authError.hidden = false;
-      });
+      }
     });
 
     $('#signOutBtn').addEventListener('click', async () => {
@@ -109,7 +85,7 @@ let renderedTabs = {};
         admins  = await getDoc(doc(db, COL.META, 'admins'));
         drivers = await getDoc(doc(db, COL.META, 'drivers'));
       } catch (err) {
-        authError.innerHTML = `Lookup failed: <code>${err.code || ''}</code> ${err.message}<br><small>UID: <code>${user.uid}</code></small>`;
+        authError.textContent = 'Sign-in lookup failed. Please contact support.';
         authError.hidden = false;
         await signOut(auth);
         return;
@@ -118,13 +94,10 @@ let renderedTabs = {};
       const driverUids = drivers.exists() ? (drivers.data().uids || []) : [];
 
       if (!adminUids.includes(user.uid)) {
-        // Drivers signing in here get pointed at the driver portal.
         const isDriver = driverUids.includes(user.uid);
         authError.innerHTML = isDriver
-          ? `Drivers should use the <a href="../driver/">Driver portal</a>.<br><small>UID: <code>${user.uid}</code></small>`
-          : `Account <strong>${user.email}</strong> is not authorised.<br>
-             <small>UID: <code>${user.uid}</code></small><br>
-             <small>Ask the admin to add this UID to <code>${COL.META}/admins</code>.</small>`;
+          ? `Drivers should use the <a href="../driver/">Driver portal</a>.`
+          : `This account is not authorised to access the admin panel.`;
         authError.hidden = false;
         await signOut(auth);
         return;
@@ -150,8 +123,10 @@ function mountTabs() {
   ADMIN_TABS.forEach(t => {
     const btn = document.createElement('button');
     btn.className = 'tab-btn';
+    btn.id = `tab-btn-${t.key}`;
     btn.dataset.tab = t.key;
     btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-controls', `tab-${t.key}`);
     btn.innerHTML = `<i class="fas ${t.icon}" aria-hidden="true"></i><span>${t.label}</span>`;
     btn.addEventListener('click', () => activateTab(t.key));
     tabbar.appendChild(btn);

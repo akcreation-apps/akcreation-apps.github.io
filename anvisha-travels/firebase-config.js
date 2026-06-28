@@ -64,5 +64,6 @@ export const COL = {
   TRIPS:     'anvisha_trips',
   CUSTOMERS: 'anvisha_customers',
   DRIVERS:   'anvisha_drivers',
+  EXPENSES:  'anvisha_expenses',
   META:      'anvisha_meta',
 };

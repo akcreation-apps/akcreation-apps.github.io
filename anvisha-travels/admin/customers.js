@@ -3,7 +3,7 @@ import {
   collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
-  fmtDate, fmtDateTime, normalisePhone, buildWaUrl, lifecycleBucket, daysBetween, toDateSafe,
+  fmtDate, fmtDateTime, normalisePhone, buildWaUrl, lifecycleBucket, daysBetween, toDateSafe, displayName, wirePhoneInput,
 } from './analytics.js';
 
 export async function renderCustomers(ctx) {
@@ -96,7 +96,7 @@ function renderRow(c) {
     <div class="row-actions">
       <button class="btn-an btn-an-outline btn-an-sm" data-action="edit" data-id="${c.id}"><i class="fas fa-pen"></i> Edit</button>
       <button class="btn-an btn-an-outline btn-an-sm" data-action="wa" data-id="${c.id}"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-      <button class="btn-an btn-an-outline btn-an-sm" data-action="delete" data-id="${c.id}" style="margin-left:auto;"><i class="fas fa-trash"></i></button>
+      <button class="btn-an btn-an-outline btn-an-sm" data-action="delete" data-id="${c.id}" style="margin-left:auto;" aria-label="Delete customer" title="Delete customer"><i class="fas fa-trash" aria-hidden="true"></i></button>
     </div>
   </div>
   `;
@@ -125,7 +125,8 @@ async function handle(db, action, id, customers) {
         confirmButtonText: 'Open',
       });
       if (r.isConfirmed) {
-        window.location.href = buildWaUrl('91' + phone, `Hi${c.name ? ' ' + c.name : ''}! This is Anvisha Travels. How can we help you today?`);
+        const friendly = displayName(c.name);
+        window.location.href = buildWaUrl('91' + phone, `Hi${friendly ? ' ' + friendly : ''}! This is Anvisha Travels. How can we help you today?`);
       }
     }
   } catch (e) {
@@ -143,14 +144,18 @@ async function openCustomerModal(db, existing) {
     html: `
       <div style="text-align:left;">
         <div class="f-row cols-2">
-          <div class="f-group"><label class="f-label">Name</label><input id="cm-name" type="text" class="f-input" value="${escapeAttr(c.name || '')}"></div>
-          <div class="f-group"><label class="f-label">Phone (10 digits)</label><input id="cm-phone" type="tel" class="f-input" value="${escapeAttr(c.phone || c.id || '')}" ${isEdit ? 'disabled' : ''}></div>
+          <div class="f-group"><label class="f-label" for="cm-name">Name</label><input id="cm-name" type="text" class="f-input" value="${escapeAttr(c.name || '')}"></div>
+          <div class="f-group"><label class="f-label" for="cm-phone">Phone (10 digits)</label><input id="cm-phone" type="tel" class="f-input" inputmode="numeric" value="${escapeAttr(c.phone || c.id || '')}" ${isEdit ? 'disabled' : ''}></div>
         </div>
-        <div class="f-group mb-12"><label class="f-label">Address</label><input id="cm-addr" type="text" class="f-input" value="${escapeAttr(c.address || '')}"></div>
+        <div class="f-group mb-12"><label class="f-label" for="cm-addr">Address</label><input id="cm-addr" type="text" class="f-input" value="${escapeAttr(c.address || '')}"></div>
       </div>
     `,
     showCancelButton: true,
     confirmButtonText: isEdit ? 'Save' : 'Create',
+    didOpen: () => {
+      const el = document.getElementById('cm-phone');
+      if (el && !el.disabled) wirePhoneInput(el);
+    },
     preConfirm: () => {
       const phone = normalisePhone(document.getElementById('cm-phone').value);
       const name  = document.getElementById('cm-name').value.trim();

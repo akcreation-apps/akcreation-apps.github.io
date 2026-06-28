@@ -129,6 +129,28 @@ export function normalisePhone(raw) {
   return s.replace(/\D/g, '');
 }
 
+// Wire up a phone <input> so pasting "+91 90909 91234" / "0 9090991234" /
+// "+919090991234" all immediately become "9090991234". Mirrors the BankiBites
+// admin pattern: intercept paste BEFORE the value lands (so maxlength doesn't
+// truncate the formatted string), and re-normalise on blur as a safety net.
+export function wirePhoneInput(input) {
+  if (!input || input.dataset.phoneWired === '1') return;
+  input.dataset.phoneWired = '1';
+  input.addEventListener('paste', e => {
+    e.preventDefault();
+    const raw = (e.clipboardData || window.clipboardData).getData('text/plain');
+    input.value = normalisePhone(raw);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  input.addEventListener('blur', () => {
+    const n = normalisePhone(input.value);
+    if (n !== input.value) {
+      input.value = n;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+}
+
 // Customer lifecycle bucket from days since last trip.
 export function lifecycleBucket(daysSince) {
   if (daysSince == null) return 'never';
@@ -141,4 +163,30 @@ export function lifecycleBucket(daysSince) {
 // Build a wa.me URL — never api.whatsapp.com.
 export function buildWaUrl(phoneE164DigitsOnly, text) {
   return `https://wa.me/${phoneE164DigitsOnly}?text=${encodeURIComponent(text)}`;
+}
+
+// Friendly customer name for outbound WhatsApp messages.
+// Admin internally uses codes like "AT 1(Kiran)" — strip the AT prefix and
+// extract the real name inside parentheses. When the customer is still an
+// unnamed internal code (e.g. "AT 5"), fall back to "Dear" so greetings stay
+// polite.
+//   "AT 1(Kiran)"   → "Kiran"
+//   "AT 12 (Kiran)" → "Kiran"
+//   "Kiran"         → "Kiran"
+//   "AT 5"          → "Dear"
+//   ""              → "Dear"
+export function displayName(raw) {
+  if (!raw) return 'Dear';
+  const s = String(raw).trim();
+  const m = s.match(/\(([^)]+)\)/);
+  if (m && m[1].trim()) return m[1].trim();
+  // No parentheses — strip a leading "AT N" / "BB N" code. If nothing
+  // meaningful is left, the customer hasn't been named yet → "Dear".
+  const stripped = s.replace(/^(?:AT|BB)\s*\d+\s*[-–:]?\s*/i, '').trim();
+  if (!stripped) return 'Dear';
+  // If the entire input WAS an AT/BB code (stripped === '' branch above
+  // handles that). If stripped equals the original AND it still looks like a
+  // bare code, also return Dear.
+  if (/^(?:AT|BB)\s*\d+$/i.test(stripped)) return 'Dear';
+  return stripped;
 }

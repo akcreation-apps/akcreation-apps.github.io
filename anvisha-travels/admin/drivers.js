@@ -3,7 +3,7 @@ import {
   doc, getDoc, setDoc, onSnapshot, collection, query, where, getDocs,
   serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { fmtNum, fmtINR, normalisePhone } from './analytics.js';
+import { fmtNum, fmtINR, normalisePhone, wirePhoneInput } from './analytics.js';
 
 // Driver allowlist lives at META/drivers as { uids: [...], profile: { uid: { name, phone } } }.
 // This view lets admin add/remove entries and shows per-driver KPIs aggregated
@@ -12,27 +12,41 @@ import { fmtNum, fmtINR, normalisePhone } from './analytics.js';
 export async function renderDrivers(ctx) {
   const { panel, db } = ctx;
   panel.innerHTML = `
-    <h2 class="section-title"><i class="fas fa-id-card"></i> Drivers</h2>
-    <div class="card-an">
-      <div class="card-head">
-        <h3 class="card-title">Add / edit driver</h3>
+    <div class="card-an ex-card">
+      <button id="dr-toggle" type="button" class="ex-toggle" aria-expanded="false" aria-controls="dr-form">
+        <span class="ex-toggle__label"><i class="fas fa-plus"></i> Add / edit driver</span>
+        <i class="fas fa-chevron-down ex-toggle__chevron" aria-hidden="true"></i>
+      </button>
+      <div id="dr-form" class="ex-form-wrap" hidden>
+        <p class="card-sub mb-12">
+          Drivers sign in with their email + password (set up in Firebase Console).
+          Once they sign in once, copy their <b>Firebase UID</b> from
+          <em>Authentication → Users</em> and add it here so they get the driver dashboard on next sign-in.
+        </p>
+        <div class="f-row cols-3">
+          <div class="f-group"><label class="f-label" for="dr-uid">UID</label><input id="dr-uid" type="text" class="f-input" placeholder="Firebase UID"></div>
+          <div class="f-group"><label class="f-label" for="dr-name">Name</label><input id="dr-name" type="text" class="f-input"></div>
+          <div class="f-group"><label class="f-label" for="dr-phone">Phone (10 digits)</label><input id="dr-phone" type="tel" class="f-input" inputmode="numeric"></div>
+        </div>
+        <button id="dr-save" class="btn-an mt-8"><i class="fas fa-check"></i> Save driver</button>
       </div>
-      <p class="card-sub mb-12">
-        Drivers sign in to this panel with their Google account. Get the driver's <b>Firebase UID</b> from
-        the Firebase Console (Authentication → Users) after they sign in once, then add it here so they
-        get the driver dashboard on next sign-in.
-      </p>
-      <div class="f-row cols-3">
-        <div class="f-group"><label class="f-label">UID</label><input id="dr-uid" type="text" class="f-input" placeholder="Firebase UID"></div>
-        <div class="f-group"><label class="f-label">Name</label><input id="dr-name" type="text" class="f-input"></div>
-        <div class="f-group"><label class="f-label">Phone (10 digits)</label><input id="dr-phone" type="tel" class="f-input"></div>
-      </div>
-      <button id="dr-save" class="btn-an mt-8"><i class="fas fa-check"></i> Save driver</button>
     </div>
 
-    <h3 class="section-title" style="font-size:14px; margin-top:18px;"><i class="fas fa-list"></i> Active drivers</h3>
-    <div id="dr-list" class="row-list"></div>
+    <div id="dr-list" class="row-list mt-12"></div>
   `;
+
+  // Collapse / expand the form (same pattern as Expenses tab).
+  const toggleBtn = panel.querySelector('#dr-toggle');
+  const formWrap  = panel.querySelector('#dr-form');
+  toggleBtn.addEventListener('click', () => {
+    const open = !!formWrap.hidden;
+    formWrap.hidden = !open;
+    toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggleBtn.classList.toggle('is-open', open);
+  });
+
+  // Paste-time phone trim (strips +91 / 91 / leading 0 / spaces).
+  wirePhoneInput(panel.querySelector('#dr-phone'));
 
   const list = panel.querySelector('#dr-list');
   let meta = null;

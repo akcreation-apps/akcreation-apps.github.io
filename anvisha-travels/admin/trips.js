@@ -1,46 +1,46 @@
 import { COL } from '../firebase-config.js';
 import {
-  collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, limit,
-  onSnapshot, updateDoc, serverTimestamp, writeBatch,
+  collection, addDoc, deleteDoc, doc, getDoc, getDocs, query, where, orderBy, limit,
+  onSnapshot, updateDoc, serverTimestamp, writeBatch, increment,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { fmtDate, fmtDateTime, fmtTimeLabel, toDateSafe } from './analytics.js';
+import { fmtDate, fmtDateTime, fmtTimeLabel, toDateSafe, wirePhoneInput } from './analytics.js';
 
 const FUEL_TYPES = ['CNG', 'Petrol', 'Diesel'];
 
 // ── Admin tab: list all trips, filter tied/untied, tie-to-booking modal ──
 export async function renderTrips(ctx, role) {
   const { panel, db } = ctx;
-  panel.innerHTML = `
-    <h2 class="section-title"><i class="fas fa-road"></i> Trips</h2>
-    <div class="filter-bar" id="tr-filters"></div>
-    <div class="card-an mb-12">
-      <div class="card-head" style="margin-bottom:0;">
-        <div class="card-sub" id="tr-count">Loading…</div>
-        <button id="tr-new" class="btn-an btn-an-sm"><i class="fas fa-plus"></i> Log trip</button>
-      </div>
-    </div>
-    <div id="tr-list" class="row-list"></div>
-  `;
   const filters = [
     { key: 'untied', label: 'Untied', match: t => !t.bookingId },
     { key: 'tied',   label: 'Tied',   match: t => !!t.bookingId },
     { key: 'all',    label: 'All',    match: () => true },
   ];
+
+  panel.innerHTML = `
+    <div class="av-toolbar">
+      <div class="av-toolbar__left">
+        <button id="tr-new" class="btn-an btn-an-sm av-toolbar__btn">
+          <i class="fas fa-plus" aria-hidden="true"></i>
+          <span class="av-toolbar__btn-text">Log trip</span>
+          <span class="av-toolbar__count" id="tr-count" aria-live="polite" aria-atomic="true"></span>
+        </button>
+      </div>
+      <div class="av-toolbar__right">
+        <label for="tr-filter" class="sr-only">Filter trips</label>
+        <select id="tr-filter" class="f-select av-toolbar__select">
+          ${filters.map(f => `<option value="${f.key}">${f.label}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div id="tr-list" class="row-list"></div>
+  `;
+
   let active = 'untied';
   let trips = [];
 
-  const filterBar = panel.querySelector('#tr-filters');
-  filters.forEach(f => {
-    const b = document.createElement('button');
-    b.className = 'filter-chip' + (f.key === active ? ' active' : '');
-    b.textContent = f.label;
-    b.addEventListener('click', () => {
-      active = f.key;
-      filterBar.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c === b));
-      render();
-    });
-    filterBar.appendChild(b);
-  });
+  const filterSelect = panel.querySelector('#tr-filter');
+  filterSelect.value = active;
+  filterSelect.addEventListener('change', () => { active = filterSelect.value; render(); });
 
   const list = panel.querySelector('#tr-list');
   const count = panel.querySelector('#tr-count');
@@ -57,7 +57,7 @@ export async function renderTrips(ctx, role) {
   function render() {
     const f = filters.find(x => x.key === active);
     const rows = trips.filter(f.match);
-    count.textContent = `${rows.length} trip${rows.length === 1 ? '' : 's'}`;
+    count.textContent = rows.length ? `· ${rows.length}` : '';
     if (!rows.length) {
       list.innerHTML = `<div class="empty"><i class="far fa-flag"></i> No trips yet.</div>`;
       return;
@@ -105,47 +105,47 @@ function renderDriverForm(host, db, ctx) {
   host.innerHTML = `
     <div class="f-row cols-2">
       <div class="f-group">
-        <label class="f-label">Date</label>
-        <input id="dt-date" type="date" class="f-input" value="${today}">
+        <label class="f-label" for="dt-date">Date <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input id="dt-date" type="date" class="f-input" value="${today}" required>
       </div>
       <div class="f-group">
-        <label class="f-label">Distance (km)</label>
-        <input id="dt-km" type="number" class="f-input" min="0" step="0.5" placeholder="e.g. 42">
+        <label class="f-label" for="dt-km">Distance (km) <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input id="dt-km" type="number" class="f-input" min="0" step="0.5" inputmode="decimal" placeholder="e.g. 42" required>
       </div>
     </div>
     <div class="f-row cols-2">
       <div class="f-group">
-        <label class="f-label">Source</label>
-        <input id="dt-src" type="text" class="f-input" placeholder="e.g. Banki">
+        <label class="f-label" for="dt-src">Source <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input id="dt-src" type="text" class="f-input" placeholder="e.g. Banki" required>
       </div>
       <div class="f-group">
-        <label class="f-label">Destination</label>
-        <input id="dt-dst" type="text" class="f-input" placeholder="e.g. Cuttack Rly Station">
+        <label class="f-label" for="dt-dst">Destination <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input id="dt-dst" type="text" class="f-input" placeholder="e.g. Cuttack Rly Station" required>
       </div>
     </div>
     <div class="f-row cols-3">
       <div class="f-group">
-        <label class="f-label">Fuel type</label>
-        <select id="dt-ftype" class="f-select">
+        <label class="f-label" for="dt-ftype">Fuel type <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <select id="dt-ftype" class="f-select" required>
           ${FUEL_TYPES.map(f => `<option value="${f}">${f}</option>`).join('')}
         </select>
       </div>
       <div class="f-group">
-        <label class="f-label">Fuel qty (L / kg)</label>
-        <input id="dt-fqty" type="number" class="f-input" min="0" step="0.1" placeholder="e.g. 4.5">
+        <label class="f-label" for="dt-fqty">Fuel qty (L / kg) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+        <input id="dt-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 4.5">
       </div>
       <div class="f-group">
-        <label class="f-label">Fuel cost (₹)</label>
-        <input id="dt-fcost" type="number" class="f-input" min="0" step="1" placeholder="e.g. 480">
+        <label class="f-label" for="dt-fcost">Fuel cost (₹) <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
+        <input id="dt-fcost" type="number" class="f-input" min="0" step="1" inputmode="numeric" placeholder="e.g. 480" required>
       </div>
     </div>
     <div class="f-row cols-2">
       <div class="f-group">
-        <label class="f-label">Misc (toll/parking ₹)</label>
-        <input id="dt-misc" type="number" class="f-input" min="0" step="1" placeholder="0">
+        <label class="f-label" for="dt-misc">Misc (toll/parking ₹)</label>
+        <input id="dt-misc" type="number" class="f-input" min="0" step="1" inputmode="numeric" placeholder="0">
       </div>
       <div class="f-group">
-        <label class="f-label">Notes (optional)</label>
+        <label class="f-label" for="dt-notes">Notes (optional)</label>
         <input id="dt-notes" type="text" class="f-input" placeholder="anything to flag for admin">
       </div>
     </div>
@@ -165,8 +165,9 @@ function renderDriverForm(host, db, ctx) {
       });
       window.avDone();
       Swal.fire({ icon: 'success', title: 'Trip logged', timer: 1400, showConfirmButton: false });
-      // Reset numeric inputs but keep date.
-      ['dt-km','dt-src','dt-dst','dt-fqty','dt-fcost','dt-misc','dt-notes'].forEach(id => host.querySelector('#' + id).value = '');
+      // Reset trip-specific fields but keep date AND source (drivers usually
+      // depart from the same town all day — re-typing it is friction).
+      ['dt-km','dt-dst','dt-fqty','dt-fcost','dt-misc','dt-notes'].forEach(id => host.querySelector('#' + id).value = '');
     } catch (e) {
       window.avDone();
       Swal.fire('Save failed', e.message || String(e), 'error');
@@ -175,18 +176,23 @@ function renderDriverForm(host, db, ctx) {
 }
 
 function collectDriverForm(host) {
-  const date  = host.querySelector('#dt-date').value;
-  const km    = parseFloat(host.querySelector('#dt-km').value);
-  const src   = host.querySelector('#dt-src').value.trim();
-  const dst   = host.querySelector('#dt-dst').value.trim();
-  const ftype = host.querySelector('#dt-ftype').value;
-  const fqty  = parseFloat(host.querySelector('#dt-fqty').value);
-  const fcost = parseFloat(host.querySelector('#dt-fcost').value);
-  const misc  = parseFloat(host.querySelector('#dt-misc').value) || 0;
-  const notes = host.querySelector('#dt-notes').value.trim();
+  const date     = host.querySelector('#dt-date').value;
+  const km       = parseFloat(host.querySelector('#dt-km').value);
+  const src      = host.querySelector('#dt-src').value.trim();
+  const dst      = host.querySelector('#dt-dst').value.trim();
+  const ftype    = host.querySelector('#dt-ftype').value;
+  const fqtyRaw  = host.querySelector('#dt-fqty').value;
+  const fqty     = fqtyRaw === '' ? null : parseFloat(fqtyRaw);
+  const fcost    = parseFloat(host.querySelector('#dt-fcost').value);
+  const misc     = parseFloat(host.querySelector('#dt-misc').value) || 0;
+  const notes    = host.querySelector('#dt-notes').value.trim();
 
-  if (!date || isNaN(km) || km <= 0 || !src || !dst || !ftype || isNaN(fqty) || isNaN(fcost)) {
-    Swal.fire('Missing fields', 'Please fill date, km, route, fuel type/qty/cost.', 'warning');
+  if (!date || isNaN(km) || km <= 0 || !src || !dst || !ftype || isNaN(fcost)) {
+    Swal.fire('Missing fields', 'Please fill date, km, route, fuel type and fuel cost.', 'warning');
+    return null;
+  }
+  if (fqty != null && isNaN(fqty)) {
+    Swal.fire('Bad fuel qty', 'Fuel qty must be a number (or leave it empty).', 'warning');
     return null;
   }
   return {
@@ -224,6 +230,7 @@ function renderRow(t) {
       ${!t.bookingId ? `<button class="btn-an btn-an-sm" data-action="tie" data-id="${t.id}"><i class="fas fa-link"></i> Tie to booking</button>` : ''}
       ${t.bookingId ? `<button class="btn-an btn-an-outline btn-an-sm" data-action="open-booking" data-id="${t.bookingId}"><i class="fas fa-up-right-from-square"></i> Open booking</button>` : ''}
       ${t.bookingId ? `<button class="btn-an btn-an-outline btn-an-sm" data-action="untie" data-id="${t.id}"><i class="fas fa-link-slash"></i> Untie</button>` : ''}
+      <button class="btn-an btn-an-outline btn-an-sm" data-action="delete-trip" data-id="${t.id}" style="margin-left:auto;" aria-label="Delete trip" title="Delete trip"><i class="fas fa-trash" aria-hidden="true"></i></button>
     </div>
   </div>
   `;
@@ -232,17 +239,69 @@ function renderRow(t) {
 async function handle(db, ctx, action, id, trips) {
   const t = trips.find(x => x.id === id);
   try {
-    if (action === 'tie' && t)        return openTieModal(db, t);
-    if (action === 'untie' && t)      return untieTrip(db, t);
+    if (action === 'tie' && t)         return openTieModal(db, t);
+    if (action === 'untie' && t)       return untieTrip(db, t);
+    if (action === 'delete-trip' && t) return deleteTrip(db, t);
     if (action === 'open-booking') {
       ctx.invalidate && ctx.invalidate('bookings');
       ctx.activateTab && ctx.activateTab('bookings');
       return;
     }
-    if (action === 'log')             return openTripLogModal(db, ctx, true);
+    if (action === 'log')              return openTripLogModal(db, ctx, true);
   } catch (e) {
     window.avDone();
     Swal.fire('Failed', e.message || String(e), 'error');
+  }
+}
+
+// Delete a trip. If it's tied to a booking, first clear booking.tripId and
+// revert that booking from 'completed' back to 'allocated' (or 'confirmed' if
+// no driver was allocated) so the workflow isn't stuck in a misleading state.
+async function deleteTrip(db, t) {
+  const warn = t.bookingId
+    ? 'This trip is tied to a booking. The booking will be reverted to "allocated" and unlinked from this trip.'
+    : 'This trip will be permanently deleted.';
+  const r = await Swal.fire({
+    title: 'Delete trip?',
+    text: warn,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Delete',
+    confirmButtonColor: '#ef4444',
+  });
+  if (!r.isConfirmed) return;
+  window.avBusy('Deleting…');
+  try {
+    if (t.bookingId) {
+      // Look up booking to choose the right revert status.
+      let revertTo = 'allocated';
+      try {
+        const bDoc = await getDoc(doc(db, COL.BOOKINGS, t.bookingId));
+        if (bDoc.exists()) {
+          const b = bDoc.data();
+          if (b.allocatedDriver && b.allocatedDriver.uid) revertTo = 'allocated';
+          else if (b.confirmedAt) revertTo = 'confirmed';
+          else revertTo = 'new';
+        }
+      } catch (_) { /* fall back to 'allocated' */ }
+
+      const batch = writeBatch(db);
+      batch.update(doc(db, COL.BOOKINGS, t.bookingId), {
+        status: revertTo,
+        tripId: null,
+        completedAt: null,
+        updatedAt: serverTimestamp(),
+      });
+      batch.delete(doc(db, COL.TRIPS, t.id));
+      await batch.commit();
+    } else {
+      await deleteDoc(doc(db, COL.TRIPS, t.id));
+    }
+    window.avDone();
+    Swal.fire({ icon: 'success', title: 'Trip deleted', timer: 1200, showConfirmButton: false });
+  } catch (e) {
+    window.avDone();
+    Swal.fire('Delete failed', e.message || String(e), 'error');
   }
 }
 
@@ -259,23 +318,23 @@ async function openTripLogModal(db, ctx, isAdmin) {
     html: `
       <div style="text-align:left;">
         <div class="f-row cols-2">
-          <div class="f-group"><label class="f-label">Date</label><input id="tlm-date" type="date" class="f-input" value="${today}"></div>
-          <div class="f-group"><label class="f-label">Distance (km)</label><input id="tlm-km" type="number" class="f-input" min="0" step="0.5"></div>
+          <div class="f-group"><label class="f-label" for="tlm-date">Date</label><input id="tlm-date" type="date" class="f-input" value="${today}"></div>
+          <div class="f-group"><label class="f-label" for="tlm-km">Distance (km)</label><input id="tlm-km" type="number" class="f-input" min="0" step="0.5" inputmode="decimal"></div>
         </div>
         <div class="f-row cols-2">
-          <div class="f-group"><label class="f-label">Source</label><input id="tlm-src" type="text" class="f-input"></div>
-          <div class="f-group"><label class="f-label">Destination</label><input id="tlm-dst" type="text" class="f-input"></div>
+          <div class="f-group"><label class="f-label" for="tlm-src">Source</label><input id="tlm-src" type="text" class="f-input"></div>
+          <div class="f-group"><label class="f-label" for="tlm-dst">Destination</label><input id="tlm-dst" type="text" class="f-input"></div>
         </div>
         <div class="f-row cols-3">
-          <div class="f-group"><label class="f-label">Fuel</label>
+          <div class="f-group"><label class="f-label" for="tlm-ftype">Fuel</label>
             <select id="tlm-ftype" class="f-select">${FUEL_TYPES.map(f => `<option>${f}</option>`).join('')}</select>
           </div>
-          <div class="f-group"><label class="f-label">Qty</label><input id="tlm-fqty" type="number" class="f-input" min="0" step="0.1"></div>
-          <div class="f-group"><label class="f-label">Fuel ₹</label><input id="tlm-fcost" type="number" class="f-input" min="0"></div>
+          <div class="f-group"><label class="f-label" for="tlm-fqty">Qty (optional)</label><input id="tlm-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal"></div>
+          <div class="f-group"><label class="f-label" for="tlm-fcost">Fuel ₹</label><input id="tlm-fcost" type="number" class="f-input" min="0" inputmode="numeric"></div>
         </div>
         <div class="f-row cols-2">
-          <div class="f-group"><label class="f-label">Misc ₹</label><input id="tlm-misc" type="number" class="f-input" min="0"></div>
-          <div class="f-group"><label class="f-label">Notes</label><input id="tlm-notes" type="text" class="f-input"></div>
+          <div class="f-group"><label class="f-label" for="tlm-misc">Misc ₹</label><input id="tlm-misc" type="number" class="f-input" min="0" inputmode="numeric"></div>
+          <div class="f-group"><label class="f-label" for="tlm-notes">Notes</label><input id="tlm-notes" type="text" class="f-input"></div>
         </div>
       </div>
     `,
@@ -284,11 +343,16 @@ async function openTripLogModal(db, ctx, isAdmin) {
       const km   = parseFloat(document.getElementById('tlm-km').value);
       const src  = document.getElementById('tlm-src').value.trim();
       const dst  = document.getElementById('tlm-dst').value.trim();
-      const ft   = document.getElementById('tlm-ftype').value;
-      const fq   = parseFloat(document.getElementById('tlm-fqty').value);
-      const fc   = parseFloat(document.getElementById('tlm-fcost').value);
-      if (!date || isNaN(km) || !src || !dst || !ft || isNaN(fq) || isNaN(fc)) {
+      const ft     = document.getElementById('tlm-ftype').value;
+      const fqRaw  = document.getElementById('tlm-fqty').value;
+      const fq     = fqRaw === '' ? null : parseFloat(fqRaw);
+      const fc     = parseFloat(document.getElementById('tlm-fcost').value);
+      if (!date || isNaN(km) || !src || !dst || !ft || isNaN(fc)) {
         Swal.showValidationMessage('Fill all required fields');
+        return false;
+      }
+      if (fq != null && isNaN(fq)) {
+        Swal.showValidationMessage('Fuel qty must be a number (or leave it empty)');
         return false;
       }
       return {
@@ -378,16 +442,16 @@ async function openTieModal(db, trip) {
     </div>
     <div class="tie-pane" data-pane="create" style="text-align:left;">
       <div class="f-row cols-2">
-        <div class="f-group"><label class="f-label">Date</label><input id="ct-date" type="date" class="f-input" value="${trip.date || ''}"></div>
-        <div class="f-group"><label class="f-label">Time</label><input id="ct-time" type="time" class="f-input"></div>
+        <div class="f-group"><label class="f-label" for="ct-date">Date</label><input id="ct-date" type="date" class="f-input" value="${trip.date || ''}"></div>
+        <div class="f-group"><label class="f-label" for="ct-time">Time</label><input id="ct-time" type="time" class="f-input"></div>
       </div>
       <div class="f-row cols-2">
-        <div class="f-group"><label class="f-label">Passengers</label><input id="ct-pax" type="text" class="f-input" placeholder="e.g. 4"></div>
-        <div class="f-group"><label class="f-label">Destination</label><input id="ct-dest" type="text" class="f-input" value="${escapeAttr((trip.route && trip.route.destination) || '')}"></div>
+        <div class="f-group"><label class="f-label" for="ct-pax">Passengers</label><input id="ct-pax" type="text" class="f-input" placeholder="e.g. 4"></div>
+        <div class="f-group"><label class="f-label" for="ct-dest">Destination</label><input id="ct-dest" type="text" class="f-input" value="${escapeAttr((trip.route && trip.route.destination) || '')}"></div>
       </div>
       <div class="f-row cols-2">
-        <div class="f-group"><label class="f-label">Customer name</label><input id="ct-name" type="text" class="f-input"></div>
-        <div class="f-group"><label class="f-label">Customer phone</label><input id="ct-phone" type="tel" class="f-input"></div>
+        <div class="f-group"><label class="f-label" for="ct-name">Customer name</label><input id="ct-name" type="text" class="f-input"></div>
+        <div class="f-group"><label class="f-label" for="ct-phone">Customer phone</label><input id="ct-phone" type="tel" class="f-input" inputmode="numeric"></div>
       </div>
     </div>
   `;
@@ -404,6 +468,8 @@ async function openTieModal(db, trip) {
           document.querySelectorAll('.tie-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === b.dataset.pane));
         });
       });
+      const phoneEl = document.getElementById('ct-phone');
+      if (phoneEl) wirePhoneInput(phoneEl);
     },
     preConfirm: () => {
       const activePane = document.querySelector('.tie-tabs button.active').dataset.pane;
@@ -437,27 +503,57 @@ async function openTieModal(db, trip) {
   try {
     const batch = writeBatch(db);
     let bookingId;
+    let customerPhone = null;
     if (v.mode === 'pick') {
       bookingId = v.bookingId;
+      // Pull the booking customer phone for the customer-stat update below.
+      try {
+        const bDoc = await getDoc(doc(db, COL.BOOKINGS, bookingId));
+        if (bDoc.exists()) {
+          const c = bDoc.data().customer;
+          if (c && c.phone) customerPhone = c.phone;
+        }
+      } catch (_) { /* swallow */ }
+      // Tie = trip complete = booking complete.
       batch.update(doc(db, COL.BOOKINGS, bookingId), {
-        status: 'in_progress',
+        status: 'completed',
         tripId: trip.id,
+        completedAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
     } else {
       const newRef = doc(collection(db, COL.BOOKINGS));
       bookingId = newRef.id;
+      if (v.booking.customer && v.booking.customer.phone) customerPhone = v.booking.customer.phone;
       batch.set(newRef, {
         ...v.booking,
+        status: 'completed',
         tripId: trip.id,
+        completedAt: serverTimestamp(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
     }
     batch.update(doc(db, COL.TRIPS, trip.id), { bookingId, updatedAt: serverTimestamp() });
     await batch.commit();
+
+    // Bump the customer's lastTripAt + tripCount (best-effort, non-blocking).
+    if (customerPhone) {
+      try {
+        const phone = String(customerPhone).replace(/\D/g, '');
+        if (phone.length === 10) {
+          const ref = doc(db, COL.CUSTOMERS, phone);
+          await updateDoc(ref, {
+            lastTripAt: serverTimestamp(),
+            tripCount: increment(1),
+            updatedAt: serverTimestamp(),
+          });
+        }
+      } catch (_) { /* customer doc may not exist — non-fatal */ }
+    }
+
     window.avDone();
-    Swal.fire({ icon: 'success', title: 'Tied', timer: 1200, showConfirmButton: false });
+    Swal.fire({ icon: 'success', title: 'Tied — booking marked completed', timer: 1400, showConfirmButton: false });
   } catch (e) {
     window.avDone();
     Swal.fire('Failed', e.message || String(e), 'error');
