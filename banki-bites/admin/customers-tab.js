@@ -9,6 +9,17 @@ import { loadCustomers, openCustomerModal } from './customers.js';
 
 const charts = new Map();
 
+// An offer is "active" when amount > 0 AND valid_until is today or later.
+// Expired offers are hidden from KPI counts and the table cell.
+function isOfferActive(r) {
+  if (!(r.active_offer_amount > 0)) return false;
+  const u = String(r.active_offer_valid_until || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(u)) return false;
+  const t = new Date(); t.setHours(0,0,0,0);
+  const todayStr = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  return u >= todayStr;
+}
+
 function mountChart(id, config) {
   const old = charts.get(id);
   if (old) { try { old.destroy(); } catch {} }
@@ -212,13 +223,7 @@ function renderKpis(root, { rows }) {
   const today = new Date(); today.setHours(0,0,0,0);
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const newThisMonth = rows.filter(r => r.created_at && r.created_at >= startOfMonth).length;
-  const activeOffers = rows.filter(r => {
-    if (!(r.active_offer_amount > 0)) return false;
-    const u = String(r.active_offer_valid_until || '');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(u)) return false;
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-    return u >= todayStr;
-  }).length;
+  const activeOffers = rows.filter(isOfferActive).length;
   const lifetimeSpend = rows.reduce((s, r) => s + r.spend, 0);
   const avgSpend = withOrders ? Math.round(lifetimeSpend / withOrders) : 0;
 
@@ -288,7 +293,7 @@ function renderTable(root, { rows }, term) {
       <td class="text-right" data-label="Spend">${fmtINR(r.spend)}</td>
       <td class="text-right" data-label="Last order">${fmtDate(r.lastOrder)}</td>
       <td class="text-right" data-label="Offer">
-        ${r.active_offer_amount > 0 ? `<span class="badge badge-success">₹${r.active_offer_amount}</span>` : '<span class="text-muted">—</span>'}
+        ${isOfferActive(r) ? `<span class="badge badge-success">₹${r.active_offer_amount}</span>` : '<span class="text-muted">—</span>'}
       </td>
       <td class="text-right cust-table__actions">
         <button class="btn btn-sm btn-outline-secondary" data-edit-phone="${escapeAttr(r.phone)}" aria-label="Edit customer">
