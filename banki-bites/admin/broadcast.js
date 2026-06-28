@@ -387,6 +387,12 @@ export async function renderBroadcast(root, db) {
   }
   function eligible(c) { return !c.not_interested; }
   function matchesSeg(c) { return inSegment(c.daysAgo, activeSeg, c); }
+  function calendarDaysAgo(lastMs) {
+    if (lastMs === null || lastMs === undefined) return null;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const that  = new Date(lastMs); that.setHours(0, 0, 0, 0);
+    return Math.round((today - that) / 86400000);
+  }
   function daysAgoLabel(daysAgo) {
     if (daysAgo === null) return 'Never ordered';
     if (daysAgo === 0) return 'Ordered today';
@@ -629,10 +635,9 @@ export async function renderBroadcast(root, db) {
       loadCustomers(db),
       loadLastOrderByPhone(db),
     ]);
-    const now = Date.now();
     customers = Array.from(map.values()).map(c => {
       const lastMs = lastOrderByPhone.get(c.phone) ?? null;
-      const daysAgo = lastMs === null ? null : Math.floor((now - lastMs) / 86400000);
+      const daysAgo = calendarDaysAgo(lastMs);
       return {
         phone: c.phone,
         name: c.name || '',
