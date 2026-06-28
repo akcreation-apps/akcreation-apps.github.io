@@ -2,9 +2,15 @@ import { getDb as getDbBase, getAuthInstance as getAuthBase, COL } from '../fire
 import {
   signInWithEmailAndPassword, signOut, onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import {
+  collection, doc, getDoc, getDocs, query, where, orderBy, limit,
+  onSnapshot,
+} from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
 import { renderDriverTripPanel } from '../admin/trips.js';
+import {
+  fmtINR, fmtNum, fmtDate, fmtTimeLabel, toDateSafe, startOfMonth,
+} from '../admin/analytics.js';
 
 const APP_NAME = 'anvisha-driver';
 const getDb = () => getDbBase(APP_NAME);
@@ -12,15 +18,11 @@ const getAuthInstance = () => getAuthBase(APP_NAME);
 
 const $ = sel => document.querySelector(sel);
 
-// Same busy overlay contract as admin so trips.js (shared) can call avBusy/avDone.
 window.avBusy = function (message = 'Working…') {
   if (!window.Swal) return;
   Swal.fire({
-    title: message,
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showConfirmButton: false,
-    didOpen: () => Swal.showLoading(),
+    title: message, allowOutsideClick: false, allowEscapeKey: false,
+    showConfirmButton: false, didOpen: () => Swal.showLoading(),
   });
 };
 window.avDone = function () {
@@ -28,9 +30,19 @@ window.avDone = function () {
   if (Swal.isLoading && Swal.isLoading()) Swal.close();
 };
 
+const TABS = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', render: renderDashboard },
+  { key: 'history',   label: 'History',   icon: 'fa-clock-rotate-left', render: renderHistory },
+  { key: 'earnings',  label: 'Earnings',  icon: 'fa-coins', render: renderEarnings },
+];
+
 const authGate = $('#authGate');
 const appShell = $('#appShell');
 const authError = $('#authError');
+const tabbar = $('#tabbar');
+
+let driver = null;
+let renderedTabs = {};
 
 (async function init() {
   try {
@@ -70,7 +82,7 @@ const authError = $('#authError');
       try {
         drivers = await getDoc(doc(db, COL.META, 'drivers'));
       } catch (err) {
-        authError.innerHTML = `Lookup failed: <code>${err.code || ''}</code> ${err.message}<br><small>UID: <code>${user.uid}</code></small>`;
+        authError.textContent = 'Sign-in lookup failed. Please contact support.';
         authError.hidden = false;
         await signOut(auth);
         return;
@@ -79,18 +91,14 @@ const authError = $('#authError');
       const driverProfiles = drivers.exists() ? (drivers.data().profile || {}) : {};
 
       if (!driverUids.includes(user.uid)) {
-        authError.innerHTML = `
-          Account <strong>${user.email}</strong> is not authorised as a driver.<br>
-          <small>UID: <code>${user.uid}</code></small><br>
-          <small>Ask the admin to add this UID to <code>${COL.META}/drivers</code>.</small>
-        `;
+        authError.textContent = 'This account is not authorised as a driver.';
         authError.hidden = false;
         await signOut(auth);
         return;
       }
 
       const profile = driverProfiles[user.uid] || {};
-      const driver = {
+      driver = {
         uid:   user.uid,
         name:  profile.name  || user.displayName || user.email,
         phone: profile.phone || '',
@@ -100,12 +108,8 @@ const authError = $('#authError');
       authGate.hidden = true;
       appShell.hidden = false;
 
-      const panel = document.getElementById('driverPanel');
-      try {
-        await renderDriverTripPanel({ panel, db, user, driver, role: 'driver', appName: APP_NAME });
-      } catch (e) {
-        panel.innerHTML = `<div class="empty"><i class="fas fa-triangle-exclamation"></i> Failed to load: ${e.message || e}</div>`;
-      }
+      mountTabs();
+      activateTab('dashboard');
     });
 
   } catch (e) {
@@ -113,3 +117,245 @@ const authError = $('#authError');
     authError.hidden = false;
   }
 })();
+
+function mountTabs() {
+  tabbar.innerHTML = '';
+  TABS.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.id = `tab-btn-${t.key}`;
+    btn.dataset.tab = t.key;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-controls', `tab-${t.key}`);
+    btn.innerHTML = `<i class="fas ${t.icon}" aria-hidden="true"></i><span>${t.label}</span>`;
+    btn.addEventListener('click', () => activateTab(t.key));
+    tabbar.appendChild(btn);
+  });
+}
+
+async function activateTab(key) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    const isActive = b.dataset.tab === key;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${key}`));
+  if (renderedTabs[key]) return;
+  renderedTabs[key] = true;
+  const panel = document.getElementById(`tab-${key}`);
+  const db = await getDb();
+  const def = TABS.find(t => t.key === key);
+  try {
+    await def.render({ panel, db, driver });
+  } catch (e) {
+    panel.innerHTML = `<div class="empty"><i class="fas fa-triangle-exclamation"></i> Failed to load: ${e.message || e}</div>`;
+  }
+}
+
+// ───────────────────────── Dashboard ─────────────────────────
+// KPIs (this month) + the existing trip-log form below.
+async function renderDashboard(ctx) {
+  const { panel, db, driver } = ctx;
+  panel.innerHTML = `
+    <h2 class="dr-greet">Hi, <strong>${escapeHtml(driver.name || 'Driver')}</strong> 👋</h2>
+    <div class="kpi-grid" id="dr-kpis">
+      ${kpi('trips', 'Trips this month')}
+      ${kpi('km',    'Distance (km)')}
+      ${kpi('fuel',  'Fuel + misc (₹)')}
+      ${kpi('earn',  'Earnings (paid)')}
+    </div>
+    <div class="card-an mt-16">
+      <h3 class="card-title mb-12"><i class="fas fa-pen-to-square"></i> Log a new trip</h3>
+      <div id="dt-host"></div>
+    </div>
+  `;
+
+  // Reuse the existing inline driver form by rendering renderDriverTripPanel
+  // into a sandbox, then pulling out just the form.
+  const sandbox = document.createElement('div');
+  await renderDriverTripPanel({ panel: sandbox, db, driver });
+  const formNode = sandbox.querySelector('#dt-form');
+  if (formNode) {
+    panel.querySelector('#dt-host').appendChild(formNode);
+  }
+
+  // KPIs
+  const monthStart = startOfMonth();
+  let trips = [];
+  try {
+    const snap = await getDocs(query(
+      collection(db, COL.TRIPS),
+      where('driver.uid', '==', driver.uid),
+    ));
+    trips = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (_) { /* swallow */ }
+
+  const inMonth = trips.filter(t => {
+    const d = toDateSafe(t.createdAt) || (t.date && new Date(t.date));
+    return d && d >= monthStart;
+  });
+  const km   = inMonth.reduce((a, t) => a + Number(t.km || 0), 0);
+  const fuel = inMonth.reduce((a, t) => a + Number((t.fuel && t.fuel.cost) || 0) + Number(t.miscCost || 0), 0);
+
+  // Earnings (paid) for this month: fares on bookings tied to this driver's trips that are paid.
+  let earn = 0;
+  try {
+    const tripsByBookingId = new Map(inMonth.filter(t => t.bookingId).map(t => [t.bookingId, t]));
+    const ids = [...tripsByBookingId.keys()];
+    // Batch reads in chunks of 10 (Firestore 'in' filter limit).
+    for (let i = 0; i < ids.length; i += 10) {
+      const chunk = ids.slice(i, i + 10);
+      if (!chunk.length) continue;
+      const snap = await getDocs(query(
+        collection(db, COL.BOOKINGS),
+        where('__name__', 'in', chunk),
+      ));
+      snap.forEach(d => {
+        const b = d.data() || {};
+        if (b.status === 'completed' && b.paid) earn += Number(b.fare || 0);
+      });
+    }
+  } catch (_) { /* swallow */ }
+
+  setKpi('trips', fmtNum(inMonth.length));
+  setKpi('km',    fmtNum(Math.round(km)));
+  setKpi('fuel',  fmtINR(fuel));
+  setKpi('earn',  fmtINR(earn));
+}
+
+// ───────────────────────── History ─────────────────────────
+async function renderHistory(ctx) {
+  const { panel, db, driver } = ctx;
+  panel.innerHTML = `
+    <h2 class="section-title"><i class="fas fa-clock-rotate-left"></i> My trips</h2>
+    <div id="dh-list" class="row-list"></div>
+  `;
+  const list = panel.querySelector('#dh-list');
+  list.innerHTML = `<div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading…</div>`;
+  onSnapshot(
+    query(collection(db, COL.TRIPS), where('driver.uid', '==', driver.uid), orderBy('createdAt', 'desc'), limit(200)),
+    snap => {
+      const trips = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (!trips.length) {
+        list.innerHTML = `<div class="empty"><i class="far fa-flag"></i> No trips yet.</div>`;
+        return;
+      }
+      list.innerHTML = trips.map(renderHistoryRow).join('');
+    },
+    err => { list.innerHTML = `<div class="empty"><i class="fas fa-triangle-exclamation"></i> ${err.message}</div>`; }
+  );
+}
+
+function renderHistoryRow(t) {
+  const fuel = t.fuel || {};
+  const route = t.route || {};
+  const tied = t.bookingId
+    ? `<span class="chip completed"><i class="fas fa-link" aria-hidden="true"></i> Linked</span>`
+    : `<span class="chip untied"><i class="fas fa-link-slash" aria-hidden="true"></i> Untied</span>`;
+  return `
+  <div class="row-card">
+    <div class="row-top">
+      <div class="flex-row flex-grow">
+        <strong>${escapeHtml(fmtDate(t.date))}</strong>
+        <span class="text-muted-an">${escapeHtml(route.source || '?')} → ${escapeHtml(route.destination || '?')}</span>
+      </div>
+      ${tied}
+    </div>
+    <div class="row-meta">
+      <div><b>Distance</b> ${escapeHtml(String(t.km ?? 0))} km</div>
+      <div><b>Fuel</b> ${escapeHtml(fuel.type || '—')} · ₹${escapeHtml(String(fuel.cost ?? 0))}${fuel.qty ? ` (${escapeHtml(String(fuel.qty))})` : ''}</div>
+      <div><b>Misc</b> ₹${escapeHtml(String(t.miscCost ?? 0))}</div>
+      ${t.notes ? `<div><b>Notes</b> ${escapeHtml(t.notes)}</div>` : ''}
+    </div>
+  </div>
+  `;
+}
+
+// ───────────────────────── Earnings ─────────────────────────
+async function renderEarnings(ctx) {
+  const { panel, db, driver } = ctx;
+  panel.innerHTML = `
+    <h2 class="section-title"><i class="fas fa-coins"></i> Earnings</h2>
+    <div class="kpi-grid" id="dr-earn-kpis">
+      ${kpi('paid_count',    'Paid trips')}
+      ${kpi('pending_count', 'Pending trips')}
+      ${kpi('paid_amt',      'Received (₹)')}
+      ${kpi('pending_amt',   'Outstanding (₹)')}
+    </div>
+    <h3 class="section-title" style="font-size:14px; margin-top:18px;"><i class="fas fa-list"></i> Allocated to me</h3>
+    <div id="de-list" class="row-list"></div>
+  `;
+  const list = panel.querySelector('#de-list');
+  list.innerHTML = `<div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading…</div>`;
+  let bookings = [];
+  try {
+    const snap = await getDocs(query(
+      collection(db, COL.BOOKINGS),
+      where('allocatedDriver.uid', '==', driver.uid),
+      orderBy('allocatedAt', 'desc'),
+      limit(200),
+    ));
+    bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (_) {
+    // Fallback if composite index missing — fetch by allocatedDriver only, sort client-side.
+    const snap = await getDocs(query(collection(db, COL.BOOKINGS), where('allocatedDriver.uid', '==', driver.uid)));
+    bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (toDateSafe(b.allocatedAt) || 0) - (toDateSafe(a.allocatedAt) || 0));
+  }
+
+  const completed = bookings.filter(b => b.status === 'completed');
+  const paid     = completed.filter(b => !!b.paid);
+  const pending  = completed.filter(b => !b.paid);
+  const paidAmt    = paid.reduce((a, b) => a + Number(b.fare || 0), 0);
+  const pendingAmt = pending.reduce((a, b) => a + Number(b.fare || 0), 0);
+
+  setKpi('paid_count',    fmtNum(paid.length));
+  setKpi('pending_count', fmtNum(pending.length));
+  setKpi('paid_amt',      fmtINR(paidAmt));
+  setKpi('pending_amt',   fmtINR(pendingAmt));
+
+  if (!bookings.length) {
+    list.innerHTML = `<div class="empty"><i class="far fa-folder-open"></i> No bookings allocated to you yet.</div>`;
+    return;
+  }
+  list.innerHTML = bookings.map(renderEarningsRow).join('');
+}
+
+function renderEarningsRow(b) {
+  const status = b.status || 'new';
+  const fare = b.fare ? `₹${b.fare}` : '<i class="text-muted-an">no fare</i>';
+  const payChip = status === 'completed'
+    ? (b.paid
+        ? `<span class="chip completed"><i class="fas fa-circle-check" aria-hidden="true"></i> Paid</span>`
+        : `<span class="chip cancelled"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Pending</span>`)
+    : `<span class="chip ${status}">${status === 'allocated' ? 'Allocated' : status}</span>`;
+  return `
+  <div class="row-card">
+    <div class="row-top">
+      <div class="flex-row flex-grow">
+        <strong>${escapeHtml(fmtDate(b.date))}</strong>
+        <span class="text-muted-an">${escapeHtml(fmtTimeLabel(b.time))}</span>
+        ${b.destination ? `<span class="text-muted-an">→ ${escapeHtml(b.destination)}</span>` : ''}
+      </div>
+      ${payChip}
+    </div>
+    <div class="row-meta">
+      <div><b>Fare</b> ${fare}</div>
+      <div><b>Passengers</b> ${escapeHtml(b.passengers || '?')}</div>
+    </div>
+  </div>
+  `;
+}
+
+// ─────────────────────── helpers ───────────────────────
+function kpi(id, label) {
+  return `<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-value" id="kpi-${id}">—</div></div>`;
+}
+function setKpi(id, v) {
+  const el = document.getElementById(`kpi-${id}`);
+  if (el) el.textContent = v;
+}
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}

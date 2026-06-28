@@ -20,6 +20,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../admin/styles.css">
 
@@ -60,13 +61,17 @@
       <div class="topbar-user">
         <span id="userEmail" class="user-email"></span>
         <button id="signOutBtn" class="btn-icon" title="Sign out" aria-label="Sign out">
-          <i class="fas fa-sign-out-alt"></i>
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
         </button>
       </div>
     </header>
 
+    <nav class="tabbar" id="tabbar" role="tablist" aria-label="Driver sections"></nav>
+
     <main class="content">
-      <section id="driverPanel" class="tab-panel active" role="tabpanel" tabindex="-1"></section>
+      <section id="tab-dashboard" class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-dashboard"></section>
+      <section id="tab-history"   class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-history"></section>
+      <section id="tab-earnings"  class="tab-panel" role="tabpanel" tabindex="-1" aria-labelledby="tab-btn-earnings"></section>
     </main>
 
     <footer class="admin-footer">
@@ -75,6 +80,6 @@
   </div>
 
   <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=20260628-1"></script>
 </body>
 </html>

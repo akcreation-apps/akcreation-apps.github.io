@@ -201,7 +201,18 @@ a:hover { text-decoration: underline; }
 .tab-btn i { font-size: 12px; }
 
 /* ── Content area ── */
-.content { padding: 16px; max-width: 1280px; margin: 0 auto; min-height: 60vh; }
+.content { padding: 16px; max-width: 1280px; margin: 0 auto; min-height: 60vh; width: 100%; }
+@media (max-width: 480px) { .content { padding: 12px; } }
+
+/* Driver greeting heading on the dashboard */
+.dr-greet {
+  margin: 0 0 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-2);
+}
+.dr-greet strong { color: var(--text); font-weight: 700; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
