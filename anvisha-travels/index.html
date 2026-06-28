@@ -1218,8 +1218,28 @@
     return 'https://wa.me/919114191989?text=' + text;
   }
 
+  function buildBookingPayload() {
+    var timeText = timeSelect.options[timeSelect.selectedIndex].text;
+    return {
+      date: dateInput.value,
+      time: timeSelect.value,
+      timeLabel: timeText,
+      passengers: getPax(),
+      destination: document.getElementById('destination').value.trim() || null,
+      source: 'web',
+      status: 'new',
+    };
+  }
+
   function openWhatsApp() {
     if (waBtn.disabled) return;
+    // Fire-and-forget DB write — never blocks the WhatsApp send so the
+    // customer experience stays identical even if Firestore is unreachable.
+    try {
+      if (typeof window.saveBookingDraft === 'function') {
+        window.saveBookingDraft(buildBookingPayload());
+      }
+    } catch (_) { /* swallow */ }
     var a = document.createElement('a');
     a.href = buildWAUrl();
     a.target = '_blank';
@@ -1267,6 +1287,29 @@
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
   update();
+</script>
+
+<!-- CryptoJS — needed by firebase-config.js to decrypt /TCD/credentials.json -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<!-- Silent booking draft writer (Firebase modular SDK) — exposes window.saveBookingDraft -->
+<script type="module">
+  import { getDb, COL } from './firebase-config.js';
+  import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+
+  window.saveBookingDraft = async function (payload) {
+    try {
+      const db = await getDb();
+      await addDoc(collection(db, COL.BOOKINGS), {
+        ...payload,
+        customer: null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+    } catch (e) {
+      // Silent — booking still goes via WhatsApp, admin can recreate manually.
+      console.warn('[anvisha] booking draft write failed:', e && e.message);
+    }
+  };
 </script>
 </body>
 </html>

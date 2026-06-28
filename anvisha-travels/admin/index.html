@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f5a623" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#956200" media="(prefers-color-scheme: light)">
+  <meta name="robots" content="noindex, nofollow">
+
+  <title>Anvisha Travels Admin</title>
+
+  <link rel="apple-touch-icon" href="/anvisha-travels/logo.webp">
+  <link rel="icon" href="/anvisha-travels/logo.webp">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+</head>
+<body>
+
+  <!-- Sign-in gate -->
+  <div id="authGate" class="auth-gate">
+    <div class="auth-card">
+      <img src="/anvisha-travels/logo.webp" alt="Anvisha Travels" class="auth-logo">
+      <h2>Anvisha Travels Admin</h2>
+      <p class="text-muted">Sign in with your authorised Google account to continue.</p>
+      <button id="googleSignInBtn" class="btn-google">
+        <i class="fab fa-google"></i> Sign in with Google
+      </button>
+      <p id="authError" class="auth-error" hidden></p>
+    </div>
+  </div>
+
+  <!-- Main shell -->
+  <div id="appShell" hidden>
+    <h1 class="sr-only">Anvisha Travels Admin</h1>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <img src="/anvisha-travels/logo.webp" alt="" class="topbar-logo">
+        <span>Anvisha</span>
+        <span class="badge-role">Admin</span>
+      </div>
+      <div class="topbar-user">
+        <span id="userEmail" class="user-email"></span>
+        <button id="signOutBtn" class="btn-icon" title="Sign out" aria-label="Sign out">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </header>
+
+    <nav class="tabbar" id="tabbar" role="tablist" aria-label="Admin sections"></nav>
+
+    <main class="content">
+      <section id="tab-dashboard" class="tab-panel" role="tabpanel" tabindex="-1"></section>
+      <section id="tab-bookings"  class="tab-panel" role="tabpanel" tabindex="-1"></section>
+      <section id="tab-trips"     class="tab-panel" role="tabpanel" tabindex="-1"></section>
+      <section id="tab-customers" class="tab-panel" role="tabpanel" tabindex="-1"></section>
+      <section id="tab-drivers"   class="tab-panel" role="tabpanel" tabindex="-1"></section>
+      <section id="tab-broadcast" class="tab-panel" role="tabpanel" tabindex="-1"></section>
+    </main>
+
+    <footer class="admin-footer">
+      <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+    </footer>
+  </div>
+
+  <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
