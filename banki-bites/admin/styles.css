@@ -1362,6 +1362,45 @@ button.fab:hover { background: var(--brand-dark); }
 .payout-selected-total i { color: var(--chip-new-fg); }
 .payout-selected-total strong { font-weight: 700; }
 
+.payout-history-list { display: flex; flex-direction: column; gap: 8px; }
+.payout-history-group {
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+}
+.payout-history-group > summary {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+}
+.payout-history-group > summary::-webkit-details-marker { display: none; }
+.payout-history-group[open] > summary { border-bottom: 1px solid var(--border, #e5e7eb); border-radius: 8px 8px 0 0; }
+.payout-history-date { display: inline-flex; align-items: center; gap: 6px; }
+.payout-history-date i { color: var(--brand); }
+.payout-history-summary { display: inline-flex; align-items: center; gap: 10px; }
+.payout-history-count { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
+.payout-history-total {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--chip-dlv-bg);
+  color: var(--chip-dlv-fg);
+  font-weight: 700;
+}
+.payout-history-orders { padding: 6px 12px 10px; display: flex; flex-direction: column; gap: 6px; }
+.payout-history-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0;
+  border-top: 1px dashed var(--border, #e5e7eb);
+}
+.payout-history-row:first-child { border-top: 0; }
+.payout-history-row .payout-row-main { flex: 1; min-width: 0; }
+.payout-history-row .payout-row-fee { font-weight: 600; }
+
 /* Softer "Mark selected as paid" affirm button — Bootstrap's btn-success is
    too saturated when it sits next to the muted "Only pending" toggle. Use a
    tinted-green pill instead, with a clear hover/active state. */

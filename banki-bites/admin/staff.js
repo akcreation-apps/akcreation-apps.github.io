@@ -258,6 +258,12 @@ function renderCard(db, root, uid, s) {
         <div class="payouts-list" data-el="payouts"></div>
       </div>
     </details>
+    <details class="payouts-block payout-history-block">
+      <summary><i class="fas fa-clock-rotate-left"></i> Payout history</summary>
+      <div class="payouts-body">
+        <div class="payout-history-list" data-el="history"></div>
+      </div>
+    </details>
     <div class="ec-actions ec-actions--bottom">
       ${callBtn}
       <button class="icon-btn icon-btn--danger" data-act="del" title="Remove ${escapeAttr(s.name)}" aria-label="Remove ${escapeAttr(s.name)}">
@@ -321,6 +327,64 @@ function renderCard(db, root, uid, s) {
   });
   renderPayoutRows();
   onlyPendingChk.addEventListener('change', renderPayoutRows);
+
+  const historyEl = el.querySelector('[data-el="history"]');
+  function renderPayoutHistory() {
+    const paidOrders = mine.filter(isPayoutPaid);
+    if (!paidOrders.length) {
+      historyEl.innerHTML = `<p class="text-muted small mb-0">No payouts settled yet.</p>`;
+      return;
+    }
+    const byDay = new Map();
+    for (const o of paidOrders) {
+      const when = toDateSafe(o.payout_paid_at) || toDateSafe(o.delivered_at);
+      const key = when ? when.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }) : 'Unknown';
+      const sortKey = when ? when.getTime() : 0;
+      if (!byDay.has(key)) byDay.set(key, { label: key, sortKey, orders: [], total: 0 });
+      const g = byDay.get(key);
+      g.orders.push(o);
+      g.total += feeForOrder(o, _staffFeeRules);
+      if (sortKey > g.sortKey) g.sortKey = sortKey;
+    }
+    const groups = [...byDay.values()].sort((a, b) => b.sortKey - a.sortKey);
+    historyEl.innerHTML = groups.map(g => {
+      const rows = g.orders
+        .sort((a, b) => {
+          const ta = (toDateSafe(b.delivered_at) || toDateSafe(b.created_at) || toDateSafe(b.payout_paid_at))?.getTime() || 0;
+          const tb = (toDateSafe(a.delivered_at) || toDateSafe(a.created_at) || toDateSafe(a.payout_paid_at))?.getTime() || 0;
+          return ta - tb;
+        })
+        .map(o => {
+          const fee = feeForOrder(o, _staffFeeRules);
+          const when = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+          const whenTxt = when ? when.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+          const cust = o.customer?.name || o.customer?.phone || '—';
+          const farTag = isFarPlace(o, _staffFeeRules) ? '<span class="tag tag-far">far</span>' : '<span class="tag tag-near">near</span>';
+          return `
+            <div class="payout-history-row">
+              <div class="payout-row-main">
+                <div class="payout-row-title">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')} · ${escapeHtml(cust)}</div>
+                <div class="payout-row-meta">${escapeHtml(whenTxt)} ${farTag}</div>
+              </div>
+              <div class="payout-row-fee">${fmtINR(fee)}</div>
+            </div>
+          `;
+        }).join('');
+      return `
+        <details class="payout-history-group" open>
+          <summary>
+            <span class="payout-history-date"><i class="fas fa-calendar-day"></i> ${escapeHtml(g.label)}</span>
+            <span class="payout-history-summary">
+              <span class="payout-history-count">${g.orders.length} order${g.orders.length === 1 ? '' : 's'}</span>
+              <span class="payout-history-total">${fmtINR(g.total)}</span>
+            </span>
+          </summary>
+          <div class="payout-history-orders">${rows}</div>
+        </details>
+      `;
+    }).join('');
+  }
+  renderPayoutHistory();
 
   el.querySelector('[data-act="markPaid"]').addEventListener('click', async () => {
     const checked = [...payoutsEl.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)')];
