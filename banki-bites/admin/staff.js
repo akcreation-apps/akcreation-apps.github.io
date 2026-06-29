@@ -371,7 +371,7 @@ function renderCard(db, root, uid, s) {
           `;
         }).join('');
       return `
-        <details class="payout-history-group" open>
+        <details class="payout-history-group">
           <summary>
             <span class="payout-history-date"><i class="fas fa-calendar-day"></i> ${escapeHtml(g.label)}</span>
             <span class="payout-history-summary">
