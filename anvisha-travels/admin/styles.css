@@ -204,6 +204,44 @@ a:hover { text-decoration: underline; }
 .content { padding: 16px; max-width: 1280px; margin: 0 auto; min-height: 60vh; width: 100%; }
 @media (max-width: 480px) { .content { padding: 12px; } }
 
+/* ── Driver dashboard — allocated-booking card ── */
+.alloc-card {
+  border-left: 4px solid var(--gold);
+}
+.alloc-card__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.alloc-when { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.alloc-when__date {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1.1;
+}
+.alloc-when__time {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--gold);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.alloc-actions { display: flex; align-items: center; gap: 8px; }
+.btn-call {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff !important;
+  text-decoration: none !important;
+  font-size: 18px;
+  box-shadow: 0 4px 14px rgba(34,197,94,0.32);
+  transition: background .15s, transform .1s;
+}
+.btn-call:hover, .btn-call:focus-visible { background: #16a34a; transform: scale(1.04); }
+.btn-call:active { transform: scale(0.96); }
+
 /* Driver greeting heading on the dashboard */
 .dr-greet {
   margin: 0 0 14px;

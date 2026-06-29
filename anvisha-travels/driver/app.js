@@ -32,8 +32,9 @@ window.avDone = function () {
 
 const TABS = [
   { key: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', render: renderDashboard },
+  { key: 'log',       label: 'Log Trip',  icon: 'fa-plus',       render: renderLogTrip },
   { key: 'history',   label: 'History',   icon: 'fa-clock-rotate-left', render: renderHistory },
-  { key: 'earnings',  label: 'Earnings',  icon: 'fa-coins', render: renderEarnings },
+  { key: 'earnings',  label: 'Earnings',  icon: 'fa-coins',      render: renderEarnings },
 ];
 
 const authGate = $('#authGate');
@@ -153,7 +154,7 @@ async function activateTab(key) {
 }
 
 // ───────────────────────── Dashboard ─────────────────────────
-// KPIs (this month) + the existing trip-log form below.
+// KPIs (this month) + collapsable "Allocated to me" list.
 async function renderDashboard(ctx) {
   const { panel, db, driver } = ctx;
   panel.innerHTML = `
@@ -164,22 +165,32 @@ async function renderDashboard(ctx) {
       ${kpi('fuel',  'Fuel + misc (₹)')}
       ${kpi('earn',  'Earnings (paid)')}
     </div>
-    <div class="card-an mt-16">
-      <h3 class="card-title mb-12"><i class="fas fa-pen-to-square"></i> Log a new trip</h3>
-      <div id="dt-host"></div>
+
+    <div class="card-an ex-card mt-16">
+      <button id="da-toggle" type="button" class="ex-toggle is-open" aria-expanded="true" aria-controls="da-list-wrap">
+        <span class="ex-toggle__label">
+          <i class="fas fa-bell"></i> Allocated to me
+          <span id="da-badge" class="bk-toolbar__count"></span>
+        </span>
+        <i class="fas fa-chevron-down ex-toggle__chevron" aria-hidden="true"></i>
+      </button>
+      <div id="da-list-wrap" class="ex-form-wrap">
+        <div id="da-list" class="row-list"></div>
+      </div>
     </div>
   `;
 
-  // Reuse the existing inline driver form by rendering renderDriverTripPanel
-  // into a sandbox, then pulling out just the form.
-  const sandbox = document.createElement('div');
-  await renderDriverTripPanel({ panel: sandbox, db, driver });
-  const formNode = sandbox.querySelector('#dt-form');
-  if (formNode) {
-    panel.querySelector('#dt-host').appendChild(formNode);
-  }
+  // Collapse / expand the allocated-bookings card.
+  const toggleBtn = panel.querySelector('#da-toggle');
+  const wrap      = panel.querySelector('#da-list-wrap');
+  toggleBtn.addEventListener('click', () => {
+    const open = wrap.hidden ? true : false;
+    wrap.hidden = !open;
+    toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggleBtn.classList.toggle('is-open', open);
+  });
 
-  // KPIs
+  // KPI fetch + render (parallel with allocated-bookings load).
   const monthStart = startOfMonth();
   let trips = [];
   try {
@@ -197,12 +208,9 @@ async function renderDashboard(ctx) {
   const km   = inMonth.reduce((a, t) => a + Number(t.km || 0), 0);
   const fuel = inMonth.reduce((a, t) => a + Number((t.fuel && t.fuel.cost) || 0) + Number(t.miscCost || 0), 0);
 
-  // Earnings (paid) for this month: fares on bookings tied to this driver's trips that are paid.
   let earn = 0;
   try {
-    const tripsByBookingId = new Map(inMonth.filter(t => t.bookingId).map(t => [t.bookingId, t]));
-    const ids = [...tripsByBookingId.keys()];
-    // Batch reads in chunks of 10 (Firestore 'in' filter limit).
+    const ids = [...new Set(inMonth.filter(t => t.bookingId).map(t => t.bookingId))];
     for (let i = 0; i < ids.length; i += 10) {
       const chunk = ids.slice(i, i + 10);
       if (!chunk.length) continue;
@@ -221,6 +229,79 @@ async function renderDashboard(ctx) {
   setKpi('km',    fmtNum(Math.round(km)));
   setKpi('fuel',  fmtINR(fuel));
   setKpi('earn',  fmtINR(earn));
+
+  // Allocated-to-me bookings (status='allocated').
+  const list  = panel.querySelector('#da-list');
+  const badge = panel.querySelector('#da-badge');
+  list.innerHTML = `<div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading…</div>`;
+  onSnapshot(
+    query(collection(db, COL.BOOKINGS), where('allocatedDriver.uid', '==', driver.uid)),
+    snap => {
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                            .filter(b => b.status === 'allocated')
+                            .sort((a, b) => {
+                              // Soonest pickup first (by date+time string).
+                              const ak = (a.date || '') + ' ' + (a.time || '');
+                              const bk = (b.date || '') + ' ' + (b.time || '');
+                              return ak.localeCompare(bk);
+                            });
+      badge.textContent = all.length ? `· ${all.length}` : '';
+      if (!all.length) {
+        list.innerHTML = `<div class="empty"><i class="far fa-bell-slash"></i> No active allocations.</div>`;
+        return;
+      }
+      list.innerHTML = all.map(renderAllocationRow).join('');
+    },
+    err => {
+      list.innerHTML = `<div class="empty"><i class="fas fa-triangle-exclamation"></i> ${err.message}</div>`;
+    }
+  );
+}
+
+function renderAllocationRow(b) {
+  const customer = b.customer || {};
+  const friendly = customer.name ? customer.name : 'Customer';
+  const phoneDigits = customer.phone ? String(customer.phone).replace(/\D/g, '') : '';
+  const phoneE164 = phoneDigits ? `+91${phoneDigits}` : '';
+  return `
+  <div class="row-card alloc-card">
+    <div class="alloc-card__head">
+      <div class="alloc-when">
+        <div class="alloc-when__date">${escapeHtml(fmtDate(b.date))}</div>
+        <div class="alloc-when__time"><i class="fas fa-clock" aria-hidden="true"></i> ${escapeHtml(fmtTimeLabel(b.time))}</div>
+      </div>
+      <div class="alloc-actions">
+        <span class="chip allocated">Allocated</span>
+        ${phoneE164 ? `<a href="tel:${escapeAttr(phoneE164)}" class="btn-call" aria-label="Call ${escapeAttr(friendly)} at ${escapeAttr(phoneE164)}" title="Call customer"><i class="fas fa-phone" aria-hidden="true"></i></a>` : ''}
+      </div>
+    </div>
+    <div class="row-meta">
+      <div><b>Customer</b> ${escapeHtml(friendly)}${phoneDigits ? ' · +91 ' + escapeHtml(phoneDigits) : ''}</div>
+      <div><b>Passengers</b> ${escapeHtml(b.passengers || '?')}</div>
+      ${b.destination ? `<div><b>To</b> ${escapeHtml(b.destination)}</div>` : ''}
+      ${b.fare ? `<div><b>Fare</b> ₹${escapeHtml(String(b.fare))}</div>` : ''}
+    </div>
+  </div>
+  `;
+}
+
+function escapeAttr(s) {
+  return escapeHtml(s);
+}
+
+// ───────────────────────── Log Trip tab ─────────────────────────
+async function renderLogTrip(ctx) {
+  const { panel, db, driver } = ctx;
+  // Reuse the existing renderDriverTripPanel — it renders form + recent trips
+  // list. We only want the form here (recent trips live in the History tab).
+  const sandbox = document.createElement('div');
+  await renderDriverTripPanel({ panel: sandbox, db, driver });
+  panel.innerHTML = `
+    <h2 class="section-title"><i class="fas fa-pen-to-square"></i> Log a new trip</h2>
+    <div class="card-an" id="dt-host"></div>
+  `;
+  const formNode = sandbox.querySelector('#dt-form');
+  if (formNode) panel.querySelector('#dt-host').appendChild(formNode);
 }
 
 // ───────────────────────── History ─────────────────────────
@@ -247,11 +328,14 @@ async function renderHistory(ctx) {
 }
 
 function renderHistoryRow(t) {
-  const fuel = t.fuel || {};
+  const fuel = t.fuel || null;
   const route = t.route || {};
   const tied = t.bookingId
     ? `<span class="chip completed"><i class="fas fa-link" aria-hidden="true"></i> Linked</span>`
     : `<span class="chip untied"><i class="fas fa-link-slash" aria-hidden="true"></i> Untied</span>`;
+  const fuelLine = fuel
+    ? `<div><b>Fuel</b> ${escapeHtml(fuel.type || '—')} · ₹${escapeHtml(String(fuel.cost ?? 0))}${fuel.qty != null ? ` (${escapeHtml(String(fuel.qty))})` : ''}</div>`
+    : '';
   return `
   <div class="row-card">
     <div class="row-top">
@@ -263,7 +347,7 @@ function renderHistoryRow(t) {
     </div>
     <div class="row-meta">
       <div><b>Distance</b> ${escapeHtml(String(t.km ?? 0))} km</div>
-      <div><b>Fuel</b> ${escapeHtml(fuel.type || '—')} · ₹${escapeHtml(String(fuel.cost ?? 0))}${fuel.qty ? ` (${escapeHtml(String(fuel.qty))})` : ''}</div>
+      ${fuelLine}
       <div><b>Misc</b> ₹${escapeHtml(String(t.miscCost ?? 0))}</div>
       ${t.notes ? `<div><b>Notes</b> ${escapeHtml(t.notes)}</div>` : ''}
     </div>

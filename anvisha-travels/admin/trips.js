@@ -125,18 +125,19 @@ function renderDriverForm(host, db, ctx) {
     </div>
     <div class="f-row cols-3">
       <div class="f-group">
-        <label class="f-label" for="dt-ftype">Fuel type <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
-        <select id="dt-ftype" class="f-select" required>
+        <label class="f-label" for="dt-ftype">Fuel type <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+        <select id="dt-ftype" class="f-select">
+          <option value="">—</option>
           ${FUEL_TYPES.map(f => `<option value="${f}">${f}</option>`).join('')}
         </select>
       </div>
       <div class="f-group">
-        <label class="f-label" for="dt-fqty">Fuel qty (L / kg) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
-        <input id="dt-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 4.5">
+        <label class="f-label" for="dt-fcost">Fuel cost (₹) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+        <input id="dt-fcost" type="number" class="f-input" min="0" step="1" inputmode="numeric" placeholder="e.g. 480">
       </div>
       <div class="f-group">
-        <label class="f-label" for="dt-fcost">Fuel cost (₹) <span aria-hidden="true">*</span><span class="sr-only"> (required)</span></label>
-        <input id="dt-fcost" type="number" class="f-input" min="0" step="1" inputmode="numeric" placeholder="e.g. 480" required>
+        <label class="f-label" for="dt-fqty">Fuel qty (L / kg) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+        <input id="dt-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 4.5">
       </div>
     </div>
     <div class="f-row cols-2">
@@ -183,33 +184,44 @@ function collectDriverForm(host) {
   const ftype    = host.querySelector('#dt-ftype').value;
   const fqtyRaw  = host.querySelector('#dt-fqty').value;
   const fqty     = fqtyRaw === '' ? null : parseFloat(fqtyRaw);
-  const fcost    = parseFloat(host.querySelector('#dt-fcost').value);
+  const fcostRaw = host.querySelector('#dt-fcost').value;
+  const fcost    = fcostRaw === '' ? null : parseFloat(fcostRaw);
   const misc     = parseFloat(host.querySelector('#dt-misc').value) || 0;
   const notes    = host.querySelector('#dt-notes').value.trim();
 
-  if (!date || isNaN(km) || km <= 0 || !src || !dst || !ftype || isNaN(fcost)) {
-    Swal.fire('Missing fields', 'Please fill date, km, route, fuel type and fuel cost.', 'warning');
+  if (!date || isNaN(km) || km <= 0 || !src || !dst) {
+    Swal.fire('Missing fields', 'Please fill date, km and route.', 'warning');
     return null;
   }
   if (fqty != null && isNaN(fqty)) {
     Swal.fire('Bad fuel qty', 'Fuel qty must be a number (or leave it empty).', 'warning');
     return null;
   }
+  if (fcost != null && isNaN(fcost)) {
+    Swal.fire('Bad fuel cost', 'Fuel cost must be a number (or leave it empty).', 'warning');
+    return null;
+  }
+  // If no fuel cost was entered, drop the entire fuel object — type without a
+  // cost adds nothing useful and skews the P&L "fuel by type" charts.
+  const fuel = (fcost == null) ? null : { type: ftype || null, qty: fqty, cost: fcost };
   return {
     date, km,
     route: { source: src, destination: dst },
-    fuel: { type: ftype, qty: fqty, cost: fcost },
+    fuel,
     miscCost: misc,
     notes: notes || null,
   };
 }
 
 function renderRow(t) {
-  const fuel = t.fuel || {};
+  const fuel = t.fuel || null;
   const route = t.route || {};
   const tied = t.bookingId
     ? `<span class="chip in_progress"><i class="fas fa-link"></i> Tied</span>`
     : `<span class="chip untied"><i class="fas fa-link-slash"></i> Untied</span>`;
+  const fuelLine = fuel
+    ? `<div><b>Fuel</b> ${escapeHtml(fuel.type || '—')} · ${fuel.qty != null ? escapeHtml(String(fuel.qty)) + ' · ' : ''}₹${escapeHtml(String(fuel.cost ?? 0))}</div>`
+    : '';
   return `
   <div class="row-card">
     <div class="row-top">
@@ -222,7 +234,7 @@ function renderRow(t) {
     <div class="row-meta">
       <div><b>Driver</b> ${escapeHtml((t.driver && t.driver.name) || '—')}</div>
       <div><b>Distance</b> ${escapeHtml(String(t.km ?? 0))} km</div>
-      <div><b>Fuel</b> ${escapeHtml(fuel.type || '—')} · ${escapeHtml(String(fuel.qty ?? 0))} · ₹${escapeHtml(String(fuel.cost ?? 0))}</div>
+      ${fuelLine}
       <div><b>Misc</b> ₹${escapeHtml(String(t.miscCost ?? 0))}</div>
       ${t.notes ? `<div><b>Notes</b> ${escapeHtml(t.notes)}</div>` : ''}
     </div>
@@ -326,11 +338,14 @@ async function openTripLogModal(db, ctx, isAdmin) {
           <div class="f-group"><label class="f-label" for="tlm-dst">Destination</label><input id="tlm-dst" type="text" class="f-input"></div>
         </div>
         <div class="f-row cols-3">
-          <div class="f-group"><label class="f-label" for="tlm-ftype">Fuel</label>
-            <select id="tlm-ftype" class="f-select">${FUEL_TYPES.map(f => `<option>${f}</option>`).join('')}</select>
+          <div class="f-group"><label class="f-label" for="tlm-ftype">Fuel type (optional)</label>
+            <select id="tlm-ftype" class="f-select">
+              <option value="">—</option>
+              ${FUEL_TYPES.map(f => `<option value="${f}">${f}</option>`).join('')}
+            </select>
           </div>
+          <div class="f-group"><label class="f-label" for="tlm-fcost">Fuel ₹ (optional)</label><input id="tlm-fcost" type="number" class="f-input" min="0" inputmode="numeric"></div>
           <div class="f-group"><label class="f-label" for="tlm-fqty">Qty (optional)</label><input id="tlm-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal"></div>
-          <div class="f-group"><label class="f-label" for="tlm-fcost">Fuel ₹</label><input id="tlm-fcost" type="number" class="f-input" min="0" inputmode="numeric"></div>
         </div>
         <div class="f-row cols-2">
           <div class="f-group"><label class="f-label" for="tlm-misc">Misc ₹</label><input id="tlm-misc" type="number" class="f-input" min="0" inputmode="numeric"></div>
@@ -346,19 +361,26 @@ async function openTripLogModal(db, ctx, isAdmin) {
       const ft     = document.getElementById('tlm-ftype').value;
       const fqRaw  = document.getElementById('tlm-fqty').value;
       const fq     = fqRaw === '' ? null : parseFloat(fqRaw);
-      const fc     = parseFloat(document.getElementById('tlm-fcost').value);
-      if (!date || isNaN(km) || !src || !dst || !ft || isNaN(fc)) {
-        Swal.showValidationMessage('Fill all required fields');
+      const fcRaw  = document.getElementById('tlm-fcost').value;
+      const fc     = fcRaw === '' ? null : parseFloat(fcRaw);
+      if (!date || isNaN(km) || !src || !dst) {
+        Swal.showValidationMessage('Fill date, km and route');
         return false;
       }
       if (fq != null && isNaN(fq)) {
         Swal.showValidationMessage('Fuel qty must be a number (or leave it empty)');
         return false;
       }
+      if (fc != null && isNaN(fc)) {
+        Swal.showValidationMessage('Fuel cost must be a number (or leave it empty)');
+        return false;
+      }
+      // No cost → no fuel record at all (drop type + qty too).
+      const fuel = (fc == null) ? null : { type: ft || null, qty: fq, cost: fc };
       return {
         date, km,
         route: { source: src, destination: dst },
-        fuel: { type: ft, qty: fq, cost: fc },
+        fuel,
         miscCost: parseFloat(document.getElementById('tlm-misc').value) || 0,
         notes: document.getElementById('tlm-notes').value.trim() || null,
       };
@@ -393,7 +415,7 @@ async function openTieModal(db, trip) {
   try {
     const snap = await getDocs(query(
       collection(db, COL.BOOKINGS),
-      where('status', 'in', ['new', 'confirmed', 'in_progress']),
+      where('status', 'in', ['new', 'confirmed', 'allocated', 'in_progress']),
       orderBy('date', 'desc'),
       limit(30),
     ));
@@ -406,7 +428,7 @@ async function openTieModal(db, trip) {
   } catch (e) {
     // index may not exist on a fresh project — fall back to a simple list
     const snap = await getDocs(query(collection(db, COL.BOOKINGS), orderBy('createdAt', 'desc'), limit(50)));
-    candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(b => ['new','confirmed','in_progress'].includes(b.status || 'new'));
+    candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(b => ['new','confirmed','allocated','in_progress'].includes(b.status || 'new'));
   }
 
   const candHtml = candidates.length

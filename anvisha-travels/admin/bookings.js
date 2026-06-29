@@ -197,14 +197,21 @@ We'll share driver details once allocated. Thank you for choosing Anvisha Travel
     confirmButtonText: 'Confirm & WhatsApp',
   });
   if (!r.isConfirmed) return;
-  window.avBusy('Confirming…');
-  await updateDoc(doc(db, COL.BOOKINGS, b.id), {
-    status: 'confirmed',
-    confirmedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  window.avDone();
-  window.location.href = buildWaUrl('91' + phone, text);
+  window.avBusy('Saving — please wait…');
+  try {
+    await updateDoc(doc(db, COL.BOOKINGS, b.id), {
+      status: 'confirmed',
+      confirmedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    // DB save is committed. Don't close the spinner — let it stay visible
+    // while the browser navigates to WhatsApp so the admin never sees a flash
+    // of un-spinnered UI between save and send.
+    window.location.href = buildWaUrl('91' + phone, text);
+  } catch (e) {
+    window.avDone();
+    Swal.fire('Save failed', 'WhatsApp was not opened. Please retry. ' + (e.message || ''), 'error');
+  }
 }
 
 // ── Allocate booking: pick driver → save → open WhatsApp to driver with details ──
@@ -252,17 +259,23 @@ async function allocateBooking(db, b) {
   const driver = r.value;
   const driverPhone = normalisePhone(driver.phone);
 
-  window.avBusy('Allocating…');
-  await updateDoc(doc(db, COL.BOOKINGS, b.id), {
-    status: 'allocated',
-    allocatedDriver: { uid: driver.uid, name: driver.name || '', phone: driver.phone || '' },
-    allocatedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  window.avDone();
+  window.avBusy('Saving — please wait…');
+  try {
+    await updateDoc(doc(db, COL.BOOKINGS, b.id), {
+      status: 'allocated',
+      allocatedDriver: { uid: driver.uid, name: driver.name || '', phone: driver.phone || '' },
+      allocatedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } catch (e) {
+    window.avDone();
+    Swal.fire('Save failed', 'Allocation not saved. WhatsApp was not opened. ' + (e.message || ''), 'error');
+    return;
+  }
 
   if (!driverPhone) {
-    Swal.fire('Allocated', 'Driver has no phone — message not sent.', 'info');
+    window.avDone();
+    Swal.fire('Allocated', 'Driver has no phone on file — message not sent.', 'info');
     return;
   }
   const dest = b.destination ? `\nDestination: ${b.destination}` : '';
@@ -278,6 +291,7 @@ Time: ${fmtTimeLabel(b.time)}
 Passengers: ${b.passengers}${dest}${fare}${cust}${phone}
 
 Please confirm pickup with the customer. Drive safe.`;
+  // Save succeeded — spinner stays visible until the wa.me navigation kicks in.
   window.location.href = buildWaUrl('91' + driverPhone, text);
 }
 
