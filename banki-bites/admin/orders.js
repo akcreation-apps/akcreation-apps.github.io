@@ -413,6 +413,22 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           <strong class="toggle-off">No payout for this order</strong>
         </span>
       </label>
+      ${(() => {
+        const defaultFee = feeForOrder({ ...o, payout_amount: undefined }, feeRules);
+        const current = Number.isFinite(+o.payout_amount) ? +o.payout_amount : '';
+        const paidChip = o.payout_paid === true
+          ? '<span class="payout-paid-chip"><i class="fas fa-check-circle"></i> Paid</span>'
+          : '';
+        return `
+        <div class="payout-amount-row" data-el="payoutAmountRow" ${payoutApplicable ? '' : 'hidden'}>
+          <label class="field">
+            <span class="field-label"><i class="fas fa-indian-rupee-sign"></i> Courier payout (₹)</span>
+            <input class="form-control form-control-sm" type="number" min="0" step="1"
+                   data-f="payoutAmount" value="${current}" placeholder="${defaultFee}">
+          </label>
+          <small class="payout-amount-hint">Default ₹${defaultFee} · blank = use default ${paidChip}</small>
+        </div>`;
+      })()}
     </div>
 
     <div class="order-section payment-section">
@@ -505,6 +521,17 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   // auto-recompute stops touching that field for this session (sticky override).
   const paymentToggle = card.querySelector('[data-f="payment"]');
   const billingBox    = card.querySelector('[data-el="billingBlock"]');
+
+  // Show/hide the manual courier-payout input in lockstep with the
+  // "Partner earns for this order" toggle so it can't be edited when the
+  // order is excluded from payout.
+  const payoutApplicableToggle = card.querySelector('[data-f="payoutApplicable"]');
+  const payoutAmountRow = card.querySelector('[data-el="payoutAmountRow"]');
+  if (payoutApplicableToggle && payoutAmountRow) {
+    payoutApplicableToggle.addEventListener('change', () => {
+      payoutAmountRow.hidden = !payoutApplicableToggle.checked;
+    });
+  }
   const discountInput = card.querySelector('[data-f="discount"]');
   const prepaidInput  = card.querySelector('[data-f="paidAlready"]');
   const methodSelect  = card.querySelector('[data-f="paidMethod"]');
@@ -883,6 +910,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     const staffId = card.querySelector('[data-f="staff"]').value || null;
     const paymentCollectedNow   = card.querySelector('[data-f="payment"]').checked;
     const payoutApplicableNow   = card.querySelector('[data-f="payoutApplicable"]').checked;
+    const payoutAmountRaw       = card.querySelector('[data-f="payoutAmount"]')?.value.trim();
+    const payoutAmountManual    = payoutAmountRaw === '' || payoutAmountRaw == null
+      ? null
+      : Number(payoutAmountRaw);
     let newStatus = card.querySelector('[data-f="status"]').value;
     if (staffId && newStatus === 'new') newStatus = 'assigned';
 
@@ -901,6 +932,14 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         icon: 'warning',
         title: 'Delivery partner required',
         text: 'Assign a delivery partner before marking the order as ' + newStatus.replace('_', ' ') + '.',
+      });
+      return;
+    }
+    if (payoutAmountManual !== null && (!Number.isFinite(payoutAmountManual) || payoutAmountManual < 0)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid courier payout',
+        text: 'Courier payout must be ₹0 or more, or blank to use the default fee.',
       });
       return;
     }
@@ -985,9 +1024,20 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     }
 
     if (newStatus === 'delivered' && !o.delivered_at) patch.delivered_at = Timestamp.now();
-    // Snapshot the courier payout fee at the moment the order is marked delivered,
-    // but only when the admin has enabled payout for this order.
-    if (newStatus === 'delivered' && !Number.isFinite(o.payout_amount) && payoutApplicableNow) {
+
+    // Courier payout amount:
+    //  • If the admin typed an explicit value, that wins (override stays editable
+    //    even after payout_paid=true, per current product decision).
+    //  • Blank input + first delivered transition → snapshot via feeForOrder().
+    //  • Toggling "Partner earns" off clears the stored amount and resets
+    //    payout_paid so the order drops out of pending/paid KPIs.
+    if (!payoutApplicableNow) {
+      patch.payout_amount = null;
+      patch.payout_paid = false;
+    } else if (payoutAmountManual !== null) {
+      patch.payout_amount = payoutAmountManual;
+      if (o.payout_paid !== true) patch.payout_paid = false;
+    } else if (newStatus === 'delivered' && !Number.isFinite(o.payout_amount)) {
       patch.payout_amount = feeForOrder({ ...o, ...patch }, feeRules);
       if (o.payout_paid !== true) patch.payout_paid = false;
     }

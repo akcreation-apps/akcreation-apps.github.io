@@ -16,7 +16,8 @@
       "Bash(python -c \"from PIL import Image; print\\('ok'\\)\")",
       "Bash(python -c \"import PIL; print\\(PIL.__version__\\)\")",
       "Bash(python *)",
-      "Bash(PYTHONIOENCODING=utf-8 python *)"
+      "Bash(PYTHONIOENCODING=utf-8 python *)",
+      "Bash(grep -n \"o\\\\\\\\.discount\\\\|o\\\\\\\\.total\\\\|o\\\\\\\\.items\\\\|o\\\\\\\\.status\\\\|o\\\\\\\\.delivery_staff_id\\\\|o\\\\\\\\.customer\\\\|o\\\\\\\\.place\\\\|o\\\\\\\\.restaurant\" /c/Users/anil.sahoo_aeccgloba/PycharmProjects/AKS_personal/akcreation-apps.github.io/banki-bites/admin/orders.js)"
     ]
   },
   "enableAllProjectMcpServers": true,

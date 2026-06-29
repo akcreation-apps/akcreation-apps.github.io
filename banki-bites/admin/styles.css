@@ -468,6 +468,10 @@ details.entity-card[open] > .order-summary .order-chevron {
 .payout-toggle { margin-top: 12px; }
 .payout-toggle .toggle-on  { color: var(--success, #16a34a); }
 .payout-toggle .toggle-off { color: var(--muted, #6b7280); }
+.payout-amount-row { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; max-width: 220px; }
+.payout-amount-row[hidden] { display: none; }
+.payout-amount-hint { font-size: 0.72rem; color: var(--muted, #6b7280); display: flex; align-items: center; gap: 6px; }
+.payout-paid-chip { display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: 999px; background: rgba(34,197,94,0.12); color: var(--success, #16a34a); font-weight: 600; font-size: 0.7rem; }
 .field-label {
   font-size: 0.74rem;
   font-weight: 600;
