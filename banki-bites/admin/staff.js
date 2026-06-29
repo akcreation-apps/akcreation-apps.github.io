@@ -252,6 +252,7 @@ function renderCard(db, root, uid, s) {
       <div class="payouts-body">
         <div class="payouts-toolbar">
           <label class="toggle-inline"><input type="checkbox" data-act="onlyPending" checked> Only pending</label>
+          <span class="payout-selected-total" data-el="selectedTotal" hidden><i class="fas fa-coins"></i> Selected: <strong data-el="selectedAmount">₹0</strong></span>
           <button class="btn btn-sm btn-pay" data-act="markPaid"><i class="fas fa-check-circle mr-1"></i>Mark selected as paid</button>
         </div>
         <div class="payouts-list" data-el="payouts"></div>
@@ -296,7 +297,7 @@ function renderCard(db, root, uid, s) {
       const farTag = isFarPlace(o, _staffFeeRules) ? '<span class="tag tag-far">far</span>' : '<span class="tag tag-near">near</span>';
       return `
         <label class="payout-row ${isPayoutPaid(o) ? 'is-paid' : 'is-pending'}">
-          <input type="checkbox" data-order="${o.id}" ${isPayoutPaid(o) ? 'checked disabled' : ''}>
+          <input type="checkbox" data-order="${o.id}" data-fee="${fee}" ${isPayoutPaid(o) ? 'checked disabled' : ''}>
           <div class="payout-row-main">
             <div class="payout-row-title">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')} · ${escapeHtml(cust)}</div>
             <div class="payout-row-meta">${escapeHtml(whenTxt)} ${farTag}</div>
@@ -305,7 +306,19 @@ function renderCard(db, root, uid, s) {
         </label>
       `;
     }).join('');
+    updateSelectedTotal();
   }
+  const selectedTotalEl = el.querySelector('[data-el="selectedTotal"]');
+  const selectedAmountEl = el.querySelector('[data-el="selectedAmount"]');
+  function updateSelectedTotal() {
+    const checked = [...payoutsEl.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)')];
+    const sum = checked.reduce((s, c) => s + (Number(c.dataset.fee) || 0), 0);
+    if (selectedAmountEl) selectedAmountEl.textContent = `${fmtINR(sum)} (${checked.length})`;
+    if (selectedTotalEl) selectedTotalEl.hidden = checked.length === 0;
+  }
+  payoutsEl.addEventListener('change', (e) => {
+    if (e.target.matches('input[type="checkbox"][data-order]')) updateSelectedTotal();
+  });
   renderPayoutRows();
   onlyPendingChk.addEventListener('change', renderPayoutRows);
 

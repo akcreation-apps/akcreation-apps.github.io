@@ -1350,6 +1350,17 @@ button.fab:hover { background: var(--brand-dark); }
   padding: 8px 0;
 }
 .payouts-toolbar .btn { flex: 0 0 auto; }
+.payout-selected-total {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--chip-new-bg);
+  color: var(--chip-new-fg);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.payout-selected-total i { color: var(--chip-new-fg); }
+.payout-selected-total strong { font-weight: 700; }
 
 /* Softer "Mark selected as paid" affirm button — Bootstrap's btn-success is
    too saturated when it sits next to the muted "Only pending" toggle. Use a
