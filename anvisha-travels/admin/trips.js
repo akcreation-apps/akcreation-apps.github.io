@@ -1,9 +1,69 @@
 import { COL } from '../firebase-config.js';
 import {
   collection, addDoc, deleteDoc, doc, getDoc, getDocs, query, where, orderBy, limit,
-  onSnapshot, updateDoc, serverTimestamp, writeBatch, increment,
+  onSnapshot, updateDoc, setDoc, serverTimestamp, writeBatch, increment, arrayUnion,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { fmtDate, fmtDateTime, fmtTimeLabel, toDateSafe, wirePhoneInput } from './analytics.js';
+import { fmtDate, fmtDateTime, fmtTimeLabel, toDateSafe, wirePhoneInput, wirePlaceAutocomplete } from './analytics.js';
+
+// Shared place registry — a single doc at anvisha_meta/places with a `list`
+// array. Both admin and driver write to it (arrayUnion) when saving a trip or
+// booking; both read from it. This way a place typed by the admin appears in
+// the driver's autocomplete (and vice-versa) without giving anyone broad read
+// access to the full trips/bookings collections.
+let _placeCache = null;
+let _placeCachePromise = null;
+async function loadKnownPlaces(db) {
+  if (_placeCache) return _placeCache;
+  if (_placeCachePromise) return _placeCachePromise;
+  _placeCachePromise = (async () => {
+    const set = new Set();
+    const norm = s => String(s || '').trim();
+    try {
+      const meta = await getDoc(doc(db, COL.META, 'places'));
+      if (meta.exists()) {
+        const list = meta.data().list || [];
+        list.forEach(p => { const n = norm(p); if (n) set.add(n); });
+      }
+    } catch (_) { /* swallow — meta doc may not exist yet */ }
+    // Best-effort fall-back: scan own data (admin sees everything, driver
+    // sees only their own trips + allocated bookings) so even if the meta
+    // doc is empty, the user still gets some suggestions on day one.
+    try {
+      const snap = await getDocs(collection(db, COL.TRIPS));
+      snap.forEach(d => {
+        const r = (d.data() || {}).route || {};
+        const s = norm(r.source);  if (s) set.add(s);
+        const dst = norm(r.destination); if (dst) set.add(dst);
+      });
+    } catch (_) { /* fine */ }
+    try {
+      const snap = await getDocs(collection(db, COL.BOOKINGS));
+      snap.forEach(d => {
+        const dst = norm((d.data() || {}).destination); if (dst) set.add(dst);
+      });
+    } catch (_) { /* fine */ }
+    _placeCache = Array.from(set).sort((a, b) => a.localeCompare(b));
+    return _placeCache;
+  })();
+  return _placeCachePromise;
+}
+function bustPlaceCache() { _placeCache = null; _placeCachePromise = null; }
+
+// Append place name(s) to the shared registry. Best-effort — never blocks
+// the main save flow. Trims, de-duplicates, ignores empties.
+async function addPlacesToRegistry(db, names) {
+  const cleaned = (names || [])
+    .map(s => String(s || '').trim())
+    .filter(Boolean);
+  if (!cleaned.length) return;
+  try {
+    await setDoc(doc(db, COL.META, 'places'), {
+      list: arrayUnion(...cleaned),
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+    bustPlaceCache();
+  } catch (_) { /* swallow — autocomplete still works from local scan */ }
+}
 
 const FUEL_TYPES = ['CNG', 'Petrol', 'Diesel'];
 
@@ -81,7 +141,7 @@ export async function renderDriverTripPanel(ctx) {
     <h3 class="section-title" style="font-size:14px; margin-top:18px;"><i class="fas fa-clock-rotate-left"></i> Recent trips</h3>
     <div id="dt-list" class="row-list"></div>
   `;
-  renderDriverForm(panel.querySelector('#dt-form'), db, ctx);
+  await renderDriverForm(panel.querySelector('#dt-form'), db, ctx);
 
   const list = panel.querySelector('#dt-list');
   onSnapshot(
@@ -100,8 +160,9 @@ export async function renderDriverTripPanel(ctx) {
   );
 }
 
-function renderDriverForm(host, db, ctx) {
+async function renderDriverForm(host, db, ctx) {
   const today = new Date().toISOString().slice(0, 10);
+  const places = await loadKnownPlaces(db).catch(() => []);
   host.innerHTML = `
     <div class="f-row cols-2">
       <div class="f-group">
@@ -152,6 +213,10 @@ function renderDriverForm(host, db, ctx) {
     </div>
     <button id="dt-save" class="btn-an btn-an-block mt-12"><i class="fas fa-check"></i> Save trip</button>
   `;
+  // Source / destination autocomplete from known places.
+  wirePlaceAutocomplete(host.querySelector('#dt-src'), places);
+  wirePlaceAutocomplete(host.querySelector('#dt-dst'), places);
+
   host.querySelector('#dt-save').addEventListener('click', async () => {
     const payload = collectDriverForm(host);
     if (!payload) return;
@@ -165,6 +230,9 @@ function renderDriverForm(host, db, ctx) {
         updatedAt: serverTimestamp(),
       });
       window.avDone();
+      // Register both endpoints so they appear in the autocomplete for
+      // everyone (admin + drivers) on the next form open.
+      addPlacesToRegistry(db, [payload.route.source, payload.route.destination]);
       Swal.fire({ icon: 'success', title: 'Trip logged', timer: 1400, showConfirmButton: false });
       // Reset trip-specific fields but keep date AND source (drivers usually
       // depart from the same town all day — re-typing it is friction).
@@ -322,11 +390,16 @@ async function openTripLogModal(db, ctx, isAdmin) {
   // To keep first version simple, default to the signed-in admin as the driver.
   const driver = ctx.driver || { uid: ctx.user.uid, name: ctx.user.displayName || ctx.user.email, phone: '' };
   const today = new Date().toISOString().slice(0, 10);
+  const places = await loadKnownPlaces(db).catch(() => []);
   const r = await Swal.fire({
     title: 'Log trip',
     width: 640,
     showCancelButton: true,
     confirmButtonText: 'Save',
+    didOpen: () => {
+      wirePlaceAutocomplete(document.getElementById('tlm-src'), places);
+      wirePlaceAutocomplete(document.getElementById('tlm-dst'), places);
+    },
     html: `
       <div style="text-align:left;">
         <div class="f-row cols-2">
@@ -334,8 +407,8 @@ async function openTripLogModal(db, ctx, isAdmin) {
           <div class="f-group"><label class="f-label" for="tlm-km">Distance (km)</label><input id="tlm-km" type="number" class="f-input" min="0" step="0.5" inputmode="decimal"></div>
         </div>
         <div class="f-row cols-2">
-          <div class="f-group"><label class="f-label" for="tlm-src">Source</label><input id="tlm-src" type="text" class="f-input"></div>
-          <div class="f-group"><label class="f-label" for="tlm-dst">Destination</label><input id="tlm-dst" type="text" class="f-input"></div>
+          <div class="f-group" style="position:relative;"><label class="f-label" for="tlm-src">Source</label><input id="tlm-src" type="text" class="f-input" autocomplete="off"></div>
+          <div class="f-group" style="position:relative;"><label class="f-label" for="tlm-dst">Destination</label><input id="tlm-dst" type="text" class="f-input" autocomplete="off"></div>
         </div>
         <div class="f-row cols-3">
           <div class="f-group"><label class="f-label" for="tlm-ftype">Fuel type (optional)</label>
@@ -392,6 +465,7 @@ async function openTripLogModal(db, ctx, isAdmin) {
     ...r.value, driver, bookingId: null,
     createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   });
+  addPlacesToRegistry(db, [r.value.route && r.value.route.source, r.value.route && r.value.route.destination]);
   window.avDone();
 }
 
@@ -483,7 +557,7 @@ async function openTieModal(db, trip) {
     width: 680,
     showCancelButton: true,
     confirmButtonText: 'Tie',
-    didOpen: () => {
+    didOpen: async () => {
       document.querySelectorAll('.tie-tabs button').forEach(b => {
         b.addEventListener('click', () => {
           document.querySelectorAll('.tie-tabs button').forEach(x => x.classList.toggle('active', x === b));
@@ -492,6 +566,12 @@ async function openTieModal(db, trip) {
       });
       const phoneEl = document.getElementById('ct-phone');
       if (phoneEl) wirePhoneInput(phoneEl);
+      const destEl = document.getElementById('ct-dest');
+      if (destEl) {
+        const places = await loadKnownPlaces(db).catch(() => []);
+        const dg = destEl.closest('.f-group'); if (dg) dg.style.position = 'relative';
+        wirePlaceAutocomplete(destEl, places);
+      }
     },
     preConfirm: () => {
       const activePane = document.querySelector('.tie-tabs button.active').dataset.pane;
@@ -558,6 +638,12 @@ async function openTieModal(db, trip) {
     }
     batch.update(doc(db, COL.TRIPS, trip.id), { bookingId, updatedAt: serverTimestamp() });
     await batch.commit();
+
+    // Newly-created booking from the tie modal may have a destination —
+    // register it for autocomplete.
+    if (v.mode === 'create' && v.booking && v.booking.destination) {
+      addPlacesToRegistry(db, [v.booking.destination]);
+    }
 
     // Bump the customer's lastTripAt + tripCount (best-effort, non-blocking).
     if (customerPhone) {

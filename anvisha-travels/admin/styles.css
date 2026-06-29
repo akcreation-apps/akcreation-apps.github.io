@@ -604,6 +604,38 @@ a:hover { text-decoration: underline; }
   .av-toolbar__btn-text { display: none; }
 }
 
+/* ── Place-autocomplete dropdown (trip source/destination, booking destination) ── */
+.place-results {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: var(--card);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-sm);
+  margin-top: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 20;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.place-result {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 9px 12px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.place-result:hover, .place-result:focus {
+  background: var(--card-2);
+  color: var(--gold);
+}
+.place-result:last-child { border-bottom: none; }
+
 /* ── Customer search results (booking modal) ── */
 .cust-results {
   position: absolute;

@@ -1,10 +1,10 @@
 import { COL } from '../firebase-config.js';
 import {
   collection, addDoc, query, orderBy, onSnapshot, doc, getDoc, getDocs,
-  setDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp, increment,
+  setDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp, increment, arrayUnion,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
-  fmtDate, fmtDateTime, fmtTimeLabel, normalisePhone, buildWaUrl, toDateSafe, displayName, wirePhoneInput,
+  fmtDate, fmtDateTime, fmtTimeLabel, normalisePhone, buildWaUrl, toDateSafe, displayName, wirePhoneInput, wirePlaceAutocomplete,
 } from './analytics.js';
 
 // Filter dropdown. Each option matches against the booking's status (+ paid for
@@ -414,6 +414,39 @@ async function loadAllCustomers(db) {
   }
 }
 
+// Cached places for the booking modal — primary source is the shared
+// anvisha_meta/places registry (visible to both admin + driver). Falls back
+// to scanning trips+bookings the admin has read access to.
+let _bookingPlacesCache = null;
+async function loadAllPlacesForBookingModal(db) {
+  if (_bookingPlacesCache) return _bookingPlacesCache;
+  const set = new Set();
+  const norm = s => String(s || '').trim();
+  try {
+    const meta = await getDoc(doc(db, COL.META, 'places'));
+    if (meta.exists()) {
+      const list = meta.data().list || [];
+      list.forEach(p => { const n = norm(p); if (n) set.add(n); });
+    }
+  } catch (_) { /* swallow */ }
+  try {
+    const snap = await getDocs(collection(db, COL.TRIPS));
+    snap.forEach(d => {
+      const r = (d.data() || {}).route || {};
+      const s = norm(r.source);  if (s) set.add(s);
+      const dst = norm(r.destination); if (dst) set.add(dst);
+    });
+  } catch (_) { /* swallow */ }
+  try {
+    const snap = await getDocs(collection(db, COL.BOOKINGS));
+    snap.forEach(d => {
+      const dst = norm((d.data() || {}).destination); if (dst) set.add(dst);
+    });
+  } catch (_) { /* swallow */ }
+  _bookingPlacesCache = Array.from(set).sort((a, b) => a.localeCompare(b));
+  return _bookingPlacesCache;
+}
+
 export async function openBookingModal(db, existing) {
   const isEdit = !!existing;
   const b = existing || {};
@@ -510,6 +543,14 @@ export async function openBookingModal(db, existing) {
       const addrEl    = document.getElementById('bm-addr');
       const newBtn    = document.getElementById('bm-new-cust');
       wirePhoneInput(phoneEl);
+      // Destination autocomplete from known places.
+      const destEl = document.getElementById('bm-dest');
+      if (destEl) {
+        const dg = destEl.closest('.f-group'); if (dg) dg.style.position = 'relative';
+        // Pull places from trips + bookings; same loader as trips.js but
+        // duplicated to avoid a cross-module dep cycle.
+        loadAllPlacesForBookingModal(db).then(places => wirePlaceAutocomplete(destEl, places));
+      }
 
       function applyCustomer(c) {
         nameEl.value  = c.name    || '';
@@ -602,6 +643,16 @@ export async function openBookingModal(db, existing) {
     }
     // Auto-upsert customer
     try { await upsertCustomerFromBooking(db, r.value.customer, savedId); } catch (_) { /* non-blocking */ }
+    // Register the destination so it appears in everyone's autocomplete.
+    if (r.value.destination) {
+      try {
+        await setDoc(doc(db, COL.META, 'places'), {
+          list: arrayUnion(String(r.value.destination).trim()),
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+        _bookingPlacesCache = null;
+      } catch (_) { /* swallow */ }
+    }
     window.avDone();
     return { id: savedId, ...r.value };
   } catch (e) {

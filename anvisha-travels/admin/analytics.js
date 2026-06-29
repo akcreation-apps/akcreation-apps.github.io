@@ -129,6 +129,65 @@ export function normalisePhone(raw) {
   return s.replace(/\D/g, '');
 }
 
+// Wire a text <input> with a places autocomplete dropdown. As the driver
+// types, matching past places (case-insensitive substring) are listed below
+// the input. Clicking a suggestion fills the input — keeps the dashboard's
+// "top destinations" chart from fragmenting across spelling variants.
+export function wirePlaceAutocomplete(input, places) {
+  if (!input || input.dataset.placeWired === '1') return;
+  input.dataset.placeWired = '1';
+  // The dropdown sits as a sibling of the input inside .f-group (which we
+  // make position:relative).
+  const wrap = input.parentElement;
+  if (wrap) wrap.style.position = 'relative';
+  const dropdown = document.createElement('div');
+  dropdown.className = 'place-results';
+  dropdown.hidden = true;
+  input.insertAdjacentElement('afterend', dropdown);
+
+  function rank(term) {
+    const t = term.toLowerCase();
+    const out = [];
+    for (const p of places) {
+      const lp = p.toLowerCase();
+      if (lp === t) continue;                                     // exact match — no point suggesting
+      if (lp.startsWith(t)) out.push({ p, r: 0 });
+      else if (lp.includes(t)) out.push({ p, r: 1 });
+    }
+    return out.sort((a, b) => a.r - b.r || a.p.localeCompare(b.p)).slice(0, 6).map(x => x.p);
+  }
+  function render() {
+    const term = input.value.trim();
+    if (!term) { dropdown.hidden = true; dropdown.innerHTML = ''; return; }
+    const matches = rank(term);
+    if (!matches.length) { dropdown.hidden = true; dropdown.innerHTML = ''; return; }
+    dropdown.innerHTML = matches.map(p =>
+      `<button type="button" class="place-result">${escapeHtml(p)}</button>`
+    ).join('');
+    dropdown.hidden = false;
+  }
+
+  input.addEventListener('input', render);
+  input.addEventListener('focus', render);
+  input.addEventListener('blur', () => {
+    // delay so the click on a result lands first
+    setTimeout(() => { dropdown.hidden = true; }, 150);
+  });
+  dropdown.addEventListener('mousedown', e => {
+    const btn = e.target.closest('.place-result');
+    if (!btn) return;
+    e.preventDefault();
+    input.value = btn.textContent;
+    dropdown.hidden = true;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
 // Wire up a phone <input> so pasting "+91 90909 91234" / "0 9090991234" /
 // "+919090991234" all immediately become "9090991234". Mirrors the BankiBites
 // admin pattern: intercept paste BEFORE the value lands (so maxlength doesn't
