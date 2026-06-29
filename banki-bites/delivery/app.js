@@ -262,11 +262,15 @@ function renderCard(db, o) {
       if (o.payout_applicable === false) {
         return '<span class="payout-chip" title="Not eligible for partner payout"><i class="fas fa-ban"></i> Not eligible</span>';
       }
+      const payoutFee = feeForOrder(o, _feeRules);
+      const amountChip = Number.isFinite(payoutFee)
+        ? `<span class="payout-chip payout-chip--amount" title="Partner payout for this order">₹${payoutFee}</span>`
+        : '';
       if (o.payout_paid === true) {
-        return '<span class="payout-chip payout-chip--ok" title="Partner payout settled"><i class="fas fa-circle-check"></i> Paid</span>';
+        return `${amountChip}<span class="payout-chip payout-chip--ok" title="Partner payout settled"><i class="fas fa-circle-check"></i> Paid</span>`;
       }
       if (isDelivered(o)) {
-        return '<span class="payout-chip payout-chip--warn" title="Partner payout pending"><i class="fas fa-hourglass-half"></i> Pending</span>';
+        return `${amountChip}<span class="payout-chip payout-chip--warn" title="Partner payout pending"><i class="fas fa-hourglass-half"></i> Pending</span>`;
       }
       return '';
     })();

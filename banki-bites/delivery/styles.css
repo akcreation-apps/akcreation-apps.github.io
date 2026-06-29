@@ -370,6 +370,14 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
 }
 .history-title > .status-pill,
 .history-title > .payout-chip { flex: 0 0 auto; }
+.payout-chip--amount {
+  background: var(--surface-2, rgba(99,102,241,0.08));
+  color: var(--text-strong, #1f2937);
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-color-scheme: dark) {
+  .payout-chip--amount { background: rgba(99,102,241,0.18); color: #e5e7eb; }
+}
 .history-title > .history-title-text {
   flex: 1 1 auto; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
