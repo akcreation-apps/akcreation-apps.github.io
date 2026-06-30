@@ -890,13 +890,6 @@
               "not_available_time": ""
             },
             {
-              "id": 3005,
-              "name": "TCD Special Mutton Masala",
-              "price": 239,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 3006,
               "name": "Prawns Masala",
               "price": 259,
@@ -907,13 +900,6 @@
               "id": 3007,
               "name": "Spicy Prawns",
               "price": 239,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3008,
-              "name": "Mutton Rogan Josh",
-              "price": 259,
               "available_time": "",
               "not_available_time": ""
             },
