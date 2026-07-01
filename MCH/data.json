@@ -357,13 +357,6 @@
               "not_available_time": 16
             },
             {
-              "id": 803,
-              "name": "Pohada Thali",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": 16
-            },
-            {
               "id": 804,
               "name": "Prawn Thali",
               "price": 219,
@@ -432,23 +425,9 @@
               "not_available_time": ""
             },
             {
-              "id": 1002,
-              "name": "Pohada Curry",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 1003,
               "name": "Chicken Kasa",
               "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1004,
-              "name": "Crab Masala",
-              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
