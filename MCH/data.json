@@ -396,6 +396,27 @@
               "price": 119,
               "available_time": "",
               "not_available_time": ""
+            },
+            {
+              "id": 903,
+              "name": "Paneer Masala",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 904,
+              "name": "Tadka",
+              "price": 59,
+              "available_time": 19,
+              "not_available_time": ""
+            },
+            {
+              "id": 905,
+              "name": "Chana Masala",
+              "price": 69,
+              "available_time": 19,
+              "not_available_time": ""
             }
           ]
         },
@@ -443,6 +464,13 @@
               "name": "Prawns Masala",
               "price": 169,
               "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1007,
+              "name": "Egg Tadka",
+              "price": 69,
+              "available_time": 19,
               "not_available_time": ""
             }
           ]

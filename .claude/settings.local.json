@@ -18,7 +18,15 @@
       "Bash(python *)",
       "Bash(PYTHONIOENCODING=utf-8 python *)",
       "Bash(grep -n \"o\\\\\\\\.discount\\\\|o\\\\\\\\.total\\\\|o\\\\\\\\.items\\\\|o\\\\\\\\.status\\\\|o\\\\\\\\.delivery_staff_id\\\\|o\\\\\\\\.customer\\\\|o\\\\\\\\.place\\\\|o\\\\\\\\.restaurant\" /c/Users/anil.sahoo_aeccgloba/PycharmProjects/AKS_personal/akcreation-apps.github.io/banki-bites/admin/orders.js)",
-      "Bash(rm *)"
+      "Bash(rm *)",
+      "Bash(magick Egg_Tadka.png Egg_Tadka.webp)",
+      "Bash(magick Tadka.png Tadka.webp)",
+      "Bash(command -v cwebp)",
+      "Bash(command -v ffmpeg)",
+      "Bash(command -v python)",
+      "Bash(command -v python3)",
+      "Bash(ffmpeg -y -i Egg_Tadka.png -c:v libwebp -lossless 0 -q:v 85 Egg_Tadka.webp)",
+      "Bash(ffmpeg -y -i Tadka.png -c:v libwebp -lossless 0 -q:v 85 Tadka.webp)"
     ]
   },
   "enableAllProjectMcpServers": true,
