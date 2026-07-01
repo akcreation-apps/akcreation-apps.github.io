@@ -44,7 +44,7 @@ export async function renderBookings(ctx) {
   const filterSelect = panel.querySelector('#bk-filter');
   const list = panel.querySelector('#bk-list');
   const count = panel.querySelector('#bk-count');
-  let activeFilter = 'new';
+  let activeFilter = 'all';
   let bookings = [];
 
   filterSelect.value = activeFilter;

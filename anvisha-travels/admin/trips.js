@@ -95,7 +95,7 @@ export async function renderTrips(ctx, role) {
     <div id="tr-list" class="row-list"></div>
   `;
 
-  let active = 'untied';
+  let active = 'all';
   let trips = [];
 
   const filterSelect = panel.querySelector('#tr-filter');
@@ -225,7 +225,9 @@ async function renderDriverForm(host, db, ctx) {
       await addDoc(collection(db, COL.TRIPS), {
         ...payload,
         driver: ctx.driver,
+        createdBy: { uid: ctx.driver.uid, name: ctx.driver.name, role: 'driver' },
         bookingId: null,
+        bookingDriver: null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -281,6 +283,26 @@ function collectDriverForm(host) {
   };
 }
 
+// Tied trips: show the booking's allocated driver (who actually ran the ride).
+// Untied trips: show who created the entry, with role — an admin logging a
+// placeholder shouldn't be shown as the "driver". Both cases fall back to
+// t.driver.name for trips written before createdBy/bookingDriver existed.
+function renderWhoLine(t) {
+  if (t.bookingId) {
+    const name = (t.bookingDriver && t.bookingDriver.name)
+      || (t.driver && t.driver.name)
+      || '—';
+    return `<div><b>Driver</b> ${escapeHtml(name)}</div>`;
+  }
+  const cb = t.createdBy;
+  if (cb && cb.name) {
+    const role = cb.role === 'admin' ? 'Admin' : 'Driver';
+    return `<div><b>Created by</b> ${escapeHtml(cb.name)} (${role})</div>`;
+  }
+  const legacy = (t.driver && t.driver.name) || '—';
+  return `<div><b>Created by</b> ${escapeHtml(legacy)}</div>`;
+}
+
 function renderRow(t) {
   const fuel = t.fuel || null;
   const route = t.route || {};
@@ -300,7 +322,7 @@ function renderRow(t) {
       ${tied}
     </div>
     <div class="row-meta">
-      <div><b>Driver</b> ${escapeHtml((t.driver && t.driver.name) || '—')}</div>
+      ${renderWhoLine(t)}
       <div><b>Distance</b> ${escapeHtml(String(t.km ?? 0))} km</div>
       ${fuelLine}
       <div><b>Misc</b> ₹${escapeHtml(String(t.miscCost ?? 0))}</div>
@@ -462,7 +484,15 @@ async function openTripLogModal(db, ctx, isAdmin) {
   if (!r.isConfirmed) return;
   window.avBusy('Saving…');
   await addDoc(collection(db, COL.TRIPS), {
-    ...r.value, driver, bookingId: null,
+    ...r.value,
+    driver,
+    createdBy: {
+      uid: ctx.user.uid,
+      name: ctx.user.displayName || ctx.user.email,
+      role: ctx.role === 'admin' ? 'admin' : 'driver',
+    },
+    bookingId: null,
+    bookingDriver: null,
     createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   });
   addPlacesToRegistry(db, [r.value.route && r.value.route.source, r.value.route && r.value.route.destination]);
@@ -474,7 +504,7 @@ async function untieTrip(db, t) {
   if (!r.isConfirmed) return;
   window.avBusy('Saving…');
   const batch = writeBatch(db);
-  batch.update(doc(db, COL.TRIPS, t.id), { bookingId: null, updatedAt: serverTimestamp() });
+  batch.update(doc(db, COL.TRIPS, t.id), { bookingId: null, bookingDriver: null, updatedAt: serverTimestamp() });
   if (t.bookingId) {
     batch.update(doc(db, COL.BOOKINGS, t.bookingId), { tripId: null, updatedAt: serverTimestamp() });
   }
@@ -606,14 +636,19 @@ async function openTieModal(db, trip) {
     const batch = writeBatch(db);
     let bookingId;
     let customerPhone = null;
+    let bookingDriver = null;
     if (v.mode === 'pick') {
       bookingId = v.bookingId;
-      // Pull the booking customer phone for the customer-stat update below.
+      // Pull the booking customer phone (for the customer-stat update below)
+      // and the allocatedDriver (denormalized onto the trip so the trips list
+      // can show who actually ran the ride without fetching bookings).
       try {
         const bDoc = await getDoc(doc(db, COL.BOOKINGS, bookingId));
         if (bDoc.exists()) {
-          const c = bDoc.data().customer;
+          const data = bDoc.data();
+          const c = data.customer;
           if (c && c.phone) customerPhone = c.phone;
+          if (data.allocatedDriver && data.allocatedDriver.uid) bookingDriver = data.allocatedDriver;
         }
       } catch (_) { /* swallow */ }
       // Tie = trip complete = booking complete.
@@ -636,7 +671,11 @@ async function openTieModal(db, trip) {
         updatedAt: serverTimestamp(),
       });
     }
-    batch.update(doc(db, COL.TRIPS, trip.id), { bookingId, updatedAt: serverTimestamp() });
+    batch.update(doc(db, COL.TRIPS, trip.id), {
+      bookingId,
+      bookingDriver: bookingDriver || null,
+      updatedAt: serverTimestamp(),
+    });
     await batch.commit();
 
     // Newly-created booking from the tie modal may have a destination —
