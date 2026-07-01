@@ -454,7 +454,28 @@
               "id": 1101,
               "name": "Chapati (Roti)",
               "price": 9,
-              "available_time": "",
+              "available_time": 19,
+              "not_available_time": ""
+            },
+            {
+              "id": 1102,
+              "name": "Lachha Paratha",
+              "price": 39,
+              "available_time": 19,
+              "not_available_time": ""
+            },
+            {
+              "id": 1103,
+              "name": "Plain Naan",
+              "price": 19,
+              "available_time": 19,
+              "not_available_time": ""
+            },
+            {
+              "id": 1104,
+              "name": "Butter Naan",
+              "price": 39,
+              "available_time": 19,
               "not_available_time": ""
             }
           ]
