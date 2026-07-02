@@ -468,6 +468,9 @@ function renderCard(db, o) {
     const patch = { status: next };
     if (next === 'delivered') {
       patch.delivered_at = Timestamp.now();
+      if (!Number.isFinite(o.payout_amount)) {
+        patch.payout_amount = feeForOrder({ ...o, ...patch }, _feeRules);
+      }
       // If there was still an amount to collect at the door, roll it into
       // paid_already so history reflects "this is now fully paid" instead of
       // leaving the order looking like it still owes money. Discount is left
