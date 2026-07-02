@@ -80,7 +80,7 @@ export async function renderOrders(root, db) {
 
   try { await whenChartReady(); } catch (e) { console.warn('[orders] Chart.js unavailable:', e.message); }
   wireStatsBlockResize(root.querySelector('.stats-block'));
-  const feeRules = await loadFeeRules(db);
+  const feeRules = await loadFeeRules(db, { force: true });
 
   // Pre-load staff for the dropdown
   const staffSnap = await getDocs(collection(db, COL.STAFF));
