@@ -142,7 +142,7 @@ let currentUser = null;
     currentUser = user;
     $('#userEmail').textContent = staffDoc.data().name || user.email;
     showShell();
-    try { _feeRules = await loadFeeRules(db); } catch {}
+    try { _feeRules = await loadFeeRules(db, { force: true }); } catch {}
     listenOrders(user);
   });
 })();
