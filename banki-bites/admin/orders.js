@@ -793,8 +793,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         const greeting = prettyName ? `Hi ${prettyName}!` : 'Hi there!';
         const parts = [
           `${greeting} 🙏`,
-          `Your *BankiBites* order is delivered 🛵 Hope you enjoy every bite! 😋`,
-          `🧾 Your bill has been generated — check the *Bill* section in the app.`,
+          `Order delivered 🛵 Hope you loved every bite! 😋`,
+          `⭐ Share honest feedback on the taste — it helps our kitchen partners level up.`,
+          `🧾 Bill is ready in the *Bill* section of the app.`,
         ];
         // Skip the offer line entirely when admin sets discount to 0 — no
         // "₹0 OFF" message and no expiry date noise. Thank-you stands alone.
