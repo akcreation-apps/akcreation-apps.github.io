@@ -122,7 +122,7 @@ export async function renderTrips(ctx, role) {
       list.innerHTML = `<div class="empty"><i class="far fa-flag"></i> No trips yet.</div>`;
       return;
     }
-    list.innerHTML = rows.map(renderRow).join('');
+    list.innerHTML = rows.map(t => renderRow(t, { showEdit: true })).join('');
     list.querySelectorAll('[data-action]').forEach(el => {
       el.addEventListener('click', () => handle(db, ctx, el.dataset.action, el.dataset.id, trips));
     });
@@ -303,7 +303,8 @@ function renderWhoLine(t) {
   return `<div><b>Created by</b> ${escapeHtml(legacy)}</div>`;
 }
 
-function renderRow(t) {
+function renderRow(t, opts) {
+  const showEdit = !!(opts && opts.showEdit);
   const fuel = t.fuel || null;
   const route = t.route || {};
   const tied = t.bookingId
@@ -329,6 +330,7 @@ function renderRow(t) {
       ${t.notes ? `<div><b>Notes</b> ${escapeHtml(t.notes)}</div>` : ''}
     </div>
     <div class="row-actions">
+      ${showEdit ? `<button class="btn-an btn-an-outline btn-an-sm" data-action="edit-trip" data-id="${t.id}"><i class="fas fa-pen"></i> Edit</button>` : ''}
       ${!t.bookingId ? `<button class="btn-an btn-an-sm" data-action="tie" data-id="${t.id}"><i class="fas fa-link"></i> Tie to booking</button>` : ''}
       ${t.bookingId ? `<button class="btn-an btn-an-outline btn-an-sm" data-action="open-booking" data-id="${t.bookingId}"><i class="fas fa-up-right-from-square"></i> Open booking</button>` : ''}
       ${t.bookingId ? `<button class="btn-an btn-an-outline btn-an-sm" data-action="untie" data-id="${t.id}"><i class="fas fa-link-slash"></i> Untie</button>` : ''}
@@ -343,6 +345,7 @@ async function handle(db, ctx, action, id, trips) {
   try {
     if (action === 'tie' && t)         return openTieModal(db, t);
     if (action === 'untie' && t)       return untieTrip(db, t);
+    if (action === 'edit-trip' && t)   return openTripEditModal(db, t);
     if (action === 'delete-trip' && t) return deleteTrip(db, t);
     if (action === 'open-booking') {
       ctx.invalidate && ctx.invalidate('bookings');
@@ -497,6 +500,93 @@ async function openTripLogModal(db, ctx, isAdmin) {
   });
   addPlacesToRegistry(db, [r.value.route && r.value.route.source, r.value.route && r.value.route.destination]);
   window.avDone();
+}
+
+async function openTripEditModal(db, trip) {
+  const places = await loadKnownPlaces(db).catch(() => []);
+  const route = trip.route || {};
+  const fuel = trip.fuel || {};
+  const r = await Swal.fire({
+    title: 'Edit trip',
+    width: 640,
+    showCancelButton: true,
+    confirmButtonText: 'Save',
+    didOpen: () => {
+      wirePlaceAutocomplete(document.getElementById('tem-src'), places);
+      wirePlaceAutocomplete(document.getElementById('tem-dst'), places);
+    },
+    html: `
+      <div style="text-align:left;">
+        <div class="f-row cols-2">
+          <div class="f-group"><label class="f-label" for="tem-date">Date</label><input id="tem-date" type="date" class="f-input" value="${escapeAttr(trip.date || '')}"></div>
+          <div class="f-group"><label class="f-label" for="tem-km">Distance (km)</label><input id="tem-km" type="number" class="f-input" min="0" step="0.5" inputmode="decimal" value="${escapeAttr(trip.km != null ? String(trip.km) : '')}"></div>
+        </div>
+        <div class="f-row cols-2">
+          <div class="f-group" style="position:relative;"><label class="f-label" for="tem-src">Source</label><input id="tem-src" type="text" class="f-input" autocomplete="off" value="${escapeAttr(route.source || '')}"></div>
+          <div class="f-group" style="position:relative;"><label class="f-label" for="tem-dst">Destination</label><input id="tem-dst" type="text" class="f-input" autocomplete="off" value="${escapeAttr(route.destination || '')}"></div>
+        </div>
+        <div class="f-row cols-3">
+          <div class="f-group"><label class="f-label" for="tem-ftype">Fuel type (optional)</label>
+            <select id="tem-ftype" class="f-select">
+              <option value="">—</option>
+              ${FUEL_TYPES.map(f => `<option value="${f}"${fuel.type === f ? ' selected' : ''}>${f}</option>`).join('')}
+            </select>
+          </div>
+          <div class="f-group"><label class="f-label" for="tem-fcost">Fuel ₹ (optional)</label><input id="tem-fcost" type="number" class="f-input" min="0" inputmode="numeric" value="${escapeAttr(fuel.cost != null ? String(fuel.cost) : '')}"></div>
+          <div class="f-group"><label class="f-label" for="tem-fqty">Qty (optional)</label><input id="tem-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" value="${escapeAttr(fuel.qty != null ? String(fuel.qty) : '')}"></div>
+        </div>
+        <div class="f-row cols-2">
+          <div class="f-group"><label class="f-label" for="tem-misc">Misc ₹</label><input id="tem-misc" type="number" class="f-input" min="0" inputmode="numeric" value="${escapeAttr(trip.miscCost != null ? String(trip.miscCost) : '')}"></div>
+          <div class="f-group"><label class="f-label" for="tem-notes">Notes</label><input id="tem-notes" type="text" class="f-input" value="${escapeAttr(trip.notes || '')}"></div>
+        </div>
+      </div>
+    `,
+    preConfirm: () => {
+      const date = document.getElementById('tem-date').value;
+      const km   = parseFloat(document.getElementById('tem-km').value);
+      const src  = document.getElementById('tem-src').value.trim();
+      const dst  = document.getElementById('tem-dst').value.trim();
+      const ft     = document.getElementById('tem-ftype').value;
+      const fqRaw  = document.getElementById('tem-fqty').value;
+      const fq     = fqRaw === '' ? null : parseFloat(fqRaw);
+      const fcRaw  = document.getElementById('tem-fcost').value;
+      const fc     = fcRaw === '' ? null : parseFloat(fcRaw);
+      if (!date || isNaN(km) || !src || !dst) {
+        Swal.showValidationMessage('Fill date, km and route');
+        return false;
+      }
+      if (fq != null && isNaN(fq)) {
+        Swal.showValidationMessage('Fuel qty must be a number (or leave it empty)');
+        return false;
+      }
+      if (fc != null && isNaN(fc)) {
+        Swal.showValidationMessage('Fuel cost must be a number (or leave it empty)');
+        return false;
+      }
+      const fuelOut = (fc == null) ? null : { type: ft || null, qty: fq, cost: fc };
+      return {
+        date, km,
+        route: { source: src, destination: dst },
+        fuel: fuelOut,
+        miscCost: parseFloat(document.getElementById('tem-misc').value) || 0,
+        notes: document.getElementById('tem-notes').value.trim() || null,
+      };
+    },
+  });
+  if (!r.isConfirmed) return;
+  window.avBusy('Saving…');
+  try {
+    await updateDoc(doc(db, COL.TRIPS, trip.id), {
+      ...r.value,
+      updatedAt: serverTimestamp(),
+    });
+    addPlacesToRegistry(db, [r.value.route.source, r.value.route.destination]);
+    window.avDone();
+    Swal.fire({ icon: 'success', title: 'Trip updated', timer: 1200, showConfirmButton: false });
+  } catch (e) {
+    window.avDone();
+    Swal.fire('Save failed', e.message || String(e), 'error');
+  }
 }
 
 async function untieTrip(db, t) {
