@@ -1,1 +1,710 @@
-{}
+{
+    "AkAY2pWqQASQQQd6rtvk": {
+        "total_cart_value": 208,
+        "created_at": "2026-07-01T14:21:42.964000+00:00",
+        "a1_place": "Gopalapur",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Lachha_Roll.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 405,
+                            "name": "Lachha Roll"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 59,
+                            "image_src": "../food_src/Manchow.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 12,
+                            "name": "Manchow"
+                        }
+                    ],
+                    "name": "Soup"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "1qUxSuTW6i09IC2hzs3G": {
+        "total_cart_value": 12084,
+        "created_at": "2026-06-28T13:51:22.337000+00:00",
+        "a1_place": "Harirajpur",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 79,
+                            "image_src": "../food_src/Veg_Roll.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 303,
+                            "name": "Veg Roll"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Chowmein_Roll.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 302,
+                            "name": "Chowmein Roll"
+                        },
+                        {
+                            "price": 79,
+                            "image_src": "../food_src/Mix_Veg_Roll.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 304,
+                            "name": "Mix Veg Roll"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Veg_Chowmein.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 301,
+                            "name": "Veg Chowmein"
+                        },
+                        {
+                            "price": 79,
+                            "image_src": "../food_src/Paneer_Roll.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 305,
+                            "name": "Paneer Roll"
+                        },
+                        {
+                            "price": 89,
+                            "image_src": "../food_src/Special_Mix_Veg_Roll.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 306,
+                            "name": "Special Mix Veg Roll"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Single_Egg_Roll.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 403,
+                            "name": "Single Egg Roll"
+                        },
+                        {
+                            "price": 79,
+                            "image_src": "../food_src/Single_Egg_Chowmein.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 401,
+                            "name": "Single Egg Chowmein"
+                        },
+                        {
+                            "price": 79,
+                            "image_src": "../food_src/Double_Egg_Roll.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 404,
+                            "name": "Double Egg Roll"
+                        },
+                        {
+                            "price": 89,
+                            "image_src": "../food_src/Double_Egg_Chowmein.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 402,
+                            "name": "Double Egg Chowmein"
+                        },
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Lachha_Roll.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 405,
+                            "name": "Lachha Roll"
+                        },
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Special_Mix_Roll.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 406,
+                            "name": "Special Mix Roll"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Paneer_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 101,
+                            "name": "Paneer Chilli"
+                        },
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Mushroom_Chatpati.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 105,
+                            "name": "Mushroom Chatpati"
+                        },
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Paneer_Salt_N_Peper.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 102,
+                            "name": "Paneer Salt N Peper"
+                        },
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Mushroom_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 106,
+                            "name": "Mushroom Chilli"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Paneer_65.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 103,
+                            "name": "Paneer 65"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Paneer_Chatpati.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 104,
+                            "name": "Paneer Chatpati"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Mushroom_65.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 107,
+                            "name": "Mushroom 65"
+                        },
+                        {
+                            "price": 79,
+                            "image_src": "../food_src/Egg_Chap_(4Pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 201,
+                            "name": "Egg Chap (4Pc)"
+                        },
+                        {
+                            "price": 89,
+                            "image_src": "../food_src/Chicken_Pakoda_(5Pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 203,
+                            "name": "Chicken Pakoda (5Pc)"
+                        },
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Egg_Chap_(7Pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 202,
+                            "name": "Egg Chap (7Pc)"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chilli_Chicken.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 204,
+                            "name": "Chilli Chicken"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 205,
+                            "name": "Chicken 65"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_Lollipop.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 206,
+                            "name": "Chicken Lollipop"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Manchurian.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 207,
+                            "name": "Chicken Manchurian"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Pakoda_(10Pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 208,
+                            "name": "Chicken Pakoda (10Pc)"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 19,
+                            "image_src": "../food_src/Plain_Paratha.webp",
+                            "quantity": 2,
+                            "id": 501,
+                            "name": "Plain Paratha"
+                        },
+                        {
+                            "price": 29,
+                            "image_src": "../food_src/Lachha_Paratha.webp",
+                            "quantity": 2,
+                            "id": 502,
+                            "name": "Lachha Paratha"
+                        }
+                    ],
+                    "name": "Roti N Paratha"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_Biryani_(3pc_1Egg).webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 701,
+                            "name": "Chicken Biryani (3pc 1Egg)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Mix_Veg_Curry.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 801,
+                            "name": "Mix Veg Curry"
+                        },
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Mushroom_Masala.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 803,
+                            "name": "Mushroom Masala"
+                        },
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Veg_Hyderabadi.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 802,
+                            "name": "Veg Hyderabadi"
+                        },
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Paneer_Masala.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 808,
+                            "name": "Paneer Masala"
+                        },
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Butter_Masala.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 809,
+                            "name": "Paneer Butter Masala"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Mushroom_Butter_Masala.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 804,
+                            "name": "Mushroom Butter Masala"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Mushroom_Hyderabadi.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 805,
+                            "name": "Mushroom Hyderabadi"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Kadai_Mushroom.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 806,
+                            "name": "Kadai Mushroom"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Paneer_Hyderabadi.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 810,
+                            "name": "Paneer Hyderabadi"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Kadai_Paneer.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 811,
+                            "name": "Kadai Paneer"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Paneer_Do_Pyaja.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 812,
+                            "name": "Paneer Do Pyaja"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Mushroom_Do_Pyaja.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 807,
+                            "name": "Mushroom Do Pyaja"
+                        },
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_Kasa.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 901,
+                            "name": "Chicken Kasa"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Butter_Masala.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 902,
+                            "name": "Chicken Butter Masala"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Hyderabadi.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 903,
+                            "name": "Chicken Hyderabadi"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Kadai_Chicken.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 904,
+                            "name": "Kadai Chicken"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Do_Pyaja.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 905,
+                            "name": "Chicken Do Pyaja"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Chicken_Mughlai.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 906,
+                            "name": "Chicken Mughlai"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "Ak4Uor94Xcis9GK31bjH": {
+        "total_cart_value": 209,
+        "created_at": "2026-06-28T13:43:26.191000+00:00",
+        "a1_place": "Harirajpur",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_Biryani_(3pc_1Egg).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Chicken Biryani (3pc 1Egg)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "gXYMIrFYPIfhCz9qyoUp": {
+        "total_cart_value": 267,
+        "created_at": "2026-06-25T13:45:37.345000+00:00",
+        "a1_place": "Ragadi",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 89,
+                            "image_src": "../food_src/Special_Mix_Veg_Roll.webp",
+                            "type": "Veg",
+                            "quantity": 3,
+                            "id": 306,
+                            "name": "Special Mix Veg Roll"
+                        }
+                    ],
+                    "name": "MainCourse"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "XLlWl70HKKaGahmVJKMJ": {
+        "total_cart_value": 209,
+        "created_at": "2026-06-24T06:55:46.545000+00:00",
+        "a1_place": "Khamaranga",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [],
+                    "name": "Soup"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_Biryani_(3pc_1Egg).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Chicken Biryani (3pc 1Egg)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "ccGReFb1knRBlnmNBfBN": {
+        "total_cart_value": 149,
+        "created_at": "2026-06-19T07:08:35.440000+00:00",
+        "a1_place": "Dompada",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Veg_Biryani_(Full).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Veg Biryani (Full)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "EBWxi6yuBiJkj14nmRAS": {
+        "total_cart_value": 149,
+        "created_at": "2026-06-18T07:39:46.107000+00:00",
+        "a1_place": "Khamaranga",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Veg_Biryani_(Full).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Veg Biryani (Full)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "svKHwSs1EhSlooDuiR70": {
+        "total_cart_value": 396,
+        "created_at": "2026-06-11T12:12:51.160000+00:00",
+        "a1_place": "Tulasipur",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Veg_Biryani_(Full).webp",
+                            "type": "Veg",
+                            "quantity": 4,
+                            "id": 601,
+                            "name": "Veg Biryani (Full)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "DpzgC3ihuxMbPRWjHybw": {
+        "total_cart_value": 228,
+        "created_at": "2026-06-07T06:12:44.191000+00:00",
+        "a1_place": "Banki",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Veg_Biryani_(Full).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Veg Biryani (Full)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Mushroom_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 106,
+                            "name": "Mushroom Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "WiuNTq9p1UPlLgtkFnCd": {
+        "total_cart_value": 228,
+        "created_at": "2026-06-07T06:10:00.772000+00:00",
+        "a1_place": "Banki",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Veg_Biryani_(Full).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "Veg Biryani (Full)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Mushroom_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 106,
+                            "name": "Mushroom Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Rejected"
+    }
+}
