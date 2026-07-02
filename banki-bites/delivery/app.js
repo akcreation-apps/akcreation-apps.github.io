@@ -97,11 +97,21 @@ let currentUser = null;
 
   window.addEventListener('beforeunload', () => console.warn('[delivery] page is about to unload'));
 
+  const showSignIn = () => {
+    const l = $('#authLoading'); if (l) l.hidden = true;
+    $('#authGate').hidden = false;
+    $('#appShell').hidden = true;
+  };
+  const showShell = () => {
+    const l = $('#authLoading'); if (l) l.hidden = true;
+    $('#authGate').hidden = true;
+    $('#appShell').hidden = false;
+  };
+
   onAuthStateChanged(auth, async user => {
     console.log('[delivery] auth state changed:', user?.email, user?.uid, 'at', new Date().toISOString());
     if (!user) {
-      $('#authGate').hidden = false;
-      $('#appShell').hidden = true;
+      showSignIn();
       return;
     }
     const db = await getDb();
@@ -111,25 +121,27 @@ let currentUser = null;
     } catch (err) {
       $('#authError').textContent = `Lookup failed (${err.code || 'error'}): ${err.message}`;
       $('#authError').hidden = false;
+      showSignIn();
       await signOut(auth);
       return;
     }
     if (!staffDoc.exists()) {
       $('#authError').innerHTML = `This account is not registered as a delivery partner.<br><small>UID: <code>${user.uid}</code></small>`;
       $('#authError').hidden = false;
+      showSignIn();
       await signOut(auth);
       return;
     }
     if (staffDoc.data().is_active === false) {
       $('#authError').textContent = 'Your account has been deactivated.';
       $('#authError').hidden = false;
+      showSignIn();
       await signOut(auth);
       return;
     }
     currentUser = user;
     $('#userEmail').textContent = staffDoc.data().name || user.email;
-    $('#authGate').hidden = true;
-    $('#appShell').hidden = false;
+    showShell();
     try { _feeRules = await loadFeeRules(db); } catch {}
     listenOrders(user);
   });

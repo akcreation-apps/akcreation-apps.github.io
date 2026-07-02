@@ -39,9 +39,21 @@ window.bbDone = function () {
   if (Swal.isLoading && Swal.isLoading()) Swal.close();
 };
 
+const authLoading = $('#authLoading');
 const authGate = $('#authGate');
 const appShell = $('#appShell');
 const authError = $('#authError');
+
+function showSignIn() {
+  if (authLoading) authLoading.hidden = true;
+  authGate.hidden = false;
+  appShell.hidden = true;
+}
+function showShell() {
+  if (authLoading) authLoading.hidden = true;
+  authGate.hidden = true;
+  appShell.hidden = false;
+}
 
 let currentUser = null;
 let renderedTabs = {};
@@ -71,8 +83,7 @@ let renderedTabs = {};
       console.log('[admin] auth state changed:', user?.email, user?.uid, 'at', new Date().toISOString());
       if (!user) {
         currentUser = null;
-        authGate.hidden = false;
-        appShell.hidden = true;
+        showSignIn();
         return;
       }
       let admins;
@@ -83,6 +94,7 @@ let renderedTabs = {};
         console.error('[admin] admins doc fetch failed', err);
         authError.innerHTML = `Lookup failed: <code>${err.code || ''}</code> ${err.message}<br><small>UID: <code>${user.uid}</code></small>`;
         authError.hidden = false;
+        showSignIn();
         await signOut(auth);
         return;
       }
@@ -95,13 +107,13 @@ let renderedTabs = {};
           <small>Allowlist: <code>${JSON.stringify(allowedUids)}</code></small>
         `;
         authError.hidden = false;
+        showSignIn();
         await signOut(auth);
         return;
       }
       currentUser = user;
       $('#userEmail').textContent = user.email;
-      authGate.hidden = true;
-      appShell.hidden = false;
+      showShell();
       // Land on Orders when there are active deliveries to triage; otherwise
       // open the Dashboard for a high-level read of the business.
       const landing = await pickLandingTab(await getDb());
@@ -115,6 +127,7 @@ let renderedTabs = {};
   } catch (e) {
     authError.textContent = 'Initialisation failed: ' + e.message;
     authError.hidden = false;
+    showSignIn();
   }
 })();
 

@@ -109,6 +109,7 @@ select.form-control, textarea.form-control {
   margin-bottom: 6px;
 }
 .auth-card .text-muted { font-size: 0.85rem; margin-bottom: 16px; }
+.auth-spinner { font-size: 28px; color: var(--primary, #f5a623); margin: 6px 0 14px; }
 .btn-google { font-weight: 600; padding: 10px; }
 .auth-error { color: var(--danger); margin-top: 10px; font-size: 0.85rem; }
 
