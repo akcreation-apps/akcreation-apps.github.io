@@ -11,28 +11,28 @@
             {
               "id": 101,
               "name": "Mushroom 65",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 102,
               "name": "Mushroom Chilli",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 103,
               "name": "Mushroom Manchurian",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 104,
               "name": "Paper Mushroom",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
@@ -108,49 +108,49 @@
             {
               "id": 201,
               "name": "Chicken 65",
-              "price": 139,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 202,
               "name": "Chilli Chicken",
-              "price": 139,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 203,
               "name": "Chicken Manchurian",
-              "price": 139,
+              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 204,
               "name": "Dragon Chicken",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 205,
               "name": "Lemon Chicken",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 206,
               "name": "Chicken Majestic",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 207,
               "name": "Chicken Hongkong",
-              "price": 139,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
