@@ -231,14 +231,9 @@ export async function renderDashboard(ctx) {
       }));
     }
 
-    // ── Top destinations ──
+    // ── Top destinations (from trips only) ──
     {
       const counts = new Map();
-      bkInRange.forEach(b => {
-        const k = (b.destination || '').trim();
-        if (!k) return;
-        counts.set(k, (counts.get(k) || 0) + 1);
-      });
       trInRange.forEach(t => {
         const k = ((t.route && t.route.destination) || '').trim();
         if (!k) return;
@@ -249,17 +244,20 @@ export async function renderDashboard(ctx) {
         type: 'bar',
         data: {
           labels: top.map(x => x[0]),
-          datasets: [{ label: 'Mentions', data: top.map(x => x[1]), backgroundColor: palette[2] }],
+          datasets: [{ label: 'Trips', data: top.map(x => x[1]), backgroundColor: palette[2] }],
         },
         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
       }));
     }
 
-    // ── Driver leaderboard by trips ──
+    // ── Driver leaderboard by trips (source: booking's assigned driver) ──
     {
       const counts = new Map();
       trInRange.forEach(t => {
-        const k = (t.driver && t.driver.name) || (t.driver && t.driver.uid && t.driver.uid.slice(0,8)) || '—';
+        const k = (t.bookingDriver && t.bookingDriver.name)
+          || (t.driver && t.driver.name)
+          || (t.driver && t.driver.uid && t.driver.uid.slice(0, 8))
+          || '—';
         counts.set(k, (counts.get(k) || 0) + 1);
       });
       const top = topN(counts, 10);
