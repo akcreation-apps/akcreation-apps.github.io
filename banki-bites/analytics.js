@@ -66,6 +66,11 @@ export function feeForOrder(o, rules) {
   return isFarPlace(o, rules) ? rules.fee_far : rules.fee_near;
 }
 
+export function truncateName(name, max = 15) {
+  const s = String(name ?? '');
+  return s.length > max ? s.slice(0, max) + '…' : s;
+}
+
 export function toDateSafe(v) {
   if (!v) return null;
   if (typeof v?.toDate === 'function') return v.toDate();

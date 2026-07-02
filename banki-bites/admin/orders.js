@@ -5,7 +5,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
-  wireStatsBlockResize, startOfLastMonth, netRevenue,
+  wireStatsBlockResize, startOfLastMonth, netRevenue, truncateName,
 } from '../analytics.js';
 
 const orderCharts = new Map();
@@ -109,7 +109,7 @@ export async function renderOrders(root, db) {
     const prev = restaurantFilter.value || 'all';
     // Trim the visible label to keep mobile dropdowns from blowing out the row;
     // the full restaurant name lives on the `title` so it's still discoverable.
-    const trimLabel = n => (n.length > 10 ? n.slice(0, 10) + '…' : n);
+    const trimLabel = n => truncateName(n);
     restaurantFilter.innerHTML =
       '<option value="all">All restaurants</option>' +
       sorted.map(n => `<option value="${escapeAttr(n)}" title="${escapeAttr(n)}">${escapeHtml(trimLabel(n))}</option>`).join('');
@@ -329,7 +329,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     <summary class="order-summary">
       <div class="order-summary-main">
         <div class="ec-title">
-          <span class="restaurant-name">${escapeHtml(o.restaurant_name || o.restaurant_id || '?')}</span>
+          <span class="restaurant-name" title="${escapeAttr(o.restaurant_name || o.restaurant_id || '?')}">${escapeHtml(truncateName(o.restaurant_name || o.restaurant_id || '?'))}</span>
           <span class="order-total">${fmtINR(netRevenue(o))}${Number(o.discount) > 0 ? `<span class="order-total-orig">₹${o.total}</span>` : ''}</span>
         </div>
         <div class="ec-meta">${created.toLocaleString('en-IN')} · ${(o.items||[]).length} item${(o.items||[]).length === 1 ? '' : 's'}${o.place ? ' · ' + escapeHtml(o.place) : ''}</div>

@@ -5,6 +5,7 @@ import {
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
   bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfDay, startOfLastMonth, startOfCurrentMonth, netRevenue,
+  truncateName,
 } from '../analytics.js';
 import { refreshStaffData } from './staff.js';
 
@@ -472,7 +473,7 @@ function renderTopRestaurants(orders, p) {
   mountChart('dashTopRestaurants', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => k),
+      labels: top.map(([k]) => truncateName(k)),
       datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
     },
     options: {

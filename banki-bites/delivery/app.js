@@ -12,6 +12,7 @@ import {
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
   toDateSafe, bucketByDay, chartPalette, whenChartReady, fmtINR, startOfDay, startOfLastMonth,
+  truncateName,
 } from '../analytics.js';
 
 const $ = sel => document.querySelector(sel);
@@ -308,7 +309,7 @@ function renderCard(db, o) {
       <div class="history-row">
         <div class="history-main">
           <div class="history-title">
-            <span class="history-title-text">${escapeHtml(restaurantLabel || '—')}${totalLabel}</span>
+            <span class="history-title-text" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</span>
             <span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>
             ${payoutChip}
           </div>
@@ -400,7 +401,7 @@ function renderCard(db, o) {
     <summary class="delivery-summary">
       <div class="ec-row">
         <div class="delivery-summary-main">
-          <div class="ec-title">${escapeHtml(restaurantLabel || '—')}${totalLabel}</div>
+          <div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</div>
           <div class="ec-meta">${created.toLocaleString('en-IN')}${hasItems ? ' · ' + items.length + ' items' : ''}</div>
           ${deliveredMeta}
         </div>
@@ -737,7 +738,7 @@ async function renderEarnings() {
   mountEarnChart('earnByRestaurant', {
     type: 'bar',
     data: {
-      labels: topRest.map(([k]) => k),
+      labels: topRest.map(([k]) => truncateName(k)),
       datasets: [{ label: 'Earnings ₹', data: topRest.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
     },
     options: {
@@ -847,7 +848,7 @@ async function renderEarnings() {
           <li class="pending-row">
             <div class="pending-row-main">
               <div class="pending-row-head">
-                <span class="pending-row-restaurant">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}</span>
+                <span class="pending-row-restaurant" title="${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}">${escapeHtml(truncateName(o.restaurant_name || o.restaurant_id || '—'))}</span>
                 <span class="pending-row-time"><i class="far fa-clock" aria-hidden="true"></i> ${escapeHtml(timeTxt)}</span>
               </div>
               ${subParts.length ? `<div class="pending-row-sub">${subParts.join(' · ')}</div>` : ''}
@@ -916,7 +917,7 @@ async function renderEarnings() {
           return `
             <div class="payout-history-row">
               <div class="payout-row-main">
-                <div class="payout-row-title">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')} · ${escapeHtml(cust)}</div>
+                <div class="payout-row-title" title="${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}">${escapeHtml(truncateName(o.restaurant_name || o.restaurant_id || '—'))} · ${escapeHtml(cust)}</div>
                 <div class="payout-row-meta">${escapeHtml(whenTxt)} ${farTag}</div>
               </div>
               <div class="payout-row-fee">${fmtINR(fee)}</div>

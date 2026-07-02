@@ -2,7 +2,7 @@ import { COL } from '../firebase-config.js';
 import {
   collection, getDocs, doc, setDoc, deleteDoc, orderBy, query, where, writeBatch, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, startOfLastMonth, isDelivered } from '../analytics.js';
+import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, startOfLastMonth, isDelivered, truncateName } from '../analytics.js';
 
 const partnerCharts = new Map();
 function mountPartnerChart(id, config) {
@@ -103,7 +103,7 @@ async function renderPartnerCharts(db) {
   mountPartnerChart('partnersOrders', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => k),
+      labels: top.map(([k]) => truncateName(k)),
       datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
     },
     options: {
@@ -182,7 +182,7 @@ function renderCard(db, root, id, p) {
       <div style="min-width:0;flex:1">
         <div class="ec-title">
           <span class="partner-pos" title="Position">#${p.sort_order ?? '–'}</span>
-          ${escapeHtml(p.name)}
+          <span title="${escapeAttr(p.name || '')}">${escapeHtml(truncateName(p.name || ''))}</span>
           ${p.is_active ? '' : '<span class="status-pill status-cancelled">Hidden</span>'}
         </div>
         <div class="ec-meta">${(p.services || []).join(' · ')} · ★ ${p.rating} · ${p.opening_hour}–${p.closing_hour}</div>

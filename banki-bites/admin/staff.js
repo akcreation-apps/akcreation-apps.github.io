@@ -6,6 +6,7 @@ import { Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-fi
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
   toDateSafe, chartPalette, whenChartReady, fmtINR, wireStatsBlockResize, startOfLastMonth,
+  truncateName,
 } from '../analytics.js';
 
 // Note: Creating a Firebase Auth user requires the Admin SDK (server-side) or the
@@ -305,7 +306,7 @@ function renderCard(db, root, uid, s) {
         <label class="payout-row ${isPayoutPaid(o) ? 'is-paid' : 'is-pending'}">
           <input type="checkbox" data-order="${o.id}" data-fee="${fee}" ${isPayoutPaid(o) ? 'checked disabled' : ''}>
           <div class="payout-row-main">
-            <div class="payout-row-title">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')} · ${escapeHtml(cust)}</div>
+            <div class="payout-row-title" title="${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}">${escapeHtml(truncateName(o.restaurant_name || o.restaurant_id || '—'))} · ${escapeHtml(cust)}</div>
             <div class="payout-row-meta">${escapeHtml(whenTxt)} ${farTag}</div>
           </div>
           <div class="payout-row-fee">${fmtINR(fee)}</div>
@@ -363,7 +364,7 @@ function renderCard(db, root, uid, s) {
           return `
             <div class="payout-history-row">
               <div class="payout-row-main">
-                <div class="payout-row-title">${escapeHtml(o.restaurant_name || o.restaurant_id || '—')} · ${escapeHtml(cust)}</div>
+                <div class="payout-row-title" title="${escapeHtml(o.restaurant_name || o.restaurant_id || '—')}">${escapeHtml(truncateName(o.restaurant_name || o.restaurant_id || '—'))} · ${escapeHtml(cust)}</div>
                 <div class="payout-row-meta">${escapeHtml(whenTxt)} ${farTag}</div>
               </div>
               <div class="payout-row-fee">${fmtINR(fee)}</div>
