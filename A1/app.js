@@ -344,6 +344,13 @@ document.addEventListener('DOMContentLoaded', async() => {
                                 return;
                             }
 
+                            // Skip rendering if today's day-of-week is in non_available_days
+                            // (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+                            if (Array.isArray(dish.non_available_days) &&
+                                dish.non_available_days.includes(new Date().getDay())) {
+                                return;
+                            }
+
                             // Compute hourly-availability note (greys out dish instead of hiding)
                             let unavailableNote = '';
                             if (typeof dish.available_time === 'number' && currentHour < dish.available_time) {

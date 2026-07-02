@@ -12,14 +12,16 @@
               "name": "Clear",
               "price": 49,
               "available_time": 16,
-              "not_available_time": ""
+              "not_available_time": "",
+              "non_available_days": [0, 3, 5]
             },
             {
               "id": 12,
               "name": "Manchow",
               "price": 59,
               "available_time": 16,
-              "not_available_time": ""
+              "not_available_time": "",
+              "non_available_days": [0, 3, 5]
             }
           ]
         },
