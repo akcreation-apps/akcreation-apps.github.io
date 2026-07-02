@@ -410,6 +410,20 @@
               "price": 69,
               "available_time": 19,
               "not_available_time": ""
+            },
+            {
+              "id": 906,
+              "name": "Chana Paneer",
+              "price": 99,
+              "available_time": 19,
+              "not_available_time": ""
+            },
+            {
+              "id": 907,
+              "name": "Special Veg Tadka",
+              "price": 99,
+              "available_time": 19,
+              "not_available_time": ""
             }
           ]
         },
@@ -449,6 +463,13 @@
               "id": 1007,
               "name": "Egg Tadka",
               "price": 69,
+              "available_time": 19,
+              "not_available_time": ""
+            },
+            {
+              "id": 1008,
+              "name": "Egg Bhuj Curry",
+              "price": 49,
               "available_time": 19,
               "not_available_time": ""
             }
