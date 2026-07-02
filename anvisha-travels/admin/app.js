@@ -43,10 +43,22 @@ const ADMIN_TABS = [
   { key: 'broadcast',  label: 'Broadcast',  icon: 'fa-bullhorn',    render: renderBroadcast },
 ];
 
+const authLoading = $('#authLoading');
 const authGate = $('#authGate');
 const appShell = $('#appShell');
 const authError = $('#authError');
 const tabbar = $('#tabbar');
+
+function showSignIn() {
+  if (authLoading) authLoading.hidden = true;
+  authGate.hidden = false;
+  appShell.hidden = true;
+}
+function showShell() {
+  if (authLoading) authLoading.hidden = true;
+  authGate.hidden = true;
+  appShell.hidden = false;
+}
 
 let currentUser = null;
 let renderedTabs = {};
@@ -75,8 +87,7 @@ let renderedTabs = {};
     onAuthStateChanged(auth, async user => {
       if (!user) {
         currentUser = null;
-        authGate.hidden = false;
-        appShell.hidden = true;
+        showSignIn();
         return;
       }
       const db = await getDb();
@@ -87,6 +98,7 @@ let renderedTabs = {};
       } catch (err) {
         authError.textContent = 'Sign-in lookup failed. Please contact support.';
         authError.hidden = false;
+        showSignIn();
         await signOut(auth);
         return;
       }
@@ -99,14 +111,14 @@ let renderedTabs = {};
           ? `Drivers should use the <a href="../driver/">Driver portal</a>.`
           : `This account is not authorised to access the admin panel.`;
         authError.hidden = false;
+        showSignIn();
         await signOut(auth);
         return;
       }
 
       currentUser = user;
       $('#userEmail').textContent = user.email;
-      authGate.hidden = true;
-      appShell.hidden = false;
+      showShell();
 
       mountTabs();
       activateTab('bookings');
@@ -115,6 +127,7 @@ let renderedTabs = {};
   } catch (e) {
     authError.textContent = 'Initialisation failed: ' + e.message;
     authError.hidden = false;
+    showSignIn();
   }
 })();
 

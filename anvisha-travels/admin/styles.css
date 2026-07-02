@@ -104,6 +104,7 @@ a:hover { text-decoration: underline; }
   color: var(--text);
 }
 .auth-card .text-muted { color: var(--muted) !important; font-size: 13px; margin-bottom: 22px; }
+.auth-spinner { font-size: 28px; color: var(--gold, #f5a623); margin: 6px 0 14px; }
 .btn-google {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   background: #fff !important; color: #1f1f1f !important; border: none !important;

@@ -28,8 +28,17 @@
 </head>
 <body>
 
+  <!-- Auth-resolving loader (shown until Firebase reports auth state) -->
+  <div id="authLoading" class="auth-gate" role="status" aria-live="polite">
+    <div class="auth-card">
+      <img src="/anvisha-travels/logo.webp" alt="Anvisha Travels" class="auth-logo">
+      <div class="auth-spinner" aria-hidden="true"><i class="fas fa-circle-notch fa-spin"></i></div>
+      <p class="text-muted" style="margin:0;">Checking your session…</p>
+    </div>
+  </div>
+
   <!-- Sign-in gate -->
-  <div id="authGate" class="auth-gate">
+  <div id="authGate" class="auth-gate" hidden>
     <div class="auth-card">
       <img src="/anvisha-travels/logo.webp" alt="Anvisha Travels" class="auth-logo">
       <h2>Driver Sign-In</h2>
