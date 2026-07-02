@@ -810,7 +810,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
 
       const defaultDiscount = Math.max(1, Math.round(netRevenue(o) * 0.10));
       const endDate = new Date();
-      endDate.setDate(endDate.getDate() + 14);
+      endDate.setDate(endDate.getDate() + 7);
       const defaultDateStr = endDate.toISOString().split('T')[0];
 
       const res = await Swal.fire({
