@@ -9,6 +9,13 @@ import { loadCustomers, openCustomerModal } from './customers.js';
 
 const charts = new Map();
 
+// Cached loadAll result. Tab switches within the TTL reuse the last snapshot
+// instead of re-fetching the entire orders + customers collections. Anything
+// that mutates a customer/order calls loadAll with { force: true } to bust it.
+const LOAD_ALL_TTL_MS = 2 * 60 * 1000;
+let _loadAllCache = null;
+export function invalidateCustomersCache() { _loadAllCache = null; }
+
 // An offer is "active" when amount > 0 AND valid_until is today or later.
 // Expired offers are hidden from KPI counts and the table cell.
 function isOfferActive(r) {
@@ -110,12 +117,12 @@ export async function renderCustomers(root, db) {
   document.getElementById('custRefresh').addEventListener('click', async () => {
     const btn = document.getElementById('custRefresh');
     btn.disabled = true; btn.classList.add('is-loading');
-    try { state = await loadAll(db); paint(root, state); }
+    try { state = await loadAll(db, { force: true }); paint(root, state); }
     finally { btn.disabled = false; btn.classList.remove('is-loading'); }
   });
   document.getElementById('custAdd').addEventListener('click', async () => {
     const saved = await openCustomerModal(db, null);
-    if (saved) { state = await loadAll(db); paint(root, state); }
+    if (saved) { state = await loadAll(db, { force: true }); paint(root, state); }
   });
   document.getElementById('custSearch').addEventListener('input', (e) => {
     renderTable(root, state, e.target.value);
@@ -127,11 +134,14 @@ export async function renderCustomers(root, db) {
     const phone = btn.getAttribute('data-edit-phone');
     const existing = state.customers.get(phone) || { phone };
     const saved = await openCustomerModal(db, existing);
-    if (saved) { state = await loadAll(db); paint(root, state); }
+    if (saved) { state = await loadAll(db, { force: true }); paint(root, state); }
   });
 }
 
-async function loadAll(db) {
+async function loadAll(db, { force = false } = {}) {
+  if (!force && _loadAllCache && (Date.now() - _loadAllCache.t) < LOAD_ALL_TTL_MS) {
+    return _loadAllCache.state;
+  }
   window.bbBusy('Loading customers…');
   try {
     const [customersMap, ordersSnap] = await Promise.all([
@@ -199,7 +209,9 @@ async function loadAll(db) {
     }
 
     rows.sort((x, y) => (y.lastOrder?.getTime() || 0) - (x.lastOrder?.getTime() || 0));
-    return { customers: customersMap, orders, rows };
+    const state = { customers: customersMap, orders, rows };
+    _loadAllCache = { state, t: Date.now() };
+    return state;
   } finally {
     window.bbDone();
   }

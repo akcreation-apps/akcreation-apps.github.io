@@ -1,4 +1,4 @@
-import { COL } from '../firebase-config.js';
+import { COL, cachedGetDocs } from '../firebase-config.js';
 import {
   doc, setDoc, collection, query, where, getDocs, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
@@ -136,21 +136,23 @@ function clearQueue() { sessionStorage.removeItem(QUEUE_KEY); }
 async function loadLastOrderByPhone(db) {
   const cutoffMs = Date.now() - ORDER_LOOKBACK_DAYS * 86400000;
   const sinceTs = Timestamp.fromMillis(cutoffMs);
-  const snap = await getDocs(query(
-    collection(db, COL.ORDERS),
-    where('created_at', '>=', sinceTs),
-  ));
+  // Shared cache: the Broadcast tab is often opened, closed, and reopened
+  // while composing a campaign. 5-min TTL is plenty for lifecycle segments.
+  const orders = await cachedGetDocs(
+    'orders:last180d',
+    () => query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs)),
+    { ttlMs: 5 * 60_000 },
+  );
   const out = new Map();
-  snap.forEach(d => {
-    const o = d.data() || {};
-    if (o.status === 'cancelled' || o.status === 'fake') return;
+  for (const o of orders) {
+    if (o.status === 'cancelled' || o.status === 'fake') continue;
     const phone = (o.customer && o.customer.phone) || '';
-    if (!phone) return;
+    if (!phone) continue;
     const ms = o.created_at?.toMillis?.();
-    if (!ms) return;
+    if (!ms) continue;
     const prev = out.get(phone);
     if (!prev || ms > prev) out.set(phone, ms);
-  });
+  }
   return out;
 }
 

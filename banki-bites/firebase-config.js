@@ -7,7 +7,7 @@
 // independent auth sessions in the same browser.
 
 import { initializeApp, getApp, getApps } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+import { getFirestore, enableIndexedDbPersistence, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { getAuth, setPersistence, browserLocalPersistence, indexedDBLocalPersistence, inMemoryPersistence } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js';
 
 const ENC_KEY = ['TCD', 'FOOD', 'CAFE'].join('-');
@@ -65,8 +65,25 @@ export function getBankiBitesApp(name) {
   return p;
 }
 
+const _persistenceEnabled = new Set();
 export async function getDb(name) {
-  return getFirestore(await getBankiBitesApp(name));
+  const db = getFirestore(await getBankiBitesApp(name));
+  const key = name || '__default__';
+  if (!_persistenceEnabled.has(key)) {
+    _persistenceEnabled.add(key);
+    try {
+      await enableIndexedDbPersistence(db);
+    } catch (err) {
+      if (err.code === 'failed-precondition') {
+        console.warn('[bankibites] IndexedDB persistence not enabled — multiple tabs open.');
+      } else if (err.code === 'unimplemented') {
+        console.warn('[bankibites] IndexedDB persistence unsupported in this browser.');
+      } else {
+        console.warn('[bankibites] IndexedDB persistence error:', err);
+      }
+    }
+  }
+  return db;
 }
 
 export async function getAuthInstance(name) {
@@ -91,6 +108,36 @@ export async function getAuthInstance(name) {
   })();
   _authPromises.set(key, p);
   return p;
+}
+
+// ---------------------------------------------------------------------------
+// Shared query-result cache
+// ---------------------------------------------------------------------------
+// Every caller passes a stable `cacheKey`, a `buildRef` that returns a Firestore
+// CollectionReference or Query, and an optional TTL. Tab switches within the
+// TTL reuse the last snapshot — zero Firestore reads. Any code that mutates
+// data should call `invalidateCache(prefix)` so the next read goes to Firestore.
+//
+// This sits ON TOP of the SDK's IndexedDB persistence. Persistence keeps the
+// SDK from re-downloading docs it already has; this cache avoids even calling
+// into the SDK when we know the answer hasn't changed.
+const _queryCache = new Map();
+
+export async function cachedGetDocs(cacheKey, buildRef, { ttlMs = 60_000, force = false } = {}) {
+  const hit = _queryCache.get(cacheKey);
+  if (!force && hit && (Date.now() - hit.t) < ttlMs) return hit.data;
+  const snap = await getDocs(buildRef());
+  const data = [];
+  snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+  _queryCache.set(cacheKey, { data, t: Date.now() });
+  return data;
+}
+
+export function invalidateCache(prefix) {
+  if (!prefix) { _queryCache.clear(); return; }
+  for (const k of Array.from(_queryCache.keys())) {
+    if (k === prefix || k.startsWith(prefix + ':')) _queryCache.delete(k);
+  }
 }
 
 // Collection names — change in one place if you rename later.

@@ -1,4 +1,5 @@
-import { COL } from '../firebase-config.js';
+import { COL, invalidateCache } from '../firebase-config.js';
+import { invalidateCustomersCache } from './customers-tab.js';
 import { loadCustomers, searchCustomers, openCustomerModal, setActiveOffer, clearActiveOffer } from './customers.js';
 import {
   collection, query, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, where, Timestamp,
@@ -7,6 +8,10 @@ import {
   loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
   wireStatsBlockResize, startOfLastMonth, netRevenue, truncateName,
 } from '../analytics.js';
+
+// Detached whenever renderOrders re-mounts, so we never accumulate live listeners
+// on the orders collection across tab switches.
+let _ordersUnsub = null;
 
 const orderCharts = new Map();
 function mountOrderChart(id, config) {
@@ -228,7 +233,14 @@ export async function renderOrders(root, db) {
   // → no composite index needed.
   const sinceTs = Timestamp.fromDate(startOfLastMonth());
   const q = query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs));
-  onSnapshot(q, snap => {
+  if (_ordersUnsub) { try { _ordersUnsub(); } catch {} _ordersUnsub = null; }
+  _ordersUnsub = onSnapshot(q, snap => {
+    // Any order mutation (from this tab, another admin, or the delivery app)
+    // fires this listener. Bust the shared caches so Dashboard / Staff /
+    // Customers / Broadcast pick up the change on their next paint instead
+    // of waiting out their TTL.
+    invalidateCache('orders');
+    invalidateCustomersCache();
     allOrders = [];
     snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
     allOrders.sort((a, b) => {

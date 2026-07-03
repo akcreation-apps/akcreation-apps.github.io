@@ -1,4 +1,4 @@
-import { COL } from '../firebase-config.js';
+import { COL, cachedGetDocs, invalidateCache } from '../firebase-config.js';
 import {
   collection, getDocs, doc, setDoc, deleteDoc, updateDoc, writeBatch, query, where,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
@@ -47,9 +47,9 @@ export async function refreshStaffData(db) {
   const targetDb = db || _staffDb;
   if (!targetDb) return;
   _staffFeeRules = await loadFeeRules(targetDb, { force: true });
-  await refreshStaffOrders(targetDb);
+  await refreshStaffOrders(targetDb, { force: true });
   if (_staffRoot) {
-    await loadStaff(targetDb, _staffRoot);
+    await loadStaff(targetDb, _staffRoot, { force: true });
     renderStaffCharts();
   }
 }
@@ -100,11 +100,13 @@ export async function renderStaff(root, db) {
   renderStaffCharts();
 }
 
-async function refreshStaffOrders(db) {
+async function refreshStaffOrders(db, { force = false } = {}) {
   const sinceTs = Timestamp.fromDate(startOfLastMonth());
-  const snap = await getDocs(query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs)));
-  _staffOrdersCache = [];
-  snap.forEach(d => _staffOrdersCache.push({ id: d.id, ...d.data() }));
+  _staffOrdersCache = await cachedGetDocs(
+    'orders:sinceLastMonth',
+    () => query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs)),
+    { ttlMs: 2 * 60_000, force },
+  );
 }
 
 function renderStaffCharts() {
@@ -236,16 +238,20 @@ function renderStaffCharts() {
   });
 }
 
-async function loadStaff(db, root) {
+async function loadStaff(db, root, { force = false } = {}) {
   const list = root.querySelector('#staffList');
   list.innerHTML = '<div class="bb-loader-block">Loading delivery partners…</div>';
-  const snap = await getDocs(collection(db, COL.STAFF));
-  if (snap.empty) {
+  const staff = await cachedGetDocs(
+    'staff:all',
+    () => collection(db, COL.STAFF),
+    { ttlMs: 10 * 60_000, force },
+  );
+  if (!staff.length) {
     list.innerHTML = `<div class="empty-state"><i class="fas fa-motorcycle"></i><p>No delivery partners yet.</p></div>`;
     return;
   }
   list.innerHTML = '';
-  snap.forEach(d => list.appendChild(renderCard(db, root, d.id, d.data())));
+  staff.forEach(s => list.appendChild(renderCard(db, root, s.id, s)));
 }
 
 function staffOrdersFor(uid) {
@@ -316,10 +322,11 @@ function renderCard(db, root, uid, s) {
     try {
       window.bbBusy('Removing…');
       await deleteDoc(doc(db, COL.STAFF, uid));
+      invalidateCache('staff:all');
     } finally {
       window.bbDone();
     }
-    loadStaff(db, root);
+    loadStaff(db, root, { force: true });
   });
 
   const payoutsEl = el.querySelector('[data-el="payouts"]');
@@ -449,10 +456,12 @@ function renderCard(db, root, uid, s) {
       }
       await batch.commit();
       window.bbDone();
-      // Reflect in cache and re-render
+      // Reflect in cache and re-render. Local mutation keeps this tab snappy;
+      // invalidating the shared cache ensures other tabs (Dashboard) refetch.
       for (const o of _staffOrdersCache) {
         if (ids.includes(o.id)) { o.payout_paid = true; o.payout_paid_at = now; }
       }
+      invalidateCache('orders:sinceLastMonth');
       Swal.fire({ icon: 'success', title: 'Saved', timer: 1100, showConfirmButton: false });
       loadStaff(db, root);
       renderStaffCharts();
@@ -517,10 +526,11 @@ async function openEditor(db, existing, root) {
   try {
     window.bbBusy('Saving…');
     await setDoc(doc(db, COL.STAFF, uid), payload, { merge: true });
+    invalidateCache('staff:all');
   } finally {
     window.bbDone();
   }
-  loadStaff(db, root);
+  loadStaff(db, root, { force: true });
 }
 
 function escapeHtml(s) {
