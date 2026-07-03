@@ -155,7 +155,7 @@
         #cart {
             max-width: 640px;
             margin: 0 auto;
-            padding: 0 14px 160px;
+            padding: 0 14px 220px;
         }
 
         /* ── Desktop: side-by-side layout ── */
@@ -334,6 +334,18 @@
         }
         #cart-total {
             font-size: 1.2rem; font-weight: 700; color: var(--text);
+        }
+        .pricing-note {
+            margin: 0 0 10px;
+            padding: 8px 10px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            line-height: 1.35;
+            color: #7a4a00;
+            background: #fff8e1;
+            border: 1px solid #ffe1a1;
+            border-radius: 8px;
+            text-align: center;
         }
         #place-order-btn {
             width: 100%;
@@ -685,6 +697,7 @@
                 <span class="total-label">Grand Total</span>
                 <span id="cart-total">₹0.00</span>
             </div>
+            <p class="pricing-note">📢 This restaurant follows separate pricing. Other restaurants may be lower.</p>
             <button id="place-order-btn">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp logo" width="22" height="22" />
                 <span class="btn-text">
