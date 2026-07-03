@@ -63,17 +63,36 @@ export async function renderOrders(root, db) {
     </details>
 
     <div class="section-header section-header--compact section-header--end section-header--sticky orders-filter-bar">
-      <select id="restaurantFilter" class="form-control form-control-sm orders-filter-bar__select" aria-label="Filter by restaurant">
-        <option value="all">All restaurants</option>
-      </select>
-      <select id="orderFilter" class="form-control form-control-sm orders-filter-bar__select" aria-label="Filter by status">
-        <option value="active">Active</option>
-        <option value="new">New only</option>
-        <option value="assigned">Assigned</option>
-        <option value="delivered">Delivered</option>
-        <option value="fake">Fake orders</option>
-        <option value="all">All</option>
-      </select>
+      <label class="orders-filter">
+        <i class="fas fa-store orders-filter__icon" aria-hidden="true"></i>
+        <select id="restaurantFilter" class="orders-filter__select" aria-label="Filter by restaurant">
+          <option value="all">All restaurants</option>
+        </select>
+        <i class="fas fa-chevron-down orders-filter__caret" aria-hidden="true"></i>
+      </label>
+      <label class="orders-filter">
+        <i class="fas fa-motorcycle orders-filter__icon" aria-hidden="true"></i>
+        <select id="partnerFilter" class="orders-filter__select" aria-label="Filter by delivery partner">
+          <option value="all">All partners</option>
+          <option value="unassigned">Unassigned</option>
+        </select>
+        <i class="fas fa-chevron-down orders-filter__caret" aria-hidden="true"></i>
+      </label>
+      <label class="orders-filter">
+        <i class="fas fa-filter orders-filter__icon" aria-hidden="true"></i>
+        <select id="orderFilter" class="orders-filter__select" aria-label="Filter by status">
+          <option value="active">Active</option>
+          <option value="new">New only</option>
+          <option value="assigned">Assigned</option>
+          <option value="delivered">Delivered</option>
+          <option value="fake">Fake orders</option>
+          <option value="all">All</option>
+        </select>
+        <i class="fas fa-chevron-down orders-filter__caret" aria-hidden="true"></i>
+      </label>
+      <button type="button" id="clearFilters" class="orders-filter-clear" aria-label="Clear all filters" hidden>
+        <i class="fas fa-xmark" aria-hidden="true"></i> Clear
+      </button>
     </div>
     <div id="ordersList" class="card-list grid-2"><div class="bb-loader-block">Listening for orders…</div></div>
   `;
@@ -94,6 +113,25 @@ export async function renderOrders(root, db) {
   const listEl = document.getElementById('ordersList');
   const filter = document.getElementById('orderFilter');
   const restaurantFilter = document.getElementById('restaurantFilter');
+  const partnerFilter = document.getElementById('partnerFilter');
+
+  // Populate the delivery partner dropdown from the staff collection. Sorted
+  // by name; active partners first so the admin's usual picks are up top.
+  function refreshPartnerOptions() {
+    const active   = staff.filter(s => s.is_active !== false);
+    const inactive = staff.filter(s => s.is_active === false);
+    const opt = s => `<option value="${escapeAttr(s.uid)}" title="${escapeAttr(s.name || s.email || s.uid)}">${escapeHtml(s.name || s.email || s.uid)}${s.is_active === false ? ' (inactive)' : ''}</option>`;
+    const prev = partnerFilter.value || 'all';
+    partnerFilter.innerHTML =
+      '<option value="all">All partners</option>' +
+      '<option value="unassigned">Unassigned</option>' +
+      active.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(opt).join('') +
+      inactive.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(opt).join('');
+    // Preserve selection if the partner still exists (or 'all'/'unassigned').
+    const valid = new Set(['all', 'unassigned', ...staff.map(s => s.uid)]);
+    partnerFilter.value = valid.has(prev) ? prev : 'all';
+  }
+  refreshPartnerOptions();
 
   // Rebuild the restaurant <option> list from the orders we've loaded, while
   // preserving the admin's current selection if that restaurant is still
@@ -120,10 +158,16 @@ export async function renderOrders(root, db) {
   function render() {
     const f = filter.value;
     const r = restaurantFilter.value;
+    const dp = partnerFilter.value;
     const filtered = allOrders.filter(o => {
       if (r !== 'all') {
         const label = (o.restaurant_name || o.restaurant_id || '').trim();
         if (label !== r) return false;
+      }
+      if (dp !== 'all') {
+        const sid = o.delivery_staff_id;
+        if (dp === 'unassigned') { if (sid) return false; }
+        else if (sid !== dp) return false;
       }
       if (f === 'fake')   return o.status === 'fake' || o.is_fake === true;
       if (f === 'all')    return true;
@@ -152,8 +196,32 @@ export async function renderOrders(root, db) {
     }
     renderOrdersStats(allOrders, filtered);
   }
-  filter.addEventListener('change', render);
-  restaurantFilter.addEventListener('change', render);
+  const clearBtn = document.getElementById('clearFilters');
+  function updateActiveState() {
+    // Highlight each wrapper when its select is off its default value, and
+    // reveal the Clear button only when at least one filter is non-default.
+    const defaults = { restaurantFilter: 'all', partnerFilter: 'all', orderFilter: 'active' };
+    let any = false;
+    for (const [id, def] of Object.entries(defaults)) {
+      const sel = document.getElementById(id);
+      const wrap = sel.closest('.orders-filter');
+      const isActive = sel.value !== def;
+      wrap.classList.toggle('orders-filter--active', isActive);
+      if (isActive) any = true;
+    }
+    clearBtn.hidden = !any;
+  }
+  const onChange = () => { updateActiveState(); render(); };
+  filter.addEventListener('change', onChange);
+  restaurantFilter.addEventListener('change', onChange);
+  partnerFilter.addEventListener('change', onChange);
+  clearBtn.addEventListener('click', () => {
+    restaurantFilter.value = 'all';
+    partnerFilter.value = 'all';
+    filter.value = 'active';
+    onChange();
+  });
+  updateActiveState();
 
   // Only fetch orders from the first day of the previous calendar month onward
   // so admin never pulls years of history into memory. Single-field range query
