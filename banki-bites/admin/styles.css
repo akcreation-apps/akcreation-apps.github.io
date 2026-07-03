@@ -2335,6 +2335,40 @@ button.fab:hover { background: var(--brand-dark); }
 .cust-row--orphan:hover td { background: var(--chip-new-bg); }
 .cust-row--orphan .text-muted { color: var(--chip-new-fg) !important; opacity: 0.85; }
 .cust-table__actions { white-space: nowrap; }
+.cust-table__name { cursor: pointer; }
+.cust-table__name:hover strong { color: var(--brand); text-decoration: underline; }
+.cust-table__name:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.cust-detail-popup .swal2-html-container { text-align: left; max-height: 78vh; overflow-y: auto; }
+.cust-detail__head { padding-bottom: 8px; border-bottom: 1px solid var(--border-soft); }
+
+/* Order-history table inside the customer analytics modal. Columns take their
+   natural width; the wrapper scrolls horizontally on narrow screens so every
+   column stays reachable. Long restaurant names cap at 220px with an ellipsis
+   (full name in the `title` attribute). */
+.cust-history-wrap {
+  max-height: 320px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+}
+.cust-history { width: max-content; min-width: 100%; border-collapse: collapse; }
+.cust-history th, .cust-history td { padding: 6px 10px; vertical-align: middle; white-space: nowrap; }
+.cust-history th { position: sticky; top: 0; background: var(--surface, #fff); z-index: 1; }
+.cust-history__when { font-size: 0.8rem; }
+.cust-history__rest { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+/* Subtle right-edge fade as an affordance that more columns exist to the right. */
+.cust-history-wrap { position: relative; }
+.cust-history-wrap::after {
+  content: "";
+  position: sticky;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.06));
+  pointer-events: none;
+}
 
 /* Customer-details sub-header — stacks on mobile, inline on tablet+ */
 .cust-details-head {

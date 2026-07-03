@@ -1,4 +1,4 @@
-import { COL } from '../firebase-config.js';
+import { COL, cachedGetDocs } from '../firebase-config.js';
 import {
   collection, getDocs,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
@@ -129,12 +129,19 @@ export async function renderCustomers(root, db) {
   });
   // Delegate edit clicks on table rows.
   root.addEventListener('click', async (e) => {
-    const btn = e.target.closest('[data-edit-phone]');
-    if (!btn) return;
-    const phone = btn.getAttribute('data-edit-phone');
-    const existing = state.customers.get(phone) || { phone };
-    const saved = await openCustomerModal(db, existing);
-    if (saved) { state = await loadAll(db, { force: true }); paint(root, state); }
+    const editBtn = e.target.closest('[data-edit-phone]');
+    if (editBtn) {
+      const phone = editBtn.getAttribute('data-edit-phone');
+      const existing = state.customers.get(phone) || { phone };
+      const saved = await openCustomerModal(db, existing);
+      if (saved) { state = await loadAll(db, { force: true }); paint(root, state); }
+      return;
+    }
+    const viewCell = e.target.closest('[data-view-phone]');
+    if (viewCell) {
+      const phone = viewCell.getAttribute('data-view-phone');
+      openCustomerDetails(state, phone);
+    }
   });
 }
 
@@ -144,12 +151,14 @@ async function loadAll(db, { force = false } = {}) {
   }
   window.bbBusy('Loading customers…');
   try {
-    const [customersMap, ordersSnap] = await Promise.all([
+    const [customersMap, ordersSnap, staffList] = await Promise.all([
       loadCustomers(db),
       getDocs(collection(db, COL.ORDERS)),
+      cachedGetDocs('staff:all', () => collection(db, COL.STAFF), { ttlMs: 10 * 60_000 }),
     ]);
     const orders = [];
     ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+    const staffById = new Map(staffList.map(s => [s.id, s]));
 
     // Aggregate per-customer (by phone). Spend only counts delivered orders.
     const agg = new Map();
@@ -209,7 +218,7 @@ async function loadAll(db, { force = false } = {}) {
     }
 
     rows.sort((x, y) => (y.lastOrder?.getTime() || 0) - (x.lastOrder?.getTime() || 0));
-    const state = { customers: customersMap, orders, rows };
+    const state = { customers: customersMap, orders, rows, staffById };
     _loadAllCache = { state, t: Date.now() };
     return state;
   } finally {
@@ -317,7 +326,7 @@ function renderTable(root, { rows }, term) {
   const fmtDate = d => d ? d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
   const rowsHtml = filtered.slice(0, 200).map(r => `
     <tr${r.orphan ? ' class="cust-row--orphan"' : ''}>
-      <td data-label="Customer">
+      <td data-label="Customer" data-view-phone="${escapeAttr(r.phone)}" class="cust-table__name" role="button" tabindex="0" title="Click to see analytics">
         <div><strong>${escapeHtml(r.name || '(no name)')}</strong>${r.not_interested ? ' <i class="fas fa-ban text-danger" title="Not interested"></i>' : ''}${r.orphan ? ' <span class="badge badge-warning ml-1">unsaved</span>' : ''}</div>
         <div class="small text-muted">${escapeHtml(r.phone)}</div>
       </td>
@@ -590,3 +599,261 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
 }
 function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+// ---------------------------------------------------------------------------
+// Per-customer analytics modal
+// ---------------------------------------------------------------------------
+// Reads from state.orders (already in memory — zero Firestore reads) and
+// summarises everything we know about one phone: profile, KPIs, spend chart,
+// payment mix, restaurants, places, items, delivery partners, and a chronological
+// order history. Purely presentational — no writes.
+function openCustomerDetails(state, phone) {
+  const profile = state.customers.get(phone) || { phone };
+  const row = state.rows.find(r => r.phone === phone);
+  const orders = (state.orders || []).filter(o => o?.customer?.phone === phone);
+  orders.sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0));
+
+  const delivered = orders.filter(o => o.status === 'delivered');
+  const cancelled = orders.filter(o => o.status === 'cancelled');
+  const fake      = orders.filter(o => o.status === 'fake' || o.is_fake === true);
+  const spend     = delivered.reduce((s, o) => s + Math.max(0, (+o.total || 0) - (+o.discount || 0)), 0);
+  const grossTotal= delivered.reduce((s, o) => s + (+o.total || 0), 0);
+  const discountReceived = delivered.reduce((s, o) => s + (+o.discount || 0), 0);
+  const aov       = delivered.length ? Math.round(spend / delivered.length) : 0;
+  const biggest   = delivered.reduce((mx, o) => {
+    const net = Math.max(0, (+o.total || 0) - (+o.discount || 0));
+    return net > (mx.net || 0) ? { net, order: o } : mx;
+  }, { net: 0, order: null });
+
+  const dates = delivered.map(o => toDateSafe(o.created_at)).filter(Boolean).sort((a, b) => a - b);
+  const firstDelivered = dates[0] || null;
+  const lastDelivered  = dates[dates.length - 1] || null;
+  const nowMs = Date.now();
+  const daysSinceLast  = lastDelivered ? Math.floor((nowMs - lastDelivered.getTime()) / 86400000) : null;
+  const joined         = toDateSafe(profile.created_at) || firstDelivered;
+  const daysAsCustomer = joined ? Math.floor((nowMs - joined.getTime()) / 86400000) : null;
+  let avgGap = null;
+  if (dates.length >= 2) {
+    let sum = 0;
+    for (let i = 1; i < dates.length; i++) sum += (dates[i].getTime() - dates[i-1].getTime());
+    avgGap = Math.round(sum / (dates.length - 1) / 86400000);
+  }
+  const successRate = orders.length ? Math.round((delivered.length / orders.length) * 100) : 0;
+
+  // Payment mix — same logic as classifyPayment in dashboard.js.
+  const pay = { prepaid: 0, cod: 0 };
+  for (const o of delivered) {
+    const method = String(o.paid_method || '').toLowerCase();
+    if (method === 'upi' || method === 'online') pay.prepaid++;
+    else if (method === 'cash') pay.cod++;
+    else if ((+o.paid_already || 0) > 0) pay.prepaid++;
+    else pay.cod++;
+  }
+
+  // Restaurant, place, item, partner breakdowns — all limited to delivered.
+  const bump = (map, key, val = 1) => { if (!key) return; map.set(key, (map.get(key) || 0) + val); };
+  const restCount = new Map(), restSpend = new Map(), places = new Map(), items = new Map(), partners = new Map();
+  for (const o of delivered) {
+    const rest = (o.restaurant_name || o.restaurant_id || '').trim();
+    bump(restCount, rest);
+    bump(restSpend, rest, Math.max(0, (+o.total || 0) - (+o.discount || 0)));
+    bump(places, (o.place || '').trim());
+    bump(partners, o.delivery_staff_id);
+    if (Array.isArray(o.items)) {
+      for (const it of o.items) {
+        const name = (it?.name || '').trim();
+        if (name) bump(items, name, Number(it.qty) || 1);
+      }
+    }
+  }
+  const topN = (map, n) => Array.from(map.entries()).sort((a,b) => b[1]-a[1]).slice(0, n);
+
+  // Orders-per-month bucket for the trend chart (last 12 months, delivered only).
+  const monthLabels = [];
+  const monthCounts = [];
+  const monthSpend  = [];
+  const ref = new Date(); ref.setDate(1); ref.setHours(0,0,0,0);
+  for (let i = 11; i >= 0; i--) {
+    const s = new Date(ref.getFullYear(), ref.getMonth() - i, 1);
+    const e = new Date(ref.getFullYear(), ref.getMonth() - i + 1, 1);
+    let c = 0, sp = 0;
+    for (const o of delivered) {
+      const d = toDateSafe(o.created_at);
+      if (d && d >= s && d < e) { c++; sp += Math.max(0, (+o.total || 0) - (+o.discount || 0)); }
+    }
+    monthLabels.push(s.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }));
+    monthCounts.push(c);
+    monthSpend.push(sp);
+  }
+
+  // Hour-of-day preference (delivered), for the "usual order time" line.
+  const hourCounts = new Array(24).fill(0);
+  for (const o of delivered) {
+    const d = toDateSafe(o.created_at);
+    if (d) hourCounts[d.getHours()]++;
+  }
+  const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+  const hoursOrdered = hourCounts.reduce((s, v) => s + (v > 0 ? 1 : 0), 0);
+
+  const fmtDate = d => d ? d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  const fmtDateTime = d => d ? d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+
+  const kpi = (icon, label, value, sub = '') => `
+    <div class="kpi-card kpi-card--sm">
+      <div class="kpi-icon"><i class="fas ${icon}"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">${label}</div>
+        <div class="kpi-value">${value}</div>
+        ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
+      </div>
+    </div>`;
+
+  const restaurantRows = topN(restCount, 5).map(([name, count]) => {
+    const sp = restSpend.get(name) || 0;
+    return `<tr><td>${escapeHtml(name || '—')}</td><td class="text-right">${count}</td><td class="text-right">${fmtINR(sp)}</td></tr>`;
+  }).join('') || '<tr><td colspan="3" class="text-muted small">No delivered orders yet</td></tr>';
+
+  const placeRows = topN(places, 5).map(([name, count]) =>
+    `<tr><td>${escapeHtml(name || '—')}</td><td class="text-right">${count}</td></tr>`
+  ).join('') || '<tr><td colspan="2" class="text-muted small">—</td></tr>';
+
+  const itemRows = topN(items, 8).map(([name, qty]) =>
+    `<tr><td>${escapeHtml(name)}</td><td class="text-right">${qty}</td></tr>`
+  ).join('') || '<tr><td colspan="2" class="text-muted small">No items on record</td></tr>';
+
+  const staffById = state.staffById || new Map();
+  const partnerLabel = uid => {
+    if (!uid) return '—';
+    const s = staffById.get(uid);
+    if (!s) return uid;
+    const name = (s.name || s.email || uid).trim();
+    return s.is_active === false ? `${name} (inactive)` : name;
+  };
+  const partnerRows = topN(partners, 5).map(([uid, count]) =>
+    `<tr><td>${escapeHtml(partnerLabel(uid))}</td><td class="text-right">${count}</td></tr>`
+  ).join('') || '<tr><td colspan="2" class="text-muted small">—</td></tr>';
+
+  const historyRows = orders.slice(0, 25).map(o => {
+    const d = toDateSafe(o.created_at);
+    const net = Math.max(0, (+o.total || 0) - (+o.discount || 0));
+    const rest = (o.restaurant_name || o.restaurant_id || '—').trim();
+    const badge = {
+      delivered: 'success', cancelled: 'danger', fake: 'dark',
+      new: 'secondary', assigned: 'info', out_for_delivery: 'primary',
+    }[o.status] || 'secondary';
+    return `<tr>
+      <td class="cust-history__when">${fmtDateTime(d)}</td>
+      <td><span class="badge badge-${badge}">${escapeHtml(o.status || 'new')}</span></td>
+      <td class="cust-history__rest" title="${escapeAttr(rest)}">${escapeHtml(rest)}</td>
+      <td class="text-right">${fmtINR(net)}</td>
+      <td class="text-right">${(o.items || []).length}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" class="text-muted small">No orders on record</td></tr>';
+
+  const offerBadge = isOfferActive(profile)
+    ? `<span class="badge badge-success ml-1">Offer ₹${profile.active_offer_amount} until ${profile.active_offer_valid_until}</span>`
+    : '';
+  const notInterested = profile.not_interested
+    ? '<span class="badge badge-danger ml-1"><i class="fas fa-ban"></i> Not interested</span>'
+    : '';
+  const gpsLink = profile.gps?.lat && profile.gps?.lng
+    ? `<a href="https://www.google.com/maps?q=${profile.gps.lat},${profile.gps.lng}" target="_blank" rel="noopener"><i class="fas fa-location-dot"></i> Open in Maps</a>`
+    : '<span class="text-muted">No GPS pinned</span>';
+
+  const html = `
+    <div class="cust-detail">
+      <div class="cust-detail__head text-left">
+        <div><strong style="font-size:1.1rem">${escapeHtml(profile.name || row?.name || '(no name)')}</strong>${notInterested}${offerBadge}</div>
+        <div class="text-muted small">${escapeHtml(phone)}${profile.address ? ' · ' + escapeHtml(profile.address) : ''}</div>
+        <div class="text-muted small">${gpsLink} · Joined ${fmtDate(joined)}${daysAsCustomer != null ? ` (${daysAsCustomer} days)` : ''}</div>
+      </div>
+
+      <div class="kpi-grid kpi-grid--compact mt-2">
+        ${kpi('fa-receipt', 'Total orders', orders.length, `${delivered.length} dlv · ${cancelled.length} cxl${fake.length ? ' · ' + fake.length + ' fake' : ''}`)}
+        ${kpi('fa-indian-rupee-sign', 'Lifetime spend', fmtINR(spend), `Gross ${fmtINR(grossTotal)}`)}
+        ${kpi('fa-chart-line', 'Avg order value', fmtINR(aov), `${delivered.length} delivered`)}
+        ${kpi('fa-tag', 'Discount received', fmtINR(discountReceived), '')}
+        ${kpi('fa-trophy', 'Biggest order', fmtINR(biggest.net), biggest.order ? fmtDate(toDateSafe(biggest.order.created_at)) : '—')}
+        ${kpi('fa-circle-check', 'Success rate', successRate + '%', `${delivered.length}/${orders.length}`)}
+        ${kpi('fa-calendar-day', 'Days since last', daysSinceLast == null ? '—' : daysSinceLast, lastDelivered ? fmtDate(lastDelivered) : 'Never delivered')}
+        ${kpi('fa-clock-rotate-left', 'Avg gap', avgGap == null ? '—' : avgGap + 'd', dates.length >= 2 ? `${dates.length} orders` : 'Need 2+ orders')}
+        ${kpi('fa-clock', 'Peak hour', hoursOrdered ? (String(peakHour).padStart(2,'0') + ':00') : '—', `${hoursOrdered} hrs seen`)}
+      </div>
+
+      <div class="chart-grid mt-3">
+        <div class="chart-card">
+          <div class="chart-card-head"><i class="fas fa-chart-column"></i> Orders per month (last 12)</div>
+          <div class="chart-card-body"><canvas id="custDetailOrdersTrend"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head"><i class="fas fa-indian-rupee-sign"></i> Spend per month (₹)</div>
+          <div class="chart-card-body"><canvas id="custDetailSpendTrend"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head"><i class="fas fa-wallet"></i> Payment mix</div>
+          <div class="chart-card-body"><canvas id="custDetailPayMix"></canvas></div>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-md-6 mb-3">
+          <h6 class="mb-1"><i class="fas fa-store text-brand"></i> Top restaurants</h6>
+          <table class="cust-table"><thead><tr><th>Restaurant</th><th class="text-right">Orders</th><th class="text-right">Spend</th></tr></thead><tbody>${restaurantRows}</tbody></table>
+        </div>
+        <div class="col-md-6 mb-3">
+          <h6 class="mb-1"><i class="fas fa-utensils text-brand"></i> Top items</h6>
+          <table class="cust-table"><thead><tr><th>Item</th><th class="text-right">Qty</th></tr></thead><tbody>${itemRows}</tbody></table>
+        </div>
+        <div class="col-md-6 mb-3">
+          <h6 class="mb-1"><i class="fas fa-location-dot text-brand"></i> Delivery places</h6>
+          <table class="cust-table"><thead><tr><th>Place</th><th class="text-right">Orders</th></tr></thead><tbody>${placeRows}</tbody></table>
+        </div>
+        <div class="col-md-6 mb-3">
+          <h6 class="mb-1"><i class="fas fa-motorcycle text-brand"></i> Delivery partners</h6>
+          <table class="cust-table"><thead><tr><th>Partner</th><th class="text-right">Orders</th></tr></thead><tbody>${partnerRows}</tbody></table>
+        </div>
+      </div>
+
+      <div class="mt-2">
+        <h6 class="mb-1"><i class="fas fa-clock-rotate-left text-brand"></i> Order history (latest 25)</h6>
+        <div class="cust-history-wrap">
+          <table class="cust-table cust-history">
+            <thead><tr><th>When</th><th>Status</th><th>Restaurant</th><th class="text-right">Net</th><th class="text-right">Items</th></tr></thead>
+            <tbody>${historyRows}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+
+  Swal.fire({
+    title: 'Customer analytics',
+    html,
+    width: '92%',
+    showConfirmButton: false,
+    showCloseButton: true,
+    customClass: { popup: 'cust-detail-popup' },
+    didOpen: () => {
+      const p = chartPalette();
+      const mount = (id, config) => {
+        const el = document.getElementById(id);
+        if (!el || !window.Chart) return;
+        try { return new Chart(el.getContext('2d'), config); } catch (e) { console.warn('[cust-detail] chart', id, e); }
+      };
+      mount('custDetailOrdersTrend', {
+        type: 'bar',
+        data: { labels: monthLabels, datasets: [{ label: 'Orders', data: monthCounts, backgroundColor: p.brand, borderWidth: 0 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+      });
+      mount('custDetailSpendTrend', {
+        type: 'line',
+        data: { labels: monthLabels, datasets: [{ label: 'Spend', data: monthSpend, borderColor: p.brand, backgroundColor: 'rgba(255,107,53,0.15)', fill: true, tension: 0.3 }] },
+        options: { plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.y) } } }, scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } } },
+      });
+      mount('custDetailPayMix', {
+        type: 'doughnut',
+        data: { labels: ['Prepaid', 'COD'], datasets: [{ data: [pay.prepaid, pay.cod], backgroundColor: [p.brand, p.muted], borderWidth: 0 }] },
+        options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+      });
+    },
+  });
+}
