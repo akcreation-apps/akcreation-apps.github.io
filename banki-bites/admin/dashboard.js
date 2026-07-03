@@ -1026,7 +1026,8 @@ function renderTopItems(orders, p, range) {
 }
 
 function renderDiscountTrend(orders, p) {
-  const days = bucketByDay(orders, o => toDateSafe(o.created_at), 7);
+  const delivered = orders.filter(isDelivered);
+  const days = bucketByDay(delivered, o => toDateSafe(o.created_at), 7);
   const data = days.keys.map(k => days.buckets.get(k).reduce((s, o) => s + (Number(o.discount) || 0), 0));
   mountChart('dashDiscountTrend', {
     type: 'bar',
@@ -1224,7 +1225,8 @@ function renderHourlyHeatmap(orders, p, root) {
   const hours = Array.from({ length: HOUR_END - HOUR_START + 1 }, (_, i) => HOUR_START + i);
   const grid = Array.from({ length: 7 }, () => new Array(hours.length).fill(0));
   let max = 0;
-  for (const o of orders) {
+  const delivered = orders.filter(isDelivered);
+  for (const o of delivered) {
     const d = toDateSafe(o.created_at);
     if (!d) continue;
     const h = d.getHours();
