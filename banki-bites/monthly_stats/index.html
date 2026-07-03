@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<meta name="theme-color" content="#4f46e5">
+<title>BankiBites — Monthly Stats Prompt Generator</title>
+<meta name="description" content="Generate BankiBites monthly analytics image prompts for restaurants and star customers.">
+
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="icon" href="/favicon.ico">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+<style>
+  :root {
+    --bb-orange: #f7931e;
+    --bb-bg: #111;
+    --bb-card: #1a1a1a;
+    --bb-border: #333;
+  }
+  html, body { color-scheme: dark; }
+  body {
+    background: var(--bb-bg);
+    color: #f5f5f5;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand-header {
+    text-align: center;
+    padding: 24px 16px 8px;
+  }
+  .brand-header img { width: 84px; height: auto; }
+  .brand-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 12px 0 4px;
+  }
+  .brand-header h1 span { color: var(--bb-orange); }
+  .brand-header p { color: #aaa; margin: 0; font-size: 0.9rem; }
+
+  main { flex: 1; }
+
+  .nav-tabs { border-bottom: 1px solid var(--bb-border); }
+  .nav-tabs .nav-link {
+    color: #ccc;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-bottom: 3px solid transparent;
+  }
+  .nav-tabs .nav-link:hover { color: var(--bb-orange); }
+  .nav-tabs .nav-link.active {
+    color: var(--bb-orange);
+    background: transparent;
+    border-bottom: 3px solid var(--bb-orange);
+  }
+
+  .panel {
+    background: var(--bb-card);
+    border: 1px solid var(--bb-border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .panel h2 {
+    font-size: 1.1rem;
+    color: var(--bb-orange);
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+  label {
+    font-size: 0.85rem;
+    color: #bbb;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .form-control, .custom-select {
+    background-color: #0d0d0d !important;
+    border: 1px solid var(--bb-border);
+    color: #fff !important;
+    border-radius: 10px;
+    min-height: 44px;
+    -webkit-text-fill-color: #fff;
+  }
+  .form-control::placeholder {
+    color: #888 !important;
+    opacity: 0.45;
+    font-style: italic;
+    font-weight: 300;
+  }
+  .form-control:focus, .custom-select:focus {
+    background-color: #0d0d0d !important;
+    color: #fff !important;
+    border-color: var(--bb-orange);
+    box-shadow: 0 0 0 0.15rem rgba(247, 147, 30, 0.25);
+  }
+  .form-control:-webkit-autofill,
+  .form-control:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #0d0d0d inset !important;
+    -webkit-text-fill-color: #fff !important;
+    caret-color: #fff;
+  }
+  textarea.form-control {
+    min-height: 340px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.9rem;
+    color: #f5f5f5 !important;
+    -webkit-text-fill-color: #f5f5f5;
+    background-color: #0d0d0d !important;
+    line-height: 1.5;
+  }
+  .form-control:invalid { box-shadow: none; }
+  .hint {
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+  .hint i { color: var(--bb-orange); }
+
+  .btn-bb {
+    background: var(--bb-orange);
+    color: #111;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    min-height: 44px;
+  }
+  .btn-bb:hover { background: #ffa733; color: #111; }
+  .btn-ghost {
+    background: transparent;
+    color: #ccc;
+    border: 1px solid var(--bb-border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    min-height: 44px;
+  }
+  .btn-ghost:hover { color: var(--bb-orange); border-color: var(--bb-orange); }
+
+  .toast-copied {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bb-orange);
+    color: #111;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s ease;
+    z-index: 999;
+  }
+  .toast-copied.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  footer {
+    text-align: center;
+    padding: 24px 16px;
+    color: #888;
+    font-size: 0.85rem;
+    border-top: 1px solid var(--bb-border);
+    margin-top: 40px;
+  }
+  footer a { color: var(--bb-orange); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (min-width: 992px) {
+    .brand-header h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="brand-header">
+  <img src="../banki-bites-logo.png" alt="BankiBites logo">
+  <h1>Monthly Stats <span>Prompt Generator</span></h1>
+  <p>Build the AI image prompt for restaurants and star customers.</p>
+</header>
+
+<main class="container" style="max-width: 1200px;">
+
+  <ul class="nav nav-tabs" id="statsTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="restaurant-tab" data-toggle="tab" href="#restaurant" role="tab">
+        <i class="fa-solid fa-utensils mr-1"></i> Restaurant
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="customer-tab" data-toggle="tab" href="#customer" role="tab">
+        <i class="fa-solid fa-star mr-1"></i> Star Customer
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+    <!-- RESTAURANT TAB -->
+    <div class="tab-pane fade show active" id="restaurant" role="tabpanel">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-pen-to-square mr-1"></i> Restaurant Details</h2>
+            <form id="restaurantForm" autocomplete="off">
+              <div class="form-group">
+                <label for="r_month">Month</label>
+                <select class="custom-select" id="r_month"></select>
+              </div>
+              <div class="form-group">
+                <label for="r_name">Restaurant Name <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="r_name" value="The Cafe Darbar" placeholder="e.g. The Cafe Darbar" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="r_sales">Last Month Sales (₹) <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="r_sales" placeholder="e.g. 12245" required>
+                </div>
+                <div class="form-group col-6">
+                  <label for="r_discount">Discount Applied (₹) <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="r_discount" placeholder="e.g. 673" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-7">
+                  <label for="r_top_day">Highest Day of Sales <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="r_top_day" placeholder="e.g. 20th June" required>
+                </div>
+                <div class="form-group col-5">
+                  <label for="r_top_day_amt">That Day (₹) <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="r_top_day_amt" placeholder="e.g. 1987" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="r_top_item">Highest Item of Sales <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="r_top_item" placeholder="e.g. Mix Veg Burger" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="r_placed">Total Order Placed <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="r_placed" placeholder="e.g. 64" required>
+                </div>
+                <div class="form-group col-6">
+                  <label for="r_delivered">Total Order Delivered <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="r_delivered" placeholder="e.g. 42" required>
+                </div>
+              </div>
+              <button type="button" class="btn btn-ghost" id="r_reset">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Generated Prompt</h2>
+            <textarea class="form-control" id="r_output" readonly></textarea>
+            <p class="hint mt-3" id="r_hint"><i class="fa-solid fa-circle-info mr-1"></i>Fill all required fields to unlock Copy.</p>
+            <div class="mt-2 d-flex flex-wrap align-items-center" style="gap: 10px;">
+              <button type="button" class="btn btn-bb" id="r_copy" style="display:none;">
+                <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
+              </button>
+              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
+                <i class="fa-solid fa-download mr-1"></i> Logo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER TAB -->
+    <div class="tab-pane fade" id="customer" role="tabpanel">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-pen-to-square mr-1"></i> Customer Details</h2>
+            <form id="customerForm" autocomplete="off">
+              <div class="form-group">
+                <label for="c_month">Month</label>
+                <select class="custom-select" id="c_month"></select>
+              </div>
+              <div class="form-group">
+                <label for="c_name">Customer Name <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="c_name" placeholder="e.g. Pupun" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="c_orders">Total Orders <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="c_orders" placeholder="e.g. 6" required>
+                </div>
+                <div class="form-group col-6">
+                  <label for="c_discount">Discount Received (₹) <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="c_discount" placeholder="e.g. 128" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="c_fav_rest">Favourite Restaurant <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="c_fav_rest" placeholder="e.g. The Cafe Darbar" required>
+              </div>
+              <div class="form-group">
+                <label for="c_fav_item">Favourite Item <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="c_fav_item" placeholder="e.g. Chilli Chicken" required>
+              </div>
+              <div class="form-group">
+                <label for="c_craving">Most Craving Time <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="c_craving" placeholder="e.g. 2 PM" required>
+              </div>
+              <button type="button" class="btn btn-ghost" id="c_reset">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Generated Prompt</h2>
+            <textarea class="form-control" id="c_output" readonly></textarea>
+            <p class="hint mt-3" id="c_hint"><i class="fa-solid fa-circle-info mr-1"></i>Fill all required fields to unlock Copy.</p>
+            <div class="mt-2 d-flex flex-wrap align-items-center" style="gap: 10px;">
+              <button type="button" class="btn btn-bb" id="c_copy" style="display:none;">
+                <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
+              </button>
+              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
+                <i class="fa-solid fa-download mr-1"></i> Logo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast-copied" id="toast">Copied!</div>
+
+<footer>
+  <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+</footer>
+
+<script>
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const currentMonth = MONTHS[new Date().getMonth()];
+
+  function fillMonths(selectEl) {
+    MONTHS.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m; opt.textContent = m;
+      if (m === currentMonth) opt.selected = true;
+      selectEl.appendChild(opt);
+    });
+  }
+  fillMonths(document.getElementById('r_month'));
+  fillMonths(document.getElementById('c_month'));
+
+  const val = id => document.getElementById(id).value.trim();
+  const num = id => document.getElementById(id).value.trim() || '';
+
+  function buildRestaurantPrompt() {
+    const month = val('r_month');
+    const placed = num('r_placed');
+    const delivered = num('r_delivered');
+    const fulfilment = (placed && delivered) ? Math.round((Number(delivered) / Number(placed)) * 100) + '%' : 'N/A';
+    return (
+`Design a premium, celebratory "Monthly Performance Report" award poster (portrait, 1080x1350, 300 DPI) for the restaurant "${val('r_name')}", powered by BankiBites, for the month of ${month}.
+
+Reference vibe:
+A luxurious dark award-style poster that feels like Spotify Wrapped meets a food-delivery brand campaign — dramatic dark background, glowing orange accents, confetti sparkles, cinematic depth. Warm, proud, share-worthy on Instagram / WhatsApp status. Same design system as the BankiBites Star Customer poster.
+
+Assets & imagery:
+- Use the ATTACHED BankiBites logo (circular badge, orange & white on black) placed inside a soft circular glow in the TOP-LEFT of the poster.
+- Include ONE polished 3D-rendered character on the RIGHT side of the hero area: a friendly BankiBites delivery rider — young Indian male, orange helmet, bright orange polo T-shirt, black jeans, riding a modern black-and-orange electric scooter with a BankiBites-branded orange delivery box on the back. Character gives a cheerful thumbs-up toward the viewer. Studio-lit 3D style (Pixar / Blender), soft rim lighting in orange, no background around the character — it should sit cleanly on the dark poster.
+- No other people, mascots, food photos, plates, cutlery, or stock graphics.
+
+Color & atmosphere:
+- Background: deep near-black (#0B0B0F to #16161C) with a subtle warm orange radial glow behind the hero title.
+- Fine confetti and sparkle particles scattered across the top half in orange and gold (small diamonds, dots, stars).
+- Ornamental golden-orange divider lines above and below the hero name — thin, elegant, with a small glowing star or dot at the center.
+- Primary accent: BankiBites orange #F7931E. Secondary: warm gold #FFB84D. Text: pure white #FFFFFF and soft gray #C9CDD4.
+
+Typography:
+- Section title "RESTAURANT REPORT" — huge, bold sans (Poppins/Inter 900), white, tightly stacked with "REPORT" much larger than "RESTAURANT". Above it: a small trophy + laurel-wreath crest icon in gold.
+- "MONTHLY PERFORMANCE" — smaller, orange, uppercase, letter-spaced, placed above the stacked title.
+- Month ribbon: horizontal orange banner-ribbon with folded edges, containing the month "${month}" in bold white uppercase, with a small star on each side.
+- "PRESENTED TO" — small uppercase orange label.
+- Restaurant name "${val('r_name')}" — very large, HANDWRITTEN CURSIVE script font (Pacifico / Great Vibes), pure white with a soft glow.
+- "Powered by BankiBites" — centered, medium weight, with "BankiBites" in orange.
+
+Layout (top → bottom):
+1. Top-left: BankiBites logo badge inside a soft circular orange glow.
+2. Top-right area: the 3D delivery-rider character on the scooter, angled slightly toward the center, giving a thumbs-up.
+3. Center hero (upper third): trophy + laurel crest, "MONTHLY PERFORMANCE / RESTAURANT REPORT" stacked title, orange month ribbon "${month}", "PRESENTED TO", cursive restaurant name "${val('r_name')}", ornamental divider, then "Powered by BankiBites".
+4. Headline KPI card (full width, elevated): on the LEFT stacked "TOTAL SALES" label + hero value "₹${num('r_sales')}/-" in massive orange bold; on the RIGHT a smooth orange area/line sparkline showing daily revenue building through the month, with a glowing endpoint dot. Small caption underneath: "Revenue trend • ${month}".
+5. Chart row (2 equal-width cards side-by-side):
+   • LEFT card — "DAILY SALES TREND": a clean vertical bar chart with 30 slim orange bars representing days of the month; the tallest bar highlighted in bright orange with a glowing pill label pointing to it: "${val('r_top_day')} • ₹${num('r_top_day_amt')}/-". Muted gray gridlines, subtle axis labels.
+   • RIGHT card — "FULFILMENT RATE": a large donut/ring chart in orange, filled to ${fulfilment}, with the value "${fulfilment}" rendered in the ring's center in bold white. Below the donut, a compact legend: orange dot "Delivered ${delivered}" and gray dot "Placed ${placed}".
+6. KPI grid (2 columns × 2 rows) of rounded dark cards (#161620, 1px subtle orange border, soft inner glow). Each card has a large orange line icon on the LEFT and a stacked (label + value) on the RIGHT. Cards:
+   • Icon: shopping bag — Label "ORDERS PLACED" — Value "${placed}"
+   • Icon: scooter / delivery box — Label "ORDERS DELIVERED" — Value "${delivered}"
+   • Icon: percentage / discount tag — Label "DISCOUNT APPLIED" — Value "₹${num('r_discount')}/-"
+   • Icon: calendar — Label "HIGHEST DAY OF SALES" — Value "${val('r_top_day')}" with small caption "₹${num('r_top_day_amt')}/-" beneath in gold.
+7. Full-width "Top Selling Item" spotlight card: small orange pill label "MOST ORDERED THIS MONTH", then the item name "${val('r_top_item')}" rendered LARGE in bold white/orange display type. To the right, a compact horizontal bar-comparison graphic showing this item as the tallest orange bar next to a few muted gray bars representing runner-up items (unlabeled — purely decorative to convey "top of the chart").
+8. Closing block, centered:
+   • Cursive orange line: "Congratulations on a stellar month!"
+   • White subtext: "Your kitchen keeps our riders busy and our customers smiling."
+9. Bottom footer strip: thin orange divider with a small star at the center; below it "KEEP COOKING, KEEP GROWING! 🙂" in uppercase orange, letter-spaced.
+
+Rules:
+- Use EXACTLY the values above. Do not invent additional numbers, dates, percentages, ratings, or KPIs beyond the fulfilment rate that is explicitly derived above.
+- Every label and value must match the source strings letter-for-letter and be sharply legible. No lorem ipsum, no "Sample" text, no misspellings.
+- The BankiBites logo and the 3D delivery-rider character are the only imagery permitted. Everything else must be typography, icons, ornaments, and geometric shapes.
+- Output a single flat poster image (no device mockup, no drop-shadow around the whole poster).`
+    );
+  }
+
+  function buildCustomerPrompt() {
+    const month = val('c_month');
+    return (
+`Design a premium, celebratory "Star Customer of the Month" award poster (portrait, 1080x1350, 300 DPI) for BankiBites, presented to "${val('c_name')}" for ${month}.
+
+Reference vibe:
+A luxurious dark award certificate that feels like Spotify Wrapped meets a food-delivery brand campaign — dramatic dark background, glowing orange accents, confetti sparkles, cinematic depth. Warm, personal, share-worthy on Instagram / WhatsApp status.
+
+Assets & imagery:
+- Use the ATTACHED BankiBites logo (circular badge, orange & white on black) placed inside a soft circular glow in the TOP-LEFT of the poster.
+- Include ONE polished 3D-rendered character on the RIGHT side of the hero area: a friendly BankiBites delivery rider — young Indian male, orange helmet, bright orange polo T-shirt, black jeans, riding a modern black-and-orange electric scooter with a BankiBites-branded orange delivery box on the back. Character gives a cheerful thumbs-up toward the viewer. Studio-lit 3D style (Pixar / Blender), soft rim lighting in orange, no background around the character — it should sit cleanly on the dark poster.
+- No other people, mascots, food photos, plates, cutlery, or stock graphics.
+
+Color & atmosphere:
+- Background: deep near-black (#0B0B0F to #16161C) with a subtle warm orange radial glow behind the hero title.
+- Fine confetti and sparkle particles scattered across the top half in orange and gold (small diamonds, dots, stars).
+- Ornamental golden-orange divider lines above and below the hero name — thin, elegant, with a small glowing star or dot at the center.
+- Primary accent: BankiBites orange #F7931E. Secondary: warm gold #FFB84D. Text: pure white #FFFFFF and soft gray #C9CDD4.
+
+Typography:
+- Section title "STAR CUSTOMER" — huge, bold sans (Poppins/Inter 900), white, tightly stacked with "CUSTOMER" much larger than "STAR" (like the reference). Above it: a small laurel-wreath + star crest icon in gold.
+- "OF THE MONTH" — smaller, orange, uppercase, letter-spaced.
+- Month ribbon: horizontal orange banner-ribbon with folded edges, containing the month "${month}" in bold white uppercase, with a small star on each side.
+- "PRESENTED TO" — small uppercase orange label.
+- Customer name "${val('c_name')}" — very large, HANDWRITTEN CURSIVE script font (Pacifico / Great Vibes), pure white, slight glow.
+- "Powered by BankiBites" — centered, medium weight, with "BankiBites" in orange.
+
+Layout (top → bottom):
+1. Top-left: BankiBites logo badge inside a soft circular orange glow.
+2. Top-right area: the 3D delivery-rider character on the scooter, angled slightly toward the center, giving a thumbs-up.
+3. Center hero (occupying upper third): laurel + star crest, "STAR CUSTOMER OF THE MONTH" stacked title, orange month ribbon "${month}", "PRESENTED TO", cursive customer name "${val('c_name')}", ornamental divider, then "Powered by BankiBites".
+4. KPI grid (2 columns × 2 rows) of rounded dark cards (#161620, 1px subtle orange border, soft inner glow). Each card has a large orange line icon on the LEFT and a stacked (label + value) on the RIGHT. Cards:
+   • Icon: shopping-bag with a smile — Label "TOTAL ORDERS" — Value "${num('c_orders')}"
+   • Icon: discount tag with % — Label "DISCOUNT RECEIVED" — Value "₹${num('c_discount')}/-"
+   • Icon: storefront/shop — Label "FAVOURITE RESTAURANT" — Value "${val('c_fav_rest')}"
+   • Icon: food bowl / noodles — Label "FAVOURITE ITEM" — Value "${val('c_fav_item')}"
+5. Full-width dark card below the grid, centered content: clock line icon on the left, label "MOST CRAVING TIME", value "${val('c_craving')}" in bold orange.
+6. Closing block, centered:
+   • Cursive orange line: "Thank you for being amazing!"
+   • White subtext: "Your love keeps us delivering better, every day."
+7. Bottom footer strip: thin orange divider with a small star at the center; below it "KEEP ORDERING, KEEP SMILING! 🙂" in uppercase orange, letter-spaced.
+
+Rules:
+- Use EXACTLY the values above. Do not invent additional numbers, dates, percentages, ratings, or KPIs.
+- Every label and value must match the source strings letter-for-letter and be sharply legible. No lorem ipsum, no "Sample" text, no misspellings.
+- The BankiBites logo and the 3D delivery-rider character are the only imagery permitted. Everything else must be typography, icons, ornaments, and geometric shapes.
+- Output a single flat poster image (no device mockup, no drop-shadow around the whole poster).`
+    );
+  }
+
+  function toggleCopy(formId, btnId, hintId) {
+    const valid = document.getElementById(formId).checkValidity();
+    document.getElementById(btnId).style.display = valid ? '' : 'none';
+    document.getElementById(hintId).style.display = valid ? 'none' : '';
+  }
+
+  function refreshRestaurant() {
+    document.getElementById('r_output').value = buildRestaurantPrompt();
+    toggleCopy('restaurantForm', 'r_copy', 'r_hint');
+  }
+  function refreshCustomer() {
+    document.getElementById('c_output').value = buildCustomerPrompt();
+    toggleCopy('customerForm', 'c_copy', 'c_hint');
+  }
+
+  document.getElementById('restaurantForm').addEventListener('input', refreshRestaurant);
+  document.getElementById('customerForm').addEventListener('input', refreshCustomer);
+
+  document.getElementById('r_reset').addEventListener('click', () => {
+    document.getElementById('restaurantForm').reset();
+    document.getElementById('r_name').value = 'The Cafe Darbar';
+    document.getElementById('r_month').value = currentMonth;
+    refreshRestaurant();
+  });
+  document.getElementById('c_reset').addEventListener('click', () => {
+    document.getElementById('customerForm').reset();
+    document.getElementById('c_month').value = currentMonth;
+    refreshCustomer();
+  });
+
+  const toast = document.getElementById('toast');
+  function flashToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1500);
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      flashToast('Copied!');
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      flashToast('Copied!');
+    }
+  }
+
+  document.getElementById('r_copy').addEventListener('click', () => copyText(buildRestaurantPrompt()));
+  document.getElementById('c_copy').addEventListener('click', () => copyText(buildCustomerPrompt()));
+
+  refreshRestaurant();
+  refreshCustomer();
+</script>
+
+</body>
+</html>
