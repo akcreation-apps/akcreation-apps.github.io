@@ -84,30 +84,9 @@
               "not_available_time": ""
             },
             {
-              "id": 203,
-              "name": "Chicken Majestic",
-              "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 205,
               "name": "Peri Peri Chicken",
               "price": 189,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 206,
-              "name": "Chilli Fish",
-              "price": 229,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 207,
-              "name": "Garlic Chicken",
-              "price": 169,
               "available_time": "",
               "not_available_time": ""
             }
@@ -443,30 +422,9 @@
               "not_available_time": ""
             },
             {
-              "id": 1003,
-              "name": "Bombay Prawn(6 inch)",
-              "price": 199,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1004,
-              "name": "Bombay Prawn(9 inch)",
-              "price": 259,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 1005,
               "name": "Italian Chicken(12 inch)",
               "price": 419,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1006,
-              "name": "Bombay Prawn(12 inch)",
-              "price": 359,
               "available_time": "",
               "not_available_time": ""
             }
@@ -504,25 +462,6 @@
             {
               "id": 1104,
               "name": "Kiwi",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Lassi",
-          "dishes": [
-            {
-              "id": 1201,
-              "name": "Sweet Lassi",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1202,
-              "name": "Salted Lassi",
               "price": 119,
               "available_time": "",
               "not_available_time": ""
@@ -728,14 +667,14 @@
               "id": 2701,
               "name": "Veg Biryani (Half)",
               "price": 139,
-              "available_time": 12,
+              "available_time": 13,
               "not_available_time": ""
             },
             {
               "id": 2702,
               "name": "Veg Biryani (Full)",
               "price": 239,
-              "available_time": 12,
+              "available_time": 13,
               "not_available_time": ""
             }
           ]
@@ -748,21 +687,21 @@
               "id": 2801,
               "name": "Chicken Biryani (2pc)",
               "price": 129,
-              "available_time": 12,
+              "available_time": 13,
               "not_available_time": ""
             },
             {
               "id": 2802,
               "name": "Chicken Biryani (3pc)",
               "price": 179,
-              "available_time": 12,
+              "available_time": 13,
               "not_available_time": ""
             },
             {
               "id": 2803,
               "name": "Chicken Biryani (5pc)",
               "price": 259,
-              "available_time": 12,
+              "available_time": 13,
               "not_available_time": ""
             }
           ]
@@ -879,27 +818,6 @@
               "id": 3003,
               "name": "Chicken Butter Masala",
               "price": 199,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3006,
-              "name": "Prawns Masala",
-              "price": 259,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3007,
-              "name": "Spicy Prawns",
-              "price": 239,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 3009,
-              "name": "Malai Prawns",
-              "price": 259,
               "available_time": "",
               "not_available_time": ""
             }
