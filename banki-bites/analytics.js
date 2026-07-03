@@ -244,3 +244,76 @@ export function isPayoutPaid(o) { return o?.payout_paid === true; }
 export function isPayoutPending(o) {
   return isDelivered(o) && !isPayoutPaid(o);
 }
+
+// Split an item list into two buckets using an optional custom cut date.
+// Default cut = start of the current month, so the return value is
+// { earlier, later, earlierLabel, laterLabel } where earlier = last month
+// and later = current month. Callers pass a custom { from, to, cutAt } when
+// a date-range picker is active.
+//
+// Labels are chosen based on whether cutAt aligns with a calendar-month
+// boundary — otherwise both halves would share the same month name (e.g. a
+// 30-day range wholly inside June gets a June midpoint cut and needs date
+// ranges like "3-17 Jun" vs "18 Jun-2 Jul", not "Jun 26 / Jun 26").
+export function splitByMonth(items, dateFn, opts = {}) {
+  const now = new Date();
+  const cutAt = opts.cutAt || startOfCurrentMonth(now);
+  const from  = opts.from  || startOfLastMonth(now);
+  const to    = opts.to    || now;
+  const earlier = [];
+  const later   = [];
+  for (const it of items) {
+    const d = dateFn(it);
+    if (!d) continue;
+    if (d < from || d >= to) continue;
+    if (d < cutAt) earlier.push(it);
+    else later.push(it);
+  }
+
+  const isMonthStart = d => d.getDate() === 1 && d.getHours() === 0 && d.getMinutes() === 0;
+  const monthLabel = d => d.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' });
+  const dayMonth   = d => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+  let earlierLabel, laterLabel;
+  if (isMonthStart(from) && isMonthStart(cutAt)) {
+    // Whole-calendar-month cut (e.g. Last month vs This month).
+    earlierLabel = monthLabel(from);
+    // Later half spans [cutAt, to). Its label is the month of cutAt.
+    laterLabel = monthLabel(cutAt);
+  } else {
+    // Midpoint or arbitrary cut — describe each half by its date range so
+    // labels are unambiguous even when both halves share a month.
+    const earlierEnd = new Date(cutAt.getTime() - 86400000);
+    const laterEnd   = new Date(to.getTime() - 86400000);
+    earlierLabel = `${dayMonth(from)}–${dayMonth(earlierEnd)}`;
+    laterLabel   = `${dayMonth(cutAt)}–${dayMonth(laterEnd)}`;
+  }
+
+  return { earlier, later, earlierLabel, laterLabel };
+}
+
+// Median of an array of finite numbers. Ignores nulls/NaNs. Returns 0 on empty.
+export function median(nums) {
+  const xs = nums.filter(n => Number.isFinite(n)).slice().sort((a, b) => a - b);
+  if (!xs.length) return 0;
+  const mid = xs.length >> 1;
+  return xs.length % 2 ? xs[mid] : (xs[mid - 1] + xs[mid]) / 2;
+}
+
+// Was this delivered order on-time (delivered_at ≤ eta)? Returns null when
+// either timestamp is missing so callers can exclude it from the denominator.
+export function isOnTime(o) {
+  const d = toDateSafe(o?.delivered_at);
+  const e = toDateSafe(o?.eta);
+  if (!d || !e) return null;
+  return d.getTime() <= e.getTime();
+}
+
+// Minutes elapsed between two order timestamps, or null when either is missing.
+export function minutesBetween(o, fromKey, toKey) {
+  const a = toDateSafe(o?.[fromKey]);
+  const b = toDateSafe(o?.[toKey]);
+  if (!a || !b) return null;
+  const mins = (b.getTime() - a.getTime()) / 60000;
+  return Number.isFinite(mins) ? mins : null;
+}

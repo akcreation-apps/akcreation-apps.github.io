@@ -233,6 +233,7 @@ function renderOrdersStats(all, filtered) {
     },
     options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
   });
+
 }
 
 function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') {

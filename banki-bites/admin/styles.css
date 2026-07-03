@@ -1280,6 +1280,14 @@ button.fab:hover { background: var(--brand-dark); }
   position: relative;
   min-width: 0;
 }
+/* Chart cards with non-canvas content (retention cohorts table, hourly
+   heatmap) grow to fit their rows — a fixed 220px height was clipping the
+   last cohort row on mobile. */
+.chart-card-body:has(.cohort-wrap),
+.chart-card-body:has(.heatmap-wrap) {
+  height: auto;
+  min-height: 220px;
+}
 /* Chart.js sizes the canvas itself (responsive + maintainAspectRatio:false).
    We must NOT force width/height via CSS — doing so de-syncs the canvas's
    bitmap coordinate system from its display size, which breaks tooltip
@@ -2380,4 +2388,139 @@ button.fab:hover { background: var(--brand-dark); }
 
   .cust-row--orphan { border-color: var(--chip-new-fg); }
   .cust-row--orphan td { background: transparent; color: inherit; }
+}
+
+/* ==================== Dashboard date-range picker ==================== */
+.dash-range {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.dash-range-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dash-range-chip {
+  appearance: none;
+  border: 1px solid var(--border, #d5d9e0);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+  min-height: 32px;
+}
+.dash-range-chip:hover { border-color: #FF6B35; color: #FF6B35; }
+.dash-range-chip.is-active {
+  background: #FF6B35;
+  border-color: #FF6B35;
+  color: #fff;
+}
+.dash-range-custom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  align-items: center;
+}
+.dash-range-custom[hidden] { display: none; }
+.dash-range-custom input[type="date"] {
+  border: 1px solid var(--border, #d5d9e0);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  min-height: 32px;
+}
+
+/* ==================== Hourly demand heatmap ==================== */
+.heatmap-wrap {
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.hm-grid {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 100%;
+}
+.hm-header,
+.hm-row {
+  display: grid;
+  grid-template-columns: 44px repeat(var(--hm-cols, 24), minmax(28px, 1fr));
+  gap: 2px;
+  align-items: stretch;
+}
+.hm-hour,
+.hm-day,
+.hm-cell,
+.hm-corner {
+  font-size: 0.68rem;
+  line-height: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  border-radius: 3px;
+}
+.hm-day { justify-content: flex-end; padding-right: 4px; color: var(--muted, #6b7280); font-weight: 600; }
+.hm-hour { color: var(--muted, #6b7280); }
+.hm-cell {
+  color: #1a1a2e;
+  background: rgba(15, 23, 42, 0.04);
+}
+@media (prefers-color-scheme: dark) {
+  .hm-cell { color: #e5e7eb; background: rgba(255, 255, 255, 0.05); }
+}
+
+/* ==================== Retention cohorts ==================== */
+.cohort-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px;
+}
+.cohort-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  min-width: 340px;
+}
+.cohort-header,
+.cohort-row {
+  display: grid;
+  grid-template-columns: minmax(56px, 0.8fr) minmax(38px, 0.5fr) repeat(4, minmax(42px, 1fr));
+  gap: 3px;
+}
+.cohort-cell {
+  min-height: 34px;
+  padding: 6px 4px;
+  border-radius: 4px;
+  font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.04);
+  color: #1a1a2e;
+}
+.cohort-head { font-weight: 600; color: var(--muted, #6b7280); background: transparent; }
+.cohort-label { justify-content: flex-start; font-weight: 600; color: var(--muted, #6b7280); background: transparent; padding-left: 4px; }
+.cohort-future { color: var(--muted, #6b7280); background: transparent !important; }
+.cohort-partial { font-style: italic; }
+.cohort-note { font-size: 0.72rem; color: var(--muted, #6b7280); margin-top: 4px; padding-left: 4px; }
+@media (min-width: 480px) {
+  .cohort-header,
+  .cohort-row {
+    grid-template-columns: 80px 60px repeat(4, minmax(60px, 1fr));
+    gap: 3px;
+  }
+  .cohort-cell { font-size: 0.78rem; padding: 6px 8px; }
+}
+@media (prefers-color-scheme: dark) {
+  .cohort-cell { color: #e5e7eb; background: rgba(255, 255, 255, 0.05); }
 }

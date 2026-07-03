@@ -3,13 +3,97 @@ import {
   collection, getDocs, query, where, Timestamp, doc, setDoc,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
-  loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
+  loadFeeRules, feeForOrder, isFarPlace, isDelivered, isCancelled, isPayoutPaid, isPayoutPending,
   bucketByDay, groupBy, topN, toDateSafe, fmtINR, chartPalette, whenChartReady, startOfDay, startOfLastMonth, startOfCurrentMonth, netRevenue,
-  truncateName,
+  truncateName, splitByMonth, median, isOnTime, minutesBetween,
 } from '../analytics.js';
 import { refreshStaffData } from './staff.js';
 
 const charts = new Map(); // canvas-id -> Chart instance (so we destroy on re-render)
+
+// Hard cap on how far back we ever fetch from Firestore. Keeps memory bounded
+// and prevents runaway queries on custom ranges the admin might type.
+// Declared above `state` because normalizeRange() reads it at module init.
+const MAX_FETCH_DAYS = 60;
+
+// Date-range state — persisted to localStorage so the choice survives reloads.
+// `preset` drives from/to/cutAt; 'custom' means from+to were user-entered.
+const RANGE_LS_KEY = 'bb_admin_dashboard_range';
+const state = {
+  range: loadRangeState(),
+};
+
+function loadRangeState() {
+  try {
+    const raw = localStorage.getItem(RANGE_LS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.preset) {
+        // Retired preset — migrate legacy 'last90' to the new 60-day cap.
+        if (parsed.preset === 'last90') parsed.preset = 'last60';
+        return normalizeRange(parsed);
+      }
+    }
+  } catch {}
+  return normalizeRange({ preset: 'last60' });
+}
+
+function saveRangeState() {
+  try {
+    localStorage.setItem(RANGE_LS_KEY, JSON.stringify({
+      preset: state.range.preset,
+      fromISO: state.range.from.toISOString(),
+      toISO:   state.range.to.toISOString(),
+    }));
+  } catch {}
+}
+
+// Given a preset (or 'custom' + explicit fromISO/toISO), compute the concrete
+// { from, to, cutAt, label } used by the fetch query + splitByMonth().
+function normalizeRange(input) {
+  const now = new Date();
+  const startOfToday = startOfDay(now);
+  const endOfToday   = new Date(startOfToday.getTime() + 86400000);
+  const preset = input.preset || 'last60';
+  let from, to, label;
+
+  const daysAgo = n => new Date(startOfToday.getTime() - n * 86400000);
+
+  switch (preset) {
+    case 'last7':   from = daysAgo(6);  to = endOfToday; label = 'Last 7 days'; break;
+    case 'last30':  from = daysAgo(29); to = endOfToday; label = 'Last 30 days'; break;
+    case 'last60':  from = daysAgo(59); to = endOfToday; label = 'Last 60 days'; break;
+    case 'thisMonth': from = startOfCurrentMonth(now); to = endOfToday; label = 'This month'; break;
+    case 'lastMonth': from = startOfLastMonth(now);   to = startOfCurrentMonth(now); label = 'Last month'; break;
+    case 'custom': {
+      const f = input.fromISO ? new Date(input.fromISO) : startOfLastMonth(now);
+      const t = input.toISO   ? new Date(input.toISO)   : endOfToday;
+      from = startOfDay(f);
+      to   = new Date(startOfDay(t).getTime() + 86400000);
+      label = 'Custom';
+      break;
+    }
+    default: from = daysAgo(59); to = endOfToday; label = 'Last 60 days';
+  }
+
+  // Clamp `from` so we never fetch more than MAX_FETCH_DAYS of history.
+  const earliest = daysAgo(MAX_FETCH_DAYS - 1);
+  if (from < earliest) {
+    from = earliest;
+    if (preset === 'custom') label = `Custom (capped ${MAX_FETCH_DAYS}d)`;
+  }
+
+  // Cut for splitByMonth: midpoint of the range so "earlier vs later" is
+  // symmetric when the range doesn't align to calendar months. When it does
+  // straddle a month boundary, prefer the calendar boundary — that's what
+  // users usually mean by "month-wise".
+  const spanMs = to.getTime() - from.getTime();
+  const midMs  = from.getTime() + spanMs / 2;
+  const monthBoundary = startOfCurrentMonth(new Date(midMs));
+  const cutAt = (monthBoundary > from && monthBoundary < to) ? monthBoundary : new Date(midMs);
+
+  return { preset, from, to, cutAt, label };
+}
 
 function mountChart(id, config) {
   const old = charts.get(id);
@@ -37,11 +121,22 @@ export async function renderDashboard(root, db) {
       </div>
     </div>
 
+    <div id="dashRange" class="dash-range" role="toolbar" aria-label="Date range">
+      ${renderRangeControls()}
+    </div>
+
     <div id="dashKpis" class="kpi-grid">
       ${kpiSkeleton()}
     </div>
 
     <div class="chart-grid">
+      <!-- Month over month first — big-picture comparison. -->
+      <div class="chart-card chart-card--wide">
+        <div class="chart-card-head"><i class="fas fa-calendar-alt"></i> Month over month</div>
+        <div class="chart-card-body"><canvas id="dashMonthOverMonth"></canvas></div>
+      </div>
+
+      <!-- 7-day trend charts (day-by-day series). -->
       <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-calendar-days"></i> Orders per day (7d)</div>
         <div class="chart-card-body"><canvas id="dashOrdersPerDay"></canvas></div>
@@ -51,12 +146,26 @@ export async function renderDashboard(root, db) {
         <div class="chart-card-body"><canvas id="dashRevenuePerDay"></canvas></div>
       </div>
       <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-ban"></i> Cancellation rate (7d)</div>
+        <div class="chart-card-body"><canvas id="dashCancelRate"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-basket-shopping"></i> Average order value (7d)</div>
+        <div class="chart-card-body"><canvas id="dashAovTrend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-user-plus"></i> New vs Repeat customers (7d)</div>
+        <div class="chart-card-body"><canvas id="dashRepeatNew"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-tag"></i> Discounts given (7d)</div>
+        <div class="chart-card-body"><canvas id="dashDiscountTrend"></canvas></div>
+      </div>
+
+      <!-- Range-wide / aggregate charts (respect the date range picker). -->
+      <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-circle-half-stroke"></i> Orders by status</div>
         <div class="chart-card-body"><canvas id="dashStatusMix"></canvas></div>
-      </div>
-      <div class="chart-card chart-card--wide">
-        <div class="chart-card-head"><i class="fas fa-calendar-alt"></i> Month over month</div>
-        <div class="chart-card-body"><canvas id="dashMonthOverMonth"></canvas></div>
       </div>
       <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-store"></i> Top restaurants</div>
@@ -75,28 +184,12 @@ export async function renderDashboard(root, db) {
         <div class="chart-card-body"><canvas id="dashFarNear"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-ban"></i> Cancellation rate (7d)</div>
-        <div class="chart-card-body"><canvas id="dashCancelRate"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-basket-shopping"></i> Average order value (7d)</div>
-        <div class="chart-card-body"><canvas id="dashAovTrend"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-user-plus"></i> New vs Repeat customers (7d)</div>
-        <div class="chart-card-body"><canvas id="dashRepeatNew"></canvas></div>
-      </div>
-      <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-crown"></i> Top customers</div>
         <div class="chart-card-body"><canvas id="dashTopCustomers"></canvas></div>
       </div>
       <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-utensils"></i> Top items sold</div>
         <div class="chart-card-body"><canvas id="dashTopItems"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-tag"></i> Discounts given (7d)</div>
-        <div class="chart-card-body"><canvas id="dashDiscountTrend"></canvas></div>
       </div>
       <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-credit-card"></i> Prepaid vs COD (delivered)</div>
@@ -110,10 +203,23 @@ export async function renderDashboard(root, db) {
         <div class="chart-card-head"><i class="fas fa-motorcycle"></i> Partner order count</div>
         <div class="chart-card-body"><canvas id="dashPartnerOrders"></canvas></div>
       </div>
+      <div class="chart-card">
+        <div class="chart-card-head"><i class="fas fa-stopwatch"></i> Delivery time distribution</div>
+        <div class="chart-card-body"><canvas id="dashDeliveryTime"></canvas></div>
+      </div>
+      <div class="chart-card chart-card--wide">
+        <div class="chart-card-head"><i class="fas fa-indian-rupee-sign"></i> Revenue by restaurant (₹)</div>
+        <div class="chart-card-body"><canvas id="dashRevenueByRestaurant"></canvas></div>
+      </div>
+      <div class="chart-card chart-card--wide">
+        <div class="chart-card-head"><i class="fas fa-clock"></i> Hourly demand (hour × weekday)</div>
+        <div class="chart-card-body"><div id="dashHourlyHeatmap" class="heatmap-wrap" aria-label="Hourly heatmap"></div></div>
+      </div>
     </div>
   `;
 
   try { await whenChartReady(); } catch (e) { console.warn('[dashboard] Chart.js unavailable:', e.message); }
+  wireRangeControls(root, db);
   await refresh(root, db);
   document.getElementById('dashRefresh').addEventListener('click', async () => {
     const btn = document.getElementById('dashRefresh');
@@ -223,11 +329,72 @@ function kpiSkeleton() {
       </div>
     </div>`;
   return [
-    blank('Orders (30d)',     'fa-receipt'),
-    blank('Revenue (30d)',    'fa-indian-rupee-sign'),
+    blank('Orders',           'fa-receipt'),
+    blank('Revenue',          'fa-indian-rupee-sign'),
     blank('Active partners',  'fa-store'),
     blank('Pending payouts',  'fa-hand-holding-dollar'),
+    blank('Delivery success', 'fa-circle-check'),
+    blank('Repeat share',     'fa-users'),
+    blank('Avg order value',  'fa-basket-shopping'),
+    blank('Payout coverage',  'fa-piggy-bank'),
   ].join('');
+}
+
+function renderRangeControls() {
+  const presets = [
+    ['last7',     'Last 7d'],
+    ['last30',    'Last 30d'],
+    ['last60',    'Last 60d'],
+    ['thisMonth', 'This month'],
+    ['lastMonth', 'Last month'],
+    ['custom',    'Custom'],
+  ];
+  const cur = state.range.preset;
+  const chips = presets.map(([k, l]) =>
+    `<button type="button" class="dash-range-chip${k === cur ? ' is-active' : ''}" data-preset="${k}" aria-pressed="${k === cur}">${l}</button>`
+  ).join('');
+  const fromISO = state.range.from.toISOString().slice(0, 10);
+  // Show `to - 1 day` in the picker so the inclusive-looking end date matches
+  // the exclusive upper bound used internally.
+  const toISO = new Date(state.range.to.getTime() - 86400000).toISOString().slice(0, 10);
+  return `
+    <div class="dash-range-chips" role="group" aria-label="Range preset">${chips}</div>
+    <div class="dash-range-custom" ${cur === 'custom' ? '' : 'hidden'}>
+      <label>From <input type="date" id="dashRangeFrom" value="${fromISO}"></label>
+      <label>To <input type="date" id="dashRangeTo" value="${toISO}"></label>
+    </div>
+  `;
+}
+
+function wireRangeControls(root, db) {
+  const wrap = root.querySelector('#dashRange');
+  if (!wrap) return;
+  wrap.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('.dash-range-chip');
+    if (!btn) return;
+    const preset = btn.dataset.preset;
+    if (preset === state.range.preset) return;
+    if (preset === 'custom') {
+      state.range = normalizeRange({ preset: 'custom',
+        fromISO: state.range.from.toISOString(),
+        toISO:   new Date(state.range.to.getTime() - 86400000).toISOString(),
+      });
+    } else {
+      state.range = normalizeRange({ preset });
+    }
+    saveRangeState();
+    wrap.innerHTML = renderRangeControls();
+    await refresh(root, db);
+  });
+  wrap.addEventListener('change', async (ev) => {
+    if (ev.target.id !== 'dashRangeFrom' && ev.target.id !== 'dashRangeTo') return;
+    const f = document.getElementById('dashRangeFrom').value;
+    const t = document.getElementById('dashRangeTo').value;
+    if (!f || !t) return;
+    state.range = normalizeRange({ preset: 'custom', fromISO: f, toISO: t });
+    saveRangeState();
+    await refresh(root, db);
+  });
 }
 
 async function refresh(root, db) {
@@ -238,9 +405,12 @@ async function refresh(root, db) {
   const chartBodies = root.querySelectorAll('.chart-card-body');
   chartBodies.forEach(el => el.classList.add('is-loading'));
 
-  // Fetch window: orders since the 1st of last month (matches admin Orders +
-  // staff/partners views). Single-field range query → no composite index.
-  const sinceTs = Timestamp.fromDate(startOfLastMonth());
+  // Fetch window: driven by the range picker. Query the widest of {selected
+  // range, last-month-to-now} so KPIs like "MoM revenue" still work when the
+  // user picks a short range like Last 7d.
+  const mom = { from: startOfLastMonth(), to: new Date() };
+  const fetchFrom = state.range.from < mom.from ? state.range.from : mom.from;
+  const sinceTs = Timestamp.fromDate(fetchFrom);
   const [ordersSnap, partnersSnap, staffSnap, rules] = await Promise.all([
     getDocs(query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs))),
     getDocs(collection(db, COL.PARTNERS)),
@@ -248,49 +418,60 @@ async function refresh(root, db) {
     loadFeeRules(db, { autoSeed: true }),
   ]);
 
-  const orders = [];
-  ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+  const ordersAll = [];
+  ordersSnap.forEach(d => ordersAll.push({ id: d.id, ...d.data() }));
   const partners = [];
   partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
   const staff = [];
   staffSnap.forEach(d => staff.push({ uid: d.id, ...d.data() }));
 
-  renderKpis(kpisEl, orders, partners, staff, rules);
+  // Filter to the selected range for every chart/KPI that respects the picker.
+  // MoM KPI + MoM chart use the always-loaded last-month window instead.
+  const range = state.range;
+  const orders = ordersAll.filter(o => {
+    const d = toDateSafe(o.created_at);
+    return d && d >= range.from && d < range.to;
+  });
+
+  renderKpis(kpisEl, orders, ordersAll, partners, staff, rules);
   kpisEl.classList.remove('is-loading');
 
   const p = chartPalette();
   renderOrdersPerDay(orders, p);
   renderRevenuePerDay(orders, p);
-  renderStatusMix(orders, p);
-  renderMonthOverMonth(orders, p);
-  renderTopRestaurants(orders, p);
-  renderTopAreas(orders, p);
-  renderPartnerPayouts(orders, staff, rules, p);
-  renderFarNear(orders, rules, p);
+  renderStatusMix(orders, p, range);
+  renderMonthOverMonth(ordersAll, p);
+  renderTopRestaurants(orders, p, range);
+  renderTopAreas(orders, p, range);
+  renderPartnerPayouts(orders, staff, rules, p, range);
+  renderFarNear(orders, rules, p, range);
   renderCancelRate(orders, p);
   renderAovTrend(orders, p);
   renderRepeatNew(orders, p);
-  renderTopCustomers(orders, p);
-  renderTopItems(orders, p);
+  renderTopCustomers(orders, p, range);
+  renderTopItems(orders, p, range);
   renderDiscountTrend(orders, p);
-  renderPrepaidCod(orders, p);
-  renderDayOfWeek(orders, p);
-  renderPartnerOrders(orders, staff, p);
+  renderPrepaidCod(orders, p, range);
+  renderDayOfWeek(orders, p, range);
+  renderPartnerOrders(orders, staff, p, range);
+  renderDeliveryTime(orders, p);
+  renderRevenueByRestaurant(orders, p, range);
+  renderHourlyHeatmap(orders, p, root);
 
   chartBodies.forEach(el => el.classList.remove('is-loading'));
 }
 
-function renderKpis(el, orders, partners, staff, rules) {
-  // `orders` is already scoped to "since the 1st of last month" (fetch window).
-  const windowLabel = startOfLastMonth().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+function renderKpis(el, orders, ordersAll, partners, staff, rules) {
+  const rangeLabel = state.range.label;
 
   // Orders KPI — delivered count only; total shown in sub-line
   const deliveredOrders = orders.filter(isDelivered);
 
-  // Revenue KPI — current month only with MoM comparison
+  // Revenue KPI — current month vs last month (uses ordersAll — always the
+  // full MoM window regardless of picker selection).
   const curStart = startOfCurrentMonth();
-  const curMonthDelivered  = orders.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) >= curStart);
-  const lastMonthDelivered = orders.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) < curStart);
+  const curMonthDelivered  = ordersAll.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) >= curStart);
+  const lastMonthDelivered = ordersAll.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) < curStart);
   const currentRevenue = curMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
   const lastRevenue    = lastMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
   let revBadge;
@@ -312,13 +493,42 @@ function renderKpis(el, orders, partners, staff, rules) {
   const activePartners = partners.filter(p => p.is_active !== false).length;
   const activeStaff    = staff.filter(s => s.is_active !== false).length;
 
+  // Part B KPIs (respect the range picker).
+  const cancelledCount = orders.filter(isCancelled).length;
+  const successDenom = deliveredOrders.length + cancelledCount;
+  const successPct = successDenom ? Math.round((deliveredOrders.length / successDenom) * 100) : 0;
+
+  // Repeat share — of delivered orders in range, how many belong to customers
+  // who had ≥2 lifetime deliveries within the loaded ordersAll window.
+  const lifetimeDelivered = new Map();
+  for (const o of ordersAll) {
+    if (!isDelivered(o)) continue;
+    const ph = o.customer?.phone;
+    if (!ph) continue;
+    lifetimeDelivered.set(ph, (lifetimeDelivered.get(ph) || 0) + 1);
+  }
+  let repeatN = 0;
+  for (const o of deliveredOrders) {
+    const ph = o.customer?.phone;
+    if (ph && (lifetimeDelivered.get(ph) || 0) >= 2) repeatN++;
+  }
+  const repeatPct = deliveredOrders.length ? Math.round((repeatN / deliveredOrders.length) * 100) : 0;
+
+  const rangeRevenue = deliveredOrders.reduce((s, o) => s + netRevenue(o), 0);
+  const aov = deliveredOrders.length ? Math.round(rangeRevenue / deliveredOrders.length) : 0;
+
+  const paidPayoutTotal = eligibleDeliveries.filter(isPayoutPaid)
+    .reduce((s, o) => s + feeForOrder(o, rules), 0);
+  const payoutTotal = paidPayoutTotal + pendingPayoutTotal;
+  const payoutCoverage = payoutTotal ? Math.round((paidPayoutTotal / payoutTotal) * 100) : 0;
+
   el.innerHTML = `
     <div class="kpi-card">
       <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
       <div class="kpi-body">
         <div class="kpi-label">Orders</div>
         <div class="kpi-value">${deliveredOrders.length}</div>
-        <div class="kpi-sub">${orders.length} total | since ${windowLabel}</div>
+        <div class="kpi-sub">${orders.length} total | ${rangeLabel}</div>
       </div>
     </div>
     <div class="kpi-card">
@@ -343,6 +553,38 @@ function renderKpis(el, orders, partners, staff, rules) {
         <div class="kpi-label">Pending payouts</div>
         <div class="kpi-value">${fmtINR(pendingPayoutTotal)}</div>
         <div class="kpi-sub">${pendingPayoutOrders.length} order${pendingPayoutOrders.length === 1 ? '' : 's'}</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-circle-check"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Delivery success</div>
+        <div class="kpi-value">${successPct}%</div>
+        <div class="kpi-sub">${deliveredOrders.length} delivered / ${cancelledCount} cancelled</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-users"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Repeat share</div>
+        <div class="kpi-value">${repeatPct}%</div>
+        <div class="kpi-sub">${repeatN} of ${deliveredOrders.length} orders</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-basket-shopping"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Avg order value</div>
+        <div class="kpi-value">${fmtINR(aov)}</div>
+        <div class="kpi-sub">${rangeLabel}</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Payout coverage</div>
+        <div class="kpi-value">${payoutCoverage}%</div>
+        <div class="kpi-sub">${fmtINR(paidPayoutTotal)} paid / ${fmtINR(payoutTotal)} total</div>
       </div>
     </div>
   `;
@@ -392,16 +634,27 @@ function renderRevenuePerDay(orders, p) {
   });
 }
 
-function renderStatusMix(orders, p) {
-  const g = groupBy(orders, o => o.status || 'new');
-  const keys = [...g.keys()];
+function renderStatusMix(orders, p, range) {
+  // Grouped bar: for each status, show earlier-period vs later-period counts.
+  // Only terminal statuses are meaningful in retrospective analytics — new /
+  // assigned / out_for_delivery are transient and reflect current in-flight
+  // work rather than what actually happened during the range.
+  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
+  const statusKeys = ['delivered', 'cancelled', 'fake'];
+  const countByStatus = list => statusKeys.map(s => list.filter(o => (o.status || 'new') === s).length);
   mountChart('dashStatusMix', {
-    type: 'doughnut',
+    type: 'bar',
     data: {
-      labels: keys.map(k => k.replace(/_/g, ' ')),
-      datasets: [{ data: keys.map(k => g.get(k).length), backgroundColor: keys.map(k => p.status[k] || p.muted), borderWidth: 0 }],
+      labels: statusKeys.map(k => k.replace(/_/g, ' ')),
+      datasets: [
+        { label: split.earlierLabel, data: countByStatus(split.earlier), backgroundColor: p.muted, borderWidth: 0 },
+        { label: split.laterLabel,   data: countByStatus(split.later),   backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
-    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+    options: {
+      plugins: { legend: { position: 'bottom' } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
   });
 }
 
@@ -467,61 +720,110 @@ function renderMonthOverMonth(orders, p) {
   });
 }
 
-function renderTopRestaurants(orders, p) {
-  const g = groupBy(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown');
-  const top = topN(g, 5);
+// Helper: given a full delivered-orders list, compute Top-N categories then
+// return { labels, earlierCounts, laterCounts } for grouped-bar rendering.
+function topNSplitCounts(delivered, keyFn, n, range, valueFn) {
+  const g = groupBy(delivered, keyFn);
+  const top = topN(g, n, valueFn);
+  const labels = top.map(([k]) => k);
+  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
+  const perKey = list => {
+    const m = new Map();
+    for (const o of list) {
+      const k = keyFn(o);
+      if (k == null || k === '') continue;
+      if (valueFn) m.set(k, (m.get(k) || 0) + valueFn([o]));
+      else m.set(k, (m.get(k) || 0) + 1);
+    }
+    return labels.map(l => m.get(l) || 0);
+  };
+  return { labels, earlier: perKey(split.earlier), later: perKey(split.later), split };
+}
+
+function renderTopRestaurants(orders, p, range) {
+  const r = topNSplitCounts(
+    orders.filter(isDelivered),
+    o => o.restaurant_name || o.restaurant_id || 'Unknown',
+    5, range,
+  );
   mountChart('dashTopRestaurants', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => truncateName(k)),
-      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+      labels: r.labels.map(n => truncateName(n, 10)),
+      datasets: [
+        { label: r.split.earlierLabel, data: r.earlier, backgroundColor: p.muted, borderWidth: 0 },
+        { label: r.split.laterLabel,   data: r.later,   backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: { title: ctx => r.labels[ctx[0].dataIndex] } },
+      },
+      scales: {
+        x: { beginAtZero: true, ticks: { precision: 0 } },
+        y: { ticks: { autoSkip: false, font: { size: 11 } } },
+      },
     },
   });
 }
 
-function renderTopAreas(orders, p) {
-  const g = groupBy(orders.filter(isDelivered), o => o.place || 'Unknown');
-  const top = topN(g, 5);
+function renderTopAreas(orders, p, range) {
+  const r = topNSplitCounts(orders.filter(isDelivered), o => o.place || 'Unknown', 5, range);
   mountChart('dashTopAreas', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => k),
-      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+      labels: r.labels,
+      datasets: [
+        { label: r.split.earlierLabel, data: r.earlier, backgroundColor: p.muted, borderWidth: 0 },
+        { label: r.split.laterLabel,   data: r.later,   backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { display: false } },
+      plugins: { legend: { position: 'bottom' } },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
 }
 
-function renderPartnerPayouts(orders, staff, rules, p) {
-  const byStaff = new Map(staff.map(s => [s.uid, { name: s.name || s.email || s.uid, paid: 0, pending: 0 }]));
-  for (const o of orders) {
-    if (!isDelivered(o)) continue;
-    if (o.payout_applicable === false) continue;
-    const sid = o.delivery_staff_id;
-    if (!sid || !byStaff.has(sid)) continue;
-    const fee = feeForOrder(o, rules);
-    if (isPayoutPaid(o)) byStaff.get(sid).paid += fee;
-    else byStaff.get(sid).pending += fee;
-  }
-  const rows = [...byStaff.values()].filter(r => r.paid || r.pending);
-  rows.sort((a, b) => (b.paid + b.pending) - (a.paid + a.pending));
-  const labels = rows.map(r => r.name);
+function renderPartnerPayouts(orders, staff, rules, p, range) {
+  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
+  const staffMap = new Map(staff.map(s => [s.uid, s.name || s.email || s.uid]));
+  const tally = (list) => {
+    const m = new Map();
+    for (const o of list) {
+      if (!isDelivered(o)) continue;
+      if (o.payout_applicable === false) continue;
+      const sid = o.delivery_staff_id;
+      if (!sid || !staffMap.has(sid)) continue;
+      if (!m.has(sid)) m.set(sid, { paid: 0, pending: 0 });
+      const fee = feeForOrder(o, rules);
+      if (isPayoutPaid(o)) m.get(sid).paid += fee;
+      else m.get(sid).pending += fee;
+    }
+    return m;
+  };
+  const earlier = tally(split.earlier);
+  const later   = tally(split.later);
+  // Union of partners appearing in either period; sort by total spend.
+  const uids = new Set([...earlier.keys(), ...later.keys()]);
+  const rows = [...uids].map(uid => {
+    const e = earlier.get(uid) || { paid: 0, pending: 0 };
+    const l = later.get(uid)   || { paid: 0, pending: 0 };
+    return { uid, name: staffMap.get(uid), e, l, total: e.paid + e.pending + l.paid + l.pending };
+  }).filter(r => r.total > 0).sort((a, b) => b.total - a.total);
+
   mountChart('dashPartnerPayouts', {
     type: 'bar',
     data: {
-      labels,
+      labels: rows.map(r => r.name),
       datasets: [
-        { label: 'Paid',    data: rows.map(r => r.paid),    backgroundColor: p.status.delivered, stack: 'pay', borderWidth: 0 },
-        { label: 'Pending', data: rows.map(r => r.pending), backgroundColor: p.status.cancelled, stack: 'pay', borderWidth: 0 },
+        { label: `${split.earlierLabel} paid`,    data: rows.map(r => r.e.paid),    backgroundColor: p.status.delivered, stack: 'earlier', borderWidth: 0 },
+        { label: `${split.earlierLabel} pending`, data: rows.map(r => r.e.pending), backgroundColor: p.muted,            stack: 'earlier', borderWidth: 0 },
+        { label: `${split.laterLabel} paid`,      data: rows.map(r => r.l.paid),    backgroundColor: p.brand,            stack: 'later',   borderWidth: 0 },
+        { label: `${split.laterLabel} pending`,   data: rows.map(r => r.l.pending), backgroundColor: p.brandSoft,        stack: 'later',   borderWidth: 0 },
       ],
     },
     options: {
@@ -532,20 +834,32 @@ function renderPartnerPayouts(orders, staff, rules, p) {
   });
 }
 
-function renderFarNear(orders, rules, p) {
-  let far = 0, near = 0, farFee = 0, nearFee = 0;
-  for (const o of orders) {
-    if (!isDelivered(o)) continue;
-    const fee = feeForOrder(o, rules);
-    if (isFarPlace(o, rules)) { far++; farFee += fee; } else { near++; nearFee += fee; }
-  }
+function renderFarNear(orders, rules, p, range) {
+  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
+  const count = list => {
+    let far = 0, near = 0;
+    for (const o of list) {
+      if (!isDelivered(o)) continue;
+      if (isFarPlace(o, rules)) far++; else near++;
+    }
+    return [far, near];
+  };
+  const [eF, eN] = count(split.earlier);
+  const [lF, lN] = count(split.later);
   mountChart('dashFarNear', {
-    type: 'doughnut',
+    type: 'bar',
     data: {
-      labels: [`Far (${fmtINR(farFee)})`, `Near (${fmtINR(nearFee)})`],
-      datasets: [{ data: [far, near], backgroundColor: [p.series[3], p.brand], borderWidth: 0 }],
+      labels: ['Far', 'Near'],
+      datasets: [
+        { label: split.earlierLabel, data: [eF, eN], backgroundColor: p.muted, borderWidth: 0 },
+        { label: split.laterLabel,   data: [lF, lN], backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
-    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { position: 'bottom' } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
   });
 }
 
@@ -649,47 +963,63 @@ function renderRepeatNew(orders, p) {
   });
 }
 
-function renderTopCustomers(orders, p) {
-  const g = groupBy(orders.filter(isDelivered), o => {
-    const c = o.customer || {};
-    return c.name || c.phone || '';
-  });
-  const top = topN(g, 5);
+function renderTopCustomers(orders, p, range) {
+  const r = topNSplitCounts(
+    orders.filter(isDelivered),
+    o => { const c = o.customer || {}; return c.name || c.phone || ''; },
+    5, range,
+  );
   mountChart('dashTopCustomers', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => k),
-      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+      labels: r.labels,
+      datasets: [
+        { label: r.split.earlierLabel, data: r.earlier, backgroundColor: p.muted, borderWidth: 0 },
+        { label: r.split.laterLabel,   data: r.later,   backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { display: false } },
+      plugins: { legend: { position: 'bottom' } },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
 }
 
-function renderTopItems(orders, p) {
-  const counts = new Map();
-  for (const o of orders.filter(isDelivered)) {
-    if (!Array.isArray(o.items)) continue;
-    for (const it of o.items) {
-      const name = (it?.name || '').trim();
-      if (!name) continue;
-      const qty = Number(it.qty) || 1;
-      counts.set(name, (counts.get(name) || 0) + qty);
+function renderTopItems(orders, p, range) {
+  const delivered = orders.filter(isDelivered);
+  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
+  const tally = list => {
+    const m = new Map();
+    for (const o of list) {
+      if (!Array.isArray(o.items)) continue;
+      for (const it of o.items) {
+        const name = (it?.name || '').trim();
+        if (!name) continue;
+        const qty = Number(it.qty) || 1;
+        m.set(name, (m.get(name) || 0) + qty);
+      }
     }
-  }
-  const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7);
+    return m;
+  };
+  const eMap = tally(split.earlier);
+  const lMap = tally(split.later);
+  const totals = new Map();
+  for (const [k, v] of eMap) totals.set(k, (totals.get(k) || 0) + v);
+  for (const [k, v] of lMap) totals.set(k, (totals.get(k) || 0) + v);
+  const labels = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7).map(([k]) => k);
   mountChart('dashTopItems', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => k),
-      datasets: [{ label: 'Units sold', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
+      labels,
+      datasets: [
+        { label: split.earlierLabel, data: labels.map(k => eMap.get(k) || 0), backgroundColor: p.muted, borderWidth: 0 },
+        { label: split.laterLabel,   data: labels.map(k => lMap.get(k) || 0), backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { display: false } },
+      plugins: { legend: { position: 'bottom' } },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
@@ -711,43 +1041,130 @@ function renderDiscountTrend(orders, p) {
   });
 }
 
-function renderPrepaidCod(orders, p) {
+function classifyPayment(o) {
+  const method = String(o.paid_method || '').toLowerCase();
+  if (method === 'upi' || method === 'online') return 'prepaid';
+  if (method === 'cash') return 'cod';
+  return (Number(o.paid_already) || 0) > 0 ? 'prepaid' : 'cod';
+}
+
+function renderPrepaidCod(orders, p, range) {
   const delivered = orders.filter(isDelivered);
-  let prepaid = 0, cod = 0;
-  for (const o of delivered) {
-    // Classify by paid_method, not paid_already. After the delivery-partner
-    // patch, every COD order ends up with paid_already > 0 once collected at
-    // the door, so the old paid_already check incorrectly counted COD as
-    // Prepaid. paid_method captures the true channel: cash = COD,
-    // upi/online = Prepaid. Legacy delivered orders without a paid_method
-    // fall back to the paid_already heuristic.
-    const method = String(o.paid_method || '').toLowerCase();
-    if (method === 'upi' || method === 'online') prepaid++;
-    else if (method === 'cash') cod++;
-    else if ((Number(o.paid_already) || 0) > 0) prepaid++;
-    else cod++;
-  }
+  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
+  const tally = list => {
+    let prepaid = 0, cod = 0;
+    for (const o of list) (classifyPayment(o) === 'prepaid' ? prepaid++ : cod++);
+    return [prepaid, cod];
+  };
+  const [eP, eC] = tally(split.earlier);
+  const [lP, lC] = tally(split.later);
   mountChart('dashPrepaidCod', {
-    type: 'doughnut',
+    type: 'bar',
     data: {
       labels: ['Prepaid', 'COD'],
-      datasets: [{ data: [prepaid, cod], backgroundColor: [p.status.delivered, p.brand], borderWidth: 0 }],
+      datasets: [
+        { label: split.earlierLabel, data: [eP, eC], backgroundColor: p.muted, borderWidth: 0 },
+        { label: split.laterLabel,   data: [lP, lC], backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
-    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+    options: {
+      plugins: { legend: { position: 'bottom' } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
   });
 }
 
-function renderDayOfWeek(orders, p) {
+function renderDayOfWeek(orders, p, range) {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const counts = new Array(7).fill(0);
-  for (const o of orders.filter(isDelivered)) {
-    const d = toDateSafe(o.created_at);
-    if (!d) continue;
-    counts[d.getDay()]++;
-  }
+  const delivered = orders.filter(isDelivered);
+  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
+  const tally = list => {
+    const c = new Array(7).fill(0);
+    for (const o of list) {
+      const d = toDateSafe(o.created_at);
+      if (d) c[d.getDay()]++;
+    }
+    return c;
+  };
   mountChart('dashDayOfWeek', {
     type: 'bar',
-    data: { labels: names, datasets: [{ label: 'Orders', data: counts, backgroundColor: p.brand, borderWidth: 0 }] },
+    data: {
+      labels: names,
+      datasets: [
+        { label: split.earlierLabel, data: tally(split.earlier), backgroundColor: p.muted, borderWidth: 0 },
+        { label: split.laterLabel,   data: tally(split.later),   backgroundColor: p.brand, borderWidth: 0 },
+      ],
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+function renderPartnerOrders(orders, staff, p, range) {
+  const staffMap = new Map(staff.map(s => [s.uid, s.name || s.email || s.uid]));
+  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
+  const tally = list => {
+    const m = new Map();
+    for (const o of list) {
+      if (!isDelivered(o)) continue;
+      const sid = o.delivery_staff_id;
+      if (!sid || !staffMap.has(sid)) continue;
+      m.set(sid, (m.get(sid) || 0) + 1);
+    }
+    return m;
+  };
+  const eMap = tally(split.earlier);
+  const lMap = tally(split.later);
+  const uids = new Set([...eMap.keys(), ...lMap.keys()]);
+  const rows = [...uids].map(uid => ({
+    uid, name: staffMap.get(uid),
+    earlier: eMap.get(uid) || 0,
+    later:   lMap.get(uid) || 0,
+  })).filter(r => r.earlier || r.later).sort((a, b) => (b.earlier + b.later) - (a.earlier + a.later));
+
+  mountChart('dashPartnerOrders', {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r.name),
+      datasets: [
+        { label: split.earlierLabel, data: rows.map(r => r.earlier), backgroundColor: p.muted, borderWidth: 0 },
+        { label: split.laterLabel,   data: rows.map(r => r.later),   backgroundColor: p.brand, borderWidth: 0 },
+      ],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { position: 'bottom' } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+// ---------- Part C: new dashboard charts ----------
+
+function renderDeliveryTime(orders, p) {
+  const buckets = [
+    { label: '15-30 m', min: 15,  max: 30 },
+    { label: '30-45 m', min: 30,  max: 45 },
+    { label: '45-60 m', min: 45,  max: 60 },
+    { label: '60-90 m', min: 60,  max: 90 },
+    { label: '90+ m',   min: 90,  max: Infinity },
+  ];
+  const counts = buckets.map(() => 0);
+  for (const o of orders) {
+    if (!isDelivered(o)) continue;
+    const m = minutesBetween(o, 'created_at', 'delivered_at');
+    if (m == null || m < 0) continue;
+    const idx = buckets.findIndex(b => m >= b.min && m < b.max);
+    if (idx >= 0) counts[idx]++;
+  }
+  mountChart('dashDeliveryTime', {
+    type: 'bar',
+    data: {
+      labels: buckets.map(b => b.label),
+      datasets: [{ label: 'Deliveries', data: counts, backgroundColor: p.series, borderWidth: 0 }],
+    },
     options: {
       plugins: { legend: { display: false } },
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
@@ -755,25 +1172,76 @@ function renderDayOfWeek(orders, p) {
   });
 }
 
-function renderPartnerOrders(orders, staff, p) {
-  const byStaff = new Map(staff.map(s => [s.uid, { name: s.name || s.email || s.uid, count: 0 }]));
-  for (const o of orders) {
-    if (!isDelivered(o)) continue;
-    const sid = o.delivery_staff_id;
-    if (!sid || !byStaff.has(sid)) continue;
-    byStaff.get(sid).count++;
-  }
-  const rows = [...byStaff.values()].filter(r => r.count > 0).sort((a, b) => b.count - a.count);
-  mountChart('dashPartnerOrders', {
+function renderRevenueByRestaurant(orders, p, range) {
+  const delivered = orders.filter(isDelivered);
+  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
+  const revBy = list => {
+    const m = new Map();
+    for (const o of list) {
+      const k = o.restaurant_name || o.restaurant_id || 'Unknown';
+      m.set(k, (m.get(k) || 0) + netRevenue(o));
+    }
+    return m;
+  };
+  const eMap = revBy(split.earlier);
+  const lMap = revBy(split.later);
+  const totals = new Map();
+  for (const [k, v] of eMap) totals.set(k, (totals.get(k) || 0) + v);
+  for (const [k, v] of lMap) totals.set(k, (totals.get(k) || 0) + v);
+  const labels = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7).map(([k]) => k);
+  mountChart('dashRevenueByRestaurant', {
     type: 'bar',
     data: {
-      labels: rows.map(r => r.name),
-      datasets: [{ label: 'Deliveries', data: rows.map(r => r.count), backgroundColor: p.series, borderWidth: 0 }],
+      labels: labels.map(n => truncateName(n, 10)),
+      datasets: [
+        { label: split.earlierLabel, data: labels.map(k => Math.round(eMap.get(k) || 0)), backgroundColor: p.muted, borderWidth: 0 },
+        { label: split.laterLabel,   data: labels.map(k => Math.round(lMap.get(k) || 0)), backgroundColor: p.brand, borderWidth: 0 },
+      ],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: { title: ctx => labels[ctx[0].dataIndex], label: ctx => `${ctx.dataset.label}: ${fmtINR(ctx.parsed.x)}` } },
+      },
+      scales: {
+        x: { beginAtZero: true, ticks: { callback: v => '₹' + v } },
+        y: { ticks: { autoSkip: false, font: { size: 11 } } },
+      },
     },
   });
+}
+
+function renderHourlyHeatmap(orders, p, root) {
+  const el = root.querySelector('#dashHourlyHeatmap');
+  if (!el) return;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Restaurants are only open 11:00–21:59, so restrict the heatmap to that
+  // window — the remaining hours are always empty and just add horizontal
+  // scroll noise on mobile.
+  const HOUR_START = 11;
+  const HOUR_END   = 21; // inclusive
+  const hours = Array.from({ length: HOUR_END - HOUR_START + 1 }, (_, i) => HOUR_START + i);
+  const grid = Array.from({ length: 7 }, () => new Array(hours.length).fill(0));
+  let max = 0;
+  for (const o of orders) {
+    const d = toDateSafe(o.created_at);
+    if (!d) continue;
+    const h = d.getHours();
+    if (h < HOUR_START || h > HOUR_END) continue;
+    const col = h - HOUR_START;
+    grid[d.getDay()][col]++;
+    if (grid[d.getDay()][col] > max) max = grid[d.getDay()][col];
+  }
+  const cell = (v) => {
+    const t = max ? v / max : 0;
+    const bg = t === 0 ? 'transparent' : `rgba(255,107,53,${Math.max(0.08, t)})`;
+    return `<div class="hm-cell" style="background:${bg}" title="${v}">${v || ''}</div>`;
+  };
+  const header = ['<div class="hm-corner"></div>', ...hours.map(h => `<div class="hm-hour">${String(h).padStart(2, '0')}</div>`)].join('');
+  const rows = days.map((name, di) => {
+    return `<div class="hm-row"><div class="hm-day">${name}</div>${grid[di].map(cell).join('')}</div>`;
+  }).join('');
+  el.setAttribute('style', `--hm-cols:${hours.length}`);
+  el.innerHTML = `<div class="hm-grid"><div class="hm-header">${header}</div>${rows}</div>`;
 }

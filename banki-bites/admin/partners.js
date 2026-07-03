@@ -99,16 +99,20 @@ async function renderPartnerCharts(db) {
 
   const g = groupBy(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown');
   const top = topN(g, 8);
+  const topNames = top.map(([k]) => k);
 
   mountPartnerChart('partnersOrders', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => truncateName(k)),
+      labels: topNames.map(n => truncateName(n, 10)),
       datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: p.series, borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { title: ctx => topNames[ctx[0].dataIndex] } },
+      },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
@@ -125,14 +129,18 @@ async function renderPartnerCharts(db) {
   });
 
   const sorted = [...partners].sort((a, b) => (+b.rating || 0) - (+a.rating || 0));
+  const ratingNames = sorted.map(x => x.name || '');
   mountPartnerChart('partnersRatings', {
     type: 'bar',
     data: {
-      labels: sorted.map(x => x.name),
+      labels: ratingNames.map(n => truncateName(n, 10)),
       datasets: [{ label: 'Rating', data: sorted.map(x => +x.rating || 0), backgroundColor: p.brand, borderWidth: 0 }],
     },
     options: {
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { title: ctx => ratingNames[ctx[0].dataIndex] } },
+      },
       scales: { y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } }, x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 30 } } },
     },
   });

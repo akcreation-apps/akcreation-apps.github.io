@@ -6,7 +6,7 @@ import { Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-fi
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
   toDateSafe, chartPalette, whenChartReady, fmtINR, wireStatsBlockResize, startOfLastMonth,
-  truncateName,
+  truncateName, isOnTime,
 } from '../analytics.js';
 
 // Note: Creating a Firebase Auth user requires the Admin SDK (server-side) or the
@@ -75,6 +75,10 @@ export async function renderStaff(root, db) {
             <div class="chart-card-head"><i class="fas fa-route"></i> Far (₹40) vs Near (₹30) — orders</div>
             <div class="chart-card-body"><canvas id="staffFarNear"></canvas></div>
           </div>
+          <div class="chart-card">
+            <div class="chart-card-head"><i class="fas fa-clock-rotate-left"></i> On-time % per partner</div>
+            <div class="chart-card-body"><canvas id="staffOnTime"></canvas></div>
+          </div>
         </div>
       </div>
     </details>
@@ -119,6 +123,11 @@ function renderStaffCharts() {
     if (isPayoutPaid(o)) row.paid += fee; else row.pending += fee;
     row.count++;
     if (isFarPlace(o, rules)) row.far++; else row.near++;
+    // On-time metric per partner (delivered_at ≤ eta)
+    row.onTimeD = row.onTimeD || 0;
+    row.onTimeN = row.onTimeN || 0;
+    const ot = isOnTime(o);
+    if (ot !== null) { row.onTimeD++; if (ot) row.onTimeN++; }
   }
   // Resolve staff names from rendered list
   document.querySelectorAll('.staff-card[data-uid]').forEach(el => {
@@ -136,11 +145,18 @@ function renderStaffCharts() {
     const totalPaid = rows.reduce((s, r) => s + r.paid, 0);
     const totalPending = rows.reduce((s, r) => s + r.pending, 0);
     const totalDeliveries = rows.reduce((s, r) => s + r.count, 0);
+    const activePartners = rows.filter(r => r.count > 0).length;
+    const avgPerPartner = activePartners ? Math.round(totalDeliveries / activePartners) : 0;
+    const totalOnTimeN = rows.reduce((s, r) => s + (r.onTimeN || 0), 0);
+    const totalOnTimeD = rows.reduce((s, r) => s + (r.onTimeD || 0), 0);
+    const onTimePct = totalOnTimeD ? Math.round((totalOnTimeN / totalOnTimeD) * 100) : null;
     kpisEl.innerHTML = `
       <div class="kpi-card kpi-card--sm"><div class="kpi-label">Deliveries</div><div class="kpi-value">${totalDeliveries}</div></div>
       <div class="kpi-card kpi-card--sm"><div class="kpi-label">Paid</div><div class="kpi-value">${fmtINR(totalPaid)}</div></div>
       <div class="kpi-card kpi-card--sm"><div class="kpi-label">Pending</div><div class="kpi-value">${fmtINR(totalPending)}</div></div>
       <div class="kpi-card kpi-card--sm"><div class="kpi-label">Total earnings</div><div class="kpi-value">${fmtINR(totalPaid + totalPending)}</div></div>
+      <div class="kpi-card kpi-card--sm"><div class="kpi-label">Avg / partner</div><div class="kpi-value">${avgPerPartner}</div><div class="kpi-sub">${activePartners} active</div></div>
+      <div class="kpi-card kpi-card--sm"><div class="kpi-label">On-time rate</div><div class="kpi-value">${onTimePct == null ? '—' : onTimePct + '%'}</div><div class="kpi-sub">${totalOnTimeN}/${totalOnTimeD}</div></div>
     `;
   }
 
@@ -195,6 +211,27 @@ function renderStaffCharts() {
       indexAxis: 'y',
       plugins: { legend: { position: 'bottom' } },
       scales: { x: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }, y: { stacked: true } },
+    },
+  });
+
+  // On-time % per partner.
+  const otRows = rows
+    .filter(r => r.onTimeD && r.onTimeD > 0)
+    .map(r => ({ name: r.name, pct: Math.round((r.onTimeN / r.onTimeD) * 100), n: r.onTimeN, d: r.onTimeD }))
+    .sort((a, b) => b.pct - a.pct);
+  mountStaffChart('staffOnTime', {
+    type: 'bar',
+    data: {
+      labels: otRows.map(r => r.name),
+      datasets: [{ label: 'On-time %', data: otRows.map(r => r.pct), backgroundColor: p.status.delivered, borderWidth: 0 }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.x}% (${otRows[ctx.dataIndex].n}/${otRows[ctx.dataIndex].d})` } },
+      },
+      scales: { x: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
     },
   });
 }

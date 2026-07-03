@@ -78,6 +78,14 @@ export async function renderCustomers(root, db) {
           <div class="chart-card-head"><i class="fas fa-clock"></i> Activity recency</div>
           <div class="chart-card-body"><canvas id="custRecency"></canvas></div>
         </div>
+        <div class="chart-card">
+          <div class="chart-card-head"><i class="fas fa-chart-column"></i> Lifetime spend distribution</div>
+          <div class="chart-card-body"><canvas id="custLtvDist"></canvas></div>
+        </div>
+        <div class="chart-card chart-card--wide">
+          <div class="chart-card-head"><i class="fas fa-table"></i> Retention cohorts</div>
+          <div class="chart-card-body"><div id="custCohorts" class="cohort-wrap" aria-label="Retention cohorts"></div></div>
+        </div>
       </div>
     </details>
 
@@ -214,6 +222,8 @@ function paint(root, state) {
   renderTopBySpend(state.rows, p);
   renderByArea(state.rows, p);
   renderRecency(state.rows, p);
+  renderLtvDist(state.rows, p);
+  renderCohorts(state.rows, state.orders, p);
 }
 
 function renderKpis(root, { rows }) {
@@ -226,6 +236,12 @@ function renderKpis(root, { rows }) {
   const activeOffers = rows.filter(isOfferActive).length;
   const lifetimeSpend = rows.reduce((s, r) => s + r.spend, 0);
   const avgSpend = withOrders ? Math.round(lifetimeSpend / withOrders) : 0;
+
+  // Churn (60d) — of customers with any orders, how many haven't ordered in
+  // the last 60 days (or never — treated as churned).
+  const sixtyDaysAgo = today.getTime() - 60 * 86400000;
+  const churnedN = rows.filter(r => r.orders > 0 && (!r.lastOrder || r.lastOrder.getTime() < sixtyDaysAgo)).length;
+  const churnPct = withOrders ? Math.round((churnedN / withOrders) * 100) : 0;
 
   const el = document.getElementById('custKpis');
   el.innerHTML = `
@@ -259,6 +275,14 @@ function renderKpis(root, { rows }) {
         <div class="kpi-label">Active offers</div>
         <div class="kpi-value">${activeOffers}</div>
         <div class="kpi-sub">unredeemed thank-you offers</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-user-clock"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Churn (60d)</div>
+        <div class="kpi-value">${churnPct}%</div>
+        <div class="kpi-sub">${churnedN} of ${withOrders} inactive 60d+</div>
       </div>
     </div>
   `;
@@ -450,6 +474,104 @@ function renderRecency(rows, p) {
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
+}
+
+function renderLtvDist(rows, p) {
+  const buckets = [
+    { label: '₹0-200',    min: 0,     max: 200 },
+    { label: '₹200-500',  min: 200,   max: 500 },
+    { label: '₹500-1k',   min: 500,   max: 1000 },
+    { label: '₹1k-2k',    min: 1000,  max: 2000 },
+    { label: '₹2k-5k',    min: 2000,  max: 5000 },
+    { label: '₹5k+',      min: 5000,  max: Infinity },
+  ];
+  const counts = buckets.map(() => 0);
+  for (const r of rows) {
+    if (!(r.spend > 0)) continue;
+    const idx = buckets.findIndex(b => r.spend >= b.min && r.spend < b.max);
+    if (idx >= 0) counts[idx]++;
+  }
+  mountChart('custLtvDist', {
+    type: 'bar',
+    data: {
+      labels: buckets.map(b => b.label),
+      datasets: [{ label: 'Customers', data: counts, backgroundColor: p.series, borderWidth: 0 }],
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+function renderCohorts(rows, orders, /* p */ _p) {
+  // Cohort by acquisition month (customer's first delivered order). Then for
+  // each subsequent month M+1..M+3, % of cohort who placed at least one
+  // delivered order.
+  const el = document.getElementById('custCohorts');
+  if (!el) return;
+
+  const firstDeliv = new Map(); // phone -> Date of first delivered order
+  const activityByMonth = new Map(); // phone -> Set of 'YYYY-MM' keys
+  for (const o of orders) {
+    if (!isDelivered(o)) continue;
+    const ph = o.customer?.phone;
+    if (!ph) continue;
+    const d = toDateSafe(o.created_at);
+    if (!d) continue;
+    const cur = firstDeliv.get(ph);
+    if (!cur || d < cur) firstDeliv.set(ph, d);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!activityByMonth.has(ph)) activityByMonth.set(ph, new Set());
+    activityByMonth.get(ph).add(key);
+  }
+
+  // Cohorts = last 6 months of acquisition (older cohorts fall off the table).
+  const ref = new Date(); ref.setDate(1); ref.setHours(0, 0, 0, 0);
+  const cohorts = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(ref.getFullYear(), ref.getMonth() - i, 1);
+    cohorts.push({
+      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+      label: d.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }),
+      date: d,
+      phones: [],
+    });
+  }
+  const byKey = new Map(cohorts.map(c => [c.key, c]));
+  for (const [ph, d] of firstDeliv) {
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (byKey.has(key)) byKey.get(key).phones.push(ph);
+  }
+
+  const offsets = [0, 1, 2, 3];
+  // Anchor for "future" detection — the current calendar month.
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const header = `<div class="cohort-header"><div class="cohort-cell cohort-head">Cohort</div><div class="cohort-cell cohort-head">Size</div>${offsets.map(o => `<div class="cohort-cell cohort-head">M+${o}</div>`).join('')}</div>`;
+  const rowsHtml = cohorts.map(c => {
+    const size = c.phones.length;
+    const cells = offsets.map(o => {
+      const target = new Date(c.date.getFullYear(), c.date.getMonth() + o, 1);
+      const targetKey = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, '0')}`;
+      // Future months haven't happened yet — show em-dash so users don't read
+      // an empty "0%" as poor retention.
+      if (target > thisMonthStart) return `<div class="cohort-cell cohort-future" title="Not yet reached">—</div>`;
+      if (!size) return `<div class="cohort-cell" style="background:transparent">—</div>`;
+      const returned = c.phones.filter(ph => activityByMonth.get(ph)?.has(targetKey)).length;
+      const pct = Math.round((returned / size) * 100);
+      const alpha = Math.max(0.08, pct / 100);
+      const bg = pct === 0 ? 'transparent' : `rgba(255,107,53,${alpha})`;
+      // The current calendar month is partial — flag it in the tooltip so
+      // users know the % will still climb.
+      const inProgress = target.getTime() === thisMonthStart.getTime();
+      const tooltip = `${returned} of ${size}${inProgress ? ' — month in progress' : ''}`;
+      const marker = inProgress ? '*' : '';
+      return `<div class="cohort-cell${inProgress ? ' cohort-partial' : ''}" style="background:${bg}" title="${tooltip}">${pct}%${marker}</div>`;
+    }).join('');
+    return `<div class="cohort-row"><div class="cohort-cell cohort-label">${c.label}</div><div class="cohort-cell">${size}</div>${cells}</div>`;
+  }).join('');
+  el.innerHTML = `<div class="cohort-grid">${header}${rowsHtml}<div class="cohort-note">* current month, still counting</div></div>`;
 }
 
 function escapeHtml(s) {
