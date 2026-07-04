@@ -18,7 +18,8 @@ function mountPartnerChart(id, config) {
 const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
   opening_hour: '08', closing_hour: '22', address: '', point_of_contact: '',
-  is_active: true, sort_order: 0, sync_collection: '', sync_doc_id: '',
+  is_active: true, is_veg: false, is_homemade: false, is_separate_price: false,
+  sort_order: 0, sync_collection: '', sync_doc_id: '',
 };
 
 async function syncToPartnerAdmin(db, syncCollection, syncDocId, updates) {
@@ -336,6 +337,18 @@ async function openEditor(db, existing, root) {
         <input class="form-check-input" type="checkbox" id="paIsActive" name="is_active" ${p.is_active ? 'checked' : ''}>
         <label class="form-check-label" for="paIsActive">Active (visible on public page)</label>
       </div>
+      <div class="form-group form-check">
+        <input class="form-check-input" type="checkbox" id="paIsVeg" name="is_veg" ${p.is_veg ? 'checked' : ''}>
+        <label class="form-check-label" for="paIsVeg">Pure Veg (serves only vegetarian food)</label>
+      </div>
+      <div class="form-group form-check">
+        <input class="form-check-input" type="checkbox" id="paIsHomemade" name="is_homemade" ${p.is_homemade ? 'checked' : ''}>
+        <label class="form-check-label" for="paIsHomemade">Home Made (food prepared at home kitchen)</label>
+      </div>
+      <div class="form-group form-check">
+        <input class="form-check-input" type="checkbox" id="paIsSeparatePrice" name="is_separate_price" ${p.is_separate_price ? 'checked' : ''}>
+        <label class="form-check-label" for="paIsSeparatePrice">Separate Pricing (prices may differ from platform average)</label>
+      </div>
       <details class="mt-2">
         <summary class="text-muted" style="font-size:.85em;cursor:pointer">Advanced (admin panel sync)</summary>
         <div class="form-row mt-2">
@@ -381,6 +394,9 @@ async function openEditor(db, existing, root) {
         address: fd.get('address').trim(),
         point_of_contact: pocRaw ? normalisePhone(pocRaw) : '',
         is_active: f.querySelector('#paIsActive').checked,
+        is_veg: f.querySelector('#paIsVeg').checked,
+        is_homemade: f.querySelector('#paIsHomemade').checked,
+        is_separate_price: f.querySelector('#paIsSeparatePrice').checked,
         sync_collection: (fd.get('sync_collection') || '').trim(),
         sync_doc_id: (fd.get('sync_doc_id') || '').trim(),
       };

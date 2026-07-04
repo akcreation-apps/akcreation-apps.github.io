@@ -325,12 +325,12 @@
     /* ── Grid (uniform card height across rows) ── */
     .grid {
       max-width: 1200px; margin: 0 auto;
-      padding: 20px 20px 60px;
+      padding: 12px 14px 60px;
       display: grid;
       grid-template-columns: 1fr;
-      grid-auto-rows: max-content;
+      grid-auto-rows: 1fr;
       align-content: start;
-      gap: 16px;
+      gap: 10px;
     }
 
     /* ── Restaurant Card (one-tap link) ── */
@@ -342,7 +342,8 @@
       transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
       text-decoration: none; color: inherit;
       display: flex; flex-direction: column;
-      align-self: start;
+      align-self: stretch;
+      min-height: 108px;
     }
     .rest-card:hover, .rest-card:focus-visible {
       box-shadow: 0 8px 32px rgba(255,107,53,0.14);
@@ -350,20 +351,20 @@
       border-color: var(--primary);
       outline: none;
     }
-    .card-inner { display: flex; align-items: center; gap: 12px; padding: 12px 14px; flex: 1; }
+    .card-inner { display: flex; align-items: center; gap: 10px; padding: 8px 12px; flex: 1; }
     .card-logo {
-      width: 52px; height: 52px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       object-fit: cover; flex-shrink: 0;
       border: 2px solid var(--border);
     }
     .card-logo-skeleton {
-      width: 52px; height: 52px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       background: linear-gradient(90deg, #f0e6de 25%, #ffe8db 50%, #f0e6de 75%);
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite; flex-shrink: 0;
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
     .card-name {
       font-size: 0.92rem; font-weight: 700; color: var(--text);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -389,6 +390,30 @@
     }
     @media (prefers-color-scheme: dark) {
       .tag { background: rgba(255,107,53,0.12); border-color: rgba(255,107,53,0.25); }
+    }
+    .tag-veg {
+      background: #eafbe7; color: #0a7f2e;
+      border-color: rgba(10,127,46,0.25);
+    }
+    .tag-veg::before {
+      content: ''; display: inline-block; width: 8px; height: 8px;
+      margin-right: 4px; vertical-align: middle;
+      background: #0a7f2e; border: 1px solid #0a7f2e;
+      box-shadow: inset 0 0 0 1px #eafbe7;
+    }
+    .tag-homemade {
+      background: #dcfce7; color: #15803d;
+      border-color: rgba(21,128,61,0.2);
+    }
+    .tag-separate-price {
+      background: #fff8e1; color: #7a4a00;
+      border-color: #ffe1a1;
+    }
+    @media (prefers-color-scheme: dark) {
+      .tag-veg { background: rgba(34,197,94,0.16); color: #4ADE80; border-color: rgba(34,197,94,0.25); }
+      .tag-veg::before { background: #4ADE80; border-color: #4ADE80; box-shadow: inset 0 0 0 1px rgba(34,197,94,0.16); }
+      .tag-homemade { background: rgba(34,197,94,0.16); color: #4ADE80; border-color: rgba(34,197,94,0.25); }
+      .tag-separate-price { background: rgba(255,193,7,0.16); color: #FBBF24; border-color: rgba(255,193,7,0.25); }
     }
     .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow: hidden; }
     .rating { display: inline-flex; align-items: center; gap: 3px; font-size: 0.74rem; font-weight: 700; color: var(--text); flex-shrink: 0; }
@@ -418,9 +443,9 @@
     }
     .card-cta {
       border-top: 1px solid var(--border);
-      padding: 7px 14px;
+      padding: 5px 12px;
       display: flex; align-items: center; justify-content: space-between;
-      font-size: 0.72rem; font-weight: 700; color: var(--primary);
+      font-size: 0.7rem; font-weight: 700; color: var(--primary);
     }
     .card-cta i { transition: transform 0.2s; }
     .rest-card:hover .card-cta i, .rest-card:focus-visible .card-cta i { transform: translateX(4px); }
@@ -479,9 +504,11 @@
 
     @media (min-width: 640px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
+      .rest-card { min-height: 120px; }
     }
     @media (min-width: 960px) {
       .grid { grid-template-columns: repeat(3, 1fr); }
+      .rest-card { min-height: 132px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -685,6 +712,7 @@
               ${logo}
               <div class="card-body">
                 <div class="card-name">${escapeHtml(p.name)}</div>
+                ${(p.is_veg || p.is_homemade || p.is_separate_price) ? `<div class="card-tags card-flags">${p.is_veg ? `<span class="tag tag-veg">Pure Veg</span>` : ''}${p.is_homemade ? `<span class="tag tag-homemade"><i class="fas fa-house-user"></i> Home Made</span>` : ''}${p.is_separate_price ? `<span class="tag tag-separate-price"><i class="fas fa-tag"></i> Separate Pricing</span>` : ''}</div>` : ''}
                 ${services.length ? `<div class="card-tags">${services.map(s => `<span class="tag">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
                 <div class="card-meta">
                   ${showRating ? `<span class="rating"><i class="fas fa-star" aria-hidden="true"></i>${escapeHtml(p.rating)} <span>/ 5</span></span>` : ''}
