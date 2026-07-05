@@ -346,7 +346,16 @@ function calculateTotal(cartItems, message) {
             deliveryNote = `\n(₹${DELIVERY_CHARGES} delivery charge applied for orders below ₹${MINIMUM_ORDER_PRICE})`;
         }
         const placeNote = place ? `\nDelivering at: ${place}` : '';
-        message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Cash On Delivery\n\n`;
+        const etaMins = (typeof RESTAURANT !== 'undefined' && Number(RESTAURANT.etaMinutes)) || 60;
+        let etaNote = '';
+        try {
+            const etaClock = new Date(Date.now() + etaMins * 60 * 1000)
+                .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+            etaNote = `\nETA: ~${etaMins} min (${etaClock})`;
+        } catch (e) {
+            etaNote = `\nETA: ~${etaMins} min`;
+        }
+        message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Prepaid${etaNote}\n\n`;
         message += `*Note: If your order remains unseen for 5 mins, please call us.*`;
     } else {
         message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}\nTable Number: ${table}`;
