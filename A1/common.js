@@ -60,6 +60,22 @@ function store_data(){
     }
 }
 
+// Sorts the place-chip buttons inside the modal alphabetically by their
+// visible label, while keeping the "Other" chip pinned as the last option.
+// Idempotent — safe to call every time the picker opens.
+function sortPlaceChips() {
+    const grid = document.getElementById('placeOptionsList');
+    if (!grid) return;
+    const chips = Array.from(grid.querySelectorAll('.place-chip'));
+    chips.sort((a, b) => {
+        const aOther = a.classList.contains('other-chip');
+        const bOther = b.classList.contains('other-chip');
+        if (aOther !== bOther) return aOther ? 1 : -1;
+        return (a.dataset.value || '').localeCompare(b.dataset.value || '', undefined, { sensitivity: 'base' });
+    });
+    chips.forEach(chip => grid.appendChild(chip));
+}
+
 // Opens the place picker modal. Optionally pre-selects `currentPlace`.
 // Tapping a chip closes immediately; "Other" reveals an inline input+tick.
 // dismissible=true allows Escape/overlay-click to close (used for the "Change" flow).
@@ -69,6 +85,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
     return new Promise(resolve => {
         const modal = document.getElementById('placeModal');
         const titleEl = document.getElementById('placeModalTitle');
+        sortPlaceChips();
         const options = modal.querySelectorAll('.place-chip');
         const otherWrapper = document.getElementById('placeOtherWrapper');
         const otherInput = document.getElementById('placeOtherInput');
