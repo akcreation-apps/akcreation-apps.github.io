@@ -1150,3 +1150,118 @@ a:hover { text-decoration: underline; }
   }
   .btn-an:hover, .btn-google:hover, .header-book-btn:hover { transform: none !important; }
 }
+
+/* ───────── Referral detail popup ───────── */
+.rf-popup {
+  border: 1px solid var(--border-hi) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45) !important;
+}
+.rf-popup__body { padding: 0 !important; margin: 0 !important; }
+.rf-detail { text-align: left; padding: 4px 4px 8px; }
+.rf-detail__head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 6px 4px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.rf-detail__avatar {
+  width: 48px; height: 48px; flex: 0 0 48px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  border: 1px solid rgba(245,166,35,0.30);
+}
+.rf-detail__title { min-width: 0; }
+.rf-detail__name {
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  font-weight: 700; font-size: 20px; line-height: 1.2;
+  color: var(--text, #f4ede1);
+  word-break: break-word;
+}
+.rf-detail__sub {
+  font-size: 12px; color: var(--muted, #948b7e);
+  letter-spacing: 0.02em; text-transform: uppercase; margin-top: 2px;
+}
+.rf-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 18px;
+}
+.rf-stat {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+.rf-stat__label {
+  font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--muted, #948b7e); margin-bottom: 4px;
+}
+.rf-stat__value {
+  font-size: 17px; font-weight: 700; color: var(--text, #f4ede1);
+  font-variant-numeric: tabular-nums;
+}
+.rf-stat--paid {
+  border-color: rgba(34,197,94,0.35);
+  background: rgba(34,197,94,0.06);
+}
+.rf-stat--paid .rf-stat__value { color: #4ade80; }
+.rf-stat--pending {
+  border-color: rgba(239,68,68,0.35);
+  background: rgba(239,68,68,0.06);
+}
+.rf-stat--pending .rf-stat__value { color: #f87171; }
+.rf-detail__section {
+  margin: 0 0 10px;
+  font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted, #948b7e); font-weight: 600;
+}
+.rf-detail__list {
+  display: flex; flex-direction: column; gap: 8px;
+  max-height: 52vh; overflow: auto;
+  padding-right: 4px;
+}
+.rf-detail__list .row-card { margin: 0; }
+.rf-detail__list::-webkit-scrollbar { width: 8px; }
+.rf-detail__list::-webkit-scrollbar-thumb {
+  background: var(--border-hi); border-radius: 4px;
+}
+
+@media (max-width: 560px) {
+  .rf-stats { grid-template-columns: repeat(2, 1fr); }
+  .rf-detail__name { font-size: 18px; }
+}
+
+/* Compact booking rows inside the referral popup */
+.rf-detail__list .row-card {
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12.5px;
+}
+.rf-detail__list .row-card .row-top {
+  margin-bottom: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.rf-detail__list .row-card .row-top strong { font-size: 13px; }
+.rf-detail__list .row-card .row-meta {
+  display: flex; flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 12px; line-height: 1.35;
+}
+.rf-detail__list .row-card .row-meta > div { margin: 0; }
+.rf-detail__list .row-card .row-meta b {
+  font-weight: 600; color: var(--muted, #948b7e);
+  margin-right: 3px;
+}
+.rf-detail__list .row-card .chip {
+  padding: 2px 8px; font-size: 10.5px; line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .rf-detail__list .row-card { padding: 7px 9px; font-size: 12px; }
+  .rf-detail__list .row-card .row-top strong { font-size: 12.5px; }
+}

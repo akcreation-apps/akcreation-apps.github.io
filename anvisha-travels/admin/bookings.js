@@ -117,6 +117,7 @@ function renderRow(b) {
       ${allocated}
       ${b.fare ? `<div><b>Fare</b> ₹${escapeHtml(String(b.fare))}${b.paid ? ' · paid' : ''}</div>` : ''}
       ${b.fuel ? `<div><b>Fuel</b> ${escapeHtml(b.fuel.type || '—')} · ${b.fuel.qty != null ? escapeHtml(String(b.fuel.qty)) + ' · ' : ''}₹${escapeHtml(String(b.fuel.cost ?? 0))}</div>` : ''}
+      ${b.referral ? `<div><b>Referral</b> ${escapeHtml(b.referral)}</div>` : ''}
       <div><b>Source</b> ${escapeHtml(b.source || 'web')}</div>
       <div><b>Received</b> ${escapeHtml(fmtDateTime(b.createdAt))}</div>
     </div>
@@ -420,6 +421,34 @@ async function loadAllCustomers(db) {
 // Cached places for the booking modal — primary source is the shared
 // anvisha_meta/places registry (visible to both admin + driver). Falls back
 // to scanning trips+bookings the admin has read access to.
+// Cached referral names — shared registry at anvisha_meta/referrals with a
+// `list` array. Booking form autocomplete pulls from here, and each save
+// arrayUnions the entered name back so it appears next time.
+let _referralsCache = null;
+export async function loadReferrals(db) {
+  if (_referralsCache) return _referralsCache;
+  const set = new Set();
+  const norm = s => String(s || '').trim();
+  try {
+    const meta = await getDoc(doc(db, COL.META, 'referrals'));
+    if (meta.exists()) {
+      const list = meta.data().list || [];
+      list.forEach(p => { const n = norm(p); if (n) set.add(n); });
+    }
+  } catch (_) { /* swallow */ }
+  // Fall back to scanning bookings so day-one still shows suggestions.
+  try {
+    const snap = await getDocs(collection(db, COL.BOOKINGS));
+    snap.forEach(d => {
+      const r = norm((d.data() || {}).referral);
+      if (r) set.add(r);
+    });
+  } catch (_) { /* swallow */ }
+  _referralsCache = Array.from(set).sort((a, b) => a.localeCompare(b));
+  return _referralsCache;
+}
+function bustReferralsCache() { _referralsCache = null; }
+
 let _bookingPlacesCache = null;
 async function loadAllPlacesForBookingModal(db) {
   if (_bookingPlacesCache) return _bookingPlacesCache;
@@ -546,6 +575,10 @@ export async function openBookingModal(db, existing) {
           <input id="bm-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 4.5" value="${b.fuel && b.fuel.qty != null ? escapeAttr(String(b.fuel.qty)) : ''}">
         </div>
       </div>
+      <div class="f-group mb-12" style="position:relative;">
+        <label class="f-label" for="bm-referral">Referral <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+        <input id="bm-referral" type="text" class="f-input" value="${escapeAttr(b.referral || '')}" placeholder="Who referred this booking?" autocomplete="off">
+      </div>
     </form>
   `;
   const r = await Swal.fire({
@@ -570,6 +603,11 @@ export async function openBookingModal(db, existing) {
         // Pull places from trips + bookings; same loader as trips.js but
         // duplicated to avoid a cross-module dep cycle.
         loadAllPlacesForBookingModal(db).then(places => wirePlaceAutocomplete(destEl, places));
+      }
+      // Referral autocomplete — reuses the places-style dropdown wiring.
+      const refEl = document.getElementById('bm-referral');
+      if (refEl) {
+        loadReferrals(db).then(names => wirePlaceAutocomplete(refEl, names));
       }
 
       function applyCustomer(c) {
@@ -648,6 +686,7 @@ export async function openBookingModal(db, existing) {
         return false;
       }
       const fuel = (fcost == null) ? null : { type: ftype || null, qty: fqty, cost: fcost };
+      const referral = document.getElementById('bm-referral').value.trim() || null;
       return {
         date, time, passengers: pax,
         destination: document.getElementById('bm-dest').value.trim() || null,
@@ -660,6 +699,7 @@ export async function openBookingModal(db, existing) {
         fare,
         paid,
         fuel,
+        referral,
       };
     },
   });
@@ -678,6 +718,16 @@ export async function openBookingModal(db, existing) {
     }
     // Auto-upsert customer
     try { await upsertCustomerFromBooking(db, r.value.customer, savedId); } catch (_) { /* non-blocking */ }
+    // Register the referral so it appears in autocomplete next time.
+    if (r.value.referral) {
+      try {
+        await setDoc(doc(db, COL.META, 'referrals'), {
+          list: arrayUnion(String(r.value.referral).trim()),
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+        bustReferralsCache();
+      } catch (_) { /* swallow */ }
+    }
     // Register the destination so it appears in everyone's autocomplete.
     if (r.value.destination) {
       try {

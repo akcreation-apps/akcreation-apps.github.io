@@ -53,6 +53,14 @@ export async function renderDashboard(ctx) {
         <h3>Driver leaderboard (trips)</h3>
         <div class="chart-canvas-wrap" style="height:300px;"><canvas id="ch-drivers" aria-label="Driver leaderboard horizontal bar chart"></canvas></div>
       </div>
+      <div class="chart-block">
+        <h3>Referral by Qty</h3>
+        <div class="chart-canvas-wrap" style="height:300px;"><canvas id="ch-ref-qty" aria-label="Referrals by booking count"></canvas></div>
+      </div>
+      <div class="chart-block">
+        <h3>Referral by Value (₹)</h3>
+        <div class="chart-canvas-wrap" style="height:300px;"><canvas id="ch-ref-val" aria-label="Referrals by total fare value"></canvas></div>
+      </div>
     </div>
   `;
 
@@ -275,6 +283,44 @@ export async function renderDashboard(ctx) {
         data: {
           labels: top.map(x => x[0]),
           datasets: [{ label: 'Trips', data: top.map(x => x[1]), backgroundColor: palette[3] }],
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
+      }));
+    }
+
+    // ── Referral by Qty ──
+    {
+      const counts = new Map();
+      bkInRange.forEach(b => {
+        const k = String(b.referral || '').trim();
+        if (!k) return;
+        counts.set(k, (counts.get(k) || 0) + 1);
+      });
+      const top = topN(counts, 10);
+      charts.push(new Chart(panel.querySelector('#ch-ref-qty'), {
+        type: 'bar',
+        data: {
+          labels: top.map(x => x[0]),
+          datasets: [{ label: 'Bookings', data: top.map(x => x[1]), backgroundColor: palette[5] }],
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
+      }));
+    }
+
+    // ── Referral by Value (₹) ──
+    {
+      const sums = new Map();
+      bkInRange.forEach(b => {
+        const k = String(b.referral || '').trim();
+        if (!k) return;
+        sums.set(k, (sums.get(k) || 0) + Number(b.fare || 0));
+      });
+      const top = topN(sums, 10);
+      charts.push(new Chart(panel.querySelector('#ch-ref-val'), {
+        type: 'bar',
+        data: {
+          labels: top.map(x => x[0]),
+          datasets: [{ label: 'Fare ₹', data: top.map(x => x[1]), backgroundColor: palette[6] }],
         },
         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
       }));

@@ -11,6 +11,7 @@ import { renderCustomers } from './customers.js';
 import { renderDrivers }   from './drivers.js';
 import { renderExpenses }  from './expenses.js';
 import { renderBroadcast } from './broadcast.js';
+import { renderReferrals } from './referrals.js';
 
 const APP_NAME = 'anvisha-admin';
 const getDb = () => getDbBase(APP_NAME);
@@ -40,6 +41,7 @@ const ADMIN_TABS = [
   { key: 'expenses',   label: 'Expenses',   icon: 'fa-receipt',     render: renderExpenses },
   { key: 'customers',  label: 'Customers',  icon: 'fa-users',       render: renderCustomers },
   { key: 'drivers',    label: 'Drivers',    icon: 'fa-id-card',     render: renderDrivers },
+  { key: 'referrals',  label: 'Referrals',  icon: 'fa-user-tag',    render: renderReferrals },
   { key: 'broadcast',  label: 'Broadcast',  icon: 'fa-bullhorn',    render: renderBroadcast },
 ];
 
