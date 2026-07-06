@@ -25,7 +25,12 @@ function mountOrderChart(id, config) {
 }
 
 const STATUSES = ['new', 'assigned', 'out_for_delivery', 'delivered', 'cancelled', 'fake'];
-const ETA_MINUTES_FROM_ASSIGN = 45;
+// When the admin expands an order card that has no ETA yet, the ETA input is
+// auto-prefilled to now + this many minutes so the admin has a sensible
+// starting point they can accept, edit, or bump via the +5/+10 shortcuts.
+// No ETA is written to Firestore until the admin explicitly saves.
+const ETA_MINUTES_PREFILL_ON_EXPAND = 35;
+const ETA_QUICK_BUMPS = [5, 10];
 
 function formatEta(ts) {
   if (!ts?.toDate) return '';
@@ -483,7 +488,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         <label class="field">
           <span class="field-label"><i class="fas fa-clock"></i> ETA</span>
           <input class="form-control form-control-sm" type="datetime-local" data-f="eta" value="${etaInputValue}">
-          <small class="text-muted">Blank = auto +${ETA_MINUTES_FROM_ASSIGN} min after assignment.</small>
+          <div class="eta-bumps" data-el="etaBumps" role="group" aria-label="Bump ETA">
+            ${ETA_QUICK_BUMPS.map(m => `<button type="button" class="eta-bump-btn" data-eta-bump="${m}" aria-label="Add ${m} minutes to ETA">+${m}</button>`).join('')}
+          </div>
+          <small class="text-muted">Auto-prefills to +${ETA_MINUTES_PREFILL_ON_EXPAND} min on first expand. Edit or tap +${ETA_QUICK_BUMPS.join(' / +')} to bump.</small>
         </label>
       </div>
       <label class="toggle payout-toggle">
@@ -602,6 +610,36 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   // auto-recompute stops touching that field for this session (sticky override).
   const paymentToggle = card.querySelector('[data-f="payment"]');
   const billingBox    = card.querySelector('[data-el="billingBlock"]');
+
+  // ── ETA prefill on first expand + quick-bump shortcuts ───────────────
+  // ETA is never auto-written to Firestore on assign anymore. Instead:
+  //   1. When the admin expands a card that has no ETA and no typed value,
+  //      pre-fill the datetime-local input with now + ETA_MINUTES_PREFILL_ON_EXPAND
+  //      so they can accept-as-is by hitting Save, or fine-tune first.
+  //   2. Tapping a +N chip adds N minutes to whatever is currently in the
+  //      input (falling back to "now" when blank).
+  const etaInput   = card.querySelector('[data-f="eta"]');
+  const etaBumpBox = card.querySelector('[data-el="etaBumps"]');
+  if (etaInput) {
+    card.addEventListener('toggle', () => {
+      if (!card.open) return;
+      if (etaInput.value) return;         // admin already typed something
+      if (o.eta?.toDate) return;          // order already has a stored ETA
+      etaInput.value = toLocalInputValue(new Date(Date.now() + ETA_MINUTES_PREFILL_ON_EXPAND * 60 * 1000));
+    });
+    if (etaBumpBox) {
+      etaBumpBox.addEventListener('click', e => {
+        const btn = e.target.closest('[data-eta-bump]');
+        if (!btn) return;
+        e.preventDefault();
+        const bump = parseInt(btn.dataset.etaBump, 10);
+        if (!Number.isFinite(bump)) return;
+        const base = etaInput.value ? new Date(etaInput.value).getTime() : Date.now();
+        if (!Number.isFinite(base)) return;
+        etaInput.value = toLocalInputValue(new Date(base + bump * 60 * 1000));
+      });
+    }
+  }
 
   // Show/hide the manual courier-payout input in lockstep with the
   // "Partner earns for this order" toggle so it can't be edited when the
@@ -1087,22 +1125,15 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     }
     if (staffId && !o.assigned_at) patch.assigned_at = Timestamp.now();
 
-    // ETA rules:
-    //  1. Transitioning into 'assigned' always overwrites ETA to now + 45 min
-    //     so every freshly-assigned order has a fresh delivery clock — the
-    //     admin can fine-tune from the datetime input afterwards.
-    //  2. Otherwise the user-typed datetime wins.
-    //  3. Otherwise, if a staff is being attached for the first time and no
-    //     ETA exists yet, fall back to the same now + 45 min auto-set.
+    // ETA is admin-controlled: whatever is in the datetime-local input at Save
+    // time gets written, and only then. There is no auto-set on assignment or
+    // staff-attach anymore — the input is pre-filled to now + 35 min when the
+    // card is first expanded (see the `toggle` handler above), so the admin
+    // sees a starting value they can accept, edit, or bump via +5/+10 chips.
     const etaInputValue = card.querySelector('[data-f="eta"]').value;
-    const justAssigned = newStatus === 'assigned' && o.status !== 'assigned';
-    if (justAssigned) {
-      patch.eta = Timestamp.fromMillis(Date.now() + ETA_MINUTES_FROM_ASSIGN * 60 * 1000);
-    } else if (etaInputValue) {
+    if (etaInputValue) {
       const ms = new Date(etaInputValue).getTime();
       if (!Number.isNaN(ms)) patch.eta = Timestamp.fromMillis(ms);
-    } else if (staffId && !o.eta) {
-      patch.eta = Timestamp.fromMillis(Date.now() + ETA_MINUTES_FROM_ASSIGN * 60 * 1000);
     }
 
     if (newStatus === 'delivered' && !o.delivered_at) patch.delivered_at = Timestamp.now();

@@ -2658,3 +2658,44 @@ button.fab:hover { background: var(--brand-dark); }
 @media (prefers-color-scheme: dark) {
   .cohort-cell { color: #e5e7eb; background: rgba(255, 255, 255, 0.05); }
 }
+
+/* ── ETA quick-bump chips ─────────────────────────────────────────────
+ * Tiny "+5" / "+10" pills that sit under the ETA datetime input. Each tap
+ * adds N minutes to the current value (or "now" when blank) so the admin
+ * can push the ETA forward without opening the wheel picker. */
+.eta-bumps {
+  display: inline-flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.eta-bump-btn {
+  appearance: none;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.08);
+  color: #1d4ed8;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, transform 0.06s ease;
+}
+.eta-bump-btn:hover,
+.eta-bump-btn:focus {
+  background: #3b82f6;
+  color: #fff;
+  outline: none;
+}
+.eta-bump-btn:active { transform: translateY(1px); }
+.eta-bump-btn:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+@media (prefers-color-scheme: dark) {
+  .eta-bump-btn {
+    background: rgba(96, 165, 250, 0.14);
+    border-color: rgba(96, 165, 250, 0.45);
+    color: #bfdbfe;
+  }
+  .eta-bump-btn:hover,
+  .eta-bump-btn:focus { background: #3b82f6; color: #fff; }
+}
