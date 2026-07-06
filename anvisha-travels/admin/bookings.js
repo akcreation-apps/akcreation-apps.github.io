@@ -558,6 +558,10 @@ export async function openBookingModal(db, existing) {
           </select>
         </div>
       </div>
+      <div class="f-group mb-12" style="position:relative;">
+        <label class="f-label" for="bm-referral">Referral <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+        <input id="bm-referral" type="text" class="f-input" value="${escapeAttr(b.referral || '')}" placeholder="Who referred this booking?" autocomplete="off">
+      </div>
       <div class="f-row cols-3">
         <div class="f-group">
           <label class="f-label" for="bm-ftype">Fuel type <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
@@ -574,10 +578,6 @@ export async function openBookingModal(db, existing) {
           <label class="f-label" for="bm-fqty">Fuel qty (L / kg) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
           <input id="bm-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 4.5" value="${b.fuel && b.fuel.qty != null ? escapeAttr(String(b.fuel.qty)) : ''}">
         </div>
-      </div>
-      <div class="f-group mb-12" style="position:relative;">
-        <label class="f-label" for="bm-referral">Referral <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
-        <input id="bm-referral" type="text" class="f-input" value="${escapeAttr(b.referral || '')}" placeholder="Who referred this booking?" autocomplete="off">
       </div>
     </form>
   `;
