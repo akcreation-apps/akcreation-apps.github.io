@@ -246,21 +246,21 @@
           "dishes": [
             {
               "id": 701,
-              "name": "Mix Veg",
+              "name": "Mix Veg Sandwich",
               "price": 59,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 702,
-              "name": "Corn Cheese",
+              "name": "Corn Cheese Sandwich",
               "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 703,
-              "name": "Peri Peri Paneer",
+              "name": "Peri Peri Paneer Sandwich",
               "price": 139,
               "available_time": "",
               "not_available_time": ""
@@ -273,7 +273,7 @@
           "dishes": [
             {
               "id": 801,
-              "name": "Casun Chicken",
+              "name": "Casun Chicken Sandwich",
               "price": 159,
               "available_time": "",
               "not_available_time": ""
@@ -286,21 +286,21 @@
           "dishes": [
             {
               "id": 831,
-              "name": "Red Sauce",
+              "name": "Red Sauce Pasta",
               "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 832,
-              "name": "White Sauce",
+              "name": "White Sauce Pasta",
               "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 833,
-              "name": "Pink Sauce",
+              "name": "Pink Sauce Pasta",
               "price": 139,
               "available_time": "",
               "not_available_time": ""
@@ -313,21 +313,21 @@
           "dishes": [
             {
               "id": 851,
-              "name": "Red Sauce",
+              "name": "Red Sauce Chicken Pasta",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 852,
-              "name": "White Sauce",
+              "name": "White Sauce Chicken Pasta",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 853,
-              "name": "Pink Sauce",
+              "name": "Pink Sauce Chicken Pasta",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
@@ -440,28 +440,28 @@
           "dishes": [
             {
               "id": 1101,
-              "name": "Kit Kat",
+              "name": "Kit Kat Smoothie",
               "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1102,
-              "name": "Mix Fruit",
+              "name": "Mix Fruit Smoothie",
               "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1103,
-              "name": "Pineapple",
+              "name": "Pineapple Smoothie",
               "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1104,
-              "name": "Kiwi",
+              "name": "Kiwi Smoothie",
               "price": 119,
               "available_time": "",
               "not_available_time": ""
