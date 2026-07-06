@@ -119,9 +119,12 @@ export async function renderDashboard(ctx) {
     const completedBookings = bookings.filter(b => (b.status === 'completed') && (inRange(b, 'completedAt') || inRange(b, 'createdAt')));
     const revenue = completedBookings.reduce((a, b) => a + Number(b.fare || 0), 0);
 
-    // ── Direct costs: fuel + misc from trips ──
-    const direct = trInRange.reduce(
-      (a, t) => a + Number((t.fuel && t.fuel.cost) || 0) + Number(t.miscCost || 0), 0);
+    // ── Direct costs: fuel from bookings + misc from trips ──
+    const fuelCost = bkInRange.reduce(
+      (a, b) => a + Number((b.fuel && b.fuel.cost) || 0), 0);
+    const miscCost = trInRange.reduce(
+      (a, t) => a + Number(t.miscCost || 0), 0);
+    const direct = fuelCost + miscCost;
 
     // ── Operating expenses ──
     const opex = exInRange.reduce((a, e) => a + Number(e.amount || 0), 0);
@@ -189,13 +192,19 @@ export async function renderDashboard(ctx) {
           return inMonth(d, m) ? a + Number(b.fare || 0) : a;
         }, 0)
       );
-      const directByMonth = months.map(m =>
-        trips.reduce((a, t) => {
+      const directByMonth = months.map(m => {
+        const fuelPart = bookings.reduce((a, b) => {
+          const d = toDateSafe(b.completedAt) || toDateSafe(b.createdAt) || (b.date && new Date(b.date));
+          if (!inMonth(d, m)) return a;
+          return a + Number((b.fuel && b.fuel.cost) || 0);
+        }, 0);
+        const miscPart = trips.reduce((a, t) => {
           const d = toDateSafe(t.createdAt) || (t.date && new Date(t.date));
           if (!inMonth(d, m)) return a;
-          return a + Number((t.fuel && t.fuel.cost) || 0) + Number(t.miscCost || 0);
-        }, 0)
-      );
+          return a + Number(t.miscCost || 0);
+        }, 0);
+        return fuelPart + miscPart;
+      });
       const opexByMonth = months.map(m =>
         expenses.reduce((a, e) => {
           const d = (e.date && new Date(e.date)) || toDateSafe(e.createdAt);

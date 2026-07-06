@@ -10,6 +10,8 @@ import {
 // Filter dropdown. Each option matches against the booking's status (+ paid for
 // the payment-specific options). Default is "New" — that's the inbox-style
 // view admin needs first thing every day.
+const FUEL_TYPES = ['CNG', 'Petrol', 'Diesel'];
+
 const STATUS_FILTERS = [
   { key: 'new',         label: 'New',                match: b => (b.status || 'new') === 'new' || b.status === 'confirmed' },
   { key: 'allocated',   label: 'Allocated',          match: b => b.status === 'allocated' },
@@ -114,6 +116,7 @@ function renderRow(b) {
       <div><b>Customer</b> ${customer.name ? escapeHtml(customer.name) : '<i class="text-muted-an">unidentified</i>'}${customer.phone ? ' · ' + escapeHtml(customer.phone) : ''}</div>
       ${allocated}
       ${b.fare ? `<div><b>Fare</b> ₹${escapeHtml(String(b.fare))}${b.paid ? ' · paid' : ''}</div>` : ''}
+      ${b.fuel ? `<div><b>Fuel</b> ${escapeHtml(b.fuel.type || '—')} · ${b.fuel.qty != null ? escapeHtml(String(b.fuel.qty)) + ' · ' : ''}₹${escapeHtml(String(b.fuel.cost ?? 0))}</div>` : ''}
       <div><b>Source</b> ${escapeHtml(b.source || 'web')}</div>
       <div><b>Received</b> ${escapeHtml(fmtDateTime(b.createdAt))}</div>
     </div>
@@ -526,6 +529,23 @@ export async function openBookingModal(db, existing) {
           </select>
         </div>
       </div>
+      <div class="f-row cols-3">
+        <div class="f-group">
+          <label class="f-label" for="bm-ftype">Fuel type <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+          <select id="bm-ftype" class="f-select">
+            <option value="">—</option>
+            ${FUEL_TYPES.map(f => `<option value="${f}"${(b.fuel && b.fuel.type) === f ? ' selected' : ''}>${f}</option>`).join('')}
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label" for="bm-fcost">Fuel cost (₹) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+          <input id="bm-fcost" type="number" class="f-input" min="0" step="1" inputmode="numeric" placeholder="e.g. 480" value="${b.fuel && b.fuel.cost != null ? escapeAttr(String(b.fuel.cost)) : ''}">
+        </div>
+        <div class="f-group">
+          <label class="f-label" for="bm-fqty">Fuel qty (L / kg) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
+          <input id="bm-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 4.5" value="${b.fuel && b.fuel.qty != null ? escapeAttr(String(b.fuel.qty)) : ''}">
+        </div>
+      </div>
     </form>
   `;
   const r = await Swal.fire({
@@ -614,6 +634,20 @@ export async function openBookingModal(db, existing) {
       }
       const phoneRaw = document.getElementById('bm-phone').value.trim();
       const phone    = phoneRaw ? normalisePhone(phoneRaw) : '';
+      const ftype    = document.getElementById('bm-ftype').value;
+      const fqtyRaw  = document.getElementById('bm-fqty').value;
+      const fqty     = fqtyRaw === '' ? null : parseFloat(fqtyRaw);
+      const fcostRaw = document.getElementById('bm-fcost').value;
+      const fcost    = fcostRaw === '' ? null : parseFloat(fcostRaw);
+      if (fqty != null && isNaN(fqty)) {
+        Swal.showValidationMessage('Fuel qty must be a number (or leave it empty)');
+        return false;
+      }
+      if (fcost != null && isNaN(fcost)) {
+        Swal.showValidationMessage('Fuel cost must be a number (or leave it empty)');
+        return false;
+      }
+      const fuel = (fcost == null) ? null : { type: ftype || null, qty: fqty, cost: fcost };
       return {
         date, time, passengers: pax,
         destination: document.getElementById('bm-dest').value.trim() || null,
@@ -625,6 +659,7 @@ export async function openBookingModal(db, existing) {
         },
         fare,
         paid,
+        fuel,
       };
     },
   });

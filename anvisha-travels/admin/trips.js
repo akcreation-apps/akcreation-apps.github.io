@@ -65,8 +65,6 @@ async function addPlacesToRegistry(db, names) {
   } catch (_) { /* swallow — autocomplete still works from local scan */ }
 }
 
-const FUEL_TYPES = ['CNG', 'Petrol', 'Diesel'];
-
 // ── Admin tab: list all trips, filter tied/untied, tie-to-booking modal ──
 export async function renderTrips(ctx, role) {
   const { panel, db } = ctx;
@@ -184,23 +182,6 @@ async function renderDriverForm(host, db, ctx) {
         <input id="dt-dst" type="text" class="f-input" placeholder="e.g. Cuttack Rly Station" required>
       </div>
     </div>
-    <div class="f-row cols-3">
-      <div class="f-group">
-        <label class="f-label" for="dt-ftype">Fuel type <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
-        <select id="dt-ftype" class="f-select">
-          <option value="">—</option>
-          ${FUEL_TYPES.map(f => `<option value="${f}">${f}</option>`).join('')}
-        </select>
-      </div>
-      <div class="f-group">
-        <label class="f-label" for="dt-fcost">Fuel cost (₹) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
-        <input id="dt-fcost" type="number" class="f-input" min="0" step="1" inputmode="numeric" placeholder="e.g. 480">
-      </div>
-      <div class="f-group">
-        <label class="f-label" for="dt-fqty">Fuel qty (L / kg) <span class="text-muted-an" style="font-weight:400; letter-spacing:0;">— optional</span></label>
-        <input id="dt-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 4.5">
-      </div>
-    </div>
     <div class="f-row cols-2">
       <div class="f-group">
         <label class="f-label" for="dt-misc">Misc (toll/parking ₹)</label>
@@ -238,7 +219,7 @@ async function renderDriverForm(host, db, ctx) {
       Swal.fire({ icon: 'success', title: 'Trip logged', timer: 1400, showConfirmButton: false });
       // Reset trip-specific fields but keep date AND source (drivers usually
       // depart from the same town all day — re-typing it is friction).
-      ['dt-km','dt-dst','dt-fqty','dt-fcost','dt-misc','dt-notes'].forEach(id => host.querySelector('#' + id).value = '');
+      ['dt-km','dt-dst','dt-misc','dt-notes'].forEach(id => host.querySelector('#' + id).value = '');
     } catch (e) {
       window.avDone();
       Swal.fire('Save failed', e.message || String(e), 'error');
@@ -251,11 +232,6 @@ function collectDriverForm(host) {
   const km       = parseFloat(host.querySelector('#dt-km').value);
   const src      = host.querySelector('#dt-src').value.trim();
   const dst      = host.querySelector('#dt-dst').value.trim();
-  const ftype    = host.querySelector('#dt-ftype').value;
-  const fqtyRaw  = host.querySelector('#dt-fqty').value;
-  const fqty     = fqtyRaw === '' ? null : parseFloat(fqtyRaw);
-  const fcostRaw = host.querySelector('#dt-fcost').value;
-  const fcost    = fcostRaw === '' ? null : parseFloat(fcostRaw);
   const misc     = parseFloat(host.querySelector('#dt-misc').value) || 0;
   const notes    = host.querySelector('#dt-notes').value.trim();
 
@@ -263,21 +239,9 @@ function collectDriverForm(host) {
     Swal.fire('Missing fields', 'Please fill date, km and route.', 'warning');
     return null;
   }
-  if (fqty != null && isNaN(fqty)) {
-    Swal.fire('Bad fuel qty', 'Fuel qty must be a number (or leave it empty).', 'warning');
-    return null;
-  }
-  if (fcost != null && isNaN(fcost)) {
-    Swal.fire('Bad fuel cost', 'Fuel cost must be a number (or leave it empty).', 'warning');
-    return null;
-  }
-  // If no fuel cost was entered, drop the entire fuel object — type without a
-  // cost adds nothing useful and skews the P&L "fuel by type" charts.
-  const fuel = (fcost == null) ? null : { type: ftype || null, qty: fqty, cost: fcost };
   return {
     date, km,
     route: { source: src, destination: dst },
-    fuel,
     miscCost: misc,
     notes: notes || null,
   };
@@ -305,14 +269,10 @@ function renderWhoLine(t) {
 
 function renderRow(t, opts) {
   const showEdit = !!(opts && opts.showEdit);
-  const fuel = t.fuel || null;
   const route = t.route || {};
   const tied = t.bookingId
     ? `<span class="chip in_progress"><i class="fas fa-link"></i> Tied</span>`
     : `<span class="chip untied"><i class="fas fa-link-slash"></i> Untied</span>`;
-  const fuelLine = fuel
-    ? `<div><b>Fuel</b> ${escapeHtml(fuel.type || '—')} · ${fuel.qty != null ? escapeHtml(String(fuel.qty)) + ' · ' : ''}₹${escapeHtml(String(fuel.cost ?? 0))}</div>`
-    : '';
   return `
   <div class="row-card">
     <div class="row-top">
@@ -325,7 +285,6 @@ function renderRow(t, opts) {
     <div class="row-meta">
       ${renderWhoLine(t)}
       <div><b>Distance</b> ${escapeHtml(String(t.km ?? 0))} km</div>
-      ${fuelLine}
       <div><b>Misc</b> ₹${escapeHtml(String(t.miscCost ?? 0))}</div>
       ${t.notes ? `<div><b>Notes</b> ${escapeHtml(t.notes)}</div>` : ''}
     </div>
@@ -435,16 +394,6 @@ async function openTripLogModal(db, ctx, isAdmin) {
           <div class="f-group" style="position:relative;"><label class="f-label" for="tlm-src">Source</label><input id="tlm-src" type="text" class="f-input" autocomplete="off"></div>
           <div class="f-group" style="position:relative;"><label class="f-label" for="tlm-dst">Destination</label><input id="tlm-dst" type="text" class="f-input" autocomplete="off"></div>
         </div>
-        <div class="f-row cols-3">
-          <div class="f-group"><label class="f-label" for="tlm-ftype">Fuel type (optional)</label>
-            <select id="tlm-ftype" class="f-select">
-              <option value="">—</option>
-              ${FUEL_TYPES.map(f => `<option value="${f}">${f}</option>`).join('')}
-            </select>
-          </div>
-          <div class="f-group"><label class="f-label" for="tlm-fcost">Fuel ₹ (optional)</label><input id="tlm-fcost" type="number" class="f-input" min="0" inputmode="numeric"></div>
-          <div class="f-group"><label class="f-label" for="tlm-fqty">Qty (optional)</label><input id="tlm-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal"></div>
-        </div>
         <div class="f-row cols-2">
           <div class="f-group"><label class="f-label" for="tlm-misc">Misc ₹</label><input id="tlm-misc" type="number" class="f-input" min="0" inputmode="numeric"></div>
           <div class="f-group"><label class="f-label" for="tlm-notes">Notes</label><input id="tlm-notes" type="text" class="f-input"></div>
@@ -456,29 +405,13 @@ async function openTripLogModal(db, ctx, isAdmin) {
       const km   = parseFloat(document.getElementById('tlm-km').value);
       const src  = document.getElementById('tlm-src').value.trim();
       const dst  = document.getElementById('tlm-dst').value.trim();
-      const ft     = document.getElementById('tlm-ftype').value;
-      const fqRaw  = document.getElementById('tlm-fqty').value;
-      const fq     = fqRaw === '' ? null : parseFloat(fqRaw);
-      const fcRaw  = document.getElementById('tlm-fcost').value;
-      const fc     = fcRaw === '' ? null : parseFloat(fcRaw);
       if (!date || isNaN(km) || !src || !dst) {
         Swal.showValidationMessage('Fill date, km and route');
         return false;
       }
-      if (fq != null && isNaN(fq)) {
-        Swal.showValidationMessage('Fuel qty must be a number (or leave it empty)');
-        return false;
-      }
-      if (fc != null && isNaN(fc)) {
-        Swal.showValidationMessage('Fuel cost must be a number (or leave it empty)');
-        return false;
-      }
-      // No cost → no fuel record at all (drop type + qty too).
-      const fuel = (fc == null) ? null : { type: ft || null, qty: fq, cost: fc };
       return {
         date, km,
         route: { source: src, destination: dst },
-        fuel,
         miscCost: parseFloat(document.getElementById('tlm-misc').value) || 0,
         notes: document.getElementById('tlm-notes').value.trim() || null,
       };
@@ -505,7 +438,6 @@ async function openTripLogModal(db, ctx, isAdmin) {
 async function openTripEditModal(db, trip) {
   const places = await loadKnownPlaces(db).catch(() => []);
   const route = trip.route || {};
-  const fuel = trip.fuel || {};
   const r = await Swal.fire({
     title: 'Edit trip',
     width: 640,
@@ -525,16 +457,6 @@ async function openTripEditModal(db, trip) {
           <div class="f-group" style="position:relative;"><label class="f-label" for="tem-src">Source</label><input id="tem-src" type="text" class="f-input" autocomplete="off" value="${escapeAttr(route.source || '')}"></div>
           <div class="f-group" style="position:relative;"><label class="f-label" for="tem-dst">Destination</label><input id="tem-dst" type="text" class="f-input" autocomplete="off" value="${escapeAttr(route.destination || '')}"></div>
         </div>
-        <div class="f-row cols-3">
-          <div class="f-group"><label class="f-label" for="tem-ftype">Fuel type (optional)</label>
-            <select id="tem-ftype" class="f-select">
-              <option value="">—</option>
-              ${FUEL_TYPES.map(f => `<option value="${f}"${fuel.type === f ? ' selected' : ''}>${f}</option>`).join('')}
-            </select>
-          </div>
-          <div class="f-group"><label class="f-label" for="tem-fcost">Fuel ₹ (optional)</label><input id="tem-fcost" type="number" class="f-input" min="0" inputmode="numeric" value="${escapeAttr(fuel.cost != null ? String(fuel.cost) : '')}"></div>
-          <div class="f-group"><label class="f-label" for="tem-fqty">Qty (optional)</label><input id="tem-fqty" type="number" class="f-input" min="0" step="0.1" inputmode="decimal" value="${escapeAttr(fuel.qty != null ? String(fuel.qty) : '')}"></div>
-        </div>
         <div class="f-row cols-2">
           <div class="f-group"><label class="f-label" for="tem-misc">Misc ₹</label><input id="tem-misc" type="number" class="f-input" min="0" inputmode="numeric" value="${escapeAttr(trip.miscCost != null ? String(trip.miscCost) : '')}"></div>
           <div class="f-group"><label class="f-label" for="tem-notes">Notes</label><input id="tem-notes" type="text" class="f-input" value="${escapeAttr(trip.notes || '')}"></div>
@@ -546,28 +468,13 @@ async function openTripEditModal(db, trip) {
       const km   = parseFloat(document.getElementById('tem-km').value);
       const src  = document.getElementById('tem-src').value.trim();
       const dst  = document.getElementById('tem-dst').value.trim();
-      const ft     = document.getElementById('tem-ftype').value;
-      const fqRaw  = document.getElementById('tem-fqty').value;
-      const fq     = fqRaw === '' ? null : parseFloat(fqRaw);
-      const fcRaw  = document.getElementById('tem-fcost').value;
-      const fc     = fcRaw === '' ? null : parseFloat(fcRaw);
       if (!date || isNaN(km) || !src || !dst) {
         Swal.showValidationMessage('Fill date, km and route');
         return false;
       }
-      if (fq != null && isNaN(fq)) {
-        Swal.showValidationMessage('Fuel qty must be a number (or leave it empty)');
-        return false;
-      }
-      if (fc != null && isNaN(fc)) {
-        Swal.showValidationMessage('Fuel cost must be a number (or leave it empty)');
-        return false;
-      }
-      const fuelOut = (fc == null) ? null : { type: ft || null, qty: fq, cost: fc };
       return {
         date, km,
         route: { source: src, destination: dst },
-        fuel: fuelOut,
         miscCost: parseFloat(document.getElementById('tem-misc').value) || 0,
         notes: document.getElementById('tem-notes').value.trim() || null,
       };

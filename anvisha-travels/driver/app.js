@@ -175,7 +175,7 @@ async function renderDashboard(ctx) {
     <div class="kpi-grid" id="dr-kpis">
       ${kpi('trips', 'Trips this month')}
       ${kpi('km',    'Distance (km)')}
-      ${kpi('fuel',  'Fuel + misc (₹)')}
+      ${kpi('fuel',  'Misc (₹)')}
       ${kpi('earn',  'Earnings (paid)')}
     </div>
 
@@ -219,7 +219,7 @@ async function renderDashboard(ctx) {
     return d && d >= monthStart;
   });
   const km   = inMonth.reduce((a, t) => a + Number(t.km || 0), 0);
-  const fuel = inMonth.reduce((a, t) => a + Number((t.fuel && t.fuel.cost) || 0) + Number(t.miscCost || 0), 0);
+  const fuel = inMonth.reduce((a, t) => a + Number(t.miscCost || 0), 0);
 
   let earn = 0;
   try {
@@ -341,14 +341,10 @@ async function renderHistory(ctx) {
 }
 
 function renderHistoryRow(t) {
-  const fuel = t.fuel || null;
   const route = t.route || {};
   const tied = t.bookingId
     ? `<span class="chip completed"><i class="fas fa-link" aria-hidden="true"></i> Linked</span>`
     : `<span class="chip untied"><i class="fas fa-link-slash" aria-hidden="true"></i> Untied</span>`;
-  const fuelLine = fuel
-    ? `<div><b>Fuel</b> ${escapeHtml(fuel.type || '—')} · ₹${escapeHtml(String(fuel.cost ?? 0))}${fuel.qty != null ? ` (${escapeHtml(String(fuel.qty))})` : ''}</div>`
-    : '';
   return `
   <div class="row-card">
     <div class="row-top">
@@ -360,7 +356,6 @@ function renderHistoryRow(t) {
     </div>
     <div class="row-meta">
       <div><b>Distance</b> ${escapeHtml(String(t.km ?? 0))} km</div>
-      ${fuelLine}
       <div><b>Misc</b> ₹${escapeHtml(String(t.miscCost ?? 0))}</div>
       ${t.notes ? `<div><b>Notes</b> ${escapeHtml(t.notes)}</div>` : ''}
     </div>

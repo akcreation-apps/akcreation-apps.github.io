@@ -123,18 +123,30 @@ export async function renderDrivers(ctx) {
 
 async function refreshTripAgg(db) {
   const m = new Map();
+  const bucket = uid => {
+    let a = m.get(uid);
+    if (!a) { a = { trips: 0, km: 0, fuelCost: 0, miscCost: 0 }; m.set(uid, a); }
+    return a;
+  };
   try {
     const snap = await getDocs(collection(db, COL.TRIPS));
     snap.forEach(d => {
       const t = d.data();
       const uid = t.driver && t.driver.uid;
       if (!uid) return;
-      const a = m.get(uid) || { trips: 0, km: 0, fuelCost: 0, miscCost: 0 };
+      const a = bucket(uid);
       a.trips += 1;
       a.km += Number(t.km || 0);
-      a.fuelCost += Number((t.fuel && t.fuel.cost) || 0);
       a.miscCost += Number(t.miscCost || 0);
-      m.set(uid, a);
+    });
+  } catch (_) { /* swallow */ }
+  try {
+    const snap = await getDocs(collection(db, COL.BOOKINGS));
+    snap.forEach(d => {
+      const b = d.data();
+      const uid = b.allocatedDriver && b.allocatedDriver.uid;
+      if (!uid || !b.fuel) return;
+      bucket(uid).fuelCost += Number((b.fuel && b.fuel.cost) || 0);
     });
   } catch (_) { /* swallow */ }
   return m;
