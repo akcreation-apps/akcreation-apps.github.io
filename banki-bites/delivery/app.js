@@ -38,6 +38,39 @@ window.bbDone = function () {
 let _feeRules = null;
 let _allOrders = [];
 let _currentView = 'active';
+// Map<normalizedRestaurantName, 10-digit phone> — populated once on sign-in so
+// the delivery card can render a "Call restaurant" button beside "Call customer"
+// on assigned orders. Keyed by lowercased name; falls back to restaurant_id
+// slug (also lowercased) when the order lacks a restaurant_name.
+const _partnerContactByName = new Map();
+const _partnerContactById = new Map();
+async function loadPartnerContacts(db) {
+  try {
+    const snap = await getDocs(collection(db, COL.PARTNERS));
+    _partnerContactByName.clear();
+    _partnerContactById.clear();
+    snap.forEach(d => {
+      const p = d.data() || {};
+      const phone = String(p.point_of_contact || '').replace(/\D/g, '');
+      if (phone.length !== 10) return;
+      if (!isBlank(p.name)) _partnerContactByName.set(String(p.name).trim().toLowerCase(), phone);
+      _partnerContactById.set(String(d.id).toLowerCase(), phone);
+    });
+  } catch (err) {
+    console.warn('[delivery] loadPartnerContacts failed:', err.message);
+  }
+}
+function lookupPartnerPhone(o) {
+  if (!isBlank(o?.restaurant_name)) {
+    const p = _partnerContactByName.get(String(o.restaurant_name).trim().toLowerCase());
+    if (p) return p;
+  }
+  if (!isBlank(o?.restaurant_id)) {
+    const p = _partnerContactById.get(String(o.restaurant_id).trim().toLowerCase());
+    if (p) return p;
+  }
+  return '';
+}
 const _earnCharts = new Map();
 function mountEarnChart(id, config) {
   const old = _earnCharts.get(id);
@@ -144,6 +177,7 @@ let currentUser = null;
     $('#userEmail').textContent = staffDoc.data().name || user.email;
     showShell();
     try { _feeRules = await loadFeeRules(db, { force: true }); } catch {}
+    await loadPartnerContacts(db);
     listenOrders(user);
   });
 })();
@@ -336,7 +370,11 @@ function renderCard(db, o) {
     etaBanner = `
       <div class="eta-banner ${isLate ? 'eta-late' : (minsLeft <= 10 ? 'eta-soon' : '')}">
         <i class="fas fa-stopwatch"></i>
-        <span>Deliver by <strong>${etaText}</strong> · ${relative}</span>
+        <span class="eta-text">
+          <span class="eta-line">By <strong>${etaText}</strong></span>
+          <span class="eta-sep"> · </span>
+          <span class="eta-line">${relative}</span>
+        </span>
       </div>`;
   }
 
@@ -345,6 +383,19 @@ function renderCard(db, o) {
   const gps = c.gps;
   const hasGps = gps && Number.isFinite(+gps.lat) && Number.isFinite(+gps.lng);
   const mapsHref = hasGps ? `https://www.google.com/maps?q=${gps.lat},${gps.lng}` : '';
+
+  // While the order is still "assigned" (not yet picked up), surface a call
+  // link to the restaurant's point of contact so the partner can check on food
+  // preparation status. Rendered as a distinct, full-width labeled banner
+  // (NOT beside the customer-call icon) so it can't be mis-tapped.
+  const restaurantPhone = o.status === 'assigned' ? lookupPartnerPhone(o) : '';
+  const hasRestaurantPhone = !isBlank(restaurantPhone);
+  const callRestaurantBanner = hasRestaurantPhone
+    ? `<a class="call-restaurant-banner" href="tel:${escapeAttr(restaurantPhone)}" aria-label="Call restaurant ${escapeAttr(restaurantLabel || '')} to check food prep status" title="Call restaurant${restaurantLabel ? ` — ${restaurantLabel}` : ''}">
+         <span class="call-restaurant-icon"><i class="fas fa-utensils" aria-hidden="true"></i></span>
+         <span class="call-restaurant-phone-icon" aria-hidden="true"><i class="fas fa-phone"></i></span>
+       </a>`
+    : '';
 
   // Once delivered, the partner is read-only: no call, no status update.
   // Call button is only rendered when a phone number is actually present.
@@ -411,7 +462,12 @@ function renderCard(db, o) {
     </summary>
 
     <div class="delivery-body">
-      ${etaBanner}
+      ${(etaBanner || callRestaurantBanner)
+        ? `<div class="eta-call-row">
+             <div class="eta-call-left">${etaBanner}</div>
+             ${callRestaurantBanner ? `<div class="eta-call-right">${callRestaurantBanner}</div>` : ''}
+           </div>`
+        : ''}
       ${collectBanner}
       ${addrBlock}
       ${itemsBlock}

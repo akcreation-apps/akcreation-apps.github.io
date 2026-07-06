@@ -119,6 +119,75 @@
   .icon-action.call-btn { color: #4ade80; border-color: rgba(74,222,128,0.35); }
   .icon-action.map-btn  { color: #60a5fa; border-color: rgba(96,165,250,0.35); }
 }
+
+/* Row that pairs the "Deliver by" ETA (left, takes most of the width) with a
+ * compact icon-only "Call restaurant" pill (right). The two are side-by-side
+ * on every screen size but the ETA gets the elastic space so its text stays
+ * on one row wherever possible. */
+.eta-call-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  margin: 8px 0 4px;
+}
+.eta-call-left  { flex: 1 1 auto; min-width: 0; display: flex; }
+.eta-call-right { flex: 0 0 auto;               display: flex; }
+.eta-call-left:empty, .eta-call-right:empty { display: none; }
+.eta-call-left > .eta-banner { margin: 0; flex: 1 1 auto; }
+
+/* Compact icon-only "Call restaurant" pill — visually distinct from the
+ * customer call icon (different color + different icon + physically separated
+ * at the top of the card) so a partner can't confuse it for Call-customer.
+ * Two icons stacked side-by-side: chef-hat (restaurant) + phone (action). */
+.call-restaurant-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(217, 119, 6, 0.4);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.14), rgba(217, 119, 6, 0.09));
+  color: #b45309;
+  text-decoration: none;
+  min-height: 44px;
+  min-width: 44px;
+  white-space: nowrap;
+}
+.call-restaurant-banner:hover,
+.call-restaurant-banner:focus {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.22), rgba(217, 119, 6, 0.16));
+  color: #92400e;
+  text-decoration: none;
+}
+.call-restaurant-banner:active { transform: translateY(1px); }
+.call-restaurant-banner:focus-visible { outline: 2px solid #d97706; outline-offset: 2px; }
+.call-restaurant-icon {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #d97706;
+  color: #fff;
+  font-size: 12px;
+}
+.call-restaurant-phone-icon {
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+  .call-restaurant-banner {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.5);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(217, 119, 6, 0.10));
+  }
+  .call-restaurant-banner:hover,
+  .call-restaurant-banner:focus { color: #fcd34d; }
+  .call-restaurant-phone-icon { color: #fbbf24; }
+}
 /* Safety gap so the items list can never sit directly above the Call button. */
 .delivery-actions-spacer { height: 6px; }
 
@@ -312,43 +381,101 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   .collect-banner-meta { color: rgba(252,211,77,0.78); }
 }
 
-/* ── ETA banner ──────────────────────────────────────────────────────── */
-.eta-banner {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--surface-soft);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 9px 12px;
-  font-weight: 500;
-  font-size: 0.85rem;
+/* ── ETA banner ──────────────────────────────────────────────────────────
+ * Spotlighted: bold gradient, filled stopwatch chip, larger type. A subtle
+ * pulse on the icon signals "don't miss this deadline" without being
+ * distracting. States escalate on tone (default blue → amber "soon" → red
+ * "late") and animation speed. */
+@keyframes bb-eta-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(59,130,246,0.55); }
+  50%      { transform: scale(1.08); box-shadow: 0 0 0 6px rgba(59,130,246,0);    }
 }
-.eta-banner i { color: #3b82f6; flex-shrink: 0; font-size: 0.92rem; }
-.eta-banner strong { color: var(--text-strong); font-weight: 600; }
+@keyframes bb-eta-pulse-soon {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(245,158,11,0.65); }
+  50%      { transform: scale(1.10); box-shadow: 0 0 0 7px rgba(245,158,11,0);    }
+}
+@keyframes bb-eta-pulse-late {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(220,38,38,0.75); }
+  50%      { transform: scale(1.12); box-shadow: 0 0 0 8px rgba(220,38,38,0);    }
+}
+
+.eta-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(37,99,235,0.06));
+  color: #1e3a8a;
+  border: 1px solid rgba(59,130,246,0.4);
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  line-height: 1.2;
+  min-height: 44px;
+  box-shadow: 0 1px 2px rgba(59,130,246,0.08);
+}
+.eta-banner i {
+  flex: 0 0 auto;
+  width: 26px; height: 26px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 12px;
+  animation: bb-eta-pulse 2.4s ease-in-out infinite;
+}
+.eta-banner strong { color: #1e3a8a; font-weight: 800; }
+.eta-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 4px;
+  row-gap: 0;
+}
+.eta-text .eta-line { white-space: nowrap; }
+/* On very narrow screens, drop the middle separator and let the two ETA
+ * fragments stack cleanly onto two rows instead of forcing a wider container. */
+@media (max-width: 380px) {
+  .eta-text { flex-direction: column; column-gap: 0; }
+  .eta-text .eta-sep { display: none; }
+  .eta-banner { font-size: 0.82rem; }
+}
 
 .eta-banner.eta-soon {
-  background: #fffaf0;
-  border-color: rgba(251,146,60,0.35);
-  color: #9a3412;
+  background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(217,119,6,0.08));
+  border-color: rgba(245,158,11,0.55);
+  color: #7c2d12;
+  box-shadow: 0 1px 3px rgba(245,158,11,0.15);
 }
-.eta-banner.eta-soon i      { color: #f59e0b; }
+.eta-banner.eta-soon i      { background: #f59e0b; animation: bb-eta-pulse-soon 1.6s ease-in-out infinite; }
 .eta-banner.eta-soon strong { color: #7c2d12; }
 
 .eta-banner.eta-late {
-  background: #fef2f2;
-  border-color: rgba(220,38,38,0.35);
-  color: #991b1b;
+  background: linear-gradient(135deg, rgba(220,38,38,0.20), rgba(185,28,28,0.10));
+  border-color: rgba(220,38,38,0.6);
+  color: #7f1d1d;
+  box-shadow: 0 1px 4px rgba(220,38,38,0.20);
 }
-.eta-banner.eta-late i      { color: #dc2626; }
+.eta-banner.eta-late i      { background: #dc2626; animation: bb-eta-pulse-late 1s ease-in-out infinite; }
 .eta-banner.eta-late strong { color: #7f1d1d; }
 
+@media (prefers-reduced-motion: reduce) {
+  .eta-banner i,
+  .eta-banner.eta-soon i,
+  .eta-banner.eta-late i { animation: none; }
+}
+
 @media (prefers-color-scheme: dark) {
-  .eta-banner i        { color: #60a5fa; }
-  .eta-banner.eta-soon { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); color: #fdba74; }
-  .eta-banner.eta-soon i      { color: #fbbf24; }
+  .eta-banner {
+    background: linear-gradient(135deg, rgba(59,130,246,0.16), rgba(37,99,235,0.08));
+    color: #bfdbfe;
+    border-color: rgba(96,165,250,0.45);
+  }
+  .eta-banner i        { background: #3b82f6; }
+  .eta-banner strong   { color: #dbeafe; }
+  .eta-banner.eta-soon { background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(217,119,6,0.08)); border-color: rgba(251,191,36,0.55); color: #fed7aa; }
   .eta-banner.eta-soon strong { color: #fed7aa; }
-  .eta-banner.eta-late { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.35); color: #fca5a5; }
-  .eta-banner.eta-late i      { color: #f87171; }
+  .eta-banner.eta-late { background: linear-gradient(135deg, rgba(220,38,38,0.22), rgba(185,28,28,0.10)); border-color: rgba(248,113,113,0.55); color: #fecaca; }
   .eta-banner.eta-late strong { color: #fecaca; }
 }
 
