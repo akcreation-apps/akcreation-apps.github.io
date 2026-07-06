@@ -667,14 +667,14 @@
               "id": 2701,
               "name": "Veg Biryani (Half)",
               "price": 139,
-              "available_time": 13,
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2702,
               "name": "Veg Biryani (Full)",
               "price": 239,
-              "available_time": 13,
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -687,21 +687,21 @@
               "id": 2801,
               "name": "Chicken Biryani (2pc)",
               "price": 129,
-              "available_time": 13,
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2802,
               "name": "Chicken Biryani (3pc)",
               "price": 179,
-              "available_time": 13,
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2803,
               "name": "Chicken Biryani (5pc)",
               "price": 259,
-              "available_time": 13,
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
