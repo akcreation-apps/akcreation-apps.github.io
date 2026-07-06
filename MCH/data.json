@@ -108,21 +108,21 @@
             {
               "id": 201,
               "name": "Chicken 65",
-              "price": 119,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 202,
               "name": "Chilli Chicken",
-              "price": 119,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 203,
               "name": "Chicken Manchurian",
-              "price": 119,
+              "price": 129,
               "available_time": "",
               "not_available_time": ""
             },
@@ -345,7 +345,7 @@
             {
               "id": 801,
               "name": "Fish Thali",
-              "price": 99,
+              "price": 109,
               "available_time": 12,
               "not_available_time": 16
             },
