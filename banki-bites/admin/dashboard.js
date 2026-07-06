@@ -135,6 +135,13 @@ export async function renderDashboard(root, db) {
         <div class="chart-card-head"><i class="fas fa-calendar-alt"></i> Month over month</div>
         <div class="chart-card-body"><canvas id="dashMonthOverMonth"></canvas></div>
       </div>
+      <!-- Day-wise cumulative revenue: this month vs the same day-of-month
+           progression last month. Ignores the date-range picker on purpose —
+           it's always a fixed month-over-month comparison. -->
+      <div class="chart-card chart-card--wide">
+        <div class="chart-card-head"><i class="fas fa-chart-line"></i> Monthly growth (day-wise revenue)</div>
+        <div class="chart-card-body"><canvas id="dashMonthlyGrowth"></canvas></div>
+      </div>
 
       <!-- 7-day trend charts (day-by-day series). -->
       <div class="chart-card">
@@ -411,10 +418,16 @@ async function refresh(root, db) {
   const mom = { from: startOfLastMonth(), to: new Date() };
   const fetchFrom = state.range.from < mom.from ? state.range.from : mom.from;
   const sinceTs = Timestamp.fromDate(fetchFrom);
-  const [ordersSnap, partnersSnap, staffSnap, rules] = await Promise.all([
+  const [ordersSnap, partnersSnap, staffSnap, customersSnap, rules] = await Promise.all([
     getDocs(query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs))),
     getDocs(collection(db, COL.PARTNERS)),
     getDocs(collection(db, COL.STAFF)),
+    // Customers collection carries each phone's created_at (first-time
+    // upsert), which the "New vs Repeat" chart uses to classify orders — this
+    // knowledge predates the current fetch window so a customer who first
+    // ordered months ago is correctly tagged as "Repeat" even if their only
+    // order inside the range is the earliest one we've fetched.
+    getDocs(collection(db, COL.CUSTOMERS)),
     loadFeeRules(db, { autoSeed: true }),
   ]);
 
@@ -424,6 +437,8 @@ async function refresh(root, db) {
   partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
   const staff = [];
   staffSnap.forEach(d => staff.push({ uid: d.id, ...d.data() }));
+  const customers = [];
+  customersSnap.forEach(d => customers.push({ phone: d.id, ...d.data() }));
 
   // Filter to the selected range for every chart/KPI that respects the picker.
   // MoM KPI + MoM chart use the always-loaded last-month window instead.
@@ -439,23 +454,24 @@ async function refresh(root, db) {
   const p = chartPalette();
   renderOrdersPerDay(orders, p);
   renderRevenuePerDay(orders, p);
-  renderStatusMix(orders, p, range);
+  renderStatusMix(orders, p);
   renderMonthOverMonth(ordersAll, p);
-  renderTopRestaurants(orders, p, range);
-  renderTopAreas(orders, p, range);
-  renderPartnerPayouts(orders, staff, rules, p, range);
-  renderFarNear(orders, rules, p, range);
+  renderMonthlyGrowth(ordersAll, p);
+  renderTopRestaurants(orders, p);
+  renderTopAreas(orders, p);
+  renderPartnerPayouts(orders, staff, rules, p);
+  renderFarNear(orders, rules, p);
   renderCancelRate(orders, p);
   renderAovTrend(orders, p);
-  renderRepeatNew(orders, p);
-  renderTopCustomers(orders, p, range);
-  renderTopItems(orders, p, range);
+  renderRepeatNew(orders, customers, p);
+  renderTopCustomers(orders, p);
+  renderTopItems(orders, p);
   renderDiscountTrend(orders, p);
-  renderPrepaidCod(orders, p, range);
-  renderDayOfWeek(orders, p, range);
-  renderPartnerOrders(orders, staff, p, range);
+  renderPrepaidCod(orders, p);
+  renderDayOfWeek(orders, p);
+  renderPartnerOrders(orders, staff, p);
   renderDeliveryTime(orders, p);
-  renderRevenueByRestaurant(orders, p, range);
+  renderRevenueByRestaurant(orders, p);
   renderHourlyHeatmap(orders, p, root);
 
   chartBodies.forEach(el => el.classList.remove('is-loading'));
@@ -629,30 +645,28 @@ function renderRevenuePerDay(orders, p) {
     },
     options: {
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.y) } } },
-      scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: fmtCompactINR } } },
     },
   });
 }
 
-function renderStatusMix(orders, p, range) {
-  // Grouped bar: for each status, show earlier-period vs later-period counts.
-  // Only terminal statuses are meaningful in retrospective analytics — new /
-  // assigned / out_for_delivery are transient and reflect current in-flight
-  // work rather than what actually happened during the range.
-  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
+function renderStatusMix(orders, p) {
+  // Simple bar of totals across the selected date range. Only terminal
+  // statuses are meaningful in retrospective analytics — new / assigned /
+  // out_for_delivery are transient and reflect current in-flight work.
   const statusKeys = ['delivered', 'cancelled', 'fake'];
-  const countByStatus = list => statusKeys.map(s => list.filter(o => (o.status || 'new') === s).length);
+  const counts = statusKeys.map(s => orders.filter(o => (o.status || 'new') === s).length);
   mountChart('dashStatusMix', {
     type: 'bar',
     data: {
       labels: statusKeys.map(k => k.replace(/_/g, ' ')),
-      datasets: [
-        { label: split.earlierLabel, data: countByStatus(split.earlier), backgroundColor: p.muted, borderWidth: 0 },
-        { label: split.laterLabel,   data: countByStatus(split.later),   backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      datasets: [{ label: 'Orders', data: counts, backgroundColor: palettePerBar(counts.length, p), borderWidth: 0 }],
     },
     options: {
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} orders` } },
+      },
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
@@ -714,7 +728,100 @@ function renderMonthOverMonth(orders, p) {
       },
       scales: {
         y:  { beginAtZero: true, position: 'left',  ticks: { precision: 0 }, title: { display: true, text: 'Orders' } },
-        y1: { beginAtZero: true, position: 'right', ticks: { callback: v => '₹' + v }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Revenue' } },
+        y1: { beginAtZero: true, position: 'right', ticks: { callback: fmtCompactINR }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Revenue' } },
+      },
+    },
+  });
+}
+
+// Day-wise cumulative net revenue for this month vs the same day-of-month
+// progression last month. Uses ordersAll (unfiltered by range picker) since
+// the whole point is a fixed month-over-month comparison — the picker only
+// scopes the range-aware charts.
+//
+// x-axis: day of month (1..31 depending on this month's length).
+// y-axis: cumulative ₹ revenue up to that day.
+// "This month" is truncated to today so the line doesn't flatline forward;
+// "Last month" is drawn full-length as a dashed reference line.
+function renderMonthlyGrowth(ordersAll, p) {
+  const today = new Date();
+  const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const lastMonthEnd   = new Date(today.getFullYear(), today.getMonth(), 0);
+  const daysInThisMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+
+  const cumThis = new Array(daysInThisMonth).fill(0);
+  const cumLast = new Array(daysInThisMonth).fill(0);
+  for (const o of ordersAll) {
+    if (!isDelivered(o)) continue;
+    const t = toDateSafe(o.created_at);
+    if (!t) continue;
+    const rev = netRevenue(o);
+    if (t >= thisMonthStart && t <= today) {
+      cumThis[t.getDate() - 1] += rev;
+    } else if (t >= lastMonthStart && t <= lastMonthEnd) {
+      const di = t.getDate() - 1;
+      if (di < cumLast.length) cumLast[di] += rev;
+    }
+  }
+  for (let i = 1; i < cumThis.length; i++) cumThis[i] += cumThis[i - 1];
+  for (let i = 1; i < cumLast.length; i++) cumLast[i] += cumLast[i - 1];
+
+  const todayDom = today.getDate();
+  const cumThisDisplay = cumThis.map((v, i) => i < todayDom ? Math.round(v) : null);
+  const cumLastDisplay = cumLast.map(v => Math.round(v));
+
+  const thisLabel = thisMonthStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+  const lastLabel = lastMonthStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+
+  mountChart('dashMonthlyGrowth', {
+    type: 'line',
+    data: {
+      labels: cumThis.map((_, i) => String(i + 1).padStart(2, '0')),
+      datasets: [
+        { label: `This month · ${thisLabel}`, data: cumThisDisplay, borderColor: p.brand, backgroundColor: p.brandSoft, fill: false, tension: 0.25, pointRadius: 2, borderWidth: 2 },
+        { label: `Last month · ${lastLabel}`, data: cumLastDisplay, borderColor: p.muted, backgroundColor: 'transparent', borderDash: [4, 4], fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 },
+      ],
+    },
+    options: {
+      // Show both lines' values in a single tooltip anchored to the hovered
+      // day — the whole point of this chart is to compare same-date figures,
+      // so the tooltip needs to surface last month's number even when you're
+      // hovering this month's line (and vice-versa).
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            title: ctxs => `Day ${ctxs[0].label}`,
+            label: ctx => {
+              const val = ctx.parsed.y;
+              return `${ctx.dataset.label}: ${val == null ? '—' : fmtINR(val)}`;
+            },
+            footer: ctxs => {
+              // If both months have a value on this day, show the delta so the
+              // admin can read growth at a glance without doing the math.
+              const items = ctxs.filter(c => c.parsed.y != null);
+              if (items.length < 2) return '';
+              const thisIdx = ctxs.findIndex(c => c.datasetIndex === 0);
+              const lastIdx = ctxs.findIndex(c => c.datasetIndex === 1);
+              if (thisIdx < 0 || lastIdx < 0) return '';
+              const t = ctxs[thisIdx].parsed.y, l = ctxs[lastIdx].parsed.y;
+              if (t == null || l == null) return '';
+              const diff = t - l;
+              const pct  = l > 0 ? Math.round((diff / l) * 100) : null;
+              const sign = diff >= 0 ? '+' : '−';
+              const pctText = pct == null ? '' : ` (${diff >= 0 ? '+' : ''}${pct}%)`;
+              return `Δ vs last month: ${sign}${fmtINR(Math.abs(diff))}${pctText}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: { ticks: { autoSkip: true, maxRotation: 0 }, title: { display: true, text: 'Day of month' } },
+        y: { beginAtZero: true, ticks: { callback: fmtCompactINR }, title: { display: true, text: 'Cumulative revenue' } },
       },
     },
   });
@@ -740,26 +847,60 @@ function topNSplitCounts(delivered, keyFn, n, range, valueFn) {
   return { labels, earlier: perKey(split.earlier), later: perKey(split.later), split };
 }
 
-function renderTopRestaurants(orders, p, range) {
-  const r = topNSplitCounts(
-    orders.filter(isDelivered),
-    o => o.restaurant_name || o.restaurant_id || 'Unknown',
-    5, range,
-  );
+// Compact ₹ axis label: 1,00,000 → "₹1L", 12,340 → "₹12k", <1000 stays raw.
+// Used on Y-axes of revenue charts so narrow screens don't blow up horizontally
+// under long numeric labels. Full ₹ value still shows in the tooltip.
+function fmtCompactINR(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n === 0) return '₹0';
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  if (abs >= 10000000) return `${sign}₹${(n / 10000000).toFixed(n % 10000000 === 0 ? 0 : 1)}Cr`;
+  if (abs >= 100000)   return `${sign}₹${(n / 100000).toFixed(n % 100000 === 0 ? 0 : 1)}L`;
+  if (abs >= 1000)     return `${sign}₹${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k`;
+  return `${sign}₹${Math.round(abs)}`;
+}
+
+// Cycle through the chart palette to give each bar its own color — used by
+// the aggregated single-series charts so bars stay easy to tell apart even
+// when the legend is hidden.
+function palettePerBar(count, p) {
+  const src = p.series && p.series.length ? p.series : [p.brand];
+  const out = new Array(count);
+  for (let i = 0; i < count; i++) out[i] = src[i % src.length];
+  return out;
+}
+
+// Helper: total counts per group, sorted desc, top-N labels + values.
+function topNTotals(items, keyFn, n) {
+  const m = new Map();
+  for (const o of items) {
+    const k = keyFn(o);
+    if (k == null || k === '') continue;
+    m.set(k, (m.get(k) || 0) + 1);
+  }
+  return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
+}
+
+function renderTopRestaurants(orders, p) {
+  const top = topNTotals(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown', 5);
+  const fullLabels = top.map(([k]) => k);
   mountChart('dashTopRestaurants', {
     type: 'bar',
     data: {
-      labels: r.labels.map(n => truncateName(n, 10)),
-      datasets: [
-        { label: r.split.earlierLabel, data: r.earlier, backgroundColor: p.muted, borderWidth: 0 },
-        { label: r.split.laterLabel,   data: r.later,   backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      labels: fullLabels.map(n => truncateName(n, 10)),
+      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: palettePerBar(top.length, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
       plugins: {
-        legend: { position: 'bottom' },
-        tooltip: { callbacks: { title: ctx => r.labels[ctx[0].dataIndex] } },
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: ctx => fullLabels[ctx[0].dataIndex],
+            label: ctx => `${ctx.parsed.x} orders`,
+          },
+        },
       },
       scales: {
         x: { beginAtZero: true, ticks: { precision: 0 } },
@@ -769,95 +910,99 @@ function renderTopRestaurants(orders, p, range) {
   });
 }
 
-function renderTopAreas(orders, p, range) {
-  const r = topNSplitCounts(orders.filter(isDelivered), o => o.place || 'Unknown', 5, range);
+function renderTopAreas(orders, p) {
+  const top = topNTotals(orders.filter(isDelivered), o => o.place || 'Unknown', 5);
   mountChart('dashTopAreas', {
     type: 'bar',
     data: {
-      labels: r.labels,
-      datasets: [
-        { label: r.split.earlierLabel, data: r.earlier, backgroundColor: p.muted, borderWidth: 0 },
-        { label: r.split.laterLabel,   data: r.later,   backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      labels: top.map(([k]) => k),
+      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: palettePerBar(top.length, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.x} orders` } },
+      },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
 }
 
-function renderPartnerPayouts(orders, staff, rules, p, range) {
-  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
+function renderPartnerPayouts(orders, staff, rules, p) {
+  // One bar per partner, stacked to show Paid vs Pending — admin needs to
+  // see at a glance how much is still owed. Colors are fixed by state
+  // (green = paid, amber = pending) rather than cycling per partner, since
+  // the paid/pending semantic is the point of this chart.
   const staffMap = new Map(staff.map(s => [s.uid, s.name || s.email || s.uid]));
-  const tally = (list) => {
-    const m = new Map();
-    for (const o of list) {
-      if (!isDelivered(o)) continue;
-      if (o.payout_applicable === false) continue;
-      const sid = o.delivery_staff_id;
-      if (!sid || !staffMap.has(sid)) continue;
-      if (!m.has(sid)) m.set(sid, { paid: 0, pending: 0 });
-      const fee = feeForOrder(o, rules);
-      if (isPayoutPaid(o)) m.get(sid).paid += fee;
-      else m.get(sid).pending += fee;
-    }
-    return m;
-  };
-  const earlier = tally(split.earlier);
-  const later   = tally(split.later);
-  // Union of partners appearing in either period; sort by total spend.
-  const uids = new Set([...earlier.keys(), ...later.keys()]);
-  const rows = [...uids].map(uid => {
-    const e = earlier.get(uid) || { paid: 0, pending: 0 };
-    const l = later.get(uid)   || { paid: 0, pending: 0 };
-    return { uid, name: staffMap.get(uid), e, l, total: e.paid + e.pending + l.paid + l.pending };
-  }).filter(r => r.total > 0).sort((a, b) => b.total - a.total);
+  const m = new Map();
+  for (const o of orders) {
+    if (!isDelivered(o)) continue;
+    if (o.payout_applicable === false) continue;
+    const sid = o.delivery_staff_id;
+    if (!sid || !staffMap.has(sid)) continue;
+    if (!m.has(sid)) m.set(sid, { paid: 0, pending: 0 });
+    const fee = feeForOrder(o, rules);
+    if (isPayoutPaid(o)) m.get(sid).paid += fee;
+    else m.get(sid).pending += fee;
+  }
+  const rows = [...m.entries()]
+    .map(([uid, v]) => ({ uid, name: staffMap.get(uid), paid: v.paid, pending: v.pending, total: v.paid + v.pending }))
+    .filter(r => r.total > 0)
+    .sort((a, b) => b.total - a.total);
 
   mountChart('dashPartnerPayouts', {
     type: 'bar',
     data: {
       labels: rows.map(r => r.name),
       datasets: [
-        { label: `${split.earlierLabel} paid`,    data: rows.map(r => r.e.paid),    backgroundColor: p.status.delivered, stack: 'earlier', borderWidth: 0 },
-        { label: `${split.earlierLabel} pending`, data: rows.map(r => r.e.pending), backgroundColor: p.muted,            stack: 'earlier', borderWidth: 0 },
-        { label: `${split.laterLabel} paid`,      data: rows.map(r => r.l.paid),    backgroundColor: p.brand,            stack: 'later',   borderWidth: 0 },
-        { label: `${split.laterLabel} pending`,   data: rows.map(r => r.l.pending), backgroundColor: p.brandSoft,        stack: 'later',   borderWidth: 0 },
+        // Muted, analytics-first palette — Tableau/Looker style. Saturated
+        // enough to distinguish paid vs pending at a glance, but low-key
+        // enough not to shout on a dashboard full of other charts.
+        { label: 'Paid',    data: rows.map(r => r.paid),    backgroundColor: '#8ab89b', borderWidth: 0, stack: 'payout' },
+        { label: 'Pending', data: rows.map(r => r.pending), backgroundColor: '#e0a458', borderWidth: 0, stack: 'payout' },
       ],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtINR(ctx.parsed.x)}` } } },
-      scales: { x: { stacked: true, beginAtZero: true, ticks: { callback: v => '₹' + v } }, y: { stacked: true } },
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${fmtINR(ctx.parsed.x)}`,
+            footer: ctxs => {
+              const row = rows[ctxs[0].dataIndex];
+              return row ? `Total: ${fmtINR(row.total)}` : '';
+            },
+          },
+        },
+      },
+      scales: {
+        x: { stacked: true, beginAtZero: true, ticks: { callback: fmtCompactINR } },
+        y: { stacked: true },
+      },
     },
   });
 }
 
-function renderFarNear(orders, rules, p, range) {
-  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
-  const count = list => {
-    let far = 0, near = 0;
-    for (const o of list) {
-      if (!isDelivered(o)) continue;
-      if (isFarPlace(o, rules)) far++; else near++;
-    }
-    return [far, near];
-  };
-  const [eF, eN] = count(split.earlier);
-  const [lF, lN] = count(split.later);
+function renderFarNear(orders, rules, p) {
+  let far = 0, near = 0;
+  for (const o of orders) {
+    if (!isDelivered(o)) continue;
+    if (isFarPlace(o, rules)) far++; else near++;
+  }
   mountChart('dashFarNear', {
     type: 'bar',
     data: {
       labels: ['Far', 'Near'],
-      datasets: [
-        { label: split.earlierLabel, data: [eF, eN], backgroundColor: p.muted, borderWidth: 0 },
-        { label: split.laterLabel,   data: [lF, lN], backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      datasets: [{ label: 'Orders', data: [far, near], backgroundColor: palettePerBar(2, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.x} orders` } },
+      },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
@@ -909,23 +1054,33 @@ function renderAovTrend(orders, p) {
     },
     options: {
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.y) } } },
-      scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: fmtCompactINR } } },
     },
   });
 }
 
-function renderRepeatNew(orders, p) {
-  // A customer (by phone) is "new" on the first day they appear in the window;
-  // every subsequent day they place an order they count as "repeat".
-  // Only delivered orders are analysed — mirrors the other customer/area charts.
+function renderRepeatNew(orders, customers, p) {
+  // A customer (by phone) is "new" only on the calendar day the customer doc
+  // was first created (their real first-ever order across all history); every
+  // later day they order they count as "repeat".
+  //
+  // Previously the firstSeen map was built only from orders already inside
+  // the fetch window, so a long-time customer whose earliest fetched order
+  // fell inside the window was wrongly tagged "new". Using the customers
+  // collection's `created_at` fixes that because it predates the range.
   const delivered = orders.filter(isDelivered);
   const firstSeen = new Map();
-  const sorted = [...delivered].sort((a, b) => (toDateSafe(a.created_at)?.getTime() || 0) - (toDateSafe(b.created_at)?.getTime() || 0));
-  for (const o of sorted) {
+  for (const c of customers || []) {
+    const d = toDateSafe(c.created_at);
+    if (c.phone && d) firstSeen.set(c.phone, d.getTime());
+  }
+  // Safety net: if any delivered order has a phone we've never seen a
+  // customer doc for, fall back to the earliest order's day as their first.
+  for (const o of delivered) {
     const phone = o.customer?.phone;
+    if (!phone || firstSeen.has(phone)) continue;
     const d = toDateSafe(o.created_at);
-    if (!phone || !d) continue;
-    if (!firstSeen.has(phone)) firstSeen.set(phone, d.getTime());
+    if (d) firstSeen.set(phone, d.getTime());
   }
   const days = bucketByDay(delivered, o => toDateSafe(o.created_at), 7);
   const newData = [], repData = [];
@@ -939,10 +1094,10 @@ function renderRepeatNew(orders, p) {
       if (!phone || !d) continue;
       const dayStart = startOfDay(d).getTime();
       const fs = firstSeen.get(phone);
-      // Count each customer once per day to keep "new" and "repeat" comparable.
+      // Count each customer once per day so "new" and "repeat" stay comparable.
       if (seenToday.has(phone)) continue;
       seenToday.add(phone);
-      if (fs >= dayStart && fs < dayStart + 86400000) n++; else r++;
+      if (fs != null && fs >= dayStart && fs < dayStart + 86400000) n++; else r++;
     }
     newData.push(n);
     repData.push(r);
@@ -963,63 +1118,54 @@ function renderRepeatNew(orders, p) {
   });
 }
 
-function renderTopCustomers(orders, p, range) {
-  const r = topNSplitCounts(
+function renderTopCustomers(orders, p) {
+  const top = topNTotals(
     orders.filter(isDelivered),
     o => { const c = o.customer || {}; return c.name || c.phone || ''; },
-    5, range,
+    5,
   );
   mountChart('dashTopCustomers', {
     type: 'bar',
     data: {
-      labels: r.labels,
-      datasets: [
-        { label: r.split.earlierLabel, data: r.earlier, backgroundColor: p.muted, borderWidth: 0 },
-        { label: r.split.laterLabel,   data: r.later,   backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      labels: top.map(([k]) => k),
+      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: palettePerBar(top.length, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.x} orders` } },
+      },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
 }
 
-function renderTopItems(orders, p, range) {
+function renderTopItems(orders, p) {
   const delivered = orders.filter(isDelivered);
-  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
-  const tally = list => {
-    const m = new Map();
-    for (const o of list) {
-      if (!Array.isArray(o.items)) continue;
-      for (const it of o.items) {
-        const name = (it?.name || '').trim();
-        if (!name) continue;
-        const qty = Number(it.qty) || 1;
-        m.set(name, (m.get(name) || 0) + qty);
-      }
+  const m = new Map();
+  for (const o of delivered) {
+    if (!Array.isArray(o.items)) continue;
+    for (const it of o.items) {
+      const name = (it?.name || '').trim();
+      if (!name) continue;
+      const qty = Number(it.qty) || 1;
+      m.set(name, (m.get(name) || 0) + qty);
     }
-    return m;
-  };
-  const eMap = tally(split.earlier);
-  const lMap = tally(split.later);
-  const totals = new Map();
-  for (const [k, v] of eMap) totals.set(k, (totals.get(k) || 0) + v);
-  for (const [k, v] of lMap) totals.set(k, (totals.get(k) || 0) + v);
-  const labels = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7).map(([k]) => k);
+  }
+  const top = [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7);
   mountChart('dashTopItems', {
     type: 'bar',
     data: {
-      labels,
-      datasets: [
-        { label: split.earlierLabel, data: labels.map(k => eMap.get(k) || 0), backgroundColor: p.muted, borderWidth: 0 },
-        { label: split.laterLabel,   data: labels.map(k => lMap.get(k) || 0), backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      labels: top.map(([k]) => k),
+      datasets: [{ label: 'Qty sold', data: top.map(([, v]) => v), backgroundColor: palettePerBar(top.length, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.x} sold` } },
+      },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
@@ -1037,7 +1183,7 @@ function renderDiscountTrend(orders, p) {
     },
     options: {
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmtINR(ctx.parsed.y) } } },
-      scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: fmtCompactINR } } },
     },
   });
 }
@@ -1049,94 +1195,75 @@ function classifyPayment(o) {
   return (Number(o.paid_already) || 0) > 0 ? 'prepaid' : 'cod';
 }
 
-function renderPrepaidCod(orders, p, range) {
+function renderPrepaidCod(orders, p) {
   const delivered = orders.filter(isDelivered);
-  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
-  const tally = list => {
-    let prepaid = 0, cod = 0;
-    for (const o of list) (classifyPayment(o) === 'prepaid' ? prepaid++ : cod++);
-    return [prepaid, cod];
-  };
-  const [eP, eC] = tally(split.earlier);
-  const [lP, lC] = tally(split.later);
+  let prepaid = 0, cod = 0;
+  for (const o of delivered) (classifyPayment(o) === 'prepaid' ? prepaid++ : cod++);
   mountChart('dashPrepaidCod', {
     type: 'bar',
     data: {
       labels: ['Prepaid', 'COD'],
-      datasets: [
-        { label: split.earlierLabel, data: [eP, eC], backgroundColor: p.muted, borderWidth: 0 },
-        { label: split.laterLabel,   data: [lP, lC], backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      datasets: [{ label: 'Orders', data: [prepaid, cod], backgroundColor: palettePerBar(2, p), borderWidth: 0 }],
     },
     options: {
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} orders` } },
+      },
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
 }
 
-function renderDayOfWeek(orders, p, range) {
+function renderDayOfWeek(orders, p) {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const delivered = orders.filter(isDelivered);
-  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
-  const tally = list => {
-    const c = new Array(7).fill(0);
-    for (const o of list) {
-      const d = toDateSafe(o.created_at);
-      if (d) c[d.getDay()]++;
-    }
-    return c;
-  };
+  const counts = new Array(7).fill(0);
+  for (const o of orders.filter(isDelivered)) {
+    const d = toDateSafe(o.created_at);
+    if (d) counts[d.getDay()]++;
+  }
   mountChart('dashDayOfWeek', {
     type: 'bar',
     data: {
       labels: names,
-      datasets: [
-        { label: split.earlierLabel, data: tally(split.earlier), backgroundColor: p.muted, borderWidth: 0 },
-        { label: split.laterLabel,   data: tally(split.later),   backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      datasets: [{ label: 'Orders', data: counts, backgroundColor: palettePerBar(counts.length, p), borderWidth: 0 }],
     },
     options: {
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} orders` } },
+      },
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
 }
 
-function renderPartnerOrders(orders, staff, p, range) {
+function renderPartnerOrders(orders, staff, p) {
   const staffMap = new Map(staff.map(s => [s.uid, s.name || s.email || s.uid]));
-  const split = splitByMonth(orders, o => toDateSafe(o.created_at), range);
-  const tally = list => {
-    const m = new Map();
-    for (const o of list) {
-      if (!isDelivered(o)) continue;
-      const sid = o.delivery_staff_id;
-      if (!sid || !staffMap.has(sid)) continue;
-      m.set(sid, (m.get(sid) || 0) + 1);
-    }
-    return m;
-  };
-  const eMap = tally(split.earlier);
-  const lMap = tally(split.later);
-  const uids = new Set([...eMap.keys(), ...lMap.keys()]);
-  const rows = [...uids].map(uid => ({
-    uid, name: staffMap.get(uid),
-    earlier: eMap.get(uid) || 0,
-    later:   lMap.get(uid) || 0,
-  })).filter(r => r.earlier || r.later).sort((a, b) => (b.earlier + b.later) - (a.earlier + a.later));
+  const m = new Map();
+  for (const o of orders) {
+    if (!isDelivered(o)) continue;
+    const sid = o.delivery_staff_id;
+    if (!sid || !staffMap.has(sid)) continue;
+    m.set(sid, (m.get(sid) || 0) + 1);
+  }
+  const rows = [...m.entries()]
+    .map(([uid, total]) => ({ uid, name: staffMap.get(uid), total }))
+    .filter(r => r.total > 0)
+    .sort((a, b) => b.total - a.total);
 
   mountChart('dashPartnerOrders', {
     type: 'bar',
     data: {
       labels: rows.map(r => r.name),
-      datasets: [
-        { label: split.earlierLabel, data: rows.map(r => r.earlier), backgroundColor: p.muted, borderWidth: 0 },
-        { label: split.laterLabel,   data: rows.map(r => r.later),   backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      datasets: [{ label: 'Orders', data: rows.map(r => r.total), backgroundColor: palettePerBar(rows.length, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
-      plugins: { legend: { position: 'bottom' } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.x} orders` } },
+      },
       scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
     },
   });
@@ -1173,40 +1300,34 @@ function renderDeliveryTime(orders, p) {
   });
 }
 
-function renderRevenueByRestaurant(orders, p, range) {
+function renderRevenueByRestaurant(orders, p) {
   const delivered = orders.filter(isDelivered);
-  const split = splitByMonth(delivered, o => toDateSafe(o.created_at), range);
-  const revBy = list => {
-    const m = new Map();
-    for (const o of list) {
-      const k = o.restaurant_name || o.restaurant_id || 'Unknown';
-      m.set(k, (m.get(k) || 0) + netRevenue(o));
-    }
-    return m;
-  };
-  const eMap = revBy(split.earlier);
-  const lMap = revBy(split.later);
-  const totals = new Map();
-  for (const [k, v] of eMap) totals.set(k, (totals.get(k) || 0) + v);
-  for (const [k, v] of lMap) totals.set(k, (totals.get(k) || 0) + v);
-  const labels = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7).map(([k]) => k);
+  const m = new Map();
+  for (const o of delivered) {
+    const k = o.restaurant_name || o.restaurant_id || 'Unknown';
+    m.set(k, (m.get(k) || 0) + netRevenue(o));
+  }
+  const top = [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7);
+  const fullLabels = top.map(([k]) => k);
   mountChart('dashRevenueByRestaurant', {
     type: 'bar',
     data: {
-      labels: labels.map(n => truncateName(n, 10)),
-      datasets: [
-        { label: split.earlierLabel, data: labels.map(k => Math.round(eMap.get(k) || 0)), backgroundColor: p.muted, borderWidth: 0 },
-        { label: split.laterLabel,   data: labels.map(k => Math.round(lMap.get(k) || 0)), backgroundColor: p.brand, borderWidth: 0 },
-      ],
+      labels: fullLabels.map(n => truncateName(n, 10)),
+      datasets: [{ label: 'Revenue ₹', data: top.map(([, v]) => Math.round(v)), backgroundColor: palettePerBar(top.length, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
       plugins: {
-        legend: { position: 'bottom' },
-        tooltip: { callbacks: { title: ctx => labels[ctx[0].dataIndex], label: ctx => `${ctx.dataset.label}: ${fmtINR(ctx.parsed.x)}` } },
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: ctx => fullLabels[ctx[0].dataIndex],
+            label: ctx => fmtINR(ctx.parsed.x),
+          },
+        },
       },
       scales: {
-        x: { beginAtZero: true, ticks: { callback: v => '₹' + v } },
+        x: { beginAtZero: true, ticks: { callback: fmtCompactINR } },
         y: { ticks: { autoSkip: false, font: { size: 11 } } },
       },
     },

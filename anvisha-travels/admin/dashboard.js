@@ -41,9 +41,17 @@ export async function renderDashboard(ctx) {
         <h3>P&amp;L by month — last 6 months</h3>
         <div class="chart-canvas-wrap" style="height:280px;"><canvas id="ch-pnl" aria-label="P and L per month bar chart"></canvas></div>
       </div>
+      <div class="chart-block" style="grid-column:1/-1;">
+        <h3>Monthly growth — this month vs last (day-wise revenue)</h3>
+        <div class="chart-canvas-wrap" style="height:280px;"><canvas id="ch-monthly-growth" aria-label="Cumulative revenue this month vs last month"></canvas></div>
+      </div>
       <div class="chart-block">
         <h3>Expense breakdown</h3>
         <div class="chart-canvas-wrap"><canvas id="ch-exp-mix" aria-label="Expense category breakdown doughnut chart"></canvas></div>
+      </div>
+      <div class="chart-block">
+        <h3>Fuel breakdown</h3>
+        <div class="chart-canvas-wrap"><canvas id="ch-fuel-mix" aria-label="Fuel type breakdown doughnut chart"></canvas></div>
       </div>
       <div class="chart-block">
         <h3>Top 10 destinations</h3>
@@ -226,13 +234,96 @@ export async function renderDashboard(ctx) {
         data: {
           labels: monthLabels,
           datasets: [
-            { label: 'Revenue',     data: revByMonth,    backgroundColor: palette[1] },
-            { label: 'Direct cost', data: directByMonth, backgroundColor: palette[7] },
-            { label: 'Opex',        data: opexByMonth,   backgroundColor: palette[4] },
-            { label: 'Net profit',  type: 'line', data: profitByMonth, borderColor: palette[0], backgroundColor: palette[0], tension: 0.3, yAxisID: 'y' },
+            { label: 'Revenue',    data: revByMonth,    backgroundColor: palette[1], borderRadius: 6, stack: 'rev' },
+            { label: 'Direct cost', data: directByMonth, backgroundColor: palette[7], borderRadius: 6, stack: 'cost' },
+            { label: 'Opex',        data: opexByMonth,   backgroundColor: palette[4], borderRadius: 6, stack: 'cost' },
+            { label: 'Net profit',  type: 'line', data: profitByMonth, borderColor: palette[0], backgroundColor: palette[0], tension: 0.35, borderWidth: 2, pointRadius: 3 },
           ],
         },
-        options: { responsive: true, maintainAspectRatio: false },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true },
+          },
+        },
+      }));
+    }
+
+    // ── Monthly growth: this month vs last (cumulative fare from completed
+    //    bookings, indexed by day-of-month). Deliberately ignores the range
+    //    picker — it's always a fixed month-over-month comparison, mirroring
+    //    the BankiBites admin dashboard chart. ──
+    {
+      const now = new Date();
+      const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const lastMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 0);
+      const daysInThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+      const cumThis = new Array(daysInThisMonth).fill(0);
+      const cumLast = new Array(daysInThisMonth).fill(0);
+      for (const b of bookings) {
+        if (b.status !== 'completed') continue;
+        const t = toDateSafe(b.completedAt) || toDateSafe(b.createdAt);
+        if (!t) continue;
+        const fare = Number(b.fare || 0);
+        if (t >= thisMonthStart && t <= now) {
+          cumThis[t.getDate() - 1] += fare;
+        } else if (t >= lastMonthStart && t <= lastMonthEnd) {
+          const di = t.getDate() - 1;
+          if (di < cumLast.length) cumLast[di] += fare;
+        }
+      }
+      for (let i = 1; i < cumThis.length; i++) cumThis[i] += cumThis[i - 1];
+      for (let i = 1; i < cumLast.length; i++) cumLast[i] += cumLast[i - 1];
+
+      const todayDom = now.getDate();
+      const cumThisDisplay = cumThis.map((v, i) => i < todayDom ? Math.round(v) : null);
+      const cumLastDisplay = cumLast.map(v => Math.round(v));
+
+      const thisLabel = thisMonthStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+      const lastLabel = lastMonthStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+
+      charts.push(new Chart(panel.querySelector('#ch-monthly-growth'), {
+        type: 'line',
+        data: {
+          labels: cumThis.map((_, i) => String(i + 1).padStart(2, '0')),
+          datasets: [
+            { label: `This month · ${thisLabel}`, data: cumThisDisplay, borderColor: palette[0], backgroundColor: palette[0] + '33', fill: false, tension: 0.25, pointRadius: 2, borderWidth: 2 },
+            { label: `Last month · ${lastLabel}`, data: cumLastDisplay, borderColor: '#94a3b8',    backgroundColor: 'transparent',   borderDash: [4, 4], fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 },
+          ],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                title: ctxs => `Day ${ctxs[0].label}`,
+                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y == null ? '—' : fmtINR(ctx.parsed.y)}`,
+                footer: ctxs => {
+                  const thisCtx = ctxs.find(c => c.datasetIndex === 0);
+                  const lastCtx = ctxs.find(c => c.datasetIndex === 1);
+                  const t = thisCtx?.parsed.y, l = lastCtx?.parsed.y;
+                  if (t == null || l == null) return '';
+                  const diff = t - l;
+                  const pct  = l > 0 ? Math.round((diff / l) * 100) : null;
+                  const pctText = pct == null ? '' : ` (${diff >= 0 ? '+' : ''}${pct}%)`;
+                  return `Δ vs last month: ${diff >= 0 ? '+' : '−'}${fmtINR(Math.abs(diff))}${pctText}`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { ticks: { autoSkip: true, maxRotation: 0 }, title: { display: true, text: 'Day of month' } },
+            y: { beginAtZero: true, ticks: { callback: fmtCompactINR }, title: { display: true, text: 'Cumulative revenue' } },
+          },
+        },
       }));
     }
 
@@ -244,6 +335,23 @@ export async function renderDashboard(ctx) {
       charts.push(new Chart(panel.querySelector('#ch-exp-mix'), {
         type: 'doughnut',
         data: { labels: labels.map(prettify), datasets: [{ data, backgroundColor: palette }] },
+        options: { responsive: true, maintainAspectRatio: false },
+      }));
+    }
+
+    // ── Fuel breakdown (by fuel type, ₹ from bookings in range) ──
+    {
+      const byType = new Map();
+      bkInRange.forEach(b => {
+        if (!b.fuel || !b.fuel.cost) return;
+        const k = (b.fuel.type || 'Unknown').trim() || 'Unknown';
+        byType.set(k, (byType.get(k) || 0) + Number(b.fuel.cost || 0));
+      });
+      const labels = [...byType.keys()];
+      const data   = labels.map(k => byType.get(k));
+      charts.push(new Chart(panel.querySelector('#ch-fuel-mix'), {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data, backgroundColor: palette }] },
         options: { responsive: true, maintainAspectRatio: false },
       }));
     }
@@ -345,4 +453,17 @@ function setKpi(id, value, sub) {
 }
 function prettify(k) {
   return String(k).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Compact ₹ axis label: 1,00,000 → "₹1L", 12,340 → "₹12.3k", <1000 stays raw.
+// Keeps y-axis narrow on phones without truncating tooltip precision.
+function fmtCompactINR(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n === 0) return '₹0';
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  if (abs >= 10000000) return `${sign}₹${(n / 10000000).toFixed(n % 10000000 === 0 ? 0 : 1)}Cr`;
+  if (abs >= 100000)   return `${sign}₹${(n / 100000).toFixed(n % 100000 === 0 ? 0 : 1)}L`;
+  if (abs >= 1000)     return `${sign}₹${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k`;
+  return `${sign}₹${Math.round(abs)}`;
 }
