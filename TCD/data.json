@@ -100,21 +100,21 @@
               "id": 301,
               "name": "Hakka Noodles",
               "price": 139,
-              "available_time": "",
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 302,
               "name": "Sezwan Noodles",
               "price": 139,
-              "available_time": "",
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 303,
               "name": "Singapore Noodles",
               "price": 139,
-              "available_time": "",
+              "available_time": 16,
               "not_available_time": ""
             },
             {
@@ -155,14 +155,14 @@
               "id": 401,
               "name": "Chicken Hakka Noodles",
               "price": 169,
-              "available_time": "",
+              "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 402,
               "name": "Chicken Sezwan Noodles",
               "price": 169,
-              "available_time": "",
+              "available_time": 16,
               "not_available_time": ""
             },
             {
