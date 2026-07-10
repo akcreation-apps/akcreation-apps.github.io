@@ -1,0 +1,174 @@
+{
+  "menu": [
+    {
+      "category": "Chinese",
+      "subcategories": [
+        {
+          "name": "Soup",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 11,
+              "name": "Chicken Soup",
+              "price": 39,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 12,
+              "name": "Mutton Soup",
+              "price": 39,
+              "available_time": 16,
+              "not_available_time": "",
+              "non_available_days": [1, 2, 4, 6]
+            }
+          ]
+        },
+        {
+          "name": "Starter",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 101,
+              "name": "Veg Manchurian",
+              "price": 69,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 102,
+              "name": "Paneer Chilli",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Starter",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 201,
+              "name": "Chicken Pakoda (5Pc)",
+              "price": 59,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 202,
+              "name": "Chicken Popcorn (10Pc)",
+              "price": 69,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 203,
+              "name": "Chicken Lollipop Dry (5Pc)",
+              "price": 119,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 204,
+              "name": "Chicken Wings (5Pc)",
+              "price": 119,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 205,
+              "name": "Chilli Chicken",
+              "price": 129,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "MainCourse",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 301,
+              "name": "Veg Chowmein",
+              "price": 69,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 302,
+              "name": "Paneer Chowmein",
+              "price": 69,
+              "available_time": 16,
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "MainCourse",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 401,
+              "name": "Single Egg Roll",
+              "price": 69,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 402,
+              "name": "Double Egg Roll",
+              "price": 79,
+              "available_time": 16,
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Indian",
+      "subcategories": [
+        {
+          "name": "Roti N Paratha",
+          "dishes": [
+            {
+              "id": 501,
+              "name": "Plain Paratha",
+              "price": 19,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Biryani",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 601,
+              "name": "Veg Biryani (Full)",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Biryani",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 701,
+              "name": "Chicken Biryani (3pc 1Egg)",
+              "price": 129,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

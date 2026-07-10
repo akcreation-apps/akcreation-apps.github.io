@@ -36,6 +36,17 @@
       "closing_hour": "22",
       "address": "Jail Road, Banki, Odisha 754008",
       "is_active": true
+    },
+    {
+      "name": "Unique Fast Food",
+      "logo": "https://akcreation-apps.com/Unique/unique-logo.png",
+      "url": "https://akcreation-apps.com/Unique/?table=COD",
+      "services": ["Chinese", "Indian"],
+      "rating": 5,
+      "opening_hour": "16",
+      "closing_hour": "23",
+      "address": "Banki Khordha Road, Banki, Odisha 754008",
+      "is_active": true
     }
   ]
 }

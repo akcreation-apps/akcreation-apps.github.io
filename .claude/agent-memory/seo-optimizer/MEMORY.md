@@ -4,3 +4,4 @@
 - [BankiBites SEO Implementation](project_bankibites_seo.md) — Schema, geo meta, OG/Twitter, PWA meta for banki-bites/index.html and dashboard.html; Organization->LocalBusiness fix; dashboard had zero structured data
 - [Anvisha Travels SEO Implementation](project_anvisha_travels_seo.md) — TaxiService+LocalBusiness schema, full OG/Twitter, local keywords, sitemap entry added May 2026; first-ever SEO pass on this page
 - [Prompt Gallery SEO Implementation](project_prompt_gallery_seo.md) — CollectionPage+ItemList schema, full OG/Twitter, H1 fix, Firebase preconnect, alt text, internal link from index.html; June 2026
+- [Unique Fast Food SEO Implementation](project_unique_fastfood_seo.md) — Description expansion, parentOrganization (BankiBites), sitemap entry added July 2026; streetAddress/telephone pending owner input
