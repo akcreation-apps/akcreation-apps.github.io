@@ -50,22 +50,22 @@
           "dishes": [
             {
               "id": 201,
-              "name": "Chicken Pakoda (5Pc)",
-              "price": 59,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 202,
-              "name": "Chicken Popcorn (10Pc)",
+              "name": "Egg Chap (4Pc)",
               "price": 69,
               "available_time": "",
               "not_available_time": ""
             },
             {
+              "id": 202,
+              "name": "Chicken Pakoda (5Pc)",
+              "price": 79,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
               "id": 203,
-              "name": "Chicken Lollipop Dry (5Pc)",
-              "price": 119,
+              "name": "Chicken Popcorn (10Pc)",
+              "price": 69,
               "available_time": "",
               "not_available_time": ""
             },
@@ -78,6 +78,20 @@
             },
             {
               "id": 205,
+              "name": "Chicken Lollipop Dry (5Pc)",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 206,
+              "name": "Chicken Lollipop Chilli (4Pc)",
+              "price": 139,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 207,
               "name": "Chilli Chicken",
               "price": 129,
               "available_time": "",
@@ -91,13 +105,27 @@
           "dishes": [
             {
               "id": 301,
+              "name": "Veg Roll",
+              "price": 59,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 302,
+              "name": "Paneer Roll",
+              "price": 69,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 303,
               "name": "Veg Chowmein",
               "price": 69,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 302,
+              "id": 304,
               "name": "Paneer Chowmein",
               "price": 69,
               "available_time": "",
@@ -119,6 +147,20 @@
             {
               "id": 402,
               "name": "Double Egg Roll",
+              "price": 79,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 403,
+              "name": "Single Egg Chowmein",
+              "price": 69,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 404,
+              "name": "Double Egg Chowmein",
               "price": 79,
               "available_time": "",
               "not_available_time": ""
