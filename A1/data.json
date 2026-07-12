@@ -1,4 +1,14 @@
 {
+  "_OFFER_KEYS_DOCS": [
+    "To feature a dish in the top Deals of the Day rail, add TWO optional keys to that dish:",
+    "  offer_price (number) — fake higher MRP; must be strictly greater than price. Renders strikethrough.",
+    "  is_offer (boolean, true) — include this dish in the horizontal Deals rail at the top of the menu.",
+    "Behaviour: both keys => dish appears in Deals rail AND its normal category card shows a red X% OFF badge + strikethrough MRP.",
+    "Only offer_price (no is_offer) => strikethrough shows on normal card, but dish is NOT lifted into the Deals rail.",
+    "Only is_offer (no offer_price) => ignored (console.warn) — nothing to strike through.",
+    "Percent OFF is computed as round((offer_price - price) / offer_price * 100). Cart still charges the real price.",
+    "Example: {\"id\": 105, \"name\": \"Honey Chilli Potato\", \"price\": 179, \"offer_price\": 229, \"is_offer\": true}"
+  ],
   "menu": [
     {
       "category": "Chinese",

@@ -849,6 +849,303 @@
             border: 1px solid rgba(255,255,255,0.25);
         }
 
+        /* Offer badge on regular category cards (also carries an offer_price) */
+        .offer-badge {
+            position: absolute;
+            top: 6px; left: 6px;
+            z-index: 4;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            letter-spacing: 0.4px;
+            line-height: 1.15;
+            box-shadow: 0 2px 6px rgba(185,28,28,0.55), 0 0 0 1.5px rgba(255,255,255,0.85);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+        }
+        .dish-card:has(.offer-badge) .diet-badge { left: auto; right: 6px; }
+        .dish-card:has(.offer-badge) .bestseller-badge { top: 32px; }
+        .price .price-strike {
+            text-decoration: line-through;
+            text-decoration-color: #ef4444;
+            text-decoration-thickness: 1.5px;
+            color: #ffffff;
+            opacity: 0.85;
+            font-size: 0.92em;
+            margin-right: 5px;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           Deals of the Day — horizontal rail (Zomato-style)
+           ============================================================ */
+        .offers-section {
+            position: relative;
+            margin: 8px -14px 20px;         /* bleed to viewport edges on mobile */
+            padding: 16px 0 18px;
+            background:
+                radial-gradient(1200px 220px at 20% 0%, rgba(239,68,68,0.10), transparent 60%),
+                radial-gradient(900px 200px at 85% 100%, rgba(245,158,11,0.10), transparent 60%),
+                linear-gradient(180deg, #fff8ec 0%, #fff 100%);
+            border-top: 1px solid rgba(239,68,68,0.10);
+            border-bottom: 1px solid rgba(245,158,11,0.15);
+        }
+        .offers-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 16px 12px;
+        }
+        .offers-head-text { min-width: 0; }
+        .offers-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #b91c1c;
+            background: rgba(239,68,68,0.10);
+            border: 1px solid rgba(239,68,68,0.22);
+            padding: 3px 8px;
+            border-radius: 999px;
+        }
+        .offers-eyebrow .fa-bolt { font-size: 0.62rem; color: #ef4444; }
+        .offers-title {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #111827;
+            margin: 6px 0 2px;
+            letter-spacing: -0.02em;
+        }
+        .offers-subtitle {
+            font-size: 0.72rem;
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .offers-count-chip {
+            flex-shrink: 0;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #ef4444;
+            background: #fff;
+            border: 1px solid rgba(239,68,68,0.25);
+            padding: 4px 9px;
+            border-radius: 999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            text-transform: uppercase;
+        }
+
+        /* Horizontal rail */
+        .offers-rail {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 16px 12px;
+            scroll-padding-left: 16px;
+        }
+        .offers-rail::-webkit-scrollbar { height: 6px; }
+        .offers-rail::-webkit-scrollbar-track { background: transparent; }
+        .offers-rail::-webkit-scrollbar-thumb {
+            background: rgba(239,68,68,0.25);
+            border-radius: 999px;
+        }
+        .offers-rail:focus { outline: none; }
+        .offers-rail:focus-visible { box-shadow: inset 0 0 0 2px rgba(239,68,68,0.35); }
+
+        /* Individual offer card */
+        .offer-card {
+            flex: 0 0 132px;
+            scroll-snap-align: start;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(17,24,39,0.06), 0 4px 14px rgba(17,24,39,0.06);
+            border: 1px solid rgba(17,24,39,0.06);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            position: relative;
+        }
+        .offer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(17,24,39,0.08), 0 10px 22px rgba(17,24,39,0.10);
+        }
+        .offer-card.unavailable { opacity: 0.55; filter: grayscale(0.35); }
+
+        .offer-card-media {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #f3f4f6;
+            overflow: hidden;
+        }
+        .offer-card-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s ease;
+        }
+        .offer-card:hover .offer-card-img { transform: scale(1.05); }
+
+        /* Ribbon — corner discount tag */
+        .offer-ribbon {
+            position: absolute;
+            top: 6px; left: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            padding: 3px 5px 3px;
+            background: linear-gradient(140deg, #ef4444 0%, #b91c1c 100%);
+            color: #fff;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(185,28,28,0.35);
+            line-height: 1;
+        }
+        .offer-ribbon-pct {
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+        .offer-ribbon-off {
+            font-size: 0.42rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-top: 1px;
+            opacity: 0.95;
+        }
+
+        /* Diet dot on the offer card */
+        .offer-diet {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 12px; height: 12px;
+            background: #fff;
+            border: 1.5px solid #963415;
+            border-radius: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .offer-diet.veg { border-color: #00922A; }
+        .offer-diet::after {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #963415;
+        }
+        .offer-diet.veg::after { background: #00922A; }
+
+        .offer-bestseller {
+            position: absolute;
+            bottom: 5px; left: 5px;
+            background: rgba(230,74,25,0.95);
+            color: #fff;
+            font-size: 0.44rem;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 5px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
+
+        .offer-card-body {
+            padding: 8px 9px 9px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .offer-card-name {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+            line-height: 1.22;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 1.85em;
+        }
+        .offer-card-price {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin-top: 2px;
+        }
+        .offer-price-now {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -0.02em;
+        }
+        .offer-price-was {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+        .offer-card-save {
+            font-size: 0.54rem;
+            font-weight: 700;
+            color: #059669;
+            letter-spacing: 0.2px;
+        }
+        /* Override the globally-absolute .item-control inside offer cards
+           so it doesn't cover the price row */
+        .offer-card .item-control.offer-card-control {
+            position: static;
+            margin-top: 6px;
+            min-height: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            border-width: 1.5px;
+            display: flex;
+            align-items: stretch;
+        }
+        .offer-card .offer-card-control .add-btn {
+            font-size: 0.68rem;
+            min-height: 30px;
+            padding: 0 6px;
+        }
+        .offer-card .offer-card-control .add-btn.unavailable {
+            font-size: 0.6rem;
+        }
+
+        /* Tablet & up */
+        @media (min-width: 768px) {
+            .offers-section {
+                margin: 12px 0 24px;
+                border-radius: 16px;
+                border: 1px solid rgba(245,158,11,0.18);
+            }
+            .offers-head { padding: 0 20px 12px; }
+            .offers-title { font-size: 1.2rem; }
+            .offers-subtitle { font-size: 0.78rem; }
+            .offers-rail { padding: 4px 20px 12px; gap: 12px; scroll-padding-left: 20px; }
+            .offer-card { flex-basis: 152px; }
+            .offer-card-name { font-size: 0.78rem; }
+            .offer-price-now { font-size: 0.9rem; }
+        }
+        @media (min-width: 1200px) {
+            .offer-card { flex-basis: 168px; }
+        }
+
         /* ── View Cart bar ── */
         .view-cart-bar {
             position: fixed;

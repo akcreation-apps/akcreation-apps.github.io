@@ -296,6 +296,116 @@ document.addEventListener('DOMContentLoaded', async() => {
     onlyVegCheckbox.checked = localStorage.getItem(lsKey('onlyVeg')) === 'true';
     onlyNonVegCheckbox.checked = localStorage.getItem(lsKey('onlyNonVeg')) === 'true';
 
+    // Decide whether a dish should be rendered given current filters + availability rules
+    const isDishRenderable = (dish, subcategory) => {
+        if (disable_ids.includes(dish.id)) return false;
+        if (Array.isArray(dish.non_available_days) &&
+            dish.non_available_days.includes(new Date().getDay())) return false;
+        if ((onlyVegCheckbox.checked && onlyNonVegCheckbox.checked) ||
+            (!onlyVegCheckbox.checked && !onlyNonVegCheckbox.checked)) {
+            // both or neither -> allow
+        } else if (onlyVegCheckbox.checked && subcategory.type !== 'Veg' && subcategory.type) {
+            return false;
+        } else if (onlyNonVegCheckbox.checked && subcategory.type !== 'NonVeg' && subcategory.type) {
+            return false;
+        }
+        return true;
+    };
+
+    // Compute the "not yet available / no longer available" note for a dish
+    const computeUnavailableNote = (dish) => {
+        const currentHour = new Date().getHours();
+        if (typeof dish.available_time === 'number' && currentHour < dish.available_time) {
+            return `From ${formatHour(dish.available_time)}`;
+        }
+        if (typeof dish.not_available_time === 'number' && currentHour >= dish.not_available_time) {
+            return `Till ${formatHour(dish.not_available_time)}`;
+        }
+        return '';
+    };
+
+    // Build a single dish card DOM node — shared between the Offers section and the regular menu
+    const buildDishCard = (dish, subcategory) => {
+        const unavailableNote = computeUnavailableNote(dish);
+        const menuItem = document.createElement('div');
+        menuItem.classList.add('menu-item');
+        if (unavailableNote) menuItem.classList.add('unavailable');
+        menuItem.setAttribute('role', 'article');
+        menuItem.setAttribute('aria-label',
+            `${dish.name} — ${subcategory.type === 'NonVeg' ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}`);
+        const url = get_dish_url(dish.name);
+        const isNonVeg = subcategory.type === 'NonVeg';
+
+        const hasOffer = typeof dish.offer_price === 'number' && dish.offer_price > dish.price;
+        if (dish.is_offer && !hasOffer) {
+            console.warn(`[MCH] Dish "${dish.name}" is_offer=true but offer_price is missing or ≤ price; skipping strikethrough.`);
+        }
+        const pct = hasOffer
+            ? Math.round((dish.offer_price - dish.price) / dish.offer_price * 100)
+            : 0;
+
+        const priceHtml = hasOffer
+            ? `<p class="price"><span class="price-strike">₹${dish.offer_price.toFixed(0)}</span> ₹${dish.price.toFixed(0)}/-</p>`
+            : `<p class="price">₹${dish.price.toFixed(0)}/-</p>`;
+
+        menuItem.innerHTML = `
+          <div class="menu-item-container">
+                <div class="dish-card">
+                    <img src="${url}" alt="${dish.name}" class="dish-img">
+                    <div class="diet-badge ${isNonVeg ? 'nonveg' : 'veg'}" aria-label="${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}"></div>
+                    ${hasOffer ? `<span class="offer-badge">${pct}% OFF</span>` : ''}
+                    ${bestsellerNames.has(dish.name) ? '<span class="bestseller-badge">🔥 Bestseller</span>' : ''}
+                    <div class="dish-overlay">
+                        <h5 class="dish-name">${dish.name}</h5>
+                        ${priceHtml}
+                    </div>
+                    <div class="item-control"></div>
+                </div>
+          </div>
+        `;
+        renderControl(menuItem.querySelector('.item-control'), subcategory, dish, false, unavailableNote);
+        return menuItem;
+    };
+
+    // Zomato-style horizontal-rail card used only inside the Offers section
+    const buildOfferRailCard = (dish, subcategory) => {
+        const unavailableNote = computeUnavailableNote(dish);
+        const url = get_dish_url(dish.name);
+        const isNonVeg = subcategory.type === 'NonVeg';
+        const pct = Math.round((dish.offer_price - dish.price) / dish.offer_price * 100);
+        const savings = Math.round(dish.offer_price - dish.price);
+
+        const card = document.createElement('article');
+        card.className = 'offer-card';
+        if (unavailableNote) card.classList.add('unavailable');
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('aria-label',
+            `${dish.name} — ${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}, ${pct}% off from ₹${dish.offer_price}`);
+
+        card.innerHTML = `
+            <div class="offer-card-media">
+                <img src="${url}" alt="${dish.name}" class="offer-card-img" loading="lazy">
+                <span class="offer-ribbon">
+                    <span class="offer-ribbon-pct">${pct}%</span>
+                    <span class="offer-ribbon-off">OFF</span>
+                </span>
+                <span class="offer-diet ${isNonVeg ? 'nonveg' : 'veg'}" aria-hidden="true"></span>
+                ${bestsellerNames.has(dish.name) ? '<span class="offer-bestseller">🔥 Bestseller</span>' : ''}
+            </div>
+            <div class="offer-card-body">
+                <h4 class="offer-card-name" title="${dish.name}">${dish.name}</h4>
+                <div class="offer-card-price">
+                    <span class="offer-price-now">₹${dish.price.toFixed(0)}</span>
+                    <span class="offer-price-was">₹${dish.offer_price.toFixed(0)}</span>
+                </div>
+                <div class="offer-card-save">You save ₹${savings}</div>
+                <div class="offer-card-control item-control"></div>
+            </div>
+        `;
+        renderControl(card.querySelector('.item-control'), subcategory, dish, false, unavailableNote);
+        return card;
+    };
+
     const renderMenu = () => {
         menuContainer.innerHTML = ''; // Clear previous content
         fetch(`data.json?v=${new Date().getTime()}`)
@@ -303,6 +413,76 @@ document.addEventListener('DOMContentLoaded', async() => {
             .then(data => {
                 // Reset shortcuts
                 shortcutsContainer.innerHTML = '';
+
+                // ── Offers section (rendered first) ──────────────────────────────
+                const offerEntries = [];
+                data.menu.forEach(category => {
+                    category.subcategories.forEach(subcategory => {
+                        subcategory.dishes.forEach(dish => {
+                            if (dish.is_offer === true &&
+                                typeof dish.offer_price === 'number' &&
+                                dish.offer_price > dish.price &&
+                                isDishRenderable(dish, subcategory)) {
+                                offerEntries.push({ dish, subcategory });
+                            }
+                        });
+                    });
+                });
+
+                if (offerEntries.length > 0) {
+                    const offersSection = document.createElement('section');
+                    offersSection.classList.add('offers-section', 'category-block');
+                    offersSection.id = 'Offers';
+                    offersSection.setAttribute('aria-labelledby', 'offers-heading');
+
+                    offersSection.innerHTML = `
+                        <div class="offers-head">
+                            <div class="offers-head-text">
+                                <span class="offers-eyebrow">
+                                    <i class="fas fa-bolt" aria-hidden="true"></i> Limited Time
+                                </span>
+                                <h3 id="offers-heading" class="offers-title">Deals of the Day</h3>
+                                <p class="offers-subtitle">Save big on today's most-loved picks · Prices drop when you tap add</p>
+                            </div>
+                            <div class="offers-count-chip" aria-hidden="true">${offerEntries.length} live</div>
+                        </div>
+                        <div class="offers-rail" role="list" tabindex="0" aria-label="Deals of the day, scroll horizontally"></div>
+                    `;
+
+                    const rail = offersSection.querySelector('.offers-rail');
+                    offerEntries
+                        .slice()
+                        .sort((a, b) => {
+                            const pctA = (a.dish.offer_price - a.dish.price) / a.dish.offer_price;
+                            const pctB = (b.dish.offer_price - b.dish.price) / b.dish.offer_price;
+                            return pctB - pctA; // biggest discount first
+                        })
+                        .forEach(({ dish, subcategory }) => {
+                            rail.appendChild(buildOfferRailCard(dish, subcategory));
+                        });
+
+                    menuContainer.appendChild(offersSection);
+
+                    // Shortcut chip for Offers (appears first)
+                    const offersShortcut = document.createElement('div');
+                    offersShortcut.classList.add('shortcut-card');
+                    const offersLink = document.createElement('a');
+                    offersLink.href = '#Offers';
+                    offersLink.className = 'shortcut';
+                    offersLink.textContent = '⚡ Deals';
+                    offersLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.querySelectorAll('.shortcut-card').forEach(c => c.classList.remove('active'));
+                        offersShortcut.classList.add('active');
+                        scrollChipIntoView(offersShortcut);
+                        _spyIgnore = true;
+                        clearTimeout(_spyIgnoreTimer);
+                        _spyIgnoreTimer = setTimeout(() => { _spyIgnore = false; }, 1000);
+                        scrollToCategory('Offers');
+                    });
+                    offersShortcut.appendChild(offersLink);
+                    shortcutsContainer.appendChild(offersShortcut);
+                }
 
                 // Render categories and dishes
                 data.menu.forEach(category => {
@@ -335,64 +515,10 @@ document.addEventListener('DOMContentLoaded', async() => {
                         const dishGrid = document.createElement('div');
                         dishGrid.classList.add('dish-grid');
 
-                        const currentHour = new Date().getHours();
-
                         const sortedDishes = [...subcategory.dishes].sort((a, b) => a.price - b.price);
                         sortedDishes.forEach(dish => {
-                            // Skip rendering the dish if its id is in disable_ids
-                            if (disable_ids.includes(dish.id)) {
-                                return;
-                            }
-
-                            // Skip rendering if today's day-of-week is in non_available_days
-                            // (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-                            if (Array.isArray(dish.non_available_days) &&
-                                dish.non_available_days.includes(new Date().getDay())) {
-                                return;
-                            }
-
-                            // Compute hourly-availability note (greys out dish instead of hiding)
-                            let unavailableNote = '';
-                            if (typeof dish.available_time === 'number' && currentHour < dish.available_time) {
-                                unavailableNote = `From ${formatHour(dish.available_time)}`;
-                            } else if (typeof dish.not_available_time === 'number' && currentHour >= dish.not_available_time) {
-                                unavailableNote = `Till ${formatHour(dish.not_available_time)}`;
-                            }
-
-                            // Filter logic: Show items with no subcategory type or based on filters
-                            if ((onlyVegCheckbox.checked && onlyNonVegCheckbox.checked) ||
-                                (!onlyVegCheckbox.checked && !onlyNonVegCheckbox.checked)) {
-                                // Both checkboxes are checked (or none), show all items
-                            } else if (onlyVegCheckbox.checked && subcategory.type !== 'Veg' && subcategory.type) {
-                                return;
-                            } else if (onlyNonVegCheckbox.checked && subcategory.type !== 'NonVeg' && subcategory.type) {
-                                return;
-                            }
-
-                            const menuItem = document.createElement('div');
-                            menuItem.classList.add('menu-item');
-                            if (unavailableNote) menuItem.classList.add('unavailable');
-                            menuItem.setAttribute('role', 'article');
-                            menuItem.setAttribute('aria-label', `${dish.name} — ${subcategory.type === 'NonVeg' ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}`);
-                            const url = get_dish_url(dish.name);
-                            const isNonVeg = subcategory.type === 'NonVeg';
-                            menuItem.innerHTML = `
-                              <div class="menu-item-container">
-                                    <div class="dish-card">
-                                        <img src="${url}" alt="${dish.name}" class="dish-img">
-                                        <div class="diet-badge ${isNonVeg ? 'nonveg' : 'veg'}" aria-label="${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}"></div>
-                                        ${bestsellerNames.has(dish.name) ? '<span class="bestseller-badge">🔥 Bestseller</span>' : ''}
-                                        <div class="dish-overlay">
-                                            <h5 class="dish-name">${dish.name}</h5>
-                                            <p class="price">₹${dish.price.toFixed(0)}/-</p>
-                                        </div>
-                                        <div class="item-control"></div>
-                                    </div>
-                              </div>
-                            `;
-                            renderControl(menuItem.querySelector('.item-control'), subcategory, dish, false, unavailableNote);
-
-                            dishGrid.appendChild(menuItem);
+                            if (!isDishRenderable(dish, subcategory)) return;
+                            dishGrid.appendChild(buildDishCard(dish, subcategory));
                             hasVisibleDishes = true;
                         });
 
@@ -536,6 +662,28 @@ function applyFilters() {
     let anyVisibleDish = false;
 
     document.querySelectorAll('.category-block').forEach(categoryBlock => {
+        // Offers section uses a horizontal rail instead of subcategory grids —
+        // filter its .offer-card children directly and skip the subcategory loop.
+        if (categoryBlock.classList.contains('offers-section')) {
+            const offerCards = categoryBlock.querySelectorAll('.offer-card');
+            let anyVisibleOffer = false;
+            offerCards.forEach(card => {
+                const dishName = card.querySelector('.offer-card-name')?.textContent.toLowerCase() || '';
+                const isBestseller = !!card.querySelector('.offer-bestseller');
+                const matchesSearch = !searchTerm || dishName.includes(searchTerm);
+                const matchesBestseller = !bestsellerOnly || isBestseller;
+                if (matchesSearch && matchesBestseller) {
+                    card.style.display = '';
+                    anyVisibleOffer = true;
+                    anyVisibleDish = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            categoryBlock.style.display = anyVisibleOffer ? '' : 'none';
+            return;
+        }
+
         let hasVisibleInCategory = false;
         categoryBlock.querySelectorAll('.subcategory-block').forEach(subcategoryBlock => {
             const dishGrid = subcategoryBlock.querySelector('.dish-grid');

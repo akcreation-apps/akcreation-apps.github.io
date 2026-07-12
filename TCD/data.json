@@ -1,4 +1,14 @@
 {
+  "_OFFER_KEYS_DOCS": [
+    "To feature a dish in the top Deals of the Day rail, add TWO optional keys to that dish:",
+    "  offer_price (number) — fake higher MRP; must be strictly greater than price. Renders strikethrough.",
+    "  is_offer (boolean, true) — include this dish in the horizontal Deals rail at the top of the menu.",
+    "Behaviour: both keys => dish appears in Deals rail AND its normal category card shows a red X% OFF badge + strikethrough MRP.",
+    "Only offer_price (no is_offer) => strikethrough shows on normal card, but dish is NOT lifted into the Deals rail.",
+    "Only is_offer (no offer_price) => ignored (console.warn) — nothing to strike through.",
+    "Percent OFF is computed as round((offer_price - price) / offer_price * 100). Cart still charges the real price.",
+    "Example: {\"id\": 105, \"name\": \"Honey Chilli Potato\", \"price\": 179, \"offer_price\": 229, \"is_offer\": true}"
+  ],
   "menu": [
     {
       "category": "Chinese",
@@ -73,6 +83,8 @@
               "id": 201,
               "name": "Chilli Chicken",
               "price": 179,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -80,6 +92,8 @@
               "id": 202,
               "name": "Chicken 65",
               "price": 179,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -100,6 +114,8 @@
               "id": 301,
               "name": "Hakka Noodles",
               "price": 139,
+              "offer_price": 159,
+              "is_offer": true,
               "available_time": 16,
               "not_available_time": ""
             },
@@ -155,6 +171,8 @@
               "id": 401,
               "name": "Chicken Hakka Noodles",
               "price": 169,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": 16,
               "not_available_time": ""
             },
@@ -248,6 +266,8 @@
               "id": 701,
               "name": "Mix Veg Sandwich",
               "price": 59,
+              "offer_price": 99,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -288,6 +308,8 @@
               "id": 831,
               "name": "Red Sauce Pasta",
               "price": 139,
+              "offer_price": 159,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -315,6 +337,8 @@
               "id": 851,
               "name": "Red Sauce Chicken Pasta",
               "price": 169,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -482,6 +506,8 @@
               "id": 1302,
               "name": "Blue Lagoon",
               "price": 99,
+              "offer_price": 159,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -557,6 +583,8 @@
               "id": 1403,
               "name": "Chocolate Milk Shake",
               "price": 119,
+              "offer_price": 159,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -611,6 +639,8 @@
               "id": 1503,
               "name": "Cold Coffee",
               "price": 119,
+              "offer_price": 159,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -667,6 +697,8 @@
               "id": 2701,
               "name": "Veg Biryani (Half)",
               "price": 139,
+              "offer_price": 159,
+              "is_offer": true,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -694,6 +726,8 @@
               "id": 2802,
               "name": "Chicken Biryani (3pc)",
               "price": 179,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": 12,
               "not_available_time": ""
             },
