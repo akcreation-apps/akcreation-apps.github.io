@@ -175,12 +175,28 @@ const updateViewCartBar = () => {
         sum + cat.category.dish_details.reduce((s, d) => s + d.quantity, 0), 0);
     const totalPrice = cart.reduce((sum, cat) =>
         sum + cat.category.dish_details.reduce((s, d) => s + d.price * d.quantity, 0), 0);
+    const fdEl = document.getElementById('vcbFreeDelivery');
     if (totalQty === 0) {
         bar.classList.remove('visible');
+        if (fdEl) fdEl.innerHTML = '';
     } else {
         bar.classList.add('visible');
         document.getElementById('vcbCount').textContent = `${totalQty} item${totalQty !== 1 ? 's' : ''}`;
         document.getElementById('vcbTotal').textContent = `₹${totalPrice.toFixed(0)}`;
+        if (fdEl) {
+            const minOrder = (typeof RESTAURANT !== 'undefined' && RESTAURANT.minOrder) ? RESTAURANT.minOrder : 200;
+            const table = localStorage.getItem(lsKey('table'));
+            if (table === 'COD') {
+                if (totalPrice >= minOrder) {
+                    fdEl.innerHTML = '<span class="vcb-fd-ico" aria-hidden="true"><i class="fas fa-check"></i></span>FREE delivery unlocked!';
+                } else {
+                    const remaining = minOrder - totalPrice;
+                    fdEl.innerHTML = `<span class="vcb-fd-ico" aria-hidden="true"><i class="fas fa-motorcycle"></i></span>Add <strong>₹${remaining.toFixed(0)}</strong> more for <strong>FREE delivery</strong>`;
+                }
+            } else {
+                fdEl.innerHTML = '';
+            }
+        }
     }
 };
 

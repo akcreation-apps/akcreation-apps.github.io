@@ -325,6 +325,56 @@
             margin-bottom: 8px;
         }
         #delivery-note:empty { display: none; }
+
+        /* ── Free-delivery progress + inline math (fits inside existing delivery-note slot) ── */
+        .fd-progress {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.7rem;
+            line-height: 1.25;
+        }
+        .fd-progress__msg {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .fd-progress__msg strong { font-weight: 700; }
+        .fd-progress__bar {
+            height: 5px;
+            width: 100%;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .fd-progress__fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary) 100%);
+            border-radius: 999px;
+            transition: width 0.35s ease;
+        }
+        .fd-math {
+            font-size: 0.66rem;
+            color: var(--muted);
+            margin-top: 3px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fd-math .op { color: var(--muted); margin: 0 3px; }
+        .fd-math .val { color: var(--text); font-weight: 600; }
+        .fd-math .free { color: #128C7E; font-weight: 700; }
+        .fd-math .strike { color: var(--muted); text-decoration: line-through; font-weight: 500; margin-right: 2px; }
+        .fd-progress--done {
+            color: #128C7E;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
         .total-row {
             display: flex;
             justify-content: space-between; align-items: center;

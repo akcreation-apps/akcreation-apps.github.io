@@ -203,33 +203,51 @@ const updateEtaRow = () => {
 const updateTotalPrice = () => {
     const totalPriceElement = document.getElementById('cart-total');
     const deliveryNoteElement = document.getElementById('delivery-note');
-    let total = 0;
+    let subtotal = 0;
 
-    // Iterate through each category and dish to calculate the total price
+    // Iterate through each category and dish to calculate the subtotal
     cart.forEach(categoryItem => {
         categoryItem.category.dish_details.forEach(dishItem => {
-            total += dishItem.price * dishItem.quantity;
+            subtotal += dishItem.price * dishItem.quantity;
         });
     });
     const table = localStorage.getItem(_safeLsKey('table'));
+    let deliveryFee = 0;
 
     if (table === 'COD') {
-        if (total > 0 && total < MINIMUM_ORDER_PRICE) {
+        if (subtotal > 0 && subtotal < MINIMUM_ORDER_PRICE) {
+            const remaining = MINIMUM_ORDER_PRICE - subtotal;
+            const pct = Math.min(100, Math.round((subtotal / MINIMUM_ORDER_PRICE) * 100));
+            deliveryFee = DELIVERY_CHARGES;
+            const grand = subtotal + deliveryFee;
             deliveryNoteElement.innerHTML = `
-                <span style="color:red;">₹${DELIVERY_CHARGES} delivery charge added for orders below ₹${MINIMUM_ORDER_PRICE}.</span><br>
-                Current Total: ₹${total.toFixed(0)} <br>
-                Delivery Charges: ₹${DELIVERY_CHARGES}
+                <div class="fd-progress" role="status" aria-live="polite">
+                    <div class="fd-progress__msg">
+                        <span aria-hidden="true">🛵</span>
+                        <span>Add <strong>₹${remaining.toFixed(0)}</strong> more for <strong>FREE delivery</strong></span>
+                    </div>
+                    <div class="fd-progress__bar" aria-hidden="true">
+                        <div class="fd-progress__fill" style="width:${pct}%"></div>
+                    </div>
+                    <div class="fd-math"><span class="val">₹${subtotal.toFixed(0)}</span><span class="op">+</span><span class="val">₹${DELIVERY_CHARGES}</span> delivery <span class="op">=</span><span class="val">₹${grand.toFixed(0)}</span></div>
+                </div>
             `;
-            total += DELIVERY_CHARGES;
-        } else if (total >= MINIMUM_ORDER_PRICE) {
+        } else if (subtotal >= MINIMUM_ORDER_PRICE) {
             deliveryNoteElement.innerHTML = `
-                <span style="color:green;">🎉 Free delivery on orders above ₹${MINIMUM_ORDER_PRICE}!</span>
+                <div class="fd-progress" role="status" aria-live="polite">
+                    <div class="fd-progress--done">
+                        <span aria-hidden="true">🎉</span>
+                        <span>FREE delivery unlocked!</span>
+                    </div>
+                    <div class="fd-math"><span class="val">₹${subtotal.toFixed(0)}</span><span class="op">+</span><span class="strike">₹${DELIVERY_CHARGES}</span><span class="free">FREE</span> <span class="op">=</span><span class="val">₹${subtotal.toFixed(0)}</span></div>
+                </div>
             `;
         } else {
             deliveryNoteElement.textContent = ""; // Empty cart
         }
     }
 
+    const total = subtotal + deliveryFee;
     // Update the displayed total price
     totalPriceElement.textContent = `₹${total.toFixed(0)}`;
     updateEtaRow();
@@ -630,8 +648,15 @@ async function collect_data(){
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const cartTotalValue = document.getElementById('cart-total').textContent;
-    const deliveryNoteValue = document.getElementById('delivery-note').textContent;
     const cartTotalNumber = parseFloat(cartTotalValue.replace(/[^0-9.-]+/g,""));
+    // Compute subtotal directly from cart to decide if the delivery fee applies —
+    // do NOT scrape DOM text, since the delivery-note copy can change.
+    const _subtotalForFee = cart.reduce((s, c) =>
+        s + c.category.dish_details.reduce((ss, d) => ss + d.price * d.quantity, 0), 0);
+    const _tableForFee = localStorage.getItem(_safeLsKey('table'));
+    const _applyDeliveryFee = _tableForFee === 'COD'
+        && _subtotalForFee > 0
+        && _subtotalForFee < MINIMUM_ORDER_PRICE;
     let data = {
         'order_details':getCartItems(),
         'triggered_to':localStorage.getItem(_safeLsKey('whatsapp_no')),
@@ -641,7 +666,7 @@ async function collect_data(){
         'status':'In Progress',
         'created_at':Timestamp.now()
     };
-    if (deliveryNoteValue.includes("delivery charge")) {
+    if (_applyDeliveryFee) {
         data['delivery_charges'] = DELIVERY_CHARGES;
     }
     const orderTable = decrypt_values(credentials.ORDER_TABLE_NAME, _cfg);

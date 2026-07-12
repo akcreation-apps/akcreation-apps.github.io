@@ -1182,7 +1182,37 @@
             transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
         }
         .view-cart-bar.visible { transform: translateY(0); }
-        .vcb-left { display: flex; align-items: center; gap: 10px; }
+        .vcb-left { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; flex: 1; }
+        .vcb-line-top { display: flex; align-items: center; gap: 10px; }
+        .vcb-fd {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            background: rgba(0,0,0,0.22);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .vcb-fd:empty { display: none; }
+        .vcb-fd strong { font-weight: 800; }
+        .vcb-fd .vcb-fd-ico {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            color: var(--primary);
+            font-size: 0.62rem;
+        }
         .vcb-count {
             font-size: 0.72rem;
             font-weight: 700;
@@ -1670,8 +1700,11 @@
     <!-- View Cart bar (slides up when cart has items) -->
     <button class="view-cart-bar" id="viewCartBar" onclick="redirect_to_cart()" aria-label="View cart" style="visibility:hidden">
         <div class="vcb-left">
-            <span class="vcb-count" id="vcbCount">0 items</span>
-            <span class="vcb-total" id="vcbTotal">₹0</span>
+            <div class="vcb-line-top">
+                <span class="vcb-count" id="vcbCount">0 items</span>
+                <span class="vcb-total" id="vcbTotal">₹0</span>
+            </div>
+            <span class="vcb-fd" id="vcbFreeDelivery" aria-live="polite"></span>
         </div>
         <div class="vcb-right">
             View Cart <i class="fas fa-chevron-right" aria-hidden="true"></i>
