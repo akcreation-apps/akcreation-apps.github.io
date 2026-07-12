@@ -119,6 +119,8 @@
               "id": 201,
               "name": "Chicken 65",
               "price": 129,
+              "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -126,6 +128,8 @@
               "id": 202,
               "name": "Chilli Chicken",
               "price": 129,
+              "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -133,6 +137,8 @@
               "id": 203,
               "name": "Chicken Manchurian",
               "price": 129,
+              "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -275,6 +281,8 @@
               "id": 502,
               "name": "Veg Biryani (Half)",
               "price": 119,
+              "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -295,6 +303,8 @@
               "id": 602,
               "name": "Chicken 65 Biryani (6pc)",
               "price": 159,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
