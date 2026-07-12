@@ -449,28 +449,64 @@
     .card-cta i { transition: transform 0.2s; }
     .rest-card:hover .card-cta i, .rest-card:focus-visible .card-cta i { transform: translateX(4px); }
 
-    /* ── Skeleton card ── */
-    .skeleton-card {
-      background: var(--card); border-radius: 16px;
-      border: 1px solid var(--border); padding: 18px;
-      display: flex; align-items: center; gap: 16px;
+    /* ── Loader (card silhouettes, sequential downward reveal) ── */
+    .grid--loading {
+      max-width: none !important;
+      width: 100vw !important;
+      margin-left: calc(50% - 50vw) !important;
+      margin-right: calc(50% - 50vw) !important;
+      grid-template-columns: 1fr !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 65%, transparent 100%);
+              mask-image: linear-gradient(180deg, #000 0%, #000 65%, transparent 100%);
     }
-    .skel-text {
-      background: linear-gradient(90deg, #f0e6de 25%, #ffe8db 50%, #f0e6de 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      border-radius: 6px;
-      display: block;
+    .grid--loading .loader-card {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
     }
-    .skeleton-body { flex: 1; }
-    .skel-text--lg { height: 16px; margin-bottom: 10px; }
-    .skel-text--md { height: 12px; margin-bottom: 8px; }
-    .skel-text--md:last-child { margin-bottom: 0; }
+    .loader-card {
+      min-height: 108px;
+      width: 100%;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      box-sizing: border-box;
+      opacity: 0;
+      transform: translateY(-8px);
+      animation: loader-pop var(--loader-cycle, 3s) ease-out infinite both;
+    }
+    @keyframes loader-pop {
+      0%   { opacity: 0; transform: translateY(-8px); }
+      8%   { opacity: 1; transform: translateY(0); }
+      92%  { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-8px); }
+    }
+    .loader-logo {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: #f0e6de;
+      flex-shrink: 0;
+    }
+    .loader-body {
+      flex: 1; display: flex; flex-direction: column; gap: 8px;
+      min-width: 0;
+    }
+    .loader-bar {
+      height: 12px; border-radius: 6px;
+      background: #f0e6de;
+    }
+    .loader-bar--sm { height: 9px; }
     @media (prefers-color-scheme: dark) {
-      .skel-text, .card-logo-skeleton {
-        background: linear-gradient(90deg, #2B2540 25%, #3A3450 50%, #2B2540 75%);
-        background-size: 200% 100%;
-      }
+      .loader-logo, .loader-bar { background: #2B2540; }
+    }
+    @media (min-width: 640px) { .loader-card { min-height: 120px; } }
+    @media (min-width: 960px) { .loader-card { min-height: 132px; } }
+    @media (prefers-reduced-motion: reduce) {
+      .loader-card { animation: none; opacity: 0.7; transform: none; }
     }
 
     /* ── Error state ── */
@@ -549,25 +585,36 @@
   </div>
 
   <!-- Cards grid -->
-  <div class="grid" id="cardGrid" role="list" aria-label="Restaurant listings">
-    <!-- Skeleton placeholders -->
-    <div class="skeleton-card" aria-hidden="true">
-      <div class="card-logo-skeleton"></div>
-      <div class="skeleton-body">
-        <div class="skel-text skel-text--lg" style="width:60%"></div>
-        <div class="skel-text skel-text--md" style="width:80%"></div>
-        <div class="skel-text skel-text--md" style="width:40%"></div>
-      </div>
-    </div>
-    <div class="skeleton-card" aria-hidden="true">
-      <div class="card-logo-skeleton"></div>
-      <div class="skeleton-body">
-        <div class="skel-text skel-text--lg" style="width:55%"></div>
-        <div class="skel-text skel-text--md" style="width:75%"></div>
-        <div class="skel-text skel-text--md" style="width:45%"></div>
-      </div>
-    </div>
-  </div>
+  <div class="grid" id="cardGrid" role="list" aria-label="Restaurant listings" aria-busy="true"></div>
+  <script>
+    // Fill the visible viewport with loader cards that sit directly in the
+    // grid, matching the real restaurant card width at every breakpoint.
+    (function () {
+      const grid = document.getElementById('cardGrid');
+      if (!grid) return;
+      const w = window.innerWidth;
+      const cardH = w >= 960 ? 132 : w >= 640 ? 120 : 108;
+      const gap   = 10;
+      const count = Math.max(4, Math.ceil((window.innerHeight - 160) / (cardH + gap)) + 1);
+      const widths  = [[60,80,45],[55,75,40],[65,70,50],[58,78,42],[62,72,48],[56,82,44]];
+      const stagger = 0.28;
+      const cycle   = (count * stagger) + 1.4;
+      grid.style.setProperty('--loader-cycle', cycle + 's');
+      grid.classList.add('grid--loading');
+      grid.innerHTML = Array.from({ length: count }, (_, i) => {
+        const [w1, w2, w3] = widths[i % widths.length];
+        const delay = (i * stagger).toFixed(2);
+        return `<div class="loader-card" aria-hidden="true" style="animation-delay:${delay}s">
+          <div class="loader-logo"></div>
+          <div class="loader-body">
+            <div class="loader-bar" style="width:${w1}%"></div>
+            <div class="loader-bar loader-bar--sm" style="width:${w2}%"></div>
+            <div class="loader-bar loader-bar--sm" style="width:${w3}%"></div>
+          </div>
+        </div>`;
+      }).join('');
+    })();
+  </script>
 
   <!-- Error state -->
   <div class="error-state" id="errorState" role="alert" aria-live="polite">
@@ -681,12 +728,19 @@
           p && p.is_active !== false && !isBlank(p.name) && !isBlank(p.url)
         );
 
+        visible.sort((a, b) => Number(isOpen(b)) - Number(isOpen(a)));
+
+        try { localStorage.setItem('bb_lastCount', String(visible.length)); } catch (e) {}
+
         if (!visible.length) {
           grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);font-size:0.85rem">No restaurants are registered yet. Check back soon!</p>';
           return;
         }
 
         renderFilterChips(visible);
+
+        grid.classList.remove('grid--loading');
+        grid.removeAttribute('aria-busy');
 
         grid.innerHTML = visible.map(p => {
           const h = hours(p);
