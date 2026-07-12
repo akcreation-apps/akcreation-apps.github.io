@@ -534,9 +534,53 @@
     .footer-app .fa-badge { display: inline-flex; padding: 2px; border-radius: 4px; }
     .footer-app .fa-badge img { display: block; height: 44px; width: auto; }
 
-    /* ── Closed card — suppress hover lift & disable navigation ── */
-    .rest-card-closed { opacity: 0.55; pointer-events: none; }
-    .rest-card-closed .card-cta { color: var(--muted); }
+    /* ── Closed card — dim inner content, keep footer prominent ── */
+    .rest-card-closed { pointer-events: none; box-shadow: none; }
+    .rest-card-closed .card-inner { opacity: 0.55; filter: grayscale(0.6); }
+    .closed-footer {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      padding: 9px 12px;
+      background: rgba(239,68,68,0.10);
+      border-top: 1px solid rgba(239,68,68,0.18);
+      font-size: 0.72rem;
+      line-height: 1;
+    }
+    .closed-footer .cf-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #b91c1c;
+      display: inline-block;
+    }
+    .closed-footer .cf-status {
+      color: #b91c1c;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+    .closed-footer .cf-sep {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: rgba(185,28,28,0.5);
+      display: inline-block;
+      margin: 0 2px;
+    }
+    .closed-footer .cf-opens {
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .closed-footer .cf-time {
+      color: var(--text);
+      font-weight: 800;
+      font-size: 0.78rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      .closed-footer {
+        background: rgba(248,113,113,0.12);
+        border-top-color: rgba(248,113,113,0.22);
+      }
+      .closed-footer .cf-dot { background: #F87171; }
+      .closed-footer .cf-status { color: #F87171; }
+      .closed-footer .cf-sep { background: rgba(248,113,113,0.5); }
+    }
 
     @media (min-width: 640px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
@@ -776,15 +820,21 @@
                 })()}
                 <div class="card-meta">
                   ${showRating ? `<span class="rating"><i class="fas fa-star" aria-hidden="true"></i>${escapeHtml(p.rating)} <span>/ 5</span></span>` : ''}
-                  ${showHours ? `<span class="open-badge ${open ? 'open' : 'closed'}">${open ? 'Open now' : `Closed · Opens ${opensAt}`}</span>` : ''}
+                  ${open && showHours ? `<span class="open-badge open">Open now</span>` : ''}
                 </div>
                 ${showAddr ? `<div class="card-address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${escapeHtml(p.address)}</span></div>` : ''}
               </div>
             </div>
-            <div class="card-cta">
-              <span>${open || !showHours ? 'View menu &amp; order' : 'Currently closed'}</span>
-              <i class="fas fa-arrow-right" aria-hidden="true"></i>
-            </div>
+            ${open || !showHours
+              ? `<div class="card-cta"><span>View menu &amp; order</span><i class="fas fa-arrow-right" aria-hidden="true"></i></div>`
+              : `<div class="closed-footer">
+                   <span class="cf-dot" aria-hidden="true"></span>
+                   <span class="cf-status">Closed</span>
+                   <span class="cf-sep" aria-hidden="true"></span>
+                   <span class="cf-opens">Opens at</span>
+                   <span class="cf-time">${escapeHtml(opensAt)}</span>
+                 </div>`
+            }
           </a>`;
         }).join('');
       })
