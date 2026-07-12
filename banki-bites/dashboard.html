@@ -766,8 +766,14 @@
               ${logo}
               <div class="card-body">
                 <div class="card-name">${escapeHtml(p.name)}</div>
-                ${(p.is_veg || p.is_homemade || p.is_separate_price) ? `<div class="card-tags card-flags">${p.is_veg ? `<span class="tag tag-veg">Pure Veg</span>` : ''}${p.is_homemade ? `<span class="tag tag-homemade"><i class="fas fa-house-user"></i> Home Made</span>` : ''}${p.is_separate_price ? `<span class="tag tag-separate-price"><i class="fas fa-tag"></i> Separate Pricing</span>` : ''}</div>` : ''}
-                ${services.length ? `<div class="card-tags">${services.map(s => `<span class="tag">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+                ${(() => {
+                  const chips = [];
+                  if (p.is_veg)            chips.push(`<span class="tag tag-veg">Pure Veg</span>`);
+                  if (p.is_homemade)       chips.push(`<span class="tag tag-homemade"><i class="fas fa-house-user"></i> Home Made</span>`);
+                  if (p.is_separate_price) chips.push(`<span class="tag tag-separate-price"><i class="fas fa-tag"></i> Separate Pricing</span>`);
+                  services.forEach(s => chips.push(`<span class="tag">${escapeHtml(s)}</span>`));
+                  return chips.length ? `<div class="card-tags">${chips.join('')}</div>` : '';
+                })()}
                 <div class="card-meta">
                   ${showRating ? `<span class="rating"><i class="fas fa-star" aria-hidden="true"></i>${escapeHtml(p.rating)} <span>/ 5</span></span>` : ''}
                   ${showHours ? `<span class="open-badge ${open ? 'open' : 'closed'}">${open ? 'Open now' : `Closed · Opens ${opensAt}`}</span>` : ''}
