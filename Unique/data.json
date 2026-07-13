@@ -63,7 +63,7 @@
               "name": "Egg Chap (4Pc)",
               "price": 69,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": 21
             },
             {
               "id": 202,
@@ -77,28 +77,28 @@
               "name": "Chicken Popcorn (10Pc)",
               "price": 69,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": 21
             },
             {
               "id": 204,
               "name": "Chicken Wings (5Pc)",
               "price": 119,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": 21
             },
             {
               "id": 205,
               "name": "Chicken Lollipop Dry (5Pc)",
               "price": 119,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": 21
             },
             {
               "id": 206,
               "name": "Chicken Lollipop Chilli (4Pc)",
               "price": 139,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": 21
             },
             {
               "id": 207,
