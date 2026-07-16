@@ -455,30 +455,90 @@
     .ios-install-modal .iim-lead {
       margin: 0 0 14px; font-size: 0.88rem; color: #444; line-height: 1.4;
     }
-    .ios-install-modal ol {
-      margin: 0 0 16px; padding-left: 0; list-style: none; counter-reset: iimstep;
+    .ios-install-modal .iim-steps {
+      margin: 0 0 14px; padding-left: 0; list-style: none; counter-reset: iimstep;
+      display: flex; flex-direction: column; gap: 10px;
     }
-    .ios-install-modal ol li {
+    .ios-install-modal .iim-steps li {
       counter-increment: iimstep;
-      display: flex; gap: 10px; padding: 10px 0;
-      border-top: 1px solid #f0f0f0;
-      font-size: 0.9rem; line-height: 1.4;
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 12px 12px 12px 10px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      font-size: 0.9rem; line-height: 1.45;
     }
-    .ios-install-modal ol li:first-child { border-top: none; }
-    .ios-install-modal ol li::before {
+    .ios-install-modal .iim-steps li::before {
       content: counter(iimstep);
       flex-shrink: 0;
-      width: 26px; height: 26px; border-radius: 50%;
+      width: 28px; height: 28px; border-radius: 50%;
       background: #FF6B35; color: #fff;
       display: inline-flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.78rem;
+      font-weight: 700; font-size: 0.82rem;
+      box-shadow: 0 2px 6px rgba(255,107,53,0.35);
+    }
+    .ios-install-modal .iim-step-body { flex: 1; min-width: 0; }
+
+    /* Inline "Share" pill mimicking the iOS button */
+    .ios-install-modal .iim-inline {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px 3px 6px;
+      background: #EAF3FF; color: #007AFF;
+      border-radius: 999px;
+      font-weight: 600; font-size: 0.85rem;
+      vertical-align: -3px;
+      white-space: nowrap;
     }
     .ios-install-modal .iim-share {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px; vertical-align: -6px;
-      margin: 0 3px;
+      width: 18px; height: 18px;
     }
-    .ios-install-modal .iim-share svg { width: 20px; height: 20px; display: block; }
+    .ios-install-modal .iim-share svg { width: 16px; height: 16px; display: block; }
+
+    /* "Add to Home Screen" action row — visually echoes an iOS list row */
+    .ios-install-modal .iim-action {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 6px;
+      padding: 8px 12px;
+      background: #fff;
+      border: 1px solid #e5e5e7;
+      border-radius: 10px;
+      font-weight: 600; color: #1a1a1a;
+      font-size: 0.88rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .ios-install-modal .iim-action-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px;
+      background: #f2f2f7; color: #1a1a1a;
+      border-radius: 6px;
+    }
+    .ios-install-modal .iim-action-icon svg { width: 16px; height: 16px; display: block; }
+
+    /* "Add" button chip */
+    .ios-install-modal .iim-btn-chip {
+      display: inline-block;
+      padding: 2px 10px;
+      background: #007AFF; color: #fff;
+      border-radius: 6px;
+      font-weight: 700; font-size: 0.82rem;
+      vertical-align: 1px;
+    }
+
+    /* Helper tip callout */
+    .ios-install-modal .iim-tip {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      background: #FFF7ED;
+      border: 1px solid #FFE1C6;
+      border-radius: 10px;
+      font-size: 0.8rem; line-height: 1.45; color: #7A3A0B;
+    }
+    .ios-install-modal .iim-tip i {
+      color: #FF6B35; font-size: 0.95rem; margin-top: 2px; flex-shrink: 0;
+    }
+    .ios-install-modal .iim-tip em { font-style: normal; font-weight: 600; }
     .ios-install-modal .iim-actions {
       display: flex; justify-content: flex-end; margin-top: 6px;
     }
@@ -982,21 +1042,47 @@
         <h3 id="iosInstallModalTitle">Install BankiBites</h3>
       </div>
       <p class="iim-lead">Add BankiBites to your iPhone Home Screen — it opens like a native app, no App Store needed.</p>
-      <ol>
+      <ol class="iim-steps">
         <li>
-          Tap the Share icon
-          <span class="iim-share" aria-label="Share icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 3v13"></path>
-              <path d="m7 8 5-5 5 5"></path>
-              <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
-            </svg>
-          </span>
-          in Safari's toolbar.
+          <div class="iim-step-body">
+            Tap the
+            <span class="iim-inline">
+              <span class="iim-share" aria-label="Share icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 3v13"></path>
+                  <path d="m7 8 5-5 5 5"></path>
+                  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
+                </svg>
+              </span>
+              Share
+            </span>
+            icon in Safari's toolbar.
+          </div>
         </li>
-        <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
-        <li>Tap <strong>Add</strong> — BankiBites will appear on your Home Screen.</li>
+        <li>
+          <div class="iim-step-body">
+            In the share sheet, <strong>swipe up</strong> to see more options, then tap
+            <span class="iim-action">
+              <span class="iim-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+                  <path d="M12 8v8M8 12h8"></path>
+                </svg>
+              </span>
+              Add to Home Screen
+            </span>
+          </div>
+        </li>
+        <li>
+          <div class="iim-step-body">
+            Tap <span class="iim-btn-chip">Add</span> in the top-right — BankiBites lands on your Home Screen.
+          </div>
+        </li>
       </ol>
+      <div class="iim-tip" role="note">
+        <i class="fas fa-lightbulb" aria-hidden="true"></i>
+        <span>Don't see <em>Add to Home Screen</em>? Scroll to the bottom of the list and tap <strong>Edit Actions</strong> → the green <strong>+</strong> next to it.</span>
+      </div>
       <div class="iim-actions">
         <button type="button" class="iim-ok" id="iosInstallModalClose">Got it</button>
       </div>
