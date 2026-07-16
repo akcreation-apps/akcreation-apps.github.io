@@ -41,6 +41,9 @@
   <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="BankiBites">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="/banki-bites/manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="banki-bites-logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="banki-bites-logo.png">
   <link rel="icon" type="image/png" sizes="16x16" href="banki-bites-logo.png">
@@ -406,6 +409,87 @@
       flex-shrink: 0;
     }
     .install-banner .ib-close:hover { opacity: 1; background: rgba(255,255,255,0.15); }
+
+    /* iOS variant — same layout, warmer gradient matching brand theme */
+    .install-banner--ios {
+      background: linear-gradient(90deg, #FF6B35 0%, #FF9558 100%);
+    }
+    .install-banner--ios .ib-cta {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #fff; color: #C7451B;
+      border: none; border-radius: 8px;
+      padding: 10px 14px; min-height: 44px;
+      font-family: inherit; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+    }
+    .install-banner--ios .ib-cta:hover,
+    .install-banner--ios .ib-cta:focus-visible { background: #fff5ef; outline: none; }
+    .install-banner--ios .ib-cta i { font-size: 0.9rem; }
+
+    /* iOS install instructions modal */
+    .ios-install-modal[hidden] { display: none; }
+    .ios-install-modal {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      background: rgba(15, 14, 21, 0.6);
+      backdrop-filter: blur(2px);
+    }
+    .ios-install-modal .iim-card {
+      background: #fff; color: #1a1a1a;
+      width: 100%; max-width: 380px;
+      border-radius: 16px; padding: 20px 20px 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      max-height: 90vh; overflow-y: auto;
+    }
+    .ios-install-modal .iim-head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    }
+    .ios-install-modal .iim-head img {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+    }
+    .ios-install-modal .iim-head h3 {
+      margin: 0; font-size: 1.05rem; font-weight: 700;
+    }
+    .ios-install-modal .iim-lead {
+      margin: 0 0 14px; font-size: 0.88rem; color: #444; line-height: 1.4;
+    }
+    .ios-install-modal ol {
+      margin: 0 0 16px; padding-left: 0; list-style: none; counter-reset: iimstep;
+    }
+    .ios-install-modal ol li {
+      counter-increment: iimstep;
+      display: flex; gap: 10px; padding: 10px 0;
+      border-top: 1px solid #f0f0f0;
+      font-size: 0.9rem; line-height: 1.4;
+    }
+    .ios-install-modal ol li:first-child { border-top: none; }
+    .ios-install-modal ol li::before {
+      content: counter(iimstep);
+      flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #FF6B35; color: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.78rem;
+    }
+    .ios-install-modal .iim-share {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; vertical-align: -6px;
+      margin: 0 3px;
+    }
+    .ios-install-modal .iim-share svg { width: 20px; height: 20px; display: block; }
+    .ios-install-modal .iim-actions {
+      display: flex; justify-content: flex-end; margin-top: 6px;
+    }
+    .ios-install-modal .iim-ok {
+      background: #FF6B35; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 10px 18px; min-height: 44px;
+      font-family: inherit; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer;
+    }
+    .ios-install-modal .iim-ok:hover { background: #E65A25; }
 
     /* ── FOOTER PLAY BADGE (visible on all devices) ── */
     .footer-app {
@@ -873,6 +957,52 @@
     </button>
   </aside>
 
+  <!-- iOS install banner (JS reveals only on iOS Safari, not Android/desktop/standalone) -->
+  <aside class="install-banner install-banner--ios" id="installBannerIos" role="region" aria-label="Install BankiBites as a web app" aria-live="polite" hidden>
+    <div class="ib-text">
+      <strong>Install BankiBites</strong>
+      <small>Add to your Home Screen for a faster, app-like experience</small>
+    </div>
+    <button type="button" class="ib-cta" id="iosInstallBtn"
+            data-umami-event="bankibites-install-ios"
+            aria-haspopup="dialog" aria-controls="iosInstallModal">
+      <i class="fas fa-mobile-screen" aria-hidden="true"></i>
+      <span>Install as Web App</span>
+    </button>
+    <button class="ib-close" id="installBannerIosClose" aria-label="Dismiss install prompt">
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </aside>
+
+  <!-- iOS install instructions modal -->
+  <div class="ios-install-modal" id="iosInstallModal" role="dialog" aria-modal="true" aria-labelledby="iosInstallModalTitle" hidden>
+    <div class="iim-card" role="document">
+      <div class="iim-head">
+        <img src="banki-bites-logo.png" alt="">
+        <h3 id="iosInstallModalTitle">Install BankiBites</h3>
+      </div>
+      <p class="iim-lead">Add BankiBites to your iPhone Home Screen — it opens like a native app, no App Store needed.</p>
+      <ol>
+        <li>
+          Tap the Share icon
+          <span class="iim-share" aria-label="Share icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v13"></path>
+              <path d="m7 8 5-5 5 5"></path>
+              <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
+            </svg>
+          </span>
+          in Safari's toolbar.
+        </li>
+        <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+        <li>Tap <strong>Add</strong> — BankiBites will appear on your Home Screen.</li>
+      </ol>
+      <div class="iim-actions">
+        <button type="button" class="iim-ok" id="iosInstallModalClose">Got it</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Topbar -->
   <header class="topbar">
     <nav class="topbar-inner" aria-label="Main navigation">
@@ -1148,35 +1278,66 @@
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
 
-    // Android-only install banner (suppress on iOS, desktop, in-app webview, and for 7 days after dismiss)
+    // Platform-aware install banner: Android → Play Store, iOS → Add to Home Screen instructions
     (function () {
       const ua = navigator.userAgent || '';
       const isAndroid    = /Android/i.test(ua);
-      const isIOS        = /iPad|iPhone|iPod/i.test(ua);
+      const isIOS        = /iPad|iPhone|iPod/i.test(ua) ||
+                           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS reports desktop UA
       const isWebView    = /; wv\)/i.test(ua); // Chrome Android WebView marker
-      const isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+      const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+                           window.navigator.standalone === true; // iOS home-screen webapp
 
-      const DISMISS_KEY = 'bb_install_dismissed_at';
-      const SNOOZE_MS   = 7 * 24 * 60 * 60 * 1000; // 7 days
-      const dismissedRecently = (() => {
+      const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+      const isRecentlyDismissed = (key) => {
         try {
-          const ts = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
+          const ts = parseInt(localStorage.getItem(key) || '0', 10);
           return ts && (Date.now() - ts) < SNOOZE_MS;
         } catch (_) { return false; }
-      })();
+      };
+      const markDismissed = (key) => {
+        try { localStorage.setItem(key, String(Date.now())); } catch (_) {}
+      };
 
-      if (!isAndroid || isIOS || isWebView || isStandalone || dismissedRecently) return;
+      // Android banner — Play Store CTA
+      if (isAndroid && !isIOS && !isWebView && !isStandalone && !isRecentlyDismissed('bb_install_dismissed_at')) {
+        const banner = document.getElementById('installBanner');
+        if (banner) {
+          banner.hidden = false;
+          banner.classList.add('show');
+          document.getElementById('installBannerClose').addEventListener('click', () => {
+            banner.classList.remove('show');
+            banner.hidden = true;
+            markDismissed('bb_install_dismissed_at');
+          });
+        }
+      }
 
-      const banner = document.getElementById('installBanner');
-      if (!banner) return;
-      banner.hidden = false;
-      banner.classList.add('show');
+      // iOS banner — Add to Home Screen modal
+      if (isIOS && !isWebView && !isStandalone && !isRecentlyDismissed('bb_ios_install_dismissed_at')) {
+        const iosBanner = document.getElementById('installBannerIos');
+        const modal     = document.getElementById('iosInstallModal');
+        if (iosBanner && modal) {
+          iosBanner.hidden = false;
+          iosBanner.classList.add('show');
 
-      document.getElementById('installBannerClose').addEventListener('click', () => {
-        banner.classList.remove('show');
-        banner.hidden = true;
-        try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch (_) {}
-      });
+          const openModal  = () => { modal.hidden = false; };
+          const closeModal = () => { modal.hidden = true; };
+
+          document.getElementById('iosInstallBtn').addEventListener('click', openModal);
+          document.getElementById('iosInstallModalClose').addEventListener('click', closeModal);
+          modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.hidden) closeModal();
+          });
+
+          document.getElementById('installBannerIosClose').addEventListener('click', () => {
+            iosBanner.classList.remove('show');
+            iosBanner.hidden = true;
+            markDismissed('bb_ios_install_dismissed_at');
+          });
+        }
+      }
     })();
 
     const restBackdrop = document.getElementById('restBackdrop');
