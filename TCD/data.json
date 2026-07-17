@@ -54,21 +54,21 @@
             },
             {
               "id": 106,
-              "name": "Mashroom 65",
+              "name": "Mushroom 65",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 107,
-              "name": "Mashroom Manchurian",
+              "name": "Mushroom Manchurian",
               "price": 169,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 108,
-              "name": "Mashroom Chilli",
+              "name": "Mushroom Chilli",
               "price": 179,
               "available_time": "",
               "not_available_time": ""
@@ -154,6 +154,13 @@
               "id": 307,
               "name": "Mix Veg Fried Rice",
               "price": 169,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 308,
+              "name": "Mushroom Fried Rice",
+              "price": 159,
               "available_time": "",
               "not_available_time": ""
             }

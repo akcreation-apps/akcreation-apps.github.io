@@ -65,7 +65,7 @@
               "name": "Egg Chap (4Pc)",
               "price": 69,
               "available_time": "",
-              "not_available_time": 21
+              "not_available_time": 20
             },
             {
               "id": 202,
@@ -81,7 +81,7 @@
               "offer_price": 99,
               "is_offer": true,
               "available_time": "",
-              "not_available_time": 21
+              "not_available_time": 20
             },
             {
               "id": 204,
@@ -90,7 +90,7 @@
               "offer_price": 149,
               "is_offer": true,
               "available_time": "",
-              "not_available_time": 21
+              "not_available_time": 20
             },
             {
               "id": 205,
@@ -99,14 +99,14 @@
               "offer_price": 149,
               "is_offer": true,
               "available_time": "",
-              "not_available_time": 21
+              "not_available_time": 20
             },
             {
               "id": 206,
               "name": "Chicken Lollipop Chilli (4Pc)",
               "price": 139,
               "available_time": "",
-              "not_available_time": 21
+              "not_available_time": 20
             },
             {
               "id": 207,
