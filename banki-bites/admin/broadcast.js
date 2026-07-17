@@ -9,9 +9,9 @@ const FOOTER = 'Reply "Stop" to stop receiving future advertisements.\n\n_Team B
 // Default body for the "Offer expiring" segment — auto-loaded when the
 // admin picks that segment and the composer is empty. Uses the {name},
 // {discount}, {expiry} placeholders supported by personalize().
-const EXPIRING_TEMPLATE = 'Hi {name}! ⏰ Your *₹{discount} OFF* BankiBites coupon expires on *{expiry}* — today is a great day to use it 😋\n\nOrder on the BankiBites app or web before the offer ends.';
+const EXPIRING_TEMPLATE = 'Hi {name}! \n\n⏰ Your *₹{discount} OFF* BankiBites coupon expires on *{expiry}* — today is a great day to use it 😋\n\nOrder on the BankiBites app or web before the offer ends.';
 const QUEUE_KEY = 'bb_broadcast_queue_v1';
-const NAME_FALLBACK = 'Friend';
+const NAME_FALLBACK = 'Dear';
 
 // Look back this many days when computing "last order" — anyone whose most
 // recent order is older than this is treated as "never" for the win-back
