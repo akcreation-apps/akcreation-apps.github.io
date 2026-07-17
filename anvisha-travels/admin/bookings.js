@@ -68,7 +68,7 @@ export async function renderBookings(ctx) {
 
   function render() {
     const f = STATUS_FILTERS.find(x => x.key === activeFilter) || STATUS_FILTERS[0];
-    const rows = bookings.filter(b => f.match(b));
+    const rows = bookings.filter(b => f.match(b)).sort(byBookingDateDesc);
     count.textContent = rows.length ? `· ${rows.length}` : '';
     if (!rows.length) {
       list.innerHTML = `<div class="empty"><i class="far fa-calendar"></i> No bookings in this view.</div>`;
@@ -79,6 +79,24 @@ export async function renderBookings(ctx) {
       el.addEventListener('click', () => handleAction(db, el.dataset.action, el.dataset.id, bookings));
     });
   }
+}
+
+// Sort by scheduled booking date/time (desc). Undated rows sink to the bottom.
+// Tiebreaker: createdAt desc so same-day/same-time rows keep a stable order.
+function byBookingDateDesc(a, b) {
+  const ad = a.date || '';
+  const bd = b.date || '';
+  if (ad !== bd) {
+    if (!ad) return 1;
+    if (!bd) return -1;
+    return bd.localeCompare(ad);
+  }
+  const at = a.time || '';
+  const bt = b.time || '';
+  if (at !== bt) return bt.localeCompare(at);
+  const ac = a.createdAt && typeof a.createdAt.toMillis === 'function' ? a.createdAt.toMillis() : 0;
+  const bc = b.createdAt && typeof b.createdAt.toMillis === 'function' ? b.createdAt.toMillis() : 0;
+  return bc - ac;
 }
 
 function renderRow(b) {
