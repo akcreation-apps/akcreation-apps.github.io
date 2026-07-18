@@ -5,7 +5,7 @@ const RESTAURANT = {
     logo:           "a1-logo.png",
     mapsUrl:        "https://maps.app.goo.gl/MRgifLEvf6UAxRp68",
     wpFallback:     "+917749984274",
-    minOrder:       200,
+    minOrder:       250,
     deliveryCharge: 50,
     etaMinutes:     45
 };

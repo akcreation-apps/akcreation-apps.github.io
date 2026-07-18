@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async() => {
         const url = get_dish_url(dish.name);
         const isNonVeg = subcategory.type === 'NonVeg';
 
-        const hasOffer = typeof dish.offer_price === 'number' && dish.offer_price > dish.price;
+        const hasOffer = dish.is_offer === true && typeof dish.offer_price === 'number' && dish.offer_price > dish.price;
         if (dish.is_offer && !hasOffer) {
             console.warn(`[TCD] Dish "${dish.name}" is_offer=true but offer_price is missing or ≤ price; skipping strikethrough.`);
         }
