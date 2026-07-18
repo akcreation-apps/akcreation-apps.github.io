@@ -20,7 +20,7 @@
             {
               "id": 11,
               "name": "Clear",
-              "price": 49,
+              "price": 39,
               "available_time": 16,
               "not_available_time": "",
               "non_available_days": [0, 3, 5]
@@ -28,7 +28,7 @@
             {
               "id": 12,
               "name": "Manchow",
-              "price": 59,
+              "price": 49,
               "available_time": 16,
               "not_available_time": "",
               "non_available_days": [0, 3, 5]
@@ -97,14 +97,14 @@
             {
               "id": 201,
               "name": "Egg Chap (4Pc)",
-              "price": 79,
+              "price": 69,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 203,
               "name": "Chicken Pakoda (5Pc)",
-              "price": 89,
+              "price": 79,
               "available_time": 16,
               "not_available_time": ""
             },
@@ -145,42 +145,42 @@
             {
               "id": 301,
               "name": "Veg Chowmein",
-              "price": 69,
+              "price": 59,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 302,
               "name": "Chowmein Roll",
-              "price": 69,
+              "price": 59,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 303,
               "name": "Veg Roll",
-              "price": 79,
+              "price": 69,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 304,
               "name": "Mix Veg Roll",
-              "price": 79,
+              "price": 69,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 305,
               "name": "Paneer Roll",
-              "price": 79,
+              "price": 69,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 306,
               "name": "Special Mix Veg Roll",
-              "price": 89,
+              "price": 79,
               "available_time": 16,
               "not_available_time": ""
             }
@@ -193,14 +193,14 @@
             {
               "id": 401,
               "name": "Single Egg Chowmein",
-              "price": 79,
+              "price": 69,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 402,
               "name": "Double Egg Chowmein",
-              "price": 89,
+              "price": 79,
               "available_time": 16,
               "not_available_time": ""
             },
@@ -214,7 +214,7 @@
             {
               "id": 404,
               "name": "Double Egg Roll",
-              "price": 79,
+              "price": 69,
               "available_time": 16,
               "not_available_time": ""
             },
