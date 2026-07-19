@@ -4,7 +4,7 @@
     "  offer_price (number) — fake higher MRP; must be strictly greater than price. Renders strikethrough.",
     "  is_offer (boolean, true) — include this dish in the horizontal Deals rail at the top of the menu.",
     "Behaviour: both keys => dish appears in Deals rail AND its normal category card shows a red X% OFF badge + strikethrough MRP.",
-    "Only offer_price (no is_offer) => strikethrough shows on normal card, but dish is NOT lifted into the Deals rail.",
+    "Only offer_price (no is_offer) => ignored on the index page — neither strikethrough nor OFF badge renders. is_offer:true is required to advertise any discount.",
     "Only is_offer (no offer_price) => ignored (console.warn) — nothing to strike through.",
     "Percent OFF is computed as round((offer_price - price) / offer_price * 100). Cart still charges the real price.",
     "Example: {\"id\": 105, \"name\": \"Honey Chilli Potato\", \"price\": 179, \"offer_price\": 229, \"is_offer\": true}"
@@ -139,7 +139,7 @@
               "name": "Paneer Fried Rice",
               "price": 159,
               "offer_price": 199,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -161,6 +161,24 @@
               "id": 308,
               "name": "Mushroom Fried Rice",
               "price": 159,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 309,
+              "name": "Combo (Burger, Noodles, Paneer Chilli, Soft Drink)",
+              "price": 399,
+              "offer_price": 499,
+              "is_offer": true,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 310,
+              "name": "Combo (Fried Rice, Paneer Butter Masala, Lachha Paratha, Honey Chilli Potato, Soft Drink)",
+              "price": 549,
+              "offer_price": 699,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -203,7 +221,7 @@
               "name": "Chicken Fried Rice",
               "price": 159,
               "offer_price": 199,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -211,6 +229,24 @@
               "id": 406,
               "name": "NonVeg Mix Fried Rice",
               "price": 169,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 407,
+              "name": "Combo (Burger, Noodles, Chicken Chilli, Soft Drink)",
+              "price": 399,
+              "offer_price": 499,
+              "is_offer": true,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 408,
+              "name": "Combo (Fried Rice, Chicken Butter Masala, Lachha Paratha, Honey Chilli Potato, Soft Drink)",
+              "price": 549,
+              "offer_price": 699,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -250,7 +286,7 @@
               "name": "Egg Burger",
               "price": 59,
               "offer_price": 99,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -259,7 +295,7 @@
               "name": "Chicken Cheese Burger",
               "price": 159,
               "offer_price": 199,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             }
@@ -274,7 +310,7 @@
               "name": "Mix Veg Sandwich",
               "price": 59,
               "offer_price": 99,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -283,7 +319,7 @@
               "name": "Corn Cheese Sandwich",
               "price": 119,
               "offer_price": 149,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -305,7 +341,7 @@
               "name": "Casun Chicken Sandwich",
               "price": 159,
               "offer_price": 199,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             }
@@ -456,196 +492,6 @@
               "id": 1005,
               "name": "Italian Chicken(10 inch)",
               "price": 419,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "category": "Drinks",
-      "subcategories": [
-        {
-          "name": "Smoothies",
-          "dishes": [
-            {
-              "id": 1101,
-              "name": "Kit Kat Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1102,
-              "name": "Mix Fruit Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1103,
-              "name": "Pineapple Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1104,
-              "name": "Kiwi Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Mocktails",
-          "dishes": [
-            {
-              "id": 1301,
-              "name": "Virgin Mojito",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1302,
-              "name": "Blue Lagoon",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1303,
-              "name": "Fresh Lime Soda",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1304,
-              "name": "Pineapple Mojito",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1305,
-              "name": "Kiwi Cooler",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1306,
-              "name": "Mango Cooler",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1307,
-              "name": "Green Apple Mojito",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1308,
-              "name": "Orange Mojito",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1309,
-              "name": "TCD Special Guava Lagoon",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Shake",
-          "dishes": [
-            {
-              "id": 1401,
-              "name": "Vanila Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1402,
-              "name": "Kit Kat Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1403,
-              "name": "Chocolate Milk Shake",
-              "price": 119,
-              "offer_price": 149,
-              "is_offer": true,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1404,
-              "name": "Mango Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1405,
-              "name": "Mix Fruit Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1406,
-              "name": "Banana Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1407,
-              "name": "Guava Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Refreshment",
-          "dishes": [
-            {
-              "id": 1501,
-              "name": "Hot Coffee",
-              "price": 39,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1502,
-              "name": "Hot Chocolate",
-              "price": 49,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1503,
-              "name": "Cold Coffee",
-              "price": 119,
-              "offer_price": 149,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -853,6 +699,196 @@
               "id": 3003,
               "name": "Chicken Butter Masala",
               "price": 199,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Drinks",
+      "subcategories": [
+        {
+          "name": "Smoothies",
+          "dishes": [
+            {
+              "id": 1101,
+              "name": "Kit Kat Smoothie",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1102,
+              "name": "Mix Fruit Smoothie",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1103,
+              "name": "Pineapple Smoothie",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1104,
+              "name": "Kiwi Smoothie",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Mocktails",
+          "dishes": [
+            {
+              "id": 1301,
+              "name": "Virgin Mojito",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1302,
+              "name": "Blue Lagoon",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1303,
+              "name": "Fresh Lime Soda",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1304,
+              "name": "Pineapple Mojito",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1305,
+              "name": "Kiwi Cooler",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1306,
+              "name": "Mango Cooler",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1307,
+              "name": "Green Apple Mojito",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1308,
+              "name": "Orange Mojito",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1309,
+              "name": "TCD Special Guava Lagoon",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Shake",
+          "dishes": [
+            {
+              "id": 1401,
+              "name": "Vanila Milk Shake",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1402,
+              "name": "Kit Kat Milk Shake",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1403,
+              "name": "Chocolate Milk Shake",
+              "price": 119,
+              "offer_price": 149,
+              "is_offer": false,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1404,
+              "name": "Mango Milk Shake",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1405,
+              "name": "Mix Fruit Milk Shake",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1406,
+              "name": "Banana Milk Shake",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1407,
+              "name": "Guava Milk Shake",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Refreshment",
+          "dishes": [
+            {
+              "id": 1501,
+              "name": "Hot Coffee",
+              "price": 39,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1502,
+              "name": "Hot Chocolate",
+              "price": 49,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1503,
+              "name": "Cold Coffee",
+              "price": 119,
+              "offer_price": 149,
+              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             }
