@@ -923,6 +923,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
           parts.push(`🎁 *₹${discount} OFF* on your next order — valid till *${label}*`);
         }
+        parts.push(`🍔✨ Don't miss our latest offers, exclusive deals & food updates!\n\n📲 Follow BankiBites on Instagram:\nhttps://www.instagram.com/bankibites`);
         parts.push(`_Team BankiBites_ ❤️`);
         return parts.join('\n\n');
       }
