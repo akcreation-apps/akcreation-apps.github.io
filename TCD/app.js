@@ -120,6 +120,26 @@ const formatHour = (h) => {
     return `${hr} ${suffix}`;
 };
 
+// Compute the "not yet available / no longer available" note for a dish
+const computeUnavailableNote = (dish) => {
+    const currentHour = new Date().getHours();
+    if (typeof dish.available_time === 'number' && currentHour < dish.available_time) {
+        return `From ${formatHour(dish.available_time)}`;
+    }
+    if (typeof dish.not_available_time === 'number' && currentHour >= dish.not_available_time) {
+        return `Till ${formatHour(dish.not_available_time)}`;
+    }
+    return '';
+};
+
+// Re-render every .item-control tied to this (subcategory, dish) — offer-rail twin + category twin
+const syncControls = (subcategory, dish, announce = false) => {
+    const key = `${subcategory.name}||${dish.id}`;
+    const note = computeUnavailableNote(dish);
+    document.querySelectorAll(`.item-control[data-cart-key="${CSS.escape(key)}"]`)
+        .forEach((el, idx) => renderControl(el, subcategory, dish, announce && idx === 0, note));
+};
+
 // Renders ADD bar or full-width qty stepper below the dish card
 const renderControl = (container, subcategory, dish, announce = false, unavailableNote = '') => {
     const qty = getItemQty(subcategory.name, dish.id);
@@ -136,7 +156,7 @@ const renderControl = (container, subcategory, dish, announce = false, unavailab
             e.stopPropagation();
             updateItemQty(subcategory, dish, 1);
             popCartBadge();
-            renderControl(container, subcategory, dish, true);
+            syncControls(subcategory, dish, true);
             container.querySelectorAll('.qty-btn')[1]?.focus();
         });
     } else {
@@ -152,7 +172,7 @@ const renderControl = (container, subcategory, dish, announce = false, unavailab
             updateItemQty(subcategory, dish, -1);
             popCartBadge();
             const newQty = getItemQty(subcategory.name, dish.id);
-            renderControl(container, subcategory, dish, true);
+            syncControls(subcategory, dish, true);
             (newQty === 0
                 ? container.querySelector('.add-btn')
                 : container.querySelectorAll('.qty-btn')[0]
@@ -162,7 +182,7 @@ const renderControl = (container, subcategory, dish, announce = false, unavailab
             e.stopPropagation();
             updateItemQty(subcategory, dish, 1);
             popCartBadge();
-            renderControl(container, subcategory, dish, true);
+            syncControls(subcategory, dish, true);
             container.querySelectorAll('.qty-btn')[1]?.focus();
         });
     }
@@ -329,18 +349,6 @@ document.addEventListener('DOMContentLoaded', async() => {
         return true;
     };
 
-    // Compute the "not yet available / no longer available" note for a dish
-    const computeUnavailableNote = (dish) => {
-        const currentHour = new Date().getHours();
-        if (typeof dish.available_time === 'number' && currentHour < dish.available_time) {
-            return `From ${formatHour(dish.available_time)}`;
-        }
-        if (typeof dish.not_available_time === 'number' && currentHour >= dish.not_available_time) {
-            return `Till ${formatHour(dish.not_available_time)}`;
-        }
-        return '';
-    };
-
     // Build a single dish card DOM node — shared between the Offers section and the regular menu
     const buildDishCard = (dish, subcategory) => {
         const unavailableNote = computeUnavailableNote(dish);
@@ -380,7 +388,9 @@ document.addEventListener('DOMContentLoaded', async() => {
                 </div>
           </div>
         `;
-        renderControl(menuItem.querySelector('.item-control'), subcategory, dish, false, unavailableNote);
+        const dishControl = menuItem.querySelector('.item-control');
+        dishControl.dataset.cartKey = `${subcategory.name}||${dish.id}`;
+        renderControl(dishControl, subcategory, dish, false, unavailableNote);
         return menuItem;
     };
 
@@ -419,7 +429,9 @@ document.addEventListener('DOMContentLoaded', async() => {
                 <div class="offer-card-control item-control"></div>
             </div>
         `;
-        renderControl(card.querySelector('.item-control'), subcategory, dish, false, unavailableNote);
+        const offerControl = card.querySelector('.item-control');
+        offerControl.dataset.cartKey = `${subcategory.name}||${dish.id}`;
+        renderControl(offerControl, subcategory, dish, false, unavailableNote);
         return card;
     };
 
