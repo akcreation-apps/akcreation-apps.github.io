@@ -50,7 +50,7 @@ const _safeLsKey = (k => {
     try {
         if (typeof lsKey === 'function') return lsKey(k);
     } catch (e) { /* fall through to local fallback */ }
-    return (_RESTAURANT.prefix || 'mch') + '_' + k;
+    return (_RESTAURANT.prefix || 'unique') + '_' + k;
 });
 // Retrieve the cart from localStorage. Wrapped because corrupted JSON or a
 // SecurityError reading localStorage would otherwise halt module evaluation,
@@ -505,8 +505,8 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
         console.error('All navigation attempts to WhatsApp failed.');
     };
 
-    // Cross-restaurant key — once acknowledged on any restaurant (TCD/A1/MCH),
-    // the customer is treated as informed everywhere.
+    // Cross-restaurant key — once acknowledged on any peer restaurant, the
+    // customer is treated as informed everywhere.
     const _hintAckKey = 'bankibites_hint_ack';
     const hintAcked = (() => { try { return localStorage.getItem(_hintAckKey) === 'true'; } catch (e) { return false; } })();
 
@@ -664,7 +664,8 @@ async function collect_data(){
         'triggered_to':localStorage.getItem(_safeLsKey('whatsapp_no')),
         'total_cart_value':cartTotalNumber,
         'table_no':localStorage.getItem(_safeLsKey('table')),
-        'mch_place':localStorage.getItem(_safeLsKey('place')) || '',
+        'unique_place':localStorage.getItem(_safeLsKey('place')) || '',
+        'unique_place_custom': localStorage.getItem(_safeLsKey('place_custom')) === '1',
         'status':'In Progress',
         'created_at':Timestamp.now()
     };
@@ -694,7 +695,8 @@ async function collect_data(){
                 subtotal:        cartTotalNumber - (data.delivery_charges || 0),
                 total:           cartTotalNumber,
                 delivery_charges: data.delivery_charges || 0,
-                place:           data.mch_place || '',
+                place:           data.unique_place || '',
+                place_custom:    data.unique_place_custom === true,
                 table_no:        data.table_no || '',
                 source_doc_path: `${orderTable}/${docRef.id}`,
             });

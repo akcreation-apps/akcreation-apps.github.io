@@ -665,6 +665,7 @@ async function collect_data(){
         'total_cart_value':cartTotalNumber,
         'table_no':localStorage.getItem(_safeLsKey('table')),
         'a1_place':localStorage.getItem(_safeLsKey('place')) || '',
+        'a1_place_custom': localStorage.getItem(_safeLsKey('place_custom')) === '1',
         'status':'In Progress',
         'created_at':Timestamp.now()
     };
@@ -695,6 +696,7 @@ async function collect_data(){
                 total:           cartTotalNumber,
                 delivery_charges: data.delivery_charges || 0,
                 place:           data.a1_place || '',
+                place_custom:    data.a1_place_custom === true,
                 table_no:        data.table_no || '',
                 source_doc_path: `${orderTable}/${docRef.id}`,
             });

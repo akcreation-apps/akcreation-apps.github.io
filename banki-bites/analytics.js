@@ -50,6 +50,8 @@ export async function loadFeeRules(db, { force = false, autoSeed = false } = {})
 }
 
 export function isFarPlace(o, rules) {
+  // Customer picked "Other" and typed a location — treated as outer zone
+  if (o?.place_custom === true) return true;
   const list = rules?.far_places || DEFAULT_RULES.far_places;
   const haystack = [o?.place, o?.customer?.address].filter(Boolean).join(' ').toLowerCase();
   if (!haystack) return false;

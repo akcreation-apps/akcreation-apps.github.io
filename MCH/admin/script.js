@@ -16,6 +16,7 @@ function flattenCartForMirror(cartItems) {
 async function syncOrderToBankiBites(orderId, orderDetails) {
     const restaurantId = RESTAURANT.prefix.toUpperCase();
     const placeField = `${RESTAURANT.prefix}_place`;
+    const placeCustomField = `${RESTAURANT.prefix}_place_custom`;
     Swal.fire({
         title: 'Syncing to BankiBites…',
         allowOutsideClick: false,
@@ -42,6 +43,7 @@ async function syncOrderToBankiBites(orderId, orderDetails) {
             total:           total,
             delivery_charges: deliveryCharges,
             place:           orderDetails[placeField] || '',
+            place_custom:    orderDetails[placeCustomField] === true,
             table_no:        orderDetails.table_no || '',
             source_doc_path: `${orderTable}/${orderId}`,
             created_at:      orderDetails.created_at,

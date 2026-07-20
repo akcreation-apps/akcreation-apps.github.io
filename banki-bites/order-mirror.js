@@ -70,6 +70,7 @@ export async function mirrorToBankiBites(payload) {
     total:           Number(payload.total) || 0,
     delivery_charges: Number(payload.delivery_charges) || 0,
     place:           payload.place || '',
+    place_custom:    payload.place_custom === true,
     table_no:        payload.table_no || '',
     source_doc_path: payload.source_doc_path || '',
     status:          'new',
