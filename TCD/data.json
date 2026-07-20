@@ -567,27 +567,27 @@
             {
               "id": 2801,
               "name": "Chicken Biryani (2pc)",
-              "price": 99,
+              "price": 129,
               "offer_price": 129,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2802,
               "name": "Chicken Biryani (3pc)",
-              "price": 129,
+              "price": 179,
               "offer_price": 179,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2803,
               "name": "Chicken Biryani (5pc)",
-              "price": 209,
+              "price": 259,
               "offer_price": 259,
-              "is_offer": true,
+              "is_offer": false,
               "available_time": 12,
               "not_available_time": ""
             }
