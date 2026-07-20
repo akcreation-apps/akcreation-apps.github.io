@@ -912,9 +912,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         const greeting = prettyName ? `Hi ${prettyName}!` : 'Hi there!';
         const parts = [
           `${greeting} 🙏`,
-          `Order delivered 🛵 Hope you loved every bite! 😋`,
-          `⭐ Share honest feedback on the taste — it helps our kitchen partners level up.`,
-          `🧾 Bill is ready in the *Bill* section of the app.`,
+          `Order delivered 🛵 Hope you enjoyed every bite! 😋`,
+          `⭐ Drop honest feedback on the taste — it helps our kitchen improve.`,
+          `🧾 Bill available in the *Bill* section.`,
         ];
         // Skip the offer line entirely when admin sets discount to 0 — no
         // "₹0 OFF" message and no expiry date noise. Thank-you stands alone.
@@ -923,7 +923,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
           parts.push(`🎁 *₹${discount} OFF* on your next order — valid till *${label}*`);
         }
-        parts.push(`🍔✨ Don't miss our latest offers, exclusive deals & food updates!\n\n📲 Follow BankiBites on Instagram:\nhttps://www.instagram.com/bankibites`);
+        parts.push(`📲 Follow for offers: https://www.instagram.com/bankibites`);
         parts.push(`_Team BankiBites_ ❤️`);
         return parts.join('\n\n');
       }
