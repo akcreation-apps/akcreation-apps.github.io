@@ -373,7 +373,9 @@ function calculateTotal(cartItems, message) {
         } catch (e) {
             etaNote = `\nETA: ~${etaMins} min`;
         }
-        message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Prepaid${etaNote}\n\n`;
+        const isCustomPlace = localStorage.getItem(_safeLsKey('place_custom')) === '1';
+        const outerZoneNote = isCustomPlace ? `\n*Outer Zone Fee applicable*` : '';
+        message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Prepaid${etaNote}${outerZoneNote}\n\n`;
         message += `*Note: If your order remains unseen for 5 mins, please call us.*`;
     } else {
         message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}\nTable Number: ${table}`;

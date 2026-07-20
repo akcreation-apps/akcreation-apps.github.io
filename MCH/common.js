@@ -45,6 +45,7 @@ function store_data(){
         if (/^\d+$/.test(table_no)) {
             // Numeric table → Dine-In session, set place immediately
             localStorage.setItem(lsKey('place'), 'Dine-In');
+            localStorage.removeItem(lsKey('place_custom'));
         } else {
             // Non-numeric (COD, etc.)
             const existingPlace = localStorage.getItem(lsKey('place'));
@@ -146,6 +147,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
                 return;
             }
             localStorage.setItem(lsKey('place'), custom);
+            localStorage.setItem(lsKey('place_custom'), '1');
             closeModal(custom);
         }
 
@@ -167,6 +169,7 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
                     otherWrapper.style.display = 'none';
                     errorMsg.style.display = 'none';
                     localStorage.setItem(lsKey('place'), value);
+                    localStorage.removeItem(lsKey('place_custom'));
                     closeModal(value);
                 }
             }, sig);
@@ -213,6 +216,7 @@ function checkAndAskPlace() {
 
     if (/^\d+$/.test(table)) {
         localStorage.setItem(lsKey('place'), 'Dine-In');
+        localStorage.removeItem(lsKey('place_custom'));
         return Promise.resolve();
     }
 
