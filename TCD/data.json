@@ -407,64 +407,68 @@
           "dishes": [
             {
               "id": 901,
-              "name": "Margarita(6 inch)",
-              "price": 129,
+              "name": "Margarita(small)",
+              "price": 119,
+              "offer_price": 129,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 902,
-              "name": "Margarita(9 inch)",
-              "price": 199,
+              "name": "Margarita(medium)",
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 903,
-              "name": "Farm House(6 inch)",
-              "price": 159,
+              "name": "Farm House(small)",
+              "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 904,
-              "name": "Farm House(9 inch)",
-              "price": 219,
+              "name": "Farm House(medium)",
+              "price": 289,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 905,
-              "name": "Corn Paneer(6 inch)",
-              "price": 169,
+              "name": "Corn Paneer(small)",
+              "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 906,
-              "name": "Corn Paneer(9 inch)",
-              "price": 229,
+              "name": "Corn Paneer(medium)",
+              "price": 309,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 907,
-              "name": "Margarita(10 inch)",
-              "price": 359,
+              "name": "Margarita(large)",
+              "price": 339,
+              "offer_price": 359,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 908,
-              "name": "Farm House(10 inch)",
-              "price": 359,
+              "name": "Farm House(large)",
+              "price": 389,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 909,
-              "name": "Corn Paneer(10 inch)",
-              "price": 359,
+              "name": "Corn Paneer(large)",
+              "price": 409,
               "available_time": "",
               "not_available_time": ""
             }
@@ -476,22 +480,24 @@
           "dishes": [
             {
               "id": 1001,
-              "name": "Italian Chicken(6 inch)",
+              "name": "Italian Chicken(small)",
               "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1002,
-              "name": "Italian Chicken(9 inch)",
-              "price": 299,
+              "name": "Italian Chicken(medium)",
+              "price": 309,
               "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 1005,
-              "name": "Italian Chicken(10 inch)",
-              "price": 419,
+              "id": 1003,
+              "name": "Italian Chicken(large)",
+              "price": 409,
+              "offer_price": 419,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -877,20 +883,6 @@
           "dishes": [
             {
               "id": 1501,
-              "name": "Hot Coffee",
-              "price": 39,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1502,
-              "name": "Hot Chocolate",
-              "price": 49,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1503,
               "name": "Cold Coffee",
               "price": 119,
               "offer_price": 149,
