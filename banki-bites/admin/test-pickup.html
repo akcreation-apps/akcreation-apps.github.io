@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<meta name="theme-color" content="#25d366">
+<meta name="robots" content="noindex,nofollow">
+<title>Pickup WhatsApp Preview — BankiBites</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 24px 16px;
+    color: #111827;
+    min-height: 100vh;
+  }
+  .card {
+    max-width: 560px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+    padding: 20px;
+  }
+  h1 {
+    font-size: 1.15rem;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h1 .wa { color: #25d366; font-size: 1.3rem; }
+  .sub { font-size: 0.85rem; color: #6b7280; margin: 0 0 18px; }
+  .row { display: flex; gap: 12px; margin-bottom: 14px; }
+  .col { flex: 1; }
+  label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: #374151; }
+  input, select, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+  textarea {
+    background: #f9fafb;
+    resize: vertical;
+    min-height: 280px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .phone-row { margin-bottom: 14px; }
+  .phone-row .fixed {
+    background: #f9fafb;
+    color: #6b7280;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+  }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+  }
+  .toggle-row input { width: auto; margin: 0; }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #25d366;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  button:hover { background: #1eb955; }
+  button:active { transform: scale(0.99); }
+  .hint {
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-top: 10px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1><span class="wa">🛵</span> Pickup WhatsApp Preview</h1>
+    <p class="sub">Test the Odia pickup message before rolling out. Sends to a fixed test number.</p>
+
+    <div class="phone-row">
+      <label>Recipient (fixed for this test)</label>
+      <input class="fixed" type="text" value="+91 77499 84274" readonly>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Customer name (optional)</label>
+        <input id="name" type="text" placeholder="e.g. Anil" value="Anil">
+      </div>
+      <div class="col">
+        <label>Restaurant label (optional)</label>
+        <input id="restaurant" type="text" placeholder="e.g. A1 Amul Fast Food" value="A1 Amul Fast Food">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>ETA (minutes)</label>
+        <input id="etaMins" type="number" min="1" step="1" value="15">
+      </div>
+      <div class="col">
+        <label>Collect amount (₹)</label>
+        <input id="collectAmt" type="number" min="0" step="1" value="300">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Already paid (₹, 0 = COD)</label>
+        <input id="prepaid" type="number" min="0" step="1" value="0">
+      </div>
+      <div class="col">
+        <label>Paid method (if prepaid)</label>
+        <select id="paidMethod">
+          <option value="">(none)</option>
+          <option value="UPI">UPI</option>
+          <option value="CASH">CASH</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <input id="paymentCollected" type="checkbox">
+      <label for="paymentCollected" style="margin:0;font-weight:500">Payment already collected (hide cash line)</label>
+    </div>
+
+    <div class="toggle-row">
+      <input id="hasGps" type="checkbox">
+      <label for="hasGps" style="margin:0;font-weight:500">Customer has GPS pin (hide location request)</label>
+    </div>
+
+    <div>
+      <label>Message preview</label>
+      <textarea id="preview" readonly></textarea>
+    </div>
+
+    <button id="sendBtn" type="button">
+      <span>📲</span> Send via WhatsApp
+    </button>
+    <p class="hint">Tapping “Send” opens WhatsApp with this exact message pre-filled to +91 77499 84274.</p>
+  </div>
+
+<script>
+  const PHONE = '917749984274';
+
+  // Same pre-encoded UTF-8 sequences used in delivery/app.js so the emoji
+  // survives any URL re-normalisation on the way to wa.me.
+  const E_WAVE     = '%F0%9F%91%8B';        // 👋
+  const E_SCOOTER  = '%F0%9F%9B%B5';        // 🛵
+  const E_CLOCK    = '%E2%8F%B0';           // ⏰
+  const E_CASH     = '%F0%9F%92%B5';        // 💵
+  const E_SPARKLES = '%E2%9C%A8';           // ✨
+  const E_HEART    = '%E2%9D%A4%EF%B8%8F';  // ❤️
+  const E_PIN      = '%F0%9F%93%8D';        // 📍
+  const NL         = '%0A';
+
+  const isBlank = v => v == null || String(v).trim() === '';
+
+  function buildEncodedPickup(cfg) {
+    const enc = encodeURIComponent;
+    const parts = [];
+
+    // greeting
+    parts.push(
+      E_WAVE + enc(' ') +
+      (!isBlank(cfg.name) ? enc('ନମସ୍କାର ' + cfg.name + ' !') : enc('ନମସ୍କାର !'))
+    );
+
+    // on-the-way
+    const fromTxt = !isBlank(cfg.restaurant)
+      ? enc(' ଆପଣଙ୍କ *BankiBites* ଅର୍ଡର *' + cfg.restaurant + '* ରୁ ଆସୁଛି !')
+      : enc(' ଆପଣଙ୍କ *BankiBites* ଅର୍ଡର ଆସୁଛି !');
+    parts.push(E_SCOOTER + fromTxt);
+
+    // ETA
+    const eta = new Date(Date.now() + (cfg.etaMins || 15) * 60 * 1000);
+    const etaTimeStr = eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    parts.push(E_CLOCK + enc(' *' + etaTimeStr + '* ସୁଦ୍ଧା ପହଞ୍ଚିବ (~' + (cfg.etaMins || 15) + ' min)'));
+
+    // cash collect
+    if (!cfg.paymentCollected && !isBlank(cfg.collectAmt)) {
+      let cashTxt = ' *₹' + cfg.collectAmt + '* ପ୍ରସ୍ତୁତ ରଖନ୍ତୁ';
+      if (cfg.prepaid > 0) {
+        const via = cfg.paidMethod ? ' via ' + String(cfg.paidMethod).toUpperCase() : '';
+        cashTxt += ' (ଆଗରୁ ₹' + cfg.prepaid + via + ' payment ହୋଇଛି)';
+      } else {
+        cashTxt += ' (cash on delivery)';
+      }
+      parts.push(E_CASH + enc(cashTxt));
+    }
+
+    // location request
+    if (!cfg.hasGps) {
+      parts.push(E_PIN + enc(' ଦୟାକରି ଆପଣଙ୍କ *current location* share କରନ୍ତୁ, ଆମେ ପହଞ୍ଚିବାରେ ସୁବିଧା ହେବ ।'));
+    }
+
+    // thank-you
+    parts.push(E_SPARKLES + enc(' BankiBites କୁ ବାଛିଥିବାରୁ ଧନ୍ୟବାଦ ') + E_HEART);
+
+    return parts.join(NL + NL);
+  }
+
+  // Decode the URL-encoded text back to a plain preview shown in the textarea.
+  function decodeForPreview(encoded) {
+    return decodeURIComponent(encoded.replace(/%0A/g, '\n'));
+  }
+
+  const $name             = document.getElementById('name');
+  const $restaurant       = document.getElementById('restaurant');
+  const $etaMins          = document.getElementById('etaMins');
+  const $collectAmt       = document.getElementById('collectAmt');
+  const $prepaid          = document.getElementById('prepaid');
+  const $paidMethod       = document.getElementById('paidMethod');
+  const $paymentCollected = document.getElementById('paymentCollected');
+  const $hasGps           = document.getElementById('hasGps');
+  const $preview          = document.getElementById('preview');
+  const $send             = document.getElementById('sendBtn');
+
+  function currentConfig() {
+    return {
+      name: $name.value,
+      restaurant: $restaurant.value,
+      etaMins: parseInt($etaMins.value) || 15,
+      collectAmt: parseInt($collectAmt.value),
+      prepaid: parseInt($prepaid.value) || 0,
+      paidMethod: $paidMethod.value,
+      paymentCollected: $paymentCollected.checked,
+      hasGps: $hasGps.checked,
+    };
+  }
+
+  function refresh() {
+    const encoded = buildEncodedPickup(currentConfig());
+    $preview.value = decodeForPreview(encoded);
+  }
+  ['input', 'change'].forEach(evt => {
+    [$name, $restaurant, $etaMins, $collectAmt, $prepaid, $paidMethod, $paymentCollected, $hasGps]
+      .forEach(el => el.addEventListener(evt, refresh));
+  });
+  refresh();
+
+  $send.addEventListener('click', () => {
+    const encoded = buildEncodedPickup(currentConfig());
+    const url = 'https://wa.me/' + PHONE + '?text=' + encoded;
+    window.location.href = url;
+  });
+</script>
+</body>
+</html>
