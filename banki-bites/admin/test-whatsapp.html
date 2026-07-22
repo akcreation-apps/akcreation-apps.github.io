@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<meta name="theme-color" content="#25d366">
+<meta name="robots" content="noindex,nofollow">
+<title>Thank-You WhatsApp Preview — BankiBites</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 24px 16px;
+    color: #111827;
+    min-height: 100vh;
+  }
+  .card {
+    max-width: 560px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+    padding: 20px;
+  }
+  h1 {
+    font-size: 1.15rem;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h1 .wa { color: #25d366; font-size: 1.3rem; }
+  .sub { font-size: 0.85rem; color: #6b7280; margin: 0 0 18px; }
+  .row { display: flex; gap: 12px; margin-bottom: 14px; }
+  .col { flex: 1; }
+  label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: #374151; }
+  input, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+  textarea {
+    background: #f9fafb;
+    resize: vertical;
+    min-height: 260px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .phone-row { margin-bottom: 14px; }
+  .phone-row .fixed {
+    background: #f9fafb;
+    color: #6b7280;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #25d366;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  button:hover { background: #1eb955; }
+  button:active { transform: scale(0.99); }
+  .hint {
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-top: 10px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1><span class="wa">💬</span> Thank-You WhatsApp Preview</h1>
+    <p class="sub">Test the Odia thank-you message before rolling out. Sends to a fixed test number.</p>
+
+    <div class="phone-row">
+      <label>Recipient (fixed for this test)</label>
+      <input class="fixed" type="text" value="+91 77499 84274" readonly>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Customer name (optional)</label>
+        <input id="name" type="text" placeholder="e.g. Anil" value="Anil">
+      </div>
+      <div class="col">
+        <label>Discount (₹)</label>
+        <input id="discount" type="number" min="0" step="1" value="50">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Valid until</label>
+        <input id="date" type="date">
+      </div>
+    </div>
+
+    <div>
+      <label>Message preview</label>
+      <textarea id="preview" readonly></textarea>
+    </div>
+
+    <button id="sendBtn" type="button">
+      <span>📲</span> Send via WhatsApp
+    </button>
+    <p class="hint">Tapping “Send” opens WhatsApp with this exact message pre-filled to +91 77499 84274.</p>
+  </div>
+
+<script>
+  const PHONE = '917749984274';
+
+  function ordSuffix(n) {
+    const s = ['th','st','nd','rd'], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  function buildMsg(name, discount, dateStr) {
+    const prettyName = (name || '').trim();
+    const greeting = prettyName ? `ନମସ୍କାର ${prettyName}!` : 'ନମସ୍କାର!';
+    const parts = [
+      `${greeting} 🙏`,
+      `ଆପଣଙ୍କ ଅର୍ଡର ଡେଲିଭର ହୋଇଗଲା 🛵 ଆଶା କରୁଛୁ ଖାଇବା ଭଲ ଲାଗିଥିବ! 😋`,
+      `⭐ ଟେଷ୍ଟ ଉପରେ ଆପଣଙ୍କ ଫିଡବ୍ୟାକ୍ ଦିଅନ୍ତୁ — ଆମ କିଚେନ୍ ଇମ୍ପ୍ରୁଭ୍ କରିବାରେ ସାହାଯ୍ୟ ହେବ।`,
+      `🧾 ବିଲ୍ *Bill* ସେକ୍ସନରେ ଉପଲବ୍ଧ।`,
+    ];
+    if (Number(discount) > 0 && dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
+      parts.push(`🎁 ପରବର୍ତ୍ତୀ ଅର୍ଡରରେ *₹${discount} OFF* — *${label}* ପର୍ଯ୍ୟନ୍ତ ବୈଧ`);
+    }
+    parts.push(`📲 ଅଫର୍ ପାଇଁ ଫଲୋ କରନ୍ତୁ: https://www.instagram.com/bankibites`);
+    parts.push(`_Team BankiBites_ ❤️`);
+    return parts.join('\n\n');
+  }
+
+  const $name     = document.getElementById('name');
+  const $discount = document.getElementById('discount');
+  const $date     = document.getElementById('date');
+  const $preview  = document.getElementById('preview');
+  const $send     = document.getElementById('sendBtn');
+
+  // Default date = today + 7
+  (function initDate() {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    $date.value = d.toISOString().split('T')[0];
+  })();
+
+  function refresh() {
+    $preview.value = buildMsg($name.value, parseInt($discount.value) || 0, $date.value);
+  }
+  ['input', 'change'].forEach(evt => {
+    [$name, $discount, $date].forEach(el => el.addEventListener(evt, refresh));
+  });
+  refresh();
+
+  $send.addEventListener('click', () => {
+    const msg = buildMsg($name.value, parseInt($discount.value) || 0, $date.value);
+    const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`;
+    window.location.href = url;
+  });
+</script>
+</body>
+</html>
