@@ -361,22 +361,22 @@ function calculateTotal(cartItems, message) {
         // Apply delivery charge if below 200
         if (total > 0 && total < MINIMUM_ORDER_PRICE) {
             total += DELIVERY_CHARGES;
-            deliveryNote = `\n(₹${DELIVERY_CHARGES} delivery charge applied for orders below ₹${MINIMUM_ORDER_PRICE})`;
+            deliveryNote = `\n\n(₹${MINIMUM_ORDER_PRICE} ରୁ କମ୍ ଅର୍ଡର ପାଇଁ ₹${DELIVERY_CHARGES} ଡେଲିଭରି ଚାର୍ଜ ଲାଗିଛି)`;
         }
-        const placeNote = place ? `\nDelivering at: ${place}` : '';
+        const placeNote = place ? `\n\nଡେଲିଭରି ସ୍ଥାନ: ${place}` : '';
         const etaMins = (typeof RESTAURANT !== 'undefined' && Number(RESTAURANT.etaMinutes)) || 60;
         let etaNote = '';
         try {
             const etaClock = new Date(Date.now() + etaMins * 60 * 1000)
                 .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-            etaNote = `\nETA: ~${etaMins} min (${etaClock})`;
+            etaNote = `\n\nଆନୁମାନିକ ସମୟ: ~${etaMins} min (${etaClock})`;
         } catch (e) {
-            etaNote = `\nETA: ~${etaMins} min`;
+            etaNote = `\n\nଆନୁମାନିକ ସମୟ: ~${etaMins} min`;
         }
         const isCustomPlace = localStorage.getItem(_safeLsKey('place_custom')) === '1';
-        const outerZoneNote = isCustomPlace ? `\n*Outer Zone Fee applicable*` : '';
-        message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}${placeNote}\nPayment Mode: Prepaid${etaNote}${outerZoneNote}\n\n`;
-        message += `*Note: If your order remains unseen for 5 mins, please call us.*`;
+        const outerZoneNote = isCustomPlace ? `\n\n*ଡେଲିଭରି ଏରିଆ ଆମ ସର୍ଭିସ ଏରିଆ ବାହାରେ, ସେଥିପାଇଁ ଏକ୍ସଟ୍ରା ଡେଲିଭରି ଚାର୍ଜ ଲାଗିବ*` : '';
+        message += `Total Price: ₹${total.toFixed(0)}/-${placeNote}\n\nPayment ପ୍ରକାର: Prepaid${etaNote}${deliveryNote}${outerZoneNote}\n\n`;
+        message += `*Note: ଯଦି ଆପଣଙ୍କ ଅର୍ଡର ୫ ମିନିଟ୍ ରେ WhatsApp ରେ ସିନ୍ ନ କରାଯାଏ, ଦୟାକରି ଆମକୁ କଲ୍ କରନ୍ତୁ।*`;
     } else {
         message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}\nTable Number: ${table}`;
     }
