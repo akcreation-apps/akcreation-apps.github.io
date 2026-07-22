@@ -909,21 +909,21 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       })();
 
       function buildMsg(discount, dateStr) {
-        const greeting = prettyName ? `Hi ${prettyName}!` : 'Hi there!';
+        const greeting = prettyName ? `ନମସ୍କାର ${prettyName} !` : 'ନମସ୍କାର !';
         const parts = [
           `${greeting} 🙏`,
-          `Order delivered 🛵 Hope you enjoyed every bite! 😋`,
-          `⭐ Drop honest feedback on the taste — it helps our kitchen improve.`,
-          `🧾 Bill available in the *Bill* section.`,
+          `ଆପଣଙ୍କ ଅର୍ଡର ଡେଲିଭର ହୋଇଗଲା 🛵 ଆଶା କରୁଛୁ ଖାଇବା ଭଲ ଲାଗିଥିବ! 😋`,
+          `⭐ ଟେଷ୍ଟ ଉପରେ ଆପଣଙ୍କ ଫିଡବ୍ୟାକ୍ ଦିଅନ୍ତୁ — ଆମ କିଚେନ୍ ଇମ୍ପ୍ରୁଭ୍ କରିବାରେ ସାହାଯ୍ୟ ହେବ ।`,
+          `🧾 Bill ଆପଣ ଅର୍ଡର କରିଥିବା restaurant ର *Bill* section ରେ ଉପଲବ୍ଧ ।`,
         ];
         // Skip the offer line entirely when admin sets discount to 0 — no
         // "₹0 OFF" message and no expiry date noise. Thank-you stands alone.
         if (Number(discount) > 0 && dateStr) {
           const d = new Date(dateStr + 'T00:00:00');
           const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
-          parts.push(`🎁 *₹${discount} OFF* on your next order — valid till *${label}*`);
+          parts.push(`🎁 ପରବର୍ତ୍ତୀ ଅର୍ଡରରେ *₹${discount} OFF* — *${label}* ପର୍ଯ୍ୟନ୍ତ ବୈଧ`);
         }
-        parts.push(`📲 Follow for offers: https://www.instagram.com/bankibites`);
+        parts.push(`📲 ଅଫର୍ ପାଇଁ ଫଲୋ କରନ୍ତୁ: https://www.instagram.com/bankibites`);
         parts.push(`_Team BankiBites_ ❤️`);
         return parts.join('\n\n');
       }

@@ -376,7 +376,7 @@ function calculateTotal(cartItems, message) {
         const isCustomPlace = localStorage.getItem(_safeLsKey('place_custom')) === '1';
         const outerZoneNote = isCustomPlace ? `\n\n*ଡେଲିଭରି ଏରିଆ ଆମ ସର୍ଭିସ ଏରିଆ ବାହାରେ, ସେଥିପାଇଁ ଏକ୍ସଟ୍ରା ଡେଲିଭରି ଚାର୍ଜ ଲାଗିବ*` : '';
         message += `Total Price: ₹${total.toFixed(0)}/-${placeNote}\n\nPayment ପ୍ରକାର: Prepaid${etaNote}${deliveryNote}${outerZoneNote}\n\n`;
-        message += `*Note: ଯଦି ଆପଣଙ୍କ ଅର୍ଡର ୫ ମିନିଟ୍ ରେ WhatsApp ରେ ସିନ୍ ନ କରାଯାଏ, ଦୟାକରି ଆମକୁ କଲ୍ କରନ୍ତୁ।*`;
+        message += `*Note: ଯଦି ଆପଣଙ୍କ ଅର୍ଡର ୫ ମିନିଟ୍ ରେ WhatsApp ରେ ସିନ୍ ନ କରାଯାଏ, ଦୟାକରି ଆମକୁ କଲ୍ କରନ୍ତୁ ।*`;
     } else {
         message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}\nTable Number: ${table}`;
     }

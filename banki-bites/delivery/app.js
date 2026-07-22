@@ -1026,28 +1026,28 @@ function openPickupWhatsApp(o, restaurantLabel) {
   // greeting
   parts.push(
     E_WAVE + enc(' ') +
-    (!isBlank(displayName) ? enc('Hi ' + displayName + '!') : enc('Hi there!'))
+    (!isBlank(displayName) ? enc('ନମସ୍କାର ' + displayName + ' !') : enc('ନମସ୍କାର !'))
   );
 
   // on-the-way
   const fromTxt = !isBlank(restaurantLabel)
-    ? enc(' Your *BankiBites* order from *' + restaurantLabel + '* is on the way!')
-    : enc(' Your *BankiBites* order is on the way!');
+    ? enc(' ଆପଣଙ୍କ *BankiBites* ଅର୍ଡର *' + restaurantLabel + '* ରୁ ଆସୁଛି !')
+    : enc(' ଆପଣଙ୍କ *BankiBites* ଅର୍ଡର ଆସୁଛି !');
   parts.push(E_SCOOTER + fromTxt);
 
   // ETA
   const eta = pickupArrival(o);
   const etaTimeStr = eta.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-  parts.push(E_CLOCK + enc(' Arriving by *' + etaTimeStr + '* (~' + pickupEtaMinutes(o) + ' min)'));
+  parts.push(E_CLOCK + enc(' *' + etaTimeStr + '* ସୁଦ୍ଧା ପହଞ୍ଚିବ (~' + pickupEtaMinutes(o) + ' min)'));
 
   // cash collect (optional)
   const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
   const prepaidWa  = Number.isFinite(+o.paid_already) ? +o.paid_already : 0;
   if (o.payment_collected === false && !isBlank(collectAmt)) {
-    let cashTxt = ' Keep *₹' + collectAmt + '* ready';
+    let cashTxt = ' *₹' + collectAmt + '* ପ୍ରସ୍ତୁତ ରଖନ୍ତୁ';
     if (prepaidWa > 0) {
       const via = o.paid_method ? ' via ' + String(o.paid_method).toUpperCase() : '';
-      cashTxt += ' (already paid ₹' + prepaidWa + via + ')';
+      cashTxt += ' (ଆଗରୁ ₹' + prepaidWa + via + ' payment ହୋଇଛି)';
     } else {
       cashTxt += ' (cash on delivery)';
     }
@@ -1059,11 +1059,11 @@ function openPickupWhatsApp(o, restaurantLabel) {
   const gps = c.gps;
   const hasGps = gps && Number.isFinite(+gps.lat) && Number.isFinite(+gps.lng);
   if (!hasGps) {
-    parts.push(E_PIN + enc(' Please share your *current location* to help us reach you.'));
+    parts.push(E_PIN + enc(' ଦୟାକରି ଆପଣଙ୍କ *current location* share କରନ୍ତୁ, ଆମେ ସହଜରେ ଆପଣଙ୍କ ପାଖରେ ପହଞ୍ଚି ପାରିବୁ ।'));
   }
 
   // thank-you
-  parts.push(E_SPARKLES + enc(' Thank you for choosing BankiBites ') + E_HEART);
+  parts.push(E_SPARKLES + enc(' BankiBites କୁ ବାଛିଥିବାରୁ ଧନ୍ୟବାଦ ') + E_HEART);
 
   const text = parts.join(NL + NL);
 
