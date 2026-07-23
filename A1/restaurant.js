@@ -1,6 +1,6 @@
 const RESTAURANT = {
     name:           "A1 Amul Fast Food",
-    prefix:         "a1",
+    prefix:         "A1",
     encKey:         ['A1', 'AMUL', 'FAST', 'FOOD'].join('-'),
     logo:           "a1-logo.png",
     mapsUrl:        "https://maps.app.goo.gl/MRgifLEvf6UAxRp68",
