@@ -1,13 +1,8 @@
 {
   "_OFFER_KEYS_DOCS": [
     "To feature a dish in the top Deals of the Day rail, add TWO optional keys to that dish:",
-    "  offer_price (number) — fake higher MRP; must be strictly greater than price. Renders strikethrough.",
-    "  is_offer (boolean, true) — include this dish in the horizontal Deals rail at the top of the menu.",
-    "Behaviour: both keys => dish appears in Deals rail AND its normal category card shows a red X% OFF badge + strikethrough MRP.",
-    "Only offer_price (no is_offer) => ignored on the index page — neither strikethrough nor OFF badge renders. is_offer:true is required to advertise any discount.",
-    "Only is_offer (no offer_price) => ignored (console.warn) — nothing to strike through.",
-    "Percent OFF is computed as round((offer_price - price) / offer_price * 100). Cart still charges the real price.",
-    "Example: {\"id\": 105, \"name\": \"Honey Chilli Potato\", \"price\": 179, \"offer_price\": 229, \"is_offer\": true}"
+    "  offer_price (number) \u2014 fake higher MRP; must be strictly greater than price. Renders strikethrough.",
+    "  is_offer (boolean, true) \u2014 include this dish in the horizontal Deals rail at the top of the menu."
   ],
   "menu": [
     {
@@ -139,7 +134,6 @@
               "name": "Paneer Fried Rice",
               "price": 159,
               "offer_price": 199,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -221,7 +215,6 @@
               "name": "Chicken Fried Rice",
               "price": 159,
               "offer_price": 199,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -286,7 +279,6 @@
               "name": "Egg Burger",
               "price": 59,
               "offer_price": 99,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -295,7 +287,6 @@
               "name": "Chicken Cheese Burger",
               "price": 159,
               "offer_price": 199,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             }
@@ -310,7 +301,6 @@
               "name": "Mix Veg Sandwich",
               "price": 59,
               "offer_price": 99,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -319,7 +309,6 @@
               "name": "Corn Cheese Sandwich",
               "price": 119,
               "offer_price": 149,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -341,7 +330,6 @@
               "name": "Casun Chicken Sandwich",
               "price": 159,
               "offer_price": 199,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             }
@@ -575,7 +563,6 @@
               "name": "Chicken Biryani (2pc)",
               "price": 129,
               "offer_price": 129,
-              "is_offer": false,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -584,7 +571,6 @@
               "name": "Chicken Biryani (3pc)",
               "price": 179,
               "offer_price": 179,
-              "is_offer": false,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -593,7 +579,6 @@
               "name": "Chicken Biryani (5pc)",
               "price": 259,
               "offer_price": 259,
-              "is_offer": false,
               "available_time": 12,
               "not_available_time": ""
             }
@@ -844,7 +829,6 @@
               "name": "Chocolate Milk Shake",
               "price": 119,
               "offer_price": 149,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -886,7 +870,6 @@
               "name": "Cold Coffee",
               "price": 119,
               "offer_price": 149,
-              "is_offer": false,
               "available_time": "",
               "not_available_time": ""
             }
