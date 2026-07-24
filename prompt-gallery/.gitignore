@@ -1,0 +1,4 @@
+member_prompts.json
+scripts/node_modules/
+scripts/service-account.json
+scripts/package-lock.json

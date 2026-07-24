@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set step = 3 %}
+{% block title %}Step 3 — Menu{% endblock %}
+{% block body_class %}menu-step{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>
+        {% if mode == 'existing' %}Edit menu — /{{ prefix }}/{% else %}Build menu — /{{ prefix }}/{% endif %}
+    </h2>
+    <p class="hint">
+        {% if mode == 'existing' %}Existing <code>data.json</code> loaded below. Dish IDs are preserved on edit; new dishes get auto-assigned IDs.
+        {% else %}Add categories → subcategories → dishes. Dish IDs auto-assign from 101.{% endif %}
+    </p>
+
+    <label class="filter-row">
+        <input type="checkbox" id="filter-offers">
+        <span>Show Offer Items only</span>
+        <span id="filter-count" class="hint"></span>
+    </label>
+
+    <div id="menu-root"></div>
+
+    <button type="button" id="add-category" class="secondary">+ Add category</button>
+
+    <div class="actions">
+        {% if mode == 'new' %}<a href="{{ url_for('step2') }}" class="secondary">← Back</a>
+        {% else %}<a href="{{ url_for('step1') }}" class="secondary">← Back</a>{% endif %}
+        <button type="button" id="finish-btn" class="primary">
+            {% if mode == 'existing' %}Save menu →{% else %}Create restaurant folder →{% endif %}
+        </button>
+    </div>
+
+    <div id="status" class="hint" aria-live="polite"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>window.__PRELOAD__ = {{ preload_json|safe }};</script>
+<script src="{{ url_for('static', filename='onboarding.js') }}"></script>
+{% endblock %}

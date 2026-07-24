@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Done{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>
+        {% if mode == 'existing' %}✅ Menu updated for /{{ prefix }}/{% else %}✅ Created /{{ prefix }}/{% endif %}
+    </h2>
+    <p>Path: <code>{{ path }}</code></p>
+
+    {% if mode == 'new' %}
+    <h3>Manual follow-ups</h3>
+    <ul>
+        <li>Credentials in <code>credentials.json</code> are plaintext — encrypt them if the app expects encrypted values (<code>common.js</code> uses <code>CryptoJS.AES.decrypt</code>).</li>
+        <li>Update SEO meta (description, keywords, canonical) in <code>/{{ prefix }}/index.html</code>.</li>
+        <li>Add <code>/{{ prefix }}/</code> to <code>sitemap.xml</code>.</li>
+        <li>Refine the schema.org JSON-LD block in <code>index.html</code>.</li>
+    </ul>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}" class="primary">Start over</a>
+</div>
+{% endblock %}

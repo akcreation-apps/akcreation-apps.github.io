@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% set step = 1 %}
+{% block title %}Step 1 — Choose Restaurant{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="card">
+    <h2>Existing or New?</h2>
+
+    <label class="radio-row">
+        <input type="radio" name="mode" value="existing" {% if not form.mode or form.mode == 'existing' %}checked{% endif %} onchange="toggleMode()">
+        <span>Update an existing restaurant (menu only)</span>
+    </label>
+
+    <div id="existing-block">
+        <label>Restaurant
+            <select name="existing_prefix">
+                {% for p in existing %}
+                <option value="{{ p }}" {% if form.existing_prefix == p %}selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+            </select>
+            <small>Only the menu (<code>data.json</code>) will be editable. Credentials and details are left untouched.</small>
+        </label>
+
+    </div>
+
+    <hr>
+
+    <label class="radio-row">
+        <input type="radio" name="mode" value="new" {% if form.mode == 'new' %}checked{% endif %} onchange="toggleMode()">
+        <span>Create a new restaurant</span>
+    </label>
+
+    <div id="new-block">
+        <label>Display name
+            <input name="name" value="{{ form.name or '' }}" placeholder="Lucky Lecun">
+        </label>
+        <label>Prefix (folder + localStorage key)
+            <input name="prefix" pattern="[a-z0-9][a-z0-9-]{1,30}" value="{{ form.prefix or '' }}" placeholder="lucky-lecun">
+            <small>Lowercase letters, digits, hyphens. Becomes <code>/&lt;prefix&gt;/</code> folder name.</small>
+        </label>
+        <label>Encryption-key parts (comma-separated)
+            <input name="encKeyParts" value="{{ form.encKeyParts or '' }}" placeholder="LUCKY, FOOD, CAFE">
+            <small>Blank → defaults to <code>&lt;PREFIX_UPPER&gt;, FOOD, CAFE</code>. Written into <code>restaurant.js</code>.</small>
+        </label>
+        <label>Logo PNG
+            <input type="file" name="logo" accept="image/png">
+            <small>Saved as <code>&lt;prefix&gt;-logo.png</code>.</small>
+        </label>
+        <label>Google Maps URL
+            <input name="mapsUrl" value="{{ form.mapsUrl or '' }}" placeholder="https://maps.app.goo.gl/...">
+        </label>
+        <label>WhatsApp fallback (E.164)
+            <input name="wpFallback" value="{{ form.wpFallback or '' }}" placeholder="+9177XXXXXXXX">
+        </label>
+        <div class="row">
+            <label>Min order (₹)
+                <input type="number" name="minOrder" min="0" value="{{ form.minOrder or 200 }}">
+            </label>
+            <label>Delivery charge (₹)
+                <input type="number" name="deliveryCharge" min="0" value="{{ form.deliveryCharge or 50 }}">
+            </label>
+            <label>ETA (minutes)
+                <input type="number" name="etaMinutes" min="0" value="{{ form.etaMinutes or 60 }}">
+            </label>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button type="submit" class="primary">Continue →</button>
+    </div>
+</form>
+
+<script>
+function toggleMode() {
+    const mode = document.querySelector('input[name=mode]:checked').value;
+    document.getElementById('existing-block').style.display = mode === 'existing' ? 'block' : 'none';
+    document.getElementById('new-block').style.display     = mode === 'new'      ? 'block' : 'none';
+    // Toggle required attributes so browser validation matches mode.
+    const newFields = ['name','prefix','mapsUrl','wpFallback','minOrder','deliveryCharge','etaMinutes'];
+    for (const n of newFields) {
+        const el = document.querySelector(`#new-block [name=${n}]`);
+        if (el) el.required = (mode === 'new');
+    }
+    const logo = document.querySelector('#new-block [name=logo]');
+    if (logo) logo.required = (mode === 'new');
+    const existSel = document.querySelector('#existing-block [name=existing_prefix]');
+    if (existSel) existSel.required = (mode === 'existing');
+}
+toggleMode();
+</script>
+{% endblock %}
