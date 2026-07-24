@@ -929,6 +929,16 @@
       .opt-wrap { transition: none; }
       .nav-cta:hover, .cta-book:hover, .btn-solid:hover { transform: none; }
     }
+
+    /* ── Disabled past time options (mobile iOS ignores `hidden` on <option>,
+       so we lean on disabled + a "· Past" label so users never guess) ── */
+    .select option:disabled {
+      color: var(--muted-2) !important;
+      background: var(--ink-2) !important;
+      font-style: italic;
+    }
+    .field-msg.warn { display: none; color: var(--brass); }
+    .field-msg.warn.show { display: flex; align-items: center; gap: 6px; }
   </style>
 </head>
 <body>
@@ -1018,9 +1028,12 @@
             </div>
             <div>
               <label class="label" for="ride-time"><i class="fas fa-clock"></i>Time</label>
-              <select class="select" id="ride-time"></select>
+              <select class="select" id="ride-time" aria-describedby="time-msg"></select>
             </div>
           </div>
+          <p id="time-msg" class="field-msg warn" role="alert" aria-live="polite">
+            <i class="fas fa-clock-rotate-left"></i> Selected time has already passed — pick an upcoming slot
+          </p>
 
           <div class="field-group">
             <label class="label" for="passengers"><i class="fas fa-users"></i>Passengers</label>
@@ -1214,53 +1227,92 @@
 
   var PHONE_RE = /^[6-9]\d{9}$/;
 
-  /* ── 1-hour time slots ── */
+  var timeMsg = document.getElementById('time-msg');
+
+  /* ── 1-hour time slots — store base label so we can toggle "· Past" ── */
   (function() {
     for (var h = 0; h < 24; h++) {
       var h12  = (h % 12) || 12;
       var ampm = h < 12 ? 'AM' : 'PM';
       var opt  = document.createElement('option');
       opt.value = (h < 10 ? '0' + h : h) + ':00';
-      opt.textContent = h12 + ':00 ' + ampm;
+      opt.dataset.label = h12 + ':00 ' + ampm;
+      opt.textContent = opt.dataset.label;
       timeSelect.appendChild(opt);
     }
   })();
 
   function getNextHourValue() {
     var h = new Date().getHours() + 1;
-    if (h >= 24) h = 0;
+    if (h >= 24) return null;         // past 11 PM — no more slots today
     return (h < 10 ? '0' + h : h) + ':00';
   }
 
+  function ymd(d) {
+    var y = d.getFullYear();
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+  }
+
+  function isToday(dateStr) { return dateStr === ymd(new Date()); }
+
+  /* Mark past hours disabled + relabel with "· Past". Never hide — iOS Safari
+     ignores hidden on <option>, so users would see them and get confused. */
   function filterTimeForToday() {
     var now = new Date();
     var nowMin = now.getHours() * 60 + now.getMinutes();
-    var first = null;
+    var firstFuture = null;
     Array.from(timeSelect.options).forEach(function(opt) {
       var p = opt.value.split(':');
       var slotMin = parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
       var past = slotMin <= nowMin;
       opt.disabled = past;
-      opt.hidden   = past;
-      if (!past && !first) first = opt.value;
+      opt.hidden = false;
+      opt.textContent = past ? (opt.dataset.label + '  ·  Past') : opt.dataset.label;
+      if (!past && !firstFuture) firstFuture = opt.value;
     });
-    return first;
+    return firstFuture;
   }
 
   function enableAllTimeOptions() {
     Array.from(timeSelect.options).forEach(function(opt) {
       opt.disabled = false;
-      opt.hidden   = false;
+      opt.hidden = false;
+      opt.textContent = opt.dataset.label;
     });
   }
 
   function applySmartTimeSelect() {
     var nextHour = getNextHourValue();
-    timeSelect.value = nextHour;
-    if (!timeSelect.value || timeSelect.options[timeSelect.selectedIndex].disabled) {
+    if (nextHour) timeSelect.value = nextHour;
+    if (!timeSelect.value || (timeSelect.options[timeSelect.selectedIndex] && timeSelect.options[timeSelect.selectedIndex].disabled)) {
       var fe = Array.from(timeSelect.options).find(function(o) { return !o.disabled; });
-      if (fe) timeSelect.value = fe.value;
+      timeSelect.value = fe ? fe.value : '';
     }
+  }
+
+  /* If today is fully past (after 11 PM), auto-roll to tomorrow so the user
+     never lands on a fully-disabled dropdown. */
+  function ensureBookableDate() {
+    if (!isToday(dateInput.value)) return;
+    var future = Array.from(timeSelect.options).some(function(o) { return !o.disabled; });
+    if (!future) {
+      var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+      dateInput.value = ymd(tomorrow);
+      if (dateInput._flatpickr) dateInput._flatpickr.setDate(tomorrow, false);
+      enableAllTimeOptions();
+      applySmartTimeSelect();
+    }
+  }
+
+  /* Hard guard: never allow a booking whose date+time is in the past. */
+  function isBookingInFuture() {
+    if (!dateInput.value || !timeSelect.value) return false;
+    var d = dateInput.value.split('-');
+    var t = timeSelect.value.split(':');
+    var picked = new Date(+d[0], +d[1] - 1, +d[2], +t[0], +t[1], 0, 0);
+    return picked.getTime() > Date.now();
   }
 
   /* ── Flatpickr ── */
@@ -1270,8 +1322,7 @@
     dateFormat:    'Y-m-d',
     disableMobile: true,
     onChange: function(selectedDates, dateStr) {
-      var today = flatpickr.formatDate(new Date(), 'Y-m-d');
-      if (dateStr === today) {
+      if (isToday(dateStr)) {
         filterTimeForToday();
         if (timeSelect.selectedOptions[0] && timeSelect.selectedOptions[0].disabled) {
           applySmartTimeSelect();
@@ -1285,6 +1336,20 @@
 
   filterTimeForToday();
   applySmartTimeSelect();
+  ensureBookableDate();
+
+  /* Re-check every minute so an idle user can't submit a slot that just
+     rolled into the past while they were filling in the form. */
+  setInterval(function() {
+    if (isToday(dateInput.value)) {
+      filterTimeForToday();
+      if (timeSelect.selectedOptions[0] && timeSelect.selectedOptions[0].disabled) {
+        applySmartTimeSelect();
+      }
+      ensureBookableDate();
+      update();
+    }
+  }, 60 * 1000);
 
   function formatDate(val) {
     if (!val) return '';
@@ -1386,6 +1451,20 @@
 
   function openWhatsApp() {
     if (waBtn.disabled) return;
+    // Final guard — if the clock rolled while the user was typing, refuse to send.
+    if (isToday(dateInput.value)) {
+      filterTimeForToday();
+      if (timeSelect.options[timeSelect.selectedIndex] && timeSelect.options[timeSelect.selectedIndex].disabled) {
+        applySmartTimeSelect();
+        update();
+      }
+    }
+    if (!isBookingInFuture()) {
+      timeMsg.classList.add('show');
+      timeSelect.classList.add('invalid');
+      update();
+      return;
+    }
     try {
       if (typeof window.saveBookingDraft === 'function') {
         window.saveBookingDraft(buildBookingPayload());
@@ -1404,7 +1483,18 @@
   function update() {
     var nameOk  = custName.value.trim().length >= 2;
     var phoneOk = PHONE_RE.test(custPhone.value.trim());
-    var ok = nameOk && phoneOk && dateInput.value && timeSelect.value && getPax();
+    var futureOk = isBookingInFuture();
+
+    // Show/hide the "past time" warning under the time dropdown.
+    if (dateInput.value && timeSelect.value && !futureOk) {
+      timeMsg.classList.add('show');
+      timeSelect.classList.add('invalid');
+    } else {
+      timeMsg.classList.remove('show');
+      timeSelect.classList.remove('invalid');
+    }
+
+    var ok = nameOk && phoneOk && futureOk && getPax();
     if (ok) {
       locationSection.classList.add('visible');
       waBtn.disabled = false;
@@ -1413,7 +1503,11 @@
     } else {
       waBtn.disabled = true;
       waBtn.classList.add('disabled');
-      helperText.innerHTML = '<i class="fas fa-info-circle"></i> Fill in all required fields to continue';
+      if (dateInput.value && timeSelect.value && !futureOk) {
+        helperText.innerHTML = '<i class="fas fa-clock-rotate-left"></i> Please choose a future date &amp; time';
+      } else {
+        helperText.innerHTML = '<i class="fas fa-info-circle"></i> Fill in all required fields to continue';
+      }
     }
   }
 
