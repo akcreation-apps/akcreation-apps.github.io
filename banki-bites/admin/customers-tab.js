@@ -610,39 +610,108 @@ function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
 function openCustomerDetails(state, phone) {
   const profile = state.customers.get(phone) || { phone };
   const row = state.rows.find(r => r.phone === phone);
-  const orders = (state.orders || []).filter(o => o?.customer?.phone === phone);
-  orders.sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0));
+  const allOrders = (state.orders || []).filter(o => o?.customer?.phone === phone);
+  allOrders.sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0));
 
-  const delivered = orders.filter(o => o.status === 'delivered');
-  const cancelled = orders.filter(o => o.status === 'cancelled');
-  const fake      = orders.filter(o => o.status === 'fake' || o.is_fake === true);
-  const spend     = delivered.reduce((s, o) => s + Math.max(0, (+o.total || 0) - (+o.discount || 0)), 0);
-  const grossTotal= delivered.reduce((s, o) => s + (+o.total || 0), 0);
-  const discountReceived = delivered.reduce((s, o) => s + (+o.discount || 0), 0);
-  const aov       = delivered.length ? Math.round(spend / delivered.length) : 0;
-  const biggest   = delivered.reduce((mx, o) => {
-    const net = Math.max(0, (+o.total || 0) - (+o.discount || 0));
-    return net > (mx.net || 0) ? { net, order: o } : mx;
-  }, { net: 0, order: null });
+  // ---- Date-range filter -------------------------------------------------
+  // Default: this month. Custom uses inclusive from/to date-picker inputs.
+  const startOfMonth = (d = new Date()) => { const x = new Date(d); x.setDate(1); x.setHours(0,0,0,0); return x; };
+  const startOfPrevMonth = (d = new Date()) => { const x = startOfMonth(d); x.setMonth(x.getMonth() - 1); return x; };
+  const endOfDayExcl = (d = new Date()) => { const x = new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate() + 1); return x; };
+  const toISODate = d => { const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; };
 
-  const dates = delivered.map(o => toDateSafe(o.created_at)).filter(Boolean).sort((a, b) => a - b);
-  const firstDelivered = dates[0] || null;
-  const lastDelivered  = dates[dates.length - 1] || null;
-  const nowMs = Date.now();
-  const daysSinceLast  = lastDelivered ? Math.floor((nowMs - lastDelivered.getTime()) / 86400000) : null;
-  const joined         = toDateSafe(profile.created_at) || firstDelivered;
-  const daysAsCustomer = joined ? Math.floor((nowMs - joined.getTime()) / 86400000) : null;
-  let avgGap = null;
-  if (dates.length >= 2) {
-    let sum = 0;
-    for (let i = 1; i < dates.length; i++) sum += (dates[i].getTime() - dates[i-1].getTime());
-    avgGap = Math.round(sum / (dates.length - 1) / 86400000);
+  function rangeForPreset(preset, customFrom, customTo) {
+    const now = new Date();
+    if (preset === 'lastMonth') {
+      return { preset, from: startOfPrevMonth(now), to: startOfMonth(now), label: 'Last month' };
+    }
+    if (preset === 'custom' && customFrom && customTo) {
+      const f = new Date(customFrom + 'T00:00:00');
+      const t = new Date(customTo + 'T00:00:00');
+      return { preset, from: f, to: endOfDayExcl(t), label: 'Custom' };
+    }
+    // Default → this month
+    return { preset: 'thisMonth', from: startOfMonth(now), to: endOfDayExcl(now), label: 'This month' };
   }
-  const successRate = orders.length ? Math.round((delivered.length / orders.length) * 100) : 0;
+  let range = rangeForPreset('thisMonth');
 
-  // Payment mix — same logic as classifyPayment in dashboard.js.
+  const topN = (map, n) => Array.from(map.entries()).sort((a,b) => b[1]-a[1]).slice(0, n);
+
+  // Compute all range-scoped stats for the current filter. Returns everything
+  // the "filtered" portion of the modal needs — KPIs, top-N tables, history.
+  function computeFiltered(from, to) {
+    const orders = allOrders.filter(o => {
+      const d = toDateSafe(o.created_at);
+      return d && d >= from && d < to;
+    });
+    const delivered = orders.filter(o => o.status === 'delivered');
+    const cancelled = orders.filter(o => o.status === 'cancelled');
+    const fake      = orders.filter(o => o.status === 'fake' || o.is_fake === true);
+    const spend     = delivered.reduce((s, o) => s + Math.max(0, (+o.total || 0) - (+o.discount || 0)), 0);
+    const grossTotal= delivered.reduce((s, o) => s + (+o.total || 0), 0);
+    const discountReceived = delivered.reduce((s, o) => s + (+o.discount || 0), 0);
+    const aov       = delivered.length ? Math.round(spend / delivered.length) : 0;
+    const biggest   = delivered.reduce((mx, o) => {
+      const net = Math.max(0, (+o.total || 0) - (+o.discount || 0));
+      return net > (mx.net || 0) ? { net, order: o } : mx;
+    }, { net: 0, order: null });
+
+    const dates = delivered.map(o => toDateSafe(o.created_at)).filter(Boolean).sort((a, b) => a - b);
+    const firstDelivered = dates[0] || null;
+    const lastDelivered  = dates[dates.length - 1] || null;
+    let avgGap = null;
+    if (dates.length >= 2) {
+      let sum = 0;
+      for (let i = 1; i < dates.length; i++) sum += (dates[i].getTime() - dates[i-1].getTime());
+      avgGap = Math.round(sum / (dates.length - 1) / 86400000);
+    }
+    const successRate = orders.length ? Math.round((delivered.length / orders.length) * 100) : 0;
+
+    const bump = (map, key, val = 1) => { if (!key) return; map.set(key, (map.get(key) || 0) + val); };
+    const restCount = new Map(), restSpend = new Map(), places = new Map(), items = new Map(), partners = new Map();
+    const hourCounts = new Array(24).fill(0);
+    for (const o of delivered) {
+      const rest = (o.restaurant_name || o.restaurant_id || '').trim();
+      bump(restCount, rest);
+      bump(restSpend, rest, Math.max(0, (+o.total || 0) - (+o.discount || 0)));
+      bump(places, (o.place || '').trim());
+      bump(partners, o.delivery_staff_id);
+      if (Array.isArray(o.items)) {
+        for (const it of o.items) {
+          const name = (it?.name || '').trim();
+          if (name) bump(items, name, Number(it.qty) || 1);
+        }
+      }
+      const d = toDateSafe(o.created_at);
+      if (d) hourCounts[d.getHours()]++;
+    }
+    // Peak hour = the single hour with the highest order count in range.
+    // hoursSeen = how many distinct hours-of-day the customer ordered in.
+    const peakHour    = hourCounts.some(v => v > 0) ? hourCounts.indexOf(Math.max(...hourCounts)) : null;
+    const peakHourN   = peakHour == null ? 0 : hourCounts[peakHour];
+    const hoursSeen   = hourCounts.reduce((s, v) => s + (v > 0 ? 1 : 0), 0);
+    return {
+      orders, delivered, cancelled, fake,
+      spend, grossTotal, discountReceived, aov, biggest,
+      firstDelivered, lastDelivered, avgGap, successRate,
+      restCount, restSpend, places, items, partners,
+      peakHour, peakHourN, hoursSeen,
+    };
+  }
+
+  // ---- Lifetime-scope stats (do NOT depend on filter) --------------------
+  const allDelivered = allOrders.filter(o => o.status === 'delivered');
+  const allDates = allDelivered.map(o => toDateSafe(o.created_at)).filter(Boolean).sort((a, b) => a - b);
+  const firstEver = allDates[0] || null;
+  const lastEver  = allDates[allDates.length - 1] || null;
+  const nowMs = Date.now();
+  const daysSinceLast  = lastEver ? Math.floor((nowMs - lastEver.getTime()) / 86400000) : null;
+  const joined         = toDateSafe(profile.created_at) || firstEver;
+  const daysAsCustomer = joined ? Math.floor((nowMs - joined.getTime()) / 86400000) : null;
+
+  // Payment mix — lifetime (drives the doughnut).
   const pay = { prepaid: 0, cod: 0 };
-  for (const o of delivered) {
+  for (const o of allDelivered) {
     const method = String(o.paid_method || '').toLowerCase();
     if (method === 'upi' || method === 'online') pay.prepaid++;
     else if (method === 'cash') pay.cod++;
@@ -650,25 +719,7 @@ function openCustomerDetails(state, phone) {
     else pay.cod++;
   }
 
-  // Restaurant, place, item, partner breakdowns — all limited to delivered.
-  const bump = (map, key, val = 1) => { if (!key) return; map.set(key, (map.get(key) || 0) + val); };
-  const restCount = new Map(), restSpend = new Map(), places = new Map(), items = new Map(), partners = new Map();
-  for (const o of delivered) {
-    const rest = (o.restaurant_name || o.restaurant_id || '').trim();
-    bump(restCount, rest);
-    bump(restSpend, rest, Math.max(0, (+o.total || 0) - (+o.discount || 0)));
-    bump(places, (o.place || '').trim());
-    bump(partners, o.delivery_staff_id);
-    if (Array.isArray(o.items)) {
-      for (const it of o.items) {
-        const name = (it?.name || '').trim();
-        if (name) bump(items, name, Number(it.qty) || 1);
-      }
-    }
-  }
-  const topN = (map, n) => Array.from(map.entries()).sort((a,b) => b[1]-a[1]).slice(0, n);
-
-  // Orders-per-month bucket for the trend chart (last 12 months, delivered only).
+  // Orders-per-month bucket for the trend chart (last 12 months, lifetime).
   const monthLabels = [];
   const monthCounts = [];
   const monthSpend  = [];
@@ -677,7 +728,7 @@ function openCustomerDetails(state, phone) {
     const s = new Date(ref.getFullYear(), ref.getMonth() - i, 1);
     const e = new Date(ref.getFullYear(), ref.getMonth() - i + 1, 1);
     let c = 0, sp = 0;
-    for (const o of delivered) {
+    for (const o of allDelivered) {
       const d = toDateSafe(o.created_at);
       if (d && d >= s && d < e) { c++; sp += Math.max(0, (+o.total || 0) - (+o.discount || 0)); }
     }
@@ -686,9 +737,9 @@ function openCustomerDetails(state, phone) {
     monthSpend.push(sp);
   }
 
-  // Hour-of-day preference (delivered), for the "usual order time" line.
+  // Hour-of-day preference (lifetime delivered), for the "peak hour" KPI.
   const hourCounts = new Array(24).fill(0);
-  for (const o of delivered) {
+  for (const o of allDelivered) {
     const d = toDateSafe(o.created_at);
     if (d) hourCounts[d.getHours()]++;
   }
@@ -708,19 +759,6 @@ function openCustomerDetails(state, phone) {
       </div>
     </div>`;
 
-  const restaurantRows = topN(restCount, 5).map(([name, count]) => {
-    const sp = restSpend.get(name) || 0;
-    return `<tr><td>${escapeHtml(name || '—')}</td><td class="text-right">${count}</td><td class="text-right">${fmtINR(sp)}</td></tr>`;
-  }).join('') || '<tr><td colspan="3" class="text-muted small">No delivered orders yet</td></tr>';
-
-  const placeRows = topN(places, 5).map(([name, count]) =>
-    `<tr><td>${escapeHtml(name || '—')}</td><td class="text-right">${count}</td></tr>`
-  ).join('') || '<tr><td colspan="2" class="text-muted small">—</td></tr>';
-
-  const itemRows = topN(items, 8).map(([name, qty]) =>
-    `<tr><td>${escapeHtml(name)}</td><td class="text-right">${qty}</td></tr>`
-  ).join('') || '<tr><td colspan="2" class="text-muted small">No items on record</td></tr>';
-
   const staffById = state.staffById || new Map();
   const partnerLabel = uid => {
     if (!uid) return '—';
@@ -729,70 +767,51 @@ function openCustomerDetails(state, phone) {
     const name = (s.name || s.email || uid).trim();
     return s.is_active === false ? `${name} (inactive)` : name;
   };
-  const partnerRows = topN(partners, 5).map(([uid, count]) =>
-    `<tr><td>${escapeHtml(partnerLabel(uid))}</td><td class="text-right">${count}</td></tr>`
-  ).join('') || '<tr><td colspan="2" class="text-muted small">—</td></tr>';
 
-  const historyRows = orders.slice(0, 25).map(o => {
-    const d = toDateSafe(o.created_at);
-    const net = Math.max(0, (+o.total || 0) - (+o.discount || 0));
-    const rest = (o.restaurant_name || o.restaurant_id || '—').trim();
-    const badge = {
-      delivered: 'success', cancelled: 'danger', fake: 'dark',
-      new: 'secondary', assigned: 'info', out_for_delivery: 'primary',
-    }[o.status] || 'secondary';
-    return `<tr>
-      <td class="cust-history__when">${fmtDateTime(d)}</td>
-      <td><span class="badge badge-${badge}">${escapeHtml(o.status || 'new')}</span></td>
-      <td class="cust-history__rest" title="${escapeAttr(rest)}">${escapeHtml(rest)}</td>
-      <td class="text-right">${fmtINR(net)}</td>
-      <td class="text-right">${(o.items || []).length}</td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="5" class="text-muted small">No orders on record</td></tr>';
+  // Build the filter-scoped section (KPIs + tables + history) from a filter.
+  function buildFilteredSection(rng) {
+    const c = computeFiltered(rng.from, rng.to);
+    const restaurantRows = topN(c.restCount, 5).map(([name, count]) => {
+      const sp = c.restSpend.get(name) || 0;
+      return `<tr><td>${escapeHtml(name || '—')}</td><td class="text-right">${count}</td><td class="text-right">${fmtINR(sp)}</td></tr>`;
+    }).join('') || '<tr><td colspan="3" class="text-muted small">No delivered orders in this range</td></tr>';
+    const placeRows = topN(c.places, 5).map(([name, count]) =>
+      `<tr><td>${escapeHtml(name || '—')}</td><td class="text-right">${count}</td></tr>`
+    ).join('') || '<tr><td colspan="2" class="text-muted small">—</td></tr>';
+    const itemRows = topN(c.items, 8).map(([name, qty]) =>
+      `<tr><td>${escapeHtml(name)}</td><td class="text-right">${qty}</td></tr>`
+    ).join('') || '<tr><td colspan="2" class="text-muted small">No items in this range</td></tr>';
+    const partnerRows = topN(c.partners, 5).map(([uid, count]) =>
+      `<tr><td>${escapeHtml(partnerLabel(uid))}</td><td class="text-right">${count}</td></tr>`
+    ).join('') || '<tr><td colspan="2" class="text-muted small">—</td></tr>';
+    const historyRows = c.orders.slice(0, 25).map(o => {
+      const d = toDateSafe(o.created_at);
+      const net = Math.max(0, (+o.total || 0) - (+o.discount || 0));
+      const rest = (o.restaurant_name || o.restaurant_id || '—').trim();
+      const badge = {
+        delivered: 'success', cancelled: 'danger', fake: 'dark',
+        new: 'secondary', assigned: 'info', out_for_delivery: 'primary',
+      }[o.status] || 'secondary';
+      return `<tr>
+        <td class="cust-history__when">${fmtDateTime(d)}</td>
+        <td><span class="badge badge-${badge}">${escapeHtml(o.status || 'new')}</span></td>
+        <td class="cust-history__rest" title="${escapeAttr(rest)}">${escapeHtml(rest)}</td>
+        <td class="text-right">${fmtINR(net)}</td>
+        <td class="text-right">${(o.items || []).length}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="5" class="text-muted small">No orders in this range</td></tr>';
 
-  const offerBadge = isOfferActive(profile)
-    ? `<span class="badge badge-success ml-1">Offer ₹${profile.active_offer_amount} until ${profile.active_offer_valid_until}</span>`
-    : '';
-  const notInterested = profile.not_interested
-    ? '<span class="badge badge-danger ml-1"><i class="fas fa-ban"></i> Not interested</span>'
-    : '';
-  const gpsLink = profile.gps?.lat && profile.gps?.lng
-    ? `<a href="https://www.google.com/maps?q=${profile.gps.lat},${profile.gps.lng}" target="_blank" rel="noopener"><i class="fas fa-location-dot"></i> Open in Maps</a>`
-    : '<span class="text-muted">No GPS pinned</span>';
-
-  const html = `
-    <div class="cust-detail">
-      <div class="cust-detail__head text-left">
-        <div><strong style="font-size:1.1rem">${escapeHtml(profile.name || row?.name || '(no name)')}</strong>${notInterested}${offerBadge}</div>
-        <div class="text-muted small">${escapeHtml(phone)}${profile.address ? ' · ' + escapeHtml(profile.address) : ''}</div>
-        <div class="text-muted small">${gpsLink} · Joined ${fmtDate(joined)}${daysAsCustomer != null ? ` (${daysAsCustomer} days)` : ''}</div>
-      </div>
-
+    return `
       <div class="kpi-grid kpi-grid--compact mt-2">
-        ${kpi('fa-receipt', 'Total orders', orders.length, `${delivered.length} dlv · ${cancelled.length} cxl${fake.length ? ' · ' + fake.length + ' fake' : ''}`)}
-        ${kpi('fa-indian-rupee-sign', 'Lifetime spend', fmtINR(spend), `Gross ${fmtINR(grossTotal)}`)}
-        ${kpi('fa-chart-line', 'Avg order value', fmtINR(aov), `${delivered.length} delivered`)}
-        ${kpi('fa-tag', 'Discount received', fmtINR(discountReceived), '')}
-        ${kpi('fa-trophy', 'Biggest order', fmtINR(biggest.net), biggest.order ? fmtDate(toDateSafe(biggest.order.created_at)) : '—')}
-        ${kpi('fa-circle-check', 'Success rate', successRate + '%', `${delivered.length}/${orders.length}`)}
-        ${kpi('fa-calendar-day', 'Days since last', daysSinceLast == null ? '—' : daysSinceLast, lastDelivered ? fmtDate(lastDelivered) : 'Never delivered')}
-        ${kpi('fa-clock-rotate-left', 'Avg gap', avgGap == null ? '—' : avgGap + 'd', dates.length >= 2 ? `${dates.length} orders` : 'Need 2+ orders')}
-        ${kpi('fa-clock', 'Peak hour', hoursOrdered ? (String(peakHour).padStart(2,'0') + ':00') : '—', `${hoursOrdered} hrs seen`)}
-      </div>
-
-      <div class="chart-grid mt-3">
-        <div class="chart-card">
-          <div class="chart-card-head"><i class="fas fa-chart-column"></i> Orders per month (last 12)</div>
-          <div class="chart-card-body"><canvas id="custDetailOrdersTrend"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-card-head"><i class="fas fa-indian-rupee-sign"></i> Spend per month (₹)</div>
-          <div class="chart-card-body"><canvas id="custDetailSpendTrend"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-card-head"><i class="fas fa-wallet"></i> Payment mix</div>
-          <div class="chart-card-body"><canvas id="custDetailPayMix"></canvas></div>
-        </div>
+        ${kpi('fa-receipt', 'Orders', c.orders.length, `${c.delivered.length} dlv · ${c.cancelled.length} cxl${c.fake.length ? ' · ' + c.fake.length + ' fake' : ''}`)}
+        ${kpi('fa-indian-rupee-sign', 'Spend', fmtINR(c.spend), `Gross ${fmtINR(c.grossTotal)}`)}
+        ${kpi('fa-chart-line', 'Avg order value', fmtINR(c.aov), `${c.delivered.length} delivered`)}
+        ${kpi('fa-tag', 'Discount received', fmtINR(c.discountReceived), '')}
+        ${kpi('fa-trophy', 'Biggest order', fmtINR(c.biggest.net), c.biggest.order ? fmtDate(toDateSafe(c.biggest.order.created_at)) : '—')}
+        ${kpi('fa-circle-check', 'Success rate', c.successRate + '%', `${c.delivered.length}/${c.orders.length}`)}
+        ${kpi('fa-calendar-day', 'Last order', c.lastDelivered ? fmtDate(c.lastDelivered) : '—', c.lastDelivered ? '' : 'None in range')}
+        ${kpi('fa-clock-rotate-left', 'Avg gap', c.avgGap == null ? '—' : c.avgGap + 'd', c.delivered.length >= 2 ? `${c.delivered.length} orders` : 'Need 2+ orders')}
+        ${kpi('fa-clock', 'Peak hour', c.peakHour == null ? '—' : (String(c.peakHour).padStart(2,'0') + ':00'), c.peakHour == null ? 'No orders in range' : `${c.peakHourN} order${c.peakHourN === 1 ? '' : 's'} · ${c.hoursSeen} hr${c.hoursSeen === 1 ? '' : 's'} seen`)}
       </div>
 
       <div class="row mt-3">
@@ -815,12 +834,83 @@ function openCustomerDetails(state, phone) {
       </div>
 
       <div class="mt-2">
-        <h6 class="mb-1"><i class="fas fa-clock-rotate-left text-brand"></i> Order history (latest 25)</h6>
+        <h6 class="mb-1"><i class="fas fa-clock-rotate-left text-brand"></i> Order history <span class="text-muted small">(latest 25 in range)</span></h6>
         <div class="cust-history-wrap">
           <table class="cust-table cust-history">
             <thead><tr><th>When</th><th>Status</th><th>Restaurant</th><th class="text-right">Net</th><th class="text-right">Items</th></tr></thead>
             <tbody>${historyRows}</tbody>
           </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function buildRangeControls(rng) {
+    const presets = [
+      ['thisMonth', 'This month'],
+      ['lastMonth', 'Last month'],
+      ['custom',    'Custom'],
+    ];
+    const chips = presets.map(([k, l]) =>
+      `<button type="button" class="dash-range-chip${k === rng.preset ? ' is-active' : ''}" data-cust-preset="${k}" aria-pressed="${k === rng.preset}">${l}</button>`
+    ).join('');
+    const fromISO = toISODate(rng.from);
+    // Show `to - 1 day` so the picker matches the inclusive end date.
+    const toDisplay = new Date(rng.to.getTime() - 86400000);
+    const toISOStr = toISODate(toDisplay);
+    return `
+      <div class="dash-range" role="toolbar" aria-label="Date range">
+        <div class="dash-range-chips" role="group">${chips}</div>
+        <div class="dash-range-custom" ${rng.preset === 'custom' ? '' : 'hidden'}>
+          <label>From <input type="date" id="custDetailFrom" value="${fromISO}"></label>
+          <label>To <input type="date" id="custDetailTo" value="${toISOStr}"></label>
+        </div>
+      </div>`;
+  }
+
+  const offerBadge = isOfferActive(profile)
+    ? `<span class="badge badge-success ml-1">Offer ₹${profile.active_offer_amount} until ${profile.active_offer_valid_until}</span>`
+    : '';
+  const notInterested = profile.not_interested
+    ? '<span class="badge badge-danger ml-1"><i class="fas fa-ban"></i> Not interested</span>'
+    : '';
+  const gpsLink = profile.gps?.lat && profile.gps?.lng
+    ? `<a href="https://www.google.com/maps?q=${profile.gps.lat},${profile.gps.lng}" target="_blank" rel="noopener"><i class="fas fa-location-dot"></i> Open in Maps</a>`
+    : '<span class="text-muted">No GPS pinned</span>';
+
+  // Lifetime KPI strip — always full-history, above the filter.
+  const lifetimeStrip = `
+    <div class="kpi-grid kpi-grid--compact mt-2">
+      ${kpi('fa-infinity', 'Lifetime orders', allOrders.length, `${allDelivered.length} delivered`)}
+      ${kpi('fa-calendar-day', 'Days since last', daysSinceLast == null ? '—' : daysSinceLast, lastEver ? fmtDate(lastEver) : 'Never delivered')}
+      ${kpi('fa-clock', 'Peak hour (lifetime)', hoursOrdered ? (String(peakHour).padStart(2,'0') + ':00') : '—', `${hoursOrdered} hrs seen`)}
+    </div>`;
+
+  const html = `
+    <div class="cust-detail">
+      <div class="cust-detail__head text-left">
+        <div><strong style="font-size:1.1rem">${escapeHtml(profile.name || row?.name || '(no name)')}</strong>${notInterested}${offerBadge}</div>
+        <div class="text-muted small">${escapeHtml(phone)}${profile.address ? ' · ' + escapeHtml(profile.address) : ''}</div>
+        <div class="text-muted small">${gpsLink} · Joined ${fmtDate(joined)}${daysAsCustomer != null ? ` (${daysAsCustomer} days)` : ''}</div>
+      </div>
+
+      ${lifetimeStrip}
+
+      <div id="custDetailRangeWrap" class="mt-3">${buildRangeControls(range)}</div>
+      <div id="custDetailFiltered">${buildFilteredSection(range)}</div>
+
+      <div class="chart-grid mt-3">
+        <div class="chart-card">
+          <div class="chart-card-head"><i class="fas fa-chart-column"></i> Orders per month (last 12)</div>
+          <div class="chart-card-body"><canvas id="custDetailOrdersTrend"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head"><i class="fas fa-indian-rupee-sign"></i> Spend per month (₹)</div>
+          <div class="chart-card-body"><canvas id="custDetailSpendTrend"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head"><i class="fas fa-wallet"></i> Payment mix (lifetime)</div>
+          <div class="chart-card-body"><canvas id="custDetailPayMix"></canvas></div>
         </div>
       </div>
     </div>`;
@@ -853,6 +943,35 @@ function openCustomerDetails(state, phone) {
         type: 'doughnut',
         data: { labels: ['Prepaid', 'COD'], datasets: [{ data: [pay.prepaid, pay.cod], backgroundColor: [p.brand, p.muted], borderWidth: 0 }] },
         options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+      });
+
+      // Wire the date-range filter → re-render the filtered section only.
+      const rangeWrap    = document.getElementById('custDetailRangeWrap');
+      const filteredWrap = document.getElementById('custDetailFiltered');
+      if (!rangeWrap || !filteredWrap) return;
+      const applyRange = (next) => {
+        range = next;
+        rangeWrap.innerHTML = buildRangeControls(range);
+        filteredWrap.innerHTML = buildFilteredSection(range);
+      };
+      rangeWrap.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('[data-cust-preset]');
+        if (!btn) return;
+        const preset = btn.dataset.custPreset;
+        if (preset === range.preset && preset !== 'custom') return;
+        if (preset === 'custom') {
+          // Keep whatever range was already showing when entering custom mode.
+          applyRange({ ...range, preset: 'custom', label: 'Custom' });
+        } else {
+          applyRange(rangeForPreset(preset));
+        }
+      });
+      rangeWrap.addEventListener('change', (ev) => {
+        if (ev.target.id !== 'custDetailFrom' && ev.target.id !== 'custDetailTo') return;
+        const f = document.getElementById('custDetailFrom')?.value;
+        const t = document.getElementById('custDetailTo')?.value;
+        if (!f || !t) return;
+        applyRange(rangeForPreset('custom', f, t));
       });
     },
   });

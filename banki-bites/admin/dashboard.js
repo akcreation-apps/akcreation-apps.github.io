@@ -344,6 +344,7 @@ function kpiSkeleton() {
     blank('Repeat share',     'fa-users'),
     blank('Avg order value',  'fa-basket-shopping'),
     blank('Payout coverage',  'fa-piggy-bank'),
+    blank('Total discounts',  'fa-tag'),
   ].join('');
 }
 
@@ -538,6 +539,11 @@ function renderKpis(el, orders, ordersAll, partners, staff, rules) {
   const payoutTotal = paidPayoutTotal + pendingPayoutTotal;
   const payoutCoverage = payoutTotal ? Math.round((paidPayoutTotal / payoutTotal) * 100) : 0;
 
+  // Total discounts given on delivered orders inside the selected range.
+  const discountOrders  = deliveredOrders.filter(o => (Number(o.discount) || 0) > 0);
+  const totalDiscount   = deliveredOrders.reduce((s, o) => s + (Number(o.discount) || 0), 0);
+  const discountPctRev  = rangeRevenue > 0 ? Math.round((totalDiscount / (rangeRevenue + totalDiscount)) * 100) : 0;
+
   el.innerHTML = `
     <div class="kpi-card">
       <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
@@ -601,6 +607,14 @@ function renderKpis(el, orders, ordersAll, partners, staff, rules) {
         <div class="kpi-label">Payout coverage</div>
         <div class="kpi-value">${payoutCoverage}%</div>
         <div class="kpi-sub">${fmtINR(paidPayoutTotal)} paid / ${fmtINR(payoutTotal)} total</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-tag"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total discounts</div>
+        <div class="kpi-value">${fmtINR(totalDiscount)}</div>
+        <div class="kpi-sub">${discountOrders.length} order${discountOrders.length === 1 ? '' : 's'}${totalDiscount > 0 ? ` · ${discountPctRev}% of gross` : ''} | ${rangeLabel}</div>
       </div>
     </div>
   `;
