@@ -825,7 +825,7 @@
                   const chips = [];
                   if (p.is_veg)            chips.push(`<span class="tag tag-veg">Pure Veg</span>`);
                   if (p.is_homemade)       chips.push(`<span class="tag tag-homemade"><i class="fas fa-house-user"></i> Home Made</span>`);
-                  if (p.is_separate_price) chips.push(`<span class="tag tag-separate-price"><i class="fas fa-tag"></i> Separate Pricing</span>`);
+                  if (p.is_separate_price) chips.push(`<span class="tag tag-separate-price"><i class="fas fa-map-marker-alt"></i> Limited Area Delivery</span>`);
                   services.forEach(s => chips.push(`<span class="tag">${escapeHtml(s)}</span>`));
                   return chips.length ? `<div class="card-tags">${chips.join('')}</div>` : '';
                 })()}

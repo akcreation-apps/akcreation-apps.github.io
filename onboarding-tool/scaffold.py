@@ -6,6 +6,7 @@ Two flows:
 """
 
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -227,6 +228,52 @@ def _replace_in_file(path: Path, replacements: list):
     path.write_text(text, encoding="utf-8")
 
 
+# Everything below is stripped from cloned HTML so a new restaurant carries
+# zero SEO baggage from the source folder.
+_SEO_STRIP_PATTERNS = [
+    r"<!--\s*Primary SEO Meta Tags\s*-->",
+    r"<!--\s*Open Graph[^>]*?-->",
+    r"<!--\s*Twitter Card\s*-->",
+    r"<!--\s*Schema\.org[^>]*?-->",
+    r'<meta\s+name="description"[^>]*>',
+    r'<meta\s+name="keywords"[^>]*>',
+    r'<meta\s+name="robots"[^>]*>',
+    r'<meta\s+name="author"[^>]*>',
+    r'<link\s+rel="canonical"[^>]*>',
+    r'<meta\s+property="og:[^"]*"[^>]*>',
+    r'<meta\s+name="twitter:[^"]*"[^>]*>',
+    r'<script\s+type="application/ld\+json">[\s\S]*?</script>',
+    # Screen-reader-only SEO headings that seed keywords for search engines.
+    r'<h1\s+class="sr-only"[^>]*>[\s\S]*?</h1>',
+    r'<h2\s+class="sr-only"[^>]*>[\s\S]*?</h2>',
+    # Long local-SEO tagline paragraph inside the local-info block.
+    r'<p\s+class="local-info-tagline"[^>]*>[\s\S]*?</p>',
+]
+
+
+def _strip_seo(html: str, restaurant_name: str) -> str:
+    for pat in _SEO_STRIP_PATTERNS:
+        html = re.sub(pat, "", html, flags=re.IGNORECASE)
+    # Replace <title>…</title> with just the restaurant name.
+    html = re.sub(
+        r"<title>[\s\S]*?</title>",
+        f"<title>{restaurant_name}</title>",
+        html,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    # Collapse runs of blank lines left behind.
+    html = re.sub(r"[ \t]+\n", "\n", html)
+    html = re.sub(r"\n{3,}", "\n\n", html)
+    return html
+
+
+def _strip_seo_in_file(path: Path, restaurant_name: str) -> None:
+    if not path.exists():
+        return
+    path.write_text(_strip_seo(path.read_text(encoding="utf-8"), restaurant_name), encoding="utf-8")
+
+
 def scaffold_new(details: dict, plain_creds: dict, categories: list, logo_bytes: bytes) -> Path:
     """CREATE flow: clone /TCD/ → /<prefix>/, write new files, do string replacements.
 
@@ -263,14 +310,20 @@ def scaffold_new(details: dict, plain_creds: dict, categories: list, logo_bytes:
 
     name = details["name"]
     logo_new = f"{prefix}-logo.png"
+
+    # Strip all SEO tags/schema/canonical/OG/Twitter blocks from cloned HTML —
+    # new restaurants start with zero source-restaurant SEO baggage.
+    for html_path in (target / "index.html", target / "cart.html"):
+        _strip_seo_in_file(html_path, name)
+
     common_replacements = [
         ("The Cafe Darbar", name),
         ("Cafe Darbar", name),
         ("tcd-logo.png", logo_new),
         ("/TCD/", f"/{prefix}/"),
-        ('"alternateName": "TCD",', f'"alternateName": "{name}",'),
         (">The Cafe</span> Darbar<", f">{name}</span><"),
         ("(TCD)", ""),
+        (" TCD ", f" {name} "),
     ]
     _replace_in_file(target / "index.html", common_replacements)
     _replace_in_file(target / "cart.html", common_replacements)

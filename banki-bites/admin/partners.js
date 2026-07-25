@@ -357,7 +357,7 @@ async function openEditor(db, existing, root) {
       </div>
       <div class="form-group form-check">
         <input class="form-check-input" type="checkbox" id="paIsSeparatePrice" name="is_separate_price" ${p.is_separate_price ? 'checked' : ''}>
-        <label class="form-check-label" for="paIsSeparatePrice">Separate Pricing (prices may differ from platform average)</label>
+        <label class="form-check-label" for="paIsSeparatePrice">Limited Area Delivery (delivers only within a restricted area)</label>
       </div>
       <details class="mt-2">
         <summary class="text-muted" style="font-size:.85em;cursor:pointer">Advanced (admin panel sync)</summary>
