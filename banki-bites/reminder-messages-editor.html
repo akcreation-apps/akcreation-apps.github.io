@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FF6B35">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0b0d12">
+  <meta name="robots" content="noindex, nofollow">
+
+  <title>BankiBites — Reminder Messages Editor</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/banki-bites/banki-bites-logo.png">
+  <link rel="icon" type="image/png" href="/banki-bites/banki-bites-logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+  <style>
+    /* ============================================================
+       Mobile-first design.
+       Base styles target ~375px viewports. `min-width` breakpoints
+       (560px / 768px) progressively enhance for tablet & desktop.
+       All touch targets are ≥ 44×44px per WCAG.
+       ============================================================ */
+    :root {
+      --brand: #FF6B35;
+      --bg: #f7f7f8;
+      --surface: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0d12;
+        --surface: #14171f;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --border: #2a2f3a;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      font-size: 15px;
+    }
+
+    /* ---- Header (mobile base: stacked-friendly, sticky) ---- */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      font-family: 'Poppins', 'Inter', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    header h1 img { width: 24px; height: 24px; flex-shrink: 0; }
+    header h1 span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ---- Buttons — 44px min touch target ---- */
+    .btn {
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 600;
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: var(--surface);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: transform .05s, background .15s;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.05); }
+    /* On very narrow screens, hide the export label — keep the icon */
+    .btn .label-sm { display: none; }
+    @media (min-width: 400px) { .btn .label-sm { display: inline; } }
+
+    .btn-icon {
+      background: transparent;
+      color: var(--muted);
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+      padding: 0;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: .8rem;
+      flex-shrink: 0;
+    }
+    .btn-icon:hover { color: #dc2626; background: rgba(220,38,38,.08); }
+
+    /* ---- Layout (mobile base: full width, single column) ---- */
+    main {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 12px 10px 32px;
+    }
+    @media (min-width: 768px) {
+      main { padding: 20px 20px 48px; }
+    }
+    @media (min-width: 1200px) {
+      main { max-width: 1400px; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    @media (min-width: 768px) {
+      .card { padding: 16px; margin-bottom: 16px; }
+    }
+    .card h2 {
+      font-family: 'Poppins', 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h2 .count {
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .card h2 .clear-btn {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 6px 10px;
+      min-height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card h2 .clear-btn:hover {
+      color: #dc2626;
+      border-color: #dc2626;
+      background: rgba(220,38,38,.06);
+    }
+    .card h2 .clear-btn[hidden] { display: none; }
+
+    /* Grid: 1 column on mobile → 2 columns on ≥ 560px */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 560px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    input, textarea {
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-family: inherit;
+      font-size: 16px; /* ≥16px prevents iOS zoom-on-focus */
+      line-height: 1.45;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(255,107,53,.18);
+    }
+    textarea { resize: vertical; min-height: 60px; }
+
+    /* Message row — textarea grabs all width; tiny delete button */
+    .row {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .row textarea { flex: 1 1 auto; min-width: 0; width: 100%; }
+
+    .add-btn {
+      width: 100%;
+      margin-top: 4px;
+      min-height: 44px;
+      padding: 10px;
+      background: transparent;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 500;
+    }
+    .add-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+    footer {
+      text-align: center;
+      padding: 20px 14px 28px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+    footer a { color: var(--brand); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .loader {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .loader i { margin-right: 8px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>
+      <img src="/banki-bites/banki-bites-logo.png" alt="">
+      <span>Reminder Messages</span>
+    </h1>
+    <button id="exportBtn" class="btn btn-primary" aria-label="Export JSON">
+      <i class="fas fa-download"></i>
+      <span class="label-sm">Export JSON</span>
+    </button>
+  </header>
+
+  <main>
+    <div id="loader" class="loader">
+      <i class="fas fa-circle-notch fa-spin"></i> Loading…
+    </div>
+
+    <div id="editor" hidden>
+      <section class="card">
+        <h2>Details</h2>
+        <div class="grid">
+          <div>
+            <label for="fld-version">Version</label>
+            <input id="fld-version" type="number" step="0.01">
+          </div>
+          <div>
+            <label for="fld-updated">Updated at</label>
+            <input id="fld-updated" type="date">
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Notification Buttons</h2>
+        <div class="grid">
+          <div>
+            <label for="fld-order">Order label</label>
+            <input id="fld-order" type="text">
+          </div>
+          <div>
+            <label for="fld-snooze">Snooze label</label>
+            <input id="fld-snooze" type="text">
+          </div>
+        </div>
+      </section>
+
+      <div id="categories"></div>
+    </div>
+  </main>
+
+  <footer>
+    &copy; <span id="year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a> &nbsp;|&nbsp; Made in Odisha ❤️
+  </footer>
+
+  <script>
+  (function () {
+    const SOURCE = './reminder_messages.json';
+    const LABELS = { lunch: 'Lunch', snacks: 'Snacks', dinner: 'Dinner' };
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const $ = (s) => document.querySelector(s);
+
+    function createRow(text, listEl, section) {
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      const ta = document.createElement('textarea');
+      ta.rows = 2;
+      ta.value = text || '';
+      ta.placeholder = 'Message text…';
+
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'btn-icon';
+      del.title = 'Delete';
+      del.setAttribute('aria-label', 'Delete message');
+      del.innerHTML = '<i class="fas fa-times"></i>';
+      del.addEventListener('click', async () => {
+        const preview = ta.value.trim().slice(0, 60) || '(empty)';
+        const res = await Swal.fire({
+          title: 'Delete this message?',
+          text: preview + (ta.value.length > 60 ? '…' : ''),
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Delete',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#dc2626',
+        });
+        if (!res.isConfirmed) return;
+        row.remove();
+        updateCount(section);
+      });
+
+      row.appendChild(ta);
+      row.appendChild(del);
+      listEl.appendChild(row);
+      return row;
+    }
+
+    function updateCount(section) {
+      const badge = section.querySelector('.count');
+      const n = section.querySelectorAll('textarea').length;
+      badge.textContent = n + (n === 1 ? ' message' : ' messages');
+      const clearBtn = section.querySelector('.clear-btn');
+      if (clearBtn) clearBtn.hidden = n === 0;
+    }
+
+    function buildCategory(key, messages) {
+      const section = document.createElement('section');
+      section.className = 'card';
+      section.dataset.key = key;
+
+      const h = document.createElement('h2');
+      h.innerHTML = '<span>' + (LABELS[key] || key) + '</span> <span class="count"></span>';
+
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'clear-btn';
+      clearBtn.title = 'Delete all messages in ' + (LABELS[key] || key);
+      clearBtn.innerHTML = '<i class="fas fa-trash"></i> Delete all';
+      h.appendChild(clearBtn);
+      section.appendChild(h);
+
+      const list = document.createElement('div');
+      section.appendChild(list);
+
+      clearBtn.addEventListener('click', async () => {
+        const n = list.querySelectorAll('textarea').length;
+        if (n === 0) return;
+        const label = LABELS[key] || key;
+        const res = await Swal.fire({
+          title: 'Delete all messages?',
+          text: 'This will remove all ' + n + ' message' + (n === 1 ? '' : 's') + ' from "' + label + '". This cannot be undone.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Delete all',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#dc2626',
+        });
+        if (!res.isConfirmed) return;
+        list.innerHTML = '';
+        updateCount(section);
+      });
+
+      (messages || []).forEach(m => createRow(m, list, section));
+
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'add-btn';
+      addBtn.innerHTML = '<i class="fas fa-plus"></i> Add message';
+      addBtn.addEventListener('click', () => {
+        const row = createRow('', list, section);
+        row.querySelector('textarea').focus();
+        updateCount(section);
+      });
+      section.appendChild(addBtn);
+
+      updateCount(section);
+      return section;
+    }
+
+    function hydrate(data) {
+      $('#fld-version').value = data.version != null ? data.version : '';
+      $('#fld-updated').value = data.updated_at || '';
+      $('#fld-order').value  = (data.notification_actions || {}).order || '';
+      $('#fld-snooze').value = (data.notification_actions || {}).snooze || '';
+
+      const catRoot = $('#categories');
+      catRoot.innerHTML = '';
+      const messages = data.messages || {};
+      Object.keys(messages).forEach(k => catRoot.appendChild(buildCategory(k, messages[k])));
+
+      $('#loader').hidden = true;
+      $('#editor').hidden = false;
+    }
+
+    function collect() {
+      const versionRaw = $('#fld-version').value.trim();
+      const obj = {
+        version: versionRaw === '' ? null : Number(versionRaw),
+        updated_at: $('#fld-updated').value || '',
+        notification_actions: {
+          order:  $('#fld-order').value,
+          snooze: $('#fld-snooze').value,
+        },
+        messages: {},
+      };
+      document.querySelectorAll('#categories section[data-key]').forEach(section => {
+        const arr = [];
+        section.querySelectorAll('textarea').forEach(ta => {
+          const v = ta.value.trim();
+          if (v) arr.push(v);
+        });
+        obj.messages[section.dataset.key] = arr;
+      });
+      return obj;
+    }
+
+    function exportJson() {
+      const data = collect();
+      const json = JSON.stringify(data, null, 2) + '\n';
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'reminder_messages.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+      Swal.fire({
+        toast: true, position: 'top-end', icon: 'success',
+        title: 'reminder_messages.json downloaded',
+        showConfirmButton: false, timer: 2000,
+      });
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', exportJson);
+
+    fetch(SOURCE + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(r => r.json())
+      .then(hydrate)
+      .catch(err => {
+        $('#loader').innerHTML = '<span style="color:#dc2626"><i class="fas fa-triangle-exclamation"></i> Failed to load: ' + (err.message || err) + '</span>';
+      });
+  })();
+  </script>
+</body>
+</html>
