@@ -1498,7 +1498,7 @@
 
     function buildInfoSection(data) {
       const seen = new Set();
-      data.partners.filter(p => p.is_active).forEach(p => {
+      data.partners.filter(p => !p.is_removed).forEach(p => {
         (p.services || []).forEach(s => { if (!isBlank(s)) seen.add(s); });
       });
       cuisineChips.innerHTML = [...seen].map(s => {
@@ -1515,7 +1515,7 @@
       // Hide partners missing the bare minimum (name + url) — they're still
       // being onboarded and can't be ordered from yet.
       const visible = partners.filter(p =>
-        p.is_active && !isBlank(p.name) && !isBlank(p.url)
+        !p.is_removed && !isBlank(p.name) && !isBlank(p.url)
       );
       if (!visible.length) {
         rpList.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0">No restaurants are registered yet. Check back soon!</p>';
@@ -1525,7 +1525,8 @@
       rpList.innerHTML = visible.map(p => {
         const hrs = hoursOf(p);
         const hasHours = !!hrs;
-        const open = hasHours && isOpen(p);
+        const manuallyClosed = !p.is_active;
+        const scheduledOpen = hasHours && isOpen(p);
         const opensAt = hasHours ? fmt(hrs.oh) : '';
 
         const services = (p.services || []).filter(s => !isBlank(s));
@@ -1535,9 +1536,13 @@
         const ratingHtml = !isBlank(p.rating)
           ? `<span class="rp-rating"><i class="fas fa-star" aria-hidden="true"></i> ${p.rating}</span>`
           : '';
-        const openHtml = hasHours
-          ? `<span class="rp-open ${open ? 'open' : 'closed'}">${open ? 'Open' : `Closed · Opens ${opensAt}`}</span>`
-          : '';
+        // Manual close beats scheduled hours — no "Opens at" since there's no scheduled reopen.
+        let openHtml = '';
+        if (manuallyClosed) {
+          openHtml = `<span class="rp-open closed">Closed</span>`;
+        } else if (hasHours) {
+          openHtml = `<span class="rp-open ${scheduledOpen ? 'open' : 'closed'}">${scheduledOpen ? 'Open' : `Closed · Opens ${opensAt}`}</span>`;
+        }
         const metaHtml = (ratingHtml || openHtml)
           ? `<div class="rp-meta">${ratingHtml}${openHtml}</div>`
           : '';
@@ -1548,10 +1553,12 @@
 
         // If we have no hours info, treat the restaurant as orderable rather
         // than locking the button — better UX than a permanent "Closed".
-        const clickable = !hasHours || open;
+        const clickable = !manuallyClosed && (!hasHours || scheduledOpen);
         const ariaLabel = clickable
           ? `Order from ${p.name}`
-          : `${p.name} is closed — opens at ${opensAt}`;
+          : manuallyClosed
+            ? `${p.name} is currently closed`
+            : `${p.name} is closed — opens at ${opensAt}`;
 
         return `
         <button class="rp-item${clickable ? '' : ' rp-closed'}"

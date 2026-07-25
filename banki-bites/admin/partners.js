@@ -18,7 +18,7 @@ function mountPartnerChart(id, config) {
 const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
   opening_hour: '08', closing_hour: '22', address: '', point_of_contact: '',
-  is_active: true, is_veg: false, is_homemade: false, is_separate_price: false,
+  is_active: true, is_removed: false, is_veg: false, is_homemade: false, is_separate_price: false,
   sort_order: 0, sync_collection: '', sync_doc_id: '',
 };
 
@@ -118,13 +118,14 @@ async function renderPartnerCharts(db) {
     },
   });
 
-  const active = partners.filter(x => x.is_active !== false).length;
-  const hidden = partners.length - active;
+  const removed = partners.filter(x => x.is_removed === true).length;
+  const activeVisible = partners.filter(x => x.is_active !== false && x.is_removed !== true).length;
+  const closedVisible = partners.length - removed - activeVisible;
   mountPartnerChart('partnersActive', {
     type: 'doughnut',
     data: {
-      labels: ['Active', 'Hidden'],
-      datasets: [{ data: [active, hidden], backgroundColor: [p.status.delivered, p.muted], borderWidth: 0 }],
+      labels: ['Active', 'Closed', 'Removed'],
+      datasets: [{ data: [activeVisible, closedVisible, removed], backgroundColor: [p.status.delivered, p.status.pending || p.muted, p.muted], borderWidth: 0 }],
     },
     options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
   });
@@ -163,9 +164,12 @@ async function loadPartners(db, root) {
 function renderCard(db, root, id, p) {
   const el = document.createElement('div');
   el.className = 'entity-card partner-card';
-  const hideIcon = p.is_active ? 'fa-eye-slash' : 'fa-eye';
-  const hideLabel = p.is_active ? 'Hide' : 'Show';
-  const hideClass = p.is_active ? 'icon-btn--warn' : 'icon-btn--success';
+  const closeIcon = p.is_active ? 'fa-store-slash' : 'fa-store';
+  const closeLabel = p.is_active ? 'Close' : 'Open';
+  const closeBtnClass = p.is_active ? 'icon-btn--warn' : 'icon-btn--success';
+  const statusPill = p.is_removed
+    ? '<span class="status-pill status-cancelled">Removed</span>'
+    : (!p.is_active ? '<span class="status-pill status-cancelled">Closed</span>' : '');
 
   const pocPhone = normalisePhone(p.point_of_contact);
   const callBtn = pocPhone
@@ -192,7 +196,7 @@ function renderCard(db, root, id, p) {
         <div class="ec-title">
           <span class="partner-pos" title="Position">#${p.sort_order ?? '–'}</span>
           <span title="${escapeAttr(p.name || '')}">${escapeHtml(truncateName(p.name || ''))}</span>
-          ${p.is_active ? '' : '<span class="status-pill status-cancelled">Hidden</span>'}
+          ${statusPill}
         </div>
         <div class="ec-meta">${(p.services || []).join(' · ')} · ★ ${p.rating} · ${p.opening_hour}–${p.closing_hour}</div>
         <div class="ec-meta">${escapeHtml(p.address || '')}</div>
@@ -203,8 +207,8 @@ function renderCard(db, root, id, p) {
       </button>
     </div>
     <div class="ec-actions ec-actions--bottom">
-      <button class="icon-btn ${hideClass}" data-act="toggle" title="${hideLabel}" aria-label="${hideLabel} ${escapeAttr(p.name)}">
-        <i class="fas ${hideIcon}"></i>
+      <button class="icon-btn ${closeBtnClass}" data-act="toggle" title="${closeLabel}" aria-label="${closeLabel} ${escapeAttr(p.name)}">
+        <i class="fas ${closeIcon}"></i>
       </button>
       ${callBtn}
       ${closedBtn}
@@ -216,12 +220,12 @@ function renderCard(db, root, id, p) {
   `;
   el.querySelector('[data-act="edit"]').addEventListener('click', () => openEditor(db, { id, ...p }, root));
   el.querySelector('[data-act="toggle"]').addEventListener('click', async () => {
-    const action = p.is_active ? 'Hide' : 'Show';
+    const action = p.is_active ? 'Close' : 'Open';
     const ok = await Swal.fire({
       title: `${action} ${p.name}?`,
       text: p.is_active
-        ? 'This partner will be hidden from the public list until you show it again.'
-        : 'This partner will become visible on the public list.',
+        ? 'This partner will be marked as Closed on the public list — still visible, but not orderable.'
+        : 'This partner will be marked as Open on the public list.',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: action,
@@ -231,7 +235,9 @@ function renderCard(db, root, id, p) {
     try {
       window.bbBusy('Updating…');
       await setDoc(doc(db, COL.PARTNERS, id), { is_active: !p.is_active }, { merge: true });
-      await syncToPartnerAdmin(db, p.sync_collection, p.sync_doc_id, { shop_status: p.is_active ? 'closed' : 'open' });
+      // Removed partners stay closed regardless of is_active flip.
+      const nextShopStatus = (!p.is_active && !p.is_removed) ? 'open' : 'closed';
+      await syncToPartnerAdmin(db, p.sync_collection, p.sync_doc_id, { shop_status: nextShopStatus });
       window.bbDone();
       loadPartners(db, root);
     } catch (err) {
@@ -335,7 +341,11 @@ async function openEditor(db, existing, root) {
       </div>
       <div class="form-group form-check">
         <input class="form-check-input" type="checkbox" id="paIsActive" name="is_active" ${p.is_active ? 'checked' : ''}>
-        <label class="form-check-label" for="paIsActive">Active (visible on public page)</label>
+        <label class="form-check-label" for="paIsActive">Active (orderable on public page)</label>
+      </div>
+      <div class="form-group form-check">
+        <input class="form-check-input" type="checkbox" id="paIsRemoved" name="is_removed" ${p.is_removed ? 'checked' : ''}>
+        <label class="form-check-label" for="paIsRemoved">Removed (fully hide from public list)</label>
       </div>
       <div class="form-group form-check">
         <input class="form-check-input" type="checkbox" id="paIsVeg" name="is_veg" ${p.is_veg ? 'checked' : ''}>
@@ -394,6 +404,7 @@ async function openEditor(db, existing, root) {
         address: fd.get('address').trim(),
         point_of_contact: pocRaw ? normalisePhone(pocRaw) : '',
         is_active: f.querySelector('#paIsActive').checked,
+        is_removed: f.querySelector('#paIsRemoved').checked,
         is_veg: f.querySelector('#paIsVeg').checked,
         is_homemade: f.querySelector('#paIsHomemade').checked,
         is_separate_price: f.querySelector('#paIsSeparatePrice').checked,
@@ -463,10 +474,14 @@ async function openEditor(db, existing, root) {
   try {
     window.bbBusy('Saving restaurant…');
     await batch.commit();
+    // Partner admin schema is locked to exactly 5 keys (disabled_items,
+    // whatsapp_no, shop_status, opening_time, closing_time). is_removed is a
+    // BankiBites-side concept and is intentionally NOT propagated — adding it
+    // would violate the partner admin's size()==5 rule.
     await syncToPartnerAdmin(db, res.value.sync_collection, res.value.sync_doc_id, {
       opening_time: String(parseInt(res.value.opening_hour) || 0),
       closing_time: String(parseInt(res.value.closing_hour) || 0),
-      shop_status: res.value.is_active ? 'open' : 'closed',
+      shop_status: (res.value.is_active && !res.value.is_removed) ? 'open' : 'closed',
     });
     window.bbDone();
   } catch (err) {

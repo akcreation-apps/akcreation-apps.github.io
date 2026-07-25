@@ -769,10 +769,15 @@
     window.bankiBitesLoad()
       .then(data => {
         const visible = (data.partners || []).filter(p =>
-          p && p.is_active !== false && !isBlank(p.name) && !isBlank(p.url)
+          p && p.is_removed !== true && !isBlank(p.name) && !isBlank(p.url)
         );
 
-        visible.sort((a, b) => Number(isOpen(b)) - Number(isOpen(a)));
+        // Manually-closed (is_active=false) partners sort below open ones.
+        visible.sort((a, b) => {
+          const aOpen = a.is_active !== false && isOpen(a);
+          const bOpen = b.is_active !== false && isOpen(b);
+          return Number(bOpen) - Number(aOpen);
+        });
 
         try { localStorage.setItem('bb_lastCount', String(visible.length)); } catch (e) {}
 
@@ -788,22 +793,28 @@
 
         grid.innerHTML = visible.map(p => {
           const h = hours(p);
-          const open = isOpen(p);
+          const manuallyClosed = p.is_active === false;
+          const scheduledOpen = !manuallyClosed && isOpen(p);
+          const showHours  = !!h;
+          const clickable = !manuallyClosed && (scheduledOpen || !showHours);
           const opensAt = h ? fmt(h.o) : '';
           const services = Array.isArray(p.services) ? p.services.filter(s => !isBlank(s)) : [];
           const showRating = !isBlank(p.rating);
-          const showHours  = !!h;
           const showAddr   = !isBlank(p.address);
           const logo = isBlank(p.logo)
             ? `<div class="card-logo card-logo-skeleton" aria-hidden="true"></div>`
             : `<img class="card-logo" src="${escapeHtml(p.logo)}" alt="${escapeHtml(p.name)} logo" loading="lazy">`;
 
+          const ariaClosedText = manuallyClosed
+            ? ', currently closed'
+            : `, currently closed, opens at ${opensAt}`;
+
           return `
-          <a class="rest-card${open || !showHours ? '' : ' rest-card-closed'}"
-             href="${open || !showHours ? escapeHtml(p.url) : '#'}"
-             ${open || !showHours ? '' : 'aria-disabled="true" tabindex="-1"'}
+          <a class="rest-card${clickable ? '' : ' rest-card-closed'}"
+             href="${clickable ? escapeHtml(p.url) : '#'}"
+             ${clickable ? '' : 'aria-disabled="true" tabindex="-1"'}
              role="listitem"
-             aria-label="${escapeHtml(p.name)}${open || !showHours ? ' — open menu' : `, currently closed, opens at ${opensAt}`}"
+             aria-label="${escapeHtml(p.name)}${clickable ? ' — open menu' : ariaClosedText}"
              data-cuisines="${escapeHtml(services.join('|'))}"
              data-umami-event="bankibites-open-menu" data-umami-event-restaurant="${escapeHtml(p.name)}">
             <div class="card-inner">
@@ -820,20 +831,25 @@
                 })()}
                 <div class="card-meta">
                   ${showRating ? `<span class="rating"><i class="fas fa-star" aria-hidden="true"></i>${escapeHtml(p.rating)} <span>/ 5</span></span>` : ''}
-                  ${open && showHours ? `<span class="open-badge open">Open now</span>` : ''}
+                  ${clickable && showHours ? `<span class="open-badge open">Open now</span>` : ''}
                 </div>
                 ${showAddr ? `<div class="card-address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${escapeHtml(p.address)}</span></div>` : ''}
               </div>
             </div>
-            ${open || !showHours
+            ${clickable
               ? `<div class="card-cta"><span>View menu &amp; order</span><i class="fas fa-arrow-right" aria-hidden="true"></i></div>`
-              : `<div class="closed-footer">
-                   <span class="cf-dot" aria-hidden="true"></span>
-                   <span class="cf-status">Closed</span>
-                   <span class="cf-sep" aria-hidden="true"></span>
-                   <span class="cf-opens">Opens at</span>
-                   <span class="cf-time">${escapeHtml(opensAt)}</span>
-                 </div>`
+              : manuallyClosed
+                ? `<div class="closed-footer">
+                     <span class="cf-dot" aria-hidden="true"></span>
+                     <span class="cf-status">Closed</span>
+                   </div>`
+                : `<div class="closed-footer">
+                     <span class="cf-dot" aria-hidden="true"></span>
+                     <span class="cf-status">Closed</span>
+                     <span class="cf-sep" aria-hidden="true"></span>
+                     <span class="cf-opens">Opens at</span>
+                     <span class="cf-time">${escapeHtml(opensAt)}</span>
+                   </div>`
             }
           </a>`;
         }).join('');

@@ -35,7 +35,9 @@ function loadActivePartners(selfPrefix) {
         });
     }
     return partnersPromise.then(partners => partners.filter(p => {
-        if (!p || p.is_active === false || !p.url) return false;
+        // Skip removed or currently-closed partners — no point cross-searching
+        // menus a user can't order from right now.
+        if (!p || p.is_removed === true || p.is_active === false || !p.url) return false;
         return prefixFromUrl(p.url) !== selfPrefix.toLowerCase();
     }));
 }
