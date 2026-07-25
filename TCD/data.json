@@ -163,7 +163,6 @@
               "name": "Combo (Burger, Noodles, Paneer Chilli, Soft Drink)",
               "price": 399,
               "offer_price": 449,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -172,7 +171,6 @@
               "name": "Combo (Fried Rice, Paneer Butter Masala, Lachha Paratha, Honey Chilli Potato, Soft Drink)",
               "price": 549,
               "offer_price": 599,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -230,7 +228,6 @@
               "name": "Combo (Burger, Noodles, Chicken Chilli, Soft Drink)",
               "price": 399,
               "offer_price": 449,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -239,7 +236,6 @@
               "name": "Combo (Fried Rice, Chicken Butter Masala, Lachha Paratha, Honey Chilli Potato, Soft Drink)",
               "price": 549,
               "offer_price": 599,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -541,14 +537,18 @@
             {
               "id": 2701,
               "name": "Veg Biryani (Half)",
-              "price": 139,
+              "price": 99,
+              "offer_price": 139,
+              "is_offer": true,
               "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2702,
               "name": "Veg Biryani (Full)",
-              "price": 239,
+              "price": 179,
+              "offer_price": 239,
+              "is_offer": true,
               "available_time": 12,
               "not_available_time": ""
             }
