@@ -1,9 +1,9 @@
 {
-  "version": 1.01,
+  "version": 1.02,
   "updated_at": "2026-07-25",
   "notification_actions": {
     "order": "🛒 ଅର୍ଡର କର",
-    "snooze": "⏰ ଆଉ ଟିକେ ପରେ ମନେ ପକାଅ"
+    "snooze": "⏰ ପରେ ମନେ ପକାଅ"
   },
   "messages": {
     "lunch": [
