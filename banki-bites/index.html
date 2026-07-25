@@ -1539,7 +1539,7 @@
         // Manual close beats scheduled hours — no "Opens at" since there's no scheduled reopen.
         let openHtml = '';
         if (manuallyClosed) {
-          openHtml = `<span class="rp-open closed">Closed</span>`;
+          openHtml = `<span class="rp-open closed">Temporary Closed</span>`;
         } else if (hasHours) {
           openHtml = `<span class="rp-open ${scheduledOpen ? 'open' : 'closed'}">${scheduledOpen ? 'Open' : `Closed · Opens ${opensAt}`}</span>`;
         }
@@ -1557,7 +1557,7 @@
         const ariaLabel = clickable
           ? `Order from ${p.name}`
           : manuallyClosed
-            ? `${p.name} is currently closed`
+            ? `${p.name} is temporary closed`
             : `${p.name} is closed — opens at ${opensAt}`;
 
         return `

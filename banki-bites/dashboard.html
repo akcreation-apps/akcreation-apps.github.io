@@ -806,7 +806,7 @@
             : `<img class="card-logo" src="${escapeHtml(p.logo)}" alt="${escapeHtml(p.name)} logo" loading="lazy">`;
 
           const ariaClosedText = manuallyClosed
-            ? ', currently closed'
+            ? ', temporary closed'
             : `, currently closed, opens at ${opensAt}`;
 
           return `
@@ -841,7 +841,7 @@
               : manuallyClosed
                 ? `<div class="closed-footer">
                      <span class="cf-dot" aria-hidden="true"></span>
-                     <span class="cf-status">Closed</span>
+                     <span class="cf-status">Temporary Closed</span>
                    </div>`
                 : `<div class="closed-footer">
                      <span class="cf-dot" aria-hidden="true"></span>
