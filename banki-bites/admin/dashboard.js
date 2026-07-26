@@ -1133,16 +1133,35 @@ function renderRepeatNew(orders, customers, p) {
 }
 
 function renderTopCustomers(orders, p) {
-  const top = topNTotals(
-    orders.filter(isDelivered),
-    o => { const c = o.customer || {}; return c.name || c.phone || ''; },
-    5,
-  );
+  // Group by phone (identity), then pick a display label from the most
+  // recently seen name for that phone. Grouping by name-or-phone splits a
+  // single customer across labels when some of their orders had a blank or
+  // different name, so the tallied count under-reports vs the profile modal
+  // which always filters by phone.
+  const perPhone = new Map(); // phone -> { count, name, lastAt }
+  for (const o of orders) {
+    if (!isDelivered(o)) continue;
+    const c = o.customer || {};
+    const phone = c.phone;
+    if (!phone) continue;
+    const at = toDateSafe(o.created_at)?.getTime() || 0;
+    const entry = perPhone.get(phone) || { count: 0, name: '', lastAt: 0 };
+    entry.count += 1;
+    if ((c.name || '').trim() && at >= entry.lastAt) {
+      entry.name = c.name.trim();
+      entry.lastAt = at;
+    }
+    perPhone.set(phone, entry);
+  }
+  const top = [...perPhone.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 5);
+  const labels = top.map(([phone, v]) => v.name || phone);
   mountChart('dashTopCustomers', {
     type: 'bar',
     data: {
-      labels: top.map(([k]) => k),
-      datasets: [{ label: 'Orders', data: top.map(([, v]) => v), backgroundColor: palettePerBar(top.length, p), borderWidth: 0 }],
+      labels,
+      datasets: [{ label: 'Orders', data: top.map(([, v]) => v.count), backgroundColor: palettePerBar(top.length, p), borderWidth: 0 }],
     },
     options: {
       indexAxis: 'y',
