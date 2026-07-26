@@ -208,6 +208,21 @@
         <i class="fa-solid fa-star mr-1"></i> Star Customer
       </a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tcust-tab" data-toggle="tab" href="#tcust" role="tab">
+        <i class="fa-solid fa-crown mr-1"></i> Top Customer <span class="badge badge-warning ml-1" style="font-size:0.6rem;vertical-align:middle;">Banner</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="trest-tab" data-toggle="tab" href="#trest" role="tab">
+        <i class="fa-solid fa-trophy mr-1"></i> Top Restaurant <span class="badge badge-warning ml-1" style="font-size:0.6rem;vertical-align:middle;">Banner</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tplaces-tab" data-toggle="tab" href="#tplaces" role="tab">
+        <i class="fa-solid fa-location-dot mr-1"></i> Top 3 Places <span class="badge badge-warning ml-1" style="font-size:0.6rem;vertical-align:middle;">Banner</span>
+      </a>
+    </li>
   </ul>
 
   <div class="tab-content">
@@ -347,6 +362,157 @@
         </div>
       </div>
     </div>
+
+    <!-- TOP CUSTOMER BANNER TAB -->
+    <div class="tab-pane fade" id="tcust" role="tabpanel">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-pen-to-square mr-1"></i> Top Customer <span class="text-muted" style="font-size:0.75rem;font-weight:500;">· 1200×628 banner</span></h2>
+            <form id="tcustForm" autocomplete="off">
+              <div class="form-group">
+                <label for="tc_month">Month</label>
+                <select class="custom-select" id="tc_month"></select>
+              </div>
+              <div class="form-group">
+                <label for="tc_name">Customer Name <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="tc_name" placeholder="e.g. Pupun" required>
+              </div>
+              <div class="form-group">
+                <label for="tc_fav_item">Favourite Item <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="tc_fav_item" placeholder="e.g. Chilli Chicken" required>
+              </div>
+              <button type="button" class="btn btn-ghost" id="tc_reset">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Generated Prompt</h2>
+            <textarea class="form-control" id="tc_output" readonly></textarea>
+            <p class="hint mt-3" id="tc_hint"><i class="fa-solid fa-circle-info mr-1"></i>Fill all required fields to unlock Copy.</p>
+            <div class="mt-2 d-flex flex-wrap align-items-center" style="gap: 10px;">
+              <button type="button" class="btn btn-bb" id="tc_copy" style="display:none;">
+                <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
+              </button>
+              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
+                <i class="fa-solid fa-download mr-1"></i> Logo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP RESTAURANT BANNER TAB -->
+    <div class="tab-pane fade" id="trest" role="tabpanel">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-pen-to-square mr-1"></i> Top Restaurant <span class="text-muted" style="font-size:0.75rem;font-weight:500;">· 1200×628 banner</span></h2>
+            <form id="trestForm" autocomplete="off">
+              <div class="form-group">
+                <label for="tr_month">Month</label>
+                <select class="custom-select" id="tr_month"></select>
+              </div>
+              <div class="form-group">
+                <label for="tr_name">Restaurant Name <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="tr_name" value="The Cafe Darbar" placeholder="e.g. The Cafe Darbar" required>
+              </div>
+              <div class="form-group">
+                <label for="tr_top_item">Top Selling Item <span style="color:var(--bb-orange)">*</span></label>
+                <input type="text" class="form-control" id="tr_top_item" placeholder="e.g. Chicken Biryani" required>
+              </div>
+              <button type="button" class="btn btn-ghost" id="tr_reset">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Generated Prompt</h2>
+            <textarea class="form-control" id="tr_output" readonly></textarea>
+            <p class="hint mt-3" id="tr_hint"><i class="fa-solid fa-circle-info mr-1"></i>Fill all required fields to unlock Copy.</p>
+            <div class="mt-2 d-flex flex-wrap align-items-center" style="gap: 10px;">
+              <button type="button" class="btn btn-bb" id="tr_copy" style="display:none;">
+                <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
+              </button>
+              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
+                <i class="fa-solid fa-download mr-1"></i> Logo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP 3 PLACES BANNER TAB -->
+    <div class="tab-pane fade" id="tplaces" role="tabpanel">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-pen-to-square mr-1"></i> Top 3 Places <span class="text-muted" style="font-size:0.75rem;font-weight:500;">· 1200×628 banner</span></h2>
+            <form id="tplacesForm" autocomplete="off">
+              <div class="form-group">
+                <label for="tp_month">Month</label>
+                <select class="custom-select" id="tp_month"></select>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="tp_place1">1st Place <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="tp_place1" placeholder="e.g. Banki Town" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="tp_orders1">Orders <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="tp_orders1" placeholder="e.g. 148" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="tp_place2">2nd Place <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="tp_place2" placeholder="e.g. Baideswar" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="tp_orders2">Orders <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="tp_orders2" placeholder="e.g. 96" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="tp_place3">3rd Place <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="tp_place3" placeholder="e.g. Nachhipur" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="tp_orders3">Orders <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="tp_orders3" placeholder="e.g. 54" required>
+                </div>
+              </div>
+              <button type="button" class="btn btn-ghost" id="tp_reset">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Generated Prompt</h2>
+            <textarea class="form-control" id="tp_output" readonly></textarea>
+            <p class="hint mt-3" id="tp_hint"><i class="fa-solid fa-circle-info mr-1"></i>Fill all required fields to unlock Copy.</p>
+            <div class="mt-2 d-flex flex-wrap align-items-center" style="gap: 10px;">
+              <button type="button" class="btn btn-bb" id="tp_copy" style="display:none;">
+                <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
+              </button>
+              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
+                <i class="fa-solid fa-download mr-1"></i> Logo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -372,6 +538,9 @@
   }
   fillMonths(document.getElementById('r_month'));
   fillMonths(document.getElementById('c_month'));
+  fillMonths(document.getElementById('tc_month'));
+  fillMonths(document.getElementById('tr_month'));
+  fillMonths(document.getElementById('tp_month'));
 
   const val = id => document.getElementById(id).value.trim();
   const num = id => document.getElementById(id).value.trim() || '';
@@ -483,6 +652,111 @@ Rules:
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Banner prompt builders (1200x628 landscape — standard OG / feed / hero size)
+  // ---------------------------------------------------------------------------
+  // Shared banner "vibe" block so all three landscape banners feel like one
+  // family, distinct from the vertical award posters above.
+  const BANNER_VIBE = `Design a professional, share-worthy landscape banner (1200x628 px, 16:8.4 aspect, 300 DPI — the standard social/OG banner size that renders cleanly on WhatsApp preview, Facebook feed, in-app hero slots, and the BankiBites app home banner).
+
+Overall look:
+- Cinematic dark background: deep near-black (#0B0B0F → #16161C) with a soft warm orange radial glow anchored behind the hero title.
+- Subtle orange + gold confetti / sparkle particles in the upper corners — small diamonds, dots, tiny stars. Never noisy.
+- One thin ornamental golden-orange divider with a small glowing star at its midpoint.
+- Primary accent BankiBites orange #F7931E, secondary warm gold #FFB84D, primary text pure white #FFFFFF, muted text soft gray #C9CDD4.
+- Typography: Poppins / Inter 900 for display, Pacifico or Great Vibes for handwritten name callouts.
+- BankiBites logo (attached — circular orange + white badge on black) placed inside a soft circular orange glow in the TOP-LEFT corner.
+- ONE polished 3D-rendered BankiBites delivery rider on the FAR RIGHT of the banner: young Indian male, orange helmet, bright orange polo T-shirt, black jeans, riding a modern black-and-orange electric scooter with the BankiBites-branded orange delivery box on the back. Cheerful thumbs-up toward the viewer. Studio-lit Pixar / Blender style, soft rim lighting in orange, sitting cleanly on the dark canvas with no background around the character.
+- No other people, mascots, food photos, plates, cutlery, or stock graphics.
+- Layout follows the classic banner grid: brand in TOP-LEFT, 3D rider anchored to the RIGHT, hero content stack in the LEFT-CENTER, footer strip at the very bottom.
+- Output as a single flat landscape banner image — no device mockup, no drop-shadow around the whole banner.`;
+
+  function buildTopCustomerBannerPrompt() {
+    const month = val('tc_month');
+    return (
+`${BANNER_VIBE}
+
+Banner purpose: Announce "TOP CUSTOMER OF THE MONTH" for BankiBites — ${month}. Only two things are highlighted on the banner: the customer's NAME and their FAVOURITE ITEM. No other stats, numbers or KPIs anywhere.
+
+Content stack (LEFT-CENTER, aligned left, vertical rhythm tight):
+1. Small orange uppercase eyebrow: "BANKIBITES • ${month.toUpperCase()}"
+2. Stacked display title in bold white sans (Poppins/Inter 900):
+   • Line 1: "TOP" — medium size.
+   • Line 2: "CUSTOMER" — very large, tightly kerned. A tiny gold laurel + star crest sits just above "TOP".
+3. Small orange uppercase label "PRESENTED TO".
+4. HERO — Customer name "${val('tc_name')}" — massive HANDWRITTEN CURSIVE (Pacifico / Great Vibes) in pure white with a soft warm-orange glow behind it. This must be the single most prominent element in the banner, larger than every other text block.
+5. Thin golden-orange ornamental divider with a glowing star at center.
+6. Favourite-item spotlight (single line only — no chips, no icons row, no KPI grid):
+   • Small orange uppercase label above: "FAVOURITE ITEM"
+   • Directly beneath it, the item name "${val('tc_fav_item')}" rendered LARGE in bold orange display type (Poppins/Inter 900), with a subtle gold underline flourish. Second-most prominent element, clearly secondary to the customer name.
+7. Bottom footer strip spanning the full width: thin orange divider with a small star at the center; below it, uppercase orange letter-spaced text "THANK YOU FOR MAKING US SMILE! 🙂" on the LEFT, and "Powered by BankiBites" on the RIGHT with "BankiBites" in orange.
+
+Rules:
+- Use EXACTLY the two values above (name + favourite item). Do not invent orders, spend, dates, ratings, or any other KPIs.
+- Every label and value must match the source strings letter-for-letter and be sharply legible at 1200x628. No lorem ipsum, no "Sample" text, no misspellings.
+- Everything except the logo + 3D rider must be typography, icons, ornaments, and geometric shapes.`
+    );
+  }
+
+  function buildTopRestaurantBannerPrompt() {
+    const month = val('tr_month');
+    return (
+`${BANNER_VIBE}
+
+Banner purpose: Announce "TOP RESTAURANT OF THE MONTH" for BankiBites — ${month}. Only two things are highlighted on the banner: the restaurant's NAME and its TOP-SELLING ITEM. No other stats, numbers or KPIs anywhere.
+
+Content stack (LEFT-CENTER, aligned left, vertical rhythm tight):
+1. Small orange uppercase eyebrow: "BANKIBITES • ${month.toUpperCase()}"
+2. Stacked display title in bold white sans (Poppins/Inter 900):
+   • Line 1: "TOP" — medium size.
+   • Line 2: "RESTAURANT" — very large, tightly kerned. A tiny gold trophy + laurel crest sits just above "TOP".
+3. Small orange uppercase label "AWARDED TO".
+4. HERO — Restaurant name "${val('tr_name')}" — massive HANDWRITTEN CURSIVE (Pacifico / Great Vibes) in pure white with a soft warm-orange glow behind it. This must be the single most prominent element in the banner, larger than every other text block.
+5. Thin golden-orange ornamental divider with a glowing star at center.
+6. Top-selling-item spotlight (single line only — no chips, no icons row, no KPI grid):
+   • Small orange uppercase label above: "TOP SELLING ITEM"
+   • Directly beneath it, the item name "${val('tr_top_item')}" rendered LARGE in bold orange display type (Poppins/Inter 900), with a subtle gold underline flourish. Second-most prominent element, clearly secondary to the restaurant name.
+7. Bottom footer strip spanning the full width: thin orange divider with a small star at the center; below it, uppercase orange letter-spaced text "KEEP COOKING, KEEP GROWING! 🙂" on the LEFT, and "Powered by BankiBites" on the RIGHT with "BankiBites" in orange.
+
+Rules:
+- Use EXACTLY the two values above (name + top-selling item). Do not invent orders, sales, dates, ratings, or any other KPIs.
+- Every label and value must match the source strings letter-for-letter and be sharply legible at 1200x628. No lorem ipsum, no "Sample" text, no misspellings.
+- Everything except the logo + 3D rider must be typography, icons, ornaments, and geometric shapes.`
+    );
+  }
+
+  function buildTopPlacesBannerPrompt() {
+    const month = val('tp_month');
+    return (
+`${BANNER_VIBE}
+
+Banner purpose: Celebrate the "TOP 3 DELIVERY PLACES" for BankiBites — ${month}.
+
+Content stack (LEFT-CENTER, aligned left, vertical rhythm tight):
+1. Small orange uppercase eyebrow: "BANKIBITES • ${month.toUpperCase()}"
+2. Stacked display title in bold white sans (Poppins/Inter 900):
+   • Line 1: "OUR TOP" — medium size.
+   • Line 2: "3 PLACES" — very large, tightly kerned, with the numeral "3" rendered in bright orange. A tiny gold pin + laurel crest sits just above "OUR TOP".
+3. Small orange uppercase eyebrow above the podium: "MOST-ORDERED NEIGHBOURHOODS".
+4. Horizontal podium of three rounded dark cards (#161620, 1px subtle orange border, soft inner glow), sized by rank — the 1st-place card is tallest and centered, 2nd on its left slightly shorter, 3rd on its right shortest — evoking a classic winners' podium. Each card contains, top-to-bottom:
+   • A large circular rank badge: "1", "2", "3" in bold white on orange for #1 (with a small gold laurel wreath around it), and orange-outline on dark for #2 and #3.
+   • A pin icon in orange.
+   • The place name in bold white uppercase, letter-spaced.
+   • The order count in bold orange with a small "orders" caption in muted gray under it.
+   Place / order values to use verbatim:
+   • Rank 1 → "${val('tp_place1')}" — "${num('tp_orders1')} orders"
+   • Rank 2 → "${val('tp_place2')}" — "${num('tp_orders2')} orders"
+   • Rank 3 → "${val('tp_place3')}" — "${num('tp_orders3')} orders"
+5. Thin golden-orange ornamental divider with a glowing star at center below the podium.
+6. Bottom footer strip spanning the full width: thin orange divider with a small star at the center; below it, uppercase orange letter-spaced text "WE LOVE FEEDING YOUR NEIGHBOURHOOD! 🙂" on the LEFT, and "Powered by BankiBites" on the RIGHT with "BankiBites" in orange.
+
+Rules:
+- Use EXACTLY the values above. Do not invent extra places, numbers, dates, or KPIs.
+- Every label and value must match the source strings letter-for-letter and be sharply legible at 1200x628. No lorem ipsum, no "Sample" text, no misspellings.
+- Everything except the logo + 3D rider must be typography, icons, ornaments, and geometric shapes.`
+    );
+  }
+
   function toggleCopy(formId, btnId, hintId) {
     const valid = document.getElementById(formId).checkValidity();
     document.getElementById(btnId).style.display = valid ? '' : 'none';
@@ -497,9 +771,24 @@ Rules:
     document.getElementById('c_output').value = buildCustomerPrompt();
     toggleCopy('customerForm', 'c_copy', 'c_hint');
   }
+  function refreshTopCustomer() {
+    document.getElementById('tc_output').value = buildTopCustomerBannerPrompt();
+    toggleCopy('tcustForm', 'tc_copy', 'tc_hint');
+  }
+  function refreshTopRestaurant() {
+    document.getElementById('tr_output').value = buildTopRestaurantBannerPrompt();
+    toggleCopy('trestForm', 'tr_copy', 'tr_hint');
+  }
+  function refreshTopPlaces() {
+    document.getElementById('tp_output').value = buildTopPlacesBannerPrompt();
+    toggleCopy('tplacesForm', 'tp_copy', 'tp_hint');
+  }
 
   document.getElementById('restaurantForm').addEventListener('input', refreshRestaurant);
   document.getElementById('customerForm').addEventListener('input', refreshCustomer);
+  document.getElementById('tcustForm').addEventListener('input', refreshTopCustomer);
+  document.getElementById('trestForm').addEventListener('input', refreshTopRestaurant);
+  document.getElementById('tplacesForm').addEventListener('input', refreshTopPlaces);
 
   document.getElementById('r_reset').addEventListener('click', () => {
     document.getElementById('restaurantForm').reset();
@@ -511,6 +800,22 @@ Rules:
     document.getElementById('customerForm').reset();
     document.getElementById('c_month').value = currentMonth;
     refreshCustomer();
+  });
+  document.getElementById('tc_reset').addEventListener('click', () => {
+    document.getElementById('tcustForm').reset();
+    document.getElementById('tc_month').value = currentMonth;
+    refreshTopCustomer();
+  });
+  document.getElementById('tr_reset').addEventListener('click', () => {
+    document.getElementById('trestForm').reset();
+    document.getElementById('tr_name').value = 'The Cafe Darbar';
+    document.getElementById('tr_month').value = currentMonth;
+    refreshTopRestaurant();
+  });
+  document.getElementById('tp_reset').addEventListener('click', () => {
+    document.getElementById('tplacesForm').reset();
+    document.getElementById('tp_month').value = currentMonth;
+    refreshTopPlaces();
   });
 
   const toast = document.getElementById('toast');
@@ -534,9 +839,15 @@ Rules:
 
   document.getElementById('r_copy').addEventListener('click', () => copyText(buildRestaurantPrompt()));
   document.getElementById('c_copy').addEventListener('click', () => copyText(buildCustomerPrompt()));
+  document.getElementById('tc_copy').addEventListener('click', () => copyText(buildTopCustomerBannerPrompt()));
+  document.getElementById('tr_copy').addEventListener('click', () => copyText(buildTopRestaurantBannerPrompt()));
+  document.getElementById('tp_copy').addEventListener('click', () => copyText(buildTopPlacesBannerPrompt()));
 
   refreshRestaurant();
   refreshCustomer();
+  refreshTopCustomer();
+  refreshTopRestaurant();
+  refreshTopPlaces();
 </script>
 
 </body>

@@ -134,6 +134,7 @@
               "name": "Paneer Fried Rice",
               "price": 159,
               "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -155,22 +156,6 @@
               "id": 308,
               "name": "Mushroom Fried Rice",
               "price": 159,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 309,
-              "name": "Combo (Burger, Noodles, Paneer Chilli, Soft Drink)",
-              "price": 399,
-              "offer_price": 449,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 310,
-              "name": "Combo (Fried Rice, Paneer Butter Masala, Lachha Paratha, Honey Chilli Potato, Soft Drink)",
-              "price": 549,
-              "offer_price": 599,
               "available_time": "",
               "not_available_time": ""
             }
@@ -213,6 +198,7 @@
               "name": "Chicken Fried Rice",
               "price": 159,
               "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -220,22 +206,6 @@
               "id": 406,
               "name": "NonVeg Mix Fried Rice",
               "price": 169,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 407,
-              "name": "Combo (Burger, Noodles, Chicken Chilli, Soft Drink)",
-              "price": 399,
-              "offer_price": 449,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 408,
-              "name": "Combo (Fried Rice, Chicken Butter Masala, Lachha Paratha, Honey Chilli Potato, Soft Drink)",
-              "price": 549,
-              "offer_price": 599,
               "available_time": "",
               "not_available_time": ""
             }
@@ -275,6 +245,7 @@
               "name": "Egg Burger",
               "price": 59,
               "offer_price": 99,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -283,6 +254,7 @@
               "name": "Chicken Cheese Burger",
               "price": 159,
               "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -297,6 +269,7 @@
               "name": "Mix Veg Sandwich",
               "price": 59,
               "offer_price": 99,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -305,6 +278,7 @@
               "name": "Corn Cheese Sandwich",
               "price": 119,
               "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -326,6 +300,7 @@
               "name": "Casun Chicken Sandwich",
               "price": 159,
               "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -393,8 +368,6 @@
               "id": 901,
               "name": "Margarita(small)",
               "price": 119,
-              "offer_price": 129,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -437,8 +410,6 @@
               "id": 907,
               "name": "Margarita(large)",
               "price": 339,
-              "offer_price": 359,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -480,8 +451,6 @@
               "id": 1003,
               "name": "Italian Chicken(large)",
               "price": 409,
-              "offer_price": 419,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -538,7 +507,6 @@
               "id": 2701,
               "name": "Veg Biryani (Half)",
               "price": 139,
-              "offer_price": 139,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -546,7 +514,6 @@
               "id": 2702,
               "name": "Veg Biryani (Full)",
               "price": 239,
-              "offer_price": 239,
               "available_time": 12,
               "not_available_time": ""
             }
@@ -560,7 +527,6 @@
               "id": 2801,
               "name": "Chicken Biryani (2pc)",
               "price": 129,
-              "offer_price": 129,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -568,7 +534,6 @@
               "id": 2802,
               "name": "Chicken Biryani (3pc)",
               "price": 179,
-              "offer_price": 179,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -576,7 +541,6 @@
               "id": 2803,
               "name": "Chicken Biryani (5pc)",
               "price": 259,
-              "offer_price": 259,
               "available_time": 12,
               "not_available_time": ""
             }
@@ -827,6 +791,7 @@
               "name": "Chocolate Milk Shake",
               "price": 119,
               "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -868,6 +833,7 @@
               "name": "Cold Coffee",
               "price": 119,
               "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
