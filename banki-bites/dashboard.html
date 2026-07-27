@@ -597,6 +597,146 @@
       .rest-card, .card-cta i { transition: none; transform: none; }
       .rest-card:hover, .rest-card:focus-visible { transform: none; }
     }
+
+    /* ── MONTHLY WINNERS (slider) ── */
+    /* Mobile: full-bleed (edge-to-edge) — pro pattern for food-delivery hero carousels.
+       Desktop: constrained to the same 1200px container as the restaurant grid. */
+    .bb-winners {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4px 0 14px;
+    }
+    .bb-winners-slider { position: relative; }
+    /* Desktop: cap slider width so the 1200:628 aspect banner shrinks proportionally
+       (720px wide → ~377px tall) rather than dominating the full page height. */
+    @media (min-width: 640px) {
+      .bb-winners { padding: 6px 14px 16px; }
+      .bb-winners-slider { max-width: 720px; margin: 0 auto; }
+    }
+    .bb-winners-track {
+      display: flex; overflow-x: auto;
+      scroll-snap-type: x mandatory; scroll-behavior: smooth;
+      gap: 14px; scrollbar-width: none; -ms-overflow-style: none;
+      padding: 0 0 6px;
+    }
+    .bb-winners-track::-webkit-scrollbar { display: none; }
+    .bb-winners-dots { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 14px; }
+    .bb-winners-dot {
+      position: relative;
+      width: 22px; height: 4px; border-radius: 999px;
+      background: rgba(0,0,0,0.08); border: none; padding: 0; cursor: pointer;
+      overflow: hidden;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .bb-winners-dot.active { width: 40px; background: rgba(0,0,0,0.12); }
+    .bb-winners-dot.active::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      border-radius: 999px;
+      transform-origin: left center;
+      animation: bbProgress 4s linear forwards;
+    }
+    .bb-winners-slider.is-paused .bb-winners-dot.active::after { animation-play-state: paused; }
+    @keyframes bbProgress {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+    .bb-winner-card {
+      position: relative; padding: 0; border: none; background: transparent;
+      border-radius: 20px; overflow: hidden; cursor: pointer;
+      box-shadow: 0 1px 2px rgba(20,16,30,0.05),
+                  0 8px 20px rgba(20,16,30,0.10),
+                  0 20px 44px -18px rgba(20,16,30,0.18);
+      transition: transform 0.25s cubic-bezier(0.34,1.3,0.64,1),
+                  box-shadow 0.25s ease;
+      flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always;
+    }
+    .bb-winner-card::after {
+      content: ''; position: absolute; inset: 0;
+      border-radius: inherit; pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35);
+    }
+    .bb-winner-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 1px 2px rgba(20,16,30,0.06),
+                  0 14px 30px rgba(20,16,30,0.14),
+                  0 30px 60px -22px rgba(20,16,30,0.24);
+    }
+    .bb-winner-card:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.45), 0 14px 30px rgba(20,16,30,0.14);
+    }
+    .bb-winner-card img {
+      display: block; width: 100%; height: auto;
+      aspect-ratio: 1200 / 628; object-fit: cover;
+    }
+
+    /* ── SHEET (popup) ── */
+    .sheet-backdrop {
+      position: fixed; inset: 0; z-index: 1100;
+      background: rgba(10,8,20,0.6); backdrop-filter: blur(3px);
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .sheet-backdrop.open { opacity: 1; pointer-events: all; }
+    .sheet {
+      background: var(--card); width: 100%; max-width: 520px;
+      border-radius: 22px 22px 0 0;
+      padding: 0 0 env(safe-area-inset-bottom, 16px);
+      transform: translateY(30px);
+      transition: transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
+      max-height: 90vh; overflow-y: auto;
+    }
+    .sheet-backdrop.open .sheet { transform: translateY(0); }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
+    .sheet-header {
+      padding: 14px 18px 12px;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    }
+    .sheet-header h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; color: var(--text); }
+    .sheet-header p { font-size: 0.73rem; color: var(--muted); }
+    .sheet-close {
+      background: none; border: none; padding: 0; cursor: pointer;
+      color: var(--muted); font-size: 1rem; flex-shrink: 0;
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sheet-close:hover { background: var(--border); color: var(--text); }
+    .bb-winner-body { padding: 0 18px 20px; }
+    .bb-prize-tier {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px; border: 1px solid var(--border);
+      border-radius: 14px; margin-bottom: 10px; background: var(--card);
+    }
+    .bb-medal { font-size: 1.6rem; flex-shrink: 0; line-height: 1; }
+    .bb-prize-tier strong { font-size: 0.9rem; color: var(--text); }
+    .bb-prize-tier small { font-size: 0.75rem; color: var(--muted); line-height: 1.4; display: block; margin-top: 2px; }
+    .bb-winner-body p { font-size: 0.85rem; color: var(--text); line-height: 1.5; margin-bottom: 10px; }
+    .bb-cta-line {
+      background: linear-gradient(135deg, rgba(255,107,53,0.10), rgba(255,107,53,0.03));
+      border: 1px dashed rgba(255,107,53,0.5);
+      border-radius: 12px; padding: 10px 12px;
+      color: var(--primary-dark) !important;
+      font-weight: 600; font-size: 0.82rem !important; margin-top: 6px !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      .bb-winners-dot { background: rgba(255,255,255,0.10); }
+      .bb-winners-dot.active { background: rgba(255,255,255,0.14); }
+      .bb-winner-card {
+        box-shadow: 0 1px 2px rgba(0,0,0,0.35),
+                    0 10px 24px rgba(0,0,0,0.35),
+                    0 24px 50px -22px rgba(0,0,0,0.5);
+      }
+      .bb-winner-card::after { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
+      .bb-cta-line { color: #FFB47A !important; border-color: rgba(255,180,122,0.5); background: rgba(255,107,53,0.12); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bb-winner-card { transition: none; }
+      .bb-winner-card:hover, .bb-winner-card:focus-visible { transform: none; }
+      .sheet, .sheet-backdrop { transition: none; }
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
@@ -621,6 +761,24 @@
       </a>
     </div>
   </nav>
+
+  <!-- Monthly winners / gamified banners -->
+  <section class="bb-winners" aria-label="BankiBites monthly winners">
+    <div class="bb-winners-slider" id="bbWinnersSlider" aria-roledescription="carousel" aria-label="Monthly winners">
+      <div class="bb-winners-track" id="bbWinnersTrack">
+        <button type="button" class="bb-winner-card" data-winner="customer" aria-label="Top customer of the month — tap for prize pool">
+          <img src="banner/customer_banner.webp" alt="BankiBites Top Customer of the month" loading="lazy" width="1200" height="628">
+        </button>
+        <button type="button" class="bb-winner-card" data-winner="restaurant" aria-label="Top restaurant of the month — tap for details">
+          <img src="banner/restaurant_banner.webp" alt="BankiBites Top Restaurant of the month" loading="lazy" width="1200" height="628">
+        </button>
+        <button type="button" class="bb-winner-card" data-winner="places" aria-label="Top 3 places — tap for details">
+          <img src="banner/top_places_banner.webp" alt="Top 3 places ordering from BankiBites" loading="lazy" width="1200" height="628">
+        </button>
+      </div>
+      <div class="bb-winners-dots" id="bbWinnersDots" role="tablist" aria-label="Choose banner"></div>
+    </div>
+  </section>
 
   <!-- Cuisine filter (sticky, horizontal scroll) -->
   <h1 class="sr-only">Restaurants in Banki, Cuttack — Order Food Online</h1>
@@ -666,6 +824,23 @@
     <p>Could not load restaurants. Please check your connection and try again.</p>
   </div>
 
+  <!-- Monthly Winner Detail Sheet -->
+  <div class="sheet-backdrop" id="winnerSheet" role="dialog" aria-modal="true" aria-labelledby="winnerSheetTitle">
+    <div class="sheet">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <div>
+          <h3 id="winnerSheetTitle"></h3>
+          <p id="winnerSheetSub"></p>
+        </div>
+        <button type="button" id="winnerSheetClose" class="sheet-close" aria-label="Close">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="bb-winner-body" id="winnerSheetBody"></div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <div class="footer-app">
@@ -689,6 +864,159 @@
 
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // ── Monthly winner banners ──
+    const WINNER_COPY = {
+      customer: {
+        title: 'Top Customer of the Month',
+        subtitle: 'The customer with the most orders this month wins the pool.',
+        bodyHTML: `
+          <div class="bb-prize-tier">
+            <span class="bb-medal" aria-hidden="true">🥇</span>
+            <div><strong>Food Champion</strong><small>₹200 coupon (min ₹750) · Champion badge · Name featured on the app for the month</small></div>
+          </div>
+          <div class="bb-prize-tier">
+            <span class="bb-medal" aria-hidden="true">🥈</span>
+            <div><strong>Gold Foodie</strong><small>₹150 coupon (min ₹500)</small></div>
+          </div>
+          <div class="bb-prize-tier">
+            <span class="bb-medal" aria-hidden="true">🥉</span>
+            <div><strong>Silver Foodie</strong><small>₹75 coupon (min ₹300)</small></div>
+          </div>
+          <p class="bb-cta-line">Order more this month and take your place on next month's banner.</p>`
+      },
+      restaurant: {
+        title: 'Top Restaurant of the Month',
+        subtitle: 'The restaurant most loved by BankiBites customers.',
+        bodyHTML: `
+          <p>This banner celebrates the restaurant with the most orders received this month — its top-selling item is called out on the banner itself.</p>
+          <p class="bb-cta-line">Order more from your favourite restaurant to push them to the top next month.</p>`
+      },
+      places: {
+        title: 'Top 3 Places on BankiBites',
+        subtitle: 'The three localities placing the most orders.',
+        bodyHTML: `
+          <p>These are the three areas from which BankiBites received the most orders this month, along with each area's order count.</p>
+          <p class="bb-cta-line">Order more from your area to put it on next month's banner.</p>`
+      }
+    };
+
+    (function initWinnerBanners() {
+      const track    = document.getElementById('bbWinnersTrack');
+      const dotsWrap = document.getElementById('bbWinnersDots');
+      const sheet    = document.getElementById('winnerSheet');
+      const titleEl  = document.getElementById('winnerSheetTitle');
+      const subEl    = document.getElementById('winnerSheetSub');
+      const bodyEl   = document.getElementById('winnerSheetBody');
+      const closeBtn = document.getElementById('winnerSheetClose');
+      if (!track || !sheet) return;
+
+      const cards = [...track.querySelectorAll('.bb-winner-card')];
+      const SLIDE_MS = 4000;
+      let currentIdx = 0, autoTimer = null, paused = false, programmaticScroll = false;
+
+      cards.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'bb-winners-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Go to banner ${i + 1}`);
+        dot.addEventListener('click', () => { goTo(i, true); restart(); });
+        dotsWrap.appendChild(dot);
+      });
+      const dots = [...dotsWrap.children];
+
+      function goTo(i, smooth) {
+        currentIdx = (i + cards.length) % cards.length;
+        programmaticScroll = true;
+        track.scrollTo({ left: cards[currentIdx].offsetLeft - track.offsetLeft, behavior: smooth ? 'smooth' : 'auto' });
+        dots.forEach((d, k) => d.classList.toggle('active', k === currentIdx));
+        setTimeout(() => { programmaticScroll = false; }, 400);
+      }
+      function next() { goTo(currentIdx + 1, true); }
+      function start() {
+        stop();
+        if (paused || sheet.classList.contains('open')) return;
+        autoTimer = setInterval(next, SLIDE_MS);
+      }
+      function stop() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+      function restart() { stop(); start(); }
+
+      let scrollDebounce;
+      track.addEventListener('scroll', () => {
+        if (programmaticScroll) return;
+        clearTimeout(scrollDebounce);
+        scrollDebounce = setTimeout(() => {
+          const w = track.clientWidth;
+          const idx = Math.round(track.scrollLeft / w);
+          if (idx !== currentIdx) {
+            currentIdx = Math.max(0, Math.min(cards.length - 1, idx));
+            dots.forEach((d, k) => d.classList.toggle('active', k === currentIdx));
+          }
+        }, 80);
+      }, { passive: true });
+
+      const slider = document.getElementById('bbWinnersSlider');
+      const pause  = () => { paused = true; stop(); slider.classList.add('is-paused'); };
+      const resume = () => { paused = false; slider.classList.remove('is-paused'); start(); };
+      track.addEventListener('mouseenter', pause);
+      track.addEventListener('mouseleave', resume);
+      track.addEventListener('touchstart', pause, { passive: true });
+      track.addEventListener('touchend', () => setTimeout(resume, 2500), { passive: true });
+      track.addEventListener('focusin', pause);
+      track.addEventListener('focusout', resume);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { stop(); slider.classList.add('is-paused'); }
+        else { slider.classList.remove('is-paused'); start(); }
+      });
+
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduceMotion) start();
+
+      let winnerTriggerEl = null;
+      function openWinnerSheet(key, triggerEl) {
+        const copy = WINNER_COPY[key];
+        if (!copy) return;
+        titleEl.textContent = copy.title;
+        subEl.textContent   = copy.subtitle;
+        bodyEl.innerHTML    = copy.bodyHTML;
+        winnerTriggerEl = triggerEl || null;
+        sheet.classList.add('open');
+        stop();
+        setTimeout(() => closeBtn.focus(), 50);
+        try { window.umami && window.umami.track && window.umami.track('winner-banner-open', { type: key, page: 'dashboard' }); } catch (_) {}
+      }
+      function closeWinnerSheet() {
+        sheet.classList.remove('open');
+        if (winnerTriggerEl) { winnerTriggerEl.focus(); winnerTriggerEl = null; }
+        if (!reduceMotion && !paused) start();
+      }
+
+      let downX = 0, downY = 0;
+      track.addEventListener('pointerdown', (e) => { downX = e.clientX; downY = e.clientY; }, { passive: true });
+      track.addEventListener('click', (e) => {
+        const card = e.target.closest('.bb-winner-card');
+        if (!card) return;
+        if (Math.abs(e.clientX - downX) > 8 || Math.abs(e.clientY - downY) > 8) return;
+        openWinnerSheet(card.dataset.winner, card);
+      });
+
+      closeBtn.addEventListener('click', closeWinnerSheet);
+      sheet.addEventListener('click', (e) => { if (e.target === sheet) closeWinnerSheet(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sheet.classList.contains('open')) closeWinnerSheet();
+      });
+      sheet.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab' || !sheet.classList.contains('open')) return;
+        const focusable = [...sheet.querySelectorAll(
+          'button:not([disabled]):not([aria-disabled="true"]),a[href],[tabindex]:not([tabindex="-1"])'
+        )];
+        if (!focusable.length) return;
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+    })();
 
     const grid       = document.getElementById('cardGrid');
     const errorState = document.getElementById('errorState');

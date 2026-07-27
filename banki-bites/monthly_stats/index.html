@@ -405,9 +405,6 @@
               <button type="button" class="btn btn-bb" id="tc_copy" style="display:none;">
                 <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
               </button>
-              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
-                <i class="fa-solid fa-download mr-1"></i> Logo
-              </a>
             </div>
           </div>
         </div>
@@ -448,9 +445,6 @@
               <button type="button" class="btn btn-bb" id="tr_copy" style="display:none;">
                 <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
               </button>
-              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
-                <i class="fa-solid fa-download mr-1"></i> Logo
-              </a>
             </div>
           </div>
         </div>
@@ -513,9 +507,6 @@
               <button type="button" class="btn btn-bb" id="tp_copy" style="display:none;">
                 <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
               </button>
-              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
-                <i class="fa-solid fa-download mr-1"></i> Logo
-              </a>
             </div>
           </div>
         </div>
@@ -669,19 +660,48 @@ Rules:
   // ---------------------------------------------------------------------------
   // Shared banner "vibe" block so all three landscape banners feel like one
   // family, distinct from the vertical award posters above.
-  const BANNER_VIBE = `Design a professional, share-worthy landscape banner (1200x628 px, 16:8.4 aspect, 300 DPI — the standard social/OG banner size that renders cleanly on WhatsApp preview, Facebook feed, in-app hero slots, and the BankiBites app home banner).
+  const BANNER_VIBE = `Design a premium, editorial landscape banner (1200x628 px, 300 DPI) for the BankiBites app hero-slot slider. The banner must feel like a single, cohesive editorial composition — every element should look like it belongs to the same photograph or 3D scene, lit by the same light source, sitting on the same surface. It must NOT look like text-plus-decoration pasted onto a busy background.
 
-Overall look:
-- Cinematic dark background: deep near-black (#0B0B0F → #16161C) with a soft warm orange radial glow anchored behind the hero title.
-- Subtle orange + gold confetti / sparkle particles in the upper corners — small diamonds, dots, tiny stars. Never noisy.
-- One thin ornamental golden-orange divider with a small glowing star at its midpoint.
-- Primary accent BankiBites orange #F7931E, secondary warm gold #FFB84D, primary text pure white #FFFFFF, muted text soft gray #C9CDD4.
-- Typography: Poppins / Inter 900 for display, Pacifico or Great Vibes for handwritten name callouts.
-- BankiBites logo (attached — circular orange + white badge on black) placed inside a soft circular orange glow in the TOP-LEFT corner.
-- ONE polished 3D-rendered BankiBites delivery rider on the FAR RIGHT of the banner: young Indian male, orange helmet, bright orange polo T-shirt, black jeans, riding a modern black-and-orange electric scooter with the BankiBites-branded orange delivery box on the back. Cheerful thumbs-up toward the viewer. Studio-lit Pixar / Blender style, soft rim lighting in orange, sitting cleanly on the dark canvas with no background around the character.
+Reference bar: Apple product hero, Airbnb category hero, Uber Eats promotion tile, Linear.app marketing hero, Netflix top-of-page card. Editorial, quiet, confident. Not certificate-style. Not confetti-poster style.
+
+Critical safe zone (READ FIRST):
+- Treat the outer 20% top and outer 20% bottom of the 1200x628 canvas as SAFE-TO-CROP margin. No text, no numbers, no names, no faces, no critical graphics may sit in those bands.
+- ALL hero content — title, name, item, values, rider character, divider, footer text — must sit inside the vertical middle 60% band (y ≈ 125 → y ≈ 500).
+- Compose as a horizontal editorial spread: content flows LEFT ↔ RIGHT. Vertical stacks stay short and stay inside the safe zone.
+
+Background & atmosphere (this is what has been feeling amateur — get it right):
+- The background is a designed, layered SCENE, not a flat dark card with stars stuck on top. Build it as follows:
+  1. Base layer: a rich, near-black gradient mesh — top-left #0E0B18, drifting through #14101F in the middle, into a warmer #1B120C in the bottom-right. Not banded. Painterly, cinematic.
+  2. Ambient light layer: 2–3 large, very soft warm-orange bokeh orbs (radius ~ 380–520 px, blur ~ 180 px, opacity ~ 12–22%) placed OFF-CENTER — one behind the hero name (center-left), one behind the rider's shoulder (right-center), one small one anchoring the footer strip. These orbs represent ambient stage light, not particles.
+  3. Directional key light: a single soft warm rim light from the upper-right at ~ 30° so highlights on the rider, on typography edges, and on any 3D element all agree with that direction. Establish and follow this light direction consistently.
+  4. Subtle 2–4% film grain / noise across the entire canvas so the background reads as physical, not vector-flat.
+  5. A very faint diagonal light streak (like a lens flare stripe) crossing the composition at ~ 20° from lower-left to upper-right, at ~ 6% opacity — used to visually tie the left content and the right rider into ONE scene.
+- No confetti. No scattered stars. No sparkle particles. No diamonds. No dots pattern. No glitter. Absolutely none of those visual clichés — they are what makes it feel amateurish. Depth must come from lighting, gradient, and grain, not from sprinkled shapes.
+- Primary accent BankiBites orange #F7931E, secondary warm amber #FFB56B, deep warm gold #C88A2E for restrained accents. Primary text pure white #FFFFFF, muted text soft gray #C9CDD4. Do not oversaturate; keep the palette editorial.
+- Typography: Poppins / Inter 900 for display type. Pacifico OR Great Vibes for the handwritten cursive hero name callout — this cursive is intentional and carries the emotional weight of the banner, rendered as glowing neon signage rather than birthday-card ink (see per-banner neon treatment below). Tight tracking on display type. Generous line-height.
+
+Imagery rules:
+- Do NOT include any BankiBites LOGO, badge, brand shield, monogram, avatar, crest, or app icon anywhere on the banner. The word "BankiBites" is allowed ONLY as clean typographic text, and only in these three places: (1) the back panel of the rider's delivery box, (2) an optional small chest print on the rider's T-shirt, and (3) the footer strip. Nowhere else — no floating wordmark, no watermark, no repeated brand text.
+- Include ONE polished 3D-rendered BankiBites delivery rider on the RIGHT third of the banner: young Indian male, matte orange helmet with a soft specular highlight from the upper-right key light, bright orange polo T-shirt, dark charcoal jeans, riding a modern matte-black electric scooter with an orange delivery box on the back. Branded typography placement (this is the ONLY place "BankiBites" appears as branding on the rider):
+    • Delivery box back panel (facing the viewer): the wordmark "BankiBites" set in bold sans-serif (Poppins/Inter 800), pure white #FFFFFF, tightly kerned, sitting horizontally centered on the orange panel. Sized so it reads clearly at banner scale — roughly 60–70% of the panel width. The "B" letters of "Banki" and "Bites" are the same weight and case as the rest — do NOT add any circular badge, monogram, icon, shield, tagline, dot, or graphic mark next to or around the wordmark. Text only.
+    • Optional small chest print on the T-shirt (left chest, viewer's right): the same "BankiBites" wordmark in bold sans-serif, white, small — treated as a real embroidered print with subtle fabric shading. Optional; skip if it would clutter the composition.
+    • No wordmark, no text, and no graphic mark anywhere else on the rider, helmet, scooter, wheels, mirrors, or fenders.
+   Gentle three-quarter angle toward the viewer with a warm, natural smile. Studio-lit Pixar / Blender style, but grounded — the rider casts a soft elliptical contact shadow directly beneath the scooter (not floating). Rim light matches the scene's upper-right key light exactly. The rider integrates INTO the scene via the ambient orange bokeh behind him and the shared grain layer — he must not look cut-out or pasted-on.
+- The rider must be sized so the entire character AND scooter fit inside the vertical middle 60% safe zone; nothing touches the top or bottom canvas edges.
 - No other people, mascots, food photos, plates, cutlery, or stock graphics.
-- Layout follows the classic banner grid: brand in TOP-LEFT, 3D rider anchored to the RIGHT, hero content stack in the LEFT-CENTER, footer strip at the very bottom.
-- Output as a single flat landscape banner image — no device mockup, no drop-shadow around the whole banner.`;
+
+Layout skeleton (LEFT → RIGHT along the safe strip):
+- LEFT column (~ 55% width): hero content stack, left-aligned, tight vertical rhythm, entirely inside the safe zone. Content sits on top of the ambient bokeh orb; the orb is what makes the text "belong to" the background.
+- RIGHT column (~ 40% width, ~ 5% breathing gap between columns): the 3D rider, vertically centered inside the safe zone, integrated via its own bokeh orb and contact shadow.
+- Footer strip: full width, placed at the bottom edge of the safe zone (NOT at the canvas edge). Only a hairline divider + short text; no icons, no boxes.
+
+Cohesion checklist the banner MUST pass:
+- Do the rider's rim highlight, any 3D crest, and the type edges all point to the SAME light source? If not, redo.
+- Does removing all text still leave a background that looks like a designed scene (gradient + orbs + grain + rim light + streak) rather than blank black with particles? If not, redo.
+- Do the ambient orbs live BEHIND the content (i.e. content sits ON the light), not floating above it as separate stickers? If not, redo.
+- Is there ANY confetti / star / sparkle / dot pattern anywhere on the canvas? If yes, remove ALL of it.
+
+Output: a single flat landscape banner image — no device mockup, no drop-shadow around the whole banner, no logo anywhere.`;
 
   function buildTopCustomerBannerPrompt() {
     const month = val('tc_month');
@@ -690,23 +710,37 @@ Overall look:
 
 Banner purpose: Announce "TOP CUSTOMER OF THE MONTH" for BankiBites — ${month}. Only two things are highlighted on the banner: the customer's NAME and their FAVOURITE ITEM. No other stats, numbers or KPIs anywhere.
 
-Content stack (LEFT-CENTER, aligned left, vertical rhythm tight):
-1. Small orange uppercase eyebrow: "BANKIBITES • ${month.toUpperCase()}"
-2. Stacked display title in bold white sans (Poppins/Inter 900):
-   • Line 1: "TOP" — medium size.
-   • Line 2: "CUSTOMER" — very large, tightly kerned. A tiny gold laurel + star crest sits just above "TOP".
-3. Small orange uppercase label "PRESENTED TO".
-4. HERO — Customer name "${val('tc_name')}" — massive HANDWRITTEN CURSIVE (Pacifico / Great Vibes) in pure white with a soft warm-orange glow behind it. This must be the single most prominent element in the banner, larger than every other text block.
-5. Thin golden-orange ornamental divider with a glowing star at center.
+LEFT-column content stack (aligned left, entirely inside the vertical safe zone, tight vertical rhythm, sitting on top of the center-left ambient bokeh orb from BANNER_VIBE so the type feels lit from behind):
+1. Editorial eyebrow "${month.toUpperCase()} — TOP CUSTOMER" in tiny letter-spaced uppercase Poppins/Inter 600, muted gray #C9CDD4, preceded by a short 24 px orange horizontal rule (—). This is the "kicker line" of the editorial.
+2. Stacked display title in bold white Poppins/Inter 900, tightly tracked:
+   • Line 1: "TOP" — medium size, muted white 80% opacity.
+   • Line 2: "CUSTOMER" — very large, tightly kerned, full white. No crests, no laurels above the title — the composition stays quiet.
+3. Small warm-amber (#FFB56B) uppercase label "PRESENTED TO" — tiny, letter-spaced.
+4. HERO — Customer name "${val('tc_name')}" — massive HANDWRITTEN CURSIVE (Pacifico or Great Vibes), rendered as a warm NEON SIGN — imagine a real neon-tube sign bent into cursive script, glowing against a dark wall. This is the single most prominent element in the banner. Neon treatment:
+   • Letterform core: near-white #FFF6E8 with a faint 1 px inner highlight along the top edge of each stroke (as if the tube is brightest at the top).
+   • Tight inner glow: soft warm-white halo #FFE5B8 at ~ 4 px blur, ~ 90% opacity, hugging the letterforms.
+   • Mid glow: BankiBites orange #F7931E at ~ 16 px blur, ~ 70% opacity, expanding just beyond the tight halo.
+   • Outer bloom: deep amber #FF7A1A at ~ 44 px blur, ~ 35% opacity, fading softly into the background so it MERGES with the ambient bokeh orb already sitting behind the name — do not create a hard-edged halo or stacked rings.
+   • Very subtle 1 px orange rim on the outermost stroke edge for that "glass tube" quality, but keep it delicate.
+   • The glow spills onto the surrounding scene (slight warm tint on adjacent type and the top edge of the divider below) — this is what visually welds the name into the composition instead of looking pasted on.
+   • No hard drop-shadow, no offset shadow, no double-outline, no sparkles around the neon.
+5. A single hairline horizontal rule in warm gold #C88A2E, 1 px, spanning ~ 240 px of the left column. No star at its center, no ornament — just the rule.
 6. Favourite-item spotlight (single line only — no chips, no icons row, no KPI grid):
-   • Small orange uppercase label above: "FAVOURITE ITEM"
-   • Directly beneath it, the item name "${val('tc_fav_item')}" rendered LARGE in bold orange display type (Poppins/Inter 900), with a subtle gold underline flourish. Second-most prominent element, clearly secondary to the customer name.
-7. Bottom footer strip spanning the full width: thin orange divider with a small star at the center; below it, uppercase orange letter-spaced text "THANK YOU FOR MAKING US SMILE! 🙂" on the LEFT, and "Powered by BankiBites" on the RIGHT with "BankiBites" in orange.
+   • Editorial uppercase label above in warm amber #FFB56B: "FAVOURITE ITEM" — letter-spaced.
+   • Directly beneath it, the item name "${val('tc_fav_item')}" rendered LARGE in bold Poppins/Inter 900 in BankiBites orange #F7931E. No underline, no flourish — the color and size do the work. Second-most prominent element, clearly secondary to the customer name.
+
+Full-width footer strip (placed at the bottom edge of the safe zone, NOT at the canvas edge):
+- A single 1 px hairline divider at 20% opacity white — no ornament, no star, no dot at the center.
+- Below the divider: tiny letter-spaced uppercase text "THANK YOU FOR MAKING US SMILE" on the LEFT in muted gray #C9CDD4, and plain text "Powered by BankiBites" on the RIGHT in muted gray with "BankiBites" set in orange (no logo, no badge, no icon — just typographic text).
 
 Rules:
 - Use EXACTLY the two values above (name + favourite item). Do not invent orders, spend, dates, ratings, or any other KPIs.
 - Every label and value must match the source strings letter-for-letter and be sharply legible at 1200x628. No lorem ipsum, no "Sample" text, no misspellings.
-- Everything except the logo + 3D rider must be typography, icons, ornaments, and geometric shapes.`
+- ABSOLUTELY NO BankiBites logo, badge, shield, monogram, crest, or app icon anywhere on the banner. The word "BankiBites" may appear ONLY as clean typographic text on: (a) the delivery-box back panel, (b) an optional small T-shirt chest print, and (c) the footer strip. Nowhere else.
+- All hero content, the rider character, and the footer strip must sit inside the vertical middle 60% safe zone.
+- No confetti, no scattered stars, no sparkle particles, no glitter, no dot patterns anywhere. Depth must come only from the gradient mesh, the ambient bokeh orbs, the diagonal light streak, and the grain layer described in BANNER_VIBE.
+- The rider and the type must share the SAME light direction (upper-right key light) and both must sit on top of ambient bokeh orbs so they belong to the same scene. No cut-out / pasted-on look allowed.
+- Everything except the 3D rider must be typography, hairline rules, and geometric shapes — no ornament, no icon rows.`
     );
   }
 
@@ -717,23 +751,37 @@ Rules:
 
 Banner purpose: Announce "TOP RESTAURANT OF THE MONTH" for BankiBites — ${month}. Only two things are highlighted on the banner: the restaurant's NAME and its TOP-SELLING ITEM. No other stats, numbers or KPIs anywhere.
 
-Content stack (LEFT-CENTER, aligned left, vertical rhythm tight):
-1. Small orange uppercase eyebrow: "BANKIBITES • ${month.toUpperCase()}"
-2. Stacked display title in bold white sans (Poppins/Inter 900):
-   • Line 1: "TOP" — medium size.
-   • Line 2: "RESTAURANT" — very large, tightly kerned. A tiny gold trophy + laurel crest sits just above "TOP".
-3. Small orange uppercase label "AWARDED TO".
-4. HERO — Restaurant name "${val('tr_name')}" — massive HANDWRITTEN CURSIVE (Pacifico / Great Vibes) in pure white with a soft warm-orange glow behind it. This must be the single most prominent element in the banner, larger than every other text block.
-5. Thin golden-orange ornamental divider with a glowing star at center.
+LEFT-column content stack (aligned left, entirely inside the vertical safe zone, tight vertical rhythm, sitting on top of the center-left ambient bokeh orb from BANNER_VIBE so the type feels lit from behind):
+1. Editorial eyebrow "${month.toUpperCase()} — TOP RESTAURANT" in tiny letter-spaced uppercase Poppins/Inter 600, muted gray #C9CDD4, preceded by a short 24 px orange horizontal rule (—). This is the "kicker line" of the editorial.
+2. Stacked display title in bold white Poppins/Inter 900, tightly tracked:
+   • Line 1: "TOP" — medium size, muted white 80% opacity.
+   • Line 2: "RESTAURANT" — very large, tightly kerned, full white. No crests, no trophies, no laurels above the title — the composition stays quiet.
+3. Small warm-amber (#FFB56B) uppercase label "AWARDED TO" — tiny, letter-spaced.
+4. HERO — Restaurant name "${val('tr_name')}" — massive HANDWRITTEN CURSIVE (Pacifico or Great Vibes), rendered as a warm NEON SIGN — imagine a real neon-tube sign bent into cursive script, glowing against a dark wall. This is the single most prominent element in the banner. Neon treatment:
+   • Letterform core: near-white #FFF6E8 with a faint 1 px inner highlight along the top edge of each stroke (as if the tube is brightest at the top).
+   • Tight inner glow: soft warm-white halo #FFE5B8 at ~ 4 px blur, ~ 90% opacity, hugging the letterforms.
+   • Mid glow: BankiBites orange #F7931E at ~ 16 px blur, ~ 70% opacity, expanding just beyond the tight halo.
+   • Outer bloom: deep amber #FF7A1A at ~ 44 px blur, ~ 35% opacity, fading softly into the background so it MERGES with the ambient bokeh orb already sitting behind the name — do not create a hard-edged halo or stacked rings.
+   • Very subtle 1 px orange rim on the outermost stroke edge for that "glass tube" quality, but keep it delicate.
+   • The glow spills onto the surrounding scene (slight warm tint on adjacent type and the top edge of the divider below) — this is what visually welds the name into the composition instead of looking pasted on.
+   • No hard drop-shadow, no offset shadow, no double-outline, no sparkles around the neon.
+5. A single hairline horizontal rule in warm gold #C88A2E, 1 px, spanning ~ 240 px of the left column. No star at its center, no ornament — just the rule.
 6. Top-selling-item spotlight (single line only — no chips, no icons row, no KPI grid):
-   • Small orange uppercase label above: "TOP SELLING ITEM"
-   • Directly beneath it, the item name "${val('tr_top_item')}" rendered LARGE in bold orange display type (Poppins/Inter 900), with a subtle gold underline flourish. Second-most prominent element, clearly secondary to the restaurant name.
-7. Bottom footer strip spanning the full width: thin orange divider with a small star at the center; below it, uppercase orange letter-spaced text "KEEP COOKING, KEEP GROWING! 🙂" on the LEFT, and "Powered by BankiBites" on the RIGHT with "BankiBites" in orange.
+   • Editorial uppercase label above in warm amber #FFB56B: "TOP SELLING ITEM" — letter-spaced.
+   • Directly beneath it, the item name "${val('tr_top_item')}" rendered LARGE in bold Poppins/Inter 900 in BankiBites orange #F7931E. No underline, no flourish — the color and size do the work. Second-most prominent element, clearly secondary to the restaurant name.
+
+Full-width footer strip (placed at the bottom edge of the safe zone, NOT at the canvas edge):
+- A single 1 px hairline divider at 20% opacity white — no ornament, no star, no dot at the center.
+- Below the divider: tiny letter-spaced uppercase text "KEEP COOKING, KEEP GROWING" on the LEFT in muted gray #C9CDD4, and plain text "Powered by BankiBites" on the RIGHT in muted gray with "BankiBites" set in orange (no logo, no badge, no icon — just typographic text).
 
 Rules:
 - Use EXACTLY the two values above (name + top-selling item). Do not invent orders, sales, dates, ratings, or any other KPIs.
 - Every label and value must match the source strings letter-for-letter and be sharply legible at 1200x628. No lorem ipsum, no "Sample" text, no misspellings.
-- Everything except the logo + 3D rider must be typography, icons, ornaments, and geometric shapes.`
+- ABSOLUTELY NO BankiBites logo, badge, shield, monogram, crest, or app icon anywhere on the banner. The word "BankiBites" may appear ONLY as clean typographic text on: (a) the delivery-box back panel, (b) an optional small T-shirt chest print, and (c) the footer strip. Nowhere else.
+- All hero content, the rider character, and the footer strip must sit inside the vertical middle 60% safe zone.
+- No confetti, no scattered stars, no sparkle particles, no glitter, no dot patterns anywhere. Depth must come only from the gradient mesh, the ambient bokeh orbs, the diagonal light streak, and the grain layer described in BANNER_VIBE.
+- The rider and the type must share the SAME light direction (upper-right key light) and both must sit on top of ambient bokeh orbs so they belong to the same scene. No cut-out / pasted-on look allowed.
+- Everything except the 3D rider must be typography, hairline rules, and geometric shapes — no ornament, no icon rows.`
     );
   }
 
@@ -744,28 +792,76 @@ Rules:
 
 Banner purpose: Celebrate the "TOP 3 DELIVERY PLACES" for BankiBites — ${month}.
 
-Content stack (LEFT-CENTER, aligned left, vertical rhythm tight):
-1. Small orange uppercase eyebrow: "BANKIBITES • ${month.toUpperCase()}"
-2. Stacked display title in bold white sans (Poppins/Inter 900):
-   • Line 1: "OUR TOP" — medium size.
-   • Line 2: "3 PLACES" — very large, tightly kerned, with the numeral "3" rendered in bright orange. A tiny gold pin + laurel crest sits just above "OUR TOP".
-3. Small orange uppercase eyebrow above the podium: "MOST-ORDERED NEIGHBOURHOODS".
-4. Horizontal podium of three rounded dark cards (#161620, 1px subtle orange border, soft inner glow), sized by rank — the 1st-place card is tallest and centered, 2nd on its left slightly shorter, 3rd on its right shortest — evoking a classic winners' podium. Each card contains, top-to-bottom:
-   • A large circular rank badge: "1", "2", "3" in bold white on orange for #1 (with a small gold laurel wreath around it), and orange-outline on dark for #2 and #3.
-   • A pin icon in orange.
-   • The place name in bold white uppercase, letter-spaced.
-   • The order count in bold orange with a small "orders" caption in muted gray under it.
-   Place / order values to use verbatim:
-   • Rank 1 → "${val('tp_place1')}" — "${num('tp_orders1')} orders"
-   • Rank 2 → "${val('tp_place2')}" — "${num('tp_orders2')} orders"
-   • Rank 3 → "${val('tp_place3')}" — "${num('tp_orders3')} orders"
-5. Thin golden-orange ornamental divider with a glowing star at center below the podium.
-6. Bottom footer strip spanning the full width: thin orange divider with a small star at the center; below it, uppercase orange letter-spaced text "WE LOVE FEEDING YOUR NEIGHBOURHOOD! 🙂" on the LEFT, and "Powered by BankiBites" on the RIGHT with "BankiBites" in orange.
+Composition note: For this banner ONLY, the podium is the visual hero, so the LEFT/RIGHT split from BANNER_VIBE is replaced by an editorial LEFT-title + RIGHT-podium composition. The 3D rider from BANNER_VIBE is OMITTED for this banner (it competes with the podium). All content sits inside the vertical middle 60% safe zone and on top of the ambient bokeh orbs so it belongs to the same scene.
+
+LEFT column (~ 42% width) — editorial title stack, left-aligned, sitting on the center-left ambient bokeh orb:
+1. Editorial eyebrow "${month.toUpperCase()} — MOST-ORDERED NEIGHBOURHOODS" in tiny letter-spaced uppercase Poppins/Inter 600, muted gray #C9CDD4, preceded by a short 24 px orange horizontal rule (—).
+2. Stacked display title in bold Poppins/Inter 900, tightly tracked:
+   • Line 1: "OUR TOP" — medium size, muted white 80% opacity.
+   • Line 2: "3 PLACES" — very large, full white, with the numeral "3" rendered in BankiBites orange #F7931E. No crests, no pins, no laurels above the title.
+3. A single hairline horizontal rule in warm gold #C88A2E, 1 px, spanning ~ 220 px of the left column. No ornament.
+4. One quiet supporting line in muted gray #C9CDD4, Poppins 500, ~ 15 px: "Neighbourhoods leading the month by order volume."
+
+RIGHT column (~ 52% width, ~ 6% breathing gap between columns) — the podium.
+
+Rank hierarchy is the single most important thing in this banner. A viewer must feel — in half a second, without reading — that 1st > 2nd > 3rd. Achieve that hierarchy through FOUR reinforcing signals working together: (1) card height, (2) card fill/glow, (3) metallic rank color, (4) a neon halo on #1 only. Do not use crests, laurels, ribbons, wreaths, stars, or trophy icons — the hierarchy is carried entirely by size, light, and color.
+
+Podium layout:
+- Three rounded cards sit on a shared invisible baseline. 2nd on the LEFT, 1st in the CENTER (tallest), 3rd on the RIGHT (shortest).
+- Height ratio, strict: 2nd ≈ 82%, 1st = 100%, 3rd ≈ 68% of the tallest card's height. Card widths are equal.
+- Corner radius: 16 px. Cards carry a real soft elliptical contact shadow beneath each (warm gray, ~ 6 px offset for #1, ~ 4 px for #2, ~ 3 px for #3 — bigger card = deeper shadow).
+
+Per-rank card treatment — this is where the hierarchy actually lands:
+
+RANK 1 (CENTER, TALLEST — the winner):
+- Card fill: a warm radial gradient anchored top-center — inner glow #3A2410 → mid #1E1420 → outer #10101A. It looks lit from within.
+- A dedicated ambient orange bokeh orb (~ 320 px, ~ 22% opacity, warm #F7931E) sits BEHIND this card only — this is the spotlight. No other card gets an orb.
+- Card stroke: a 1 px hairline gradient border, GOLD — top edge #F7C558, fading to #C88A2E at the bottom. Feels metallic.
+- Rank badge: a large "1" set in Poppins / Inter 900 tabular, rendered as a WARM-GOLD NEON glyph so it echoes the hero name's neon treatment and unifies the design language:
+    • Core: near-white #FFF6E8.
+    • Tight inner glow: warm-white #FFE5B8 at ~ 3 px blur, ~ 90% opacity.
+    • Mid glow: BankiBites orange #F7931E at ~ 12 px blur, ~ 70% opacity.
+    • Outer bloom: deep amber #FF7A1A at ~ 30 px blur, ~ 40% opacity, dissolving into the bokeh orb behind the card.
+    • The "1" sits at the top-center of the card, sized to visually dominate the other two numerals.
+- Beneath the "1": a 1 px 30%-opacity gold hairline separator, ~ 70 px wide, centered.
+- Place name: "${val('tp_place1')}" in bold Poppins / Inter 800 uppercase, letter-spaced, pure white — noticeably larger than the 2nd/3rd place names.
+- Order count: "${num('tp_orders1')}" as a large tabular Poppins / Inter 900 numeral in BankiBites orange #F7931E, with a soft warm outer bloom (~ 8 px, ~ 30% opacity) so it feels lit. Small muted-gray #C9CDD4 caption "orders" directly beneath, letter-spaced.
+
+RANK 2 (LEFT, MEDIUM — silver):
+- Card fill: a subtle vertical gradient #1C1B22 → #101018. No orb, no glow.
+- Card stroke: 1 px hairline gradient border, SILVER — top edge #D8DEE7, fading to #7B818C at the bottom. Cooler metallic feel.
+- Rank badge: a large "2" in Poppins / Inter 900 tabular, filled with a metallic silver gradient (#EDEFF3 top → #A8AEBB bottom), no neon, no glow — flat metallic. Sized ~ 78% of the "1".
+- Beneath the "2": a 1 px 20%-opacity silver hairline separator, ~ 60 px wide, centered.
+- Place name: "${val('tp_place2')}" in bold Poppins / Inter 800 uppercase, letter-spaced, muted white (90% opacity).
+- Order count: "${num('tp_orders2')}" in Poppins / Inter 900 white (95% opacity), no glow. Small muted-gray "orders" caption beneath.
+
+RANK 3 (RIGHT, SHORTEST — bronze):
+- Card fill: a subtle vertical gradient #1A1620 → #0F0E17. No orb, no glow.
+- Card stroke: 1 px hairline gradient border, BRONZE — top edge #C88A5A, fading to #6E4A2E at the bottom. Warm metallic, but darker than gold.
+- Rank badge: a large "3" in Poppins / Inter 900 tabular, filled with a metallic bronze gradient (#D89A6E top → #7A4E2F bottom), no neon, no glow — flat metallic. Sized ~ 66% of the "1".
+- Beneath the "3": a 1 px 20%-opacity bronze hairline separator, ~ 60 px wide, centered.
+- Place name: "${val('tp_place3')}" in bold Poppins / Inter 800 uppercase, letter-spaced, muted white (80% opacity).
+- Order count: "${num('tp_orders3')}" in Poppins / Inter 900 muted white (85% opacity), no glow. Small muted-gray "orders" caption beneath.
+
+Ranking cues that MUST land — self-check before rendering:
+- #1 is the ONLY card that is both taller AND has a lit background orb AND has a neon-glowing rank numeral. #2 and #3 must feel dimmer and cooler by comparison — no orb, no glow, flat metallic numerals.
+- The metallic border colors (gold / silver / bronze) match the universal winners'-medal color code — this is the fastest hierarchy signal in the world; do not swap or muddle it.
+- The rank numeral SIZE ratio (1 : 2 : 3) is roughly 1.00 : 0.78 : 0.66. Do not render all three at the same size.
+- The order-count colors also cascade: orange (with soft bloom) → bright white → muted white.
+
+Full-width footer strip (placed at the bottom edge of the safe zone, NOT at the canvas edge):
+- A single 1 px hairline divider at 20% opacity white — no ornament, no star, no dot at the center.
+- Below the divider: tiny letter-spaced uppercase text "WE LOVE FEEDING YOUR NEIGHBOURHOOD" on the LEFT in muted gray #C9CDD4, and plain text "Powered by BankiBites" on the RIGHT in muted gray with "BankiBites" set in orange (no logo, no badge, no icon — just typographic text).
 
 Rules:
 - Use EXACTLY the values above. Do not invent extra places, numbers, dates, or KPIs.
 - Every label and value must match the source strings letter-for-letter and be sharply legible at 1200x628. No lorem ipsum, no "Sample" text, no misspellings.
-- Everything except the logo + 3D rider must be typography, icons, ornaments, and geometric shapes.`
+- ABSOLUTELY NO BankiBites logo, badge, shield, monogram, crest, or app icon anywhere on the banner. The word "BankiBites" may appear ONLY as clean typographic text on: (a) the delivery-box back panel, (b) an optional small T-shirt chest print, and (c) the footer strip. Nowhere else.
+- The podium, title, eyebrow, and footer strip must all sit inside the vertical middle 60% safe zone.
+- OMIT the 3D delivery-rider character on this banner — the podium is the hero and must not compete with a character.
+- No confetti, no scattered stars, no sparkle particles, no glitter, no dot patterns anywhere. Depth must come only from the gradient mesh, the ambient bokeh orbs, the diagonal light streak, and the grain layer described in BANNER_VIBE.
+- The podium cards must sit on the same light stage as the background: each card carries a real soft contact shadow, and the strongest ambient orange bleed lands inside the #1 card so it visually "wins" the light.
+- Everything must be typography, hairline rules, and geometric shapes — no ornament, no icon rows, no crests, no laurels, no pins.`
     );
   }
 

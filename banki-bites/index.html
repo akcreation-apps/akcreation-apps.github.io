@@ -1593,22 +1593,8 @@
         });
     }
 
-    function handleOrderClick(e) {
-      sheetTriggerEl = e ? e.currentTarget : document.activeElement;
-      restBackdrop.classList.add('open');
-      if (!cachedData) rpList.setAttribute('aria-busy', 'true');
-      setTimeout(() => {
-        const firstOpen = rpList.querySelector('.rp-item:not([aria-disabled="true"])');
-        const closeBtn  = document.getElementById('sheetClose');
-        (firstOpen || closeBtn).focus();
-      }, 50);
-      if (cachedData) return;
-      loadData().catch(() => {
-        rpList.removeAttribute('aria-busy');
-        rpList.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0"><i class="fas fa-wifi-slash" aria-hidden="true"></i> Could not load. Please refresh.</p>';
-        cuisineChips.innerHTML = '';
-        areaChips.innerHTML = '';
-      });
+    function handleOrderClick() {
+      window.location.href = 'dashboard.html';
     }
 
     document.getElementById('orderBtn').addEventListener('click', handleOrderClick);
