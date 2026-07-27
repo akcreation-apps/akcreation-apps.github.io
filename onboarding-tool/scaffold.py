@@ -319,20 +319,31 @@ def scaffold_new(details: dict, plain_creds: dict, categories: list, logo_bytes:
 
     # Strip all SEO tags/schema/canonical/OG/Twitter blocks from cloned HTML —
     # new restaurants start with zero source-restaurant SEO baggage.
-    for html_path in (target / "index.html", target / "cart.html"):
+    for html_path in (target / "index.html", target / "cart.html", target / "invoice.html",
+                       target / "viewInvoice.html", target / "referral.html"):
         _strip_seo_in_file(html_path, name)
+
+    # Preserve the two-tone logo look: first word in .brand-accent, remainder plain.
+    parts = name.strip().split(None, 1)
+    if len(parts) == 2:
+        logo_span_replacement = f">{parts[0]}</span> {parts[1]}<"
+    else:
+        # Single-word names stay wrapped in the accent span so the accent colour still applies.
+        logo_span_replacement = f">{name}</span><"
 
     common_replacements = [
         ("The Cafe Darbar", name),
         ("Cafe Darbar", name),
         ("tcd-logo.png", logo_new),
         ("/TCD/", f"/{prefix}/"),
-        (">The Cafe</span> Darbar<", f">{name}</span><"),
+        (">The Cafe</span> Darbar<", logo_span_replacement),
         ("(TCD)", ""),
         (" TCD ", f" {name} "),
+        # cart.js hardcodes the source prefix in the order payload — retarget it.
+        ("restaurant_id:   'TCD'", f"restaurant_id:   '{prefix.upper()}'"),
     ]
-    _replace_in_file(target / "index.html", common_replacements)
-    _replace_in_file(target / "cart.html", common_replacements)
+    for fname in ("index.html", "cart.html", "invoice.html", "viewInvoice.html", "referral.html", "cart.js"):
+        _replace_in_file(target / fname, common_replacements)
     _replace_in_file(target / "admin" / "index.html", [("tcd-logo.png", logo_new)])
 
     return target

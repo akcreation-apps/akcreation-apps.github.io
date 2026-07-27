@@ -1,0 +1,294 @@
+{
+  "_OFFER_KEYS_DOCS": [
+    "To feature a dish in the top Deals of the Day rail, add TWO optional keys to that dish:",
+    "  offer_price (number) \u2014 fake higher MRP; must be strictly greater than price. Renders strikethrough.",
+    "  is_offer (boolean, true) \u2014 include this dish in the horizontal Deals rail at the top of the menu."
+  ],
+  "menu": [
+    {
+      "category": "Cakes",
+      "subcategories": [
+        {
+          "name": "Cream",
+          "dishes": [
+            {
+              "id": 101,
+              "name": "Pink Rose",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 102,
+              "name": "Cutty Pink",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 103,
+              "name": "Cutty Preety",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 104,
+              "name": "Pinky Choco",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 105,
+              "name": "Pinky Garden",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 106,
+              "name": "Pistal Berry",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 107,
+              "name": "Rosy White",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 108,
+              "name": "Sky Fyy",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 109,
+              "name": "Star Lilly",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 110,
+              "name": "Sweet Heart",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 111,
+              "name": "White Magic",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Jelly",
+          "dishes": [
+            {
+              "id": 201,
+              "name": "Choco Pinky",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 203,
+              "name": "Flower Heart",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 204,
+              "name": "Matty Brown",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 205,
+              "name": "Orange Candy",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 206,
+              "name": "Pimple Candy",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 207,
+              "name": "Rainy Flower",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 208,
+              "name": "Violet Creamy",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 209,
+              "name": "Yellow Picks",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Party Accessories",
+      "subcategories": [
+        {
+          "name": "Caps N Crowns",
+          "dishes": [
+            {
+              "id": 301,
+              "name": "Party Cap",
+              "price": 39,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 302,
+              "name": "King Crown",
+              "price": 79,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 303,
+              "name": "Queen Crown",
+              "price": 49,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Candles N Baloons",
+          "dishes": [
+            {
+              "id": 401,
+              "name": "Spark Candle",
+              "price": 29,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 402,
+              "name": "Bend Candle",
+              "price": 19,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 403,
+              "name": "Balloon (30pc)",
+              "price": 39,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 404,
+              "name": "HBD Printed Balloon (10pc)",
+              "price": 39,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 405,
+              "name": "Happy Birthday Letter Balloon",
+              "price": 159,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 406,
+              "name": "Happy Anniversary Letter Balloon",
+              "price": 159,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 407,
+              "name": "Baby Shower Letter Balloon",
+              "price": 159,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Party Spray N Banners",
+          "dishes": [
+            {
+              "id": 501,
+              "name": "Party Pop",
+              "price": 69,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 502,
+              "name": "Snow Spray",
+              "price": 49,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 503,
+              "name": "Happy Birthday Banner",
+              "price": 79,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 504,
+              "name": "Happy Annivesary Banner",
+              "price": 79,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
