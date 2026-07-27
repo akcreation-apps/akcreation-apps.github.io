@@ -175,6 +175,11 @@ def build_menu(categories: list, starting_id: int = 101) -> dict:
                     ordered["is_offer"] = True
                 ordered["available_time"] = _num_or_empty(d.get("available_time"))
                 ordered["not_available_time"] = _num_or_empty(d.get("not_available_time"))
+                days = d.get("non_available_days")
+                if isinstance(days, list) and days:
+                    cleaned = sorted({int(x) for x in days if str(x).strip() != "" and 0 <= int(x) <= 6})
+                    if cleaned:
+                        ordered["non_available_days"] = cleaned
                 dishes.append(ordered)
 
             if dishes:
@@ -213,6 +218,7 @@ def menu_to_categories(menu_doc: dict) -> list:
                     "is_offer": bool(d.get("is_offer")),
                     "available_time": d.get("available_time", ""),
                     "not_available_time": d.get("not_available_time", ""),
+                    "non_available_days": d.get("non_available_days", []) or [],
                 })
             subs.append({"name": sub.get("name", ""), "type": sub.get("type", ""), "dishes": dishes})
         out.append({"name": cat.get("category", ""), "subcategories": subs})

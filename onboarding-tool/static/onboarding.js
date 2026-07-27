@@ -72,6 +72,20 @@
         line2.appendChild(el('input', { type: 'number', placeholder: 'Not-available time', 'data-field': 'not_available_time', value: (dish && dish.not_available_time !== '' && dish.not_available_time != null ? dish.not_available_time : '') }));
         row.appendChild(line2);
 
+        // Third line: non_available_days — weekday checkboxes (0 = Sun … 6 = Sat).
+        const line3 = el('div', { class: 'dish-line days' });
+        line3.appendChild(el('span', { class: 'days-label' }, 'Closed on:'));
+        const currentDays = new Set(Array.isArray(dish && dish.non_available_days) ? dish.non_available_days.map(Number) : []);
+        const DAYS = [['Sun', 0], ['Mon', 1], ['Tue', 2], ['Wed', 3], ['Thu', 4], ['Fri', 5], ['Sat', 6]];
+        for (const [label, val] of DAYS) {
+            const daylab = el('label', { class: 'inline day-cb' });
+            const cb = el('input', { type: 'checkbox', 'data-field': 'non_available_day', 'data-day': String(val), checked: currentDays.has(val) });
+            daylab.appendChild(cb);
+            daylab.appendChild(document.createTextNode(label));
+            line3.appendChild(daylab);
+        }
+        row.appendChild(line3);
+
         return row;
     }
 
@@ -172,6 +186,11 @@
 
                     dish.available_time = numOrEmpty(row.querySelector('input[data-field=available_time]').value);
                     dish.not_available_time = numOrEmpty(row.querySelector('input[data-field=not_available_time]').value);
+
+                    const dayCbs = row.querySelectorAll('input[data-field=non_available_day]:checked');
+                    if (dayCbs.length) {
+                        dish.non_available_days = Array.from(dayCbs).map(cb => Number(cb.dataset.day)).sort((a, b) => a - b);
+                    }
 
                     dishes.push(dish);
                 }

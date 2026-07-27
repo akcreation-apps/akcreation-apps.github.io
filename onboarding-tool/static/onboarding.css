@@ -219,6 +219,17 @@ body.menu-step .container { max-width: 1080px; }
     padding-top: .45rem;
     border-top: 1px dashed var(--border);
 }
+.dish-line.days {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem .8rem;
+    margin-top: .4rem;
+    padding-top: .4rem;
+    border-top: 1px dashed var(--border);
+}
+.dish-line.days .days-label { font-size: .8rem; color: var(--muted); font-weight: 600; }
+.dish-line.days .day-cb { font-size: .8rem; }
 .dish-line input, .dish-line select { margin-top: 0; padding: .45rem .55rem; font-size: .9rem; }
 .dish-line .id-input { text-align: center; font-weight: 600; color: var(--muted); background: #f6f7fb; }
 .dish-line .name-input { font-weight: 500; }
