@@ -80,6 +80,33 @@ const renderCartItems = () => {
         emptyCartBanner.style.display = 'none';
         cartTotalContainer.style.display = 'block'; // Show total and button
 
+        // Bakery order summary (Event + Name on Cake) at the top of the cart
+        const bakeryEvent = localStorage.getItem(_safeLsKey('bakery_event')) || '';
+        const nameOnCake = (localStorage.getItem(_safeLsKey('bakery_name_on_cake')) || '').trim();
+        const hasCake = cart.some(c => c.category.dish_details.some(d => d.size != null && d.flavour));
+        if (bakeryEvent && hasCake) {
+            const summary = document.createElement('div');
+            summary.className = 'cart-bakery-summary';
+            summary.innerHTML = `
+                <div class="cbs-header">
+                    <i class="fas fa-birthday-cake" aria-hidden="true"></i>
+                    <span>Cake Details</span>
+                </div>
+                <div class="cbs-row"><span class="cbs-label">Event</span><span class="cbs-value">${bakeryEvent}</span></div>
+                <div class="cbs-row"><span class="cbs-label">Name on Cake</span><span class="cbs-value">${nameOnCake || '<em>None</em>'}</span></div>
+                <button type="button" class="cbs-edit" id="cbsEditBtn">
+                    <i class="fas fa-pen" aria-hidden="true"></i> Edit
+                </button>`;
+            cartItemsContainer.appendChild(summary);
+            summary.querySelector('#cbsEditBtn').addEventListener('click', async () => {
+                if (typeof openBakeryOrderPicker === 'function') {
+                    await openBakeryOrderPicker(true);
+                    renderCartItems();
+                    if (typeof updateDeliveryBadge === 'function') updateDeliveryBadge();
+                }
+            });
+        }
+
         // Loop through each category in the cart
         cart.forEach((categoryItem, categoryIndex) => {
             // Loop through each dish in the category
@@ -87,14 +114,22 @@ const renderCartItems = () => {
                 const cartItem = document.createElement('div');
                 cartItem.classList.add('cart-item');
                 const url = get_dish_url(dishItem.name);
+                const isCakeLine = dishItem.size != null && dishItem.flavour;
+                const optionTags = isCakeLine
+                    ? `<div class="cart-item-tags">
+                           <span class="cart-tag"><span class="cart-tag-label">Size</span><span class="cart-tag-value">${dishItem.size} kg</span></span>
+                           <span class="cart-tag"><span class="cart-tag-label">Flavour</span><span class="cart-tag-value">${dishItem.flavour}</span></span>
+                       </div>`
+                    : '';
 
                 cartItem.innerHTML = `
                     <img src="${url}" alt="${dishItem.name}">
                     <div class="cart-item-info">
                         <h5>
                           <span class="cart-diet-badge ${dishItem.type === 'NonVeg' ? 'nonveg' : 'veg'}"></span>
-                          ${dishItem.name} (${categoryItem.category.name})
+                          ${dishItem.name} <span class="cart-item-category">(${categoryItem.category.name})</span>
                         </h5>
+                        ${optionTags}
                         <p class="cart-item-price">₹${dishItem.price.toFixed(0)} <span class="price-x">×</span> ${dishItem.quantity} = <strong>₹${(dishItem.price * dishItem.quantity).toFixed(0)}</strong></p>
                     </div>
                     <div class="cart-item-controls">
@@ -296,6 +331,16 @@ function createOrderMessage(cartItems) {
       now.getMinutes().toString().padStart(2, '0');
     let message = `*${_RESTAURANT.name || 'Order'}*\nHello, I would like to place an order for the following items:\n\n`;
     message += "Ordered ID: "+orderId+"\n\n";
+
+    // Cake details — event is mandatory in the COD flow, name-on-cake is optional
+    const bakeryEvent = localStorage.getItem(_safeLsKey('bakery_event')) || '';
+    const nameOnCake = (localStorage.getItem(_safeLsKey('bakery_name_on_cake')) || '').trim();
+    if (bakeryEvent) {
+        message += "*Cake Details:*\n";
+        message += `  Event: ${bakeryEvent}\n`;
+        message += `  Name on Cake: ${nameOnCake || '(none)'}\n\n`;
+    }
+
     message += "Ordered Items:\n\n";
 
     // Create an object to group items by category
@@ -311,20 +356,28 @@ function createOrderMessage(cartItems) {
 
         // Iterate through the dish details to add dishes to the corresponding category
         item.category.dish_details.forEach(dish => {
-            const dishId = dish.id; // Get the dish name
-            const dishName = dish.type === "NonVeg" ? `${dish.name} (Non-Veg)` : dish.name; // Get the dish name
-            const quantity = dish.quantity; // Get the quantity
-            const price = dish.price; // Get the price
+            const dishId = dish.id;
+            const baseName = dish.type === "NonVeg" ? `${dish.name} (Non-Veg)` : dish.name;
+            // Cakes carry size + flavour; every combo is a separate line in the message
+            const isCakeLine = dish.size != null && dish.flavour;
+            const dishName = isCakeLine
+                ? `${dish.name} (${dish.flavour}, ${dish.size}kg)`
+                : baseName;
+            const quantity = dish.quantity;
+            const price = dish.price;
 
-            // Find if the dish already exists in this category
-            const existingDish = categoryMap[categoryName].find(d => d.id === dishId);
+            // Merge only exact same variant (id + size + flavour). Accessories
+            // fall through with size/flavour undefined and merge by id.
+            const existingDish = categoryMap[categoryName].find(d =>
+                d.id === dishId && d.size === dish.size && d.flavour === dish.flavour);
 
             if (existingDish) {
-                // If it exists, update the quantity
                 existingDish.quantity += quantity;
             } else {
-                // If it doesn't exist, add it to the category
-                categoryMap[categoryName].push({ name: dishName, quantity: quantity, price: price });
+                categoryMap[categoryName].push({
+                    id: dishId, name: dishName, quantity, price,
+                    size: dish.size, flavour: dish.flavour
+                });
             }
         });
     });

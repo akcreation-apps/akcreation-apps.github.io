@@ -681,6 +681,170 @@
             pointer-events: none;
         }
 
+        /* ── Cake config (size + flavour) under the image on cake cards ── */
+        .cake-item .menu-item-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        /* Cake overlay: no bottom item-control inside the image, so drop the
+           reserved 42px bottom padding that leaves an awkward gap below the name */
+        .cake-item .dish-overlay {
+            padding: 14px 8px 10px;
+        }
+        .cake-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding: 8px;
+            background: var(--card);
+        }
+        .cake-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+        .cake-field-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .cake-config select {
+            width: 100%;
+            min-height: 42px;
+            padding: 8px 26px 8px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3e%3cpath fill='%236B6B6B' d='M0 0l5 6 5-6z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        .cake-config select:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 1px;
+            border-color: var(--primary);
+        }
+        @media (min-width: 480px) {
+            .cake-config select { font-size: 0.78rem; min-height: 40px; }
+        }
+
+        /* ADD button sits at the bottom of the cake card, below the selects */
+        .cake-item .cake-add.item-control {
+            position: static;
+            width: 100%;
+            min-height: 44px;
+            margin-top: auto;
+            border-radius: 0 0 var(--r) var(--r);
+            background: var(--primary);
+            border: none;
+        }
+        .cake-item .cake-add.item-control.in-cart {
+            background: #16a34a;
+        }
+        .cake-item .cake-add .add-btn {
+            font-size: 0.82rem;
+            letter-spacing: 0.6px;
+            min-height: 44px;
+        }
+        .cake-item .cake-add .add-btn.unavailable {
+            font-size: 0.72rem;
+        }
+        .cake-item .cake-add .qty-btn {
+            min-height: 44px;
+            font-size: 1.2rem;
+        }
+        .cake-item .cake-add .qty-display {
+            min-width: 32px;
+            font-size: 0.9rem;
+        }
+
+        /* ── Bakery order picker (Event + Name on Cake) ── */
+        .bakery-picker-note {
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin: 4px 0 12px;
+            line-height: 1.35;
+        }
+        .bakery-field { margin-bottom: 14px; }
+        .bakery-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .bakery-required { color: var(--error-clr); margin-left: 2px; }
+        .bakery-input,
+        .bakery-select {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            outline: none;
+        }
+        .bakery-select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 34px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3e%3cpath fill='%236B6B6B' d='M0 0l6 8 6-8z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        .bakery-input:focus-visible,
+        .bakery-select:focus-visible {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+        .bakery-help {
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-top: 4px;
+            font-style: italic;
+        }
+        .bakery-submit {
+            width: 100%;
+            min-height: 46px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: background 0.15s, opacity 0.15s;
+        }
+        .bakery-submit:hover:not([disabled]) { background: #E64A19; }
+        .bakery-submit[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+        /* Delivery strip: second row for event summary */
+        .ds-bakery {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            color: var(--muted);
+            padding-top: 2px;
+        }
+        .ds-bakery strong { color: var(--text); font-weight: 700; }
+
         /* ── Cart badge pop ── */
         @keyframes badgePop {
             0%   { transform: scale(1); }
@@ -1358,6 +1522,47 @@
         }
         .place-other-note i { color: var(--primary, #FF6B35); }
 
+        /* ── Image lightbox (tap cake image to zoom) ── */
+        .img-lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .img-lightbox.open { display: flex; animation: lbFade 0.18s ease; }
+        @keyframes lbFade { from { opacity: 0; } to { opacity: 1; } }
+        .img-lightbox-img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+        }
+        .img-lightbox-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.92);
+            color: #111;
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+        .img-lightbox-close:hover { background: #fff; transform: scale(1.06); }
+
         /* ── Reduced motion ── */
         @media (prefers-reduced-motion: reduce) {
             .refer-btn::after { animation: none; }
@@ -1633,6 +1838,41 @@
                     </p>
                     <p id="placeError" class="place-error" role="alert"></p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bakery order picker: Event (mandatory) + Name on Cake (optional) -->
+    <div class="place-modal-overlay" id="bakeryOrderModal" style="display:none;"
+         role="dialog" aria-modal="true"
+         aria-labelledby="bakeryOrderTitle">
+        <div class="place-modal">
+            <div class="place-modal-handle" aria-hidden="true"></div>
+            <div class="place-modal-body">
+                <div class="place-modal-header">
+                    <div class="place-modal-icon">
+                        <i class="fas fa-birthday-cake" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 id="bakeryOrderTitle">A few cake details</h3>
+                        <p class="place-modal-sub">Tell us what the cake is for.</p>
+                    </div>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="bakeryEventSelect">
+                        Event<span class="bakery-required" aria-hidden="true">*</span>
+                    </label>
+                    <select id="bakeryEventSelect" class="bakery-select" required>
+                        <option value="" disabled selected>Select occasion</option>
+                    </select>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="bakeryNameInput">Name on Cake</label>
+                    <input type="text" id="bakeryNameInput" class="bakery-input"
+                           placeholder="e.g. Anvisha" maxlength="30" autocomplete="off" />
+                    <p class="bakery-help">Leave blank if you want the cake without a name.</p>
+                </div>
+                <button type="button" id="bakerySubmitBtn" class="bakery-submit" disabled>Continue</button>
             </div>
         </div>
     </div>

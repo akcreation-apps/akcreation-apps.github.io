@@ -238,14 +238,88 @@
             flex: 1; min-width: 0;
         }
         .cart-item-info h5 {
-            font-size: 0.8rem; font-weight: 600;
-            margin: 0 0 3px; color: var(--text);
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            display: flex; align-items: center; gap: 4px;
+            font-size: 0.85rem; font-weight: 600;
+            margin: 0 0 4px; color: var(--text);
+            display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+            line-height: 1.3;
+        }
+        .cart-item-category {
+            font-size: 0.7rem; font-weight: 500; color: var(--muted);
+        }
+        .cart-item-tags {
+            display: flex; flex-wrap: wrap; gap: 5px;
+            margin: 4px 0 6px;
+        }
+        .cart-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: rgba(255, 107, 53, 0.08);
+            border: 1px solid rgba(255, 107, 53, 0.28);
+            border-radius: 8px;
+            padding: 2px 8px;
+            font-size: 0.68rem;
+            line-height: 1.35;
+            white-space: nowrap;
+        }
+        .cart-tag-label {
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-size: 0.58rem;
+        }
+        .cart-tag-value {
+            font-weight: 600; color: var(--text);
         }
         .cart-item-price {
             font-size: 0.73rem; color: var(--primary);
             font-weight: 600; margin: 0;
+        }
+
+        /* Bakery order summary (Event + Name on Cake) */
+        .cart-bakery-summary {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255,107,53,0.06), rgba(255,107,53,0.02));
+            border: 1px solid rgba(255,107,53,0.28);
+            border-radius: 12px;
+            padding: 12px 14px 14px;
+            margin-bottom: 12px;
+        }
+        .cart-bakery-summary .cbs-header {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.78rem; font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.6px;
+            margin-bottom: 8px;
+        }
+        .cart-bakery-summary .cbs-header i { font-size: 0.9rem; }
+        .cart-bakery-summary .cbs-row {
+            display: flex; justify-content: space-between; gap: 12px;
+            padding: 4px 0;
+            font-size: 0.82rem;
+        }
+        .cart-bakery-summary .cbs-row + .cbs-row {
+            border-top: 1px dashed rgba(255,107,53,0.18);
+        }
+        .cart-bakery-summary .cbs-label {
+            color: var(--muted); font-weight: 500;
+        }
+        .cart-bakery-summary .cbs-value {
+            color: var(--text); font-weight: 700; text-align: right;
+            max-width: 60%; overflow-wrap: anywhere;
+        }
+        .cart-bakery-summary .cbs-value em {
+            color: var(--muted); font-style: italic; font-weight: 500;
+        }
+        .cart-bakery-summary .cbs-edit {
+            position: absolute; top: 10px; right: 10px;
+            background: transparent; border: none;
+            color: var(--primary); font-weight: 600; cursor: pointer;
+            font-size: 0.72rem; font-family: 'Poppins', sans-serif;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 8px; border-radius: 6px;
+        }
+        .cart-bakery-summary .cbs-edit:hover {
+            background: rgba(255,107,53,0.1);
         }
 
         /* FSSAI diet badge — matches menu page */
@@ -615,6 +689,44 @@
         .place-other-note { margin-top: 8px; font-size: 0.78rem; color: var(--text-muted, #6b7280); font-style: italic; display: flex; align-items: center; gap: 6px; line-height: 1.35; }
         .place-other-note i { color: var(--primary, #FF6B35); }
 
+        /* ── Bakery order picker (Event + Name on Cake) ── */
+        .bakery-field { margin-bottom: 14px; padding: 0 20px; }
+        .bakery-label {
+            display: block; font-size: 0.78rem; font-weight: 600;
+            color: var(--text); margin-bottom: 6px;
+        }
+        .bakery-required { color: var(--error-clr); margin-left: 2px; }
+        .bakery-input, .bakery-select {
+            width: 100%; min-height: 44px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border); border-radius: 10px;
+            background: var(--bg); color: var(--text);
+            font-family: 'Poppins', sans-serif; font-size: 0.88rem;
+            outline: none;
+        }
+        .bakery-select {
+            appearance: none; -webkit-appearance: none;
+            padding-right: 34px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3e%3cpath fill='%236B6B6B' d='M0 0l6 8 6-8z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 12px center;
+        }
+        .bakery-input:focus-visible, .bakery-select:focus-visible {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+        .bakery-help { font-size: 0.7rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+        .bakery-submit {
+            width: calc(100% - 40px); margin: 4px 20px 0;
+            min-height: 46px;
+            background: var(--primary); color: #fff; border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem; font-weight: 700; cursor: pointer;
+            transition: background 0.15s, opacity 0.15s;
+        }
+        .bakery-submit:hover:not([disabled]) { background: #E64A19; }
+        .bakery-submit[disabled] { opacity: 0.5; cursor: not-allowed; }
+
         /* ── Screen reader only ── */
         .sr-only {
             position: absolute;
@@ -797,6 +909,41 @@
                     </p>
                     <p id="placeError" class="place-error" role="alert"></p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bakery order picker: Event (mandatory) + Name on Cake (optional) -->
+    <div class="place-modal-overlay" id="bakeryOrderModal" style="display:none;"
+         role="dialog" aria-modal="true"
+         aria-labelledby="bakeryOrderTitle">
+        <div class="place-modal">
+            <div class="place-modal-handle" aria-hidden="true"></div>
+            <div class="place-modal-body">
+                <div class="place-modal-header">
+                    <div class="place-modal-icon">
+                        <i class="fas fa-birthday-cake" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 id="bakeryOrderTitle">A few cake details</h3>
+                        <p class="place-modal-sub">Tell us what the cake is for.</p>
+                    </div>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="bakeryEventSelect">
+                        Event<span class="bakery-required" aria-hidden="true">*</span>
+                    </label>
+                    <select id="bakeryEventSelect" class="bakery-select" required>
+                        <option value="" disabled selected>Select occasion</option>
+                    </select>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="bakeryNameInput">Name on Cake</label>
+                    <input type="text" id="bakeryNameInput" class="bakery-input"
+                           placeholder="e.g. Anvisha" maxlength="30" autocomplete="off" />
+                    <p class="bakery-help">Leave blank if you want the cake without a name.</p>
+                </div>
+                <button type="button" id="bakerySubmitBtn" class="bakery-submit" disabled>Continue</button>
             </div>
         </div>
     </div>

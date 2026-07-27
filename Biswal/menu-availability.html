@@ -705,7 +705,7 @@
     async function init() {
       try {
         const [menuRes, adminData] = await Promise.all([
-          fetch('data.json').then(r => r.json()),
+          fetch('biswal_data.json').then(r => r.json()),
           fetchAdminData()
         ]);
 

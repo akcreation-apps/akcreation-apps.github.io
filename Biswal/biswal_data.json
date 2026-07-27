@@ -13,7 +13,7 @@
           "dishes": [
             {
               "id": 101,
-              "name": "Pink Rose",
+              "name": "Blue Garden",
               "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
               "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
               "available_time": "",
@@ -38,8 +38,8 @@
             {
               "id": 104,
               "name": "Pinky Choco",
-              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
-              "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "cake_size_list": "[1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[439, 639, 839, 1239, 1639, 2039]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -165,6 +165,30 @@
               "name": "Yellow Picks",
               "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
               "cake_price_list": "[219, 439, 639, 839, 1239, 1639, 2039]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 210,
+              "name": "Choco Forest",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[269, 489, 689, 889, 1289, 1689, 2089]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 211,
+              "name": "Choco Forest",
+              "cake_size_list": "[.5, 1, 1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[269, 489, 689, 889, 1289, 1689, 2089]",
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 211,
+              "name": "Choco Woco",
+              "cake_size_list": "[1.5, 2, 3, 4, 5]",
+              "cake_price_list": "[639, 839, 1239, 1639, 2039]",
               "available_time": "",
               "not_available_time": ""
             }

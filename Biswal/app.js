@@ -79,6 +79,60 @@ const updateCartCount = () => {
 
 
 
+// Cakes ship in multiple sizes/flavours — each (id, size, flavour) combo is
+// a distinct cart line, so accessory items (which have no size/flavour) don't
+// need to share dish.id space with cake variants.
+const isCake = (dish) => typeof dish.cake_size_list === 'string';
+
+const getCakeQty = (categoryName, dishId, size, flavour) => {
+    const cat = cart.find(item => item.category.name === categoryName);
+    if (!cat) return 0;
+    const d = cat.category.dish_details.find(x =>
+        x.id === dishId && x.size === size && x.flavour === flavour);
+    return d ? d.quantity : 0;
+};
+
+const updateCakeQty = (subcategory, dish, size, flavour, unitPrice, delta) => {
+    const match = (d) => d.id === dish.id && d.size === size && d.flavour === flavour;
+    let existingCategory = cart.find(item => item.category.name === subcategory.name);
+    if (existingCategory) {
+        const existingDish = existingCategory.category.dish_details.find(match);
+        if (existingDish) {
+            existingDish.quantity += delta;
+            existingDish.price = unitPrice;
+            if (existingDish.quantity <= 0) {
+                existingCategory.category.dish_details =
+                    existingCategory.category.dish_details.filter(d => !match(d));
+                if (existingCategory.category.dish_details.length === 0) {
+                    cart.splice(cart.indexOf(existingCategory), 1);
+                }
+            }
+        } else if (delta > 0) {
+            existingCategory.category.dish_details.push({
+                id: dish.id, name: dish.name, type: subcategory.type || '',
+                price: unitPrice, quantity: 1, image_src: get_dish_url(dish.name),
+                size, flavour
+            });
+        }
+    } else if (delta > 0) {
+        cart.push({
+            category: {
+                name: subcategory.name,
+                dish_details: [{
+                    id: dish.id, name: dish.name, type: subcategory.type || '',
+                    price: unitPrice, quantity: 1, image_src: get_dish_url(dish.name),
+                    size, flavour
+                }]
+            }
+        });
+    }
+    localStorage.setItem(lsKey('cart'), JSON.stringify(cart));
+    updateCartCount();
+};
+
+const addCakeToCart = (subcategory, dish, size, flavour, unitPrice) =>
+    updateCakeQty(subcategory, dish, size, flavour, unitPrice, 1);
+
 // Mutates cart quantity by delta (+1 / -1); removes dish/category when qty hits 0
 const updateItemQty = (subcategory, dish, delta) => {
     const existingCategory = cart.find(item => item.category.name === subcategory.name);
@@ -349,8 +403,149 @@ document.addEventListener('DOMContentLoaded', async() => {
         return true;
     };
 
+    // Permissive parse — cake_size_list values like ".5" aren't strict JSON,
+    // so JSON.parse rejects them. Data is trusted local content.
+    const parseNumArray = (s) => {
+        try { return Function('"use strict";return (' + s + ')')(); }
+        catch (e) { console.warn('parseNumArray failed for', s, e); return []; }
+    };
+
+    // Cake card — size + flavour selects sit below the image, price updates live,
+    // and every "+ ADD" click pushes the current combo as a distinct cart line.
+    const buildCakeCard = (dish, subcategory) => {
+        const sizes = parseNumArray(dish.cake_size_list);
+        const prices = parseNumArray(dish.cake_price_list);
+        const unavailableNote = computeUnavailableNote(dish);
+        const menuItem = document.createElement('div');
+        menuItem.classList.add('menu-item', 'cake-item');
+        if (unavailableNote) menuItem.classList.add('unavailable');
+        menuItem.setAttribute('role', 'article');
+        menuItem.setAttribute('aria-label', `${dish.name} — from ₹${prices[0]}`);
+        const url = get_dish_url(dish.name);
+
+        menuItem.innerHTML = `
+          <div class="menu-item-container">
+                <div class="dish-card">
+                    <img src="${url}" alt="${dish.name}" class="dish-img">
+                    ${bestsellerNames.has(dish.name) ? '<span class="bestseller-badge">🔥 Bestseller</span>' : ''}
+                    <div class="dish-overlay">
+                        <h5 class="dish-name">${dish.name}</h5>
+                        <p class="price"><span class="cake-price">₹${prices[0].toFixed(0)}/-</span></p>
+                    </div>
+                </div>
+                <div class="cake-config">
+                    <label class="cake-field">
+                        <span class="cake-field-label">Size</span>
+                        <select class="cake-size" aria-label="Size for ${dish.name}">
+                            ${sizes.map((s, i) => `<option value="${i}">${s} kg</option>`).join('')}
+                        </select>
+                    </label>
+                    <label class="cake-field">
+                        <span class="cake-field-label">Flavour</span>
+                        <select class="cake-flavour" aria-label="Flavour for ${dish.name}">
+                            ${BAKERY_FLAVOURS.map(f => `<option value="${f}">${f}</option>`).join('')}
+                        </select>
+                    </label>
+                </div>
+                <div class="item-control cake-add"></div>
+          </div>
+        `;
+
+        const sizeSel = menuItem.querySelector('.cake-size');
+        const flavourSel = menuItem.querySelector('.cake-flavour');
+        const priceEl = menuItem.querySelector('.cake-price');
+        const control = menuItem.querySelector('.cake-add');
+
+        // Tap image / name / price → open large preview. Overlay covers the
+        // lower half of the image on small screens, so wiring the whole card
+        // (image + overlay text) keeps the tap target big and thumb-friendly.
+        const dishCard = menuItem.querySelector('.dish-card');
+        if (dishCard) {
+            dishCard.style.cursor = 'zoom-in';
+            dishCard.setAttribute('role', 'button');
+            dishCard.setAttribute('tabindex', '0');
+            dishCard.setAttribute('aria-label', `View larger image of ${dish.name}`);
+            const openLb = (e) => {
+                e.stopPropagation();
+                openImageLightbox(url, dish.name);
+            };
+            dishCard.addEventListener('click', openLb);
+            dishCard.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(e); }
+            });
+        }
+
+        // Read current selection into a shared holder so all renders agree
+        const getSelection = () => {
+            const idx = parseInt(sizeSel.value, 10);
+            return { idx, size: sizes[idx], flavour: flavourSel.value, unitPrice: prices[idx] };
+        };
+
+        const renderCakeControl = (announce = false) => {
+            if (unavailableNote) {
+                control.classList.add('unavailable');
+                control.classList.remove('in-cart');
+                control.innerHTML = `<span class="add-btn unavailable">🕒 ${unavailableNote}</span>`;
+                return;
+            }
+            const { size, flavour, unitPrice } = getSelection();
+            const qty = getCakeQty(subcategory.name, dish.id, size, flavour);
+            control.classList.toggle('in-cart', qty > 0);
+            if (announce) announceCart(`${dish.name} (${flavour}, ${size}kg)`, qty);
+            if (qty === 0) {
+                control.innerHTML = `<button type="button" class="add-btn" aria-label="Add ${dish.name} to cart">+ ADD</button>`;
+                control.querySelector('.add-btn').addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    const sel = getSelection();
+                    try {
+                        updateCakeQty(subcategory, dish, sel.size, sel.flavour, sel.unitPrice, 1);
+                        popCartBadge();
+                        renderCakeControl(true);
+                    } catch (err) { console.error('[Biswal] add failed:', err); }
+                });
+            } else {
+                control.innerHTML = `
+                    <div class="qty-stepper" role="group" aria-label="Quantity for ${dish.name} (${flavour}, ${size}kg)">
+                        <button type="button" class="qty-btn" aria-label="Remove one">&#8722;</button>
+                        <span class="qty-display" aria-live="polite" aria-atomic="true">${qty}</span>
+                        <button type="button" class="qty-btn" aria-label="Add one more">+</button>
+                    </div>`;
+                const [decBtn, incBtn] = control.querySelectorAll('.qty-btn');
+                decBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    const sel = getSelection();
+                    try {
+                        updateCakeQty(subcategory, dish, sel.size, sel.flavour, sel.unitPrice, -1);
+                        popCartBadge();
+                        renderCakeControl(true);
+                    } catch (err) { console.error('[Biswal] decrement failed:', err); }
+                });
+                incBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    const sel = getSelection();
+                    try {
+                        updateCakeQty(subcategory, dish, sel.size, sel.flavour, sel.unitPrice, 1);
+                        popCartBadge();
+                        renderCakeControl(true);
+                    } catch (err) { console.error('[Biswal] increment failed:', err); }
+                });
+            }
+        };
+
+        sizeSel.addEventListener('change', () => {
+            const { idx } = getSelection();
+            priceEl.textContent = `₹${prices[idx].toFixed(0)}/-`;
+            renderCakeControl(false);
+        });
+        flavourSel.addEventListener('change', () => renderCakeControl(false));
+
+        renderCakeControl(false);
+        return menuItem;
+    };
+
     // Build a single dish card DOM node — shared between the Offers section and the regular menu
     const buildDishCard = (dish, subcategory) => {
+        if (isCake(dish)) return buildCakeCard(dish, subcategory);
         const unavailableNote = computeUnavailableNote(dish);
         const menuItem = document.createElement('div');
         menuItem.classList.add('menu-item');
@@ -437,7 +632,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
     const renderMenu = () => {
         menuContainer.innerHTML = ''; // Clear previous content
-        fetch(`data.json?v=${new Date().getTime()}`)
+        fetch(`biswal_data.json?v=${new Date().getTime()}`)
             .then(response => response.json())
             .then(data => {
                 // Reset shortcuts

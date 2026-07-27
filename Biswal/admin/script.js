@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load access control data from external JSON file
     function loadAccessControlData() {
-        fetch(`../data.json?v=${new Date().getTime()}`) // Ensure the path to your JSON file is correct
+        fetch(`../biswal_data.json?v=${new Date().getTime()}`) // Ensure the path to your JSON file is correct
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load data');

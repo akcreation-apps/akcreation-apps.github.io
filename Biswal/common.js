@@ -1,6 +1,6 @@
 function get_dish_url(dish_name) {
     // Split the string into words by spaces, then join with an underscore
-    return '../food_src/'+dish_name.split(' ').join('_')+'.webp';
+    return 'src/'+dish_name.split(' ').join('_')+'.webp';
 }
 
 async function get_credentials() {
@@ -209,10 +209,71 @@ function openPlacePicker(currentPlace = '', title = 'Where are you ordering from
     });
 }
 
+// Bakery order picker — mandatory Event dropdown + optional Name-on-Cake input.
+// Non-dismissible: Continue stays disabled until Event is chosen. Only shown
+// once per session; use openBakeryOrderPicker(true) to force-reopen (edit flow).
+function openBakeryOrderPicker(dismissible = false) {
+    return new Promise(resolve => {
+        const modal = document.getElementById('bakeryOrderModal');
+        if (!modal) { resolve(null); return; }
+        const eventSel = document.getElementById('bakeryEventSelect');
+        const nameInput = document.getElementById('bakeryNameInput');
+        const submitBtn = document.getElementById('bakerySubmitBtn');
+
+        // Populate events (alphabetical) — clear old options after the placeholder
+        while (eventSel.options.length > 1) eventSel.remove(1);
+        (typeof BAKERY_EVENTS !== 'undefined' ? BAKERY_EVENTS : []).forEach(evt => {
+            const opt = document.createElement('option');
+            opt.value = evt; opt.textContent = evt;
+            eventSel.appendChild(opt);
+        });
+
+        // Prefill from existing storage (edit flow)
+        const savedEvent = localStorage.getItem(lsKey('bakery_event')) || '';
+        const savedName = localStorage.getItem(lsKey('bakery_name_on_cake')) || '';
+        eventSel.value = savedEvent || '';
+        nameInput.value = savedName;
+        submitBtn.disabled = !eventSel.value;
+
+        modal.style.display = 'flex';
+        setTimeout(() => eventSel.focus(), 30);
+
+        const ac = new AbortController();
+        const sig = { signal: ac.signal };
+
+        function close(result) {
+            modal.style.display = 'none';
+            ac.abort();
+            resolve(result);
+        }
+
+        eventSel.addEventListener('change', () => {
+            submitBtn.disabled = !eventSel.value;
+        }, sig);
+
+        submitBtn.addEventListener('click', () => {
+            if (!eventSel.value) { eventSel.focus(); return; }
+            localStorage.setItem(lsKey('bakery_event'), eventSel.value);
+            localStorage.setItem(lsKey('bakery_name_on_cake'), nameInput.value.trim());
+            close(eventSel.value);
+        }, sig);
+
+        modal.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && dismissible) { e.preventDefault(); close(null); }
+        }, sig);
+
+        if (dismissible) {
+            modal.addEventListener('click', e => {
+                if (e.target === modal) close(null);
+            }, sig);
+        }
+    });
+}
+
 function checkAndAskPlace() {
     const table = localStorage.getItem(lsKey('table'));
     const place = localStorage.getItem(lsKey('place'));
-    if (!table || place) return Promise.resolve();
+    if (!table) return Promise.resolve();
 
     if (/^\d+$/.test(table)) {
         localStorage.setItem(lsKey('place'), 'Dine-In');
@@ -220,8 +281,20 @@ function checkAndAskPlace() {
         return Promise.resolve();
     }
 
+    // COD path — need place, then bakery event details
+    const needsPlace = !place;
+    const needsBakery = !localStorage.getItem(lsKey('bakery_event'));
+    if (!needsPlace && !needsBakery) return Promise.resolve();
+
     hideLoader();
-    return openPlacePicker('', 'Where are you ordering from?', false).then(() => { showLoader(); });
+    let chain = Promise.resolve();
+    if (needsPlace) {
+        chain = chain.then(() => openPlacePicker('', 'Where are you ordering from?', false));
+    }
+    if (needsBakery) {
+        chain = chain.then(() => openBakeryOrderPicker(false));
+    }
+    return chain.then(() => { showLoader(); });
 }
 
 function updateDeliveryBadge() {
@@ -230,6 +303,18 @@ function updateDeliveryBadge() {
     const strip = document.getElementById('deliveryStrip');
     if (!strip || !place || !table) return;
     const isDineIn = place === 'Dine-In';
+    const bakeryEvent = localStorage.getItem(lsKey('bakery_event')) || '';
+    const nameOnCake = localStorage.getItem(lsKey('bakery_name_on_cake')) || '';
+
+    const bakeryRow = (!isDineIn && bakeryEvent)
+        ? `<div class="ds-bakery">
+             <i class="fas fa-birthday-cake ds-icon" aria-hidden="true"></i>
+             <span><strong>${bakeryEvent}</strong>${nameOnCake ? ` · ${nameOnCake}` : ''}</span>
+             <button class="ds-change" id="dsBakeryChangeBtn" aria-label="Change event / name on cake">
+                 Edit <i class="fas fa-pen" style="font-size:0.55rem" aria-hidden="true"></i>
+             </button>
+           </div>`
+        : '';
 
     strip.innerHTML = `<div class="delivery-strip-inner">
         <i class="fas ${isDineIn ? 'fa-utensils' : 'fa-map-marker-alt'} ds-icon" aria-hidden="true"></i>
@@ -241,7 +326,7 @@ function updateDeliveryBadge() {
                    Change <i class="fas fa-pen" style="font-size:0.55rem" aria-hidden="true"></i>
                </button>`
         }
-    </div>`;
+    </div>${bakeryRow}`;
     strip.style.display = 'block';
 
     document.getElementById('dsChangeBtn')?.addEventListener('click', async function() {
@@ -249,6 +334,44 @@ function updateDeliveryBadge() {
         await openPlacePicker(current, 'Change delivery location', true, this);
         updateDeliveryBadge();
     });
+    document.getElementById('dsBakeryChangeBtn')?.addEventListener('click', async function() {
+        await openBakeryOrderPicker(true);
+        updateDeliveryBadge();
+    });
+}
+
+// Full-screen image preview for cake designs. Lightbox element is created
+// lazily on first call so index.html doesn't need extra markup.
+function openImageLightbox(imgUrl, altText) {
+    let lb = document.getElementById('imgLightbox');
+    if (!lb) {
+        lb = document.createElement('div');
+        lb.id = 'imgLightbox';
+        lb.className = 'img-lightbox';
+        lb.setAttribute('role', 'dialog');
+        lb.setAttribute('aria-modal', 'true');
+        lb.setAttribute('aria-label', 'Cake image preview');
+        lb.innerHTML = `
+            <button type="button" class="img-lightbox-close" aria-label="Close preview">&times;</button>
+            <img class="img-lightbox-img" alt="" />
+        `;
+        document.body.appendChild(lb);
+        const close = () => {
+            lb.classList.remove('open');
+            document.body.style.overflow = '';
+        };
+        lb.addEventListener('click', (e) => {
+            if (e.target === lb || e.target.classList.contains('img-lightbox-close')) close();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lb.classList.contains('open')) close();
+        });
+    }
+    const imgEl = lb.querySelector('.img-lightbox-img');
+    imgEl.src = imgUrl;
+    imgEl.alt = altText || '';
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
 }
 
 function redirect_to_home(){
