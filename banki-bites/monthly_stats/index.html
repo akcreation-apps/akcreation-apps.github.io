@@ -313,6 +313,14 @@
                 <select class="custom-select" id="c_month"></select>
               </div>
               <div class="form-group">
+                <label for="c_position">Position <span style="color:var(--bb-orange)">*</span></label>
+                <select class="custom-select" id="c_position" required>
+                  <option value="🥇 Food Champion" selected>🥇 Food Champion (1st)</option>
+                  <option value="🥈 Gold Foodie">🥈 Gold Foodie (2nd)</option>
+                  <option value="🥉 Silver Foodie">🥉 Silver Foodie (3rd)</option>
+                </select>
+              </div>
+              <div class="form-group">
                 <label for="c_name">Customer Name <span style="color:var(--bb-orange)">*</span></label>
                 <input type="text" class="form-control" id="c_name" placeholder="e.g. Pupun" required>
               </div>
@@ -604,8 +612,11 @@ Rules:
 
   function buildCustomerPrompt() {
     const month = val('c_month');
+    const position = val('c_position'); // e.g. "🥇 Food Champion"
+    const rankLabel = position.replace(/^\S+\s*/, '').trim(); // "Food Champion"
+    const rankMedal = (position.match(/^\S+/) || [''])[0];    // "🥇"
     return (
-`Design a premium, celebratory "Star Customer of the Month" award poster (portrait, 1080x1350, 300 DPI) for BankiBites, presented to "${val('c_name')}" for ${month}.
+`Design a premium, celebratory "Star Customer of the Month" award poster (portrait, 1080x1350, 300 DPI) for BankiBites, presented to "${val('c_name')}" for ${month}. This customer's rank this month is "${position}" (${rankLabel}), signalled by the ${rankMedal} medal.
 
 Reference vibe:
 A luxurious dark award certificate that feels like Spotify Wrapped meets a food-delivery brand campaign — dramatic dark background, glowing orange accents, confetti sparkles, cinematic depth. Warm, personal, share-worthy on Instagram / WhatsApp status.
@@ -625,6 +636,7 @@ Typography:
 - Section title "STAR CUSTOMER" — huge, bold sans (Poppins/Inter 900), white, tightly stacked with "CUSTOMER" much larger than "STAR" (like the reference). Above it: a small laurel-wreath + star crest icon in gold.
 - "OF THE MONTH" — smaller, orange, uppercase, letter-spaced.
 - Month ribbon: horizontal orange banner-ribbon with folded edges, containing the month "${month}" in bold white uppercase, with a small star on each side.
+- Rank badge: a bold circular medallion showing the ${rankMedal} medal at large size, with the rank label "${rankLabel}" set in uppercase Poppins/Inter 900 orange letter-spaced text right beside or beneath it.
 - "PRESENTED TO" — small uppercase orange label.
 - Customer name "${val('c_name')}" — very large, HANDWRITTEN CURSIVE script font (Pacifico / Great Vibes), pure white, slight glow.
 - "Powered by BankiBites" — centered, medium weight, with "BankiBites" in orange.
@@ -632,7 +644,7 @@ Typography:
 Layout (top → bottom):
 1. Top-left: BankiBites logo badge inside a soft circular orange glow.
 2. Top-right area: the 3D delivery-rider character on the scooter, angled slightly toward the center, giving a thumbs-up.
-3. Center hero (occupying upper third): laurel + star crest, "STAR CUSTOMER OF THE MONTH" stacked title, orange month ribbon "${month}", "PRESENTED TO", cursive customer name "${val('c_name')}", ornamental divider, then "Powered by BankiBites".
+3. Center hero (occupying upper third): laurel + star crest, "STAR CUSTOMER OF THE MONTH" stacked title, orange month ribbon "${month}", the ${rankMedal} rank medallion with "${rankLabel}" uppercase-orange caption directly beneath the month ribbon, "PRESENTED TO", cursive customer name "${val('c_name')}", ornamental divider, then "Powered by BankiBites".
 4. KPI grid (2 columns × 2 rows) of rounded dark cards (#161620, 1px subtle orange border, soft inner glow). Each card has a large orange line icon on the LEFT and a stacked (label + value) on the RIGHT. Cards:
    • Icon: shopping-bag with a smile — Label "TOTAL ORDERS" — Value "${num('c_orders')}"
    • Icon: discount tag with % — Label "DISCOUNT RECEIVED" — Value "₹${num('c_discount')}/-"
@@ -799,6 +811,7 @@ Rules:
   document.getElementById('c_reset').addEventListener('click', () => {
     document.getElementById('customerForm').reset();
     document.getElementById('c_month').value = currentMonth;
+    document.getElementById('c_position').value = '🥇 Food Champion';
     refreshCustomer();
   });
   document.getElementById('tc_reset').addEventListener('click', () => {
