@@ -367,14 +367,14 @@
             {
               "id": 901,
               "name": "Margarita(small)",
-              "price": 119,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 902,
               "name": "Margarita(medium)",
-              "price": 239,
+              "price": 259,
               "available_time": "",
               "not_available_time": ""
             },
@@ -409,7 +409,7 @@
             {
               "id": 907,
               "name": "Margarita(large)",
-              "price": 339,
+              "price": 359,
               "available_time": "",
               "not_available_time": ""
             },
