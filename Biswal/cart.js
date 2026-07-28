@@ -89,14 +89,16 @@ const renderCartItems = () => {
             summary.className = 'cart-bakery-summary';
             summary.innerHTML = `
                 <div class="cbs-header">
-                    <i class="fas fa-birthday-cake" aria-hidden="true"></i>
-                    <span>Cake Details</span>
+                    <span class="cbs-header-title">
+                        <i class="fas fa-birthday-cake" aria-hidden="true"></i>
+                        <span>Cake Details</span>
+                    </span>
+                    <button type="button" class="cbs-edit" id="cbsEditBtn">
+                        <i class="fas fa-pen" aria-hidden="true"></i> Edit
+                    </button>
                 </div>
                 <div class="cbs-row"><span class="cbs-label">Event</span><span class="cbs-value">${bakeryEvent}</span></div>
-                <div class="cbs-row"><span class="cbs-label">Name on Cake</span><span class="cbs-value">${nameOnCake || '<em>None</em>'}</span></div>
-                <button type="button" class="cbs-edit" id="cbsEditBtn">
-                    <i class="fas fa-pen" aria-hidden="true"></i> Edit
-                </button>`;
+                <div class="cbs-row"><span class="cbs-label">Name on Cake</span><span class="cbs-value">${nameOnCake || '<em>None</em>'}</span></div>`;
             cartItemsContainer.appendChild(summary);
             summary.querySelector('#cbsEditBtn').addEventListener('click', async () => {
                 if (typeof openBakeryOrderPicker === 'function') {

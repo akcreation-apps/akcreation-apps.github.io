@@ -277,7 +277,6 @@
 
         /* Bakery order summary (Event + Name on Cake) */
         .cart-bakery-summary {
-            position: relative;
             background: linear-gradient(135deg, rgba(255,107,53,0.06), rgba(255,107,53,0.02));
             border: 1px solid rgba(255,107,53,0.28);
             border-radius: 12px;
@@ -285,11 +284,16 @@
             margin-bottom: 12px;
         }
         .cart-bakery-summary .cbs-header {
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .cart-bakery-summary .cbs-header-title {
+            display: inline-flex; align-items: center; gap: 8px;
             font-size: 0.78rem; font-weight: 700;
             color: var(--primary);
             text-transform: uppercase; letter-spacing: 0.6px;
-            margin-bottom: 8px;
+            min-width: 0;
         }
         .cart-bakery-summary .cbs-header i { font-size: 0.9rem; }
         .cart-bakery-summary .cbs-row {
@@ -301,22 +305,22 @@
             border-top: 1px dashed rgba(255,107,53,0.18);
         }
         .cart-bakery-summary .cbs-label {
-            color: var(--muted); font-weight: 500;
+            color: var(--muted); font-weight: 500; flex-shrink: 0;
         }
         .cart-bakery-summary .cbs-value {
             color: var(--text); font-weight: 700; text-align: right;
-            max-width: 60%; overflow-wrap: anywhere;
+            min-width: 0; flex: 1; overflow-wrap: anywhere;
         }
         .cart-bakery-summary .cbs-value em {
             color: var(--muted); font-style: italic; font-weight: 500;
         }
         .cart-bakery-summary .cbs-edit {
-            position: absolute; top: 10px; right: 10px;
-            background: transparent; border: none;
+            background: transparent; border: 1px solid rgba(255,107,53,0.28);
             color: var(--primary); font-weight: 600; cursor: pointer;
-            font-size: 0.72rem; font-family: 'Poppins', sans-serif;
+            font-size: 0.7rem; font-family: 'Poppins', sans-serif;
             display: inline-flex; align-items: center; gap: 4px;
-            padding: 4px 8px; border-radius: 6px;
+            padding: 4px 10px; border-radius: 999px;
+            flex-shrink: 0;
         }
         .cart-bakery-summary .cbs-edit:hover {
             background: rgba(255,107,53,0.1);

@@ -222,18 +222,53 @@ function openBakeryOrderPicker(dismissible = false) {
 
         // Populate events (alphabetical) — clear old options after the placeholder
         while (eventSel.options.length > 1) eventSel.remove(1);
-        (typeof BAKERY_EVENTS !== 'undefined' ? BAKERY_EVENTS : []).forEach(evt => {
+        const events = (typeof BAKERY_EVENTS !== 'undefined' ? BAKERY_EVENTS : []);
+        events.forEach(evt => {
             const opt = document.createElement('option');
             opt.value = evt; opt.textContent = evt;
             eventSel.appendChild(opt);
         });
+        // Append "Other" so users can type an unlisted occasion
+        const otherOpt = document.createElement('option');
+        otherOpt.value = '__other__'; otherOpt.textContent = 'Other (specify)';
+        eventSel.appendChild(otherOpt);
 
-        // Prefill from existing storage (edit flow)
+        // Inject the custom-event input just under the select (idempotent)
+        const eventField = eventSel.closest('.bakery-field');
+        let otherInput = document.getElementById('bakeryEventOtherInput');
+        if (!otherInput) {
+            otherInput = document.createElement('input');
+            otherInput.type = 'text';
+            otherInput.id = 'bakeryEventOtherInput';
+            otherInput.className = 'bakery-input';
+            otherInput.placeholder = 'Type your occasion…';
+            otherInput.maxLength = 40;
+            otherInput.autocomplete = 'off';
+            otherInput.style.marginTop = '8px';
+            otherInput.style.display = 'none';
+            eventField.appendChild(otherInput);
+        }
+
+        // Prefill from existing storage (edit flow). If saved value isn't in the
+        // canonical list, drive the picker into the "Other" branch and prefill.
         const savedEvent = localStorage.getItem(lsKey('bakery_event')) || '';
         const savedName = localStorage.getItem(lsKey('bakery_name_on_cake')) || '';
-        eventSel.value = savedEvent || '';
+        const isKnown = events.includes(savedEvent);
+        if (savedEvent && !isKnown) {
+            eventSel.value = '__other__';
+            otherInput.value = savedEvent;
+            otherInput.style.display = '';
+        } else {
+            eventSel.value = savedEvent || '';
+            otherInput.value = '';
+            otherInput.style.display = 'none';
+        }
         nameInput.value = savedName;
-        submitBtn.disabled = !eventSel.value;
+
+        const currentEventValue = () =>
+            eventSel.value === '__other__' ? otherInput.value.trim() : eventSel.value;
+        const refreshSubmit = () => { submitBtn.disabled = !currentEventValue(); };
+        refreshSubmit();
 
         modal.style.display = 'flex';
         setTimeout(() => eventSel.focus(), 30);
@@ -248,14 +283,27 @@ function openBakeryOrderPicker(dismissible = false) {
         }
 
         eventSel.addEventListener('change', () => {
-            submitBtn.disabled = !eventSel.value;
+            if (eventSel.value === '__other__') {
+                otherInput.style.display = '';
+                setTimeout(() => otherInput.focus(), 30);
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.value = '';
+            }
+            refreshSubmit();
         }, sig);
 
+        otherInput.addEventListener('input', refreshSubmit, sig);
+
         submitBtn.addEventListener('click', () => {
-            if (!eventSel.value) { eventSel.focus(); return; }
-            localStorage.setItem(lsKey('bakery_event'), eventSel.value);
+            const value = currentEventValue();
+            if (!value) {
+                (eventSel.value === '__other__' ? otherInput : eventSel).focus();
+                return;
+            }
+            localStorage.setItem(lsKey('bakery_event'), value);
             localStorage.setItem(lsKey('bakery_name_on_cake'), nameInput.value.trim());
-            close(eventSel.value);
+            close(value);
         }, sig);
 
         modal.addEventListener('keydown', e => {
