@@ -126,8 +126,8 @@ function createOrderElement(order, order_id) {
                 ${cat.category.dish_details.map(dish => `
                     <div class="dish-item">
                         <span class="dish-name">
-                            ${dish.size != null && dish.flavour
-                                ? `${dish.name} (${dish.flavour}, ${dish.size}kg)`
+                            ${dish.size != null
+                                ? `${dish.name} (${dish.flavour ? dish.flavour + ', ' : ''}${dish.size}kg)`
                                 : (dish.type === "NonVeg" ? dish.name + " (Non-Veg)" : dish.name)}
                         </span>
                         <span>₹${dish.price} x ${dish.quantity}</span>

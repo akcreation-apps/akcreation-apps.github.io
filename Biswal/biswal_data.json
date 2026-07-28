@@ -15,7 +15,7 @@
               "id": 101,
               "name": "Blue Garden",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -23,7 +23,7 @@
               "id": 102,
               "name": "Cutty Pink",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -31,7 +31,7 @@
               "id": 103,
               "name": "Cutty Preety",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -47,7 +47,7 @@
               "id": 105,
               "name": "Pinky Garden",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -55,7 +55,7 @@
               "id": 106,
               "name": "Pistal Berry",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -63,7 +63,7 @@
               "id": 107,
               "name": "Rosy White",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -71,7 +71,7 @@
               "id": 108,
               "name": "Sky Fyy",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -79,7 +79,7 @@
               "id": 109,
               "name": "Star Lilly",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -87,7 +87,7 @@
               "id": 110,
               "name": "Sweet Heart",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -95,7 +95,7 @@
               "id": 111,
               "name": "White Magic",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -103,7 +103,8 @@
               "id": 112,
               "name": "Dual Heart",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[299, 699, 849, 1099, 1599]",
+              "cake_price_list": "[299, 599, 849, 1099, 1599]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -128,6 +129,7 @@
               "name": "Choosy Rasmalai",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
               "cake_price_list": "[419, 799, 1089, 1499, 2199]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -136,6 +138,7 @@
               "name": "Preety Rasmalai",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
               "cake_price_list": "[419, 799, 1089, 1499, 2199]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             }
@@ -149,6 +152,7 @@
               "name": "Choco Pinky",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
               "cake_price_list": "[259, 529, 759, 979, 1419]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -156,7 +160,7 @@
               "id": 202,
               "name": "Flower Heart",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -164,7 +168,7 @@
               "id": 203,
               "name": "Matty Brown",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -172,7 +176,7 @@
               "id": 204,
               "name": "Orange Candy",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -180,7 +184,7 @@
               "id": 205,
               "name": "Pimple Candy",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -188,7 +192,7 @@
               "id": 206,
               "name": "Rainy Flower",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -196,7 +200,7 @@
               "id": 207,
               "name": "Violet Creamy",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -204,7 +208,7 @@
               "id": 208,
               "name": "Yellow Picks",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -213,6 +217,7 @@
               "name": "Choco Forest",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
               "cake_price_list": "[259, 529, 759, 979, 1419]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -221,6 +226,7 @@
               "name": "Choco Hell",
               "cake_size_list": "[1.5, 2, 3]",
               "cake_price_list": "[819, 1059, 1539]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -245,6 +251,7 @@
               "name": "Choco Oreo",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
               "cake_price_list": "[259, 529, 759, 979, 1419]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -252,7 +259,7 @@
               "id": 214,
               "name": "Cutty Teddy",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[219, 479, 699, 899, 1299]",
+              "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
               "not_available_time": ""
             },
@@ -261,6 +268,7 @@
               "name": "Melti Choco",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
               "cake_price_list": "[289, 579, 819, 1059, 1539]",
+              "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
             },
@@ -374,14 +382,14 @@
             {
               "id": 409,
               "name": "Blue HBD Combo",
-              "price": 219,
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 410,
               "name": "Pink HBD Combo",
-              "price": 219,
+              "price": 239,
               "available_time": "",
               "not_available_time": ""
             },

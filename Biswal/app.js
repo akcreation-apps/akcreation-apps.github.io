@@ -402,6 +402,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     const buildCakeCard = (dish, subcategory) => {
         const sizes = parseNumArray(dish.cake_size_list);
         const prices = parseNumArray(dish.cake_price_list);
+        const hasFlavour = dish.has_flavour !== false;
         const unavailableNote = computeUnavailableNote(dish);
         const menuItem = document.createElement('div');
         menuItem.classList.add('menu-item', 'cake-item');
@@ -420,19 +421,19 @@ document.addEventListener('DOMContentLoaded', async() => {
                         <p class="price"><span class="cake-price">₹${prices[0].toFixed(0)}/-</span></p>
                     </div>
                 </div>
-                <div class="cake-config">
+                <div class="cake-config"${hasFlavour ? '' : ' style="grid-template-columns:1fr"'}>
                     <label class="cake-field">
                         <span class="cake-field-label">Size</span>
                         <select class="cake-size" aria-label="Size for ${dish.name}">
-                            ${sizes.map((s, i) => `<option value="${i}">${s} kg</option>`).join('')}
+                            ${sizes.map((s, i) => `<option value="${i}">${s} kg (${s * 10} persons)</option>`).join('')}
                         </select>
                     </label>
-                    <label class="cake-field">
+                    ${hasFlavour ? `<label class="cake-field">
                         <span class="cake-field-label">Flavour</span>
                         <select class="cake-flavour" aria-label="Flavour for ${dish.name}">
                             ${BAKERY_FLAVOURS.map(f => `<option value="${f}">${f}</option>`).join('')}
                         </select>
-                    </label>
+                    </label>` : ''}
                 </div>
                 <div class="item-control cake-add"></div>
           </div>
@@ -465,8 +466,11 @@ document.addEventListener('DOMContentLoaded', async() => {
         // Read current selection into a shared holder so all renders agree
         const getSelection = () => {
             const idx = parseInt(sizeSel.value, 10);
-            return { idx, size: sizes[idx], flavour: flavourSel.value, unitPrice: prices[idx] };
+            return { idx, size: sizes[idx], flavour: flavourSel ? flavourSel.value : '', unitPrice: prices[idx] };
         };
+
+        const variantLabel = (size, flavour) =>
+            flavour ? `${flavour}, ${size}kg` : `${size}kg`;
 
         const renderCakeControl = (announce = false) => {
             if (unavailableNote) {
@@ -478,7 +482,7 @@ document.addEventListener('DOMContentLoaded', async() => {
             const { size, flavour, unitPrice } = getSelection();
             const qty = getCakeQty(subcategory.name, dish.id, size, flavour);
             control.classList.toggle('in-cart', qty > 0);
-            if (announce) announceCart(`${dish.name} (${flavour}, ${size}kg)`, qty);
+            if (announce) announceCart(`${dish.name} (${variantLabel(size, flavour)})`, qty);
             if (qty === 0) {
                 control.innerHTML = `<button type="button" class="add-btn" aria-label="Add ${dish.name} to cart">+ ADD</button>`;
                 control.querySelector('.add-btn').addEventListener('click', (e) => {
@@ -492,7 +496,7 @@ document.addEventListener('DOMContentLoaded', async() => {
                 });
             } else {
                 control.innerHTML = `
-                    <div class="qty-stepper" role="group" aria-label="Quantity for ${dish.name} (${flavour}, ${size}kg)">
+                    <div class="qty-stepper" role="group" aria-label="Quantity for ${dish.name} (${variantLabel(size, flavour)})">
                         <button type="button" class="qty-btn" aria-label="Remove one">&#8722;</button>
                         <span class="qty-display" aria-live="polite" aria-atomic="true">${qty}</span>
                         <button type="button" class="qty-btn" aria-label="Add one more">+</button>
@@ -524,7 +528,7 @@ document.addEventListener('DOMContentLoaded', async() => {
             priceEl.textContent = `₹${prices[idx].toFixed(0)}/-`;
             renderCakeControl(false);
         });
-        flavourSel.addEventListener('change', () => renderCakeControl(false));
+        if (flavourSel) flavourSel.addEventListener('change', () => renderCakeControl(false));
 
         renderCakeControl(false);
         return menuItem;

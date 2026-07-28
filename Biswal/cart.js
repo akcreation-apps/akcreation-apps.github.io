@@ -83,7 +83,7 @@ const renderCartItems = () => {
         // Bakery order summary (Event + Name on Cake) at the top of the cart
         const bakeryEvent = localStorage.getItem(_safeLsKey('bakery_event')) || '';
         const nameOnCake = (localStorage.getItem(_safeLsKey('bakery_name_on_cake')) || '').trim();
-        const hasCake = cart.some(c => c.category.dish_details.some(d => d.size != null && d.flavour));
+        const hasCake = cart.some(c => c.category.dish_details.some(d => d.size != null));
         if (bakeryEvent && hasCake) {
             const summary = document.createElement('div');
             summary.className = 'cart-bakery-summary';
@@ -114,11 +114,11 @@ const renderCartItems = () => {
                 const cartItem = document.createElement('div');
                 cartItem.classList.add('cart-item');
                 const url = get_dish_url(dishItem.name);
-                const isCakeLine = dishItem.size != null && dishItem.flavour;
+                const isCakeLine = dishItem.size != null;
                 const optionTags = isCakeLine
                     ? `<div class="cart-item-tags">
                            <span class="cart-tag"><span class="cart-tag-label">Size</span><span class="cart-tag-value">${dishItem.size} kg</span></span>
-                           <span class="cart-tag"><span class="cart-tag-label">Flavour</span><span class="cart-tag-value">${dishItem.flavour}</span></span>
+                           ${dishItem.flavour ? `<span class="cart-tag"><span class="cart-tag-label">Flavour</span><span class="cart-tag-value">${dishItem.flavour}</span></span>` : ''}
                        </div>`
                     : '';
 
@@ -356,10 +356,10 @@ function createOrderMessage(cartItems) {
         // Iterate through the dish details to add dishes to the corresponding category
         item.category.dish_details.forEach(dish => {
             const dishId = dish.id;
-            // Cakes carry size + flavour; every combo is a separate line in the message
-            const isCakeLine = dish.size != null && dish.flavour;
+            // Cakes carry size (and optionally flavour); every combo is a separate line in the message
+            const isCakeLine = dish.size != null;
             const dishName = isCakeLine
-                ? `${dish.name} (${dish.flavour}, ${dish.size}kg)`
+                ? `${dish.name} (${dish.flavour ? dish.flavour + ', ' : ''}${dish.size}kg)`
                 : dish.name;
             const quantity = dish.quantity;
             const price = dish.price;
