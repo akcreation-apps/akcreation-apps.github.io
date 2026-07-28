@@ -574,6 +574,11 @@
         }
         .ds-change:hover { text-decoration: underline; }
 
+        /* Cart page shows a larger .cart-bakery-summary block above the item
+           list, so the compact ds-bakery row in the delivery strip would just
+           duplicate that info. Hide it here only. */
+        .ds-bakery { display: none; }
+
         /* ── Place selector — bottom sheet ── */
         .place-modal-overlay {
             position: fixed;
