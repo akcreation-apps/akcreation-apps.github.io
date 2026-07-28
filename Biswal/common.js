@@ -218,7 +218,23 @@ function openBakeryOrderPicker(dismissible = false) {
         if (!modal) { resolve(null); return; }
         const eventSel = document.getElementById('bakeryEventSelect');
         const nameInput = document.getElementById('bakeryNameInput');
+        const scheduleInput = document.getElementById('bakeryScheduleInput');
         const submitBtn = document.getElementById('bakerySubmitBtn');
+
+        // Earliest allowed schedule = now + 2h. Compute in local time so the
+        // datetime-local input's `min` and `value` strings match what the user
+        // sees; also stash the timestamp for validation on submit.
+        const MIN_LEAD_MS = 2 * 60 * 60 * 1000;
+        const pad = n => String(n).padStart(2, '0');
+        const toLocalDT = d =>
+            `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        const refreshScheduleMin = () => {
+            if (!scheduleInput) return 0;
+            const earliest = new Date(Date.now() + MIN_LEAD_MS);
+            scheduleInput.min = toLocalDT(earliest);
+            return earliest.getTime();
+        };
+        let earliestMs = refreshScheduleMin();
 
         // Populate events (alphabetical) — clear old options after the placeholder
         while (eventSel.options.length > 1) eventSel.remove(1);
@@ -265,9 +281,65 @@ function openBakeryOrderPicker(dismissible = false) {
         }
         nameInput.value = savedName;
 
+        // Prefill schedule: prefer a previously-saved slot still ≥ 2h out;
+        // otherwise auto-fill "earliest + 15 min" (i.e. now + 2h 15m). The
+        // extra buffer gives the kitchen a small cushion beyond the strict
+        // minimum, while `min` on the input still enforces the 2h floor.
+        const DEFAULT_BUFFER_MS = 15 * 60 * 1000;
+        if (scheduleInput) {
+            const savedScheduleMs = parseInt(localStorage.getItem(lsKey('bakery_schedule')) || '0', 10);
+            if (savedScheduleMs && savedScheduleMs >= earliestMs) {
+                scheduleInput.value = toLocalDT(new Date(savedScheduleMs));
+            } else {
+                scheduleInput.value = toLocalDT(new Date(earliestMs + DEFAULT_BUFFER_MS));
+            }
+        }
+
         const currentEventValue = () =>
             eventSel.value === '__other__' ? otherInput.value.trim() : eventSel.value;
-        const refreshSubmit = () => { submitBtn.disabled = !currentEventValue(); };
+        const currentScheduleMs = () => {
+            if (!scheduleInput || !scheduleInput.value) return 0;
+            const ms = new Date(scheduleInput.value).getTime();
+            return Number.isFinite(ms) ? ms : 0;
+        };
+        const isScheduleValid = () => {
+            const ms = currentScheduleMs();
+            return ms && ms >= earliestMs;
+        };
+        // Continue stays enabled once the event is chosen. Schedule validity
+        // is checked on submit (with a friendly inline message) instead of
+        // silently disabling the button — a disabled button leaves customers
+        // stuck without knowing why.
+        const refreshSubmit = () => {
+            submitBtn.disabled = !currentEventValue();
+            // Clear the schedule error once the user edits the field
+            if (scheduleErr && isScheduleValid()) scheduleErr.style.display = 'none';
+        };
+
+        // Inline error banner under the schedule field (created lazily, reused).
+        // Compact card style — the earliest allowed time is the hero element so
+        // customers immediately see the number they need to beat.
+        let scheduleErr = null;
+        if (scheduleInput) {
+            scheduleErr = scheduleInput.parentElement.querySelector('.bakery-schedule-error');
+            if (!scheduleErr) {
+                scheduleErr = document.createElement('div');
+                scheduleErr.className = 'bakery-schedule-error';
+                scheduleErr.setAttribute('role', 'alert');
+                scheduleErr.style.cssText =
+                    'display:none;margin-top:8px;padding:8px 10px;border-radius:8px;' +
+                    'background:rgba(229,57,53,0.10);border:1px solid rgba(229,57,53,0.35);' +
+                    'color:var(--error-clr,#E53935);font-size:0.72rem;line-height:1.35;' +
+                    'display:none;align-items:center;gap:8px';
+                scheduleInput.parentElement.appendChild(scheduleErr);
+            }
+        }
+        const formatEarliest = (ms) =>
+            new Date(ms).toLocaleString('en-IN', {
+                weekday: 'short', day: '2-digit', month: 'short',
+                hour: '2-digit', minute: '2-digit', hour12: true
+            });
+
         refreshSubmit();
 
         modal.style.display = 'flex';
@@ -295,14 +367,39 @@ function openBakeryOrderPicker(dismissible = false) {
 
         otherInput.addEventListener('input', refreshSubmit, sig);
 
+        if (scheduleInput) {
+            // The `min` attribute rolls forward as real time passes; refresh
+            // it whenever the user focuses / changes the field so a stale
+            // 2-hour lead can't slip through.
+            const revalidate = () => { earliestMs = refreshScheduleMin(); refreshSubmit(); };
+            scheduleInput.addEventListener('focus', revalidate, sig);
+            scheduleInput.addEventListener('change', revalidate, sig);
+            scheduleInput.addEventListener('input', refreshSubmit, sig);
+        }
+
         submitBtn.addEventListener('click', () => {
             const value = currentEventValue();
             if (!value) {
                 (eventSel.value === '__other__' ? otherInput : eventSel).focus();
                 return;
             }
+            earliestMs = refreshScheduleMin();
+            if (!isScheduleValid()) {
+                if (scheduleErr) {
+                    scheduleErr.innerHTML =
+                        `<i class="fas fa-clock" aria-hidden="true" style="font-size:0.9rem;flex-shrink:0"></i>` +
+                        `<span>Pick a slot after ` +
+                        `<strong style="font-weight:800;font-size:0.82rem;white-space:nowrap">${formatEarliest(earliestMs)}</strong>` +
+                        `</span>`;
+                    scheduleErr.style.display = 'flex';
+                }
+                scheduleInput && scheduleInput.focus();
+                return;
+            }
+            if (scheduleErr) scheduleErr.style.display = 'none';
             localStorage.setItem(lsKey('bakery_event'), value);
             localStorage.setItem(lsKey('bakery_name_on_cake'), nameInput.value.trim());
+            localStorage.setItem(lsKey('bakery_schedule'), String(currentScheduleMs()));
             close(value);
         }, sig);
 
@@ -331,7 +428,9 @@ function checkAndAskPlace() {
 
     // COD path — need place, then bakery event details
     const needsPlace = !place;
-    const needsBakery = !localStorage.getItem(lsKey('bakery_event'));
+    const savedScheduleMs = parseInt(localStorage.getItem(lsKey('bakery_schedule')) || '0', 10);
+    const scheduleFresh = savedScheduleMs && savedScheduleMs >= Date.now() + 2 * 60 * 60 * 1000;
+    const needsBakery = !localStorage.getItem(lsKey('bakery_event')) || !scheduleFresh;
     if (!needsPlace && !needsBakery) return Promise.resolve();
 
     hideLoader();

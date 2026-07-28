@@ -80,9 +80,16 @@ const renderCartItems = () => {
         emptyCartBanner.style.display = 'none';
         cartTotalContainer.style.display = 'block'; // Show total and button
 
-        // Bakery order summary (Event + Name on Cake) at the top of the cart
+        // Bakery order summary (Event + Name on Cake + Scheduled slot) at the top of the cart
         const bakeryEvent = localStorage.getItem(_safeLsKey('bakery_event')) || '';
         const nameOnCake = (localStorage.getItem(_safeLsKey('bakery_name_on_cake')) || '').trim();
+        const scheduleMs = parseInt(localStorage.getItem(_safeLsKey('bakery_schedule')) || '0', 10);
+        const scheduleLabel = scheduleMs
+            ? new Date(scheduleMs).toLocaleString('en-IN', {
+                  weekday: 'short', day: '2-digit', month: 'short',
+                  hour: '2-digit', minute: '2-digit', hour12: true
+              })
+            : '';
         const hasCake = cart.some(c => c.category.dish_details.some(d => d.size != null));
         if (bakeryEvent && hasCake) {
             const summary = document.createElement('div');
@@ -98,7 +105,8 @@ const renderCartItems = () => {
                     </button>
                 </div>
                 <div class="cbs-row"><span class="cbs-label">Event</span><span class="cbs-value">${bakeryEvent}</span></div>
-                <div class="cbs-row"><span class="cbs-label">Name on Cake</span><span class="cbs-value">${nameOnCake || '<em>None</em>'}</span></div>`;
+                <div class="cbs-row"><span class="cbs-label">Name on Cake</span><span class="cbs-value">${nameOnCake || '<em>None</em>'}</span></div>
+                ${scheduleLabel ? `<div class="cbs-row"><span class="cbs-label">Scheduled</span><span class="cbs-value">${scheduleLabel}</span></div>` : ''}`;
             cartItemsContainer.appendChild(summary);
             summary.querySelector('#cbsEditBtn').addEventListener('click', async () => {
                 if (typeof openBakeryOrderPicker === 'function') {
@@ -193,47 +201,10 @@ const renderCartItems = () => {
 };
 
 
-// COD-only: surface the estimated arrival time as the Place Order button's
-// sub-text. For dine-in / empty cart, falls back to "via WhatsApp".
-// Driven by RESTAURANT.etaMinutes; refreshed on every cart change and on a
-// 30s ticker so the displayed clock stays current.
-const updateEtaRow = () => {
-    const btn = document.getElementById('place-order-btn');
-    const chip = document.getElementById('place-order-eta');
-    const timeEl = document.getElementById('place-order-sub');
-    if (!btn || !chip || !timeEl) return;
-    const table = (() => { try { return localStorage.getItem(_safeLsKey('table')); } catch (e) { return null; } })();
-    const hasItems = Array.isArray(cart) && cart.some(c => (c.category?.dish_details || []).some(d => (d.quantity || 0) > 0));
-    if (table !== 'COD' || !hasItems) {
-        btn.classList.remove('eta-on');
-        return;
-    }
-    const mins = (typeof RESTAURANT !== 'undefined' && Number(RESTAURANT.etaMinutes)) || 60;
-    let rel, clock;
-    try {
-        clock = new Date(Date.now() + mins * 60 * 1000)
-            .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-        rel = `~${mins} min`;
-    } catch (e) {
-        btn.classList.remove('eta-on');
-        return;
-    }
-    const fullLabel = `${rel} · ${clock}`;
-    const changed = chip.dataset.label !== fullLabel;
-    if (changed) {
-        chip.dataset.label = fullLabel;
-        timeEl.innerHTML =
-            `<span class="eta-rel">${rel}</span>` +
-            `<span class="eta-sep"> · </span>` +
-            `<span class="eta-abs">${clock}</span>`;
-    }
-    btn.classList.add('eta-on');
-    if (changed) {
-        chip.classList.remove('is-shimmer');
-        void chip.offsetWidth; // force reflow so the animation restarts
-        chip.classList.add('is-shimmer');
-    }
-};
+// Cake orders are scheduled — the customer picks a slot in the bakery modal,
+// so a live ETA chip on the Place Order button no longer makes sense. Kept as
+// a no-op stub so existing call sites don't need to change.
+const updateEtaRow = () => {};
 
 // Calculate and update the total price
 const updateTotalPrice = () => {
@@ -307,8 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     renderCartItems();
     updateDeliveryBadge();
-    updateEtaRow();
-    setInterval(updateEtaRow, 30000);
     hideLoader();
 });
 
@@ -333,13 +302,25 @@ function createOrderMessage(cartItems) {
     let message = `*${_RESTAURANT.name || 'Order'}*\nHello, I would like to place an order for the following items:\n\n`;
     message += "Ordered ID: "+orderId+"\n\n";
 
-    // Cake details — event is mandatory in the COD flow, name-on-cake is optional
+    // Cake details — event + delivery slot are mandatory in the COD flow,
+    // name-on-cake is optional. Slot is stored as an epoch ms string.
     const bakeryEvent = localStorage.getItem(_safeLsKey('bakery_event')) || '';
     const nameOnCake = (localStorage.getItem(_safeLsKey('bakery_name_on_cake')) || '').trim();
+    const scheduleMs = parseInt(localStorage.getItem(_safeLsKey('bakery_schedule')) || '0', 10);
+    const scheduleLabel = scheduleMs
+        ? new Date(scheduleMs).toLocaleString('en-IN', {
+              weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+              hour: '2-digit', minute: '2-digit', hour12: true
+          })
+        : '';
     if (bakeryEvent) {
         message += "*Cake Details:*\n";
         message += `  Event: ${bakeryEvent}\n`;
-        message += `  Name on Cake: ${nameOnCake || '(none)'}\n\n`;
+        message += `  Name on Cake: ${nameOnCake || '(none)'}\n`;
+        if (scheduleLabel) {
+            message += `  Scheduled Delivery: ${scheduleLabel}\n`;
+        }
+        message += `\n`;
     }
 
     message += "Ordered Items:\n\n";

@@ -811,6 +811,19 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
         }
+        /* Native datetime-local calendar icon is black by default — invisible
+           on dark cards. Invert to white in dark mode. `color-scheme` is left
+           unset so we don't double-invert against the browser's own themed icon. */
+        .bakery-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.75;
+        }
+        @media (prefers-color-scheme: dark) {
+            .bakery-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+                filter: invert(1) brightness(1.2);
+                opacity: 0.95;
+            }
+        }
         .bakery-help {
             font-size: 0.7rem;
             color: var(--muted);
@@ -1852,6 +1865,13 @@
                            placeholder="e.g. Anvisha" maxlength="30" autocomplete="off" />
                     <p class="bakery-help">Leave blank if you want the cake without a name.</p>
                 </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="bakeryScheduleInput">
+                        Delivery Date &amp; Time<span class="bakery-required" aria-hidden="true">*</span>
+                    </label>
+                    <input type="datetime-local" id="bakeryScheduleInput" class="bakery-input" required />
+                    <p class="bakery-help">Earliest slot is 2 hours from now — cakes are made fresh to order.</p>
+                </div>
                 <button type="button" id="bakerySubmitBtn" class="bakery-submit" disabled>Continue</button>
             </div>
         </div>
@@ -1899,5 +1919,6 @@
     }());
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

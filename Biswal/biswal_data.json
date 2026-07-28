@@ -182,7 +182,7 @@
             },
             {
               "id": 205,
-              "name": "Pimple Candy",
+              "name": "Berry Candy",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
               "cake_price_list": "[239, 479, 699, 899, 1299]",
               "available_time": "",
