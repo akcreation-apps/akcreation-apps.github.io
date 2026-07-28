@@ -339,21 +339,56 @@
             {
               "id": 405,
               "name": "Happy Birthday Letter Balloon",
-              "price": 159,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 406,
               "name": "Happy Anniversary Letter Balloon",
-              "price": 159,
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 407,
               "name": "Baby Shower Letter Balloon",
-              "price": 159,
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 407,
+              "name": "Bride To Be Letter Balloon",
+              "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 408,
+              "name": "Baby Shower Combo Set",
+              "price": 359,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 409,
+              "name": "Blue HBD Combo",
+              "price": 219,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 410,
+              "name": "Pink HBD Combo",
+              "price": 219,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 411,
+              "name": "Party Foil Door (Jhaleri)",
+              "price": 79,
               "available_time": "",
               "not_available_time": ""
             }
@@ -385,7 +420,7 @@
             },
             {
               "id": 504,
-              "name": "Happy Annivesary Banner",
+              "name": "Happy Anniversary Banner",
               "price": 79,
               "available_time": "",
               "not_available_time": ""
