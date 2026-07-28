@@ -3,6 +3,7 @@ import pathlib
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+FOOD_SRC = ROOT / 'Biswal/src'
 EXTS = {'.jpeg', '.jpg', '.png', '.webp'}
 
 
@@ -44,7 +45,8 @@ def crop_folder(folder: pathlib.Path, dry_run: bool = False) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description='Center-crop every image in a folder to a square (skips already-square files).')
-    ap.add_argument('folder', help='folder containing images (relative to repo root or absolute)')
+    ap.add_argument('folder', nargs='?', default=str(FOOD_SRC),
+                    help='folder containing images (relative to repo root or absolute); defaults to Biswal/src')
     ap.add_argument('--dry-run', action='store_true', help='preview without writing')
     args = ap.parse_args()
 

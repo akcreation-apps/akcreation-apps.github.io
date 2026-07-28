@@ -381,25 +381,12 @@ document.addEventListener('DOMContentLoaded', async() => {
     const menuContainer = document.getElementById('menu-container');
     const shortcutsContainer = document.querySelector('.shortcuts-grid'); // Get the shortcuts container
 
-    // Load checkbox states from localStorage
-    const onlyVegCheckbox = document.getElementById('vegFilter');
-    const onlyNonVegCheckbox = document.getElementById('nonVegFilter');
-    onlyVegCheckbox.checked = localStorage.getItem(lsKey('onlyVeg')) === 'true';
-    onlyNonVegCheckbox.checked = localStorage.getItem(lsKey('onlyNonVeg')) === 'true';
-
-    // Decide whether a dish should be rendered given current filters + availability rules
-    const isDishRenderable = (dish, subcategory) => {
+    // Biswal Bakery is pure veg — no veg/non-veg filter. Render every dish
+    // that isn't disabled or day-blocked.
+    const isDishRenderable = (dish) => {
         if (disable_ids.includes(dish.id)) return false;
         if (Array.isArray(dish.non_available_days) &&
             dish.non_available_days.includes(new Date().getDay())) return false;
-        if ((onlyVegCheckbox.checked && onlyNonVegCheckbox.checked) ||
-            (!onlyVegCheckbox.checked && !onlyNonVegCheckbox.checked)) {
-            // both or neither -> allow
-        } else if (onlyVegCheckbox.checked && subcategory.type !== 'Veg' && subcategory.type) {
-            return false;
-        } else if (onlyNonVegCheckbox.checked && subcategory.type !== 'NonVeg' && subcategory.type) {
-            return false;
-        }
         return true;
     };
 
@@ -551,10 +538,8 @@ document.addEventListener('DOMContentLoaded', async() => {
         menuItem.classList.add('menu-item');
         if (unavailableNote) menuItem.classList.add('unavailable');
         menuItem.setAttribute('role', 'article');
-        menuItem.setAttribute('aria-label',
-            `${dish.name} — ${subcategory.type === 'NonVeg' ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}`);
+        menuItem.setAttribute('aria-label', `${dish.name} — ₹${dish.price}`);
         const url = get_dish_url(dish.name);
-        const isNonVeg = subcategory.type === 'NonVeg';
 
         const hasOffer = dish.is_offer === true && typeof dish.offer_price === 'number' && dish.offer_price > dish.price;
         if (dish.is_offer && !hasOffer) {
@@ -572,7 +557,6 @@ document.addEventListener('DOMContentLoaded', async() => {
           <div class="menu-item-container">
                 <div class="dish-card">
                     <img src="${url}" alt="${dish.name}" class="dish-img">
-                    <div class="diet-badge ${isNonVeg ? 'nonveg' : 'veg'}" aria-label="${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}"></div>
                     ${hasOffer ? `<span class="offer-badge">${pct}% OFF</span>` : ''}
                     ${bestsellerNames.has(dish.name) ? '<span class="bestseller-badge">🔥 Bestseller</span>' : ''}
                     <div class="dish-overlay">
@@ -593,7 +577,6 @@ document.addEventListener('DOMContentLoaded', async() => {
     const buildOfferRailCard = (dish, subcategory) => {
         const unavailableNote = computeUnavailableNote(dish);
         const url = get_dish_url(dish.name);
-        const isNonVeg = subcategory.type === 'NonVeg';
         const pct = Math.round((dish.offer_price - dish.price) / dish.offer_price * 100);
         const savings = Math.round(dish.offer_price - dish.price);
 
@@ -602,7 +585,7 @@ document.addEventListener('DOMContentLoaded', async() => {
         if (unavailableNote) card.classList.add('unavailable');
         card.setAttribute('role', 'listitem');
         card.setAttribute('aria-label',
-            `${dish.name} — ${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}, ${pct}% off from ₹${dish.offer_price}`);
+            `${dish.name} — ₹${dish.price}, ${pct}% off from ₹${dish.offer_price}`);
 
         card.innerHTML = `
             <div class="offer-card-media">
@@ -611,7 +594,6 @@ document.addEventListener('DOMContentLoaded', async() => {
                     <span class="offer-ribbon-pct">${pct}%</span>
                     <span class="offer-ribbon-off">OFF</span>
                 </span>
-                <span class="offer-diet ${isNonVeg ? 'nonveg' : 'veg'}" aria-hidden="true"></span>
                 ${bestsellerNames.has(dish.name) ? '<span class="offer-bestseller">🔥 Bestseller</span>' : ''}
             </div>
             <div class="offer-card-body">
@@ -739,7 +721,21 @@ document.addEventListener('DOMContentLoaded', async() => {
                         const dishGrid = document.createElement('div');
                         dishGrid.classList.add('dish-grid');
 
-                        const sortedDishes = [...subcategory.dishes].sort((a, b) => a.price - b.price);
+                        // Cakes carry `cake_price_list` (JSON-ish string) instead of a
+                        // flat `price`; fall back to the smallest-size price so
+                        // subcategories still sort cheapest → costliest.
+                        const effectivePrice = (d) => {
+                            if (typeof d.price === 'number') return d.price;
+                            if (typeof d.cake_price_list === 'string') {
+                                try {
+                                    const arr = Function('"use strict";return (' + d.cake_price_list + ')')();
+                                    if (Array.isArray(arr) && arr.length) return Math.min(...arr);
+                                } catch (e) { /* fall through */ }
+                            }
+                            return Number.POSITIVE_INFINITY;
+                        };
+                        const sortedDishes = [...subcategory.dishes]
+                            .sort((a, b) => effectivePrice(a) - effectivePrice(b));
                         sortedDishes.forEach(dish => {
                             if (!isDishRenderable(dish, subcategory)) return;
                             dishGrid.appendChild(buildDishCard(dish, subcategory));
@@ -806,17 +802,6 @@ document.addEventListener('DOMContentLoaded', async() => {
     }
     renderMenu(); // Initial render of menu
     updateViewCartBar();
-
-    // Setup filter functionality
-    const saveCheckboxState = () => {
-        localStorage.setItem(lsKey('onlyVeg'), onlyVegCheckbox.checked);
-        localStorage.setItem(lsKey('onlyNonVeg'), onlyNonVegCheckbox.checked);
-        searchBar.value = ''; // Set the search bar value to empty
-        renderMenu(); // Re-render menu when checkbox state changes
-    };
-
-    onlyVegCheckbox.addEventListener('change', saveCheckboxState);
-    onlyNonVegCheckbox.addEventListener('change', saveCheckboxState);
 
     if (bestsellerFilterBtn) {
         bestsellerFilterBtn.addEventListener('click', () => {

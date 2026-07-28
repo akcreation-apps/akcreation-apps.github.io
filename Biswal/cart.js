@@ -126,7 +126,6 @@ const renderCartItems = () => {
                     <img src="${url}" alt="${dishItem.name}">
                     <div class="cart-item-info">
                         <h5>
-                          <span class="cart-diet-badge ${dishItem.type === 'NonVeg' ? 'nonveg' : 'veg'}"></span>
                           ${dishItem.name} <span class="cart-item-category">(${categoryItem.category.name})</span>
                         </h5>
                         ${optionTags}
@@ -357,12 +356,11 @@ function createOrderMessage(cartItems) {
         // Iterate through the dish details to add dishes to the corresponding category
         item.category.dish_details.forEach(dish => {
             const dishId = dish.id;
-            const baseName = dish.type === "NonVeg" ? `${dish.name} (Non-Veg)` : dish.name;
             // Cakes carry size + flavour; every combo is a separate line in the message
             const isCakeLine = dish.size != null && dish.flavour;
             const dishName = isCakeLine
                 ? `${dish.name} (${dish.flavour}, ${dish.size}kg)`
-                : baseName;
+                : dish.name;
             const quantity = dish.quantity;
             const price = dish.price;
 
