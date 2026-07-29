@@ -5,7 +5,7 @@ const RESTAURANT = {
     logo:           "biswal-bakery-logo.png",
     mapsUrl:        "https://maps.app.goo.gl/2Ewkw9Fe19gFGps26",
     wpFallback:     "7749984274",
-    minOrder:       500,
+    minOrder:       400,
     deliveryCharge: 50,
     etaMinutes:     120
 };

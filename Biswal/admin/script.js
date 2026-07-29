@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const validateButton = document.getElementById('validateButton');
 
     let analyticsData = [];
-    let sessionTime = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
+    let sessionTime = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
     let password = ''
     get_credentials().then(credentials => {
         password = decrypt_values(credentials.PASS_KEY, _cfg); // Example password

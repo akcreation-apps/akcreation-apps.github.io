@@ -1665,10 +1665,19 @@
                     <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                     Banki, Cuttack, Odisha 754008, India
                 </span>
-                <a class="local-info-item local-info-maps" href="https://maps.app.goo.gl/JSGtbqW55FQkPeBK6" target="_blank" rel="noopener noreferrer" aria-label="View The Cafe Darbar on Google Maps">
+                <a id="local-info-maps-link" class="local-info-item local-info-maps" href="#" target="_blank" rel="noopener noreferrer" aria-label="View on Google Maps">
                     <i class="fas fa-directions" aria-hidden="true"></i>
                     Get Directions on Google Maps
                 </a>
+                <script>
+                    (function () {
+                        var link = document.getElementById('local-info-maps-link');
+                        if (link && typeof RESTAURANT !== 'undefined' && RESTAURANT.mapsUrl) {
+                            link.href = RESTAURANT.mapsUrl;
+                            link.setAttribute('aria-label', 'View ' + (RESTAURANT.name || '') + ' on Google Maps');
+                        }
+                    })();
+                </script>
                 <span class="local-info-item">
                     <i class="fas fa-clock" aria-hidden="true"></i>
                     Open daily 10:00 AM – 10:00 PM

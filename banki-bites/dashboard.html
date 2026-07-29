@@ -607,11 +607,8 @@
       padding: 4px 0 14px;
     }
     .bb-winners-slider { position: relative; }
-    /* Desktop: cap slider width so the 1200:628 aspect banner shrinks proportionally
-       (720px wide → ~377px tall) rather than dominating the full page height. */
     @media (min-width: 640px) {
       .bb-winners { padding: 6px 14px 16px; }
-      .bb-winners-slider { max-width: 720px; margin: 0 auto; }
     }
     .bb-winners-track {
       display: flex; overflow-x: auto;
@@ -669,6 +666,19 @@
     .bb-winner-card img {
       display: block; width: 100%; height: auto;
       aspect-ratio: 1200 / 628; object-fit: cover;
+    }
+    @media (min-width: 640px) {
+      .bb-winner-card img {
+        aspect-ratio: auto;
+        height: 240px;
+        object-fit: fill;
+      }
+    }
+    @media (min-width: 960px) {
+      .bb-winner-card img { height: 280px; }
+    }
+    @media (min-width: 1200px) {
+      .bb-winner-card img { height: 320px; }
     }
 
     /* ── SHEET (popup) ── */

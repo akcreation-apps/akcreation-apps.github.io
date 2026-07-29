@@ -254,6 +254,10 @@ _SEO_STRIP_PATTERNS = [
     r'<h2\s+class="sr-only"[^>]*>[\s\S]*?</h2>',
     # Long local-SEO tagline paragraph inside the local-info block.
     r'<p\s+class="local-info-tagline"[^>]*>[\s\S]*?</p>',
+    # Hardcoded TCD physical address — new restaurants must not inherit it.
+    r'<span\s+class="local-info-item"[^>]*>\s*<i\s+class="fas fa-map-marker-alt"[^>]*></i>\s*Banki,\s*Cuttack,\s*Odisha\s*754008,\s*India\s*</span>',
+    # Hardcoded TCD opening hours.
+    r'<span\s+class="local-info-item"[^>]*>\s*<i\s+class="fas fa-clock"[^>]*></i>\s*Open daily[\s\S]*?</span>',
 ]
 
 
