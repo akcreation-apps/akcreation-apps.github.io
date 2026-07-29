@@ -398,18 +398,11 @@ function calculateTotal(cartItems, message) {
             deliveryNote = `\n\n(₹${MINIMUM_ORDER_PRICE} ରୁ କମ୍ ଅର୍ଡର ପାଇଁ ₹${DELIVERY_CHARGES} ଡେଲିଭରି ଚାର୍ଜ ଲାଗିଛି)`;
         }
         const placeNote = place ? `\n\nଡେଲିଭରି ସ୍ଥାନ: ${place}` : '';
-        const etaMins = (typeof RESTAURANT !== 'undefined' && Number(RESTAURANT.etaMinutes)) || 60;
-        let etaNote = '';
-        try {
-            const etaClock = new Date(Date.now() + etaMins * 60 * 1000)
-                .toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-            etaNote = `\n\nଆନୁମାନିକ ସମୟ: ~${etaMins} min (${etaClock})`;
-        } catch (e) {
-            etaNote = `\n\nଆନୁମାନିକ ସମୟ: ~${etaMins} min`;
-        }
+        // ETA note removed — cake orders are scheduled; the Scheduled Delivery
+        // line in the cake details block already tells the customer when to expect it.
         const isCustomPlace = localStorage.getItem(_safeLsKey('place_custom')) === '1';
         const outerZoneNote = isCustomPlace ? `\n\n*ଡେଲିଭରି ଏରିଆ ଆମ ସର୍ଭିସ ଏରିଆ ବାହାରେ, ସେଥିପାଇଁ ଏକ୍ସଟ୍ରା ଡେଲିଭରି ଚାର୍ଜ ଲାଗିବ*` : '';
-        message += `Total Price: ₹${total.toFixed(0)}/-${placeNote}\n\nPayment ପ୍ରକାର: Prepaid${etaNote}${deliveryNote}${outerZoneNote}\n\n`;
+        message += `Total Price: ₹${total.toFixed(0)}/-${placeNote}\n\nPayment ପ୍ରକାର: Prepaid${deliveryNote}${outerZoneNote}\n\n`;
         message += `*Note: ଯଦି ଆପଣଙ୍କ ଅର୍ଡର ୫ ମିନିଟ୍ ରେ WhatsApp ରେ ସିନ୍ ନ କରାଯାଏ, ଦୟାକରି ଆମକୁ କଲ୍ କରନ୍ତୁ ।*`;
     } else {
         message += `Total Price: ₹${total.toFixed(0)}/-\n${deliveryNote}\nTable Number: ${table}`;
@@ -479,6 +472,41 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
         });
         _loaderHide();
         return;
+    }
+
+    // Stale-schedule guard: the customer may have picked a slot hours ago,
+    // walked away, and come back to place the order. If the saved slot is
+    // now less than 2h out (or missing entirely), force them to re-pick
+    // before the WhatsApp message goes out — otherwise the kitchen would
+    // receive an unachievable delivery time.
+    const hasCakeInCart = cartItems.some(c =>
+        (c.category?.dish_details || []).some(d => d.size != null));
+    if (hasCakeInCart) {
+        const MIN_LEAD_MS = 2 * 60 * 60 * 1000;
+        const savedScheduleMs = parseInt(_lsGet(_safeLsKey('bakery_schedule')) || '0', 10);
+        if (!savedScheduleMs || savedScheduleMs < Date.now() + MIN_LEAD_MS) {
+            _loaderHide();
+            const earliestLabel = new Date(Date.now() + MIN_LEAD_MS)
+                .toLocaleString('en-IN', {
+                    weekday: 'short', day: '2-digit', month: 'short',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                });
+            const result = await Swal.fire({
+                icon: 'warning',
+                title: 'Please re-schedule',
+                html: `Your saved delivery time is no longer at least 2 hours away.<br><br>` +
+                      `Earliest slot now: <strong>${earliestLabel}</strong>`,
+                confirmButtonText: 'Pick a new time',
+                confirmButtonColor: '#FF6B35',
+                showCancelButton: true
+            });
+            if (result.isConfirmed && typeof openBakeryOrderPicker === 'function') {
+                await openBakeryOrderPicker(true);
+                if (typeof updateDeliveryBadge === 'function') updateDeliveryBadge();
+                renderCartItems();
+            }
+            return;
+        }
     }
     const today = new Date().toDateString();
     const lastOrderDate = _lsGet(_safeLsKey('order_date'));
