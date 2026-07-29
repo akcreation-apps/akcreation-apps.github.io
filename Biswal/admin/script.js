@@ -708,9 +708,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <ul style="list-style-type: none; padding-left: 0;">
                             ${orderDetails.order_details.map(cat => `
                                 <li><strong>${cat.category.name}</strong></li>
-                                ${cat.category.dish_details.map(dish => `
-                                    <li>${dish.quantity} x ${dish.name} - ₹${(dish.price * dish.quantity).toFixed(0)}</li>
-                                `).join('')}
+                                ${cat.category.dish_details.map(dish => {
+                                    const cakeSuffix = dish.size != null
+                                        ? ` (${dish.flavour ? dish.flavour + ', ' : ''}${dish.size}kg)`
+                                        : '';
+                                    return `<li>${dish.quantity} x ${dish.name}${cakeSuffix} - ₹${(dish.price * dish.quantity).toFixed(0)}</li>`;
+                                }).join('')}
                             `).join('')}
                             ${orderDetails.delivery_charges && orderDetails.delivery_charges > 0
                             ? `<li style="color: red; font-weight: 600;">Delivery Charges - ₹${orderDetails.delivery_charges.toFixed(0)}</li>`

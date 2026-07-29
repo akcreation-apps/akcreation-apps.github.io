@@ -243,7 +243,12 @@
             cat.category.dish_details.forEach(dish => {
                 const liDish = document.createElement('li');
                 liDish.classList.add('bill-item');
-                const label = `${dish.quantity} × ${dish.name}${dish.type === "NonVeg" ? " (NV)" : ""}`;
+                // Cake lines carry a `size` (kg) and optionally a `flavour`.
+                // Non-cake accessory lines fall back to the (NV) suffix if applicable.
+                const cakeSuffix = dish.size != null
+                    ? ` (${dish.flavour ? dish.flavour + ', ' : ''}${dish.size}kg)`
+                    : (dish.type === "NonVeg" ? " (NV)" : "");
+                const label = `${dish.quantity} × ${dish.name}${cakeSuffix}`;
                 const price = `₹${(dish.price * dish.quantity).toFixed(2)}`;
                 liDish.innerHTML = `<span>${label}</span><span>${price}</span>`;
                 billItemsElement.appendChild(liDish);
