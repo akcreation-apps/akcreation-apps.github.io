@@ -853,6 +853,21 @@
             font-weight: 600;
             line-height: 1.4;
         }
+        .cc-earliest {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,107,53,0.08);
+            border: 1px solid rgba(255,107,53,0.22);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            font-size: 0.78rem;
+            color: var(--text);
+            line-height: 1.35;
+        }
+        .cc-earliest i { color: var(--primary); font-size: 0.85rem; flex-shrink: 0; }
+        .cc-earliest strong { font-weight: 700; color: var(--primary); }
 
         /* ── Create Customised Cake CTA (above search) ── */
         .custom-cake-btn {
@@ -2076,7 +2091,10 @@
                         Delivery Date &amp; Time<span class="bakery-required" aria-hidden="true">*</span>
                     </label>
                     <input type="datetime-local" id="ccScheduleInput" class="bakery-input" required />
-                    <p class="bakery-help" id="ccScheduleHelp">Custom cakes need at least 24 hours. Schedule slots open from…</p>
+                    <div class="cc-earliest" role="note">
+                        <i class="fas fa-clock" aria-hidden="true"></i>
+                        <span>Earliest available slot: <strong id="ccEarliestSlot">—</strong></span>
+                    </div>
                     <p class="bakery-error" id="ccScheduleError" role="alert" style="display:none;"></p>
                 </div>
 
@@ -2101,7 +2119,7 @@
             const flavSel   = document.getElementById('ccFlavourSelect');
             const schedIn   = document.getElementById('ccScheduleInput');
             const submitBtn = document.getElementById('ccSubmitBtn');
-            const helpEl    = document.getElementById('ccScheduleHelp');
+            const earliestEl = document.getElementById('ccEarliestSlot');
             const errEl     = document.getElementById('ccScheduleError');
             if (!openBtn || !modal) return;
 
@@ -2160,7 +2178,7 @@
                 const earliest = new Date(Date.now() + MIN_LEAD_MS);
                 earliestMs = earliest.getTime();
                 schedIn.min = toLocalDT(earliest);
-                helpEl.textContent = `Custom cakes need at least 24 hours. Earliest available slot: ${fmtHuman(earliest)}.`;
+                earliestEl.textContent = fmtHuman(earliest);
                 if (!schedIn.value || new Date(schedIn.value).getTime() < earliestMs) {
                     schedIn.value = toLocalDT(earliest);
                 }
@@ -2170,7 +2188,7 @@
                 if (!schedIn.value) { errEl.style.display = 'none'; return true; }
                 const chosen = new Date(schedIn.value).getTime();
                 if (chosen < earliestMs) {
-                    errEl.textContent = `Please pick a time on or after ${fmtHuman(new Date(earliestMs))}.`;
+                    errEl.textContent = 'Selected time is too early. Please pick a later slot.';
                     errEl.style.display = '';
                     return false;
                 }
