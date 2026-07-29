@@ -5,11 +5,11 @@ import {
 import { loadCustomers } from './customers.js';
 
 const OFFER_URL = 'https://akcreation-apps.com/banki-bites/offer.html';
-const FOOTER = 'Reply "Stop" to stop receiving future advertisements.\n\n_Team BankiBites_ ❤️';
+const FOOTER = 'ଏହିପରି message ଆଉ ପାଇବାକୁ ନ ଚାହିଁଲେ "Stop" reply କରନ୍ତୁ ।\n\n_Team BankiBites_ ❤️';
 // Default body for the "Offer expiring" segment — auto-loaded when the
 // admin picks that segment and the composer is empty. Uses the {name},
 // {discount}, {expiry} placeholders supported by personalize().
-const EXPIRING_TEMPLATE = 'Hi {name}! \n\n⏰ Your *₹{discount} OFF* BankiBites coupon expires on *{expiry}* — today is a great day to use it 😋\n\nOrder on the BankiBites app or web before the offer ends.';
+const EXPIRING_TEMPLATE = 'ନମସ୍କାର {name} !\n\n⏰ ଆପଣଙ୍କ *₹{discount} OFF* BankiBites coupon *{expiry}* ରେ expire ହୋଇଯିବ — ଆଜି ଏହାକୁ use କରିବାର ଠିକ୍ ଦିନ 😋\n\nOffer ଶେଷ ହେବା ପୂର୍ବରୁ BankiBites app କିମ୍ବା website ରେ order କରନ୍ତୁ ।';
 const QUEUE_KEY = 'bb_broadcast_queue_v1';
 const NAME_FALLBACK = 'Dear';
 
