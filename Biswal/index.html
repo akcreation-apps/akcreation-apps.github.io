@@ -846,6 +846,109 @@
         }
         .bakery-submit:hover:not([disabled]) { background: #E64A19; }
         .bakery-submit[disabled] { opacity: 0.5; cursor: not-allowed; }
+        .bakery-error {
+            font-size: 0.72rem;
+            color: var(--error-clr, #d32f2f);
+            margin-top: 6px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* ── Create Customised Cake CTA (above search) ── */
+        .custom-cake-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: calc(100% - 24px);
+            gap: 10px;
+            padding: 7px 12px;
+            margin: 6px 12px 2px;
+            border: 1.5px solid rgba(255,107,53,0.35);
+            border-radius: 12px;
+            background: linear-gradient(90deg, rgba(255,107,53,0.10), rgba(255,107,53,0.02));
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
+        }
+        .custom-cake-btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 6px 20px rgba(255,107,53,0.18);
+            transform: translateY(-1px);
+        }
+        .custom-cake-btn .ccb-left {
+            display: flex; align-items: center; gap: 10px;
+            min-width: 0;
+        }
+        .custom-cake-btn > .ccb-left > i {
+            font-size: 0.95rem; color: var(--primary); flex-shrink: 0;
+        }
+        .custom-cake-btn .ccb-title {
+            font-size: 0.82rem; font-weight: 700; color: var(--text);
+            line-height: 1.2;
+        }
+        .custom-cake-btn .ccb-chev {
+            color: var(--primary); font-size: 0.8rem; flex-shrink: 0;
+        }
+
+        /* ── Custom Cake modal ── */
+        .custom-cake-modal { max-height: 92vh; overflow-y: auto; }
+        .custom-cake-modal .place-modal-header { position: relative; }
+        .cc-close {
+            position: absolute; top: -4px; right: -4px;
+            width: 32px; height: 32px;
+            background: transparent; border: none; cursor: pointer;
+            color: var(--muted); font-size: 1.6rem; line-height: 1;
+            border-radius: 50%;
+            transition: background 0.15s, color 0.15s;
+        }
+        .cc-close:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+
+        .cc-how {
+            background: rgba(255,107,53,0.06);
+            border: 1px solid rgba(255,107,53,0.18);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 4px 0 18px;
+        }
+        .cc-how-title {
+            font-size: 0.82rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--primary);
+            margin: 0 0 12px;
+        }
+        .cc-steps {
+            list-style: none;
+            padding: 0; margin: 0;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .cc-steps li {
+            display: flex; gap: 12px;
+            align-items: flex-start;
+        }
+        .cc-step-num {
+            flex-shrink: 0;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.78rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cc-step-body strong {
+            display: block;
+            font-size: 0.82rem; font-weight: 700;
+            color: var(--text);
+            line-height: 1.3;
+        }
+        .cc-step-body p {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin: 3px 0 0;
+            line-height: 1.45;
+        }
 
         /* Delivery strip: second row for event summary */
         .ds-bakery {
@@ -1712,6 +1815,16 @@
                 </div>
             </div>
 
+            <!-- Create Customised Cake CTA -->
+            <button id="customCakeBtn" class="custom-cake-btn" type="button"
+                    aria-haspopup="dialog" aria-controls="customCakeModal">
+                <span class="ccb-left">
+                    <i class="fas fa-birthday-cake" aria-hidden="true"></i>
+                    <span class="ccb-title">Create Customised Cake</span>
+                </span>
+                <i class="fas fa-chevron-right ccb-chev" aria-hidden="true"></i>
+            </button>
+
             <!-- Search + Bestseller filter -->
             <div class="search-row">
                 <div class="search-container">
@@ -1877,8 +1990,254 @@
         </div>
     </div>
 
+    <!-- Create Customised Cake modal -->
+    <div class="place-modal-overlay" id="customCakeModal" style="display:none;"
+         role="dialog" aria-modal="true" aria-labelledby="customCakeTitle">
+        <div class="place-modal custom-cake-modal">
+            <div class="place-modal-handle" aria-hidden="true"></div>
+            <div class="place-modal-body">
+                <div class="place-modal-header">
+                    <div class="place-modal-icon">
+                        <i class="fas fa-birthday-cake" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 id="customCakeTitle">Create Your Own Cake</h3>
+                        <p class="place-modal-sub">Send us a design — we'll bake it just for you.</p>
+                    </div>
+                    <button type="button" id="ccCloseBtn" class="cc-close" aria-label="Close">&times;</button>
+                </div>
+
+                <!-- How it works -->
+                <div class="cc-how" aria-label="How it works">
+                    <h4 class="cc-how-title">How it works</h4>
+                    <ol class="cc-steps">
+                        <li>
+                            <span class="cc-step-num">1</span>
+                            <div class="cc-step-body">
+                                <strong>Send Your Own Cake Design</strong>
+                                <p>Share your reference photo or design idea with us.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="cc-step-num">2</span>
+                            <div class="cc-step-body">
+                                <strong>We Evaluate &amp; Confirm Pricing</strong>
+                                <p>Our team reviews the design and confirms the final price before the order is confirmed.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="cc-step-num">3</span>
+                            <div class="cc-step-body">
+                                <strong>Please Order 2–3 Days Prior</strong>
+                                <p>Custom cakes take time to craft — kindly schedule 2 to 3 days ahead of your event.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <!-- Form -->
+                <div class="bakery-field">
+                    <label class="bakery-label" for="ccEventSelect">
+                        Occasion<span class="bakery-required" aria-hidden="true">*</span>
+                    </label>
+                    <select id="ccEventSelect" class="bakery-select" required>
+                        <option value="" disabled selected>Select occasion</option>
+                    </select>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="ccNameInput">Name on the Cake</label>
+                    <input type="text" id="ccNameInput" class="bakery-input"
+                           placeholder="e.g. Happy Birthday Rahul" maxlength="30" autocomplete="off" />
+                    <p class="bakery-help">Leave blank if you want the cake without a name.</p>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="ccSizeSelect">
+                        Size<span class="bakery-required" aria-hidden="true">*</span>
+                    </label>
+                    <select id="ccSizeSelect" class="bakery-select" required>
+                        <option value="" disabled selected>Select size</option>
+                        <option value="0.5 kg (5 persons)">0.5 kg (5 persons)</option>
+                        <option value="1 kg (10 persons)">1 kg (10 persons)</option>
+                        <option value="1.5 kg (15 persons)">1.5 kg (15 persons)</option>
+                        <option value="2 kg (20 persons)">2 kg (20 persons)</option>
+                        <option value="3 kg (30 persons)">3 kg (30 persons)</option>
+                    </select>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="ccFlavourSelect">
+                        Flavour<span class="bakery-required" aria-hidden="true">*</span>
+                    </label>
+                    <select id="ccFlavourSelect" class="bakery-select" required>
+                        <option value="" disabled selected>Select flavour</option>
+                    </select>
+                </div>
+                <div class="bakery-field">
+                    <label class="bakery-label" for="ccScheduleInput">
+                        Delivery Date &amp; Time<span class="bakery-required" aria-hidden="true">*</span>
+                    </label>
+                    <input type="datetime-local" id="ccScheduleInput" class="bakery-input" required />
+                    <p class="bakery-help" id="ccScheduleHelp">Custom cakes need at least 24 hours. Schedule slots open from…</p>
+                    <p class="bakery-error" id="ccScheduleError" role="alert" style="display:none;"></p>
+                </div>
+
+                <button type="button" id="ccSubmitBtn" class="bakery-submit" disabled>
+                    <i class="fab fa-whatsapp" aria-hidden="true"></i> Send Request on WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        // ── Create Customised Cake modal ─────────────────────────────────
+        (function () {
+            const openBtn   = document.getElementById('customCakeBtn');
+            const modal     = document.getElementById('customCakeModal');
+            const closeBtn  = document.getElementById('ccCloseBtn');
+            const eventSel  = document.getElementById('ccEventSelect');
+            const nameInput = document.getElementById('ccNameInput');
+            const sizeSel   = document.getElementById('ccSizeSelect');
+            const flavSel   = document.getElementById('ccFlavourSelect');
+            const schedIn   = document.getElementById('ccScheduleInput');
+            const submitBtn = document.getElementById('ccSubmitBtn');
+            const helpEl    = document.getElementById('ccScheduleHelp');
+            const errEl     = document.getElementById('ccScheduleError');
+            if (!openBtn || !modal) return;
+
+            const MIN_LEAD_MS = 24 * 60 * 60 * 1000; // 1 day minimum
+            let earliestMs = 0;
+
+            // Populate occasions (+ Other)
+            const events = (typeof BAKERY_EVENTS !== 'undefined' ? BAKERY_EVENTS : []);
+            events.forEach(evt => {
+                const o = document.createElement('option');
+                o.value = evt; o.textContent = evt;
+                eventSel.appendChild(o);
+            });
+            const otherOpt = document.createElement('option');
+            otherOpt.value = '__other__'; otherOpt.textContent = 'Other (specify)';
+            eventSel.appendChild(otherOpt);
+
+            // "Other" occasion inline input
+            let otherInput = null;
+            eventSel.addEventListener('change', () => {
+                if (eventSel.value === '__other__') {
+                    if (!otherInput) {
+                        otherInput = document.createElement('input');
+                        otherInput.type = 'text';
+                        otherInput.className = 'bakery-input';
+                        otherInput.placeholder = 'Type your occasion…';
+                        otherInput.maxLength = 40;
+                        otherInput.style.marginTop = '8px';
+                        eventSel.closest('.bakery-field').appendChild(otherInput);
+                        otherInput.addEventListener('input', updateSubmitState);
+                    }
+                    otherInput.style.display = '';
+                } else if (otherInput) {
+                    otherInput.style.display = 'none';
+                }
+                updateSubmitState();
+            });
+
+            // Populate flavours
+            const flavours = (typeof BAKERY_FLAVOURS !== 'undefined' ? BAKERY_FLAVOURS : []);
+            flavours.forEach(f => {
+                const o = document.createElement('option');
+                o.value = f; o.textContent = f;
+                flavSel.appendChild(o);
+            });
+
+            // Schedule min = now + 24 hours
+            const pad = n => String(n).padStart(2, '0');
+            const toLocalDT = d =>
+                `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            const fmtHuman = d => d.toLocaleString('en-IN', {
+                weekday: 'short', day: '2-digit', month: 'short',
+                hour: '2-digit', minute: '2-digit', hour12: true
+            });
+            const refreshMin = () => {
+                const earliest = new Date(Date.now() + MIN_LEAD_MS);
+                earliestMs = earliest.getTime();
+                schedIn.min = toLocalDT(earliest);
+                helpEl.textContent = `Custom cakes need at least 24 hours. Earliest available slot: ${fmtHuman(earliest)}.`;
+                if (!schedIn.value || new Date(schedIn.value).getTime() < earliestMs) {
+                    schedIn.value = toLocalDT(earliest);
+                }
+                validateSchedule();
+            };
+            function validateSchedule() {
+                if (!schedIn.value) { errEl.style.display = 'none'; return true; }
+                const chosen = new Date(schedIn.value).getTime();
+                if (chosen < earliestMs) {
+                    errEl.textContent = `Please pick a time on or after ${fmtHuman(new Date(earliestMs))}.`;
+                    errEl.style.display = '';
+                    return false;
+                }
+                errEl.style.display = '';
+                errEl.style.color = '';
+                errEl.textContent = '';
+                errEl.style.display = 'none';
+                return true;
+            }
+
+            const currentEvent = () =>
+                eventSel.value === '__other__' ? (otherInput ? otherInput.value.trim() : '') : eventSel.value;
+
+            function updateSubmitState() {
+                const schedOk = validateSchedule();
+                const ok = currentEvent() && sizeSel.value && flavSel.value && schedIn.value && schedOk;
+                submitBtn.disabled = !ok;
+            }
+            [eventSel, sizeSel, flavSel, schedIn].forEach(el =>
+                el.addEventListener('change', updateSubmitState));
+            schedIn.addEventListener('input', updateSubmitState);
+
+            function openModal() {
+                refreshMin();
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => eventSel.focus(), 50);
+            }
+            function closeModal() {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            openBtn.addEventListener('click', openModal);
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && modal.style.display !== 'none') closeModal();
+            });
+
+            // Submit → WhatsApp
+            submitBtn.addEventListener('click', () => {
+                const occasion = currentEvent();
+                const nameOnCake = nameInput.value.trim() || '(no name)';
+                const size = sizeSel.value;
+                const flavour = flavSel.value;
+                const when = schedIn.value
+                    ? new Date(schedIn.value).toLocaleString('en-IN', {
+                        weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: true
+                      })
+                    : '';
+                const lines = [
+                    'Hi Biswal Bakery, I want to order a *Customised Cake*.',
+                    '',
+                    `• Occasion: ${occasion}`,
+                    `• Name on Cake: ${nameOnCake}`,
+                    `• Size: ${size}`,
+                    `• Flavour: ${flavour}`,
+                    `• Delivery: ${when}`,
+                    '',
+                    'I will share the design reference in the next message. Please confirm the price.'
+                ];
+                const phone = '91' + (RESTAURANT && RESTAURANT.wpFallback ? RESTAURANT.wpFallback : '7749984274');
+                const url = `https://wa.me/${phone}?text=${encodeURIComponent(lines.join('\n'))}`;
+                window.location.href = url;
+            });
+        })();
     </script>
     <script>
     (function () {

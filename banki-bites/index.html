@@ -372,6 +372,67 @@
     }
     .hero-areas i { color: var(--primary); font-size: 0.65rem; }
 
+    /* ── HERO HOURS CARD ── */
+    .hero-hours {
+      display: flex; flex-direction: column; gap: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,107,53,0.28);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 4px 0 20px;
+      text-align: left;
+    }
+    .hero-hours-top {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .hero-hours-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.35);
+      color: #4ade80;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.6px; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 20px;
+    }
+    .hero-hours-badge.closed {
+      background: rgba(239,68,68,0.15);
+      border-color: rgba(239,68,68,0.35);
+      color: #f87171;
+    }
+    .hero-hours-badge .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 0 rgba(34,197,94,0.55);
+      animation: hbPulse 1.6s ease-out infinite;
+    }
+    .hero-hours-badge.closed .live-dot {
+      background: #ef4444; animation: none; box-shadow: none;
+    }
+    @keyframes hbPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); }
+      70%  { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+    .hero-hours-label {
+      font-size: 0.72rem; font-weight: 600;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.4px; text-transform: uppercase;
+    }
+    .hero-hours-time {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.05rem; font-weight: 800; color: #fff;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hero-hours-time i { color: var(--primary); font-size: 0.95rem; }
+    .hero-hours-note {
+      font-size: 0.75rem; color: rgba(255,255,255,0.6);
+      line-height: 1.5;
+    }
+    .hero-hours-note strong { color: #fff; font-weight: 700; }
+    @media (min-width: 720px) {
+      .hero-hours { align-self: flex-start; max-width: 420px; }
+    }
+
     /* ── ANDROID INSTALL BANNER (shown only via JS on Android phones) ── */
     .install-banner {
       background: linear-gradient(90deg, #1F8E3D 0%, #25D366 100%);
@@ -1109,6 +1170,21 @@
       <div class="hero-copy">
         <div class="hero-eyebrow"><i class="fas fa-bolt" aria-hidden="true"></i> Banki's First Food Delivery</div>
         <h1>Hungry in <em>Banki?</em> Order in 2 taps.</h1>
+
+        <div class="hero-hours" role="group" aria-label="BankiBites operating hours">
+          <div class="hero-hours-top">
+            <span class="hero-hours-badge" id="hoursBadge">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span id="hoursStatus">Open Now</span>
+            </span>
+            <span class="hero-hours-label">Order Hours</span>
+          </div>
+          <div class="hero-hours-time">
+            <i class="fas fa-clock" aria-hidden="true"></i>
+            <span>12:00 PM &ndash; 10:00 PM &middot; Every Day</span>
+          </div>
+        </div>
+
         <button class="btn-cta" id="orderBtn" aria-label="Find restaurants and order food">
           <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Food Now
         </button>
@@ -1363,6 +1439,19 @@
 
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // Live open/closed indicator for hero hours (12:00–22:00 IST)
+    (function updateHoursStatus() {
+      const badge = document.getElementById('hoursBadge');
+      const label = document.getElementById('hoursStatus');
+      if (!badge || !label) return;
+      const istNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+      const minutes = istNow.getHours() * 60 + istNow.getMinutes();
+      const isOpen = minutes >= 12 * 60 && minutes < 22 * 60;
+      badge.classList.toggle('closed', !isOpen);
+      label.textContent = isOpen ? 'Open Now' : 'Closed Now';
+      setTimeout(updateHoursStatus, 60 * 1000);
+    })();
 
     // Platform-aware install banner: Android → Play Store, iOS → Add to Home Screen instructions
     (function () {
