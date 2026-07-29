@@ -13,4 +13,4 @@ const RESTAURANT = {
 function lsKey(key) { return RESTAURANT.prefix + '_' + key; }
 
 const BAKERY_EVENTS = ['Anniversary', 'Baby Shower', 'Birthday', 'Marriage', 'Ring Ceremony'];
-const BAKERY_FLAVOURS = ['BlueBerry', 'Butter Scotch', 'Chocklet', 'Pineapple', 'Strawberry'];
+const BAKERY_FLAVOURS = ['BlueBerry', 'Butter Scotch', 'Chocolate', 'Pineapple', 'Strawberry'];
