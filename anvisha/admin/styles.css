@@ -1,0 +1,766 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    overflow-y: auto; /* Allow vertical scrolling if needed */
+}
+
+.container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    text-align: center;
+}
+
+/* Navigation styles */
+nav {
+    background-color: #fff; /* White background for the navbar */
+    padding: 10px 20px; /* Add padding to the navbar */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+    border-radius: 5px; /* Rounded corners for the navbar */
+}
+
+/* Navigation list styles */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0; /* Remove default margin */
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center the items */
+    align-items: center; /* Align items vertically */
+}
+
+/* Navigation list items */
+nav ul li {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+    border-radius: 5px; /* Rounded corners for the items */
+    margin: 0 10px; /* Add some space between items */
+}
+
+/* Active tab styles */
+nav ul li.active {
+    background-color: #4a90e2; /* Blue background for the active tab */
+    color: white; /* White text color */
+}
+
+/* Hover effects */
+nav ul li:hover {
+    background-color: #357abd; /* Darker blue on hover */
+    color: white; /* Keep text white on hover */
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 600px) {
+    nav ul {
+        flex-direction: row; /* Keep items in a row on small screens */
+        flex-wrap: wrap; /* Allow wrapping if necessary */
+    }
+
+    nav ul li {
+        margin: 5px; /* Adjust margin for smaller screens */
+        width: auto; /* Allow items to shrink as needed */
+        text-align: center; /* Center text */
+        padding: 10px; /* Adjust padding for better touch targets */
+    }
+}
+
+
+.popup {
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    max-width: 90%; /* Set max width to ensure responsiveness */
+    width: 300px; /* Set a default width */
+}
+
+/* Responsive styles for popup */
+@media (max-width: 400px) {
+    .popup-content {
+        width: 80%; /* Adjust width for smaller screens */
+    }
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5rem; /* Responsive font size */
+}
+
+.password-input {
+    width: 100%; /* Full width */
+    padding: 10px 2px;
+    margin-bottom: 10px; /* Spacing below input */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem; /* Responsive font size */
+    transition: border-color 0.3s; /* Transition for focus effect */
+}
+
+.password-input input {
+    width: 100%; /* Full width input */
+    padding: 10px 40px; /* Add padding for the input and space for the icon */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Font size */
+    transition: border-color 0.3s; /* Smooth transition for focus effect */
+}
+
+.password-input:focus {
+    border-color: #4a90e2; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+.password-toggle {
+    text-align: left; /* Align label to the left */
+    margin-bottom: 10px; /* Spacing below toggle */
+}
+
+#submitButton {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 10px; /* Add horizontal padding */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem; /* Responsive font size */
+    transition: background-color 0.3s; /* Transition for hover effect */
+}
+
+#submitButton:hover {
+    background-color: #357abd; /* Darker blue on hover */
+}
+
+#resetButton {
+    background-color: #e2754a;
+    color: white;
+    border: none;
+    padding: 10px 10px; /* Add horizontal padding */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem; /* Responsive font size */
+    transition: background-color 0.3s; /* Transition for hover effect */
+}
+
+#resetButton:hover {
+    background-color: #357abd; /* Darker blue on hover */
+}
+
+.error-message {
+    color: red;
+    font-size: 0.875rem; /* Responsive font size */
+    margin-top: 10px; /* Space above error message */
+}
+
+#validateButton, #submitPassword {
+    background-color: #dd922f;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#validateButton:hover {
+    background-color: #357abd;
+}
+
+input[type="number"] {
+    width: 80%;
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#error {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Container for the list of dishes */
+#dishesListAccess {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Subcategory title styles */
+#dishesListAccess h4 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #333;
+    border-bottom: 2px solid #4a90e2;
+    padding-bottom: 5px;
+}
+
+/* Individual dish item styles */
+.dish-item {
+    display: flex;
+    justify-content: space-between; /* Space between dish name and toggle */
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0; /* Space between dish items */
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s; /* Smooth hover effect */
+}
+
+.dish-item:hover {
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Dish name and price styles */
+.dish-item span {
+    font-size: 1.2rem;
+    color: #4a4a4a;
+}
+
+.dish-item .description {
+    flex: 1;
+    font-size: 1rem;
+    color: #333;
+}
+
+.dish-item .switch {
+    flex-shrink: 0;
+}
+
+/* Toggle switch styles */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0; /* Hide the default checkbox */
+    width: 0;
+    height: 0;
+}
+
+/* Slider styles */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s; /* Smooth transition for background color */
+    border-radius: 34px; /* Rounded corners */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px; /* Positioning the toggle */
+    bottom: 4px;
+    background-color: white;
+    transition: .4s; /* Smooth transition for toggle knob */
+    border-radius: 50%; /* Circular knob */
+}
+
+/* Checkbox checked state */
+input:checked + .slider {
+    background-color: #4a90e2; /* Change background when checked */
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px); /* Move knob to the right */
+}
+
+/* Optional: Add a text label next to the switch */
+.dish-item label {
+    margin-left: 10px; /* Space between dish item and toggle */
+}
+
+
+/* Access Control Section */
+#accessControlSection {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    width:100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-height: 90vh; /* Set max height for the section */
+    overflow-y: auto; /* Enable vertical scroll if content exceeds max height */
+    position: relative; /* Ensure it positions correctly in the flow */
+}
+
+/* Input field styles */
+/* Input Styles */
+#inputNumber {
+    padding: 10px;
+    width: auto;
+    margin: 10px 0; /* Margin around the input */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    text-align: center;
+    margin-right: 10px;
+}
+
+/* Title for List of Dishes */
+#accessControlSection h3 {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Container for the list of dishes */
+#dishesListAccess {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Subcategory title styles */
+#dishesListAccess h4 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #333;
+    border-bottom: 2px solid #4a90e2;
+    padding-bottom: 5px;
+}
+
+/* Individual dish item styles */
+.dish-item {
+    display: flex;
+    justify-content: space-between; /* Space between dish name and toggle */
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0; /* Space between dish items */
+    background-color: #f1f1f1; /* Light gray for dish items */
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s; /* Smooth hover effect */
+}
+
+.dish-item:hover {
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Dish name and price styles */
+.dish-item span {
+    font-size: 1.1rem;
+    color: #4a4a4a;
+}
+
+/* Toggle switch styles */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0; /* Hide the default checkbox */
+    width: 0;
+    height: 0;
+}
+
+/* Slider styles */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s; /* Smooth transition for background color */
+    border-radius: 34px; /* Rounded corners */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px; /* Positioning the toggle */
+    bottom: 4px;
+    background-color: white;
+    transition: .4s; /* Smooth transition for toggle knob */
+    border-radius: 50%; /* Circular knob */
+}
+
+/* Checkbox checked state */
+input:checked + .slider {
+    background-color: #4a90e2; /* Change background when checked */
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px); /* Move knob to the right */
+}
+
+/* Optional: Add a text label next to the switch */
+.dish-item label {
+    margin-left: 10px; /* Space between dish item and toggle */
+}
+
+/* Subcategory title styles */
+.save-container h5 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Save container */
+.save-container {
+    background-color: #ffd1d1; /* White background for a clean look */
+    gap: 14px;
+    align-items: center; /* Center items vertically */
+    margin: 20px 10px; /* Margin above and below */
+    padding: 15px 15px; /* Add padding around the container */
+    border-radius: 25px; /* Rounded corners for a modern look */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
+    position: relative; /* Set position to relative for positioning the clear icon */
+    border: 1px solid #ddd; /* Subtle border */
+}
+
+/* Number container */
+.number-container {
+    display: inline-flex;
+    background-color: #fff; /* White background for a clean look */
+    top: 22px;  /* 20px from the top of the container */
+    height: 65px;
+    align-items: center; /* Center items vertically */
+    margin: 20px 10px; /* Margin above and below */
+    padding: 12px 15px; /* Add padding around the container */
+    border-radius: 25px; /* Rounded corners for a modern look */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
+    position: relative; /* Set position to relative for positioning the clear icon */
+    border: 1px solid #ddd; /* Subtle border */
+}
+
+/* Search container */
+.search-container {
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center items vertically */
+    margin: 0px 10px; /* Margin above and below */
+    padding: 10px 10px; /* Add padding around the container */
+    border-radius: 25px; /* Rounded corners for a modern look */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
+    position: relative; /* Set position to relative for positioning the clear icon */
+    border: 1px solid #ddd; /* Subtle border */
+}
+
+
+/* Search input styles */
+#searchBar {
+    flex: 1; /* Make the search input fill available space */
+    padding: 10px; /* Padding for better usability */
+    border: none; /* Remove default border */
+    font-size: 1rem; /* Font size */
+    border-radius: 25px; /* Rounded corners */
+    outline: none; /* Remove outline on focus */
+    background-color: #f4f4f4; /* Light grey background for input */
+    padding-right: 40px; /* Add extra space on the right to avoid overlap with the clear icon */
+}
+
+/* Clear icon styles */
+.clear-icon {
+    position: absolute; /* Position the clear icon relative to the container */
+    right: 30px; /* Align it to the right inside the search container */
+    top: 50%; /* Center it vertically */
+    transform: translateY(-50%); /* Adjust vertical alignment */
+    font-size: 1.5rem; /* Size of the cross icon */
+    color: #e74c3c; /* Red color for the cross icon */
+    cursor: pointer; /* Pointer cursor on hover */
+    display: none; /* Initially hidden */
+    transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+.clear-icon:hover {
+    color: #c0392b; /* Darker red on hover */
+}
+
+/* Focus state for input */
+#searchBar:focus {
+    border: 2px solid #3498db; /* Blue border when focused for a modern touch */
+    background-color: #fff; /* White background when focused */
+}
+
+
+#noResultsContainer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#noResultsContainer img {
+    max-width: 200px; /* Adjust as necessary */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Styles for previous orders list */
+#actionControlSection {
+    max-height: 85vh; /* Set maximum height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    padding: 10px;     /* Optional padding */
+    border: 1px solid #ccc; /* Optional border for clarity */
+    border-radius: 8px; /* Optional rounded corners */
+}
+
+.order-item {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.order-header:hover {
+    background-color: #e0e0e0;
+}
+
+.order-details {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.order-details ul {
+    padding-left: 20px;
+}
+
+.order-details ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-details ul li:last-child {
+    border-bottom: none;
+}
+
+.order-details ul li strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#chartSection h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Charts container should adapt to the screen size */
+#chartSection {
+    max-height: 90vh;
+    width: auto;
+    overflow-x: hidden;
+    border: 1px solid;
+    display: flex;
+    border-radius: 8px;
+    flex-wrap: wrap; /* Wrap charts if needed */
+    justify-content: center; /* Center charts in the available space */
+    padding-right: 20px; /* Adjust padding as needed */
+}
+
+.chart {
+    width: 100%;
+    max-width: 800px; /* Set a max width for charts in web view */
+    margin: 0 auto;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+.pie-chart canvas, .doughnut-chart canvas {
+    max-width: 500px; /* Limit size in web view */
+    max-height: 500px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Chart title and chart area */
+#chartSection canvas {
+    width: 100% !important; /* Make sure the canvas stretches to full container width */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Ensure charts don't overflow on small screens */
+@media (max-width: 768px) {
+    #chartSection {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .chart {
+        max-width: 100%;
+    }
+
+    #chartSection h2 {
+        font-size: 1.5rem;
+    }
+    .pie-chart canvas, .doughnut-chart canvas {
+        max-width: 100%; /* Allow full width on smaller screens */
+        max-height: auto;
+    }
+}
+
+/* Responsive typography for smaller devices */
+@media (max-width: 480px) {
+    #chartSection h2 {
+        font-size: 1.2rem;
+    }
+    .chart canvas text {
+        transform: rotate(-45deg); /* Rotate x-axis labels */
+        text-anchor: end;
+    }
+}
+
+/* Shop status container */
+.shop-status-container {
+    margin: 20px 10px;
+    padding: 15px;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Row for toggle + label */
+.shop-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Label beside toggle */
+.shop-status-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Switch (reuse your existing switch but tuned) */
+.shop-status-container .switch {
+    width: 55px;
+    height: 30px;
+    margin-right: 10px;
+}
+.shop-status-container .slider {
+    border-radius: 30px;
+}
+.shop-status-container .slider:before {
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+}
+
+/* Timings container */
+.timings-container {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Title inside timing box */
+.timings-container h4 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #4a90e2;
+}
+
+/* Inline time selection */
+.time-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap; /* stack on small screens */
+}
+.time-inline label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #444;
+}
+.to-label {
+    font-weight: bold;
+    color: #666;
+}
+
+/* Stylish select dropdown */
+.time-inline select {
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: linear-gradient(to bottom, #fff, #f7f7f7);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.time-inline select:hover {
+    border-color: #4a90e2;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+.time-inline select:focus {
+    border-color: #357abd;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74,144,226,0.25);
+}
+
+/* Responsive tweaks */
+@media (max-width: 500px) {
+    .time-inline {
+        flex-direction: row; /* keep same line */
+        flex-wrap: nowrap;   /* prevent wrapping */
+        gap: 8px;            /* slightly tighter gap for mobile */
+    }
+
+    .time-inline select {
+        flex: 1;             /* shrink to fit smaller screens */
+        min-width: 70px;     /* ensure tap-friendly size */
+    }
+}
