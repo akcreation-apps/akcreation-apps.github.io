@@ -223,6 +223,11 @@
         <i class="fa-solid fa-location-dot mr-1"></i> Top 3 Places <span class="badge badge-warning ml-1" style="font-size:0.6rem;vertical-align:middle;">Banner</span>
       </a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" id="manalytics-tab" data-toggle="tab" href="#manalytics" role="tab">
+        <i class="fa-solid fa-chart-pie mr-1"></i> Monthly Analytics
+      </a>
+    </li>
   </ul>
 
   <div class="tab-content">
@@ -512,6 +517,121 @@
         </div>
       </div>
     </div>
+
+    <!-- MONTHLY ANALYTICS TAB -->
+    <div class="tab-pane fade" id="manalytics" role="tabpanel">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-pen-to-square mr-1"></i> Monthly Analytics <span class="text-muted" style="font-size:0.75rem;font-weight:500;">· 1080×1080 Instagram post</span></h2>
+            <form id="manalyticsForm" autocomplete="off">
+              <div class="form-group">
+                <label for="ma_month">Month</label>
+                <select class="custom-select" id="ma_month"></select>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="ma_repeat_pct">Repeat Customer % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_repeat_pct" placeholder="e.g. 42" required>
+                </div>
+                <div class="form-group col-6">
+                  <label for="ma_total_discount">Total Discount Availed (₹) <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" class="form-control" id="ma_total_discount" placeholder="e.g. 1874" required>
+                </div>
+              </div>
+
+              <h6 class="mt-3 mb-2" style="color:var(--bb-orange);font-weight:700;letter-spacing:.04em;">
+                <i class="fa-solid fa-trophy mr-1"></i> Top 3 Restaurants
+              </h6>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_rest1">1st Restaurant <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_rest1" placeholder="e.g. The Cafe Darbar" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_rest1_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_rest1_pct" placeholder="e.g. 48" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_rest2">2nd Restaurant <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_rest2" placeholder="e.g. Biryani Junction" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_rest2_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_rest2_pct" placeholder="e.g. 30" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_rest3">3rd Restaurant <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_rest3" placeholder="e.g. Fastfood Corner" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_rest3_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_rest3_pct" placeholder="e.g. 22" required>
+                </div>
+              </div>
+
+              <h6 class="mt-3 mb-2" style="color:var(--bb-orange);font-weight:700;letter-spacing:.04em;">
+                <i class="fa-solid fa-location-dot mr-1"></i> Top 3 Places
+              </h6>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_place1">1st Place <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_place1" placeholder="e.g. Banki Town" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_place1_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_place1_pct" placeholder="e.g. 54" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_place2">2nd Place <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_place2" placeholder="e.g. Baideswar" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_place2_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_place2_pct" placeholder="e.g. 28" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_place3">3rd Place <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_place3" placeholder="e.g. Nachhipur" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_place3_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_place3_pct" placeholder="e.g. 18" required>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-ghost" id="ma_reset">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <div class="panel">
+            <h2><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Generated Prompt</h2>
+            <textarea class="form-control" id="ma_output" readonly></textarea>
+            <p class="hint mt-3" id="ma_hint"><i class="fa-solid fa-circle-info mr-1"></i>Fill all required fields to unlock Copy.</p>
+            <div class="mt-2 d-flex flex-wrap align-items-center" style="gap: 10px;">
+              <button type="button" class="btn btn-bb" id="ma_copy" style="display:none;">
+                <i class="fa-solid fa-copy mr-1"></i> Copy Prompt
+              </button>
+              <a href="../banki-bites-logo.png" download class="btn btn-ghost">
+                <i class="fa-solid fa-download mr-1"></i> Logo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -540,6 +660,7 @@
   fillMonths(document.getElementById('tc_month'));
   fillMonths(document.getElementById('tr_month'));
   fillMonths(document.getElementById('tp_month'));
+  fillMonths(document.getElementById('ma_month'));
 
   const val = id => document.getElementById(id).value.trim();
   const num = id => document.getElementById(id).value.trim() || '';
@@ -865,6 +986,127 @@ Rules:
     );
   }
 
+  function buildMonthlyAnalyticsPrompt() {
+    const month = val('ma_month');
+    return (
+`Design a SUPER eye-catchy, ultra-professional "Monthly Analytics Dashboard" Instagram post (SQUARE, 1080x1080, 300 DPI) for BankiBites, summarising the entire month of ${month} for our customers. Treat this like a premium data-viz screenshot from a top-tier product dashboard (think: Stripe / Linear / Vercel / Notion Charts / Apple Health / Spotify Wrapped Data) exported as a shareable Instagram card. Everything must sit inside a ~ 60 px safe margin on all four sides so nothing is cropped in the feed thumbnail.
+
+Reference bar (aim here — NOT a certificate, NOT a poster, NOT a birthday card):
+- Stripe monthly report card, Linear analytics screenshot, Vercel deploy dashboard, Superhuman metric card, Spotify Wrapped 2024 data slides, Apple Fitness monthly summary, Cred / Groww analytics screens. Editorial, calm, information-first. Numbers are the hero. Zero confetti, zero sparkle, zero ribbon, zero laurel, zero crest, zero mascot.
+
+Overall aesthetic:
+- Dark-mode SaaS dashboard exported to a 1:1 card. Feels like real product UI, not decoration. Grid-aligned, generous whitespace, sharp typography, crisp data-viz. The layout should read cleanly at Instagram thumbnail size (a viewer scrolling should be able to detect the standout numbers in under 1 second).
+
+Assets & imagery:
+- Use the ATTACHED BankiBites logo (circular badge) placed SMALL in the TOP-LEFT corner (~ 72 px), sitting flat on the dark canvas — no glow halo, no confetti, no ornament around it.
+- NO 3D character. NO delivery rider. NO mascot. NO food photography. NO plates, cutlery, or stock graphics. NO ornamental gold divider lines, NO stars, NO sparkles, NO ribbons, NO laurel wreaths, NO crests, NO medals as decoration (medals appear only inline in the ranking rows as tiny emoji, described below).
+
+Color system (strict — this is a dashboard, keep it disciplined):
+- Canvas background: near-black flat #0B0D12 with an extremely subtle 4–6% noise texture. No radial glows, no bokeh, no gradients behind the title.
+- Cards / tiles: dark surface #14171F, 1 px hairline border #232833, 12–16 px corner radius, ultra-soft 1 px inner top highlight #FFFFFF at 4% opacity for depth. NO drop shadows, NO orange glows on cards.
+- Primary accent (data-positive): BankiBites orange #F7931E for hero numbers, chart fills, progress bars.
+- Secondary accent: warm amber #FFB56B for supporting values.
+- Text hierarchy: pure white #FFFFFF for hero numbers, #E6E9EF for names, #8A93A6 (muted gray) for labels and captions.
+- Ranking accent chips: gold #F4C15A for #1, silver #C7CDD8 for #2, bronze #C88A5A for #3 — used only as small numeric badges "1", "2", "3" (NOT medal emoji graphics, NOT trophies).
+
+Typography (single family, disciplined weights):
+- Inter or Poppins, mixed weights only:
+  • 900 for hero KPI numbers (huge, tabular figures).
+  • 700 for restaurant / place names.
+  • 600 for section headers.
+  • 500 for muted captions.
+- Tabular / lining figures for ALL numbers so digits align vertically. Tight tracking on display numbers, generous tracking on small uppercase labels.
+- No cursive, no script, no handwritten fonts anywhere. This is a data card, not an award.
+
+Grid layout (top → bottom, aligned to a 12-column grid inside the safe zone):
+
+┌─────────────────────────────────────────┐
+│ [logo]  BankiBites            ${month} 20XX │  ← header strip
+│                                          │
+│ MONTHLY ANALYTICS                        │  ← eyebrow (muted gray, tiny, letter-spaced uppercase)
+│ ${month.toUpperCase()} PERFORMANCE       │  ← H1 white, Inter 900, huge
+│ ────────                                 │  ← 40 px orange bar underline
+│                                          │
+│ ┌──────────────┐  ┌──────────────┐       │  ← KPI ROW (2 tiles, equal width)
+│ │ REPEAT CUST. │  │ TOTAL DISCOUNT│       │
+│ │  ${num('ma_repeat_pct')}%  ●●●●●○○○ │  │ ₹${num('ma_total_discount')} │  ← big tabular number + supporting mini-viz
+│ └──────────────┘  └──────────────┘       │
+│                                          │
+│ ┌────────────────────────────────────┐   │  ← TOP RESTAURANTS card
+│ │ TOP RESTAURANTS         SHARE %    │   │
+│ │ 1  ${val('ma_rest1')}  ${num('ma_rest1_pct')}%  ▓▓▓▓▓▓▓▓░░░ │
+│ │ 2  ${val('ma_rest2')}  ${num('ma_rest2_pct')}%  ▓▓▓▓▓░░░░░░ │
+│ │ 3  ${val('ma_rest3')}  ${num('ma_rest3_pct')}%  ▓▓▓░░░░░░░░ │
+│ └────────────────────────────────────┘   │
+│                                          │
+│ ┌────────────────────────────────────┐   │  ← TOP PLACES card
+│ │ TOP PLACES              SHARE %    │   │
+│ │ 1  ${val('ma_place1')}  ${num('ma_place1_pct')}%  ▓▓▓▓▓▓▓▓░░░ │
+│ │ 2  ${val('ma_place2')}  ${num('ma_place2_pct')}%  ▓▓▓▓▓░░░░░░ │
+│ │ 3  ${val('ma_place3')}  ${num('ma_place3_pct')}%  ▓▓▓░░░░░░░░ │
+│ └────────────────────────────────────┘   │
+│                                          │
+│ powered by BankiBites   ·   ${month} report │  ← footer strip (muted)
+└─────────────────────────────────────────┘
+
+Section-by-section detail:
+
+1. HEADER STRIP (top ~ 8% of canvas):
+   - Left: the ATTACHED BankiBites circular logo at ~ 72 px, immediately followed by the wordmark "BankiBites" in Inter 700 white, 24 px.
+   - Right: month label "${month.toUpperCase()} REPORT" in Inter 600 muted gray #8A93A6, tiny letter-spaced uppercase, 14 px.
+   - Optional 1 px hairline divider #232833 beneath the strip.
+
+2. HERO TITLE BLOCK:
+   - Eyebrow: "MONTHLY ANALYTICS" in Inter 600, muted gray #8A93A6, letter-spaced uppercase, 16 px.
+   - H1: "${month.toUpperCase()} PERFORMANCE" in Inter 900 pure white, 60–72 px, tight tracking, single line.
+   - Under the H1: a short 40 px × 4 px solid orange (#F7931E) bar as an accent underline. That is the ONLY decorative element in the whole design.
+
+3. KPI ROW — two equal tiles side by side (12-col grid, 6 cols each, 24 px gap):
+   Tile A — "REPEAT CUSTOMERS":
+   - Tiny label: "REPEAT CUSTOMERS" (Inter 600 muted gray, uppercase, letter-spaced, 13 px).
+   - Hero value: "${num('ma_repeat_pct')}%" — Inter 900, 88–96 px, in BankiBites orange #F7931E, tabular figures.
+   - Supporting mini-viz beneath the number: a SEGMENTED PROGRESS BAR of 10 segments, corner radius 3 px, height 8 px. Fill the first N segments in orange #F7931E where N = round(${num('ma_repeat_pct')} / 10); the remaining segments are #232833. Right of the bar (small): "of customers came back".
+   Tile B — "TOTAL DISCOUNT GIVEN":
+   - Tiny label: "TOTAL DISCOUNT GIVEN" (same style).
+   - Hero value: "₹${num('ma_total_discount')}" — Inter 900, 88–96 px, in BankiBites orange #F7931E, tabular figures, thousands separator with a thin space if the number is ≥ 1000 (do NOT invent extra digits, do NOT abbreviate to "1.2K").
+   - Supporting caption beneath: "saved by BankiBites customers this month" (Inter 500 muted gray, 13 px).
+
+4. TOP RESTAURANTS TABLE-CARD:
+   - Card header row (top of the card, 20 px padding): left "TOP RESTAURANTS" in Inter 600 white 18 px; right "SHARE %" in Inter 600 muted gray 13 px letter-spaced uppercase.
+   - Three data rows, evenly spaced, separated by 1 px #1E222C hairlines:
+     Row 1: rank chip "1" (24 × 24 rounded square, gold fill #F4C15A on #1F1810 base, Inter 800 black digit) · restaurant name "${val('ma_rest1')}" in Inter 700 white 20 px · on the right: percentage "${num('ma_rest1_pct')}%" in Inter 800 orange #F7931E 20 px, tabular · followed by a horizontal HORIZONTAL BAR CHART segment sized proportionally (bar length = ${num('ma_rest1_pct')}% of the available bar track, height 6 px, corner radius 3 px, orange #F7931E fill, background track #232833).
+     Row 2: rank chip "2" (silver #C7CDD8) · "${val('ma_rest2')}" · "${num('ma_rest2_pct')}%" · bar sized to ${num('ma_rest2_pct')}%.
+     Row 3: rank chip "3" (bronze #C88A5A) · "${val('ma_rest3')}" · "${num('ma_rest3_pct')}%" · bar sized to ${num('ma_rest3_pct')}%.
+   - The three bars MUST be scaled proportionally to their percentages so the ranking is instantly visible at thumbnail size.
+
+5. TOP PLACES TABLE-CARD:
+   - Identical structure and styling to the Top Restaurants card.
+   - Card header: left "TOP PLACES" in Inter 600 white 18 px; right "SHARE %" in Inter 600 muted gray 13 px letter-spaced uppercase.
+   - Row 1: chip "1" gold · "${val('ma_place1')}" · "${num('ma_place1_pct')}%" · bar sized to ${num('ma_place1_pct')}%.
+   - Row 2: chip "2" silver · "${val('ma_place2')}" · "${num('ma_place2_pct')}%" · bar sized to ${num('ma_place2_pct')}%.
+   - Row 3: chip "3" bronze · "${val('ma_place3')}" · "${num('ma_place3_pct')}%" · bar sized to ${num('ma_place3_pct')}%.
+
+6. FOOTER STRIP (bottom ~ 5% of canvas):
+   - Single 1 px hairline #232833 above the strip.
+   - Left: "powered by BankiBites" in Inter 500 muted gray, with "BankiBites" set in orange #F7931E.
+   - Right: "${month} report · akcreation-apps.com/banki-bites" in Inter 500 muted gray, 12 px.
+
+Readability & scan-test rules (this is what makes it detectable at a glance):
+- The three biggest visual weights in the whole design MUST be, in order: (1) the two hero KPI numbers, (2) the H1 "${month.toUpperCase()} PERFORMANCE", (3) the rank-1 percentages in each ranking card.
+- Every horizontal bar in a ranking card must be visibly proportional to its percentage — bar 1 must be visibly wider than bar 2, and bar 2 visibly wider than bar 3.
+- Numbers use tabular figures and are right-aligned in each row so digits line up in a clean column.
+- The card grid must feel snapped to a mathematical rhythm: equal padding inside each card, equal gaps between cards, everything on multiples of 8 px.
+- Nothing overlaps. Nothing sits inside the 60 px outer safe margin.
+
+Rules:
+- Use EXACTLY the values above. Do NOT invent additional numbers, dates, percentages, ratings, or KPIs beyond what is listed here.
+- Every label and value must match the source strings letter-for-letter and be sharply legible at 1080×1080 AND still readable at Instagram feed thumbnail size. No lorem ipsum, no "Sample" text, no placeholder data, no misspellings.
+- Preserve the ranking order (rank chip 1 → 2 → 3) exactly as given for both the Restaurants and the Places sections.
+- Absolutely NO confetti, sparkle, gold divider, star, ribbon, laurel, crest, mascot, food photo, or 3D character. This is a data card, not a poster.
+- Output a single flat SQUARE 1080x1080 dashboard-style image — no device mockup, no phone frame, no drop-shadow around the whole card.`
+    );
+  }
+
   function toggleCopy(formId, btnId, hintId) {
     const valid = document.getElementById(formId).checkValidity();
     document.getElementById(btnId).style.display = valid ? '' : 'none';
@@ -891,12 +1133,17 @@ Rules:
     document.getElementById('tp_output').value = buildTopPlacesBannerPrompt();
     toggleCopy('tplacesForm', 'tp_copy', 'tp_hint');
   }
+  function refreshMonthlyAnalytics() {
+    document.getElementById('ma_output').value = buildMonthlyAnalyticsPrompt();
+    toggleCopy('manalyticsForm', 'ma_copy', 'ma_hint');
+  }
 
   document.getElementById('restaurantForm').addEventListener('input', refreshRestaurant);
   document.getElementById('customerForm').addEventListener('input', refreshCustomer);
   document.getElementById('tcustForm').addEventListener('input', refreshTopCustomer);
   document.getElementById('trestForm').addEventListener('input', refreshTopRestaurant);
   document.getElementById('tplacesForm').addEventListener('input', refreshTopPlaces);
+  document.getElementById('manalyticsForm').addEventListener('input', refreshMonthlyAnalytics);
 
   document.getElementById('r_reset').addEventListener('click', () => {
     document.getElementById('restaurantForm').reset();
@@ -926,6 +1173,11 @@ Rules:
     document.getElementById('tp_month').value = currentMonth;
     refreshTopPlaces();
   });
+  document.getElementById('ma_reset').addEventListener('click', () => {
+    document.getElementById('manalyticsForm').reset();
+    document.getElementById('ma_month').value = currentMonth;
+    refreshMonthlyAnalytics();
+  });
 
   const toast = document.getElementById('toast');
   function flashToast(msg) {
@@ -951,12 +1203,14 @@ Rules:
   document.getElementById('tc_copy').addEventListener('click', () => copyText(buildTopCustomerBannerPrompt()));
   document.getElementById('tr_copy').addEventListener('click', () => copyText(buildTopRestaurantBannerPrompt()));
   document.getElementById('tp_copy').addEventListener('click', () => copyText(buildTopPlacesBannerPrompt()));
+  document.getElementById('ma_copy').addEventListener('click', () => copyText(buildMonthlyAnalyticsPrompt()));
 
   refreshRestaurant();
   refreshCustomer();
   refreshTopCustomer();
   refreshTopRestaurant();
   refreshTopPlaces();
+  refreshMonthlyAnalytics();
 </script>
 
 </body>
