@@ -1,4 +1,448 @@
 {
+    "n77c1mryRtAHTwGkettp": {
+        "total_cart_value": 248,
+        "created_at": "2026-08-01T07:36:24.212000+00:00",
+        "triggered_to": "+917749984274",
+        "mch_place_custom": false,
+        "table_no": "COD",
+        "mch_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Mushroom_65.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Mushroom 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Veg_Biryani_(Half).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Veg Biryani (Half)"
+                        }
+                    ],
+                    "name": "Biryani N Rice"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "NqKwCK7zHfduSEAtwXgW": {
+        "total_cart_value": 387,
+        "created_at": "2026-07-31T07:14:28.648000+00:00",
+        "triggered_to": "+917749984274",
+        "mch_place_custom": false,
+        "table_no": "COD",
+        "mch_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Mushroom_65.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Mushroom 65"
+                        },
+                        {
+                            "price": 139,
+                            "image_src": "../food_src/Paneer_Chilli.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 106,
+                            "name": "Paneer Chilli"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Veg_Biryani_(Half).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Veg Biryani (Half)"
+                        }
+                    ],
+                    "name": "Biryani N Rice"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "aLoJGmCh1Yf4vFPLbUyP": {
+        "total_cart_value": 288,
+        "created_at": "2026-07-30T09:13:52.355000+00:00",
+        "triggered_to": "+917749984274",
+        "mch_place_custom": false,
+        "table_no": "COD",
+        "mch_place": "Khamaranga",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_65_Biryani_(6pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 602,
+                            "name": "Chicken 65 Biryani (6pc)"
+                        }
+                    ],
+                    "name": "Biryani"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Chicken_Manchurian.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 203,
+                            "name": "Chicken Manchurian"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "4lkO68bQ1RhTeXLxLPV4": {
+        "total_cart_value": 258,
+        "created_at": "2026-07-30T08:12:17.667000+00:00",
+        "triggered_to": "+917749984274",
+        "mch_place_custom": false,
+        "table_no": "COD",
+        "mch_place": "Gopalapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken 65"
+                        },
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Chilli_Chicken.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chilli Chicken"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "HFILpjkw5YhP3VYfoGpj": {
+        "total_cart_value": 248,
+        "created_at": "2026-07-30T07:57:25.883000+00:00",
+        "triggered_to": "+917749984274",
+        "mch_place_custom": false,
+        "table_no": "COD",
+        "mch_place": "Gopalapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 129,
+                            "image_src": "../food_src/Lemon_Chicken.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 205,
+                            "name": "Lemon Chicken"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Chicken_Kasa.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 1003,
+                            "name": "Chicken Kasa"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "ZWLW7XA7rhDuyG4ZY63Q": {
+        "total_cart_value": 209,
+        "created_at": "2026-07-29T07:41:27.056000+00:00",
+        "triggered_to": "+917749984274",
+        "mch_place_custom": false,
+        "table_no": "COD",
+        "mch_place": "Sisua",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Mushroom_Thali.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 703,
+                            "name": "Mushroom Thali"
+                        }
+                    ],
+                    "name": "Thali/Meal"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "8oxR1mZFTDRVVQtHe2wt": {
+        "total_cart_value": 169,
+        "created_at": "2026-07-29T07:41:22+00:00",
+        "triggered_to": "+917749984274",
+        "mch_place_custom": false,
+        "table_no": "COD",
+        "mch_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Veg_Biryani_(Half).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Veg Biryani (Half)"
+                        }
+                    ],
+                    "name": "Biryani N Rice"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "5DwtMNmmXoOisfyyp7GZ": {
+        "total_cart_value": 238,
+        "created_at": "2026-07-04T15:49:11.673000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "mch_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Chicken_Kasa.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 1003,
+                            "name": "Chicken Kasa"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "5n7PS1SiWRNQIJyZKwtK": {
+        "total_cart_value": 278,
+        "created_at": "2026-07-04T09:24:39.963000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "mch_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Chicken_65.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken 65"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_Thali.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 802,
+                            "name": "Chicken Thali"
+                        }
+                    ],
+                    "name": "Thali/Meal"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "gWkiPPzV8SZe9vjzxXh1": {
+        "total_cart_value": 318,
+        "created_at": "2026-07-04T07:42:57.340000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "mch_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Chicken_Thali.webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 802,
+                            "name": "Chicken Thali"
+                        }
+                    ],
+                    "name": "Thali/Meal"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "mijzGOvnCUagbXrNS5Me": {
+        "total_cart_value": 338,
+        "created_at": "2026-07-03T10:32:57.347000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "mch_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Mutton_Masala.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 1005,
+                            "name": "Mutton Masala"
+                        },
+                        {
+                            "price": 169,
+                            "image_src": "../food_src/Prawns_Masala.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 1006,
+                            "name": "Prawns Masala"
+                        }
+                    ],
+                    "name": "Curry"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "cDiGOglvEzaUBUuX3RR8": {
+        "total_cart_value": 238,
+        "created_at": "2026-07-03T07:52:59.462000+00:00",
+        "triggered_to": "+917749984274",
+        "table_no": "COD",
+        "mch_place": "Sisua",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Veg_Biryani_(Half).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Veg Biryani (Half)"
+                        }
+                    ],
+                    "name": "Biryani N Rice"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/Chilli_Chicken.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chilli Chicken"
+                        }
+                    ],
+                    "name": "Starter"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
     "Rxr8cKMpF9NKhFVH9BkD": {
         "total_cart_value": 221,
         "created_at": "2026-07-01T14:00:02.338000+00:00",
@@ -38,276 +482,5 @@
         ],
         "delivery_charges": 50,
         "status": "Approved"
-    },
-    "GCyAynm1l26viNUiqGlu": {
-        "total_cart_value": 189,
-        "created_at": "2026-06-29T07:35:52.204000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Gopalapur",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 139,
-                            "image_src": "../food_src/Chicken_Biryani_(3pc_1Egg).webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 601,
-                            "name": "Chicken Biryani (3pc 1Egg)"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Approved"
-    },
-    "sCBiVxr1306gnNwreEw6": {
-        "total_cart_value": 382,
-        "created_at": "2026-06-28T13:35:53.999000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Harirajpur",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 119,
-                            "image_src": "../food_src/Chicken_Kasa.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 1003,
-                            "name": "Chicken Kasa"
-                        },
-                        {
-                            "price": 99,
-                            "image_src": "../food_src/Paneer_Mix_Veg.webp",
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 901,
-                            "name": "Paneer Mix Veg"
-                        }
-                    ],
-                    "name": "Curry"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 119,
-                            "image_src": "../food_src/Chicken_65.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 201,
-                            "name": "Chicken 65"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 9,
-                            "image_src": "../food_src/Chapati_(Roti).webp",
-                            "quantity": 5,
-                            "id": 1101,
-                            "name": "Chapati (Roti)"
-                        }
-                    ],
-                    "name": "Roti N Breads"
-                }
-            }
-        ],
-        "status": "Approved"
-    },
-    "PqjkOwsHJAMpHvf9bn7L": {
-        "total_cart_value": 219,
-        "created_at": "2026-06-28T08:33:56.435000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Banki",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "image_src": "../food_src/Maa_Charchika_Special_Chicken_Biryani.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 604,
-                            "name": "Maa Charchika Special Chicken Biryani"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "status": "Approved"
-    },
-    "rhhpqOYCtS1kF29ZgRAr": {
-        "total_cart_value": 169,
-        "created_at": "2026-06-27T10:37:01.571000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Sahadapada",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 119,
-                            "image_src": "../food_src/Chilli_Chicken.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chilli Chicken"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "OmdLCm7WbbNaRErqrk7I": {
-        "total_cart_value": 338,
-        "created_at": "2026-06-24T06:55:06.878000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Khamaranga",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 119,
-                            "image_src": "../food_src/Chicken_Kasa.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 1003,
-                            "name": "Chicken Kasa"
-                        }
-                    ],
-                    "name": "Curry"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 219,
-                            "image_src": "../food_src/Maa_Charchika_Special_Chicken_Biryani.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 604,
-                            "name": "Maa Charchika Special Chicken Biryani"
-                        }
-                    ],
-                    "name": "Biryani"
-                }
-            }
-        ],
-        "status": "Approved"
-    },
-    "oyEN82PlBPgPPSe0qiqo": {
-        "total_cart_value": 238,
-        "created_at": "2026-06-21T08:28:03.115000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Banki",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 119,
-                            "image_src": "../food_src/Chilli_Chicken.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chilli Chicken"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 119,
-                            "image_src": "../food_src/Chicken_Kasa.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 1003,
-                            "name": "Chicken Kasa"
-                        }
-                    ],
-                    "name": "Curry"
-                }
-            }
-        ],
-        "status": "Rejected"
-    },
-    "Nh3FnBsfRPp8Qdb7jNID": {
-        "total_cart_value": 179,
-        "created_at": "2026-06-15T07:32:13.260000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Banki",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 129,
-                            "image_src": "../food_src/Mushroom_Chilli.webp",
-                            "type": "Veg",
-                            "quantity": 1,
-                            "id": 102,
-                            "name": "Mushroom Chilli"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
-    },
-    "ZkpPoEHIq6qfanFGNbwJ": {
-        "total_cart_value": 169,
-        "created_at": "2026-06-09T13:42:11.297000+00:00",
-        "triggered_to": "+917749984274",
-        "table_no": "COD",
-        "mch_place": "Ranapur",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 119,
-                            "image_src": "../food_src/Chilli_Chicken.webp",
-                            "type": "NonVeg",
-                            "quantity": 1,
-                            "id": 202,
-                            "name": "Chilli Chicken"
-                        }
-                    ],
-                    "name": "Starter"
-                }
-            }
-        ],
-        "delivery_charges": 50,
-        "status": "Rejected"
     }
 }
