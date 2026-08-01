@@ -575,6 +575,40 @@
               </div>
 
               <h6 class="mt-3 mb-2" style="color:var(--bb-orange);font-weight:700;letter-spacing:.04em;">
+                <i class="fa-solid fa-bowl-food mr-1"></i> Top 3 Items Sold
+              </h6>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_item1">1st Item <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_item1" placeholder="e.g. Chicken Biryani" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_item1_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_item1_pct" placeholder="e.g. 32" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_item2">2nd Item <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_item2" placeholder="e.g. Chilli Chicken" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_item2_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_item2_pct" placeholder="e.g. 24" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-8">
+                  <label for="ma_item3">3rd Item <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="text" class="form-control" id="ma_item3" placeholder="e.g. Mix Veg Burger" required>
+                </div>
+                <div class="form-group col-4">
+                  <label for="ma_item3_pct">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="ma_item3_pct" placeholder="e.g. 18" required>
+                </div>
+              </div>
+
+              <h6 class="mt-3 mb-2" style="color:var(--bb-orange);font-weight:700;letter-spacing:.04em;">
                 <i class="fa-solid fa-location-dot mr-1"></i> Top 3 Places
               </h6>
               <div class="form-row">
@@ -1039,12 +1073,12 @@ Grid layout (top → bottom, aligned to a 12-column grid inside the safe zone):
 │ │ 3  ${val('ma_rest3')}  ${num('ma_rest3_pct')}%  ▓▓▓░░░░░░░░ │
 │ └────────────────────────────────────┘   │
 │                                          │
-│ ┌────────────────────────────────────┐   │  ← TOP PLACES card
-│ │ TOP PLACES              SHARE %    │   │
-│ │ 1  ${val('ma_place1')}  ${num('ma_place1_pct')}%  ▓▓▓▓▓▓▓▓░░░ │
-│ │ 2  ${val('ma_place2')}  ${num('ma_place2_pct')}%  ▓▓▓▓▓░░░░░░ │
-│ │ 3  ${val('ma_place3')}  ${num('ma_place3_pct')}%  ▓▓▓░░░░░░░░ │
-│ └────────────────────────────────────┘   │
+│ ┌───────────────────┐ ┌───────────────────┐│ ← TOP ITEMS + TOP PLACES side-by-side
+│ │ TOP ITEMS   %     │ │ TOP PLACES   %    ││
+│ │ 1 ${val('ma_item1')} ${num('ma_item1_pct')}%│ │ 1 ${val('ma_place1')} ${num('ma_place1_pct')}%│
+│ │ 2 ${val('ma_item2')} ${num('ma_item2_pct')}%│ │ 2 ${val('ma_place2')} ${num('ma_place2_pct')}%│
+│ │ 3 ${val('ma_item3')} ${num('ma_item3_pct')}%│ │ 3 ${val('ma_place3')} ${num('ma_place3_pct')}%│
+│ └───────────────────┘ └───────────────────┘│
 │                                          │
 │ powered by BankiBites   ·   ${month} report │  ← footer strip (muted)
 └─────────────────────────────────────────┘
@@ -1079,12 +1113,21 @@ Section-by-section detail:
      Row 3: rank chip "3" (bronze #C88A5A) · "${val('ma_rest3')}" · "${num('ma_rest3_pct')}%" · bar sized to ${num('ma_rest3_pct')}%.
    - The three bars MUST be scaled proportionally to their percentages so the ranking is instantly visible at thumbnail size.
 
-5. TOP PLACES TABLE-CARD:
-   - Identical structure and styling to the Top Restaurants card.
-   - Card header: left "TOP PLACES" in Inter 600 white 18 px; right "SHARE %" in Inter 600 muted gray 13 px letter-spaced uppercase.
+5. BOTTOM ROW — TWO CARDS SIDE-BY-SIDE (12-col grid, 6 cols each, 24 px gap). Both cards use the same table-card structure as the Top Restaurants card above, but rendered more compact so both fit inside the square canvas without overflowing the 60 px safe margin. Use slightly smaller name (16 px) and percentage (16 px) type sizes inside these two cards. Truncate long names with an ellipsis if needed rather than wrapping to a second line.
+
+   Card L — TOP ITEMS SOLD:
+   - Card header: left "TOP ITEMS SOLD" in Inter 600 white 16 px; right "SHARE %" in Inter 600 muted gray 12 px letter-spaced uppercase.
+   - Row 1: rank chip "1" gold · item name "${val('ma_item1')}" in Inter 700 white · "${num('ma_item1_pct')}%" in Inter 800 orange #F7931E · proportional horizontal bar sized to ${num('ma_item1_pct')}%.
+   - Row 2: rank chip "2" silver · "${val('ma_item2')}" · "${num('ma_item2_pct')}%" · bar sized to ${num('ma_item2_pct')}%.
+   - Row 3: rank chip "3" bronze · "${val('ma_item3')}" · "${num('ma_item3_pct')}%" · bar sized to ${num('ma_item3_pct')}%.
+
+   Card R — TOP PLACES:
+   - Card header: left "TOP PLACES" in Inter 600 white 16 px; right "SHARE %" in Inter 600 muted gray 12 px letter-spaced uppercase.
    - Row 1: chip "1" gold · "${val('ma_place1')}" · "${num('ma_place1_pct')}%" · bar sized to ${num('ma_place1_pct')}%.
    - Row 2: chip "2" silver · "${val('ma_place2')}" · "${num('ma_place2_pct')}%" · bar sized to ${num('ma_place2_pct')}%.
    - Row 3: chip "3" bronze · "${val('ma_place3')}" · "${num('ma_place3_pct')}%" · bar sized to ${num('ma_place3_pct')}%.
+
+   The three bars within EACH card must remain visibly proportional to their percentages (row 1 wider than row 2, row 2 wider than row 3). The two cards do NOT need to be normalised against each other — each card is scaled to its own 100%.
 
 6. FOOTER STRIP (bottom ~ 5% of canvas):
    - Single 1 px hairline #232833 above the strip.
@@ -1101,7 +1144,7 @@ Readability & scan-test rules (this is what makes it detectable at a glance):
 Rules:
 - Use EXACTLY the values above. Do NOT invent additional numbers, dates, percentages, ratings, or KPIs beyond what is listed here.
 - Every label and value must match the source strings letter-for-letter and be sharply legible at 1080×1080 AND still readable at Instagram feed thumbnail size. No lorem ipsum, no "Sample" text, no placeholder data, no misspellings.
-- Preserve the ranking order (rank chip 1 → 2 → 3) exactly as given for both the Restaurants and the Places sections.
+- Preserve the ranking order (rank chip 1 → 2 → 3) exactly as given for the Restaurants, Items Sold, and Places sections.
 - Absolutely NO confetti, sparkle, gold divider, star, ribbon, laurel, crest, mascot, food photo, or 3D character. This is a data card, not a poster.
 - Output a single flat SQUARE 1080x1080 dashboard-style image — no device mockup, no phone frame, no drop-shadow around the whole card.`
     );
