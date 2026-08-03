@@ -473,8 +473,8 @@
                   <input type="text" class="form-control" id="tp_place1" placeholder="e.g. Banki Town" required>
                 </div>
                 <div class="form-group col-4">
-                  <label for="tp_orders1">Orders <span style="color:var(--bb-orange)">*</span></label>
-                  <input type="number" min="0" class="form-control" id="tp_orders1" placeholder="e.g. 148" required>
+                  <label for="tp_orders1">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="tp_orders1" placeholder="e.g. 54" required>
                 </div>
               </div>
               <div class="form-row">
@@ -483,8 +483,8 @@
                   <input type="text" class="form-control" id="tp_place2" placeholder="e.g. Baideswar" required>
                 </div>
                 <div class="form-group col-4">
-                  <label for="tp_orders2">Orders <span style="color:var(--bb-orange)">*</span></label>
-                  <input type="number" min="0" class="form-control" id="tp_orders2" placeholder="e.g. 96" required>
+                  <label for="tp_orders2">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="tp_orders2" placeholder="e.g. 28" required>
                 </div>
               </div>
               <div class="form-row">
@@ -493,8 +493,8 @@
                   <input type="text" class="form-control" id="tp_place3" placeholder="e.g. Nachhipur" required>
                 </div>
                 <div class="form-group col-4">
-                  <label for="tp_orders3">Orders <span style="color:var(--bb-orange)">*</span></label>
-                  <input type="number" min="0" class="form-control" id="tp_orders3" placeholder="e.g. 54" required>
+                  <label for="tp_orders3">Share % <span style="color:var(--bb-orange)">*</span></label>
+                  <input type="number" min="0" max="100" step="0.1" class="form-control" id="tp_orders3" placeholder="e.g. 18" required>
                 </div>
               </div>
               <button type="button" class="btn btn-ghost" id="tp_reset">
@@ -950,12 +950,12 @@ Banner purpose: Celebrate the "TOP 3 DELIVERY PLACES" for BankiBites — ${month
 Composition note: For this banner ONLY, the podium is the visual hero, so the LEFT/RIGHT split from BANNER_VIBE is replaced by an editorial LEFT-title + RIGHT-podium composition. The 3D rider from BANNER_VIBE is OMITTED for this banner (it competes with the podium). All content sits inside the vertical middle 60% safe zone and on top of the ambient bokeh orbs so it belongs to the same scene.
 
 LEFT column (~ 42% width) — editorial title stack, left-aligned, sitting on the center-left ambient bokeh orb:
-1. Editorial eyebrow "${month.toUpperCase()} — MOST-ORDERED NEIGHBOURHOODS" in tiny letter-spaced uppercase Poppins/Inter 600, muted gray #C9CDD4, preceded by a short 24 px orange horizontal rule (—).
+1. Editorial eyebrow "${month.toUpperCase()} — NEIGHBOURHOODS BY ORDER SHARE" in tiny letter-spaced uppercase Poppins/Inter 600, muted gray #C9CDD4, preceded by a short 24 px orange horizontal rule (—).
 2. Stacked display title in bold Poppins/Inter 900, tightly tracked:
    • Line 1: "OUR TOP" — medium size, muted white 80% opacity.
    • Line 2: "3 PLACES" — very large, full white, with the numeral "3" rendered in BankiBites orange #F7931E. No crests, no pins, no laurels above the title.
 3. A single hairline horizontal rule in warm gold #C88A2E, 1 px, spanning ~ 220 px of the left column. No ornament.
-4. One quiet supporting line in muted gray #C9CDD4, Poppins 500, ~ 15 px: "Neighbourhoods leading the month by order volume."
+4. One quiet supporting line in muted gray #C9CDD4, Poppins 500, ~ 15 px: "Neighbourhoods leading the month by order share."
 
 RIGHT column (~ 52% width, ~ 6% breathing gap between columns) — the podium.
 
@@ -980,7 +980,7 @@ RANK 1 (CENTER, TALLEST — the winner):
     • The "1" sits at the top-center of the card, sized to visually dominate the other two numerals.
 - Beneath the "1": a 1 px 30%-opacity gold hairline separator, ~ 70 px wide, centered.
 - Place name: "${val('tp_place1')}" in bold Poppins / Inter 800 uppercase, letter-spaced, pure white — noticeably larger than the 2nd/3rd place names.
-- Order count: "${num('tp_orders1')}" as a large tabular Poppins / Inter 900 numeral in BankiBites orange #F7931E, with a soft warm outer bloom (~ 8 px, ~ 30% opacity) so it feels lit. Small muted-gray #C9CDD4 caption "orders" directly beneath, letter-spaced.
+- Order share: "${num('tp_orders1')}%" as a large tabular Poppins / Inter 900 numeral in BankiBites orange #F7931E, with a soft warm outer bloom (~ 8 px, ~ 30% opacity) so it feels lit. Small muted-gray #C9CDD4 caption "share" directly beneath, letter-spaced.
 
 RANK 2 (LEFT, MEDIUM — silver):
 - Card fill: a subtle vertical gradient #1C1B22 → #101018. No orb, no glow.
@@ -988,7 +988,7 @@ RANK 2 (LEFT, MEDIUM — silver):
 - Rank badge: a large "2" in Poppins / Inter 900 tabular, filled with a metallic silver gradient (#EDEFF3 top → #A8AEBB bottom), no neon, no glow — flat metallic. Sized ~ 78% of the "1".
 - Beneath the "2": a 1 px 20%-opacity silver hairline separator, ~ 60 px wide, centered.
 - Place name: "${val('tp_place2')}" in bold Poppins / Inter 800 uppercase, letter-spaced, muted white (90% opacity).
-- Order count: "${num('tp_orders2')}" in Poppins / Inter 900 white (95% opacity), no glow. Small muted-gray "orders" caption beneath.
+- Order share: "${num('tp_orders2')}%" in Poppins / Inter 900 white (95% opacity), no glow. Small muted-gray "share" caption beneath.
 
 RANK 3 (RIGHT, SHORTEST — bronze):
 - Card fill: a subtle vertical gradient #1A1620 → #0F0E17. No orb, no glow.
@@ -996,13 +996,13 @@ RANK 3 (RIGHT, SHORTEST — bronze):
 - Rank badge: a large "3" in Poppins / Inter 900 tabular, filled with a metallic bronze gradient (#D89A6E top → #7A4E2F bottom), no neon, no glow — flat metallic. Sized ~ 66% of the "1".
 - Beneath the "3": a 1 px 20%-opacity bronze hairline separator, ~ 60 px wide, centered.
 - Place name: "${val('tp_place3')}" in bold Poppins / Inter 800 uppercase, letter-spaced, muted white (80% opacity).
-- Order count: "${num('tp_orders3')}" in Poppins / Inter 900 muted white (85% opacity), no glow. Small muted-gray "orders" caption beneath.
+- Order share: "${num('tp_orders3')}%" in Poppins / Inter 900 muted white (85% opacity), no glow. Small muted-gray "share" caption beneath.
 
 Ranking cues that MUST land — self-check before rendering:
 - #1 is the ONLY card that is both taller AND has a lit background orb AND has a neon-glowing rank numeral. #2 and #3 must feel dimmer and cooler by comparison — no orb, no glow, flat metallic numerals.
 - The metallic border colors (gold / silver / bronze) match the universal winners'-medal color code — this is the fastest hierarchy signal in the world; do not swap or muddle it.
 - The rank numeral SIZE ratio (1 : 2 : 3) is roughly 1.00 : 0.78 : 0.66. Do not render all three at the same size.
-- The order-count colors also cascade: orange (with soft bloom) → bright white → muted white.
+- The order-share colors also cascade: orange (with soft bloom) → bright white → muted white.
 
 Full-width footer strip (placed at the bottom edge of the safe zone, NOT at the canvas edge):
 - A single 1 px hairline divider at 20% opacity white — no ornament, no star, no dot at the center.
