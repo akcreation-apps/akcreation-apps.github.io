@@ -1,13 +1,8 @@
 {
   "_OFFER_KEYS_DOCS": [
     "To feature a dish in the top Deals of the Day rail, add TWO optional keys to that dish:",
-    "  offer_price (number) — fake higher MRP; must be strictly greater than price. Renders strikethrough.",
-    "  is_offer (boolean, true) — include this dish in the horizontal Deals rail at the top of the menu.",
-    "Behaviour: both keys => dish appears in Deals rail AND its normal category card shows a red X% OFF badge + strikethrough MRP.",
-    "Only offer_price (no is_offer) => ignored on the index page — neither strikethrough nor OFF badge renders. is_offer:true is required to advertise any discount.",
-    "Only is_offer (no offer_price) => ignored (console.warn) — nothing to strike through.",
-    "Percent OFF is computed as round((offer_price - price) / offer_price * 100). Cart still charges the real price.",
-    "Example: {\"id\": 105, \"name\": \"Honey Chilli Potato\", \"price\": 179, \"offer_price\": 229, \"is_offer\": true}"
+    "  offer_price (number) \u2014 fake higher MRP; must be strictly greater than price. Renders strikethrough.",
+    "  is_offer (boolean, true) \u2014 include this dish in the horizontal Deals rail at the top of the menu."
   ],
   "menu": [
     {
@@ -30,7 +25,12 @@
               "price": 49,
               "available_time": "",
               "not_available_time": "",
-              "non_available_days": [1, 2, 4, 6]
+              "non_available_days": [
+                1,
+                2,
+                4,
+                6
+              ]
             }
           ]
         },
@@ -112,6 +112,22 @@
               "id": 207,
               "name": "Chilli Chicken",
               "price": 129,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 208,
+              "name": "Chicken Manchurian",
+              "price": 99,
+              "offer_price": 139,
+              "is_offer": true,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 209,
+              "name": "Chicken 65",
+              "price": 139,
               "available_time": "",
               "not_available_time": ""
             }
