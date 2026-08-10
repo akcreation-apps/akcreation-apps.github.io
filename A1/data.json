@@ -137,7 +137,6 @@
               "name": "Chicken Manchurian",
               "price": 139,
               "offer_price": 159,
-              "is_offer": true,
               "available_time": 16,
               "not_available_time": ""
             }
