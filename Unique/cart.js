@@ -199,6 +199,32 @@ const updateEtaRow = () => {
     }
 };
 
+// Reserve bottom space equal to the fixed cart-total container's height so its
+// growing content (e.g. custom-place note) never hides the last cart items on mobile.
+const syncCartBottomPadding = () => {
+    const cart = document.getElementById('cart');
+    const container = document.getElementById('cart-total-container');
+    if (!cart || !container) return;
+    const isMobile = window.matchMedia('(max-width: 899px)').matches;
+    const visible = getComputedStyle(container).display !== 'none';
+    if (isMobile && visible) {
+        cart.style.paddingBottom = (container.offsetHeight + 8) + 'px';
+    } else {
+        cart.style.paddingBottom = '';
+    }
+};
+
+// Toggle the "custom place — extra charge" notice above Place Order.
+const updateCustomPlaceNote = () => {
+    const el = document.getElementById('custom-place-note');
+    if (!el) return;
+    const isCustom = localStorage.getItem(_safeLsKey('place_custom')) === '1';
+    el.hidden = !isCustom;
+    requestAnimationFrame(syncCartBottomPadding);
+};
+window.updateCustomPlaceNote = updateCustomPlaceNote;
+window.addEventListener('resize', syncCartBottomPadding);
+
 // Calculate and update the total price
 const updateTotalPrice = () => {
     const totalPriceElement = document.getElementById('cart-total');
@@ -251,6 +277,7 @@ const updateTotalPrice = () => {
     // Update the displayed total price
     totalPriceElement.textContent = `₹${total.toFixed(0)}`;
     updateEtaRow();
+    updateCustomPlaceNote();
 };
 
 
@@ -271,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     renderCartItems();
     updateDeliveryBadge();
+    updateCustomPlaceNote();
     updateEtaRow();
     setInterval(updateEtaRow, 30000);
     hideLoader();

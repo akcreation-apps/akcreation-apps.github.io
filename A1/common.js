@@ -249,6 +249,8 @@ function updateDeliveryBadge() {
         await openPlacePicker(current, 'Change delivery location', true, this);
         updateDeliveryBadge();
     });
+
+    if (typeof window.updateCustomPlaceNote === 'function') window.updateCustomPlaceNote();
 }
 
 function redirect_to_home(){

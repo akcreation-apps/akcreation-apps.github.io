@@ -485,6 +485,8 @@ function updateDeliveryBadge() {
         await openBakeryOrderPicker(true);
         updateDeliveryBadge();
     });
+
+    if (typeof window.updateCustomPlaceNote === 'function') window.updateCustomPlaceNote();
 }
 
 // Full-screen image preview for cake designs. Lightbox element is created
