@@ -114,6 +114,12 @@ let renderedTabs = {};
       currentUser = user;
       $('#userEmail').textContent = user.email;
       showShell();
+      // Ask once for browser-notification permission so we can alert on
+      // new orders when this tab is backgrounded. Silent if already
+      // granted/denied — no fallback prompt.
+      if ('Notification' in window && Notification.permission === 'default') {
+        try { Notification.requestPermission(); } catch {}
+      }
       // Land on Orders when there are active deliveries to triage; otherwise
       // open the Dashboard for a high-level read of the business.
       const landing = await pickLandingTab(await getDb());

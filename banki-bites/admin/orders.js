@@ -13,6 +13,156 @@ import {
 // on the orders collection across tab switches.
 let _ordersUnsub = null;
 
+// New-order alert plumbing. State is module-scoped so a Firestore snapshot
+// during an admin's session doesn't re-alert on orders they've already seen.
+let _newOrderState = null;
+function initNewOrderAlerts() {
+  if (_newOrderState) return _newOrderState;
+  _newOrderState = {
+    seenIds: new Set(),
+    prevStatus: new Map(),
+    firstSnapshot: true,
+    badgeCount: 0,
+    origTitle: document.title,
+    flashTimer: null,
+    audioCtx: null,
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && isOrdersTabActive()) clearNewOrderCues();
+  });
+  document.getElementById('tab-btn-orders')?.addEventListener('click', clearNewOrderCues);
+  return _newOrderState;
+}
+function isOrdersTabActive() {
+  return !!document.getElementById('tab-btn-orders')?.classList.contains('active');
+}
+function playNewOrderChime() {
+  const s = _newOrderState;
+  try {
+    if (!s.audioCtx) s.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = s.audioCtx;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    const t0 = ctx.currentTime;
+    [[880, 0], [1320, 0.18]].forEach(([freq, delay]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, t0 + delay);
+      gain.gain.linearRampToValueAtTime(0.25, t0 + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0 + delay + 0.35);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0 + delay);
+      osc.stop(t0 + delay + 0.4);
+    });
+  } catch {}
+}
+function showNewOrderBrowserNotification(order) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const name = order.customer?.name || order.customer_name || 'Customer';
+  const total = order.total ?? order.total_amount;
+  try {
+    new Notification('New BankiBites order', {
+      body: `${name}${total != null ? ' — ₹' + total : ''}`,
+      icon: '/banki-bites/banki-bites-logo.png',
+      tag: order.id,
+    });
+  } catch {}
+}
+function shortOrderRef(order) {
+  const id = order.id || '';
+  return id ? `#${id.slice(-6).toUpperCase()}` : '';
+}
+function showStatusBrowserNotification(kind, order) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const ref = shortOrderRef(order);
+  const name = order.customer?.name || order.customer_name || 'Customer';
+  const total = order.total ?? order.total_amount;
+  let title, body;
+  if (kind === 'out_for_delivery') {
+    title = `Order ${ref} out for delivery`;
+    body = `${name} — on the way`;
+  } else {
+    title = `Order ${ref} delivered ✓`;
+    body = `${name}${total != null ? ' — ₹' + total + ' collected' : ''}`;
+  }
+  try {
+    new Notification(title, {
+      body,
+      icon: '/banki-bites/banki-bites-logo.png',
+      tag: `${order.id}:${kind}`,
+    });
+  } catch {}
+}
+function bumpOrdersBadge() {
+  const s = _newOrderState;
+  s.badgeCount++;
+  const btn = document.getElementById('tab-btn-orders');
+  if (!btn) return;
+  let badge = btn.querySelector('.tab-badge');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'tab-badge';
+    badge.setAttribute('aria-label', 'new orders');
+    btn.appendChild(badge);
+  }
+  badge.textContent = s.badgeCount > 99 ? '99+' : String(s.badgeCount);
+}
+function startTitleFlash() {
+  const s = _newOrderState;
+  if (s.flashTimer) return;
+  let on = false;
+  s.flashTimer = setInterval(() => {
+    on = !on;
+    document.title = on ? '🔔 New order!' : s.origTitle;
+  }, 1000);
+}
+function clearNewOrderCues() {
+  const s = _newOrderState;
+  if (!s) return;
+  s.badgeCount = 0;
+  document.getElementById('tab-btn-orders')?.querySelector('.tab-badge')?.remove();
+  if (s.flashTimer) { clearInterval(s.flashTimer); s.flashTimer = null; }
+  document.title = s.origTitle;
+}
+function alertNewOrder(order) {
+  playNewOrderChime();
+  const background = document.visibilityState === 'hidden' || !isOrdersTabActive();
+  if (background) {
+    showNewOrderBrowserNotification(order);
+    bumpOrdersBadge();
+    startTitleFlash();
+  }
+}
+// Soft, single-tone chime for informational status transitions (out for
+// delivery / delivered). Distinct pitch from the new-order chime so the
+// admin can tell them apart by ear.
+function playStatusChime(kind) {
+  const s = _newOrderState;
+  try {
+    if (!s.audioCtx) s.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = s.audioCtx;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    const t0 = ctx.currentTime;
+    // out_for_delivery: two rising blips. delivered: single mellow tone.
+    const notes = kind === 'out_for_delivery'
+      ? [[660, 0], [990, 0.14]]
+      : [[520, 0]];
+    notes.forEach(([freq, delay]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, t0 + delay);
+      gain.gain.linearRampToValueAtTime(0.15, t0 + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0 + delay + 0.4);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0 + delay);
+      osc.stop(t0 + delay + 0.45);
+    });
+  } catch {}
+}
+
 const orderCharts = new Map();
 function mountOrderChart(id, config) {
   const old = orderCharts.get(id);
@@ -239,6 +389,7 @@ export async function renderOrders(root, db) {
   const sinceTs = Timestamp.fromDate(startOfLastMonth());
   const q = query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs));
   if (_ordersUnsub) { try { _ordersUnsub(); } catch {} _ordersUnsub = null; }
+  const alertState = initNewOrderAlerts();
   _ordersUnsub = onSnapshot(q, snap => {
     // Any order mutation (from this tab, another admin, or the delivery app)
     // fires this listener. Bust the shared caches so Dashboard / Staff /
@@ -248,6 +399,39 @@ export async function renderOrders(root, db) {
     invalidateCustomersCache();
     allOrders = [];
     snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
+    // Alert on newly-inserted "new"-status orders. The very first snapshot is
+    // the backfill, so we seed seenIds and skip alerts. Subsequent snapshots
+    // only fire for genuine inserts we haven't seen before.
+    if (alertState.firstSnapshot) {
+      snap.forEach(d => {
+        alertState.seenIds.add(d.id);
+        alertState.prevStatus.set(d.id, d.data().status || 'new');
+      });
+      alertState.firstSnapshot = false;
+    } else {
+      snap.docChanges().forEach(ch => {
+        const id = ch.doc.id;
+        const data = ch.doc.data();
+        const status = data.status || 'new';
+        if (ch.type === 'added') {
+          if (alertState.seenIds.has(id)) return;
+          alertState.seenIds.add(id);
+          alertState.prevStatus.set(id, status);
+          if (status === 'new') alertNewOrder({ id, ...data });
+        } else if (ch.type === 'modified') {
+          const prev = alertState.prevStatus.get(id);
+          alertState.prevStatus.set(id, status);
+          if (prev === status) return;
+          if (status === 'out_for_delivery' || status === 'delivered') {
+            playStatusChime(status);
+            const background = document.visibilityState === 'hidden' || !isOrdersTabActive();
+            if (background) showStatusBrowserNotification(status, { id, ...data });
+          }
+        } else if (ch.type === 'removed') {
+          alertState.prevStatus.delete(id);
+        }
+      });
+    }
     allOrders.sort((a, b) => {
       const ta = a.created_at?.toMillis?.() || 0;
       const tb = b.created_at?.toMillis?.() || 0;

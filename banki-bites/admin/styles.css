@@ -162,6 +162,28 @@ select.form-control, textarea.form-control {
   border-bottom: 3px solid transparent;
   transition: color .15s, border-color .15s, background .15s;
   scroll-snap-align: start;
+  position: relative;
+}
+.tab-btn .tab-badge {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #e11d48;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--surface);
+  animation: bb-badge-pulse 1s ease-in-out infinite;
+}
+@keyframes bb-badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
 }
 .tab-btn i { font-size: 1.05rem; }
 .tab-btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
