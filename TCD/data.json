@@ -13,20 +13,6 @@
           "type": "Veg",
           "dishes": [
             {
-              "id": 101,
-              "name": "Crispy Corn",
-              "price": 139,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 102,
-              "name": "Stir Fried Baby Corn",
-              "price": 179,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 103,
               "name": "Paneer Chilli",
               "price": 179,
