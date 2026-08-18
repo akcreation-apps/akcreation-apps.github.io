@@ -484,21 +484,31 @@ function renderKpis(el, orders, ordersAll, partners, staff, rules) {
   // Orders KPI — delivered count only; total shown in sub-line
   const deliveredOrders = orders.filter(isDelivered);
 
-  // Revenue KPI — current month vs last month (uses ordersAll — always the
-  // full MoM window regardless of picker selection).
-  const curStart = startOfCurrentMonth();
-  const curMonthDelivered  = ordersAll.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) >= curStart);
-  const lastMonthDelivered = ordersAll.filter(o => isDelivered(o) && (toDateSafe(o.created_at) || new Date(0)) < curStart);
+  // Revenue KPI — current MTD vs last month MTD (same day-of-month cutoff)
+  // so early-month comparisons stay meaningful. Uses ordersAll — always the
+  // full MoM window regardless of picker selection.
+  const curStart   = startOfCurrentMonth();
+  const lastStart  = startOfLastMonth();
+  const now        = new Date();
+  const lastCutoff = new Date(lastStart.getFullYear(), lastStart.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+  const curMonthDelivered = ordersAll.filter(o => {
+    if (!isDelivered(o)) return false;
+    const d = toDateSafe(o.created_at); return d && d >= curStart;
+  });
+  const lastMonthDelivered = ordersAll.filter(o => {
+    if (!isDelivered(o)) return false;
+    const d = toDateSafe(o.created_at); return d && d >= lastStart && d < lastCutoff;
+  });
   const currentRevenue = curMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
   const lastRevenue    = lastMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
   let revBadge;
   if (lastRevenue > 0) {
     const pct = ((currentRevenue - lastRevenue) / lastRevenue * 100).toFixed(1);
-    if (pct > 0) revBadge = `<span style="color:#16a34a">↑${pct}%</span> vs last month`;
-    else if (pct < 0) revBadge = `<span style="color:#dc3545">↓${Math.abs(pct)}%</span> vs last month`;
-    else revBadge = `— vs last month`;
+    if (pct > 0) revBadge = `<span style="color:#16a34a">↑${pct}%</span> vs last month (MTD)`;
+    else if (pct < 0) revBadge = `<span style="color:#dc3545">↓${Math.abs(pct)}%</span> vs last month (MTD)`;
+    else revBadge = `— vs last month (MTD)`;
   } else {
-    revBadge = `— vs last month`;
+    revBadge = `— vs last month (MTD)`;
   }
 
   // Pending Payouts — mirror the Delivery section logic exactly:
@@ -691,13 +701,21 @@ function renderMonthOverMonth(orders, p) {
   const lastStart = startOfLastMonth();
   const now = new Date();
 
-  const lastMonthLabel = lastStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
-  const curMonthLabel  = curStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+  const lastCutoff = new Date(lastStart.getFullYear(), lastStart.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+  const dayLabel = ` (till day ${now.getDate()})`;
+  const lastFullLabel = lastStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) + ' (full)';
+  const lastMtdLabel  = lastStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) + dayLabel;
+  const curMonthLabel = curStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) + dayLabel;
 
   const lastDelivered = orders.filter(o => {
     if (!isDelivered(o)) return false;
     const d = toDateSafe(o.created_at);
     return d && d >= lastStart && d < curStart;
+  });
+  const lastMtdDelivered = orders.filter(o => {
+    if (!isDelivered(o)) return false;
+    const d = toDateSafe(o.created_at);
+    return d && d >= lastStart && d < lastCutoff;
   });
   const curDelivered = orders.filter(o => {
     if (!isDelivered(o)) return false;
@@ -705,25 +723,26 @@ function renderMonthOverMonth(orders, p) {
     return d && d >= curStart;
   });
 
-  const lastRevenue = lastDelivered.reduce((s, o) => s + netRevenue(o), 0);
-  const curRevenue  = curDelivered.reduce((s, o) => s + netRevenue(o), 0);
+  const lastRevenue    = lastDelivered.reduce((s, o) => s + netRevenue(o), 0);
+  const lastMtdRevenue = lastMtdDelivered.reduce((s, o) => s + netRevenue(o), 0);
+  const curRevenue     = curDelivered.reduce((s, o) => s + netRevenue(o), 0);
 
   mountChart('dashMonthOverMonth', {
     type: 'bar',
     data: {
-      labels: [lastMonthLabel, curMonthLabel],
+      labels: [lastFullLabel, lastMtdLabel, curMonthLabel],
       datasets: [
         {
           label: 'Delivered Orders',
-          data: [lastDelivered.length, curDelivered.length],
-          backgroundColor: [p.muted, p.brand],
+          data: [lastDelivered.length, lastMtdDelivered.length, curDelivered.length],
+          backgroundColor: [p.muted, p.muted, p.brand],
           yAxisID: 'y',
           borderWidth: 0,
         },
         {
           label: 'Revenue (₹)',
-          data: [lastRevenue, curRevenue],
-          backgroundColor: [p.muted + '99', p.brandSoft],
+          data: [lastRevenue, lastMtdRevenue, curRevenue],
+          backgroundColor: [p.muted + '99', p.muted + '99', p.brandSoft],
           yAxisID: 'y1',
           borderWidth: 0,
         },
