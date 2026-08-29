@@ -73,21 +73,21 @@
             {
               "id": 105,
               "name": "Mushroom Chatpati",
-              "price": 109,
+              "price": 129,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 106,
               "name": "Mushroom Chilli",
-              "price": 119,
+              "price": 139,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 107,
               "name": "Mushroom 65",
-              "price": 159,
+              "price": 179,
               "available_time": 16,
               "not_available_time": ""
             }
@@ -309,35 +309,35 @@
             {
               "id": 803,
               "name": "Mushroom Masala",
-              "price": 109,
+              "price": 129,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 804,
               "name": "Mushroom Butter Masala",
-              "price": 159,
+              "price": 179,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 805,
               "name": "Mushroom Hyderabadi",
-              "price": 159,
+              "price": 179,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 806,
               "name": "Kadai Mushroom",
-              "price": 139,
+              "price": 179,
               "available_time": 16,
               "not_available_time": ""
             },
             {
               "id": 807,
               "name": "Mushroom Do Pyaja",
-              "price": 159,
+              "price": 179,
               "available_time": 16,
               "not_available_time": ""
             },
