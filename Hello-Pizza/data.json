@@ -130,7 +130,14 @@
           "dishes": [
             {
               "id": 401,
-              "name": "Chicken Burger",
+              "name": "Chicken Classic Burger",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 402,
+              "name": "Chicken Cheese Burger",
               "price": 109,
               "available_time": "",
               "not_available_time": ""
