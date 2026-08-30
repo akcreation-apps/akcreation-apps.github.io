@@ -702,6 +702,16 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           <small class="payout-amount-hint">Default ₹${defaultFee} · blank = use default ${paidChip}</small>
         </div>`;
       })()}
+      <div class="extra-charges-row">
+        <label class="field">
+          <span class="field-label"><i class="fas fa-indian-rupee-sign"></i> Extra charges (₹)</span>
+          <input class="form-control form-control-sm" type="number" min="0" step="1"
+                 data-f="extraCharges"
+                 value="${Number.isFinite(+o.extra_charges) ? +o.extra_charges : ''}"
+                 placeholder="0">
+        </label>
+        <small class="extra-charges-hint">Extra amount collected from customer (e.g. delivery fee). Blank = ₹0.</small>
+      </div>
     </div>
 
     <div class="order-section payment-section">
@@ -1219,6 +1229,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     const payoutAmountManual    = payoutAmountRaw === '' || payoutAmountRaw == null
       ? null
       : Number(payoutAmountRaw);
+    const extraChargesRaw       = card.querySelector('[data-f="extraCharges"]')?.value.trim();
+    const extraChargesManual    = extraChargesRaw === '' || extraChargesRaw == null
+      ? null
+      : Number(extraChargesRaw);
     let newStatus = card.querySelector('[data-f="status"]').value;
     if (staffId && newStatus === 'new') newStatus = 'assigned';
 
@@ -1248,6 +1262,14 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       });
       return;
     }
+    if (extraChargesManual !== null && (!Number.isFinite(extraChargesManual) || extraChargesManual < 0)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid extra charges',
+        text: 'Extra charges must be ₹0 or more, or blank.',
+      });
+      return;
+    }
 
     const phone = normalisePhone(rawPhone);
     // Reflect the normalised value back into the input for the user.
@@ -1259,6 +1281,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       status: newStatus,
       payment_collected: paymentCollectedNow,
       payout_applicable: payoutApplicableNow,
+      extra_charges: extraChargesManual,
     };
 
     // Keep `is_fake` aligned with the chosen status so the Mark-as-Fake button

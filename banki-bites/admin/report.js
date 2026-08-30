@@ -371,17 +371,18 @@ async function generate(db, iso, out, printBtn, excelBtn) {
       groups.get(key).push(o);
     }
 
-    let dayGross = 0, dayDiscount = 0, dayDelivery = 0, dayOrders = delivered.length;
+    let dayGross = 0, dayDiscount = 0, dayDelivery = 0, dayExtra = 0, dayOrders = delivered.length;
     const cards = [];
     const restaurants = [];
     const sortedGroups = [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
     for (const [restName, list] of sortedGroups) {
       const items = new Map();
-      let gross = 0, discount = 0, delivery = 0;
+      let gross = 0, discount = 0, delivery = 0, extra = 0;
       for (const o of list) {
         gross    += Number(o.total) || 0;
         discount += Number(o.discount) || 0;
+        if (Number.isFinite(+o.extra_charges)) extra += +o.extra_charges;
         // Only count delivery cost when the partner-earns toggle is on AND a payout
         // amount has been recorded. Orders with payout_applicable=false, or with no
         // payout_amount set, contribute 0 — no fee-rule fallback.
@@ -402,6 +403,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
       dayGross    += gross;
       dayDiscount += discount;
       dayDelivery += delivery;
+      dayExtra    += extra;
 
       const sortedItems = [...items.entries()]
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
@@ -410,7 +412,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
         name: restName,
         orders: list.length,
         items: sortedItems,
-        gross, discount, delivery,
+        gross, discount, delivery, extra,
       });
 
       const rows = sortedItems
@@ -440,6 +442,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
               <div class="foot-cell"><span class="foot-lbl">Discount</span><span class="foot-val">${fmtINR(discount)}</span></div>
               <div class="foot-cell"><span class="foot-lbl">Net</span><span class="foot-val">${fmtINR(gross - discount)}</span></div>
               <div class="foot-cell"><span class="foot-lbl">Delivery</span><span class="foot-val">${fmtINR(delivery)}</span></div>
+              <div class="foot-cell"><span class="foot-lbl">Extra charges</span><span class="foot-val">${fmtINR(extra)}</span></div>
             </div>
           </div>
         </details>
@@ -480,6 +483,10 @@ async function generate(db, iso, out, printBtn, excelBtn) {
           <div class="rpt-kpi-head"><i class="fas fa-motorcycle"></i> Total delivery cost</div>
           <div class="rpt-kpi-val">${fmtINR(dayDelivery)}</div>
         </div>
+        <div class="rpt-kpi is-cost">
+          <div class="rpt-kpi-head"><i class="fas fa-indian-rupee-sign"></i> Total extra charges</div>
+          <div class="rpt-kpi-val">${fmtINR(dayExtra)}</div>
+        </div>
       </div>
       <div class="rpt-cards">
         ${cards.join('')}
@@ -488,7 +495,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
     printBtn.disabled = false;
     excelBtn.disabled = false;
     return {
-      iso, dayOrders, dayGross, dayDiscount, dayDelivery,
+      iso, dayOrders, dayGross, dayDiscount, dayDelivery, dayExtra,
       restaurants,
     };
   } catch (e) {
@@ -516,6 +523,7 @@ function exportExcel(data) {
   rows.push(`<tr><td><b>Discount</b></td><td>${money(data.dayDiscount)}</td></tr>`);
   rows.push(`<tr><td><b>Net</b></td><td>${money(data.dayGross - data.dayDiscount)}</td></tr>`);
   rows.push(`<tr><td><b>Total delivery cost</b></td><td>${money(data.dayDelivery)}</td></tr>`);
+  rows.push(`<tr><td><b>Total extra charges</b></td><td>${money(data.dayExtra)}</td></tr>`);
   rows.push(`<tr><td colspan="2">&nbsp;</td></tr>`);
 
   for (const r of data.restaurants) {
@@ -532,6 +540,7 @@ function exportExcel(data) {
     rows.push(`<tr><td><b>Discount</b></td><td>${money(r.discount)}</td></tr>`);
     rows.push(`<tr><td><b>Net</b></td><td>${money(r.gross - r.discount)}</td></tr>`);
     rows.push(`<tr><td><b>Delivery cost</b></td><td>${money(r.delivery)}</td></tr>`);
+    rows.push(`<tr><td><b>Extra charges</b></td><td>${money(r.extra)}</td></tr>`);
     rows.push(`<tr><td colspan="2">&nbsp;</td></tr>`);
   }
 
