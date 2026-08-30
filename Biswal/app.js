@@ -312,7 +312,7 @@ let bestsellerOnly = false;
 let bestsellerNames = new Set();
 const fetchBestsellers = async () => {
     try {
-        const res = await fetch(`admin/tcd_order_data.json?v=${Date.now()}`);
+        const res = await fetch(`admin/biswal_order_data.json?v=${Date.now()}`);
         if (!res.ok) return;
         const data = await res.json();
         const threeMonthsAgo = Date.now() - (90 * 24 * 60 * 60 * 1000);

@@ -303,6 +303,11 @@ def scaffold_new(details: dict, plain_creds: dict, categories: list, logo_bytes:
     admin_leftover = target / "admin" / "tcd_order_data.json"
     if admin_leftover.exists():
         admin_leftover.unlink()
+    # Seed an empty order-data snapshot under the wizard-supplied filename so
+    # the customer menu (bestseller badges) and admin dashboard don't 404 on
+    # first load, before any real orders have flowed through the restaurant.
+    order_data_filename = details["orderDataFilename"]
+    (target / "admin" / order_data_filename).write_text("{}\n", encoding="utf-8")
 
     (target / "restaurant.js").write_text(restaurant_js(details), encoding="utf-8")
 
@@ -345,9 +350,14 @@ def scaffold_new(details: dict, plain_creds: dict, categories: list, logo_bytes:
         (" TCD ", f" {name} "),
         # cart.js hardcodes the source prefix in the order payload — retarget it.
         ("restaurant_id:   'TCD'", f"restaurant_id:   '{prefix.upper()}'"),
+        # app.js (customer menu) and admin/script.js both fetch the order
+        # snapshot by hardcoded filename — retarget to the wizard-supplied name
+        # so the empty snapshot seeded above resolves instead of 404-ing.
+        ("tcd_order_data.json", order_data_filename),
     ]
-    for fname in ("index.html", "cart.html", "invoice.html", "viewInvoice.html", "referral.html", "cart.js"):
+    for fname in ("index.html", "cart.html", "invoice.html", "viewInvoice.html", "referral.html", "cart.js", "app.js"):
         _replace_in_file(target / fname, common_replacements)
     _replace_in_file(target / "admin" / "index.html", [("tcd-logo.png", logo_new)])
+    _replace_in_file(target / "admin" / "script.js", [("tcd_order_data.json", order_data_filename)])
 
     return target
