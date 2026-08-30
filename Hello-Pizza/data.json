@@ -1,0 +1,240 @@
+{
+  "_OFFER_KEYS_DOCS": [
+    "To feature a dish in the top Deals of the Day rail, add TWO optional keys to that dish:",
+    "  offer_price (number) \u2014 fake higher MRP; must be strictly greater than price. Renders strikethrough.",
+    "  is_offer (boolean, true) \u2014 include this dish in the horizontal Deals rail at the top of the menu."
+  ],
+  "menu": [
+    {
+      "category": "Continental",
+      "subcategories": [
+        {
+          "name": "Pizza",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 101,
+              "name": "Classic Pizza (small)",
+              "price": 159,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 102,
+              "name": "Classic Pizza (medium)",
+              "price": 279,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 103,
+              "name": "Classic Pizza (large)",
+              "price": 479,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 104,
+              "name": "Paneer Pizza (small)",
+              "price": 179,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 105,
+              "name": "Paneer Pizza (medium)",
+              "price": 299,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 106,
+              "name": "Paneer Pizza (large)",
+              "price": 519,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 107,
+              "name": "Mushroom Pizza (small)",
+              "price": 179,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 108,
+              "name": "Mushroom Pizza (medium)",
+              "price": 299,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 109,
+              "name": "Mushroom Pizza (large)",
+              "price": 519,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Pizza",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 201,
+              "name": "Chicken Pizza (small)",
+              "price": 229,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 202,
+              "name": "Chicken Pizza (medium)",
+              "price": 359,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 203,
+              "name": "Chicken Pizza (large)",
+              "price": 589,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Burger",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 301,
+              "name": "Classic Burger",
+              "price": 69,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 302,
+              "name": "Cheese Burger",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Burger",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 401,
+              "name": "Chicken Burger",
+              "price": 109,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Sandwitch",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 501,
+              "name": "Grilled Classic Sandwitch",
+              "price": 69,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 502,
+              "name": "Grilled Paneer Sandwitch",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 503,
+              "name": "Grilled Mushroom Sandwitch",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Fries",
+          "dishes": [
+            {
+              "id": 601,
+              "name": "French Fries (small)",
+              "price": 69,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 602,
+              "name": "French Fries (large)",
+              "price": 119,
+              "offer_price": 139,
+              "is_offer": true,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Fries",
+          "type": "NonVeg",
+          "dishes": [
+            {
+              "id": 701,
+              "name": "Crispy Chicken Finger (5pc)",
+              "price": 179,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Drinks",
+      "subcategories": [
+        {
+          "name": "Milk Shake",
+          "dishes": [
+            {
+              "id": 801,
+              "name": "Chocolate Milk Shake",
+              "price": 109,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 802,
+              "name": "Butter Scotch Milk Shake",
+              "price": 109,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        },
+        {
+          "name": "Coffe",
+          "dishes": [
+            {
+              "id": 901,
+              "name": "Cold Coffee",
+              "price": 109,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

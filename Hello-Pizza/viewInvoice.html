@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="robots" content="noindex, nofollow">
-    <link rel="canonical" href="https://akcreation-apps.com/Unique/viewInvoice.html">
-    <link rel="apple-touch-icon" sizes="180x180" href="unique-logo.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="unique-logo.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="unique-logo.png">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="hello-pizza-logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="hello-pizza-logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="hello-pizza-logo.png">
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="icon" href="unique-logo.png">
-    <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#F5F0EB" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0D0C13" media="(prefers-color-scheme: dark)">
-    <title>Bill - Unique Fast Food</title>
+    <link rel="icon" href="hello-pizza-logo.png">
+    <meta name="theme-color" content="#1A1A2E">
+    <title>Hello Pizza</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -176,9 +173,9 @@
 
         <!-- Header -->
         <div class="bill-header">
-            <div class="bill-title">Unique Fast Food</div>
+            <div class="bill-title">Hello Pizza</div>
             <div class="restaurant-info">
-                <p>Banki Road, Towards Khordha</p>
+                <p>Banki College Road</p>
                 <p>Banki, Cuttack 754008</p>
             </div>
         </div>
@@ -229,7 +226,7 @@
         document.getElementById('tableNo').textContent =
             order.order_details.table_no === 'COD'
                 ? 'Payment: COD'
-                : `Table - ${order.order_details.table_no}`;
+                : `Table — ${order.order_details.table_no}`;
 
         const createdAtSeconds = order.order_details.created_at.seconds;
         const date = new Date(createdAtSeconds * 1000);

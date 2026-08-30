@@ -1,0 +1,810 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    padding-top: 60px; /* Adjust according to new navbar height */
+}
+
+/* Sticky Navbar with smaller height */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #ff7043;
+    padding: 20px 20px; /* Reduced padding */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px; /* Adjust height as needed */
+}
+
+.logo {
+    font-size: 1.2rem; /* Reduced font size for smaller logo */
+    font-weight: bold;
+    margin-right: 20px; /* Adjust margin to reduce space */
+}
+
+.cart-icon {
+    font-size: 1.3rem; /* Adjust font size for cart icon */
+    position: relative;
+    cursor: pointer;
+    margin-right: 10px; /* Adjust margin to reduce space */
+}
+
+.cart-icon .cart-count {
+    background-color: red;
+    color: white;
+    font-size: 0.8rem;
+    border-radius: 50%;
+    padding: 3px 7px;
+    position: absolute;
+    top: -5px;
+    right: -10px;
+}
+
+.nav-links {
+    list-style: none;
+}
+
+.nav-links li {
+    display: inline-block;
+    margin-left: 15px; /* Reduced margin for links */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 0.9rem; /* Adjust font size for links */
+}
+
+#cart {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #5A5A5A;
+    margin-bottom: 20px;
+}
+
+.btn {
+    background-color: #ff7043;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 30px;
+    display: inline-block;
+}
+
+.btn:hover {
+    background-color: #e64a19;
+}
+
+/* Menu Section */
+.menu {
+    text-align: center;
+}
+
+.menu h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+}
+
+/* Category Styling */
+.category-block {
+    margin-bottom: 50px;
+    display: flex;
+    border-bottom: 1px solid #ddd; /* Visual separation between categories */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Styling for Individual Category Card */
+.category-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.3s ease;
+    flex: 1 1 200px; /* Flex-grow, flex-shrink, flex-basis */
+    max-width: 250px; /* Optional: Limits max width */
+    min-width: 180px; /* Ensures a minimum size on smaller screens */
+}
+
+.category-card:hover {
+    transform: scale(1.05);
+}
+
+.category-block h3 {
+    font-size: 2rem;
+    color: #ff7043;
+    text-align: center;
+}
+
+/* Subcategory Styling */
+.subcategory-block {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px;
+}
+
+.subcategory-block h4 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0; /* Ensure no extra margin on headings */
+}
+
+/* Grid Layout for Dishes - 2 items per row */
+.dish-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Always 2 items per row */
+    gap: 20px;
+}
+/* Responsive Design for smaller screens */
+@media (max-width: 1200px) {
+    .category-card {
+        flex: 1 1 180px; /* Shrink cards to fit smaller screens */
+    }
+    .subcategory-block {
+        flex-direction: column; /* Stack subcategories vertically */
+    }
+}
+
+@media (max-width: 576px) {
+    .category-card {
+        flex: 1 1 100%; /* Full width for mobile screens */
+    }
+
+    .category-block h3 {
+        font-size: 1.5rem;
+    }
+
+    .subcategory-block h4 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    /* For very small screens, reduce the gap between cards but keep 2 items per row */
+    .dish-grid {
+        gap: 10px;
+        grid-template-columns: repeat(2, 1fr); /* Force 2 items per row even on small screens */
+    }
+    .shortcuts-container {
+        padding: 0 20px; /* Increase padding on smaller screens */
+    }
+
+    .shortcut-card {
+        margin: 0 8px; /* Slightly reduce the gap between shortcut cards on smaller screens */
+    }
+}
+
+.menu-item {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    justify-content: space-between; /* Space out items */
+    height: 100%; /* Ensure all menu items take up the same height */
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    width: 100%; /* Take full available width of the container */
+    max-width: 200px; /* Set maximum width to keep consistent card sizes */
+    margin: auto; /* Center the card horizontally */
+
+}
+
+.menu-item:hover {
+    transform: scale(1.05);
+}
+
+.menu-item img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.menu-item h5 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.price {
+    font-weight: bold;
+    color: #ffff;
+    margin-bottom: 10px;
+}
+
+/* Add to Cart Button Styling */
+.add-to-cart-btn {
+    background-color: #ff7043; /* Original background color */
+    color: white;
+    padding: 10px 15px; /* Consistent padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Make the button take the full width */
+    text-align: center; /* Center text inside the button */
+    margin-top: auto;          /* Push button to the bottom of the container */
+}
+
+.add-to-cart-btn.added-to-cart {
+    background-color: #ff7043;
+    color: white;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #e64a19;
+}
+
+/* Cart Page Styling */
+.cart-page {
+    padding: 60px 20px;
+}
+
+.cart-page h2 {
+    margin-bottom: 40px;
+}
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between quantity controls and delete button */
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    transition: background-color 0.2s;
+    margin-bottom: 10px; /* Add space between cart items */
+}
+
+.cart-item:hover, .cart-item:active, .cart-item:focus {
+    background-color: #fff; /* Ensure background stays white on hover or click */
+    outline: none; /* Remove any focus outline */
+}
+
+.cart-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    align-self: center; /* Center the image vertically */
+    margin-right: 20px; /* Add space between image and text */
+}
+
+.cart-item-info {
+    flex-grow: 1;
+    max-width: 45%; /* Limit the width */
+    font-size: 14px; /* Smaller font for better fit */
+}
+
+.cart-item-info h5 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* Price and Quantity */
+.cart-item-price,
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+/* Quantity Container */
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: auto; /* Push quantity section to the right */
+}
+
+.cart-item-quantity button {
+    background-color: #007bff;
+    width: 30px;
+    height: 30px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 5px;
+    transition: background-color 0.2s;
+}
+
+.cart-item-quantity button:hover {
+    background-color: #0056b3;
+}
+
+.quantity {
+    font-size: 16px;
+    margin: 0 10px;
+}
+
+.delete-item {
+    cursor: pointer;
+    color: #dc3545;
+    font-size: 24px;
+    border: none;
+    background: none;
+    margin-left: 10px;          /* Add left margin for spacing */
+    transition: color 0.2s;
+}
+
+.delete-item:hover {
+    color: #c82333;
+}
+
+#cart-total-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-top: 2px solid #e0e0e0;
+    margin-top: 20px;
+}
+
+#cart-total {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.cart-total .total-price {
+    color: #000;
+}
+
+#place-order-btn {
+    margin-top: 20px;
+    background-color: #2e7d32; /* professional deep green */
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+#place-order-btn img {
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+#place-order-btn .btn-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+#place-order-btn .main-text {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+#place-order-btn .sub-text {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.85;
+}
+
+#place-order-btn:hover {
+    background-color: #256629; /* slightly darker green */
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+
+/* Filter Container */
+.filter-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+  
+.filter-card {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+  
+.filter-label {
+    margin-right: 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+input[type="checkbox"] {
+    margin-right: 8px;
+}
+  
+  /* Shortcuts Grid */
+.shortcuts-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    overflow-x: hidden; /* Prevent vertical scrollbar if needed */
+}
+  
+.shortcuts-container h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+  
+  /* Shortcuts Grid */
+.shortcuts-grid {
+    display: flex; /* Use flexbox layout */
+    overflow-x: auto; /* Allow horizontal scrolling */
+    padding: 10px 0; /* Add padding for spacing */
+    white-space: nowrap; /* Prevent items from wrapping to the next line */
+}
+
+/* Individual Shortcut Item */
+.shortcut-card {
+    flex: 0 0 auto; /* Prevent items from shrinking */
+    margin-right: 15px; /* Space between shortcut cards */
+    background-color: #f2cabd; /* Background color for cards */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px 15px; /* Padding inside cards */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    cursor: pointer; /* Indicate clickable */
+    text-align: center; /* Center text */
+    min-width: 120px; /* Minimum width for cards */
+    transition: transform 0.3s; /* Add transition for hover effect */
+    user-select: none; /* Prevent text selection on click */
+}
+
+.shortcut-card:hover {
+    transform: scale(1.05); /* Scale effect on hover */
+}
+
+  
+.shortcut-card a {
+text-decoration: none;
+color: #333;
+font-size: 18px;
+display: block;
+}
+
+
+/* Full-screen loader */
+.loader-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 1000; /* Make sure it's above other content */
+    justify-content: center; /* Center the loader horizontally */
+    align-items: center; /* Center the loader vertically */
+}
+
+.loader {
+    border: 8px solid #f3f3f3; /* Light gray border */
+    border-radius: 50%; /* Circular loader */
+    border-top: 8px solid #28a745; /* Green top border */
+    width: 50px; /* Width of the loader */
+    height: 50px; /* Height of the loader */
+    animation: spin 1s linear infinite; /* Animation for spinning */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); } /* Starting point */
+    100% { transform: rotate(360deg); } /* Ending point */
+}
+
+
+/* Add the following styles for the hero section */
+.hero {
+    position: relative;
+    min-height: auto; /* Will fit content but expand to full viewport height if needed */
+    background: url('../food_src/hero-background.png') center center/cover no-repeat;
+    display: flex;
+    align-items: center;    /* Vertically center */
+    justify-content: center; /* Horizontally center */
+    padding: 150px 100px; /* Added padding to ensure space around content */
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+}
+
+.hero h1 span {
+    color: #e74c3c;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+}
+
+.hero-content .btn {
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+}
+
+.hero-content .btn:hover {
+    background-color: #c0392b;
+}
+
+/* Responsive design for small screens */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-content p {
+        font-size: 1.2rem;
+    }
+    
+    .hero-content .btn {
+        font-size: 1rem;
+    }
+    .menu-item {
+        width: 100%; /* Full width for smaller screens */
+    }
+    
+    .cart-item {
+        flex-direction: row; /* Ensure they are aligned in a row */
+        justify-content: flex-end; /* Space between items */
+    }
+    .cart-item img {
+        width: 60px; /* Reduce image size */
+        height: 60px; /* Reduce image size */
+        margin-bottom: 10px; /* Add space below the image */
+    }
+
+    .cart-item-info {
+        max-width: 100%; /* Allow full width */
+        margin-bottom: 10px; /* Add spacing for better readability */
+    }
+
+    .cart-item-quantity {
+        margin-left: auto; /* Keep quantity on the right */
+        justify-content: flex-start; /* Align to the left */
+    }
+
+    .delete-item {
+        margin-left: 20; /* Remove margin for smaller screens */
+    }
+}
+
+/* Search Bar Styles */
+.search-container {
+    position: relative; /* Make the container relative for absolute positioning of the button */
+    display: inline-block; /* Aligns with the navbar elements */
+    justify-content: center;
+    margin: 20px 10; /* Margin above and below the search bar */
+}
+
+.search-container input[type="text"] {
+    padding: 12px 30px; /* Increased padding for a spacious feel */
+    border-radius: 30px; /* More rounded corners for a pill shape */
+    border: 1px solid #e74c3c; /* Red border */
+    width: 350px; /* Slightly wider for better usability */
+    font-size: 16px; /* Font size for the input */
+    font-family: Arial, sans-serif; /* Clean font family */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Transition effects */
+}
+
+.search-container input[type="text"]:focus {
+    outline: none; /* Remove default outline */
+    border-color: #ff7043; /* Change border color on focus */
+    box-shadow: 0 0 8px rgba(255, 112, 67, 0.5); /* Shadow effect on focus */
+}
+
+.search-container input[type="text"]::placeholder {
+    color: #999; /* Placeholder color */
+    font-style: italic; /* Italicize placeholder text */
+    transition: color 0.3s; /* Transition for placeholder color */
+}
+
+.search-container input[type="text"]:focus::placeholder {
+    color: transparent; /* Hide placeholder on focus */
+}
+
+.icon-container {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center icons vertically */
+}
+
+.search-icon {
+    font-size: 1.3rem; /* Same font size as cart icon */
+    cursor: pointer;
+    margin-right: 20px; /* Adjust margin to reduce space */
+    display: flex; /* Align icon vertically */
+    align-items: center; /* Center the icon vertically */
+}
+
+.invoice-icon {
+    font-size: 1.3rem; /* Same font size as cart icon */
+    cursor: pointer;
+    margin-right: 20px; /* Adjust margin to reduce space */
+    display: flex; /* Align icon vertically */
+    align-items: center; /* Center the icon vertically */
+}
+
+.clear-button {
+    position: absolute;
+    right: 20px; /* Position it inside the input */
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
+    border: none;
+    background: none;
+    color: #888; /* Color for the cross button */
+    font-size: 1.2rem; /* Font size */
+    cursor: pointer;
+    display: none; /* Initially hidden */
+    outline: none; /* Remove outline on focus */
+}
+
+.clear-button:hover {
+    color: #e74c3c; /* Change color on hover */
+}
+
+.no-results {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-results img {
+    max-width: 200px; /* Adjust as necessary */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.no-results p {
+    color: #888; /* Adjust text color */
+    font-size: 1.2rem; /* Adjust font size */
+}
+
+.menu-item-container {
+    display: inline-block;
+}
+
+.dish-card {
+    position: relative;
+    width: 150px;       /* fixed width */
+    height: 180px;      /* fixed constant height */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* Force constant image size */
+.dish-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;   /* fills area without distortion */
+    display: block;
+}
+
+/* Overlay */
+.dish-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 6px;
+    background: linear-gradient(to top, rgba(0,0,0), rgba(0,0,0,0));
+    color: #fff;
+    text-align: left;
+}
+
+.dish-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.2;
+}
+
+
+/* Cart icon */
+.add-to-cart-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.add-to-cart-btn:hover {
+    background: #4a90e2;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.nonveg-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1px solid #900;
+  background: #900;         /* red fill */
+  border-radius: 2px;
+  position: relative;
+  margin-left: 6px;
+}
+
+.nonveg-icon::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  background: #fff;        /* white inner circle */
+  border-radius: 50%;
+}
