@@ -643,13 +643,6 @@
           "name": "Smoothies",
           "dishes": [
             {
-              "id": 1101,
-              "name": "Kit Kat Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 1102,
               "name": "Mix Fruit Smoothie",
               "price": 119,
@@ -746,13 +739,6 @@
             {
               "id": 1401,
               "name": "Vanila Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1402,
-              "name": "Kit Kat Milk Shake",
               "price": 119,
               "available_time": "",
               "not_available_time": ""
