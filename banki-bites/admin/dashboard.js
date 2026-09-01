@@ -171,7 +171,10 @@ export async function renderDashboard(root, db) {
 
       <!-- Range-wide / aggregate charts (respect the date range picker). -->
       <div class="chart-card">
-        <div class="chart-card-head"><i class="fas fa-circle-half-stroke"></i> Orders by status</div>
+        <div class="chart-card-head">
+          <span><i class="fas fa-circle-half-stroke"></i> Orders by status</span>
+          <select id="dashStatusMixRestaurant" class="chart-filter" aria-label="Filter Orders by status by restaurant"></select>
+        </div>
         <div class="chart-card-body"><canvas id="dashStatusMix"></canvas></div>
       </div>
       <div class="chart-card">
@@ -679,7 +682,31 @@ function renderStatusMix(orders, p) {
   // statuses are meaningful in retrospective analytics — new / assigned /
   // out_for_delivery are transient and reflect current in-flight work.
   const statusKeys = ['delivered', 'cancelled', 'fake'];
-  const counts = statusKeys.map(s => orders.filter(o => (o.status || 'new') === s).length);
+  const restKey = o => o.restaurant_name || o.restaurant_id || 'Unknown';
+
+  const select = document.getElementById('dashStatusMixRestaurant');
+  if (select) {
+    const uniqueRestaurants = [...new Set(orders.map(restKey))].sort((a, b) => a.localeCompare(b));
+    const prevSelected = select.value || 'all';
+    select.innerHTML = '';
+    const optAll = document.createElement('option');
+    optAll.value = 'all';
+    optAll.textContent = 'All restaurants';
+    select.appendChild(optAll);
+    uniqueRestaurants.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+    select.value = [...select.options].some(o => o.value === prevSelected) ? prevSelected : 'all';
+    // Replace handler each render so it closes over the latest `orders`.
+    select.onchange = () => renderStatusMix(orders, p);
+  }
+
+  const selected = select?.value || 'all';
+  const filtered = selected === 'all' ? orders : orders.filter(o => restKey(o) === selected);
+  const counts = statusKeys.map(s => filtered.filter(o => (o.status || 'new') === s).length);
   mountChart('dashStatusMix', {
     type: 'bar',
     data: {

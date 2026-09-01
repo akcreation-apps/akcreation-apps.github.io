@@ -1396,6 +1396,36 @@ button.fab:hover { background: var(--brand-dark); }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .chart-card-head i { color: var(--brand); flex: 0 0 auto; }
+.chart-card-head > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.chart-card-head .chart-filter {
+  margin-left: auto;
+  font: inherit;
+  font-weight: 500;
+  padding: 3px 22px 3px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text-strong);
+  max-width: 55%;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.chart-card-head .chart-filter:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 25%, transparent);
+}
+.chart-card-head .chart-filter option {
+  background-color: var(--surface);
+  color: var(--text-strong);
+}
 .chart-card-body {
   padding: 8px;
   height: 220px;
