@@ -51,10 +51,6 @@
         <label>WhatsApp fallback (E.164)
             <input name="wpFallback" value="{{ form.wpFallback or '' }}" placeholder="+9177XXXXXXXX">
         </label>
-        <label>Order-data JSON filename
-            <input name="orderDataFilename" value="{{ form.orderDataFilename or '' }}" placeholder="tcd_order_data.json">
-            <small>Filename under <code>admin/</code> used by the bestseller fetch and admin dashboard. Convention: <code>&lt;prefix&gt;_order_data.json</code> (e.g. <code>tcd_order_data.json</code>). Must end with <code>.json</code>.</small>
-        </label>
         <div class="row">
             <label>Min order (₹)
                 <input type="number" name="minOrder" min="0" value="{{ form.minOrder or 200 }}">
@@ -79,7 +75,7 @@ function toggleMode() {
     document.getElementById('existing-block').style.display = mode === 'existing' ? 'block' : 'none';
     document.getElementById('new-block').style.display     = mode === 'new'      ? 'block' : 'none';
     // Toggle required attributes so browser validation matches mode.
-    const newFields = ['name','prefix','mapsUrl','wpFallback','orderDataFilename','minOrder','deliveryCharge','etaMinutes'];
+    const newFields = ['name','prefix','mapsUrl','wpFallback','minOrder','deliveryCharge','etaMinutes'];
     for (const n of newFields) {
         const el = document.querySelector(`#new-block [name=${n}]`);
         if (el) el.required = (mode === 'new');

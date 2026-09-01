@@ -78,10 +78,6 @@ def step1():
         enc_parts_raw = request.form.get("encKeyParts", "").strip()
         enc_parts = [p.strip() for p in enc_parts_raw.split(",") if p.strip()] if enc_parts_raw else [prefix.upper(), "FOOD", "CAFE"]
 
-        order_data_filename = request.form.get("orderDataFilename", "").strip()
-        if not order_data_filename.endswith(".json") or "/" in order_data_filename or "\\" in order_data_filename:
-            return render_template("step1_restaurant.html", existing=existing, available=available, form=request.form, error="Order-data filename must be a plain filename ending in .json (e.g. tcd_order_data.json).")
-
         session["mode"] = "new"
         session["prefix"] = prefix
         session["details"] = {
@@ -90,7 +86,6 @@ def step1():
             "encKeyParts": enc_parts,
             "mapsUrl": request.form["mapsUrl"].strip(),
             "wpFallback": request.form["wpFallback"].strip(),
-            "orderDataFilename": order_data_filename,
             "minOrder": int(request.form["minOrder"]),
             "deliveryCharge": int(request.form["deliveryCharge"]),
             "etaMinutes": int(request.form["etaMinutes"]),
