@@ -2327,6 +2327,136 @@ button.fab:hover { background: var(--brand-dark); }
   }
 }
 
+/* ---- Cancel-reason picker (Swal) — mobile-first, dark-mode aware ---- */
+.cancel-reason-popup {
+  width: min(94vw, 460px) !important;
+  padding: 16px 14px 14px !important;
+  border-radius: 16px !important;
+  background: var(--surface, #fff) !important;
+  color: var(--text-strong, #0f172a) !important;
+}
+.cancel-reason-popup .swal2-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: inherit;
+  padding: 0 8px 4px;
+}
+.cancel-reason-popup .swal2-close { color: var(--text-strong, #0f172a); }
+.cancel-reason-html { padding: 0 !important; margin: 8px 0 4px !important; }
+.cancel-reason-list {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+.cancel-reason-tile {
+  display: grid;
+  grid-template-columns: 40px 1fr 24px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  min-height: 60px;
+  border: 1.5px solid var(--border-soft, #e5e7eb);
+  border-radius: 12px;
+  background: var(--surface-soft, #f9fafb);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cancel-reason-tile:active { transform: scale(0.99); }
+.cancel-reason-tile input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.cancel-reason-tile .crt-icon {
+  width: 40px; height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, #dc3545 12%, transparent);
+  color: #dc3545;
+  font-size: 1rem;
+  flex: 0 0 40px;
+}
+.cancel-reason-tile .crt-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.cancel-reason-tile .crt-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-strong, #0f172a);
+  line-height: 1.25;
+}
+.cancel-reason-tile .crt-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.3;
+}
+.cancel-reason-tile .crt-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-soft, #d1d5db);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.65rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.cancel-reason-tile .crt-check i { opacity: 0; transition: opacity 0.15s ease; }
+.cancel-reason-tile:hover { border-color: color-mix(in srgb, #dc3545 40%, var(--border-soft, #e5e7eb)); }
+.cancel-reason-tile.is-selected {
+  border-color: #dc3545;
+  background: color-mix(in srgb, #dc3545 6%, var(--surface-soft, #f9fafb));
+}
+.cancel-reason-tile.is-selected .crt-check {
+  background: #dc3545;
+  border-color: #dc3545;
+}
+.cancel-reason-tile.is-selected .crt-check i { opacity: 1; }
+.cancel-reason-popup .swal2-actions {
+  gap: 8px;
+  margin: 12px 4px 0 !important;
+  flex-wrap: wrap-reverse;
+  width: 100%;
+}
+.cancel-reason-popup .swal2-actions button {
+  flex: 1 1 44%;
+  min-height: 44px;
+  border-radius: 10px !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 14px !important;
+}
+.cancel-reason-popup .swal2-validation-message {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  background: transparent;
+  color: #dc3545;
+  padding: 0 4px;
+}
+@media (prefers-color-scheme: dark) {
+  .cancel-reason-tile .crt-title { color: #f3f4f6; }
+  .cancel-reason-tile .crt-hint { color: #9aa3b2; }
+  .cancel-reason-tile .crt-check { border-color: #303645; }
+  .cancel-reason-popup .swal2-close { color: #f3f4f6; }
+}
+@media (max-width: 380px) {
+  .cancel-reason-popup { padding: 12px 10px 10px !important; }
+  .cancel-reason-tile {
+    grid-template-columns: 36px 1fr 22px;
+    padding: 10px;
+    min-height: 54px;
+  }
+  .cancel-reason-tile .crt-icon { width: 36px; height: 36px; flex-basis: 36px; }
+  .cancel-reason-tile .crt-title { font-size: 0.9rem; }
+  .cancel-reason-tile .crt-hint { font-size: 0.74rem; }
+}
+
 /* ---- Responsive scale-ups ---- */
 @media (min-width: 576px) {
   .bb-bc__stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }

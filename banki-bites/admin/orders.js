@@ -1271,6 +1271,75 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       return;
     }
 
+    // Cancellation reason: mandatory whenever an order is being moved into
+    // "cancelled" state and does not already carry a recorded reason. This
+    // powers the "Cancel reasons" analytics on the dashboard, so we require it
+    // up-front instead of trusting the admin to backfill later.
+    let cancelReasonNext = o.cancel_reason || null;
+    if (newStatus === 'cancelled' && !cancelReasonNext) {
+      const REASONS = [
+        { value: 'Out Of Stock',   icon: 'fa-box-open',        hint: 'Item ran out at the restaurant' },
+        { value: 'Not Interested', icon: 'fa-user-slash',      hint: 'Customer no longer wants the order' },
+        { value: 'Extra Charges',  icon: 'fa-indian-rupee-sign', hint: 'Customer refused additional fees' },
+        { value: 'Others',         icon: 'fa-ellipsis',        hint: 'Any other reason' },
+      ];
+      const tiles = REASONS.map(r => `
+        <label class="cancel-reason-tile">
+          <input type="radio" name="cancel-reason" value="${r.value}">
+          <span class="crt-icon"><i class="fas ${r.icon}"></i></span>
+          <span class="crt-body">
+            <span class="crt-title">${r.value}</span>
+            <span class="crt-hint">${r.hint}</span>
+          </span>
+          <span class="crt-check" aria-hidden="true"><i class="fas fa-check"></i></span>
+        </label>`).join('');
+
+      const reasonRes = await Swal.fire({
+        title: 'Why is this order being cancelled?',
+        html: `<div class="cancel-reason-list" role="radiogroup" aria-label="Cancellation reason">${tiles}</div>`,
+        showCancelButton: true,
+        confirmButtonText: 'Confirm cancel',
+        cancelButtonText: 'Go back',
+        confirmButtonColor: '#dc3545',
+        reverseButtons: true,
+        focusConfirm: false,
+        showCloseButton: true,
+        customClass: {
+          popup: 'cancel-reason-popup',
+          htmlContainer: 'cancel-reason-html',
+          confirmButton: 'cancel-reason-confirm',
+        },
+        didOpen: (popup) => {
+          const radios = popup.querySelectorAll('input[name="cancel-reason"]');
+          radios.forEach(r => r.addEventListener('change', () => {
+            popup.querySelectorAll('.cancel-reason-tile').forEach(tile => {
+              tile.classList.toggle('is-selected', tile.contains(r) && r.checked);
+            });
+          }));
+          // Whole tile is tappable — click anywhere selects the radio.
+          popup.querySelectorAll('.cancel-reason-tile').forEach(tile => {
+            tile.addEventListener('click', () => {
+              const input = tile.querySelector('input');
+              if (input && !input.checked) {
+                input.checked = true;
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            });
+          });
+        },
+        preConfirm: () => {
+          const picked = document.querySelector('input[name="cancel-reason"]:checked');
+          if (!picked) {
+            Swal.showValidationMessage('Please pick a reason before cancelling this order.');
+            return false;
+          }
+          return picked.value;
+        },
+      });
+      if (!reasonRes.isConfirmed || !reasonRes.value) return;
+      cancelReasonNext = reasonRes.value;
+    }
+
     const phone = normalisePhone(rawPhone);
     // Reflect the normalised value back into the input for the user.
     phoneInput.value = phone;
@@ -1282,6 +1351,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       payment_collected: paymentCollectedNow,
       payout_applicable: payoutApplicableNow,
       extra_charges: extraChargesManual,
+      cancel_reason: newStatus === 'cancelled' ? cancelReasonNext : null,
     };
 
     // Keep `is_fake` aligned with the chosen status so the Mark-as-Fake button

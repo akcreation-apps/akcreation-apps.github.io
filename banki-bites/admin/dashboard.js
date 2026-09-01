@@ -178,6 +178,13 @@ export async function renderDashboard(root, db) {
         <div class="chart-card-body"><canvas id="dashStatusMix"></canvas></div>
       </div>
       <div class="chart-card">
+        <div class="chart-card-head">
+          <span><i class="fas fa-ban"></i> Cancel reasons</span>
+          <select id="dashCancelReasonsRestaurant" class="chart-filter" aria-label="Filter Cancel reasons by restaurant"></select>
+        </div>
+        <div class="chart-card-body"><canvas id="dashCancelReasons"></canvas></div>
+      </div>
+      <div class="chart-card">
         <div class="chart-card-head"><i class="fas fa-store"></i> Top restaurants</div>
         <div class="chart-card-body"><canvas id="dashTopRestaurants"></canvas></div>
       </div>
@@ -459,6 +466,7 @@ async function refresh(root, db) {
   renderOrdersPerDay(orders, p);
   renderRevenuePerDay(orders, p);
   renderStatusMix(orders, p);
+  renderCancelReasons(orders, p);
   renderMonthOverMonth(ordersAll, p);
   renderMonthlyGrowth(ordersAll, p);
   renderTopRestaurants(orders, p);
@@ -712,6 +720,55 @@ function renderStatusMix(orders, p) {
     data: {
       labels: statusKeys.map(k => k.replace(/_/g, ' ')),
       datasets: [{ label: 'Orders', data: counts, backgroundColor: palettePerBar(counts.length, p), borderWidth: 0 }],
+    },
+    options: {
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} orders` } },
+      },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
+  });
+}
+
+// Cancel-reason breakdown: one bar per reason across all cancelled orders in
+// the selected date range. Filters by restaurant via the header dropdown, with
+// "All restaurants" as the default. Reasons captured on the order-save flow in
+// orders.js (Out Of Stock / Not Interested / Extra Charges / Others); legacy
+// cancels without a reason are grouped under "Unknown" so nothing gets hidden.
+function renderCancelReasons(orders, p) {
+  const REASON_KEYS = ['Out Of Stock', 'Not Interested', 'Extra Charges', 'Others', 'Unknown'];
+  const restKey = o => o.restaurant_name || o.restaurant_id || 'Unknown';
+  const cancelled = orders.filter(o => (o.status || 'new') === 'cancelled');
+
+  const select = document.getElementById('dashCancelReasonsRestaurant');
+  if (select) {
+    const uniqueRestaurants = [...new Set(cancelled.map(restKey))].sort((a, b) => a.localeCompare(b));
+    const prevSelected = select.value || 'all';
+    select.innerHTML = '';
+    const optAll = document.createElement('option');
+    optAll.value = 'all';
+    optAll.textContent = 'All restaurants';
+    select.appendChild(optAll);
+    uniqueRestaurants.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+    select.value = [...select.options].some(o => o.value === prevSelected) ? prevSelected : 'all';
+    select.onchange = () => renderCancelReasons(orders, p);
+  }
+
+  const selected = select?.value || 'all';
+  const filtered = selected === 'all' ? cancelled : cancelled.filter(o => restKey(o) === selected);
+  const counts = REASON_KEYS.map(r => filtered.filter(o => (o.cancel_reason || 'Unknown') === r).length);
+
+  mountChart('dashCancelReasons', {
+    type: 'bar',
+    data: {
+      labels: REASON_KEYS,
+      datasets: [{ label: 'Cancelled orders', data: counts, backgroundColor: palettePerBar(counts.length, p), borderWidth: 0 }],
     },
     options: {
       plugins: {
