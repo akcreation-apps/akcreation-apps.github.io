@@ -1105,10 +1105,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       function buildMsg(discount, dateStr) {
         const greeting = prettyName ? `ନମସ୍କାର ${prettyName} !` : 'ନମସ୍କାର !';
         const parts = [
-          `${greeting} 🙏`,
-          `ଆପଣଙ୍କ order deliver ହୋଇଗଲା 🛵 ଆଶା କରୁଛୁ ଖାଇବା ଭଲ ଲାଗିଥିବ ! 😋`,
-          `⭐ ଆପଣଙ୍କ taste ଉପରେ feedback ଦିଅନ୍ତୁ — ଆମ partner restaurant kitchen କୁ improve କରିବାରେ ସାହାଯ୍ୟ ମିଳିବ ।`,
-          `🧾 Bill ଆପଣ order କରିଥିବା restaurant ର *Bill* section ରେ ଉପଲବ୍ଧ ।`,
+          `${greeting} `,
+          `ଆଶା କରୁଛୁ ଖାଇବା ଭଲ ଲାଗିଥିବ !`,
+          `ଆପଣଙ୍କ taste ଉପରେ feedback ଦିଅନ୍ତୁ ।`,
+          `Bill ଆପଣ order କରିଥିବା restaurant ର *Bill* section ରେ ଉପଲବ୍ଧ ।`,
         ];
         // Skip the offer line entirely when admin sets discount to 0 — no
         // "₹0 OFF" message and no expiry date noise. Thank-you stands alone.
@@ -1116,14 +1116,13 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           const d = new Date(dateStr + 'T00:00:00');
           const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })} ${d.getFullYear()}`;
           parts.push(
-            `🎁 Your Special Offer — *₹${discount} OFF!*\n` +
-            `ପରବର୍ତ୍ତୀ order ରେ ₹${discount} ନିଜ bill amount ରୁ କମାଇ ଦେଇ payment କରିପାରିବେ। 💰\n\n` +
-            `⚠️ Important: ବର୍ତ୍ତମାନ ଅଧିକ order ଥିବାରୁ ଆମ side ରୁ offer track କରିବା ସମ୍ଭବ ହେଉନାହିଁ । ସେଥିପାଇଁ order କରିବା ସମୟରେ ନିଜେ ₹${discount} deduct କରି payment କରନ୍ତୁ।\n` +
-            `📅 Offer Valid Till: *${label}*`
+            `ପରବର୍ତ୍ତୀ order ରେ ₹${discount} ନିଜ bill amount ରୁ କମାଇ ଦେଇ payment କରିପାରିବେ ।\n\n` +
+            `ବର୍ତ୍ତମାନ ଅଧିକ order ଥିବାରୁ ଆମ side ରୁ offer track କରିବା ସମ୍ଭବ ହେଉନାହିଁ ।\n` +
+            `Offer Valid Till: *${label}*`
           );
         }
-        parts.push(`📲 Restaurant ର live Offer ଜାଣିବା ପାଇଁ follow କରନ୍ତୁ: https://www.instagram.com/bankibites`);
-        parts.push(`_Team BankiBites_ ❤️`);
+        parts.push(`Restaurant ର live Offer ଜାଣିବା ପାଇଁ follow କରନ୍ତୁ: https://www.instagram.com/bankibites`);
+        parts.push(`_Team BankiBites :)_`);
         return parts.join('\n\n');
       }
 
