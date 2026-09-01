@@ -1114,8 +1114,13 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         // "₹0 OFF" message and no expiry date noise. Thank-you stands alone.
         if (Number(discount) > 0 && dateStr) {
           const d = new Date(dateStr + 'T00:00:00');
-          const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })}`;
-          parts.push(`🎁 ପରବର୍ତ୍ତୀ order ରେ *₹${discount} OFF* — *${label}* ପର୍ଯ୍ୟନ୍ତ valid`);
+          const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })} ${d.getFullYear()}`;
+          parts.push(
+            `🎁 Your Special Offer — *₹${discount} OFF!*\n` +
+            `ପରବର୍ତ୍ତୀ order ରେ ₹${discount} ନିଜ bill amount ରୁ କମାଇ ଦେଇ payment କରିପାରିବେ। 💰\n\n` +
+            `⚠️ Important: ବର୍ତ୍ତମାନ ଅଧିକ order ଥିବାରୁ ଆମ side ରୁ offer track କରିବା ସମ୍ଭବ ହେଉନାହିଁ । ସେଥିପାଇଁ order କରିବା ସମୟରେ ନିଜେ ₹${discount} deduct କରି payment କରନ୍ତୁ।\n` +
+            `📅 Offer Valid Till: *${label}*`
+          );
         }
         parts.push(`📲 Restaurant ର live Offer ଜାଣିବା ପାଇଁ follow କରନ୍ତୁ: https://www.instagram.com/bankibites`);
         parts.push(`_Team BankiBites_ ❤️`);
