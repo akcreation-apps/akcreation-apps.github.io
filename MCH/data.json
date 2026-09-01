@@ -340,14 +340,14 @@
               "id": 1101,
               "name": "Chapati (Roti)",
               "price": 9,
-              "available_time": 19,
+              "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1102,
               "name": "Lachha Paratha",
               "price": 39,
-              "available_time": 19,
+              "available_time": "",
               "not_available_time": ""
             },
             {
