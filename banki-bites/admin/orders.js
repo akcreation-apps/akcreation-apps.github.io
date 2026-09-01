@@ -1285,6 +1285,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         { value: 'Out Of Stock',   icon: 'fa-box-open',        hint: 'Item ran out at the restaurant' },
         { value: 'Not Interested', icon: 'fa-user-slash',      hint: 'Customer no longer wants the order' },
         { value: 'Extra Charges',  icon: 'fa-indian-rupee-sign', hint: 'Customer refused additional fees' },
+        { value: 'Prepay Required', icon: 'fa-money-bill-wave', hint: 'First-time customer refused to prepay (BankiBites disallows COD on first orders)' },
         { value: 'Others',         icon: 'fa-ellipsis',        hint: 'Any other reason' },
       ];
       const tiles = REASONS.map(r => `
@@ -1302,7 +1303,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         title: 'Why is this order being cancelled?',
         html: `<div class="cancel-reason-list" role="radiogroup" aria-label="Cancellation reason">${tiles}</div>`,
         showCancelButton: true,
-        confirmButtonText: 'Confirm cancel',
+        confirmButtonText: 'Confirm',
         cancelButtonText: 'Go back',
         confirmButtonColor: '#dc3545',
         reverseButtons: true,

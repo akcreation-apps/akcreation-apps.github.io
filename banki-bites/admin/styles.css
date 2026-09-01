@@ -2419,18 +2419,37 @@ button.fab:hover { background: var(--brand-dark); }
 }
 .cancel-reason-tile.is-selected .crt-check i { opacity: 1; }
 .cancel-reason-popup .swal2-actions {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: nowrap;
   gap: 8px;
-  margin: 12px 4px 0 !important;
-  flex-wrap: wrap-reverse;
+  margin: 14px 0 0 !important;
+  padding: 0 4px;
   width: 100%;
+  box-sizing: border-box;
 }
 .cancel-reason-popup .swal2-actions button {
-  flex: 1 1 44%;
-  min-height: 44px;
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0 !important;
+  min-height: 46px;
   border-radius: 10px !important;
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 10px 14px !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.cancel-reason-popup .swal2-cancel {
+  background: transparent !important;
+  color: var(--text-strong, #0f172a) !important;
+  border: 1.5px solid var(--border-soft, #d1d5db) !important;
+}
+@media (prefers-color-scheme: dark) {
+  .cancel-reason-popup .swal2-cancel {
+    color: #f3f4f6 !important;
+    border-color: #303645 !important;
+  }
 }
 .cancel-reason-popup .swal2-validation-message {
   margin: 10px 0 0;

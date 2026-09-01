@@ -225,7 +225,7 @@
               "id": 210,
               "name": "Choco Hell",
               "cake_size_list": "[1.5, 2, 3]",
-              "cake_price_list": "[819, 1059, 1539]",
+              "cake_price_list": "[849, 1099, 1599]",
               "has_flavour": false,
               "available_time": "",
               "not_available_time": ""
@@ -268,7 +268,7 @@
               "id": 215,
               "name": "Melti Choco",
               "cake_size_list": "[.5, 1, 1.5, 2, 3]",
-              "cake_price_list": "[289, 579, 819, 1059, 1539]",
+              "cake_price_list": "[359, 699, 999, 1200, 1800]",
               "has_flavour": false,
               "available_time": "",
               "not_available_time": ""

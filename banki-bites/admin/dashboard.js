@@ -737,7 +737,7 @@ function renderStatusMix(orders, p) {
 // orders.js (Out Of Stock / Not Interested / Extra Charges / Others); legacy
 // cancels without a reason are grouped under "Unknown" so nothing gets hidden.
 function renderCancelReasons(orders, p) {
-  const REASON_KEYS = ['Out Of Stock', 'Not Interested', 'Extra Charges', 'Others', 'Unknown'];
+  const REASON_KEYS = ['Out Of Stock', 'Not Interested', 'Extra Charges', 'Prepay Required', 'Others', 'Unknown'];
   const restKey = o => o.restaurant_name || o.restaurant_id || 'Unknown';
   const cancelled = orders.filter(o => (o.status || 'new') === 'cancelled');
 
