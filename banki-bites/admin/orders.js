@@ -1118,7 +1118,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           parts.push(
             `ପରବର୍ତ୍ତୀ order ରେ ₹${discount} ନିଜ bill amount ରୁ କମାଇ payment କରିପାରିବେ ।\n` +
             `ବର୍ତ୍ତମାନ ଅଧିକ order ଥିବାରୁ ଆମ side ରୁ offer track କରିବା ସମ୍ଭବ ହେଉନାହିଁ ।\n\n` +
-            `Offer Amount: *${discount}\n` +
+            `Offer Amount: *₹${discount}*\n` +
             `Offer Valid Till: *${label}*`
           );
         }
