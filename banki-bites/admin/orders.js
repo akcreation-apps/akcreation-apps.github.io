@@ -1287,6 +1287,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         { value: 'Not Interested', icon: 'fa-user-slash',      hint: 'Customer no longer wants the order' },
         { value: 'Extra Charges',  icon: 'fa-indian-rupee-sign', hint: 'Customer refused additional fees' },
         { value: 'Prepay Required', icon: 'fa-money-bill-wave', hint: 'First-time customer refused to prepay (BankiBites disallows COD on first orders)' },
+        { value: 'Outer Zone',     icon: 'fa-map-location-dot', hint: 'Delivery address is beyond the 10 km serviceable radius' },
         { value: 'Others',         icon: 'fa-ellipsis',        hint: 'Any other reason' },
       ];
       const tiles = REASONS.map(r => `
