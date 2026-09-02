@@ -211,7 +211,7 @@ details.delivery-order > .delivery-summary {
   list-style: none;
   cursor: pointer;
   user-select: none;
-  padding: 14px 16px;
+  padding: 10px 14px;
 }
 details.delivery-order > .delivery-summary::-webkit-details-marker { display: none; }
 details.delivery-order > .delivery-summary::marker { display: none; }
@@ -226,10 +226,30 @@ details.delivery-order .delivery-summary .ec-row {
 }
 .delivery-summary-main .ec-title {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
   word-break: break-word;
+  line-height: 1.25;
+}
+.delivery-summary-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px 10px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+  min-width: 0;
+}
+.delivery-summary-sub .ec-meta { line-height: 1.25; min-width: 0; }
+@media (max-width: 380px) {
+  .delivery-summary-sub { gap: 4px 8px; }
+  .delivery-summary-sub .ec-meta { font-size: 0.72rem; }
+  .pay-chip, .eta-chip { font-size: 0.68rem; padding: 2px 7px; }
+  .pay-chip i, .eta-chip i { font-size: 0.68rem; }
+  .collect-banner { font-size: 0.85rem; padding: 7px 10px; gap: 8px; }
+  .collect-banner i { font-size: 0.95rem; }
+  .collect-banner-meta { font-size: 0.7rem; }
 }
 /* Keep the status pill compact and never let it shrink/wrap text — pair with
    the JS-side abbreviation (out_for_delivery → "on the way") so long
@@ -257,10 +277,10 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   transform: rotate(180deg);
 }
 .delivery-body {
-  padding: 12px 16px 16px;
+  padding: 10px 14px 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   border-top: 1px solid var(--border-soft);
 }
 
@@ -336,27 +356,116 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
 
 .tab-panel { display: block; }
 
-/* ── Payment-collection alert ────────────────────────────────────────── */
+/* ── Payment-collection alert ─────────────────────────────────────────
+ * Delivery partners were missing COD collections — clear color codes are
+ * the priority: amber-red for COD (collect cash), green for PAID (do NOT
+ * collect). Applied both as a card-level accent (left ribbon + tinted
+ * border) and as a chip inside the collapsed summary so the state is
+ * visible before the card is even expanded. */
 .entity-card.must-collect {
-  border-color: rgba(245,158,11,0.45);
-  box-shadow: 0 0 0 2px rgba(245,158,11,0.12);
+  position: relative;
+  border-color: rgba(245,158,11,0.6);
+  box-shadow: 0 0 0 2px rgba(245,158,11,0.16);
+  background: rgba(245,158,11,0.04);
 }
+.entity-card.must-collect::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  border-radius: 6px 0 0 6px;
+  background: linear-gradient(180deg, #f59e0b, #dc2626);
+}
+.entity-card.paid-in-full {
+  position: relative;
+  border-color: rgba(22,163,74,0.5);
+  background: rgba(22,163,74,0.04);
+}
+.entity-card.paid-in-full::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  border-radius: 6px 0 0 6px;
+  background: #16a34a;
+}
+
+/* Summary-row payment chip — the at-a-glance signal */
+.pay-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  border: 1.5px solid transparent;
+  font-feature-settings: "tnum" 1;
+  white-space: nowrap;
+}
+.pay-chip i { font-size: 0.72rem; }
+.pay-chip--cod {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+.pay-chip--paid {
+  background: #dcfce7;
+  color: #14532d;
+  border-color: #16a34a;
+}
+
+/* ETA chip — same shape/family as pay-chip so summary row stays consistent. */
+.eta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  border: 1.5px solid #93c5fd;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-feature-settings: "tnum" 1;
+  white-space: nowrap;
+}
+.eta-chip i { font-size: 0.72rem; }
+.eta-chip--soon {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+.eta-chip--late {
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-color: #dc2626;
+}
+
+/* COD banner (inside expanded card) */
 .collect-banner {
   display: flex; align-items: center; gap: 10px;
-  background: #fffaf0;
-  color: #92400e;
-  border: 1px solid rgba(245,158,11,0.3);
+  background: #fef3c7;
+  color: #78350f;
+  border: 1.5px solid #f59e0b;
+  border-left-width: 5px;
   border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 500;
-  font-size: 0.88rem;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 0;
+  word-break: break-word;
 }
 .collect-banner i {
-  font-size: 0.95rem;
-  color: var(--warn);
+  font-size: 1.05rem;
+  color: #dc2626;
   flex-shrink: 0;
 }
-.collect-banner strong { font-weight: 700; color: #78350f; }
+.collect-banner strong { font-weight: 800; color: #7f1d1d; font-size: 1.05em; }
 .collect-banner-body {
   display: flex;
   flex-direction: column;
@@ -365,20 +474,54 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   flex: 1 1 auto;
 }
 .collect-banner-meta {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(146,64,14,0.78);
+  color: rgba(120,53,15,0.85);
   font-feature-settings: "tnum" 1;
 }
 
 @media (prefers-color-scheme: dark) {
-  .collect-banner {
-    background: rgba(245,158,11,0.08);
-    border-color: rgba(245,158,11,0.3);
-    color: #fcd34d;
+  .entity-card.must-collect {
+    background: rgba(245,158,11,0.09);
+    border-color: rgba(245,158,11,0.55);
   }
-  .collect-banner strong { color: #fde68a; }
-  .collect-banner-meta { color: rgba(252,211,77,0.78); }
+  .entity-card.paid-in-full {
+    background: rgba(22,163,74,0.09);
+    border-color: rgba(22,163,74,0.5);
+  }
+  .pay-chip--cod {
+    background: rgba(245,158,11,0.18);
+    color: #fde68a;
+    border-color: #d97706;
+  }
+  .pay-chip--paid {
+    background: rgba(22,163,74,0.18);
+    color: #bbf7d0;
+    border-color: #16a34a;
+  }
+  .eta-chip {
+    background: rgba(59,130,246,0.15);
+    color: #bfdbfe;
+    border-color: #3b82f6;
+  }
+  .eta-chip--soon {
+    background: rgba(245,158,11,0.18);
+    color: #fde68a;
+    border-color: #d97706;
+  }
+  .eta-chip--late {
+    background: rgba(220,38,38,0.2);
+    color: #fecaca;
+    border-color: #dc2626;
+  }
+  .collect-banner {
+    background: rgba(245,158,11,0.12);
+    border-color: #d97706;
+    color: #fde68a;
+  }
+  .collect-banner i { color: #fca5a5; }
+  .collect-banner strong { color: #fca5a5; }
+  .collect-banner-meta { color: rgba(253,230,138,0.8); }
 }
 
 /* ── ETA banner ──────────────────────────────────────────────────────────

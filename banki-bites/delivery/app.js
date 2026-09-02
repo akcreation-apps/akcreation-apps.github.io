@@ -274,6 +274,7 @@ function renderCard(db, o) {
   // back to the order total when no override is set.
   const collectAmt = (o.collect_amount != null && Number.isFinite(+o.collect_amount)) ? +o.collect_amount : o.total;
   if (mustCollect) card.classList.add('must-collect');
+  else             card.classList.add('paid-in-full');
 
   // Optional breakdown line: shown when admin recorded a discount or a
   // prepayment so the driver knows why the cash amount differs from the cart.
@@ -294,6 +295,12 @@ function renderCard(db, o) {
          </div>
        </div>`
     : '';
+  // Summary chip — amber "COD ₹X" so the collect action never gets missed;
+  // green "PAID" flag so the partner has an explicit positive signal instead
+  // of relying only on card tint.
+  const paymentSummaryChip = mustCollect
+    ? `<span class="pay-chip pay-chip--cod" title="Cash on delivery"><i class="fas fa-money-bill-wave"></i> COD${!isBlank(collectAmt) ? ` ₹${collectAmt}` : ''}</span>`
+    : `<span class="pay-chip pay-chip--paid" title="Already paid"><i class="fas fa-circle-check"></i> PAID</span>`;
 
   const isClosed = o.status === 'delivered' || o.status === 'cancelled';
 
@@ -356,6 +363,7 @@ function renderCard(db, o) {
   }
 
   let etaBanner = '';
+  let etaSummaryChip = '';
   // Once the order is delivered/cancelled the ETA is no longer actionable.
   if (o.eta?.toDate && !isClosed) {
     const eta = o.eta.toDate();
@@ -376,6 +384,11 @@ function renderCard(db, o) {
           <span class="eta-line">${relative}</span>
         </span>
       </div>`;
+    // Compact summary chip so the ETA time is visible on the collapsed card,
+    // colour-shifted red when overdue / amber when within 10 min so a partner
+    // scanning the order list can spot urgency without opening each card.
+    const etaChipMod = isLate ? 'eta-chip--late' : (minsLeft <= 10 ? 'eta-chip--soon' : '');
+    etaSummaryChip = `<span class="eta-chip ${etaChipMod}" title="Deliver by ${etaText}"><i class="fas fa-stopwatch"></i> ${etaText}</span>`;
   }
 
   // GPS pin from the customer record (set by admin from the customer modal).
@@ -453,7 +466,11 @@ function renderCard(db, o) {
       <div class="ec-row">
         <div class="delivery-summary-main">
           <div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</div>
-          <div class="ec-meta">${created.toLocaleString('en-IN')}${hasItems ? ' · ' + items.length + ' items' : ''}</div>
+          <div class="delivery-summary-sub">
+            <span class="ec-meta">${created.toLocaleString('en-IN')}${hasItems ? ' · ' + items.length + ' items' : ''}</span>
+            ${!isClosed ? etaSummaryChip : ''}
+            ${!isClosed ? paymentSummaryChip : ''}
+          </div>
           ${deliveredMeta}
         </div>
         <span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>
