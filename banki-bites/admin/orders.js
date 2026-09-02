@@ -1116,8 +1116,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           const d = new Date(dateStr + 'T00:00:00');
           const label = `${ordSuffix(d.getDate())} ${d.toLocaleDateString('en-IN', { month: 'long' })} ${d.getFullYear()}`;
           parts.push(
-            `ପରବର୍ତ୍ତୀ order ରେ ₹${discount} ନିଜ bill amount ରୁ କମାଇ ଦେଇ payment କରିପାରିବେ ।\n\n` +
-            `ବର୍ତ୍ତମାନ ଅଧିକ order ଥିବାରୁ ଆମ side ରୁ offer track କରିବା ସମ୍ଭବ ହେଉନାହିଁ ।\n` +
+            `ପରବର୍ତ୍ତୀ order ରେ ₹${discount} ନିଜ bill amount ରୁ କମାଇ payment କରିପାରିବେ ।\n` +
+            `ବର୍ତ୍ତମାନ ଅଧିକ order ଥିବାରୁ ଆମ side ରୁ offer track କରିବା ସମ୍ଭବ ହେଉନାହିଁ ।\n\n` +
+            `Offer Amount: *${discount}\n` +
             `Offer Valid Till: *${label}*`
           );
         }
