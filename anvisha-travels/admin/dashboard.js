@@ -1,9 +1,64 @@
 import { COL } from '../firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
-  fmtINR, fmtNum, toDateSafe, startOfMonth, addDays, groupBy, topN,
+  fmtINR, fmtNum, toDateSafe, startOfDay, startOfMonth, addDays, groupBy, topN,
   chartPalette, applyChartGlobalDefaults, wireStatsBlockResize,
 } from './analytics.js';
+
+const RANGE_LS_KEY = 'av_admin_dashboard_range';
+
+function startOfLastMonth(d = new Date()) {
+  const x = startOfMonth(d);
+  x.setMonth(x.getMonth() - 1);
+  return x;
+}
+
+// Given a preset (or 'custom' + fromISO/toISO), compute concrete { preset, from, to, label }.
+// `to` is exclusive (start of next day) so same-day picks include the whole day.
+// `all` yields from=null/to=null so inRange() short-circuits.
+function normalizeRange(input) {
+  const now = new Date();
+  const startOfToday = startOfDay(now);
+  const endOfToday = new Date(startOfToday.getTime() + 86400000);
+  const preset = input.preset || 'this_month';
+  let from, to, label;
+  switch (preset) {
+    case 'this_month': from = startOfMonth(now);     to = endOfToday;             label = 'This month'; break;
+    case 'last_month': from = startOfLastMonth(now); to = startOfMonth(now);      label = 'Last month'; break;
+    case 'all':        from = null; to = null; label = 'All time'; break;
+    case 'custom': {
+      const f = input.fromISO ? new Date(input.fromISO) : startOfMonth(now);
+      const t = input.toISO   ? new Date(input.toISO)   : startOfToday;
+      from = startOfDay(f);
+      to   = new Date(startOfDay(t).getTime() + 86400000);
+      label = 'Custom';
+      break;
+    }
+    default: from = startOfMonth(now); to = endOfToday; label = 'This month';
+  }
+  return { preset, from, to, label };
+}
+
+function loadRangeState() {
+  try {
+    const raw = localStorage.getItem(RANGE_LS_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && p.preset) return normalizeRange(p);
+    }
+  } catch {}
+  return normalizeRange({ preset: 'this_month' });
+}
+
+function saveRangeState(range) {
+  try {
+    localStorage.setItem(RANGE_LS_KEY, JSON.stringify({
+      preset: range.preset,
+      fromISO: range.from ? range.from.toISOString() : null,
+      toISO:   range.to   ? range.to.toISOString()   : null,
+    }));
+  } catch {}
+}
 
 export async function renderDashboard(ctx) {
   const { panel, db } = ctx;
@@ -75,23 +130,54 @@ export async function renderDashboard(ctx) {
   applyChartGlobalDefaults();
 
   // ── Range filter ──
-  const ranges = [
-    { key: 'this_month', label: 'This month' },
-    { key: 'last_month', label: 'Last month' },
-    { key: 'all',        label: 'All time' },
+  const state = { range: loadRangeState() };
+  const presets = [
+    ['this_month', 'This month'],
+    ['last_month', 'Last month'],
+    ['custom',     'Custom'],
+    ['all',        'All time'],
   ];
-  let activeRange = 'this_month';
   const rangeBar = panel.querySelector('#db-range');
-  ranges.forEach(rg => {
-    const b = document.createElement('button');
-    b.className = 'filter-chip' + (rg.key === activeRange ? ' active' : '');
-    b.textContent = rg.label;
-    b.addEventListener('click', () => {
-      activeRange = rg.key;
-      rangeBar.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c === b));
-      compute();
-    });
-    rangeBar.appendChild(b);
+  function renderRangeBar() {
+    const cur = state.range.preset;
+    const chip = (k, l) => `<button type="button" class="filter-chip${k === cur ? ' active' : ''}" data-preset="${k}" aria-pressed="${k === cur}">${l}</button>`;
+    const fromISO = state.range.from ? state.range.from.toISOString().slice(0, 10) : '';
+    const toISO   = state.range.to   ? new Date(state.range.to.getTime() - 86400000).toISOString().slice(0, 10) : '';
+    rangeBar.innerHTML = `
+      <div class="filter-bar" style="margin:0;">${presets.map(([k, l]) => chip(k, l)).join('')}</div>
+      <div class="filter-custom" ${cur === 'custom' ? '' : 'hidden'} style="margin-top:8px;">
+        <label>From <input type="date" id="dbRangeFrom" value="${fromISO}"></label>
+        <label>To <input type="date" id="dbRangeTo" value="${toISO}"></label>
+      </div>
+    `;
+  }
+  renderRangeBar();
+  rangeBar.addEventListener('click', (e) => {
+    const b = e.target.closest('.filter-chip');
+    if (!b) return;
+    const preset = b.dataset.preset;
+    if (preset === state.range.preset) return;
+    if (preset === 'custom') {
+      state.range = normalizeRange({
+        preset: 'custom',
+        fromISO: state.range.from ? state.range.from.toISOString() : null,
+        toISO:   state.range.to   ? new Date(state.range.to.getTime() - 86400000).toISOString() : null,
+      });
+    } else {
+      state.range = normalizeRange({ preset });
+    }
+    saveRangeState(state.range);
+    renderRangeBar();
+    compute();
+  });
+  rangeBar.addEventListener('change', (e) => {
+    if (e.target.id !== 'dbRangeFrom' && e.target.id !== 'dbRangeTo') return;
+    const f = document.getElementById('dbRangeFrom').value;
+    const t = document.getElementById('dbRangeTo').value;
+    if (!f || !t) return;
+    state.range = normalizeRange({ preset: 'custom', fromISO: f, toISO: t });
+    saveRangeState(state.range);
+    compute();
   });
 
   // ── Load everything once ──
@@ -114,15 +200,10 @@ export async function renderDashboard(ctx) {
   compute();
 
   function inRange(rec, dateField) {
-    if (activeRange === 'all') return true;
+    if (state.range.preset === 'all') return true;
     const d = toDateSafe(rec[dateField]) || (rec.date && new Date(rec.date));
     if (!d) return false;
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    if (activeRange === 'this_month') return d >= start;
-    if (activeRange === 'last_month') return d >= lastStart && d < start;
-    return true;
+    return d >= state.range.from && d < state.range.to;
   }
 
   function compute() {

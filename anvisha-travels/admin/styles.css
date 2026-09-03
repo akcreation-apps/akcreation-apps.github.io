@@ -497,6 +497,15 @@ a:hover { text-decoration: underline; }
 }
 .filter-chip:hover { color: var(--gold); }
 
+.filter-custom { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.filter-custom label { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; color: var(--text-2); }
+.filter-custom input[type="date"] {
+  background: var(--card); color: var(--text-1);
+  border: 1px solid var(--border-hi); border-radius: 8px;
+  padding: 6px 10px; font-size: 13px; min-height: 32px;
+}
+.filter-custom input[type="date"]:focus { outline: none; border-color: var(--gold); }
+
 /* ── Search input ── */
 .search-wrap { position: relative; flex: 1; min-width: 180px; }
 .search-wrap .f-input { padding-left: 36px; }
