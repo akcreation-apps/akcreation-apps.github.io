@@ -12,7 +12,7 @@ import {
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
   toDateSafe, bucketByDay, chartPalette, whenChartReady, fmtINR, startOfDay, startOfLastMonth,
-  truncateName,
+  truncateName, isOnTime,
 } from '../analytics.js';
 
 const $ = sel => document.querySelector(sel);
@@ -308,6 +308,12 @@ function renderCard(db, o) {
   // no separate address block. One line summary + collapsed items.
   if (isClosed) {
     card.classList.add('history-card');
+    // Payout state → row-level class so the whole card carries a green
+    // (settled) or orange (pending) accent, not just the chip. Cancelled
+    // orders and payout-ineligible orders stay neutral.
+    if (o.payout_applicable !== false && isDelivered(o)) {
+      card.classList.add(o.payout_paid === true ? 'history-card--paid' : 'history-card--pending');
+    }
     const when = o.delivered_at?.toDate?.() || o.created_at?.toDate?.() || new Date();
     // Payout state chip: Paid (settled), Pending (eligible & delivered but unsettled),
     // or Not eligible (admin flagged payout_applicable === false). Cancelled orders
@@ -677,6 +683,7 @@ async function renderEarnings() {
     <div class="section-header section-header--compact">
       <h3 class="m-0"><i class="fas fa-coins text-primary mr-1"></i> My Earnings</h3>
     </div>
+    <div id="earnHero" class="kpi-hero-grid"></div>
     <div id="earnKpis" class="kpi-grid kpi-grid--compact"></div>
     <div class="chart-grid">
       <div class="chart-card">
@@ -750,6 +757,62 @@ async function renderEarnings() {
     activeDaySet.add(startOfDay(t).getTime());
   }
   const activeDays = activeDaySet.size;
+
+  // Projected month-end earning — linear extrapolation of month-to-date pace
+  // over the full calendar month. Uses month.total / dayOfMonth * daysInMonth
+  // so a partner sees where they'd land if today's pace holds. Skipped on
+  // day 1 (no signal) — falls back to "—" so we don't project ₹0 all day.
+  const dayOfMonth = now.getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const projectedMonth = dayOfMonth >= 1 && month.total > 0
+    ? Math.round(month.total / dayOfMonth * daysInMonth)
+    : null;
+
+  // On-time % over the current month. Denominator = deliveries with both
+  // eta and delivered_at recorded (isOnTime returns null otherwise). Skipped
+  // when no measurable deliveries exist so we don't display a misleading 0%.
+  const monthDelivered = orders.filter(inRange(startMonth));
+  let onTimeYes = 0, onTimeMeasurable = 0;
+  for (const o of monthDelivered) {
+    const flag = isOnTime(o);
+    if (flag === null) continue;
+    onTimeMeasurable += 1;
+    if (flag) onTimeYes += 1;
+  }
+  const onTimePct = onTimeMeasurable > 0
+    ? Math.round((onTimeYes / onTimeMeasurable) * 100)
+    : null;
+  const onTimeMod = onTimePct === null
+    ? ''
+    : onTimePct >= 90 ? 'kpi-card--ok'
+    : onTimePct >= 75 ? 'kpi-card--warn'
+    : 'kpi-card--bad';
+
+  $('#earnHero').innerHTML = `
+    <div class="kpi-hero kpi-hero--projection">
+      <div class="kpi-hero-icon"><i class="fas fa-arrow-trend-up"></i></div>
+      <div class="kpi-hero-body">
+        <div class="kpi-hero-label">Projected monthly earning</div>
+        <div class="kpi-hero-value">${projectedMonth !== null ? fmtINR(projectedMonth) : '—'}</div>
+        <div class="kpi-hero-sub">${projectedMonth !== null
+          ? `<i class="fas fa-calendar-day"></i> at current pace · day ${dayOfMonth} of ${daysInMonth} · MTD ${fmtINR(month.total)}`
+          : 'need more delivery data to project'}</div>
+      </div>
+    </div>
+    <div class="kpi-hero kpi-hero--ontime ${onTimeMod ? onTimeMod.replace('kpi-card--', 'kpi-hero--') : ''}">
+      <div class="kpi-hero-icon"><i class="fas fa-stopwatch"></i></div>
+      <div class="kpi-hero-body">
+        <div class="kpi-hero-label">On-time delivery</div>
+        <div class="kpi-hero-value">${onTimePct !== null ? `${onTimePct}%` : '—'}</div>
+        <div class="kpi-hero-sub">${onTimePct !== null
+          ? `<i class="fas fa-circle-check"></i> ${onTimeYes} of ${onTimeMeasurable} deliveries on-time this month`
+          : 'no ETA data yet this month'}</div>
+        ${onTimePct !== null
+          ? `<div class="kpi-hero-bar"><span style="width:${onTimePct}%"></span></div>`
+          : ''}
+      </div>
+    </div>
+  `;
 
   $('#earnKpis').innerHTML = `
     <div class="kpi-card kpi-card--sm"><div class="kpi-label">Today</div><div class="kpi-value">${fmtINR(today.total)}</div><div class="kpi-sub">${today.count} delivered</div></div>
