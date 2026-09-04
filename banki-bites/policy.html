@@ -161,24 +161,38 @@
     @media (prefers-color-scheme: dark) {
       .mandatory-pill { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); }
     }
-    .card-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
-    .card-body ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 5px; }
-    .card-body ul li {
-      position: relative; padding-left: 14px;
-      font-size: 0.78rem; color: var(--text); line-height: 1.55;
+    .card-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* POINT-WISE NUMBERED LIST */
+    .point-list {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 10px;
+      counter-reset: point;
+    }
+    .point-list li {
+      position: relative; padding: 2px 0 2px 34px;
+      font-size: 0.8rem; color: var(--text); line-height: 1.6;
       word-break: break-word; overflow-wrap: break-word;
+      counter-increment: point;
     }
-    .card-body ul li::before {
-      content: ''; position: absolute; left: 0; top: 7px;
-      width: 5px; height: 5px; border-radius: 50%; background: var(--primary);
+    .point-list li::before {
+      content: counter(point);
+      position: absolute; left: 0; top: 1px;
+      width: 24px; height: 24px; border-radius: 7px;
+      background: var(--primary); color: #fff;
+      font-size: 0.7rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
     }
+    .point-list li strong { font-weight: 700; color: var(--text); }
+
     .penalty-strip {
-      display: flex; align-items: flex-start; gap: 7px;
-      background: var(--red-bg); border: 1px solid #fecaca; border-radius: 8px;
-      padding: 8px 12px; font-size: 0.72rem; font-weight: 600;
-      color: var(--red); line-height: 1.5; word-break: break-word;
+      display: flex; align-items: flex-start; gap: 8px;
+      background: var(--red-bg); border: 1px solid #fecaca; border-radius: 10px;
+      padding: 10px 14px; font-size: 0.75rem; font-weight: 600;
+      color: var(--red); line-height: 1.55; overflow-wrap: break-word;
     }
-    .penalty-strip i { flex-shrink: 0; margin-top: 2px; font-size: 0.65rem; }
+    .penalty-strip i { flex-shrink: 0; margin-top: 3px; font-size: 0.7rem; }
+    .penalty-strip span { flex: 1; min-width: 0; }
 
     /* PRICING TABLE */
     .price-table { width: 100%; border-collapse: collapse; }
@@ -258,11 +272,14 @@
     footer a { color: rgba(255,255,255,.6); text-decoration: none; }
     footer a:hover { color: var(--primary); }
 
-    /* PRINT */
+    /* ═══════════════════════════════════════════════════════════
+       PRINT — formal official document, pure B&W, single A4 page
+       Serif letterhead + numbered clauses + signature.
+       ═══════════════════════════════════════════════════════════ */
     @media print {
-      @page { size: A4 portrait; margin: 12mm; }
-      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      body { background: #fff; color: #111; }
+      @page { size: A4 portrait; margin: 9mm 12mm; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+      body { background: #fff !important; color: #000 !important; font-family: 'Georgia', 'Times New Roman', serif; }
       .topbar, footer, .tab-bar, .print-btn { display: none !important; }
       .page { padding: 0; max-width: 100%; }
 
@@ -270,82 +287,226 @@
       .policy-section { display: none !important; }
       .policy-section.active { display: block !important; }
 
-      /* doc header */
-      .doc-header { border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; }
-      .doc-badge  { font-size: 0.58rem; padding: 3px 9px; margin-bottom: 8px; }
-      .doc-header h1 { font-size: 1.05rem; line-height: 1.2; margin-bottom: 5px; }
-      .doc-header p  { font-size: 0.66rem; line-height: 1.45; }
-      .doc-meta      { margin-top: 10px; gap: 10px; }
-      .doc-meta-item { font-size: 0.6rem; }
+      /* strip all card visuals — flatten to document */
+      .policy-card, .signature-section, .penalty-strip {
+        background: #fff !important; border: none !important;
+        border-radius: 0 !important; padding: 0 !important; margin: 0 !important;
+      }
+      .card-icon      { display: none !important; }
+      .mandatory-pill { display: none !important; }
+      .section-label  { display: none !important; }
+      .print-only     { display: block !important; }
 
-      /* cards */
-      .policy-card   { border-radius: 8px; margin-bottom: 8px; }
-      .card-head     { padding: 9px 14px; }
-      .card-head-text h2 { font-size: 0.75rem; }
-      .card-head-text .clause-num { font-size: 0.55rem; }
-      .card-icon     { width: 30px; height: 30px; font-size: 0.8rem; border-radius: 7px; }
-      .card-body     { padding: 10px 14px; gap: 6px; }
-      .card-body ul  { gap: 5px; }
-      .card-body ul li { font-size: 0.66rem; line-height: 1.5; padding-left: 12px; }
-      .card-body ul li::before { width: 5px; height: 5px; top: 6px; }
-      .penalty-strip { font-size: 0.62rem; padding: 7px 11px; border-radius: 6px; }
+      /* ── LETTERHEAD ── */
+      .doc-header {
+        background: #fff !important; border: none !important; border-radius: 0 !important;
+        padding: 0 0 6px !important; margin: 0 0 8px !important;
+        border-bottom: 1.5px solid #000 !important; text-align: center;
+      }
+      .doc-header::before { display: none !important; }
+      .doc-header-inner   { display: block !important; }
+      .doc-header-inner > div:first-child { text-align: center; }
+      .doc-badge {
+        display: inline-block !important; background: transparent !important;
+        border: none !important; color: #000 !important;
+        font-family: 'Georgia', serif; padding: 0; margin: 0 0 4px;
+        font-size: 0 !important; line-height: 1 !important;
+      }
+      .doc-badge i { display: none; }
+      .doc-badge::before { content: 'BankiBites'; font-family: 'Georgia', serif; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; display: block; line-height: 1.2; }
+      .doc-badge::after  { content: 'Banki · Cuttack · Odisha 754008'; display: block; font-size: 0.62rem; letter-spacing: 1.8px; line-height: 1.2; margin-top: 2px; }
 
-      .price-table th  { font-size: 0.6rem; padding: 6px 11px; }
-      .price-table td  { font-size: 0.66rem; padding: 7px 11px; }
-      .price-badge     { font-size: 0.66rem; padding: 2px 8px; }
+      .doc-header h1 {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 1.5rem; font-weight: 700; line-height: 1.15;
+        letter-spacing: 2px; text-transform: uppercase; margin: 6px 0 0;
+      }
+      .doc-header h1 br { display: none; }
+      .doc-header h1 em {
+        color: #000 !important; font-style: italic; font-weight: 400;
+        font-size: 0.82rem; letter-spacing: 3px; text-transform: uppercase;
+        display: block; margin-top: 3px;
+      }
+      .doc-header h1 em::before { content: '— '; }
+      .doc-header h1 em::after  { content: ' —'; }
+      .doc-header p    { display: none !important; }
+      .doc-meta        { justify-content: center; margin-top: 6px; gap: 14px; font-family: 'Georgia', serif; }
+      .doc-meta-item   { color: #000 !important; font-size: 0.66rem; font-style: italic; }
+      .doc-meta-item i { display: none; }
 
-      .doc-chips       { gap: 7px; }
-      .doc-chip        { padding: 8px 11px; border-radius: 7px; }
-      .doc-chip i      { font-size: 0.9rem; }
-      .doc-chip strong { font-size: 0.68rem; }
-      .doc-chip span   { font-size: 0.6rem; }
+      /* ── PREAMBLE ── */
+      .preamble {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.78rem; line-height: 1.55; text-align: justify;
+        margin: 0 0 8px !important; text-indent: 22px;
+      }
+      .preamble strong { font-weight: 700; }
+      .preamble em { font-style: italic; }
 
-      .section-label { font-size: 0.55rem; margin: 11px 0 7px; }
-      .section-label::after { display: none; }
-      .mandatory-pill { font-size: 0.5rem; padding: 1px 5px; }
+      /* ── SECTION / CLAUSE HEADINGS ── */
+      .policy-card { display: block; margin-bottom: 8px !important; break-inside: avoid; }
+      .card-head {
+        display: block !important; padding: 0 !important;
+        border: none !important; border-bottom: 0.6px solid #000 !important;
+        margin-bottom: 5px; padding-bottom: 2px !important;
+      }
+      .card-head-text .clause-num {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.6rem; font-weight: 400; text-transform: uppercase;
+        letter-spacing: 2.4px; margin-bottom: 2px;
+      }
+      .card-head-text h2 {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.88rem; font-weight: 700; letter-spacing: 0.3px;
+      }
+      .card-body { padding: 0 !important; display: block !important; }
 
-      /* signature */
-      .signature-section { border-radius: 8px; padding: 13px 16px; margin-top: 10px; }
-      .sig-note          { font-size: 0.63rem; margin-bottom: 9px; line-height: 1.5; }
-      .sig-divider       { margin: 9px 0; }
-      .sig-grid          { gap: 20px; }
-      .sig-name-big      { font-size: 1.1rem; margin: 3px 0; }
-      .sig-role          { font-size: 0.6rem; }
-      .sig-label         { font-size: 0.55rem; }
-      .sig-stamp         { font-size: 0.58rem; padding: 5px 10px; margin-top: 7px; }
-      .sig-stamp img     { width: 13px; height: 13px; }
-      .sig-partner-name  { font-size: 0.66rem; margin-bottom: 7px; }
-      .sig-field         { margin-top: 6px !important; }
-      .sig-field span    { font-size: 0.52rem; }
-      .sig-dashed        { height: 36px; }
-      .policy-foot       { font-size: 0.58rem; margin-top: 9px; }
+      /* ── NUMBERED POINTS ── */
+      .point-list { padding-left: 0; margin: 0; gap: 0; }
+      .point-list li {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.78rem; line-height: 1.55;
+        padding: 3px 0 3px 22px !important; position: relative;
+        text-align: justify;
+      }
+      .point-list li strong { color: #000 !important; font-weight: 700; }
+      .point-list li::before {
+        content: counter(point) '.'; background: transparent !important;
+        color: #000 !important;
+        width: 18px !important; height: auto !important;
+        font-family: 'Georgia', serif; font-weight: 700;
+        font-size: 0.78rem; border-radius: 0 !important;
+        display: block; text-align: left; top: 3px !important; left: 0 !important;
+      }
 
-      /* delivery section has more content — tighten selectively */
-      #sec-delivery .doc-header    { padding: 10px 14px; margin-bottom: 8px; }
-      #sec-delivery .doc-header h1 { font-size: 0.9rem; }
-      #sec-delivery .doc-header p  { font-size: 0.6rem; }
-      #sec-delivery .doc-meta      { margin-top: 7px; }
-      #sec-delivery .policy-card   { margin-bottom: 6px; }
-      #sec-delivery .card-head     { padding: 7px 12px; }
-      #sec-delivery .card-body     { padding: 8px 12px; gap: 5px; }
-      #sec-delivery .card-body ul  { gap: 4px; }
-      #sec-delivery .card-body ul li { font-size: 0.62rem; line-height: 1.42; }
-      #sec-delivery .penalty-strip { font-size: 0.58rem; padding: 6px 9px; }
-      #sec-delivery .price-table th { font-size: 0.56rem; padding: 5px 9px; }
-      #sec-delivery .price-table td { font-size: 0.62rem; padding: 5px 9px; }
-      #sec-delivery .doc-chips      { gap: 5px; margin-bottom: 2px; }
-      #sec-delivery .doc-chip       { padding: 6px 9px; }
+      /* ── PENALTY (italic caution rule) ── */
+      .penalty-strip {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.74rem; font-style: italic; font-weight: 400;
+        line-height: 1.5; margin-top: 5px !important;
+        padding: 4px 10px !important; border-left: 2px solid #000 !important;
+      }
+      .penalty-strip i { display: none; }
+      .penalty-strip span { display: block; }
+      .penalty-strip strong { font-style: italic; font-weight: 700; }
+
+      /* ── PRICE TABLE (delivery) ── */
+      .price-table { margin-top: 3px; }
+      .price-table th {
+        background: #fff !important; color: #000 !important;
+        font-family: 'Georgia', serif; font-size: 0.64rem;
+        font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+        border-bottom: 1px solid #000 !important; padding: 5px 8px !important;
+      }
+      .price-table td {
+        font-family: 'Georgia', serif; color: #000 !important;
+        font-size: 0.72rem !important; padding: 5px 8px !important;
+        border-bottom: 0.4px solid #000 !important;
+      }
+      .price-badge { background: transparent !important; color: #000 !important; font-weight: 700; padding: 0 !important; }
+
+      /* ── DOC CHIPS (delivery — Aadhaar / DL) ── */
+      .doc-chips { display: flex !important; gap: 12px !important; margin: 3px 0 4px !important; }
+      .doc-chip  {
+        flex: 1; background: #fff !important; border: 1px solid #000 !important;
+        border-radius: 0 !important; padding: 5px 9px !important;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .doc-chip i      { display: none !important; }
+      .doc-chip strong { font-family: 'Georgia', serif; font-size: 0.7rem; color: #000 !important; }
+      .doc-chip span   { font-family: 'Georgia', serif; font-size: 0.6rem; color: #000 !important; font-style: italic; }
+
+      /* ── SIGNATURE BLOCK ── */
+      .signature-section {
+        margin-top: 22px !important;
+        border-top: 1.5px solid #000 !important; border-radius: 0 !important;
+        padding: 16px 0 0 !important; break-inside: avoid;
+      }
+      .sig-note {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.72rem; font-style: italic; line-height: 1.5;
+        margin-bottom: 16px !important; text-align: justify;
+      }
+      .sig-divider { display: none !important; }
+      .sig-grid    { gap: 28px !important; margin-top: 4px; }
+      .sig-block   { gap: 7px !important; }
+      .sig-label {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+        border-bottom: 0.6px solid #000; padding-bottom: 4px; margin-bottom: 14px;
+      }
+      .sig-name-big {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 1.15rem; font-weight: 700; font-style: italic;
+        letter-spacing: 0.3px; margin: 12px 0 8px !important;
+      }
+      .sig-name-big span { color: #000 !important; }
+      .sig-role {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.7rem; font-style: italic; line-height: 1.7; margin-top: 2px;
+      }
+      .sig-stamp {
+        display: inline-block !important; background: transparent !important;
+        color: #000 !important; border: 1px solid #000 !important;
+        border-radius: 0 !important; padding: 5px 12px !important; margin-top: 20px !important;
+        font-family: 'Georgia', serif; font-size: 0.6rem; font-weight: 400;
+        letter-spacing: 2px; text-transform: uppercase;
+      }
+      .sig-stamp img { display: none !important; }
+      .sig-dashed {
+        height: 24px !important; border-bottom: 1px solid #000 !important; margin-bottom: 3px !important;
+      }
+      .sig-partner-name {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.68rem; font-style: italic; margin-bottom: 6px !important;
+      }
+      .sig-field { margin-top: 6px !important; gap: 2px !important; }
+      .sig-field span {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.56rem; font-weight: 400; letter-spacing: 1.6px; text-transform: uppercase;
+      }
+      .sig-field .sig-line { height: 0.9px !important; background: #000 !important; }
+
+      .policy-foot {
+        color: #000 !important; font-family: 'Georgia', serif;
+        font-size: 0.62rem; font-style: italic;
+        margin-top: 10px !important; padding-top: 5px;
+        border-top: 0.5px solid #000; text-align: center;
+      }
+      .policy-foot a { color: #000 !important; text-decoration: none; }
+
+      /* ── Delivery tab has more content (table + doc-chips + 4 clauses) — tighten selectively ── */
+      #sec-delivery .doc-header h1 { font-size: 1.3rem; }
+      #sec-delivery .doc-header h1 em { font-size: 0.72rem; }
+      #sec-delivery .doc-meta { margin-top: 5px; }
+      #sec-delivery .doc-meta-item { font-size: 0.58rem; }
+      #sec-delivery .preamble  { font-size: 0.72rem; line-height: 1.6; margin-bottom: 9px !important; }
+      #sec-delivery .policy-card { margin-bottom: 10px !important; }
+      #sec-delivery .card-head { margin-bottom: 7px; padding-bottom: 3px !important; }
+      #sec-delivery .card-head-text h2 { font-size: 0.8rem; }
+      #sec-delivery .card-head-text .clause-num { font-size: 0.56rem; margin-bottom: 3px; }
+      #sec-delivery .point-list li { font-size: 0.7rem; line-height: 1.65; padding: 5px 0 5px 20px !important; }
+      #sec-delivery .point-list li::before { font-size: 0.7rem; width: 16px !important; top: 5px !important; }
+      #sec-delivery .penalty-strip { font-size: 0.68rem; line-height: 1.55; padding: 5px 10px !important; margin-top: 7px !important; }
+      #sec-delivery .price-table th { font-size: 0.58rem; padding: 4px 7px !important; }
+      #sec-delivery .price-table td { font-size: 0.64rem !important; padding: 4px 7px !important; }
       #sec-delivery .doc-chip strong { font-size: 0.62rem; }
-      #sec-delivery .doc-chip span   { font-size: 0.55rem; }
-      #sec-delivery .section-label  { margin: 8px 0 5px; }
-      #sec-delivery .signature-section { padding: 10px 14px; margin-top: 7px; }
-      #sec-delivery .sig-note       { font-size: 0.58rem; margin-bottom: 7px; }
-      #sec-delivery .sig-divider    { margin: 7px 0; }
-      #sec-delivery .sig-dashed     { height: 28px; }
-      #sec-delivery .sig-name-big   { font-size: 0.95rem; }
-      #sec-delivery .sig-field      { margin-top: 5px !important; }
-      #sec-delivery .policy-foot    { margin-top: 7px; }
+      #sec-delivery .doc-chip span   { font-size: 0.54rem; }
+      #sec-delivery .signature-section { margin-top: 12px !important; padding-top: 10px !important; }
+      #sec-delivery .sig-note { font-size: 0.64rem; margin-bottom: 10px !important; }
+      #sec-delivery .sig-name-big { font-size: 1rem; margin: 8px 0 6px !important; }
+      #sec-delivery .sig-role { font-size: 0.62rem; line-height: 1.6; }
+      #sec-delivery .sig-label { margin-bottom: 10px; }
+      #sec-delivery .sig-stamp { margin-top: 14px !important; font-size: 0.55rem; }
+      #sec-delivery .sig-dashed { height: 20px !important; }
+      #sec-delivery .sig-partner-name { font-size: 0.62rem; margin-bottom: 5px !important; }
+      #sec-delivery .sig-field { margin-top: 5px !important; }
+      #sec-delivery .sig-field span { font-size: 0.5rem; }
+      #sec-delivery .policy-foot { font-size: 0.56rem; margin-top: 8px !important; }
     }
+
+    /* print-only elements are hidden on screen */
+    .print-only { display: none; }
 
     @media (prefers-reduced-motion: reduce) { .tab-btn, .topbar-link, .print-btn { transition: none; } }
   </style>
@@ -402,6 +563,15 @@
         </div>
       </div>
 
+      <p class="print-only preamble">
+        This Onboarding Agreement is executed on the date affixed below at
+        <strong>Banki, Cuttack, Odisha 754008</strong>, between
+        <strong>BankiBites</strong> (operated under <em>AkCreation</em>, hereinafter referred to as
+        "the Platform") and the undersigned <strong>Restaurant Partner</strong>
+        (hereinafter referred to as "the Restaurant"), setting out the mandatory
+        standards the Restaurant undertakes to observe while listed on the Platform.
+      </p>
+
       <div class="section-label"><i class="fas fa-shield-halved" aria-hidden="true"></i> Core Policies</div>
 
       <div class="policy-card">
@@ -413,11 +583,10 @@
           </div>
         </div>
         <div class="card-body">
-          <ul>
+          <ol class="point-list">
             <li>All food must be packed in <strong>food-grade sealed containers</strong> or <strong>aluminium foil paper</strong> — no newspaper or open packets.</li>
-            <li>Liquids and gravies must use <strong>leak-proof containers</strong> with sealed lids.</li>
-            <li>Packaging must keep food fresh, hot, and intact throughout delivery.</li>
-          </ul>
+            <li>Liquids and gravies must use <strong>leak-proof containers</strong> with sealed lids so food stays fresh and intact till delivery.</li>
+          </ol>
         </div>
       </div>
 
@@ -430,13 +599,12 @@
           </div>
         </div>
         <div class="card-body">
-          <ul>
-            <li>Inform BankiBites <strong>every morning</strong> about items you cannot prepare before orders are placed.</li>
-            <li>If an item is permanently removed from your menu, update BankiBites immediately to delist it.</li>
-          </ul>
+          <ol class="point-list">
+            <li>Inform BankiBites <strong>every morning</strong> about items you cannot prepare, and immediately for any item permanently removed from the menu.</li>
+          </ol>
           <div class="penalty-strip">
             <i class="fas fa-ban" aria-hidden="true"></i>
-            Penalty: Failure to notify unavailability → restaurant <strong>delisted for 24 hours</strong>. 3+ violations in 30 days → <strong>permanent removal</strong>.
+            <span>Penalty: Failure to notify → <strong>24-hour delisting</strong>. 3+ violations in 30 days → <strong>permanent removal</strong>.</span>
           </div>
         </div>
       </div>
@@ -450,11 +618,10 @@
           </div>
         </div>
         <div class="card-body">
-          <ul>
+          <ol class="point-list">
             <li>All food quality, taste, hygiene, and safety is <strong>entirely the restaurant's responsibility</strong>. BankiBites is not liable.</li>
-            <li>Refunds or replacements due to food complaints are <strong>fully borne by the restaurant</strong>.</li>
-            <li>Maintain a clean, hygienic kitchen and comply with all local food safety norms at all times.</li>
-          </ul>
+            <li>Refunds or replacements arising from food complaints are <strong>fully borne by the restaurant</strong>.</li>
+          </ol>
         </div>
       </div>
 
@@ -469,11 +636,26 @@
           </div>
         </div>
         <div class="card-body">
-          <ul>
+          <ol class="point-list">
             <li>Be ready to accept orders during your listed operating hours at all times.</li>
             <li>Never collect direct payments from BankiBites customers outside the platform.</li>
-            <li>Treat BankiBites delivery staff and coordinators with respect.</li>
-          </ul>
+          </ol>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <div class="card-head">
+          <div class="card-icon red"><i class="fas fa-door-open" aria-hidden="true"></i></div>
+          <div class="card-head-text">
+            <div class="clause-num">Clause 5 — Exit / Opt-Out</div>
+            <h2>Governed by a Separate Opt-Out Declaration</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <ol class="point-list">
+            <li>Exit from BankiBites — whether initiated by BankiBites (policy violation) or by the restaurant owner — is governed by a <strong>separate Opt-Out Declaration</strong>, signed at the time of removal.</li>
+            <li>Re-joining later requires fresh acceptance of the <strong>then-current policy</strong>; the current version does not carry over.</li>
+          </ol>
         </div>
       </div>
 
@@ -493,7 +675,6 @@
             <div class="sig-dashed"></div>
             <div class="sig-partner-name">Restaurant Owner / Authorised Representative</div>
             <div class="sig-field"><span>Restaurant Name</span><div class="sig-line"></div></div>
-            <div class="sig-field" style="margin-top:7px;"><span>Phone</span><div class="sig-line"></div></div>
             <div class="sig-field" style="margin-top:7px;"><span>Date</span><div class="sig-line"></div></div>
           </div>
         </div>
@@ -527,6 +708,15 @@
         </div>
       </div>
 
+      <p class="print-only preamble">
+        This Onboarding Agreement is executed on the date affixed below at
+        <strong>Banki, Cuttack, Odisha 754008</strong>, between
+        <strong>BankiBites</strong> (operated under <em>AkCreation</em>, hereinafter referred to as
+        "the Platform") and the undersigned <strong>Delivery Partner</strong>
+        (hereinafter referred to as "the Rider"), setting out the mandatory
+        rules the Rider undertakes to observe while delivering for the Platform.
+      </p>
+
       <div class="section-label"><i class="fas fa-shield-halved" aria-hidden="true"></i> Core Policies</div>
 
       <div class="policy-card">
@@ -538,13 +728,13 @@
           </div>
         </div>
         <div class="card-body">
-          <ul>
+          <ol class="point-list">
             <li>Notify BankiBites <strong>before 10:00 AM</strong> every day you cannot work. No notification = you are considered <strong>on duty</strong>.</li>
             <li>Any delivery assigned after 10:00 AM without prior notice is <strong>your full responsibility</strong> to complete.</li>
-          </ul>
+          </ol>
           <div class="penalty-strip">
             <i class="fas fa-ban" aria-hidden="true"></i>
-            Penalty: Abandoning an assigned delivery without prior notice → <strong>48-hour suspension</strong> (first offence). Repeated violations → <strong>permanent removal</strong>.
+            <span>Penalty: Abandoning an assigned delivery without prior notice → <strong>48-hour suspension</strong> (first offence). Repeated violations → <strong>permanent removal</strong>.</span>
           </div>
         </div>
       </div>
@@ -565,7 +755,7 @@
             <tbody>
               <tr>
                 <td><strong>Zone A</strong></td>
-                <td>All locations within Banki incl. <strong>Bedapur &amp; Gopalapur</strong></td>
+                <td>All locations within Banki excl. <strong>Bedapur &amp; Gopalapur</strong></td>
                 <td><span class="price-badge green">₹ 30</span></td>
               </tr>
               <tr>
@@ -573,9 +763,14 @@
                 <td>Beyond Bedapur &amp; Gopalapur</td>
                 <td><span class="price-badge amber">₹ 40</span></td>
               </tr>
+              <tr>
+                <td><strong>Outer Zone</strong></td>
+                <td>Locations outside the above zones</td>
+                <td><span class="price-badge amber">₹ 10 / km</span></td>
+              </tr>
             </tbody>
           </table>
-          <p style="font-size:0.68rem;color:var(--muted);margin-top:6px;">All charges are inclusive. No extra collection from customers is permitted under any circumstance.</p>
+          <p style="font-size:0.68rem;color:var(--muted);margin-top:6px;">For any location outside Zone A / Zone B, the delivery charge is <strong>₹ 10 per kilometre</strong> and will be communicated by BankiBites before the order is accepted. All charges are inclusive — no extra collection from customers is permitted under any circumstance.</p>
         </div>
       </div>
 
@@ -598,9 +793,9 @@
               <div><strong>Driving Licence</strong><span>Valid copy for your vehicle</span></div>
             </div>
           </div>
-          <ul style="margin-top:8px;">
+          <ol class="point-list" style="margin-top:8px;">
             <li>Submit documents to the BankiBites coordinator <strong>before your first delivery</strong>. Onboarding will not proceed without them.</li>
-          </ul>
+          </ol>
         </div>
       </div>
 
@@ -615,10 +810,10 @@
           </div>
         </div>
         <div class="card-body">
-          <ul>
+          <ol class="point-list">
             <li>Handle all food packages with care — do not tilt, squeeze, or mishandle during transit.</li>
             <li>Maintain polite, professional behaviour with customers and restaurant staff at all times.</li>
-          </ul>
+          </ol>
         </div>
       </div>
 
