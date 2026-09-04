@@ -1,0 +1,60 @@
+{
+  "_comment": "Standalone Party & Bulk order catalogue. This is the only data source for /banki-bites/bulk-order.html. Each restaurant entry carries display info, its own Firebase pointer (folder + encKey), the bulk menu, and constraints. The page uses this to fetch the restaurant's own credentials.json and write the order to the restaurant's Firestore (same pattern as their normal cart.js) + save to <prefix>_order_history + mirror to bankibites_orders.",
+  "default_min_qty_per_item": 10,
+  "restaurants": {
+    "thecafedarbar": {
+      "id": "TCD",
+      "name": "The Cafe Darbar",
+      "logo": "https://akcreation-apps.com/TCD/tcd-logo.png",
+      "folder": "TCD",
+      "prefix": "tcd",
+      "encKey": "TCD-FOOD-CAFE",
+      "whatsapp": "7749984274",
+      "is_active": true,
+      "min_qty_per_item": 10,
+      "lead_time_hours": 12,
+      "notes": "",
+      "items": [
+        { "id": "veg-biryani",    "name": "Veg Biryani",    "price": 120, "unit": "plate", "available": true },
+        { "id": "chicken-biryani","name": "Chicken Biryani","price": 150, "unit": "plate", "available": true }
+      ]
+    },
+    "maacharchikahotelnrestaurant": {
+      "id": "MCH",
+      "name": "Maa Charchika Hotel N Restaurant",
+      "logo": "https://akcreation-apps.com/MCH/mch-logo.png",
+      "folder": "MCH",
+      "prefix": "mch",
+      "encKey": "MAA-CHARCHIKA-HOTEL",
+      "whatsapp": "7749984274",
+      "is_active": true,
+      "min_qty_per_item": 10,
+      "lead_time_hours": 12,
+      "notes": "",
+      "items": [
+        { "id": "veg-biryani",    "name": "Veg Biryani",    "price": 100, "unit": "plate", "available": true },
+        { "id": "chicken-biryani","name": "Chicken Biryani","price": 120, "unit": "plate", "available": true },
+        { "id": "chicken-65-biryani","name": "Chicken 65 Biryani","price": 130, "unit": "plate", "available": true },
+        { "id": "fry-pc-biryani","name": "Fry pcs Biryani","price": 150, "unit": "plate", "available": true },
+        { "id": "special-chicken-biryani","name": "Special Chicken Biryani","price": 180, "unit": "plate", "available": true }
+      ]
+    },
+    "uniquefastfood": {
+      "id": "Unique",
+      "name": "Unique Fast Food",
+      "logo": "https://akcreation-apps.com/Unique/unique-logo.png",
+      "folder": "Unique",
+      "prefix": "unique",
+      "encKey": "Unique-Fast-Food",
+      "whatsapp": "7749984274",
+      "is_active": true,
+      "min_qty_per_item": 10,
+      "lead_time_hours": 12,
+      "notes": "",
+      "items": [
+        { "id": "veg-biryani",    "name": "Veg Biryani",    "price": 80,  "unit": "plate", "available": true },
+        { "id": "chicken-biryani","name": "Chicken Biryani","price": 110, "unit": "plate", "available": true }
+      ]
+    }
+  }
+}

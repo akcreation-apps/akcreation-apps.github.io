@@ -427,9 +427,18 @@
     .open-badge.open::before  { content: '●'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
     .open-badge.closed { background: #fee2e2; color: #b91c1c; }
     .open-badge.closed::before { content: '○'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
+    /* ETA badge — compact "X–Y min" pill so customers can compare fastest kitchens. */
+    .eta-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.7rem; font-weight: 700; color: var(--text);
+      background: rgba(107,114,128,0.10); padding: 2px 8px;
+      border-radius: 9px; white-space: nowrap; flex-shrink: 0;
+    }
+    .eta-badge i { color: var(--primary); font-size: 0.65rem; }
     @media (prefers-color-scheme: dark) {
       .open-badge.open  { background: rgba(34,197,94,0.16); color: #4ADE80; }
       .open-badge.closed { background: rgba(239,68,68,0.16); color: #F87171; }
+      .eta-badge { background: rgba(255,255,255,0.08); }
     }
     .card-address {
       font-size: 0.7rem; color: var(--muted); line-height: 1.3;
@@ -771,6 +780,57 @@
       </a>
     </div>
   </nav>
+
+  <!-- Party & Bulk promo strip — single-line on mobile, taller two-line band
+       on tablet+. Small enough to leave room for the winners banner + grid. -->
+  <style>
+    .bulk-strip {
+      display: flex; align-items: center; gap: 10px;
+      background: linear-gradient(90deg,#FF6B35 0%,#F97316 100%);
+      color: #fff; padding: 9px 14px; text-decoration: none; line-height: 1.2;
+      box-shadow: 0 2px 8px rgba(255,107,53,0.20);
+      position: relative; overflow: hidden;
+    }
+    .bulk-strip .bs-icon {
+      width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
+      background: rgba(255,255,255,0.22);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+    }
+    .bulk-strip .bs-body { flex: 1; min-width: 0; }
+    .bulk-strip .bs-new {
+      display: none; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; background: rgba(255,255,255,0.22);
+      padding: 2px 7px; border-radius: 999px;
+    }
+    .bulk-strip .bs-title { display: block; font-size: 0.85rem; font-weight: 800; }
+    .bulk-strip .bs-sub {
+      display: none; font-size: 0.75rem; opacity: 0.92; margin-top: 2px;
+    }
+    .bulk-strip .bs-cta {
+      flex-shrink: 0; background: #fff; color: #E64A19; font-weight: 700;
+      font-size: 0.78rem; padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+    }
+    @media (min-width: 640px) {
+      .bulk-strip { padding: 12px 18px; gap: 14px; }
+      .bulk-strip .bs-icon { width: 40px; height: 40px; font-size: 1.15rem; border-radius: 11px; }
+      .bulk-strip .bs-new { display: inline-block; margin-bottom: 3px; }
+      .bulk-strip .bs-title { font-size: 0.95rem; }
+      .bulk-strip .bs-sub { display: block; }
+      .bulk-strip .bs-cta { font-size: 0.85rem; padding: 8px 14px; border-radius: 10px; }
+    }
+  </style>
+  <a class="bulk-strip" href="bulk-order.html"
+     aria-label="Order in bulk for a party or event from Banki's kitchens"
+     data-umami-event="bankibites-listing-bulk-strip">
+    <span class="bs-icon" aria-hidden="true"><i class="fas fa-cake-candles"></i></span>
+    <span class="bs-body">
+      <span class="bs-new">New</span>
+      <span class="bs-title">Party or event? Order in bulk.</span>
+      <span class="bs-sub">Min 10 per item · Scheduled delivery from Banki's kitchens.</span>
+    </span>
+    <span class="bs-cta">Explore <i class="fas fa-arrow-right" aria-hidden="true" style="margin-left:2px;"></i></span>
+  </a>
 
   <!-- Monthly winners / gamified banners -->
   <section class="bb-winners" aria-label="BankiBites monthly winners">
@@ -1139,6 +1199,20 @@
           const services = Array.isArray(p.services) ? p.services.filter(s => !isBlank(s)) : [];
           const showRating = !isBlank(p.rating);
           const showAddr   = !isBlank(p.address);
+          // ETA — prefer the partner's own field, otherwise fall back to a small
+          // per-restaurant lookup (matches each <Restaurant>/restaurant.js
+          // etaMinutes). Displayed as a "X–Y min" band so customers can compare
+          // fastest kitchens at a glance.
+          const ETA_FALLBACK = {
+            'The Cafe Darbar': 75,
+            'A1 Amul Fast Food': 45,
+            'Maa Charchika Hotel N Restaurant': 45,
+            'Unique Fast Food': 45,
+          };
+          const etaMin = Number(p.eta_minutes) || ETA_FALLBACK[p.name] || 0;
+          const etaBand = etaMin
+            ? `${Math.max(15, etaMin - 10)}–${etaMin} min`
+            : '';
           const logo = isBlank(p.logo)
             ? `<div class="card-logo card-logo-skeleton" aria-hidden="true"></div>`
             : `<img class="card-logo" src="${escapeHtml(p.logo)}" alt="${escapeHtml(p.name)} logo" loading="lazy">`;
@@ -1169,6 +1243,7 @@
                 })()}
                 <div class="card-meta">
                   ${showRating ? `<span class="rating"><i class="fas fa-star" aria-hidden="true"></i>${escapeHtml(p.rating)} <span>/ 5</span></span>` : ''}
+                  ${etaBand ? `<span class="eta-badge" title="Estimated delivery time"><i class="fas fa-clock" aria-hidden="true"></i>${escapeHtml(etaBand)}</span>` : ''}
                   ${clickable && showHours ? `<span class="open-badge open">Open now</span>` : ''}
                 </div>
                 ${showAddr ? `<div class="card-address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${escapeHtml(p.address)}</span></div>` : ''}

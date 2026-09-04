@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F0E15" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+
+  <title>Party &amp; Bulk Orders — BankiBites, Banki, Cuttack</title>
+  <meta name="description" content="Order party &amp; bulk food from Banki's kitchens on BankiBites. Pick a restaurant, choose items (minimum 10 per item), schedule delivery — order goes straight to BankiBites operations.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://akcreation-apps.com/banki-bites/bulk-order.html">
+
+  <meta name="geo.region" content="IN-OR">
+  <meta name="geo.placename" content="Banki, Cuttack, Odisha">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="BankiBites">
+  <meta property="og:title" content="Party &amp; Bulk Orders — BankiBites">
+  <meta property="og:description" content="Plan a party, get-together or event in Banki? Order in bulk from local restaurants — minimum 10 per item.">
+  <meta property="og:image" content="https://akcreation-apps.com/banki-bites/banner.jpg">
+  <meta property="og:url" content="https://akcreation-apps.com/banki-bites/bulk-order.html">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="manifest" href="/banki-bites/manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="banki-bites-logo.png">
+  <link rel="icon" type="image/png" href="banki-bites-logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --primary: #FF6B35;
+      --primary-dark: #E64A19;
+      --wa: #25D366;
+      --wa-dark: #128C4A;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #EDE8E3;
+      --card: #FFFFFF;
+      --bg: #FFF8F1;
+      --danger: #dc2626;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #F0EAE3;
+        --muted: #a3a3a3;
+        --border: #2a2636;
+        --card: #1C1929;
+        --bg: #0F0E15;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      display: flex; flex-direction: column;
+    }
+    /* Grow main to fill leftover height so footer parks at the viewport bottom
+       when content is short, without adding needless scroll. */
+    main.container { flex: 1 0 auto; }
+    footer { flex-shrink: 0; }
+    /* Only reserve space for the fixed cart bar when it's actually visible.
+       Also hide the marketing footer — the cart bar is the CTA anchor and
+       should own the bottom of the viewport (Zomato / Swiggy / Amazon pattern). */
+    body.has-cart-bar { padding-bottom: 88px; }
+    body.has-cart-bar footer { display: none; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--card); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    }
+    .topbar .back {
+      background: transparent; border: none; color: var(--text);
+      font-size: 1.1rem; cursor: pointer; padding: 8px;
+      min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+    }
+    .topbar .back:hover, .topbar .back:focus-visible { background: rgba(0,0,0,0.05); outline: none; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .topbar .brand img { width: 28px; height: 28px; border-radius: 6px; }
+    .topbar .title { font-weight: 700; font-size: 1.05rem; }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+
+    /* -------- Landing hero (Stage A) -------- */
+    .hero {
+      position: relative;
+      margin: 8px 0 14px;
+      padding: 18px 18px 16px;
+      border-radius: 18px;
+      background:
+        radial-gradient(600px 200px at 0% 0%, rgba(255,255,255,0.30), transparent 60%),
+        linear-gradient(135deg, #FF6B35 0%, #FF8A5B 55%, #F97316 100%);
+      color: #fff;
+      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(255,107,53,0.22);
+    }
+    .hero::before {
+      content: ''; position: absolute; border-radius: 50%; pointer-events: none;
+      background: rgba(255,255,255,0.10);
+      width: 140px; height: 140px; right: -40px; top: -50px;
+    }
+    .hero .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.20);
+      color: #fff; font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 4px 9px; border-radius: 999px; margin-bottom: 8px;
+    }
+    .hero h1 {
+      font-size: 1.35rem; line-height: 1.2;
+      margin: 0 0 6px; font-weight: 800; letter-spacing: -0.01em;
+    }
+    .hero h1 .accent { color: #FFF3E0; }
+    .hero p { margin: 0; font-size: 0.85rem; opacity: 0.95; line-height: 1.4; max-width: 32ch; }
+    @media (min-width: 700px) {
+      .hero { padding: 30px 30px; margin: 12px 0 22px; border-radius: 22px; }
+      .hero h1 { font-size: 2.1rem; }
+      .hero p  { font-size: 1.02rem; max-width: 44ch; }
+      .hero .badge { font-size: 0.72rem; padding: 6px 12px; margin-bottom: 12px; }
+      .hero::before { width: 180px; height: 180px; right: -50px; top: -60px; }
+    }
+
+    /* Feature strip — horizontal on mobile (single row, all 3 fit), grid on tablet+ */
+    .feature-strip {
+      display: grid; gap: 8px; margin: 0 0 14px;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .feature {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 8px;
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+    }
+    .feature .fi {
+      width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(255,107,53,0.12); color: var(--primary-dark); font-size: 0.85rem;
+    }
+    .feature .ft { font-size: 0.7rem; line-height: 1.25; }
+    .feature .ft strong { display: block; color: var(--text); font-size: 0.75rem; margin-bottom: 1px; }
+    .feature .ft span { color: var(--muted); display: none; }
+    @media (min-width: 560px) {
+      .feature-strip { gap: 10px; margin-bottom: 22px; }
+      .feature { flex-direction: row; text-align: left; padding: 12px 14px; gap: 12px; }
+      .feature .fi { width: 40px; height: 40px; font-size: 1.05rem; }
+      .feature .ft { font-size: 0.82rem; line-height: 1.35; }
+      .feature .ft strong { font-size: 0.9rem; }
+      .feature .ft span { display: inline; }
+    }
+
+    .section-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin: 14px 0 10px;
+    }
+    .section-head h2 { margin: 0; font-size: 1rem; font-weight: 800; color: var(--text); }
+    .section-head .sh-sub { color: var(--muted); font-size: 0.75rem; }
+    @media (min-width: 560px) {
+      .section-head { margin: 18px 0 12px; }
+      .section-head h2 { font-size: 1.1rem; }
+      .section-head .sh-sub { font-size: 0.82rem; }
+    }
+
+    .stage { display: none; }
+    .stage.active { display: block; }
+
+    .rest-grid {
+      display: grid; gap: 10px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 640px) { .rest-grid { gap: 14px; grid-template-columns: 1fr 1fr; } }
+    .rest-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; text-align: left; width: 100%;
+      color: var(--text); font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .rest-card:hover, .rest-card:focus-visible {
+      border-color: var(--primary);
+      box-shadow: 0 8px 20px rgba(255,107,53,0.14);
+      transform: translateY(-2px); outline: none;
+    }
+    .rest-logo {
+      width: 46px; height: 46px; border-radius: 11px; object-fit: cover;
+      background: #f3f4f6; flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .rest-info { flex: 1; min-width: 0; }
+    .rest-name {
+      font-weight: 700; font-size: 0.95rem; margin: 0 0 3px; letter-spacing: -0.01em;
+      color: var(--text); line-height: 1.25;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .rest-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .rest-tag {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 0.68rem; font-weight: 600;
+      padding: 2px 7px; border-radius: 999px;
+      background: rgba(255,107,53,0.10); color: var(--primary-dark);
+      white-space: nowrap;
+    }
+    .rest-tag i { font-size: 0.62rem; }
+    .rest-tag.tag-neutral { background: rgba(107,114,128,0.10); color: var(--muted); }
+    /* Hide the "min" and "notice" tags on tight mobile — keep only 2 most useful. */
+    @media (max-width: 400px) {
+      .rest-tag.tag-hide-sm { display: none; }
+    }
+    .rest-cta {
+      color: var(--primary); flex-shrink: 0;
+      font-size: 1rem; padding: 0 4px;
+    }
+    @media (min-width: 640px) {
+      .rest-card { padding: 14px; border-radius: 16px; gap: 12px; }
+      .rest-logo { width: 56px; height: 56px; border-radius: 13px; }
+      .rest-name { font-size: 1rem; white-space: normal; }
+      .rest-tag { font-size: 0.72rem; padding: 3px 8px; }
+    }
+
+    .item-list { display: flex; flex-direction: column; gap: 10px; }
+    .item-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name { font-weight: 600; margin: 0; font-size: 0.98rem; }
+    .item-price { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+    .item-price strong { color: var(--primary-dark); }
+
+    .stepper {
+      display: inline-flex; align-items: center; gap: 4px;
+      border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+      background: var(--bg);
+    }
+    .stepper button {
+      background: transparent; border: none; color: var(--text);
+      font-size: 1rem; font-weight: 700;
+      width: 40px; height: 40px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .stepper button:hover { background: rgba(255,107,53,0.1); }
+    .stepper .qty {
+      min-width: 48px; width: 56px; text-align: center; font-weight: 700;
+      background: transparent; border: none; color: var(--text);
+      font-family: inherit; font-size: 0.98rem;
+      padding: 8px 4px; -moz-appearance: textfield;
+    }
+    .stepper .qty::-webkit-outer-spin-button,
+    .stepper .qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .stepper .qty:focus { outline: none; background: rgba(255,107,53,0.08); }
+
+    .add-btn {
+      background: var(--primary); color: white; border: none;
+      border-radius: 10px; padding: 10px 14px;
+      font-family: inherit; font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; min-height: 44px; white-space: nowrap;
+    }
+    .add-btn:hover { background: var(--primary-dark); }
+    .add-btn i { margin-right: 4px; }
+
+    .rest-info-banner {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 12px;
+    }
+    .rib-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 999px; padding: 5px 10px;
+      font-size: 0.75rem; color: var(--text); line-height: 1.2;
+      white-space: nowrap;
+    }
+    .rib-chip i { color: var(--primary); font-size: 0.72rem; }
+    .rib-chip strong { font-weight: 700; }
+    .rib-chip.rib-wide {
+      white-space: normal;
+      background: rgba(255,107,53,0.06); border-color: rgba(255,107,53,0.25);
+    }
+    .rib-chip.rib-wide i { color: var(--primary-dark); }
+
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+    .form-row input, .form-row textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--card); color: var(--text);
+      font-family: inherit; font-size: 0.95rem; min-height: 44px;
+    }
+    .form-row input:focus, .form-row textarea:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(255,107,53,0.15);
+    }
+    .form-row textarea { min-height: 72px; resize: vertical; }
+    .form-row .hint { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 560px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+
+    .review-list {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px; margin-bottom: 16px;
+    }
+    .review-item {
+      display: flex; justify-content: space-between; gap: 12px;
+      padding: 6px 0; border-bottom: 1px dashed var(--border);
+    }
+    .review-item:last-child { border-bottom: none; }
+    .review-total {
+      display: flex; justify-content: space-between; font-weight: 800;
+      color: var(--primary-dark); margin-top: 10px; padding-top: 10px;
+      border-top: 2px solid var(--border); font-size: 1.05rem;
+    }
+
+    .cart-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+      background: var(--card); border-top: 1px solid var(--border);
+      padding: 12px 16px; display: none;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.06);
+    }
+    .cart-bar.visible { display: flex; align-items: center; gap: 12px; }
+    .cart-bar .summary { flex: 1; }
+    .cart-bar .summary .items { font-size: 0.82rem; color: var(--muted); }
+    .cart-bar .summary .total { font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); }
+    .cart-bar .continue {
+      background: var(--primary); color: white; border: none;
+      padding: 12px 18px; font-weight: 700; font-family: inherit;
+      border-radius: 10px; cursor: pointer; font-size: 0.95rem; min-height: 48px;
+    }
+    .cart-bar .continue:hover { background: var(--primary-dark); }
+
+    .place-btn {
+      background: var(--primary); color: white; border: none;
+      padding: 14px 20px; font-weight: 700; font-family: inherit;
+      border-radius: 12px; cursor: pointer; font-size: 1rem; min-height: 52px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+    }
+    .place-btn:hover { background: var(--primary-dark); }
+    .place-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .empty-state, .loading { text-align: center; padding: 40px 16px; color: var(--muted); }
+    .empty-state i, .loading i { font-size: 2.5rem; color: var(--primary); margin-bottom: 12px; display: block; }
+    .loading i { font-size: 1.6rem; }
+
+    footer {
+      text-align: center; padding: 20px 16px; font-size: 0.85rem;
+      color: var(--muted); border-top: 1px solid var(--border);
+      margin-top: 32px;
+    }
+    footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <button class="back" id="backBtn" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+    <div class="brand">
+      <img src="banki-bites-logo.png" alt="">
+      <div class="title" id="topTitle">Party &amp; Bulk Orders</div>
+    </div>
+  </div>
+
+  <main class="container">
+    <div id="lead">
+      <section class="hero" aria-label="Party and bulk orders">
+        <span class="badge"><i class="fas fa-cake-candles" aria-hidden="true"></i> Banki's first bulk-order service</span>
+        <h1>Feed the whole <span class="accent">party</span> — from Banki's best kitchens.</h1>
+        <p>Weddings, birthdays, meetings, ceremonies — order in bulk from local restaurants and let BankiBites deliver on schedule.</p>
+      </section>
+
+      <div class="feature-strip" role="list" aria-label="Why order in bulk">
+        <div class="feature" role="listitem">
+          <div class="fi"><i class="fas fa-people-group" aria-hidden="true"></i></div>
+          <div class="ft"><strong>Min 10 per item</strong><span>Priced right for gatherings</span></div>
+        </div>
+        <div class="feature" role="listitem">
+          <div class="fi"><i class="fas fa-calendar-check" aria-hidden="true"></i></div>
+          <div class="ft"><strong>Plan ahead</strong><span>Pick your delivery date &amp; time</span></div>
+        </div>
+        <div class="feature" role="listitem">
+          <div class="fi"><i class="fas fa-utensils" aria-hidden="true"></i></div>
+          <div class="ft"><strong>Straight to the kitchen</strong><span>No middleman markup</span></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="stage" id="stageRestaurants">
+      <div class="section-head" id="restSectionHead" hidden>
+        <h2>Choose your kitchen</h2>
+        <span class="sh-sub" id="restCount"></span>
+      </div>
+      <div class="loading" id="restLoading"><i class="fas fa-spinner fa-spin"></i> Loading kitchens…</div>
+      <div class="rest-grid" id="restGrid" hidden></div>
+      <div class="empty-state" id="restEmpty" hidden>
+        <i class="fas fa-utensils"></i>
+        <p>No restaurants available for bulk orders right now.</p>
+      </div>
+    </section>
+
+    <section class="stage" id="stageMenu">
+      <div class="rest-info-banner" id="restInfoBanner"></div>
+      <div class="item-list" id="itemList"></div>
+      <div class="empty-state" id="menuEmpty" hidden>
+        <i class="fas fa-bowl-food"></i>
+        <p>No bulk items configured for this restaurant yet.</p>
+      </div>
+    </section>
+
+    <section class="stage" id="stageReview">
+      <h2 style="margin-top:0;font-size:1.15rem;">Order summary</h2>
+      <div class="review-list" id="reviewList"></div>
+
+      <h2 style="font-size:1.1rem;">Delivery schedule</h2>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="fDate">Delivery date</label>
+          <input type="date" id="fDate" required>
+        </div>
+        <div class="form-row">
+          <label for="fTime">Delivery time</label>
+          <input type="time" id="fTime" required>
+        </div>
+      </div>
+      <div class="form-row" id="leadTimeHint" hidden>
+        <div class="hint" style="color:var(--primary-dark);font-weight:600;"></div>
+      </div>
+
+      <div class="form-row" role="note" aria-label="Delivery charge policy">
+        <div style="background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.25);border-radius:10px;padding:8px 12px;font-size:0.78rem;line-height:1.4;color:var(--text);display:flex;gap:8px;align-items:flex-start;">
+          <i class="fas fa-truck" aria-hidden="true" style="color:var(--primary-dark);font-size:0.85rem;margin-top:3px;flex-shrink:0;"></i>
+          <div>
+            <strong style="color:var(--primary-dark);">Free delivery</strong> across Banki &amp; every area up to <strong>Harirajpur, Dangipita, Ragadi &amp; Bheda</strong>.
+            <span style="color:var(--muted);">Extra charge applies beyond this belt.</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="fNotes">Note for the kitchen (optional)</label>
+        <textarea id="fNotes" maxlength="240" placeholder="Any special request — e.g. less spicy, extra packing"></textarea>
+      </div>
+
+      <button class="place-btn" id="placeBtn">
+        <i class="fas fa-check-circle"></i> Place bulk order
+      </button>
+    </section>
+  </main>
+
+  <div class="cart-bar" id="cartBar" role="region" aria-label="Order summary">
+    <div class="summary">
+      <div class="items" id="cartItems">0 items</div>
+      <div class="total" id="cartTotal">₹0</div>
+    </div>
+    <button class="continue" id="continueBtn">
+      Continue <i class="fas fa-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <footer>
+    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha &#10084;&#65039;</p>
+  </footer>
+
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+
+  <!-- ES-module logic: dynamically imports Firebase per restaurant so a bulk order
+       lands in the same Firestore + localStorage layout the restaurant already uses. -->
+  <script type="module">
+    import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
+    import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+    import { warmMirrorConnection, mirrorToBankiBites } from './order-mirror.js';
+
+    // ------------ per-restaurant Firebase (mirrors <Restaurant>/cart.js) ------------
+    const _restaurantDbs = new Map(); // prefix -> { db, orderTable }
+    const _credsCache = new Map();    // folder -> raw credentials JSON
+
+    async function fetchRestaurantCredentials(folder) {
+      if (_credsCache.has(folder)) return _credsCache.get(folder);
+      const p = fetch(`../${folder}/credentials.json?v=${Date.now()}`)
+        .then(r => { if (!r.ok) throw new Error(`credentials fetch failed for ${folder}`); return r.json(); });
+      _credsCache.set(folder, p);
+      return p;
+    }
+    const decrypt = (value, key) => CryptoJS.AES.decrypt(value, key).toString(CryptoJS.enc.Utf8);
+
+    async function getRestaurantDb(bulk) {
+      const cacheKey = bulk.prefix;
+      if (_restaurantDbs.has(cacheKey)) return _restaurantDbs.get(cacheKey);
+      const raw = await fetchRestaurantCredentials(bulk.folder);
+      const cfg = {
+        apiKey:            decrypt(raw.API_KEY, bulk.encKey),
+        authDomain:        decrypt(raw.AUTH_DOMAIN, bulk.encKey),
+        projectId:         decrypt(raw.ID, bulk.encKey),
+        storageBucket:     decrypt(raw.STORAGE_BUCKET, bulk.encKey),
+        messagingSenderId: decrypt(raw.MESSAGING_SENDER_ID, bulk.encKey),
+        appId:             decrypt(raw.APP_ID, bulk.encKey),
+        measurementId:     decrypt(raw.MEASUREMENT_ID, bulk.encKey),
+      };
+      const appName = `bulk-${bulk.prefix}`;
+      const app = getApps().find(a => a.name === appName) || initializeApp(cfg, appName);
+      const db = getFirestore(app);
+      const orderTable = decrypt(raw.ORDER_TABLE_NAME, bulk.encKey);
+      const rec = { db, orderTable };
+      _restaurantDbs.set(cacheKey, rec);
+      return rec;
+    }
+
+    // ------------ helpers ------------
+    const $ = (sel) => document.querySelector(sel);
+    const escHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const formatINR = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
+    const genId = () => 'bulk_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+
+    function toWaNumber(raw) {
+      if (!raw) return '';
+      let s = String(raw).trim().replace(/[^\d+]/g, '');
+      if (s.startsWith('+91')) s = s.slice(3);
+      else if (s.startsWith('91') && s.length === 12) s = s.slice(2);
+      else if (s.startsWith('0') && s.length === 11) s = s.slice(1);
+      s = s.replace(/\D/g, '');
+      return s.length === 10 ? ('91' + s) : '';
+    }
+
+    function buildWhatsappMessage(bulk, lines, total, scheduledFor, note) {
+      const nl = '\n';
+      let msg = '';
+      msg += '🎉 *Party / Bulk Order — BankiBites*' + nl + nl;
+      msg += `Restaurant: ${bulk.name}` + nl;
+      msg += `Delivery: ${scheduledFor.replace('T', ' ')}` + nl + nl;
+      msg += '*Items:*' + nl;
+      lines.forEach(l => {
+        msg += `• ${l.name} — ${l.qty} × ₹${l.price} = ₹${l.subtotal}` + nl;
+      });
+      msg += nl + `*Total:* ₹${total}` + nl;
+      if (note) msg += nl + `Note: ${note}` + nl;
+      msg += nl + 'Placed via BankiBites Bulk Orders.';
+      return msg;
+    }
+
+    // ------------ state ------------
+    const state = {
+      bulkData: null,          // parsed bulk-orders.json
+      currentRestKey: null,    // key into bulkData.restaurants
+      qty: {},                 // { itemId: number }
+    };
+
+    // ------------ data load ------------
+    async function loadAll() {
+      const res = await fetch('bulk-orders.json?v=' + Date.now());
+      if (!res.ok) throw new Error('bulk-orders.json fetch failed');
+      state.bulkData = await res.json();
+    }
+
+    // ------------ router ------------
+    function setStage(name) {
+      document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+      const s = document.getElementById('stage' + name);
+      if (s) s.classList.add('active');
+      window.scrollTo({ top: 0 });
+    }
+    const setTitle = (t) => { $('#topTitle').textContent = t; };
+
+    function route() {
+      const hash = window.location.hash || '#restaurants';
+      const [head, key] = hash.replace(/^#/, '').split('/');
+      if (head === 'menu' && key) openMenu(key);
+      else if (head === 'review' && key) openReview(key);
+      else openRestaurants();
+    }
+    window.addEventListener('hashchange', route);
+
+    // ------------ Stage A: Restaurants ------------
+    function openRestaurants() {
+      setStage('Restaurants');
+      setTitle('Party & Bulk Orders');
+      $('#lead').hidden = false;
+      hideCartBar();
+
+      const entries = Object.entries(state.bulkData?.restaurants || {})
+        .filter(([, r]) => r && r.is_active !== false && r.name);
+
+      $('#restLoading').hidden = true;
+      if (!entries.length) {
+        $('#restEmpty').hidden = false;
+        $('#restGrid').hidden = true;
+        $('#restSectionHead').hidden = true;
+        return;
+      }
+      $('#restEmpty').hidden = true;
+      $('#restGrid').hidden = false;
+      $('#restSectionHead').hidden = false;
+      $('#restCount').textContent = entries.length + (entries.length === 1 ? ' kitchen ready' : ' kitchens ready');
+
+      $('#restGrid').innerHTML = entries.map(([key, r]) => {
+        const items = (r.items || []).filter(it => it && it.available !== false);
+        const minQty = r.min_qty_per_item || state.bulkData.default_min_qty_per_item || 10;
+        const lead = r.lead_time_hours || 0;
+        const startingFrom = items.length ? Math.min(...items.map(it => Number(it.price) || Infinity)) : null;
+        return `
+          <button class="rest-card" data-key="${escHtml(key)}" aria-label="Choose ${escHtml(r.name)} for bulk order">
+            <img class="rest-logo" src="${escHtml(r.logo || 'banki-bites-logo.png')}" alt="" loading="lazy">
+            <div class="rest-info">
+              <div class="rest-name">${escHtml(r.name)}</div>
+              <div class="rest-tags">
+                <span class="rest-tag"><i class="fas fa-bowl-food"></i> ${items.length} item${items.length === 1 ? '' : 's'}</span>
+                ${startingFrom !== null && isFinite(startingFrom) ? `<span class="rest-tag tag-neutral"><i class="fas fa-tag"></i> from ${formatINR(startingFrom)}</span>` : ''}
+                <span class="rest-tag tag-neutral tag-hide-sm"><i class="fas fa-people-group"></i> min ${minQty}</span>
+                ${lead ? `<span class="rest-tag tag-neutral tag-hide-sm"><i class="fas fa-clock"></i> ${lead}h</span>` : ''}
+              </div>
+            </div>
+            <i class="fas fa-chevron-right rest-cta" aria-hidden="true"></i>
+          </button>
+        `;
+      }).join('');
+
+      $('#restGrid').querySelectorAll('.rest-card').forEach(btn => {
+        btn.addEventListener('click', () => { window.location.hash = '#menu/' + btn.dataset.key; });
+      });
+    }
+
+    // ------------ Stage B: Menu ------------
+    function openMenu(key) {
+      const bulk = state.bulkData?.restaurants?.[key];
+      if (!bulk) { window.location.hash = '#restaurants'; return; }
+      state.currentRestKey = key;
+      if (state.qty.__key !== key) { state.qty = { __key: key }; }
+
+      setStage('Menu');
+      setTitle(bulk.name);
+      $('#lead').hidden = true;
+
+      const minQty = bulk.min_qty_per_item || state.bulkData.default_min_qty_per_item || 10;
+      const chips = [];
+      chips.push(`<span class="rib-chip"><i class="fas fa-people-group"></i> Min <strong>${minQty}</strong>/item</span>`);
+      if (bulk.lead_time_hours) chips.push(`<span class="rib-chip"><i class="fas fa-clock"></i> <strong>${bulk.lead_time_hours}h</strong> notice</span>`);
+      if (bulk.notes) chips.push(`<span class="rib-chip"><i class="fas fa-circle-info"></i> ${escHtml(bulk.notes)}</span>`);
+      chips.push(`<span class="rib-chip rib-wide"><i class="fas fa-truck"></i> <strong>Free delivery</strong> across Banki &amp; areas up to Harirajpur, Dangipita, Ragadi &amp; Bheda &middot; extra charge beyond this belt</span>`);
+      $('#restInfoBanner').innerHTML = chips.join('');
+
+      const items = (bulk.items || []).filter(it => it && it.available !== false);
+      if (!items.length) {
+        $('#menuEmpty').hidden = false;
+        $('#itemList').innerHTML = '';
+      } else {
+        $('#menuEmpty').hidden = true;
+        $('#itemList').innerHTML = items.map(it => renderItemRow(it, minQty)).join('');
+        wireItemRows(minQty);
+      }
+      refreshCartBar();
+    }
+
+    function renderItemRow(it, minQty) {
+      const q = state.qty[it.id] || 0;
+      return `
+        <div class="item-card" data-id="${escHtml(it.id)}">
+          <div class="item-info">
+            <p class="item-name">${escHtml(it.name)}</p>
+            <div class="item-price"><strong>${formatINR(it.price)}</strong> / ${escHtml(it.unit || 'piece')} &nbsp;·&nbsp; min ${minQty}</div>
+          </div>
+          <div class="qty-slot">${q > 0 ? qtyStepperHtml(q, minQty) : addBtnHtml()}</div>
+        </div>
+      `;
+    }
+    const addBtnHtml = () => `<button class="add-btn" data-action="add"><i class="fas fa-plus"></i>Add</button>`;
+    const qtyStepperHtml = (q, minQty) => `
+      <div class="stepper" role="group" aria-label="Quantity">
+        <button data-action="dec" aria-label="Decrease"><i class="fas fa-minus"></i></button>
+        <input class="qty" type="number" inputmode="numeric" min="0" step="1" value="${q}" data-min="${minQty}" aria-label="Quantity (min ${minQty})">
+        <button data-action="inc" aria-label="Increase"><i class="fas fa-plus"></i></button>
+      </div>
+    `;
+
+    function wireItemRows(minQty) {
+      $('#itemList').querySelectorAll('.item-card').forEach(row => {
+        const id = row.dataset.id;
+        const rerender = () => {
+          const slot = row.querySelector('.qty-slot');
+          const q = state.qty[id] || 0;
+          slot.innerHTML = q > 0 ? qtyStepperHtml(q, minQty) : addBtnHtml();
+        };
+
+        row.addEventListener('click', (ev) => {
+          const btn = ev.target.closest('button[data-action]');
+          if (!btn) return;
+          const action = btn.dataset.action;
+          const cur = state.qty[id] || 0;
+          if (action === 'add') state.qty[id] = minQty;
+          else if (action === 'inc') state.qty[id] = Math.max(cur + 1, minQty);
+          else if (action === 'dec') {
+            if (cur <= minQty) delete state.qty[id];
+            else state.qty[id] = cur - 1;
+          }
+          rerender(); refreshCartBar();
+        });
+
+        row.addEventListener('input', (ev) => {
+          const input = ev.target.closest('input.qty');
+          if (!input) return;
+          const n = parseInt(input.value.replace(/\D/g, ''), 10);
+          if (!isNaN(n) && n > 0) { state.qty[id] = n; refreshCartBar(); }
+        });
+        row.addEventListener('change', (ev) => {
+          const input = ev.target.closest('input.qty');
+          if (!input) return;
+          let n = parseInt(input.value, 10);
+          if (isNaN(n) || n <= 0) { delete state.qty[id]; }
+          else if (n < minQty) {
+            Swal.fire({ icon: 'info', title: `Minimum ${minQty}`, text: `This item needs at least ${minQty} to qualify as a bulk order.`, confirmButtonColor: '#FF6B35' });
+            state.qty[id] = minQty;
+          } else { state.qty[id] = n; }
+          rerender(); refreshCartBar();
+        });
+        row.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && ev.target.matches('input.qty')) { ev.preventDefault(); ev.target.blur(); }
+        });
+        row.addEventListener('focusin', (ev) => { if (ev.target.matches('input.qty')) ev.target.select(); });
+      });
+    }
+
+    // ------------ cart bar ------------
+    function cartLines() {
+      const bulk = state.bulkData?.restaurants?.[state.currentRestKey];
+      if (!bulk) return [];
+      const map = new Map((bulk.items || []).map(i => [i.id, i]));
+      return Object.keys(state.qty)
+        .filter(k => k !== '__key' && state.qty[k] > 0 && map.has(k))
+        .map(k => {
+          const it = map.get(k); const qty = state.qty[k];
+          return { id: k, name: it.name, price: it.price, unit: it.unit || 'piece', qty, subtotal: qty * it.price };
+        });
+    }
+    function refreshCartBar() {
+      const lines = cartLines();
+      const cnt = lines.reduce((a, l) => a + l.qty, 0);
+      const total = lines.reduce((a, l) => a + l.subtotal, 0);
+      if (lines.length) {
+        $('#cartBar').classList.add('visible');
+        document.body.classList.add('has-cart-bar');
+        $('#cartItems').textContent = cnt + ' ' + (cnt === 1 ? 'item' : 'items');
+        $('#cartTotal').textContent = formatINR(total);
+      } else {
+        hideCartBar();
+      }
+    }
+    function hideCartBar() {
+      $('#cartBar').classList.remove('visible');
+      document.body.classList.remove('has-cart-bar');
+    }
+    $('#continueBtn').addEventListener('click', () => {
+      if (state.currentRestKey) window.location.hash = '#review/' + state.currentRestKey;
+    });
+
+    // ------------ Stage C: Review ------------
+    function openReview(key) {
+      const bulk = state.bulkData?.restaurants?.[key];
+      if (!bulk) { window.location.hash = '#restaurants'; return; }
+      const lines = cartLines();
+      if (!lines.length) { window.location.hash = '#menu/' + key; return; }
+
+      state.currentRestKey = key;
+      setStage('Review');
+      setTitle('Review & place');
+      $('#lead').hidden = true;
+      hideCartBar();
+
+      $('#reviewList').innerHTML = lines.map(l => `
+        <div class="review-item">
+          <span>${escHtml(l.name)} <small style="color:var(--muted)">× ${l.qty} ${escHtml(l.unit)}${l.qty === 1 ? '' : 's'}</small></span>
+          <strong>${formatINR(l.subtotal)}</strong>
+        </div>
+      `).join('') + `
+        <div class="review-total">
+          <span>Estimated total</span>
+          <span>${formatINR(lines.reduce((a,l) => a + l.subtotal, 0))}</span>
+        </div>
+      `;
+
+      const leadHours = bulk.lead_time_hours || 0;
+      const earliest = new Date(Date.now() + leadHours * 3600 * 1000);
+      // Suggest delivery = earliest + 1 hour buffer, so a same-time-tomorrow
+      // click doesn't fall inside the lead-time window. User can override.
+      const suggested = new Date(earliest.getTime() + 60 * 60 * 1000);
+      const yyyy = earliest.getFullYear();
+      const mm = String(earliest.getMonth() + 1).padStart(2, '0');
+      const dd = String(earliest.getDate()).padStart(2, '0');
+      $('#fDate').min = `${yyyy}-${mm}-${dd}`;
+      if (!$('#fDate').value) {
+        $('#fDate').value = `${suggested.getFullYear()}-${String(suggested.getMonth() + 1).padStart(2, '0')}-${String(suggested.getDate()).padStart(2, '0')}`;
+      }
+      if (!$('#fTime').value) {
+        $('#fTime').value = `${String(suggested.getHours()).padStart(2, '0')}:${String(suggested.getMinutes()).padStart(2, '0')}`;
+      }
+
+      if (leadHours > 0) {
+        const fmt = earliest.toLocaleString('en-IN', {
+          weekday: 'short', day: '2-digit', month: 'short',
+          hour: '2-digit', minute: '2-digit', hour12: true,
+        });
+        const hint = $('#leadTimeHint');
+        hint.hidden = false;
+        hint.querySelector('.hint').innerHTML =
+          `<i class="fas fa-circle-info" aria-hidden="true"></i> Needs at least <strong>${leadHours} hours'</strong> notice. Earliest delivery: <strong>${escHtml(fmt)}</strong>.`;
+      } else {
+        $('#leadTimeHint').hidden = true;
+      }
+    }
+
+    function validate() {
+      const lines = cartLines();
+      if (!lines.length) return { ok: false, msg: 'Please add at least one item.' };
+      if (!$('#fDate').value) return { ok: false, msg: 'Please pick a delivery date.' };
+      if (!$('#fTime').value) return { ok: false, msg: 'Please pick a delivery time.' };
+
+      const bulk = state.bulkData?.restaurants?.[state.currentRestKey];
+      const leadHours = bulk?.lead_time_hours || 0;
+      if (leadHours > 0) {
+        const requested = new Date(`${$('#fDate').value}T${$('#fTime').value}`);
+        const earliest = new Date(Date.now() + leadHours * 3600 * 1000);
+        if (isNaN(requested.getTime())) return { ok: false, msg: 'The delivery date or time is invalid.' };
+        if (requested < earliest) {
+          const fmt = earliest.toLocaleString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true });
+          return { ok: false, msg: `Bulk orders need at least ${leadHours} hours' notice. Earliest delivery: ${fmt}.` };
+        }
+      }
+      return { ok: true, lines };
+    }
+
+    // ------------ Place order — full parity with individual restaurant checkout ------------
+    // Steps:
+    //   1) Write the order doc into the restaurant's own Firestore (their orderTable).
+    //   2) Append it to the restaurant's <prefix>_order_history in localStorage —
+    //      that's what viewInvoice.html reads to render the bill.
+    //   3) Mirror the order to bankibites_orders (side-channel, best-effort).
+    //   4) Redirect the customer to <folder>/viewInvoice.html?order_id=<id>
+    //      so they see "In Progress" now and the accepted bill later.
+    function buildOrderDetailsShape(bulk, lines, scheduledFor, note) {
+      // Match the shape viewInvoice.html expects: order_details is an array of
+      // { category: { name, dish_details: [{name, quantity, price, type}] } }
+      return [{
+        category: {
+          name: 'Bulk Order' + (scheduledFor ? ' — ' + scheduledFor.replace('T', ' ') : ''),
+          dish_details: lines.map(l => ({
+            name:     l.name,
+            quantity: l.qty,
+            price:    l.price,
+            type:     'Veg',
+          })),
+        },
+      }];
+    }
+
+    $('#placeBtn').addEventListener('click', async () => {
+      const v = validate();
+      if (!v.ok) {
+        Swal.fire({ icon: 'warning', title: 'Almost there', text: v.msg, confirmButtonColor: '#FF6B35' });
+        return;
+      }
+      const bulk = state.bulkData.restaurants[state.currentRestKey];
+      const lines = v.lines;
+      const total = lines.reduce((a, l) => a + l.subtotal, 0);
+      const scheduledFor = `${$('#fDate').value}T${$('#fTime').value}`;
+      const note = $('#fNotes').value.trim();
+
+      const confirm = await Swal.fire({
+        icon: 'question',
+        title: 'Place bulk order?',
+        html: `<div style="text-align:left"><strong>${escHtml(bulk.name)}</strong><br>${lines.length} items · <strong>${formatINR(total)}</strong><br>Delivery: <strong>${escHtml(scheduledFor.replace('T', ' '))}</strong></div>`,
+        showCancelButton: true,
+        confirmButtonText: 'Place order',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#FF6B35',
+        cancelButtonColor: '#6b7280',
+      });
+      if (!confirm.isConfirmed) return;
+
+      const btn = $('#placeBtn');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing order…';
+
+      Swal.fire({
+        title: 'Saving your order…',
+        html: '<div style="font-size:.9rem;color:#6b7280">Hang tight, this takes a moment.</div>',
+        allowOutsideClick: false, allowEscapeKey: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        // 1) Write to the restaurant's own Firestore.
+        const { db, orderTable } = await getRestaurantDb(bulk);
+        const orderDetails = buildOrderDetailsShape(bulk, lines, scheduledFor, note);
+        const data = {
+          order_details:     orderDetails,
+          triggered_to:      '',
+          total_cart_value:  total,
+          table_no:          'COD',
+          tcd_place:         'BULK_ORDER',
+          tcd_place_custom:  false,
+          status:            'In Progress',
+          created_at:        Timestamp.now(),
+          order_type:        'bulk',
+          scheduled_for:     scheduledFor,
+          customer_note:     note,
+        };
+        const docRef = await addDoc(collection(db, orderTable), data);
+
+        // 2) Append to <prefix>_order_history so viewInvoice.html can read it.
+        const historyKey = bulk.prefix + '_order_history';
+        let history = [];
+        try { history = JSON.parse(localStorage.getItem(historyKey)) || []; } catch (e) { history = []; }
+        history.push({
+          order_id:      docRef.id,
+          admin_id:      bulk.encKey,
+          api_call:      'Initiated',
+          order_details: data,
+        });
+        try { localStorage.setItem(historyKey, JSON.stringify(history)); } catch (e) { console.warn('order_history save failed:', e); }
+
+        // 3) Mirror to bankibites_orders (best-effort — never blocks the customer).
+        try {
+          await mirrorToBankiBites({
+            restaurant_id:    bulk.id || bulk.prefix,
+            restaurant_name:  bulk.name,
+            source_doc_id:    docRef.id,
+            source_doc_path:  `${orderTable}/${docRef.id}`,
+            items: lines.map(l => ({ name: l.name, qty: l.qty, price: l.price })),
+            subtotal:         total,
+            total:            total,
+            delivery_charges: 0,
+            place:            'BULK_ORDER',
+            place_custom:     false,
+            table_no:         '',
+          });
+        } catch (mErr) {
+          console.warn('BankiBites mirror failed:', mErr);
+        }
+
+        state.qty = {};
+        try { Swal.close(); } catch (e) {}
+        await new Promise(r => setTimeout(r, 80));
+
+        // 4) Auto-open WhatsApp — no extra confirm dialog. When the customer
+        //    returns from WhatsApp (browser back), the pending-invoice bridge
+        //    at the top of this script jumps them to the bill viewer.
+        const wa = toWaNumber(bulk.whatsapp) || '917749984274';
+        const invoiceUrl = `../${bulk.folder}/viewInvoice.html?order_id=${encodeURIComponent(docRef.id)}`;
+        const text = encodeURIComponent(buildWhatsappMessage(bulk, lines, total, scheduledFor, note));
+        try { sessionStorage.setItem('bankibites_pending_invoice', invoiceUrl); } catch (e) {}
+        window.location.href = 'https://wa.me/' + wa + '?text=' + text;
+        return;
+      } catch (err) {
+        console.error('[bulk-order] place failed:', err);
+        try { Swal.close(); } catch (e) {}
+        Swal.fire({
+          icon: 'error',
+          title: 'Order could not be placed',
+          text: (err && err.message) || 'Please check your connection and try again.',
+          confirmButtonColor: '#FF6B35',
+        });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    });
+
+    // ------------ back button ------------
+    $('#backBtn').addEventListener('click', () => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#review')) window.location.hash = '#menu/' + state.currentRestKey;
+      else if (hash.startsWith('#menu')) window.location.hash = '#restaurants';
+      else window.location.href = 'index.html';
+    });
+
+    // ------------ pending-invoice bridge ------------
+    // If the customer just came back from a WhatsApp send, jump straight to
+    // their bill viewer (which shows "In Progress" now → final bill when the
+    // kitchen accepts).
+    try {
+      const pending = sessionStorage.getItem('bankibites_pending_invoice');
+      if (pending) {
+        sessionStorage.removeItem('bankibites_pending_invoice');
+        window.location.href = pending;
+      }
+    } catch (e) { /* ignore storage errors */ }
+
+    // ------------ bootstrap ------------
+    loadAll()
+      .then(() => { route(); warmMirrorConnection(); })
+      .catch(err => {
+        console.error(err);
+        $('#restLoading').hidden = true;
+        $('#restEmpty').hidden = false;
+        $('#restEmpty').innerHTML = '<i class="fas fa-triangle-exclamation"></i><p>Couldn\'t load the bulk menu. Please refresh the page.</p>';
+      });
+  </script>
+</body>
+</html>

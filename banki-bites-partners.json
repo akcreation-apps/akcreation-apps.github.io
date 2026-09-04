@@ -13,6 +13,7 @@
       "opening_hour": "10",
       "closing_hour": "22",
       "address": "BJP Party Office Side, Banki College Road, Banki 754008",
+      "eta_minutes": 75,
       "is_active": true
     },
     {
@@ -24,6 +25,7 @@
       "opening_hour": "10",
       "closing_hour": "22",
       "address": "Banki College Road, Banki 754008",
+      "eta_minutes": 45,
       "is_active": true
     },
     {
@@ -35,6 +37,7 @@
       "opening_hour": "10",
       "closing_hour": "22",
       "address": "Jail Road, Banki, Odisha 754008",
+      "eta_minutes": 45,
       "is_active": true
     },
     {
@@ -46,6 +49,7 @@
       "opening_hour": "16",
       "closing_hour": "23",
       "address": "Banki Khordha Road, Banki, Odisha 754008",
+      "eta_minutes": 45,
       "is_active": true
     }
   ]
