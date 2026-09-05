@@ -781,57 +781,38 @@
     </div>
   </nav>
 
-  <!-- Party & Bulk promo strip — single-line on mobile, taller two-line band
-       on tablet+. Small enough to leave room for the winners banner + grid. -->
+  <!-- Party & Bulk promo strip — kept identical to the Android app's
+       BulkOrderStrip: cake icon tile · 2-line title/subtitle · "Explore" pill.
+       Text and layout are constant across all screen sizes (no responsive
+       collapse) so mobile and desktop see the same copy the app does. -->
   <style>
     .bulk-strip {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 12px;
       background: linear-gradient(90deg,#FF6B35 0%,#F97316 100%);
-      color: #fff; padding: 9px 14px; text-decoration: none; line-height: 1.2;
+      color: #fff; padding: 12px 14px; text-decoration: none; line-height: 1.2;
       box-shadow: 0 2px 8px rgba(255,107,53,0.20);
       position: relative; overflow: hidden;
     }
     .bulk-strip .bs-icon {
-      width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
+      width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px;
       background: rgba(255,255,255,0.22);
       display: inline-flex; align-items: center; justify-content: center;
-      font-size: 0.95rem;
+      font-size: 1.05rem;
     }
     .bulk-strip .bs-body { flex: 1; min-width: 0; }
-    .bulk-strip .bs-new {
-      display: none; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em;
-      text-transform: uppercase; background: rgba(255,255,255,0.22);
-      padding: 2px 7px; border-radius: 999px;
+    .bulk-strip .bs-title {
+      display: block; font-size: 0.9rem; font-weight: 800;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .bulk-strip .bs-title { display: block; font-size: 0.85rem; font-weight: 800; }
     .bulk-strip .bs-sub {
-      display: none; font-size: 0.75rem; opacity: 0.92; margin-top: 2px;
+      display: block; font-size: 0.78rem; opacity: 0.92; margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .bulk-strip .bs-cta {
       flex-shrink: 0; background: #fff; color: #E64A19; font-weight: 700;
       font-size: 0.78rem; padding: 6px 10px; border-radius: 8px; white-space: nowrap;
     }
-    @media (min-width: 640px) {
-      .bulk-strip { padding: 12px 18px; gap: 14px; }
-      .bulk-strip .bs-icon { width: 40px; height: 40px; font-size: 1.15rem; border-radius: 11px; }
-      .bulk-strip .bs-new { display: inline-block; margin-bottom: 3px; }
-      .bulk-strip .bs-title { font-size: 0.95rem; }
-      .bulk-strip .bs-sub { display: block; }
-      .bulk-strip .bs-cta { font-size: 0.85rem; padding: 8px 14px; border-radius: 10px; }
-    }
   </style>
-  <a class="bulk-strip" href="bulk-order.html"
-     aria-label="Order in bulk for a party or event from Banki's kitchens"
-     data-umami-event="bankibites-listing-bulk-strip">
-    <span class="bs-icon" aria-hidden="true"><i class="fas fa-cake-candles"></i></span>
-    <span class="bs-body">
-      <span class="bs-new">New</span>
-      <span class="bs-title">Party or event? Order in bulk.</span>
-      <span class="bs-sub">Min 10 per item · Scheduled delivery from Banki's kitchens.</span>
-    </span>
-    <span class="bs-cta">Explore <i class="fas fa-arrow-right" aria-hidden="true" style="margin-left:2px;"></i></span>
-  </a>
-
   <!-- Monthly winners / gamified banners -->
   <section class="bb-winners" aria-label="BankiBites monthly winners">
     <div class="bb-winners-slider" id="bbWinnersSlider" aria-roledescription="carousel" aria-label="Monthly winners">
@@ -849,6 +830,20 @@
       <div class="bb-winners-dots" id="bbWinnersDots" role="tablist" aria-label="Choose banner"></div>
     </div>
   </section>
+
+  <!-- Party & Bulk promo strip — placed AFTER the winners banner to match the
+       Zomato / Swiggy / DoorDash pattern (and the Android app's ordering):
+       hero/banner → promo → filters → listings. -->
+  <a class="bulk-strip" href="bulk-order.html"
+     aria-label="Order in bulk for a party or event from Banki's kitchens"
+     data-umami-event="bankibites-listing-bulk-strip">
+    <span class="bs-icon" aria-hidden="true"><i class="fas fa-cake-candles"></i></span>
+    <span class="bs-body">
+      <span class="bs-title">Party or event? Order in bulk.</span>
+      <span class="bs-sub">Min 10 per item &middot; Scheduled delivery</span>
+    </span>
+    <span class="bs-cta">Explore</span>
+  </a>
 
   <!-- Cuisine filter (sticky, horizontal scroll) -->
   <h1 class="sr-only">Restaurants in Banki, Cuttack — Order Food Online</h1>

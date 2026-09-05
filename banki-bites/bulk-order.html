@@ -509,10 +509,23 @@
       padding: 12px 16px; display: none;
       box-shadow: 0 -8px 24px rgba(0,0,0,0.06);
     }
-    .cart-bar.visible { display: flex; align-items: center; gap: 12px; }
-    .cart-bar .summary { flex: 1; }
-    .cart-bar .summary .items { font-size: 0.82rem; color: var(--muted); }
-    .cart-bar .summary .total { font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); }
+    .cart-bar.visible { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+    .cart-bar .summary {
+      margin-left: auto; text-align: right;
+      display: inline-flex; flex-direction: column; align-items: flex-end;
+      padding: 6px 12px; border-radius: 12px;
+      background: rgba(255,107,53,0.10);
+      border: 1px solid rgba(255,107,53,0.25);
+      line-height: 1.15;
+    }
+    .cart-bar .summary .items {
+      font-size: 0.7rem; font-weight: 600; color: var(--primary-dark);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .cart-bar .summary .total {
+      font-weight: 800; font-size: 1.25rem; color: var(--primary-dark);
+      letter-spacing: -0.01em;
+    }
     .cart-bar .continue {
       background: var(--primary); color: white; border: none;
       padding: 12px 18px; font-weight: 700; font-family: inherit;
@@ -765,6 +778,12 @@
     const setTitle = (t) => { $('#topTitle').textContent = t; };
 
     function route() {
+      // Normalise empty hash to #restaurants without adding a history entry,
+      // so the very first browser-back exits the page cleanly instead of
+      // toggling between "" and "#restaurants".
+      if (!window.location.hash) {
+        window.history.replaceState(null, '', '#restaurants');
+      }
       const hash = window.location.hash || '#restaurants';
       const [head, key] = hash.replace(/^#/, '').split('/');
       if (head === 'menu' && key) openMenu(key);
@@ -772,6 +791,7 @@
       else openRestaurants();
     }
     window.addEventListener('hashchange', route);
+    window.addEventListener('popstate', route);
 
     // ------------ Stage A: Restaurants ------------
     function openRestaurants() {
@@ -1168,11 +1188,20 @@
     });
 
     // ------------ back button ------------
+    // Delegate to browser history so the topbar back button and the phone /
+    // browser back button behave identically. If there's no in-app history
+    // (deep-link into #menu or #review), fall back to a manual step-back.
     $('#backBtn').addEventListener('click', () => {
       const hash = window.location.hash;
-      if (hash.startsWith('#review')) window.location.hash = '#menu/' + state.currentRestKey;
-      else if (hash.startsWith('#menu')) window.location.hash = '#restaurants';
-      else window.location.href = 'index.html';
+      const canGoBack = window.history.length > 1 && document.referrer !== '';
+      if (hash.startsWith('#review') || hash.startsWith('#menu')) {
+        if (canGoBack) window.history.back();
+        else if (hash.startsWith('#review')) window.location.hash = '#menu/' + state.currentRestKey;
+        else window.location.hash = '#restaurants';
+      } else {
+        if (canGoBack) window.history.back();
+        else window.location.href = 'index.html';
+      }
     });
 
     // ------------ pending-invoice bridge ------------
