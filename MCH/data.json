@@ -237,7 +237,7 @@
               "name": "Paneer Mix Veg",
               "price": 99,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": 20
             },
             {
               "id": 902,
