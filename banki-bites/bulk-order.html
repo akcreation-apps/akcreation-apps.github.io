@@ -778,12 +778,11 @@
     const setTitle = (t) => { $('#topTitle').textContent = t; };
 
     function route() {
-      // Normalise empty hash to #restaurants without adding a history entry,
-      // so the very first browser-back exits the page cleanly instead of
-      // toggling between "" and "#restaurants".
-      if (!window.location.hash) {
-        window.history.replaceState(null, '', '#restaurants');
-      }
+      // Treat an empty hash as #restaurants without touching history — this way
+      // the stage rendering stays predictable and the browser's own history
+      // stack (built up from user clicks pushing #menu/… and #review/… via
+      // `window.location.hash = ...`) is the single source of truth for
+      // back-navigation. Both `hashchange` and `popstate` bring us here.
       const hash = window.location.hash || '#restaurants';
       const [head, key] = hash.replace(/^#/, '').split('/');
       if (head === 'menu' && key) openMenu(key);
@@ -1188,19 +1187,20 @@
     });
 
     // ------------ back button ------------
-    // Delegate to browser history so the topbar back button and the phone /
-    // browser back button behave identically. If there's no in-app history
-    // (deep-link into #menu or #review), fall back to a manual step-back.
+    // Delegate to browser history so the topbar back arrow and the phone /
+    // browser back button behave identically. For deep-links (no prior entry
+    // in this tab) we manually step one stage back inside the flow, and only
+    // leave to /banki-bites/ from the restaurant picker.
     $('#backBtn').addEventListener('click', () => {
       const hash = window.location.hash;
-      const canGoBack = window.history.length > 1 && document.referrer !== '';
-      if (hash.startsWith('#review') || hash.startsWith('#menu')) {
-        if (canGoBack) window.history.back();
-        else if (hash.startsWith('#review')) window.location.hash = '#menu/' + state.currentRestKey;
-        else window.location.hash = '#restaurants';
+      const hasHistory = window.history.length > 1;
+      if (hasHistory) { window.history.back(); return; }
+      if (hash.startsWith('#review')) {
+        window.location.hash = '#menu/' + state.currentRestKey;
+      } else if (hash.startsWith('#menu')) {
+        window.location.hash = '#restaurants';
       } else {
-        if (canGoBack) window.history.back();
-        else window.location.href = 'index.html';
+        window.location.href = 'index.html';
       }
     });
 
