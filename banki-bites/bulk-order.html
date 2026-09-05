@@ -270,6 +270,7 @@
       border-radius: 8px;
     }
     .topbar .back:hover, .topbar .back:focus-visible { background: rgba(0,0,0,0.05); outline: none; }
+    .topbar .back[hidden] { display: none; }
     .topbar .brand { display: flex; align-items: center; gap: 8px; flex: 1; }
     .topbar .brand img { width: 28px; height: 28px; border-radius: 6px; }
     .topbar .title { font-weight: 700; font-size: 1.05rem; }
@@ -570,7 +571,7 @@
 
 
   <div class="topbar">
-    <button class="back" id="backBtn" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+    <button class="back" id="backBtn" aria-label="Go back" hidden><i class="fas fa-arrow-left"></i></button>
     <div class="brand">
       <img src="banki-bites-logo.png" alt="">
       <div class="title" id="topTitle">Party &amp; Bulk Orders</div>
@@ -673,7 +674,7 @@
   </div>
 
   <footer>
-    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha &#10084;&#65039;</p>
+    <p>&copy; <span id="footer-year"></span> AK Creation. All rights reserved. &nbsp;|&nbsp; Made in Odisha &#10084;&#65039;</p>
   </footer>
 
   <script>
@@ -773,6 +774,9 @@
       document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
       const s = document.getElementById('stage' + name);
       if (s) s.classList.add('active');
+      // Hide the back arrow on the root restaurant picker — there's nowhere
+      // to go back to inside this standalone flow.
+      $('#backBtn').hidden = (name === 'Restaurants');
       window.scrollTo({ top: 0 });
     }
     const setTitle = (t) => { $('#topTitle').textContent = t; };
@@ -1187,20 +1191,16 @@
     });
 
     // ------------ back button ------------
-    // Delegate to browser history so the topbar back arrow and the phone /
-    // browser back button behave identically. For deep-links (no prior entry
-    // in this tab) we manually step one stage back inside the flow, and only
-    // leave to /banki-bites/ from the restaurant picker.
+    // Bulk-order.html is a standalone URL embedded in the BankiBites Android
+    // app WebView — the back arrow must NEVER exit the flow to the BankiBites
+    // website. Step manually through stages; on the root restaurant picker,
+    // do nothing (the app's own back button owns exit from here).
     $('#backBtn').addEventListener('click', () => {
       const hash = window.location.hash;
-      const hasHistory = window.history.length > 1;
-      if (hasHistory) { window.history.back(); return; }
       if (hash.startsWith('#review')) {
         window.location.hash = '#menu/' + state.currentRestKey;
       } else if (hash.startsWith('#menu')) {
         window.location.hash = '#restaurants';
-      } else {
-        window.location.href = 'index.html';
       }
     });
 
