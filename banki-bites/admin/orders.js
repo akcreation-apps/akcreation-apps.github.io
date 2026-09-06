@@ -614,7 +614,12 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     </summary>
 
     <div class="order-section">
-      <div class="order-section-head"><i class="fas fa-list"></i> Items</div>
+      <div class="order-section-head order-section-head--row">
+        <span><i class="fas fa-list"></i> Items</span>
+        <button type="button" class="btn btn-sm btn-outline-secondary btn-copy-items" data-act="copyItems" title="Copy items to send to the restaurant">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
       <ul class="order-items">${itemsHtml}</ul>
     </div>
 
@@ -1084,6 +1089,49 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     addrInput.value = '';
     clearChip();
     searchInput.focus();
+  });
+
+  // Copy items in a restaurant-friendly plain-text format so admins can paste
+  // straight into the partner's WhatsApp/phone. Format:
+  //   <Restaurant name>
+  //   • 2 × Chicken Biryani
+  //   • 1 × Paneer Butter Masala
+  card.querySelector('[data-act="copyItems"]').addEventListener('click', async (ev) => {
+    const btn = ev.currentTarget;
+    const items = o.items || [];
+    if (!items.length) {
+      Swal.fire({ icon: 'info', title: 'No items', text: 'This order has no items to copy.', confirmButtonColor: '#FF6B35' });
+      return;
+    }
+    const lines = [];
+    if (o.restaurant_name || o.restaurant_id) lines.push(String(o.restaurant_name || o.restaurant_id));
+    const orderTime = created.toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true,
+    });
+    lines.push(`Order time: ${orderTime}`);
+    lines.push('');
+    lines.push('Items:');
+    items.forEach(i => { lines.push(`• ${i.qty} × ${i.name}`); });
+    const text = lines.join('\n');
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const original = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+      btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1500);
+    } catch (err) {
+      console.error('[orders] copy items failed:', err);
+      Swal.fire({ icon: 'error', title: 'Copy failed', text: 'Could not copy to clipboard. Please copy manually.', confirmButtonColor: '#FF6B35' });
+    }
   });
 
   const thankYouBtnEl = card.querySelector('[data-act="thankYou"]');

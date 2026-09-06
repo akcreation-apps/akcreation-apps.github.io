@@ -470,6 +470,14 @@ details.entity-card[open] > .order-summary .order-chevron {
   gap: 6px;
 }
 .order-section-head i { font-size: 0.85rem; color: var(--brand); }
+.order-section-head--row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.btn-copy-items {
+  font-size: 0.7rem; padding: 2px 8px; line-height: 1.4;
+  text-transform: none; letter-spacing: 0; font-weight: 600;
+}
+.btn-copy-items i { margin-right: 4px; }
 .order-section .order-items { background: transparent; padding: 0; max-height: none; }
 
 .dispatch-grid {
