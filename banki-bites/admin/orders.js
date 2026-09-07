@@ -790,6 +790,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     </div>
 
     <div class="ec-actions order-actions">
+      ${cust.phone && status !== 'delivered' && status !== 'cancelled' && !isFake ? `
+      <button class="btn btn-sm btn-outline-primary mr-auto" data-act="notifyEta" title="Send ETA greeting on WhatsApp">
+        <i class="fab fa-whatsapp mr-1"></i> Notify ETA
+      </button>` : ''}
       ${status === 'delivered' && cust.phone ? `
       <button class="btn btn-sm btn-outline-success mr-auto" data-act="thankYou" title="Send thank-you coupon on WhatsApp">
         <i class="fab fa-whatsapp mr-1"></i> Thank You
@@ -1133,6 +1137,91 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       Swal.fire({ icon: 'error', title: 'Copy failed', text: 'Could not copy to clipboard. Please copy manually.', confirmButtonColor: '#FF6B35' });
     }
   });
+
+  // Notify ETA — WhatsApp greeting with the customer's name and an estimated
+  // delivery time = "now + offset minutes" (default 45). Admin can adjust the
+  // offset in the dialog before sending.
+  const notifyEtaBtnEl = card.querySelector('[data-act="notifyEta"]');
+  if (notifyEtaBtnEl) {
+    notifyEtaBtnEl.addEventListener('click', async () => {
+      const rawName = o.customer?.name || '';
+      const prettyName = (() => {
+        const s = String(rawName).trim();
+        if (!s) return '';
+        if (!/^bb/i.test(s)) return s;
+        const m = s.match(/\(([^)]+)\)/);
+        return (m && m[1].trim()) ? m[1].trim() : '';
+      })();
+
+      const formatEtaTime = (mins) => {
+        const t = new Date(Date.now() + Number(mins) * 60000);
+        return t.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      };
+      const buildMsg = (mins) => {
+        const etaLabel = formatEtaTime(mins);
+        const greeting = prettyName ? `ନମସ୍କାର ${prettyName} !` : 'ନମସ୍କାର !';
+        return [
+          greeting,
+          `ଆପଣଙ୍କ order ପ୍ରାୟ *${etaLabel}* ସୁଦ୍ଧା ପହଞ୍ଚିଯିବ ।`,
+          `କୌଣସି ପ୍ରଶ୍ନ ଥିଲେ ଏହି number ରେ reply କରନ୍ତୁ ।`,
+          `_Team BankiBites :)_`,
+        ].join('\n\n');
+      };
+
+      const DEFAULT_MINS = 45;
+      const res = await Swal.fire({
+        title: `<i class="fab fa-whatsapp mr-1" style="color:#25d366"></i> Notify ETA${prettyName ? ' — ' + prettyName : ''}`,
+        html: `
+          <div class="text-left">
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:600">Minutes from now</label>
+              <input class="form-control" id="etaMins" type="number" min="1" step="1" value="${DEFAULT_MINS}">
+              <small class="text-muted" id="etaTimePreview" style="font-size:0.75rem"></small>
+            </div>
+            <div class="form-group mb-0">
+              <label style="font-size:0.82rem;font-weight:600">Message preview</label>
+              <textarea id="etaPreview" class="form-control" rows="5"
+                style="font-size:0.82rem;resize:none;background:var(--surface-soft)" readonly></textarea>
+            </div>
+          </div>`,
+        confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Open WhatsApp',
+        confirmButtonColor: '#25d366',
+        showCancelButton: true,
+        width: 460,
+        didOpen: () => {
+          const minsEl = document.getElementById('etaMins');
+          const prevEl = document.getElementById('etaPreview');
+          const timeEl = document.getElementById('etaTimePreview');
+          const refresh = () => {
+            const m = Math.max(1, parseInt(minsEl.value, 10) || DEFAULT_MINS);
+            prevEl.value = buildMsg(m);
+            timeEl.textContent = `Estimated delivery: ${formatEtaTime(m)}`;
+          };
+          minsEl.addEventListener('input', refresh);
+          refresh();
+        },
+        preConfirm: () => {
+          const mins = Math.max(1, parseInt(document.getElementById('etaMins').value, 10) || DEFAULT_MINS);
+          return { mins };
+        },
+      });
+
+      if (!res.isConfirmed) return;
+      const { mins } = res.value;
+      const msg = buildMsg(mins);
+      const phone = normalisePhone(o.customer?.phone || '');
+      if (!phone) {
+        Swal.fire({ icon: 'warning', title: 'No phone', text: 'This order has no customer phone number.', confirmButtonColor: '#FF6B35' });
+        return;
+      }
+      const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
+      try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
+      try { window.location.href = waUrl; return; } catch (e) {}
+      try { window.location.assign(waUrl); return; } catch (e) {}
+      try { window.open(waUrl, '_self'); return; } catch (e) {}
+      try { window.open(waUrl, '_blank'); return; } catch (e) {}
+    });
+  }
 
   const thankYouBtnEl = card.querySelector('[data-act="thankYou"]');
   if (thankYouBtnEl) {
