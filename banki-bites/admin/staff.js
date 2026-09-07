@@ -6,7 +6,7 @@ import { Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-fi
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isPayoutPaid, isPayoutPending,
   toDateSafe, chartPalette, whenChartReady, fmtINR, wireStatsBlockResize, startOfLastMonth,
-  truncateName, isOnTime,
+  startOfCurrentMonth, truncateName, isOnTime,
 } from '../analytics.js';
 
 // Note: Creating a Firebase Auth user requires the Admin SDK (server-side) or the
@@ -274,6 +274,20 @@ function renderCard(db, root, uid, s) {
   const paid    = mine.filter(isPayoutPaid).reduce((sum, o) => sum + feeForOrder(o, _staffFeeRules), 0);
   const pending = earned - paid;
 
+  // Straight-line projection of month-to-date earnings to a full-month
+  // estimate. Uses delivered_at (falls back to created_at) so the run rate
+  // reflects when the partner was actually paid for the drop, not when the
+  // order landed.
+  const now = new Date();
+  const monthStart = startOfCurrentMonth(now);
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysElapsed = Math.max((now.getTime() - monthStart.getTime()) / 86400000, 1);
+  const mtdEarned = mine.reduce((sum, o) => {
+    const d = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+    return d && d >= monthStart ? sum + feeForOrder(o, _staffFeeRules) : sum;
+  }, 0);
+  const projectedMonthly = Math.round(mtdEarned * (daysInMonth / daysElapsed));
+
   el.innerHTML = `
     <div class="ec-row">
       <div style="min-width:0;flex:1">
@@ -290,6 +304,7 @@ function renderCard(db, root, uid, s) {
       <div class="payout-chip"><i class="fas fa-coins"></i> Earned ${fmtINR(earned)}</div>
       <div class="payout-chip payout-chip--ok"><i class="fas fa-circle-check"></i> Paid ${fmtINR(paid)}</div>
       <div class="payout-chip payout-chip--warn"><i class="fas fa-hourglass-half"></i> Pending ${fmtINR(pending)}</div>
+      <div class="payout-chip payout-chip--projection" title="Straight-line projection of this month's earnings at the current run rate"><i class="fas fa-chart-line"></i> Projected ${fmtINR(projectedMonthly)} <span class="payout-chip-sub">/ month</span></div>
     </div>
     <details class="payouts-block">
       <summary><i class="fas fa-list-check"></i> Earnings &amp; Payouts</summary>

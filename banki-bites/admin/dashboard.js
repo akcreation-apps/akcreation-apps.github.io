@@ -512,6 +512,17 @@ function renderKpis(el, orders, ordersAll, partners, staff, rules) {
   });
   const currentRevenue = curMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
   const lastRevenue    = lastMonthDelivered.reduce((s, o) => s + netRevenue(o), 0);
+
+  // Monthly projection — straight-line extrapolation of the MTD run rate.
+  // days_elapsed counts today as a partial day so early-morning numbers don't
+  // over-project. Uses local date (matches the timezone the KPIs are shown in).
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const msElapsed  = now.getTime() - curStart.getTime();
+  const daysElapsed = Math.max(msElapsed / 86400000, 1); // never below 1 day
+  const projectionFactor = daysInMonth / daysElapsed;
+  const projectedRevenue   = Math.round(currentRevenue * projectionFactor);
+  const projectedDeliveries = Math.round(curMonthDelivered.length * projectionFactor);
+  const curMonthLabel = curStart.toLocaleDateString('en-IN', { month: 'short' });
   let revBadge;
   if (lastRevenue > 0) {
     const pct = ((currentRevenue - lastRevenue) / lastRevenue * 100).toFixed(1);
@@ -566,6 +577,22 @@ function renderKpis(el, orders, ordersAll, partners, staff, rules) {
   const discountPctRev  = rangeRevenue > 0 ? Math.round((totalDiscount / (rangeRevenue + totalDiscount)) * 100) : 0;
 
   el.innerHTML = `
+    <div class="kpi-card kpi-card--highlight">
+      <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">${curMonthLabel} projection · at current run rate</div>
+        <div class="kpi-projection-row">
+          <div class="kpi-projection">
+            <div class="kpi-value">${fmtINR(projectedRevenue)}</div>
+            <div class="kpi-sub"><i class="fas fa-indian-rupee-sign"></i> Revenue · ${fmtINR(currentRevenue)} so far</div>
+          </div>
+          <div class="kpi-projection">
+            <div class="kpi-value">${projectedDeliveries}</div>
+            <div class="kpi-sub"><i class="fas fa-truck-fast"></i> Deliveries · ${curMonthDelivered.length} so far</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="kpi-card">
       <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
       <div class="kpi-body">

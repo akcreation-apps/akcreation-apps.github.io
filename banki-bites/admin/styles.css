@@ -1348,6 +1348,45 @@ button.fab:hover { background: var(--brand-dark); }
 .kpi-card--sm .kpi-label { margin: 0; }
 .kpi-card--sm .kpi-value { margin-top: 2px; }
 .kpi-card--sm .kpi-sub { margin-top: 1px; }
+
+/* Highlighted projection KPI — spans the full KPI grid and stands out with
+   a brand gradient so admins see the month-end forecast first. */
+.kpi-card--highlight {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 55%, #F97316 100%);
+  border: 1px solid transparent;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(255,107,53,0.28);
+}
+.kpi-card--highlight .kpi-icon {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.kpi-card--highlight .kpi-label {
+  color: rgba(255,255,255,0.92);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.kpi-card--highlight .kpi-value { color: #fff; }
+.kpi-card--highlight .kpi-sub  { color: rgba(255,255,255,0.85); }
+.kpi-card--highlight .kpi-sub i { color: rgba(255,255,255,0.85); margin-right: 4px; }
+
+.kpi-projection-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 6px;
+}
+.kpi-projection { min-width: 0; }
+.kpi-projection .kpi-value {
+  font-size: clamp(1.2rem, 5.5vw, 1.8rem);
+  line-height: 1.1;
+}
+@media (min-width: 640px) {
+  .kpi-projection .kpi-value { font-size: 1.7rem; }
+}
+
 .kpi-icon {
   width: 32px; height: 32px; flex: 0 0 32px;
   border-radius: 9px;
@@ -1491,6 +1530,15 @@ button.fab:hover { background: var(--brand-dark); }
 .payout-chip--ok i { color: var(--chip-dlv-fg); }
 .payout-chip--warn { background: var(--chip-new-bg); color: var(--chip-new-fg); }
 .payout-chip--warn i { color: var(--chip-new-fg); }
+.payout-chip--projection {
+  background: linear-gradient(135deg, #FF6B35 0%, #F97316 100%);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(255,107,53,0.28);
+}
+.payout-chip--projection i { color: #fff; }
+.payout-chip--projection .payout-chip-sub {
+  font-weight: 500; opacity: 0.85; margin-left: 2px;
+}
 
 .payouts-block {
   margin: 0 10px 10px;
