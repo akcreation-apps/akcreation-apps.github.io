@@ -351,63 +351,63 @@
           "dishes": [
             {
               "id": 901,
-              "name": "Margarita(small)",
+              "name": "Margarita Pizza (small)",
               "price": 139,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 902,
-              "name": "Margarita(medium)",
+              "name": "Margarita Pizza (medium)",
               "price": 259,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 903,
-              "name": "Farm House(small)",
+              "name": "Farm House Pizza (small)",
               "price": 179,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 904,
-              "name": "Farm House(medium)",
+              "name": "Farm House Pizza (medium)",
               "price": 289,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 905,
-              "name": "Corn Paneer(small)",
+              "name": "Corn Paneer Pizza (small)",
               "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 906,
-              "name": "Corn Paneer(medium)",
+              "name": "Corn Paneer Pizza (medium)",
               "price": 309,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 907,
-              "name": "Margarita(large)",
+              "name": "Margarita Pizza (large)",
               "price": 359,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 908,
-              "name": "Farm House(large)",
+              "name": "Farm House Pizza (large)",
               "price": 389,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 909,
-              "name": "Corn Paneer(large)",
+              "name": "Corn Paneer Pizza (large)",
               "price": 409,
               "available_time": "",
               "not_available_time": ""
@@ -420,21 +420,21 @@
           "dishes": [
             {
               "id": 1001,
-              "name": "Italian Chicken(small)",
+              "name": "Italian Chicken Pizza (small)",
               "price": 199,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1002,
-              "name": "Italian Chicken(medium)",
+              "name": "Italian Chicken Pizza (medium)",
               "price": 309,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 1003,
-              "name": "Italian Chicken(large)",
+              "name": "Italian Chicken Pizza (large)",
               "price": 409,
               "available_time": "",
               "not_available_time": ""
