@@ -45,6 +45,21 @@ Deployment is via git push to `main` — GitHub Pages serves directly from the r
 
 ## HTML Conventions
 
+### Auto Theme (BankiBites & every restaurant folder)
+`/banki-bites/` and every per-restaurant app (e.g. `/TCD/`, plus every folder mounted via `banki-bites/bulk-orders.json`) auto-select light or dark theme based on the OS setting via `prefers-color-scheme`. **There is no manual theme toggle.** Every new UI style, button, chip, card, or page in these areas MUST work in both themes.
+
+Requirements:
+- For any new colour usage in CSS, add a matching rule inside `@media (prefers-color-scheme: dark) { … }`.
+- Prefer the existing theme-aware CSS variables (`--brand`, `--brand-soft`, `--text`, `--muted`, `--border`, `--surface`, `--danger`, `--success`, `--warn`) over hard-coded hex.
+- New HTML pages must declare both `theme-color` metas plus `color-scheme`:
+  ```html
+  <meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F0E15" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  ```
+- When adding a Bootstrap `btn-outline-*` variant (or any custom chip/badge), always add both the light default and the dark override. See `banki-bites/admin/styles.css` (~lines 1020–1050) for the pattern to mirror.
+- Before reporting UI work as done, verify both themes by toggling the OS theme, or by using DevTools → Rendering → **Emulate CSS media feature `prefers-color-scheme`**.
+
 ### Mobile-First Design (with full responsiveness)
 All HTML pages — new and existing — must be designed **mobile-first** while remaining fully responsive across all screen sizes. This means:
 - Base styles target small screens; scale up with `min-width` media queries (`md`, `lg`, `xl`).
