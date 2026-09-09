@@ -217,14 +217,39 @@
               "name": "Prawn Thali",
               "price": 219,
               "available_time": "",
-              "not_available_time": 16
+              "not_available_time": 16,
+              "non_available_days": [
+                1,
+                2,
+                4,
+                6
+              ]
             },
             {
               "id": 805,
               "name": "Mutton Thali",
               "price": 229,
               "available_time": "",
-              "not_available_time": 16
+              "not_available_time": 16,
+              "non_available_days": [
+                1,
+                2,
+                4,
+                6
+              ]
+            },
+            {
+              "id": 806,
+              "name": "Crab Thali",
+              "price": 249,
+              "available_time": "",
+              "not_available_time": 16,
+              "non_available_days": [
+                1,
+                2,
+                4,
+                6
+              ]
             }
           ]
         },
@@ -306,28 +331,60 @@
               "name": "Mutton Masala",
               "price": 169,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": "",
+              "non_available_days": [
+                1,
+                2,
+                4,
+                6
+              ]
             },
             {
               "id": 1006,
               "name": "Prawns Masala",
               "price": 169,
               "available_time": "",
-              "not_available_time": ""
+              "not_available_time": "",
+              "non_available_days": [
+                1,
+                2,
+                4,
+                6
+              ]
             },
             {
               "id": 1007,
+              "name": "Crab Masala",
+              "price": 169,
+              "available_time": "",
+              "not_available_time": "",
+              "non_available_days": [
+                1,
+                2,
+                4,
+                6
+              ]
+            },
+            {
+              "id": 1008,
               "name": "Egg Tadka",
               "price": 69,
               "available_time": 19,
               "not_available_time": ""
             },
             {
-              "id": 1008,
+              "id": 1009,
               "name": "Egg Bhuj Curry",
               "price": 49,
               "offer_price": 69,
               "is_offer": true,
+              "available_time": 19,
+              "not_available_time": ""
+            },
+            {
+              "id": 1010,
+              "name": "Macha Munda Mixture",
+              "price": 109,
               "available_time": 19,
               "not_available_time": ""
             }
