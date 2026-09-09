@@ -48,7 +48,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bulk Food Order in Banki — Party &amp; Event Catering">
-  <meta name="twitter:description" content="Party, wedding &amp; office bulk food orders in Banki, Cuttack. Scheduled delivery from Banki's best kitchens. Min 10 per item, free delivery in the belt.">
+  <meta name="twitter:description" content="Party, wedding &amp; office bulk food orders in Banki, Cuttack. Scheduled delivery from Banki's best kitchens. Min 10 per item, free delivery in the area.">
   <meta name="twitter:image" content="https://akcreation-apps.com/banki-bites/banner.jpg">
   <meta name="twitter:image:alt" content="Bulk food orders on BankiBites — Banki, Cuttack, Odisha">
 
@@ -76,7 +76,7 @@
         "name": "BankiBites Bulk & Party Food Orders",
         "alternateName": ["Bulk Food Order Banki", "Party Catering Banki", "Event Food Delivery Banki"],
         "serviceType": "Bulk food ordering, party catering, event catering",
-        "description": "Order bulk food online for parties, weddings, birthdays, ceremonies and office events in Banki, Cuttack, Odisha. Minimum 10 per item. Scheduled delivery from Banki's best restaurants. Free delivery in the Banki belt (up to Harirajpur, Dangipita, Ragadi & Bheda).",
+        "description": "Order bulk food online for parties, weddings, birthdays, ceremonies and office events in Banki, Cuttack, Odisha. Minimum 10 per item. Scheduled delivery from Banki's best restaurants. Free delivery in the Banki area (up to Harirajpur, Dangipita, Ragadi & Bheda).",
         "url": "https://akcreation-apps.com/banki-bites/bulk-order.html",
         "image": "https://akcreation-apps.com/banki-bites/banner.jpg",
         "provider": {
@@ -166,7 +166,7 @@
             "name": "Where do you deliver bulk orders?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Free delivery across Banki and every area up to Harirajpur, Dangipita, Ragadi and Bheda. Beyond this belt, a distance-based delivery charge applies."
+              "text": "Free delivery across Banki and every area up to Harirajpur, Dangipita, Ragadi and Bheda. Beyond this area, a distance-based delivery charge applies."
             }
           },
           {
@@ -648,7 +648,7 @@
           <i class="fas fa-truck" aria-hidden="true" style="color:var(--primary-dark);font-size:0.85rem;margin-top:3px;flex-shrink:0;"></i>
           <div>
             <strong style="color:var(--primary-dark);">Free delivery</strong> across Banki &amp; every area up to <strong>Harirajpur, Dangipita, Ragadi &amp; Bheda</strong>.
-            <span style="color:var(--muted);">Extra charge applies beyond this belt.</span>
+            <span style="color:var(--muted);">Extra charge applies beyond this area.</span>
           </div>
         </div>
       </div>
@@ -861,7 +861,7 @@
       chips.push(`<span class="rib-chip"><i class="fas fa-people-group"></i> Min <strong>${minQty}</strong>/item</span>`);
       if (bulk.lead_time_hours) chips.push(`<span class="rib-chip"><i class="fas fa-clock"></i> <strong>${bulk.lead_time_hours}h</strong> notice</span>`);
       if (bulk.notes) chips.push(`<span class="rib-chip"><i class="fas fa-circle-info"></i> ${escHtml(bulk.notes)}</span>`);
-      chips.push(`<span class="rib-chip rib-wide"><i class="fas fa-truck"></i> <strong>Free delivery</strong> across Banki &amp; areas up to Harirajpur, Dangipita, Ragadi &amp; Bheda &middot; extra charge beyond this belt</span>`);
+      chips.push(`<span class="rib-chip rib-wide"><i class="fas fa-truck"></i> <strong>Free delivery</strong> across Banki &amp; areas up to Harirajpur, Dangipita, Ragadi &amp; Bheda &middot; extra charge beyond this area</span>`);
       $('#restInfoBanner').innerHTML = chips.join('');
 
       const items = (bulk.items || []).filter(it => it && it.available !== false);
