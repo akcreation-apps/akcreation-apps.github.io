@@ -13,6 +13,60 @@ import {
 // on the orders collection across tab switches.
 let _ordersUnsub = null;
 
+// ── Per-restaurant ETA loader ──────────────────────────────────────────────
+// Reads etaMinutes straight from each restaurant's own /<folder>/restaurant.js
+// so the Notify-ETA dialog defaults match the value the restaurant configured
+// for their own cart. Cached per restaurant_id for the tab's lifetime.
+//
+// Folder resolution — tried in order:
+//   1. Explicit override map (for the pre-onboarding-tool folders whose names
+//      don't follow the current convention).
+//   2. restaurant_id as-is (e.g. "TCD", "MCH", "A1", "Unique" — same casing).
+//   3. restaurant_id.toLowerCase() (matches the onboarding-tool convention:
+//      folder = prefix.lower(), restaurant_id = prefix.upper()).
+// This means new restaurants created via /onboarding-tool need no code change.
+const _restaurantIdToFolder = {
+  ANVISHA: 'Anvisha-Kitchen',
+  'BISWAL-BAKERY': 'Biswal',
+  'HELLO-PIZZA': 'Hello-Pizza',
+};
+const _etaCache = new Map(); // restaurant_id -> minutes (or null when unavailable)
+const _etaInflight = new Map();
+async function _fetchEta(folder) {
+  const res = await fetch(`../../${folder}/restaurant.js?v=${Date.now()}`);
+  if (!res.ok) throw new Error(`restaurant.js ${res.status}`);
+  const text = await res.text();
+  const m = text.match(/etaMinutes\s*:\s*(\d+)/);
+  return m ? parseInt(m[1], 10) : null;
+}
+async function loadRestaurantEtaMinutes(restaurantId) {
+  if (!restaurantId) return null;
+  if (_etaCache.has(restaurantId)) return _etaCache.get(restaurantId);
+  if (_etaInflight.has(restaurantId)) return _etaInflight.get(restaurantId);
+  const candidates = [];
+  if (_restaurantIdToFolder[restaurantId]) candidates.push(_restaurantIdToFolder[restaurantId]);
+  candidates.push(restaurantId);
+  if (restaurantId.toLowerCase() !== restaurantId) candidates.push(restaurantId.toLowerCase());
+  const p = (async () => {
+    for (const folder of candidates) {
+      try {
+        const mins = await _fetchEta(folder);
+        if (Number.isFinite(mins)) {
+          _etaCache.set(restaurantId, mins);
+          return mins;
+        }
+      } catch (err) {
+        // try the next candidate — 404 on first is normal for tool-created folders
+      }
+    }
+    console.warn(`[orders] eta unavailable for ${restaurantId} (tried: ${candidates.join(', ')})`);
+    _etaCache.set(restaurantId, null);
+    return null;
+  })().finally(() => _etaInflight.delete(restaurantId));
+  _etaInflight.set(restaurantId, p);
+  return p;
+}
+
 // New-order alert plumbing. State is module-scoped so a Firestore snapshot
 // during an admin's session doesn't re-alert on orders they've already seen.
 let _newOrderState = null;
@@ -1168,7 +1222,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         ].join('\n\n');
       };
 
-      const DEFAULT_MINS = 45;
+      // Default ETA minutes come from the restaurant's own <folder>/restaurant.js
+      // (etaMinutes key). Falls back to 45 when the file/value isn't reachable.
+      const restaurantEta = await loadRestaurantEtaMinutes(o.restaurant_id);
+      const DEFAULT_MINS = Number.isFinite(restaurantEta) && restaurantEta > 0 ? restaurantEta : 45;
       const res = await Swal.fire({
         title: `<i class="fab fa-whatsapp mr-1" style="color:#25d366"></i> Notify ETA${prettyName ? ' — ' + prettyName : ''}`,
         html: `
