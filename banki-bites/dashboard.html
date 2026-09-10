@@ -427,6 +427,8 @@
     .open-badge.open::before  { content: '●'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
     .open-badge.closed { background: #fee2e2; color: #b91c1c; }
     .open-badge.closed::before { content: '○'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
+    .open-badge.closing-soon { background: #fef3c7; color: #b45309; }
+    .open-badge.closing-soon::before { content: '●'; font-size: 0.5em; margin-right: 3px; vertical-align: middle; }
     /* ETA badge — compact "X–Y min" pill so customers can compare fastest kitchens. */
     .eta-badge {
       display: inline-flex; align-items: center; gap: 4px;
@@ -438,6 +440,7 @@
     @media (prefers-color-scheme: dark) {
       .open-badge.open  { background: rgba(34,197,94,0.16); color: #4ADE80; }
       .open-badge.closed { background: rgba(239,68,68,0.16); color: #F87171; }
+      .open-badge.closing-soon { background: rgba(245,158,11,0.18); color: #FBBF24; }
       .eta-badge { background: rgba(255,255,255,0.08); }
     }
     .card-address {
@@ -1103,6 +1106,13 @@
       const now = new Date().getHours();
       return now >= h.o && now < h.c;
     }
+    const CLOSING_SOON_THRESHOLD_MINUTES = 30;
+    function minutesUntilClose(p) {
+      const h = hours(p); if (!h) return null;
+      if (!isOpen(p)) return null;
+      const d = new Date();
+      return h.c * 60 - (d.getHours() * 60 + d.getMinutes());
+    }
     function fmt(h) { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:00 ${ampm}`; }
 
     function escapeHtml(s) {
@@ -1191,6 +1201,9 @@
           const showHours  = !!h;
           const clickable = !manuallyClosed && (scheduledOpen || !showHours);
           const opensAt = h ? fmt(h.o) : '';
+          const closesAt = h ? fmt(h.c) : '';
+          const mtc = scheduledOpen ? minutesUntilClose(p) : null;
+          const closingSoon = mtc !== null && mtc <= CLOSING_SOON_THRESHOLD_MINUTES;
           const services = Array.isArray(p.services) ? p.services.filter(s => !isBlank(s)) : [];
           const showRating = !isBlank(p.rating);
           const showAddr   = !isBlank(p.address);
@@ -1239,7 +1252,11 @@
                 <div class="card-meta">
                   ${showRating ? `<span class="rating"><i class="fas fa-star" aria-hidden="true"></i>${escapeHtml(p.rating)} <span>/ 5</span></span>` : ''}
                   ${etaBand ? `<span class="eta-badge" title="Estimated delivery time"><i class="fas fa-clock" aria-hidden="true"></i>${escapeHtml(etaBand)}</span>` : ''}
-                  ${clickable && showHours ? `<span class="open-badge open">Open now</span>` : ''}
+                  ${clickable && showHours
+                    ? (closingSoon
+                        ? `<span class="open-badge closing-soon">Closes ${escapeHtml(closesAt)}</span>`
+                        : `<span class="open-badge open">Open now</span>`)
+                    : ''}
                 </div>
                 ${showAddr ? `<div class="card-address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${escapeHtml(p.address)}</span></div>` : ''}
               </div>
