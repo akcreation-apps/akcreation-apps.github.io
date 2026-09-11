@@ -43,7 +43,7 @@
   if (yr) yr.textContent = new Date().getFullYear();
   document.title = `Shop by Category · ${CFG.vendorName}`;
 
-  // Mobile search toggle
+  // Mobile search toggle (simple inline expand/collapse)
   const searchToggle = document.getElementById('searchToggle');
   const searchMobile = document.getElementById('searchMobile');
   if (searchToggle && searchMobile) {

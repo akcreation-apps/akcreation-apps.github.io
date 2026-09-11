@@ -8,6 +8,42 @@
   const KEY = CFG.cartStorageKey || 'bb_grocery_cart_v1';
   const money = (n) => (CFG.currency || '₹') + Number(n).toFixed(0);
 
+  // ================================================================
+  // Overlay history stack — makes the Android/browser back button
+  // close whatever's on top (cart, place picker, search) instead of
+  // leaving the site.  Every openable overlay uses openOverlay / closeOverlay.
+  // ================================================================
+  const OVERLAY_STACK = [];   // [{ name, closeFn }]
+  let popping = false;        // guard: closes triggered by popstate mustn't re-push
+
+  function openOverlay(name, closeFn) {
+    // If the same overlay is already open, no-op
+    if (OVERLAY_STACK.some((o) => o.name === name)) return;
+    OVERLAY_STACK.push({ name, closeFn });
+    history.pushState({ bbOverlay: name, depth: OVERLAY_STACK.length }, '');
+  }
+
+  function closeOverlay(name) {
+    const idx = OVERLAY_STACK.findIndex((o) => o.name === name);
+    if (idx === -1) return;
+    // Close everything from here to the top (deepest first)
+    const removed = OVERLAY_STACK.splice(idx);
+    removed.slice().reverse().forEach((o) => o.closeFn(true));
+    if (!popping) {
+      // Sync history by popping the corresponding entries
+      history.go(-removed.length);
+    }
+  }
+
+  window.addEventListener('popstate', () => {
+    if (OVERLAY_STACK.length === 0) return;
+    popping = true;
+    const o = OVERLAY_STACK.pop();
+    try { o.closeFn(true); } finally { popping = false; }
+  });
+
+  window.bbOverlay = { open: openOverlay, close: closeOverlay };
+
   // ---------- Delivery ETA ----------
   // Rule: order before CFG.delivery.cutoffHour local time → tomorrow's window.
   // Order at/after cutoff → day-after-tomorrow's window.
@@ -195,11 +231,13 @@
     document.getElementById('cartBackdrop').classList.add('open');
     document.getElementById('cartDrawer').classList.add('open');
     document.body.style.overflow = 'hidden';
+    openOverlay('cart', closeDrawer);
   }
-  function closeDrawer() {
+  function closeDrawer(fromHistory) {
     document.getElementById('cartBackdrop')?.classList.remove('open');
     document.getElementById('cartDrawer')?.classList.remove('open');
     document.body.style.overflow = '';
+    if (!fromHistory) closeOverlay('cart');
   }
 
   function renderDrawer() {
@@ -424,10 +462,12 @@
       document.getElementById('placeBackdrop').classList.add('open');
       document.getElementById('placeModal').classList.add('open');
     });
+    openOverlay('place', closePlace);
   }
-  function closePlace() {
+  function closePlace(fromHistory) {
     document.getElementById('placeBackdrop')?.classList.remove('open');
     document.getElementById('placeModal')?.classList.remove('open');
+    if (!fromHistory) closeOverlay('place');
   }
   window.bbOpenPlace = openPlace;
 
@@ -548,9 +588,9 @@
 
   // Close drawers on ESC
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeDrawer();
-      closePlace();
+    // ESC closes whichever overlay is on top (delegates to popstate handler)
+    if (e.key === 'Escape' && OVERLAY_STACK.length) {
+      history.back();
     }
   });
 

@@ -54,7 +54,7 @@
   $$('[data-hero-cta-primary]').forEach((el) => (el.textContent = H.ctaPrimary || 'Start shopping'));
   $$('[data-hero-cta-secondary]').forEach((el) => (el.textContent = H.ctaSecondary || 'View deals'));
 
-  // Mobile search toggle
+  // Mobile search toggle (simple inline expand/collapse)
   const searchToggle = document.getElementById('searchToggle');
   const searchMobile = document.getElementById('searchMobile');
   if (searchToggle && searchMobile) {

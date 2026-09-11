@@ -169,7 +169,9 @@ p { color: var(--text); }
    HEADER
    ================================================================ */
 .site-header {
-  position: sticky; top: 0; z-index: 100;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background: color-mix(in srgb, var(--surface) 85%, transparent);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -275,12 +277,12 @@ p { color: var(--text); }
    ================================================================ */
 /* Mobile-only delivery strip (below header, above subnav).
    Desktop shows the location in the header itself.
-   Background must be OPAQUE — it's sticky, so any transparency lets scrolled
+   Background is OPAQUE — it's sticky, so any transparency lets scrolled
    content bleed through and looks broken. */
 .mobile-loc-strip {
   display: flex; align-items: center; gap: 8px;
   width: 100%; padding: 8px 16px;
-  background: #E9F9EF;         /* opaque pale green (light mode) */
+  background: #E9F9EF;
   color: var(--brand-dark);
   border-bottom: 1px solid var(--line);
   font-size: 0.82rem;
@@ -289,7 +291,6 @@ p { color: var(--text); }
   cursor: pointer;
   position: sticky; top: var(--header-h); z-index: 95;
   transition: background 0.15s;
-  /* Safety-net blur for any browser edge case where the fill still bleeds */
   backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
   box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
