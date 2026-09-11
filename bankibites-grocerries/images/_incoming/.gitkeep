@@ -1,0 +1,9 @@
+# Drop raw product images here (any format — jpg / png / webp / avif …).
+# Then from the project root run:
+#
+#   python add_images.py
+#
+# Each file is resized to 500x500 (white letterbox), converted to WebP, and
+# moved into images/products/. Source files are removed on success.
+#
+# This .gitkeep exists only so the folder is preserved in git.

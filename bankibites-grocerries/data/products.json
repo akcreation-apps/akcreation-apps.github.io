@@ -159,6 +159,26 @@
               "inStock": true,
               "featured": false,
               "deal": false
+            },
+            {
+              "id": 1371,
+              "name": "S&J Tomato Ketchup",
+              "price": 15.0,
+              "unit": "95G",
+              "image": "images/products/S&J Tomato Ketchup 48X95Gm(15).webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1374,
+              "name": "S&J Ginger Garlic Paste",
+              "price": 47.0,
+              "unit": "200G",
+              "image": "images/products/S&J Ginger Garlic Paste 200g New.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
             }
           ]
         }
@@ -309,6 +329,96 @@
               "price": 30.0,
               "unit": "100G",
               "image": "images/products/TAAZA MASALACHASKA ELAICHI100GPPD.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1358,
+              "name": "Tata Tea Agni Leaf Extra Josh",
+              "price": 55.0,
+              "unit": "225G",
+              "image": "images/products/TTAgni Lf Extra Josh 225g MF PP-AL02.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1362,
+              "name": "Tata Tea Agni Leaf",
+              "price": 200.0,
+              "unit": "1KG",
+              "image": "images/products/TTAgni Lf 1 kg PP- STGP-AL01-MF.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1364,
+              "name": "Tata Tea Premium Dust Polypack",
+              "price": 20.0,
+              "unit": "50G",
+              "image": "images/products/Tata Tea Pr Dust 50gm Polypack Cuttack.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1368,
+              "name": "Tata Tea Premium Dust Polypack",
+              "price": 100.0,
+              "unit": "250G",
+              "image": "images/products/Tata Tea Pr Dust 250gm Polypack Cuttack.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1370,
+              "name": "Tata Tea Buff Dust",
+              "price": 360.0,
+              "unit": "1KG",
+              "image": "images/products/TATA TEA BUFF DUST 1 KG - OR01-MF.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1373,
+              "name": "Tata Tea Agni Leaf",
+              "price": 120.0,
+              "unit": "500G",
+              "image": "images/products/TTAgni Lf 500g PP-STGP-AL01-MF.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1377,
+              "name": "Tata Tea Agni Leaf",
+              "price": 235.0,
+              "unit": "1KG",
+              "image": "images/products/TTAgni Lf 1 kg PP- STGP-AL04-MF.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1378,
+              "name": "Tata Tea Premium Dust Polypack",
+              "price": 200.0,
+              "unit": "500G",
+              "image": "images/products/Tata Tea Pr Dust 500gm Polypack Cutack.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1382,
+              "name": "Tata Tea Premium Leaf Polypack",
+              "price": 100.0,
+              "unit": "250G",
+              "image": "images/products/Tata Tea Pr Lf 250g PP-OR-Spcl pr.webp",
               "inStock": true,
               "featured": false,
               "deal": false
@@ -1507,7 +1617,7 @@
             },
             {
               "id": 1242,
-              "name": "Vaseline Deep Moisture Lotion (with 50ML Free)",
+              "name": "Vaseline Deep Moisture Lotion (with Free)",
               "price": 435.0,
               "unit": "400ML",
               "image": "images/products/VDM LOTION 400ML WITH PSLG 50ML.webp",
@@ -2053,6 +2163,974 @@
               "price": 294.0,
               "unit": "400G",
               "image": "images/products/WOMEN HORLICKS 400GBIB CHOCOLATE.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baby-food-nutrition",
+      "name": "Baby Food & Nutrition",
+      "image": "images/categories/Baby_Nutrition___Care.png",
+      "subcategories": [
+        {
+          "id": "baby-food-nutrition-all",
+          "name": "Baby Food & Nutrition",
+          "dishes": [
+            {
+              "id": 1294,
+              "name": "Cerelac Stage 1 Wheat Apple",
+              "price": 280.0,
+              "unit": "360G",
+              "image": "images/products/CERELAC STG1 Whe App 24x360g ZS N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1295,
+              "name": "Cerelac Stage 1 Wheat Apple",
+              "price": 280.0,
+              "unit": "360G",
+              "image": "images/products/CERELAC STG1 Wheat Apple 24x360g WS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1296,
+              "name": "Cerelac Stage 2 Wheat Apple Cherry",
+              "price": 299.0,
+              "unit": "360G",
+              "image": "images/products/CERELAC STG2 Whe App Chry 24x360gWS N1IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1297,
+              "name": "Cerelac Stage 2 Wheat Orange",
+              "price": 299.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG2 Wheat Orange 24x300g WS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1298,
+              "name": "Cerelac Stage 2 Wheat Apple Cherry",
+              "price": 299.0,
+              "unit": "360G",
+              "image": "images/products/CERELAC STG2 Whe App Chry 24x360g ZS N1IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1299,
+              "name": "Cerelac Stage 3 Wheat Rice Mixed Fruit",
+              "price": 290.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG3 WheRi Mix Frt 24x300g ZS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1300,
+              "name": "Cerelac Stage 3 Wheat Rice Mixed Fruit",
+              "price": 290.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG3 WheRi Mix Frt 24x300g WS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1301,
+              "name": "Cerelac Stage 3 Wheat Rice Mixed Vegetable",
+              "price": 290.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STA3 Whe Ri MixVeg 24x300g ZS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1302,
+              "name": "Cerelac Stage 4 Multi-grain Dal Vegetable",
+              "price": 295.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG 4 MU Dal Veg 24x300g ZS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1303,
+              "name": "Cerelac Stage 4 Multi-grain Fruit",
+              "price": 295.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG 4 MU Fruit 24x300g WS N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1304,
+              "name": "Cerelac Stage 5 5-Grain Fruit",
+              "price": 299.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG5 5 Grain Fruit 24x300g ZS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1305,
+              "name": "Cerelac Stage 5 5-Grain Vegetable",
+              "price": 299.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG5 5 Grain Veg 24x300g ZS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1306,
+              "name": "Cerelac Stage 5 5-Grain Fruit",
+              "price": 299.0,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG5 5 Grain Fruit 24x300g WS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1307,
+              "name": "Lactogen Pro 1 Bag-in-Box",
+              "price": 460.0,
+              "unit": "400G",
+              "image": "images/products/LACTOGEN PRO1 BIB 24x400g INNWPB176 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1308,
+              "name": "Lactogen Pro 2 Bag-in-Box",
+              "price": 460.0,
+              "unit": "400G",
+              "image": "images/products/LACTOGEN PRO2 BIB 24x400g INLEB086 N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1309,
+              "name": "Lactogen Pro 3 Bag-in-Box",
+              "price": 450.0,
+              "unit": "400G",
+              "image": "images/products/LACTOGEN PRO 3 BIB 24x400g INJE087-2 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1310,
+              "name": "Lactogen Pro 4 Bag-in-Box",
+              "price": 450.0,
+              "unit": "400G",
+              "image": "images/products/LACTOGEN PRO 4 BIB 24x400g INJE091-1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1311,
+              "name": "NAN Pro 1 Infant Formula",
+              "price": 775.0,
+              "unit": "400G",
+              "image": "images/products/NAN PRO 1 IF BIB 24x400g INNWB174 NV IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1312,
+              "name": "NAN Pro 2",
+              "price": 775.0,
+              "unit": "400G",
+              "image": "images/products/NAN PRO2 BIB 24x400g INLW070 LS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1313,
+              "name": "NAN Pro 3",
+              "price": 775.0,
+              "unit": "400G",
+              "image": "images/products/NAN PRO 3 BIB 24x400g INJE096-1 LS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1314,
+              "name": "NAN Pro 4",
+              "price": 775.0,
+              "unit": "400G",
+              "image": "images/products/NAN PRO 4 BIB 24x400g INJE097-1 LS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1315,
+              "name": "NAN GROW",
+              "price": 595.0,
+              "unit": "400G",
+              "image": "images/products/NANGROW 24x400g JEFB001-2 N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1316,
+              "name": "Nestum Stage 1 Rice",
+              "price": 190.0,
+              "unit": "325G",
+              "image": "images/products/NESTUM STAGE 1 Rice BIB 24x325g IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1317,
+              "name": "Nestum Stage 2 Rice & Vegetables",
+              "price": 210.0,
+              "unit": "325G",
+              "image": "images/products/NESTUM STA2 Rice Vegetables BIB24x325gIN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1318,
+              "name": "Nestum Stage 3 Rice & Fruit",
+              "price": 230.0,
+              "unit": "325G",
+              "image": "images/products/NESTUM STAGE 3 Rice Frt BIB 24x325g IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1319,
+              "name": "Nestlé Ceregrow",
+              "price": 299.0,
+              "unit": "300G",
+              "image": "images/products/NESTLE CEREGROW BIB 24x300g WS N8 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1320,
+              "name": "NAN LoLac Infant Formula",
+              "price": 345.0,
+              "unit": "200G",
+              "image": "images/products/NAN LO-LAC IF BIB 24x200g INNE003 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chocolates-confectionery",
+      "name": "Chocolates & Confectionery",
+      "image": "images/categories/Chocolates___Confectionery.png",
+      "subcategories": [
+        {
+          "id": "chocolates-confectionery-all",
+          "name": "Chocolates & Confectionery",
+          "dishes": [
+            {
+              "id": 1321,
+              "name": "KitKat 2-Finger Mini",
+              "price": 10.0,
+              "unit": "12.1G",
+              "image": "images/products/KIT KAT 2F MINI 24(42x12.1g) IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1322,
+              "name": "KitKat 2-Finger",
+              "price": 20.0,
+              "unit": "18.5G",
+              "image": "images/products/KIT KAT 2F 24(30x18.5g)N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1323,
+              "name": "KitKat 3-Finger",
+              "price": 25.0,
+              "unit": "28.5G",
+              "image": "images/products/KIT KAT 3F 18(28x28.5g) IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1324,
+              "name": "KitKat 3-Finger Duo",
+              "price": 25.0,
+              "unit": "28.5G",
+              "image": "images/products/KIT KAT 3F Duo 18(28x28.5g) IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1325,
+              "name": "KitKat 4-Finger",
+              "price": 30.0,
+              "unit": "38.5G",
+              "image": "images/products/KIT KAT 4 Finger 18(21x38.5g)N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1326,
+              "name": "KitKat 2 × 3-Finger Pack",
+              "price": 50.0,
+              "unit": "57G",
+              "image": "images/products/KIT KAT 2x3F 18(14x(2x28.5g))N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1327,
+              "name": "KitKat Gooey Salted Caramel",
+              "price": 185.0,
+              "unit": "112G",
+              "image": "images/products/KIT KAT Gooey Salted Crml 10(6x112g) IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1328,
+              "name": "KitKat Tablet Dark",
+              "price": 95.0,
+              "unit": "50G",
+              "image": "images/products/KIT KAT Tablet Dark 12(12x50g)N3 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1329,
+              "name": "KitKat Tablet Rich Chocolate",
+              "price": 90.0,
+              "unit": "50G",
+              "image": "images/products/KIT KAT Tablet Rich Choc 12(12x50g)N5 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1330,
+              "name": "KitKat Tablet Rich Chocolate",
+              "price": 210.0,
+              "unit": "150G",
+              "image": "images/products/KIT KAT Tablet Rich Choc 10(6x150g)N5 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1331,
+              "name": "Munch Maha",
+              "price": 5.0,
+              "unit": "10.4G",
+              "image": "images/products/MUNCH Maha 27(32x10.4g) NR IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1332,
+              "name": "Munch Choco Loops",
+              "price": 10.0,
+              "unit": "17G",
+              "image": "images/products/MUNCH Choco Loops 192x17g IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1333,
+              "name": "Munch King Size",
+              "price": 10.0,
+              "unit": "17.4G",
+              "image": "images/products/MUNCH King Size 24(24x17.4g) NR 3 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1334,
+              "name": "Munch Maxx",
+              "price": 20.0,
+              "unit": "38.5G",
+              "image": "images/products/MUNCH Maxx 12(24x38.5g) N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1335,
+              "name": "Milkybar Mould",
+              "price": 10.0,
+              "unit": "12.5G",
+              "image": "images/products/MILKYBAR Mould 24(30x12.5g) N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1336,
+              "name": "Nestlé Classic",
+              "price": 10.0,
+              "unit": "15G",
+              "image": "images/products/NESTLE CLASSIC 24(28x15g) IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "instant-foods-noodles",
+      "name": "Instant Foods & Noodles",
+      "image": "images/categories/Instant_Food___Cooking.png",
+      "subcategories": [
+        {
+          "id": "instant-foods-noodles-all",
+          "name": "Instant Foods & Noodles",
+          "dishes": [
+            {
+              "id": 1337,
+              "name": "Maggi 2-Minute Noodles Masala Chain",
+              "price": 10.0,
+              "unit": "48G",
+              "image": "images/products/MAGGI 2-MIN NDLS Masala Chain 120x48g IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1338,
+              "name": "Maggi 2-Minute Noodles Masala",
+              "price": 90.0,
+              "unit": "420G",
+              "image": "images/products/MAGGI 2-MINN Mas 16x420g PR Rs7 Off IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1339,
+              "name": "Maggi 2-Minute Noodles Masala",
+              "price": 60.0,
+              "unit": "280G",
+              "image": "images/products/MAGGI 2-MINN Mas 24x280g PR Rs2 Off IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1340,
+              "name": "Maggi 2-Minute Noodles Masala Chain",
+              "price": 7.0,
+              "unit": "32G",
+              "image": "images/products/MAGGI 2-MINN Mas Chain 160x32g IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1341,
+              "name": "Maggi Masala-ae-Magic",
+              "price": 5.0,
+              "unit": "6G",
+              "image": "images/products/MAGGI Masala-ae-Magic 16(2(60x6g) N2 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1342,
+              "name": "Maggi Tomato Ketchup + Noodles Combo",
+              "price": 170.0,
+              "unit": "960G",
+              "image": "images/products/MAGGI Tom Ket 12x960g PR Ndls 280g IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1343,
+              "name": "Maggi Nutrilicious Atta Noodles",
+              "price": 20.0,
+              "unit": "55G",
+              "image": "images/products/MAGGI Ntr-lcs Atta 96x55g Rurban RC3 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1346,
+              "name": "Maggi Hot & Sweet Sauce",
+              "price": 190.0,
+              "unit": "1KG",
+              "image": "images/products/MAGGI HOT & SWEET 12x1Kg N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1363,
+              "name": "Ching's Schezwan Chutney",
+              "price": 10.0,
+              "unit": "30G",
+              "image": "images/products/Ching's Schezwan Chutney 360x 30 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1366,
+              "name": "Ching's Red Chilli Sauce",
+              "price": 25.0,
+              "unit": "90G",
+              "image": "images/products/Ching's Red Chilli Sauce 48 x 90 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1367,
+              "name": "Ching's Dark Soy Sauce",
+              "price": 25.0,
+              "unit": "90G",
+              "image": "images/products/Ching's Dark Soy Sauce 48 x 90 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1384,
+              "name": "Ching's Instant Sweet Corn Soup",
+              "price": 10.0,
+              "unit": "13G",
+              "image": "images/products/Ching's Instant SweetCorn Soup 240X13 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1385,
+              "name": "Ching's Manchurian Noodles",
+              "price": 80.0,
+              "unit": "240G",
+              "image": "images/products/Ching's Manchurian Noodles 36 x 240 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1388,
+              "name": "Ching's Instant Mixed Vegetable Soup",
+              "price": 10.0,
+              "unit": "14G",
+              "image": "images/products/Ching's Instant Mix Veg Soup 240X14 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1389,
+              "name": "Ching's Instant Manchow Soup",
+              "price": 10.0,
+              "unit": "14G",
+              "image": "images/products/Ching's Instant Manchow Soup 240X14 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1390,
+              "name": "Ching's Instant Sweet Corn Soup",
+              "price": 10.0,
+              "unit": "15G",
+              "image": "images/products/Ching's Instant SweetCorn Soup 240X15 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1391,
+              "name": "Ching's Instant Hot & Sour Soup",
+              "price": 10.0,
+              "unit": "14G",
+              "image": "images/products/Ching's Instant Hot&Sour Soup 240X14 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1392,
+              "name": "Ching's Instant Tomato Soup with Crouton",
+              "price": 10.0,
+              "unit": "16G",
+              "image": "images/products/Ching's Ins.Tomato Soup Crouton 240X16gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coffee-beverages",
+      "name": "Coffee & Beverages",
+      "image": "images/categories/coffee-beverages.png",
+      "subcategories": [
+        {
+          "id": "coffee-beverages-all",
+          "name": "Coffee & Beverages",
+          "dishes": [
+            {
+              "id": 1347,
+              "name": "Nescafé Sunrise Sachet Stick",
+              "price": 2.0,
+              "unit": "1G",
+              "image": "images/products/NESC Sunrise Sac Stk 30(156x1g)NWNR4 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1348,
+              "name": "Nescafé Classic Stick",
+              "price": 2.0,
+              "unit": "1G",
+              "image": "images/products/NESCAFE Classic Stick 96(144x1g) IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1349,
+              "name": "Nescafé Iced Cappuccino Can",
+              "price": 50.0,
+              "unit": "170ML",
+              "image": "images/products/NESCAFE Iced Cappuccino 60x170ml IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1350,
+              "name": "Nescafé Iced Frappé Can",
+              "price": 50.0,
+              "unit": "170ML",
+              "image": "images/products/NESCAFE Iced Frappe Cnd 60x170ml IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1351,
+              "name": "Nescafé Iced Latte Can",
+              "price": 50.0,
+              "unit": "170ML",
+              "image": "images/products/NESCAFE Iced Latte Cnd 60x170ml IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1352,
+              "name": "Nescafé Vietnamese Coffee Can",
+              "price": 75.0,
+              "unit": "200ML",
+              "image": "images/products/NESCAFE Vietnamese Coffee 30x200ml NR IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1353,
+              "name": "Nescafé Classic Latte Can",
+              "price": 75.0,
+              "unit": "200ML",
+              "image": "images/products/NESCAFE Classic Latte Cnd 30x200ml IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1354,
+              "name": "Nescafé Chocolate Latte Can",
+              "price": 75.0,
+              "unit": "200ML",
+              "image": "images/products/NESCAFE Choco Latte Cnd 30x200ml IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1355,
+              "name": "Nescafé Classic Jar",
+              "price": 124.0,
+              "unit": "24G",
+              "image": "images/products/NESCAFE CLASSIC Jar 36x24g NR IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1379,
+              "name": "Tata Coffee All-in-1 Premix",
+              "price": 10.0,
+              "unit": "16G",
+              "image": "images/products/Tata Coffee All in 1 Premix 16g Sachet.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "staples-salt-sugar-pulses",
+      "name": "Staples, Salt, Sugar & Pulses",
+      "image": "images/categories/Salt__Dal__Pulses___Staples.png",
+      "subcategories": [
+        {
+          "id": "staples-salt-sugar-pulses-all",
+          "name": "Staples, Salt, Sugar & Pulses",
+          "dishes": [
+            {
+              "id": 1356,
+              "name": "Tata Salt Packed",
+              "price": 32.0,
+              "unit": "1KG",
+              "image": "images/products/TATA SALT PACKED 25 X 1 KG (MRP32).webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1357,
+              "name": "Tata Salt Sendha+",
+              "price": 65.0,
+              "unit": "1KG",
+              "image": "images/products/TATA SALT Sendha+ 12X1 KG.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1359,
+              "name": "Chana Dal",
+              "price": 147.0,
+              "unit": "1KG",
+              "image": "images/products/CHANA DAL 25 x 1Kg.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1360,
+              "name": "OI Jaggery Powder",
+              "price": 220.0,
+              "unit": "1KG",
+              "image": "images/products/OI Jaggery Powder 1Kg.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1361,
+              "name": "OI Jaggery Powder",
+              "price": 110.0,
+              "unit": "500G",
+              "image": "images/products/OI Jaggery Powder 500g.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1365,
+              "name": "Tata Salt Packed",
+              "price": 32.0,
+              "unit": "1KG",
+              "image": "images/products/TATA SALT PACKED 50 X 1 KG (MRP32).webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1369,
+              "name": "Tata Gold Leaf Cathedral Pack",
+              "price": 135.0,
+              "unit": "250G",
+              "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1372,
+              "name": "OI Desi Khandsari Sugar",
+              "price": 120.0,
+              "unit": "500G",
+              "image": "images/products/OI Desi Khandsari Sugar 500G.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1375,
+              "name": "OI Pink Rock Salt",
+              "price": 150.0,
+              "unit": "1KG",
+              "image": "images/categories/Salt__Dal__Pulses___Staples.png",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1376,
+              "name": "Toor Dal",
+              "price": 224.0,
+              "unit": "1KG",
+              "image": "images/products/Toor Dal 25 x 1Kg.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1380,
+              "name": "Besan Gargara",
+              "price": 75.0,
+              "unit": "500G",
+              "image": "images/products/BESAN GARGARA 20 x 500G (7 MONTHS).webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1381,
+              "name": "Moong Dal",
+              "price": 223.0,
+              "unit": "1KG",
+              "image": "images/products/MOONG DAL 25 x 1Kg.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1383,
+              "name": "Tata Sampann Poha (Thick)",
+              "price": 58.0,
+              "unit": "500G",
+              "image": "images/products/Tata Sampann POHA (Thick) ROI-40 X 500g.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1386,
+              "name": "Tata Himalayan Rock Salt",
+              "price": 120.0,
+              "unit": "1KG",
+              "image": "images/products/TATA HIMALAYAN ROCK SALT 18x1KG Bag.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1387,
+              "name": "Tata Lite Salt Packed",
+              "price": 50.0,
+              "unit": "1KG",
+              "image": "images/products/TATA LITE SALT PACKED 25 X 1 KG (NEW).webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1393,
+              "name": "Schezwan Chutney",
+              "price": 90.0,
+              "unit": "250G",
+              "image": "images/products/Swwzwan Chutny 250.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dairy-products",
+      "name": "Dairy Products",
+      "image": "images/categories/Dairy_Products.png",
+      "subcategories": [
+        {
+          "id": "dairy-products-all",
+          "name": "Dairy Products",
+          "dishes": [
+            {
+              "id": 1344,
+              "name": "Milkmaid Doypack",
+              "price": 84.0,
+              "unit": "190G",
+              "image": "images/products/MILKMAID Doy Pack 64x190g IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false
+            },
+            {
+              "id": 1345,
+              "name": "Milkmaid Tin",
+              "price": 149.0,
+              "unit": "380G",
+              "image": "images/products/MILKMAID SCM EOE Tin 48x380g N2 IN.webp",
               "inStock": true,
               "featured": false,
               "deal": false
