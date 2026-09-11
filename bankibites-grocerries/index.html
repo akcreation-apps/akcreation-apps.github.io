@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="theme-color" content="#16A34A" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A0B0F" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+
+  <title>BankiBites Grocerries · Fresh essentials, delivered.</title>
+  <meta name="description" content="Trusted branded groceries — tea, sauces, personal care, laundry, household. Order on WhatsApp, delivered in 60 minutes across Banki.">
+
+  <link rel="icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="Home">
+        <span class="brand-mark"><img src="images/logo.png" alt="" loading="eager"></span>
+        <span class="brand-name" data-vendor-name>BankiBites<span class="accent">.</span></span>
+      </a>
+
+      <button class="location" data-open-place aria-label="Change delivery location">
+        <i class="fa-solid fa-location-dot pin"></i>
+        <span>
+          <span class="label">Deliver to</span>
+          <span class="value"><span data-location-value>Select area</span> <i class="fa-solid fa-chevron-down caret"></i></span>
+        </span>
+      </button>
+
+      <div class="search search-desktop" role="search">
+        <i class="fa-solid fa-magnifying-glass icon-left"></i>
+        <input type="search" placeholder="Search brands, groceries, essentials…" aria-label="Search">
+        <span class="icon-right"><i class="fa-solid fa-arrow-right"></i></span>
+      </div>
+
+      <div class="header-icons">
+        <button class="icon-btn search-toggle" id="searchToggle" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="icon-btn" data-open-cart aria-label="Cart">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="count" data-cart-count style="display:none">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-mobile" id="searchMobile">
+      <div class="search" role="search">
+        <i class="fa-solid fa-magnifying-glass icon-left"></i>
+        <input type="search" placeholder="Search brands, essentials…" aria-label="Search">
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile-only delivery strip (desktop shows the location in the header instead) -->
+  <button type="button" class="mobile-loc-strip" data-open-place aria-label="Change delivery location">
+    <i class="fa-solid fa-location-dot"></i>
+    <span class="ms-text">Delivering to <strong data-location-value>Select area</strong></span>
+    <span class="ms-change">Change <i class="fa-solid fa-chevron-right"></i></span>
+  </button>
+
+  <!-- SUBNAV -->
+  <nav class="subnav" aria-label="Categories">
+    <div class="subnav-inner" id="subnavInner"></div>
+  </nav>
+
+  <main>
+
+    <!-- Compact hero — text-only, playful copy. -->
+    <section class="hero-slim">
+      <div class="container">
+        <div class="hero-slim-card">
+          <div class="hero-slim-copy">
+            <span class="chip chip-brand">
+              <i class="fa-solid fa-truck-fast"></i>
+              <span data-hero-eyebrow-prefix>Arriving</span>
+              <strong data-eta-short>tomorrow · 10 AM – 12 PM</strong>
+            </span>
+            <h1><span data-hero-t1>Your kirana shop.</span><br><span data-hero-t2>In your pyjamas.</span></h1>
+            <p class="lede" data-hero-lede>Tap what you need. Take a nap. We knock at your door before lunch — chai, sabun, shampoo, all of it. No queues, no billing wait, no forgot-something-again moments.</p>
+            <div class="hero-slim-ctas">
+              <a class="btn btn-brand" href="#products"><span data-hero-cta-primary>Start shopping</span> <i class="fa-solid fa-arrow-right"></i></a>
+              <a class="btn btn-ghost" href="#deals" data-hero-cta-secondary>Peek at today's deals</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEALS row -->
+    <section class="prod-row-section deals" id="deals">
+      <div class="container">
+        <div class="prod-row-head">
+          <div>
+            <span class="eyebrow"><i class="fa-solid fa-fire"></i> Weekly deals</span>
+            <h2>Deals worth picking up</h2>
+          </div>
+          <a class="row-see-all" href="categories.html">Browse all <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="prod-row" id="dealsScroll"></div>
+      </div>
+    </section>
+
+    <!-- Category rows (one horizontal-scroll rail per category, populated by main.js) -->
+    <div id="products">
+      <div class="container" id="categoryRows"></div>
+    </div>
+
+    <!-- Trust — single compact strip -->
+    <section class="trust-strip">
+      <div class="container">
+        <div class="trust-row">
+          <div class="trust-mini">
+            <i class="fa-solid fa-shield-halved"></i>
+            <div><strong>100% Genuine</strong><span>Only branded products</span></div>
+          </div>
+          <div class="trust-mini">
+            <i class="fa-brands fa-whatsapp"></i>
+            <div><strong>Order on WhatsApp</strong><span>No app, no account</span></div>
+          </div>
+          <div class="trust-mini">
+            <i class="fa-solid fa-truck-fast"></i>
+            <div><strong>Next-day delivery</strong><span data-eta-short>Tomorrow · 10 AM – 12 PM</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER (compact) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html">
+            <span class="brand-mark"><img src="images/logo.png" alt="" loading="eager"></span>
+            <span class="brand-name" data-vendor-name>BankiBites<span class="accent">.</span></span>
+          </a>
+          <p>Trusted grocery essentials for your home. From <span data-city>Banki, Cuttack, Odisha</span>.</p>
+          <div class="footer-social">
+            <a data-wa-link href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            <a data-ig-link href="https://www.instagram.com/bankibites/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; <span id="year"></span> <span data-vendor-full>BankiBites Grocerries</span>. Made in Odisha ❤️ · Part of <a data-parent-url href="https://akcreation-apps.com/services.html"><span data-parent-brand>AK Creation</span></a>.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating view-cart bar -->
+  <div class="view-cart-bar" id="viewCartBar" data-open-cart role="button" tabindex="0">
+    <div class="vcb-info">
+      <i class="fa-solid fa-basket-shopping"></i>
+      <span id="viewCartCount">0 items</span>
+      <span class="vcb-dot"></span>
+      <strong id="viewCartTotal">₹0</strong>
+    </div>
+    <div class="vcb-cta">View Cart <i class="fa-solid fa-arrow-right"></i></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
