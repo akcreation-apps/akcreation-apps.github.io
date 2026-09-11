@@ -357,11 +357,19 @@ async function sendThankYou(b) {
   if (!phone) { Swal.fire('No phone', 'Customer phone is not set.', 'info'); return; }
   const friendly = displayName(b.customer && b.customer.name);
   const text =
-`Hi${friendly ? ' ' + friendly : ''}! 🙏
+`ନମସ୍କାର${friendly ? ' ' + friendly : ''}! 🙏✨
 
-Thank you for travelling with Anvisha Travels today. We hope you had a smooth ride.
+Anvisha Travels ସହିତ ଆଜି ଯାତ୍ରା କରିଥିବାରୁ ଆପଣଙ୍କୁ ଅନେକ ଅନେକ ଧନ୍ୟବାଦ! 🚗💨
 
-If you ever need a cab around Banki, Cuttack or Bhubaneswar, we're a WhatsApp away. Safe travels!`;
+ଆପଣଙ୍କ ଯାତ୍ରା ସୁରକ୍ଷିତ ଓ ଆରାମଦାୟକ ରହିଥିଲା ବୋଲି ଆଶା କରୁଛୁ। 😊
+
+ଆଉ ଥରେ Cab ଦରକାର ପଡ଼ିଲେ — ଆମେ ମାତ୍ର ଏକ Click ଦୂର! 📱👇
+
+👉 https://akcreation-apps.com/anvisha-travels/
+
+ଆପଣଙ୍କ ଆଗାମୀ ଯାତ୍ରା ପାଇଁ ଅପେକ୍ଷାରେ ରହିଲୁ। ❤️🙌
+
+Safe travels — Team Anvisha Travels 🚕💚`;
   const r = await Swal.fire({
     title: 'Send thank-you?',
     html: `WhatsApp to <code>+91${phone}</code><br><br><pre style="text-align:left;white-space:pre-wrap;font-size:12px;">${escapeHtml(text)}</pre>`,
