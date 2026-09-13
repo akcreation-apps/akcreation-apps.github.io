@@ -233,20 +233,23 @@
   }
 
   function productCard(p) {
-    const s = seed(p.id + 99);
-    const disc = 5 + Math.floor(s * 20);
-    const mrp = Math.round(p.price / (1 - disc / 100));
+    const mrp = Number(p.mrp) || Number(p.price);
+    const price = Number(p.price);
+    const hasDiscount = mrp > price;
+    const disc = hasDiscount ? Math.round(((mrp - price) / mrp) * 100) : 0;
+    const isDeal = p.deal === true;
     const brand = brandOf(p.name);
     const img = encPath(p.image || p.categoryImage);
     return `
-      <article class="prod-card"
+      <article class="prod-card${isDeal ? ' is-deal' : ''}"
         data-product data-id="${attr(p.id)}"
         data-name="${attr(p.name)}"
         data-price="${p.price}"
         data-unit="${attr(p.unit)}"
         data-image="${attr(img)}">
         <div class="prod-img">
-          <span class="badge badge-brand prod-badge">${disc}% OFF</span>
+          ${hasDiscount ? `<span class="badge badge-brand prod-badge">${disc}% OFF</span>` : ''}
+          ${isDeal ? `<span class="prod-deal-badge"><i class="fa-solid fa-tag"></i> BEST PRICE</span>` : ''}
           <img loading="lazy" src="${img}" alt="${attr(p.name)}" onerror="this.style.opacity=0.35">
         </div>
         <div class="prod-body">
@@ -254,8 +257,8 @@
           <h4 class="prod-name">${html(p.name)}</h4>
           <div class="prod-meta"><span>${html(p.unit)}</span></div>
           <div class="prod-price-row">
-            <span class="prod-price">${money(p.price)}</span>
-            <span class="prod-mrp">${money(mrp)}</span>
+            <span class="prod-price">${money(price)}</span>
+            ${hasDiscount ? `<span class="prod-mrp">${money(mrp)}</span>` : ''}
           </div>
           <div class="prod-add-shell" data-add-shell>
             <button type="button" class="prod-add" data-add-btn="${attr(p.id)}">
