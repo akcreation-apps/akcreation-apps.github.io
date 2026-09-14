@@ -296,17 +296,17 @@
     if (belowMin) {
       banner = `<div class="cart-free-line warn">
         <i class="fa-solid fa-circle-exclamation"></i>
-        Minimum order <strong>${money(minOrder)}</strong> — add ${money(minOrder - sub2)} more to place order.
+        <span>Minimum order <strong>${money(minOrder)}</strong> — add ${money(minOrder - sub2)} more to place order.</span>
       </div>`;
     } else if (threshold > 0 && diffToFree > 0) {
       banner = `<div class="cart-free-line">
         <i class="fa-solid fa-truck-fast"></i>
-        Add ${money(diffToFree)} more for <strong>FREE delivery</strong>
+        <span>Add ${money(diffToFree)} more for <strong>FREE delivery</strong></span>
       </div>`;
     } else if (threshold > 0) {
       banner = `<div class="cart-free-line success">
         <i class="fa-solid fa-circle-check"></i>
-        You've unlocked <strong>FREE delivery</strong>
+        <span>You've unlocked <strong>FREE delivery</strong></span>
       </div>`;
     }
 

@@ -1165,8 +1165,11 @@ p { color: var(--text); }
   padding: 10px 12px; margin-bottom: 10px;
   border-radius: 10px; background: var(--brand-tint);
   color: var(--brand-dark); font-size: 0.8rem; font-weight: 500;
-  display: flex; align-items: center; gap: 8px;
+  display: grid; grid-template-columns: auto 1fr; gap: 10px;
+  align-items: start; line-height: 1.4;
 }
+.cart-free-line > i { font-size: 0.9rem; margin-top: 2px; }
+.cart-free-line > span { min-width: 0; overflow-wrap: anywhere; }
 .cart-free-line.success { background: var(--brand-soft); }
 .cart-free-line strong { font-weight: 700; }
 .cart-free-line.warn {

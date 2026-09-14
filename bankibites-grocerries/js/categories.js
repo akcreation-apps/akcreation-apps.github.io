@@ -89,6 +89,19 @@
       renderSubnav();
       renderSidebar();
       renderContent();
+      // If arriving via ?cat=… (e.g. clicked "See all" on the home page),
+      // bring the active chip + sidebar row into view so it's obvious which
+      // category was selected. The page itself already loads at top.
+      if (qCat) {
+        requestAnimationFrame(() => {
+          document.querySelector('.subnav-item.active')?.scrollIntoView({
+            behavior: 'smooth', inline: 'center', block: 'nearest',
+          });
+          document.querySelector('.cat-side-item.active')?.scrollIntoView({
+            behavior: 'smooth', block: 'center', inline: 'nearest',
+          });
+        });
+      }
     })
     .catch(() => {
       $('#catContent').innerHTML = '<p class="loading-text">Unable to load catalog. Please try again.</p>';

@@ -110,14 +110,20 @@
   function renderSubnav(data) {
     const wrap = $('#subnavInner');
     if (!wrap) return;
-    wrap.innerHTML = data.categories
+    const hasDeals = collectAll(data).some((p) => p.inStock && p.deal === true);
+    const offerChip = hasDeals
+      ? `<a class="subnav-item offer active" data-cat-nav="deals" href="#deals"><i class="fa-solid fa-fire"></i>Offers</a>`
+      : '';
+    const catChips = data.categories
       .map(
         (c, i) => `
-      <a class="subnav-item${i === 0 ? ' active' : ''}" data-cat-nav="${attr(c.id)}" href="#cat-${attr(c.id)}">
+      <a class="subnav-item${!hasDeals && i === 0 ? ' active' : ''}" data-cat-nav="${attr(c.id)}" href="#cat-${attr(c.id)}">
         <i class="fa-solid ${CATEGORY_ICONS[c.id] || 'fa-basket-shopping'}"></i>${html(shortName(c.name))}
       </a>`
       )
-      .join('') + `<a class="subnav-item offer" data-cat-nav="deals" href="#deals">Offers</a>`;
+      .join('');
+    // Offers chip first (highest priority) when there are any live deals.
+    wrap.innerHTML = offerChip + catChips;
 
     // Click a chip → smooth-scroll to the matching rail (native scroll-padding-top
     // handles the offset for the sticky header stack).
