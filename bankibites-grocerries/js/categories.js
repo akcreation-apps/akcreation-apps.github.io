@@ -256,6 +256,7 @@
         data-product data-id="${attr(p.id)}"
         data-name="${attr(p.name)}"
         data-price="${p.price}"
+        data-mrp="${mrp}"
         data-unit="${attr(p.unit)}"
         data-image="${attr(img)}">
         <div class="prod-img">
@@ -281,4 +282,114 @@
   }
 
   // Search is wired globally by js/search.js — it hijacks every .search input.
+
+  // ================================================================
+  // Product quick-view sheet — tap a card image inside the grid
+  // to see the full name + unit + price, and add to basket.
+  // Add button reuses [data-add-shell]/[data-add-btn], so cart.js
+  // automatically swaps in the qty-stepper when the item is in the cart.
+  // ================================================================
+  function ensureQuickView() {
+    if (document.getElementById('pvSheet')) return;
+    const markup = `
+      <div class="pv-backdrop" id="pvBackdrop" data-pv-close></div>
+      <aside class="pv-sheet" id="pvSheet" role="dialog" aria-modal="true" aria-labelledby="pvName">
+        <button type="button" class="pv-close" data-pv-close aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="pv-img"><img id="pvImg" alt=""></div>
+        <div class="pv-body">
+          <span class="pv-brand" id="pvBrand"></span>
+          <h3 class="pv-name" id="pvName"></h3>
+          <div class="pv-meta">
+            <span class="pv-unit" id="pvUnit"></span>
+            <span class="pv-price-wrap">
+              <span class="pv-price" id="pvPrice"></span>
+              <span class="pv-mrp" id="pvMrp" hidden></span>
+              <span class="pv-off" id="pvOff" hidden></span>
+            </span>
+          </div>
+          <div class="pv-cta">
+            <div class="prod-add-shell" data-add-shell>
+              <button type="button" class="prod-add" id="pvAddBtn" data-add-btn="">
+                <i class="fa-solid fa-plus"></i> Add to basket
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    `;
+    document.body.insertAdjacentHTML('beforeend', markup);
+  }
+
+  function openQuickView(card) {
+    ensureQuickView();
+    const id = card.dataset.id;
+    const name = card.dataset.name || '';
+    const price = Number(card.dataset.price) || 0;
+    const unit = card.dataset.unit || '';
+    const image = card.dataset.image || '';
+    const mrp = Number(card.dataset.mrp) || price;
+    const hasDiscount = mrp > price;
+    const disc = hasDiscount ? Math.round(((mrp - price) / mrp) * 100) : 0;
+
+    $('#pvImg').src = image;
+    $('#pvImg').alt = name;
+    $('#pvBrand').textContent = brandOf(name);
+    $('#pvName').textContent = name;
+    $('#pvUnit').textContent = unit || '';
+    $('#pvUnit').style.display = unit ? '' : 'none';
+    $('#pvPrice').textContent = money(price);
+
+    const mrpEl = $('#pvMrp');
+    const offEl = $('#pvOff');
+    if (hasDiscount) {
+      mrpEl.textContent = money(mrp); mrpEl.hidden = false;
+      offEl.textContent = `${disc}% OFF`; offEl.hidden = false;
+    } else {
+      mrpEl.hidden = true; offEl.hidden = true;
+    }
+
+    const btn = $('#pvAddBtn');
+    btn.setAttribute('data-add-btn', id);
+    btn.dataset.name = name;
+    btn.dataset.price = price;
+    btn.dataset.unit = unit;
+    btn.dataset.image = image;
+    btn.innerHTML = `<i class="fa-solid fa-plus"></i> Add to basket`;
+    // Drop any stepper left over from a previous product — cart.js will
+    // recreate a fresh one for the current id if needed.
+    $('#pvSheet [data-stepper]')?.remove();
+    btn.style.display = '';
+
+    $('#pvBackdrop').classList.add('open');
+    $('#pvSheet').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    if (window.bbOverlay) window.bbOverlay.open('quickview', closeQuickView);
+    if (window.bbRefreshInline) window.bbRefreshInline();
+  }
+
+  function closeQuickView(fromHistory) {
+    $('#pvBackdrop')?.classList.remove('open');
+    $('#pvSheet')?.classList.remove('open');
+    document.body.style.overflow = '';
+    if (!fromHistory && window.bbOverlay) window.bbOverlay.close('quickview');
+  }
+
+  // Delegated click on the grid — tap the image (not the Add button) to open.
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-pv-close]')) {
+      e.preventDefault();
+      closeQuickView();
+      return;
+    }
+    const img = e.target.closest('.prod-grid .prod-card .prod-img');
+    if (!img) return;
+    if (e.target.closest('[data-add-btn], [data-inc], [data-dec], .prod-wish')) return;
+    const card = img.closest('[data-product]');
+    if (!card) return;
+    e.preventDefault();
+    openQuickView(card);
+  });
 })();
