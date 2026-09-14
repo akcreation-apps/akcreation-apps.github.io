@@ -583,23 +583,34 @@ p { color: var(--text); }
 .prod-add:hover { background: var(--brand); color: #fff; }
 .prod-add i { font-size: 0.72rem; }
 
-/* Qty stepper (inline, replaces .prod-add when in cart) */
+/* Qty stepper (inline, replaces .prod-add when in cart).
+   Solid brand-dark (deeper forest green) — distinct from:
+   - the light-tinted outlined Add button (empty state)
+   - the bright brand-green floating view-cart bar (system nav) */
 .qty-stepper {
   display: inline-flex; align-items: center; justify-content: space-between;
   width: 100%; height: 34px;
-  border: 1px solid var(--brand); border-radius: 8px;
-  background: var(--brand); color: #fff; overflow: hidden;
+  border: 1px solid var(--brand-dark);
+  border-radius: 8px;
+  background: var(--brand-dark);
+  color: #fff;
+  overflow: hidden;
   font-weight: 700;
 }
 @media (min-width: 640px) { .qty-stepper { height: 40px; border-radius: 10px; } }
 .qty-stepper button {
-  width: 34px; height: 100%; color: #fff; font-size: 1rem;
+  width: 34px; height: 100%;
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
   display: inline-flex; align-items: center; justify-content: center;
   transition: background 0.15s;
 }
 @media (min-width: 640px) { .qty-stepper button { width: 40px; font-size: 1.1rem; } }
-.qty-stepper button:hover { background: rgba(255,255,255,0.15); }
-.qty-stepper span { flex: 1; text-align: center; font-size: 0.85rem; color: #fff; }
+.qty-stepper button:hover { background: rgba(255, 255, 255, 0.15); }
+.qty-stepper span {
+  flex: 1; text-align: center; font-size: 0.85rem; color: #fff;
+}
 @media (min-width: 640px) { .qty-stepper span { font-size: 0.9rem; } }
 
 /* ================================================================
