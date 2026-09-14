@@ -73,7 +73,7 @@
     }
     .cat-list { display: flex; flex-direction: column; gap: 4px; }
     .cat-item {
-      display: grid; grid-template-columns: 32px 1fr auto; gap: 8px;
+      display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 8px;
       align-items: center; padding: 8px 10px;
       border: 1px solid var(--line); border-radius: 8px;
       background: var(--surface-2); cursor: pointer;
@@ -83,6 +83,17 @@
     .cat-item.active { background: var(--brand-tint); border-color: var(--brand); }
     .cat-item.dragging { opacity: 0.4; }
     .cat-item.drag-over { border-color: var(--brand); background: var(--brand-soft); }
+    .cat-item.is-dirty { border-left: 3px solid var(--warn); padding-left: 8px; }
+    .cat-item.is-new   { border-left: 3px solid var(--brand); padding-left: 8px; }
+    .cat-item .dirty-dot {
+      display: none;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--warn); margin-left: 4px;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    }
+    .cat-item.is-dirty .dirty-dot,
+    .cat-item.is-new   .dirty-dot { display: inline-block; }
+    .cat-item.is-new   .dirty-dot { background: var(--brand); box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2); }
     .cat-order {
       display: inline-flex; align-items: center; justify-content: center;
       width: 26px; height: 26px; border-radius: 6px;
@@ -90,20 +101,34 @@
       cursor: grab;
     }
     .cat-order:active { cursor: grabbing; }
-    .cat-name { color: var(--ink); font-weight: 600; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cat-body { min-width: 0; overflow: hidden; }
+    .cat-name {
+      color: var(--ink); font-weight: 600; font-size: 0.88rem;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
     .cat-count { color: var(--muted); font-size: 0.72rem; }
+    .cat-name-input {
+      width: 100%; padding: 4px 6px;
+      border: 1px solid var(--brand); border-radius: 4px;
+      font-size: 0.88rem; font-weight: 600; color: var(--ink);
+      background: var(--surface); outline: none;
+    }
+    .cat-actions { display: flex; gap: 2px; flex-shrink: 0; }
+    .cat-actions .btn-icon { width: 26px; height: 26px; }
 
     /* Products panel */
     .prod-panel { padding: 16px 20px; overflow-x: auto; }
     .panel-head {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
     }
+    .panel-head > div:first-child { flex: 1; min-width: 0; }
     .panel-head h2 { color: var(--ink); font-size: 1.05rem; font-weight: 700; }
-    .panel-head .cat-meta { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+    .panel-head .cat-meta { color: var(--muted); font-size: 0.78rem; margin-top: 2px; word-wrap: break-word; }
     .panel-head .cat-name-edit {
       background: transparent; border: 1px dashed transparent; padding: 4px 8px;
-      color: var(--ink); font-size: 1.05rem; font-weight: 700; width: 100%; max-width: 340px;
+      color: var(--ink); font-size: 1.05rem; font-weight: 700;
+      width: 100%; max-width: 100%; box-sizing: border-box;
     }
     .panel-head .cat-name-edit:hover, .panel-head .cat-name-edit:focus {
       border-color: var(--muted); background: var(--surface); outline: none;
@@ -121,6 +146,11 @@
     .prod-table tr:last-child td { border-bottom: 0; }
     .prod-table tr.dragging { opacity: 0.4; }
     .prod-table tr.drag-over td { background: var(--brand-tint); }
+    .prod-table tr.is-dirty td { background: #FEF9E7; }
+    .prod-table tr.is-dirty td:first-child { border-left: 3px solid var(--warn); }
+    .prod-table tr.is-new   td { background: var(--brand-tint); }
+    .prod-table tr.is-new   td:first-child { border-left: 3px solid var(--brand); }
+    .prod-table tr.is-dirty .field-dirty { background: #FEF3C7 !important; border-color: var(--warn) !important; }
     .prod-table .drag-handle {
       width: 24px; text-align: center; color: var(--muted); cursor: grab;
       user-select: none;
@@ -265,6 +295,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
   let data = null;                 // full JSON object
+  let originalData = null;         // deep-cloned snapshot from the last load/save
   let activeCatId = null;          // currently selected category id
   let dirty = false;               // unsaved changes flag
 
@@ -273,8 +304,100 @@
     el.textContent = label;
     el.className = 'status ' + cls;
   };
-  const markDirty = () => { dirty = true; setStatus('unsaved changes', 'dirty'); };
-  const markSaved = () => { dirty = false; setStatus('saved', 'saved'); };
+  const updateDirtyCount = () => {
+    if (!originalData) return;
+    // Count dirty + new products across every category, plus category-level renames/moves
+    let d = 0, n = 0;
+    const origById = new Map();
+    originalData.categories.forEach((c) => c.subcategories.forEach((s) => s.dishes.forEach((x) => origById.set(x.id, { dish: x, catId: c.id }))));
+    const currIds = new Set();
+    data.categories.forEach((c) => c.subcategories.forEach((s) => s.dishes.forEach((x) => {
+      currIds.add(x.id);
+      const orig = origById.get(x.id);
+      if (!orig) n++;
+      else if (isDishDirty(x, orig.dish, c.id, orig.catId)) d++;
+    })));
+    // Count deletions
+    origById.forEach((_, id) => { if (!currIds.has(id)) d++; });
+    // Category-level changes
+    data.categories.forEach((c) => {
+      const orig = originalData.categories.find((o) => o.id === c.id);
+      if (!orig) return;                        // counted as new by cat-level styling instead
+      if (orig.name !== c.name || orig.order !== c.order) d++;
+    });
+    const total = d + n;
+    if (total === 0) { markSaved(); return; }
+    dirty = true;
+    setStatus(`${total} unsaved change${total === 1 ? '' : 's'}`, 'dirty');
+  };
+  const markDirty = () => { dirty = true; updateDirtyCount(); };
+  const markSaved = () => {
+    dirty = false;
+    originalData = deepClone(data);
+    setStatus('saved', 'saved');
+    // Wipe every dirty visual — snapshot now equals current, so nothing is dirty
+    document.querySelectorAll('.cat-item').forEach((el) => el.classList.remove('is-dirty', 'is-new'));
+    document.querySelectorAll('.prod-table tr').forEach((tr) => tr.classList.remove('is-dirty', 'is-new'));
+    document.querySelectorAll('.field-dirty').forEach((el) => el.classList.remove('field-dirty'));
+    document.querySelectorAll('.prod-table input[type="checkbox"]').forEach((el) => { el.style.outline = ''; el.style.outlineOffset = ''; });
+  };
+
+  function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  // ---------- Dirty detection ----------
+  const DISH_FIELDS = ['name', 'price', 'mrp', 'unit', 'inStock', 'featured', 'deal', 'image'];
+  function isDishDirty(curr, orig, currCat, origCat) {
+    if (!orig) return true;
+    if (currCat !== origCat) return true;      // moved between categories
+    for (const f of DISH_FIELDS) {
+      if ((curr[f] ?? null) !== (orig[f] ?? null)) return true;
+    }
+    return false;
+  }
+  function isCatDirty(cat) {
+    if (!originalData) return false;
+    const orig = originalData.categories.find((c) => c.id === cat.id);
+    if (!orig) return false;                    // treated as "new" separately
+    if (orig.name !== cat.name || orig.order !== cat.order) return true;
+    // Any dish added / removed / edited in this category?
+    const origIds = new Set(); orig.subcategories.forEach((s) => s.dishes.forEach((d) => origIds.add(d.id)));
+    const currIds = new Set(); cat.subcategories.forEach((s) => s.dishes.forEach((d) => currIds.add(d.id)));
+    if (origIds.size !== currIds.size) return true;
+    for (const id of currIds) if (!origIds.has(id)) return true;
+    // Any per-dish field change?
+    for (const sub of cat.subcategories) {
+      for (const dish of sub.dishes) {
+        const origDish = findOrigDish(dish.id);
+        if (origDish && isDishDirty(dish, origDish.dish, cat.id, origDish.catId)) return true;
+      }
+    }
+    return false;
+  }
+  function isCatNew(cat) {
+    if (!originalData) return false;
+    return !originalData.categories.some((c) => c.id === cat.id);
+  }
+  function findOrigDish(id) {
+    if (!originalData) return null;
+    for (const c of originalData.categories) {
+      for (const s of c.subcategories) {
+        const d = s.dishes.find((x) => x.id === id);
+        if (d) return { dish: d, catId: c.id };
+      }
+    }
+    return null;
+  }
+  function dishState(dish, catId) {
+    const orig = findOrigDish(dish.id);
+    if (!orig) return 'new';
+    if (isDishDirty(dish, orig.dish, catId, orig.catId)) return 'dirty';
+    return 'clean';
+  }
+  function fieldDirty(dish, field) {
+    const orig = findOrigDish(dish.id);
+    if (!orig) return false;                    // new items highlight the whole row instead
+    return (dish[field] ?? null) !== (orig.dish[field] ?? null);
+  }
 
   // ==============================================================
   // Load
@@ -286,6 +409,7 @@
       data = await res.json();
       // Sort by order for the editor
       data.categories.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
+      originalData = deepClone(data);
       renderCats();
       if (activeCatId && data.categories.some(c => c.id === activeCatId)) {
         renderProducts(activeCatId);
@@ -314,24 +438,41 @@
     list.innerHTML = data.categories.map((c, i) => {
       const count = c.subcategories.reduce((s, sub) => s + sub.dishes.length, 0);
       const active = c.id === activeCatId ? ' active' : '';
+      const isNew = isCatNew(c);
+      const isDirty = !isNew && isCatDirty(c);
+      const dirtyCls = isNew ? ' is-new' : (isDirty ? ' is-dirty' : '');
+      const dirtyTitle = isNew ? 'New category' : (isDirty ? 'Unsaved changes' : '');
       return `
-        <div class="cat-item${active}" data-cat-id="${c.id}" draggable="true">
+        <div class="cat-item${active}${dirtyCls}" data-cat-id="${c.id}" draggable="true" title="${dirtyTitle}">
           <span class="cat-order" title="Drag to reorder">${c.order ?? (i + 1)}</span>
-          <div>
-            <div class="cat-name">${escapeHtml(c.name)}</div>
+          <div class="cat-body">
+            <div class="cat-name" title="${escapeAttr(c.name)}">${escapeHtml(c.name)}<span class="dirty-dot" title="${dirtyTitle}"></span></div>
             <div class="cat-count">${count} item${count === 1 ? '' : 's'}</div>
           </div>
-          <button class="btn-icon" data-del-cat="${c.id}" title="Delete category"><i class="fa-regular fa-trash-can" style="color:var(--danger)"></i></button>
+          <div class="cat-actions">
+            <button class="btn-icon" data-rename-cat="${c.id}" title="Rename category"><i class="fa-solid fa-pen" style="color:var(--muted); font-size:0.72rem;"></i></button>
+            <button class="btn-icon" data-del-cat="${c.id}" title="Delete category"><i class="fa-regular fa-trash-can" style="color:var(--danger); font-size:0.78rem;"></i></button>
+          </div>
         </div>`;
     }).join('');
 
-    // Click to activate
+    // Click to activate (but ignore clicks on action buttons and the inline input)
     list.querySelectorAll('.cat-item').forEach((el) => {
       el.addEventListener('click', (e) => {
         if (e.target.closest('[data-del-cat]')) return;
+        if (e.target.closest('[data-rename-cat]')) return;
+        if (e.target.closest('.cat-name-input')) return;
         activeCatId = el.getAttribute('data-cat-id');
         renderCats();
         renderProducts(activeCatId);
+      });
+    });
+
+    // Inline rename
+    list.querySelectorAll('[data-rename-cat]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startInlineRename(btn.getAttribute('data-rename-cat'));
       });
     });
 
@@ -389,6 +530,59 @@
     data.categories.forEach((c, i) => c.order = i + 1);
   }
 
+  // Update only the dirty CSS classes on existing category items — cheaper than
+  // re-rendering the whole sidebar (which would also lose any drag state).
+  function refreshCatDirtyMarkers() {
+    document.querySelectorAll('.cat-item').forEach((el) => {
+      const id = el.getAttribute('data-cat-id');
+      const cat = data.categories.find((c) => c.id === id);
+      if (!cat) return;
+      const isNew = isCatNew(cat);
+      const isDirty = !isNew && isCatDirty(cat);
+      el.classList.toggle('is-dirty', isDirty);
+      el.classList.toggle('is-new', isNew);
+    });
+  }
+
+  // Swap the category name for an editable input right where it sits.
+  // Saves on Enter or blur; cancels on Esc.
+  function startInlineRename(catId) {
+    const cat = data.categories.find(c => c.id === catId);
+    if (!cat) return;
+    const item = document.querySelector(`.cat-item[data-cat-id="${CSS.escape(catId)}"]`);
+    if (!item) return;
+    const nameEl = item.querySelector('.cat-name');
+    if (!nameEl || nameEl.tagName === 'INPUT') return;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'cat-name-input';
+    input.value = cat.name;
+    nameEl.replaceWith(input);
+    input.focus();
+    input.select();
+
+    const save = () => {
+      const v = input.value.trim();
+      if (v && v !== cat.name) {
+        cat.name = v;
+        markDirty();
+      }
+      renderCats();
+      // If this is the currently open category, refresh its header too
+      if (activeCatId === catId) renderProducts(activeCatId);
+    };
+    const cancel = () => renderCats();
+
+    input.addEventListener('blur', save);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+      else if (e.key === 'Escape') { e.preventDefault(); input.removeEventListener('blur', save); cancel(); }
+    });
+    // Clicks inside the input shouldn't bubble up to the item's click handler
+    input.addEventListener('click', (e) => e.stopPropagation());
+  }
+
   // ==============================================================
   // Product panel
   // ==============================================================
@@ -414,10 +608,10 @@
       </div>
 
       <div class="bulk-bar">
-        <label>Bulk apply to all in this category:</label>
+        <label>Bulk apply to all in this category (only price changes — MRP is never touched):</label>
         <select id="bulkAction">
-          <option value="discount">Set discount %</option>
-          <option value="mrp-eq-price">Reset MRP = Price</option>
+          <option value="discount">Set discount % → recalculate price from MRP</option>
+          <option value="reset-price">Reset price = MRP (remove discount)</option>
           <option value="mark-featured">Mark all featured</option>
           <option value="unmark-featured">Unmark all featured</option>
           <option value="mark-deal">Mark all as Best Price</option>
@@ -446,7 +640,7 @@
           </tr>
         </thead>
         <tbody id="prodBody">
-          ${rows.map((r, idx) => renderRow(r.dish, idx)).join('')}
+          ${rows.map((r, idx) => renderRow(r.dish, idx, cat.id)).join('')}
         </tbody>
       </table>
 
@@ -460,20 +654,24 @@
     wireProducts(cat);
   }
 
-  function renderRow(d, idx) {
+  function renderRow(d, idx, catId) {
     const img = d.image ? `<img src="${escapeAttr(d.image)}" alt="" loading="lazy" onerror="this.style.opacity=0.3">` : '';
+    const state = dishState(d, catId);
+    const stateCls = state === 'new' ? ' is-new' : (state === 'dirty' ? ' is-dirty' : '');
+    const fCls = (f) => (state !== 'new' && fieldDirty(d, f)) ? ' field-dirty' : '';
+    const stateTitle = state === 'new' ? 'New product (not yet saved)' : (state === 'dirty' ? 'Unsaved changes' : '');
     return `
-      <tr draggable="true" data-idx="${idx}" data-id="${d.id}">
+      <tr draggable="true" data-idx="${idx}" data-id="${d.id}" class="${stateCls.trim()}" title="${stateTitle}">
         <td class="drag-handle" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></td>
         <td><span class="id-cell">${d.id}</span></td>
         <td><div class="img-cell">${img}</div></td>
-        <td class="name-cell"><input type="text" value="${escapeAttr(d.name)}" data-field="name"></td>
-        <td class="num"><input type="number" min="0" step="0.5" value="${d.mrp ?? d.price}" data-field="mrp"></td>
-        <td class="num"><input type="number" min="0" step="0.5" value="${d.price}" data-field="price"></td>
-        <td class="unit"><input type="text" value="${escapeAttr(d.unit || '')}" data-field="unit"></td>
-        <td class="check"><input type="checkbox" ${d.inStock ? 'checked' : ''} data-field="inStock"></td>
-        <td class="check"><input type="checkbox" ${d.featured ? 'checked' : ''} data-field="featured"></td>
-        <td class="check"><input type="checkbox" ${d.deal ? 'checked' : ''} data-field="deal"></td>
+        <td class="name-cell"><input class="${fCls('name')}" type="text" value="${escapeAttr(d.name)}" data-field="name"></td>
+        <td class="num"><input class="${fCls('mrp')}" type="number" min="0" step="0.5" value="${d.mrp ?? ''}" data-field="mrp" placeholder="—"></td>
+        <td class="num"><input class="${fCls('price')}" type="number" min="0" step="0.5" value="${d.price}" data-field="price"></td>
+        <td class="unit"><input class="${fCls('unit')}" type="text" value="${escapeAttr(d.unit || '')}" data-field="unit"></td>
+        <td class="check"><input type="checkbox" ${d.inStock ? 'checked' : ''} data-field="inStock" ${fCls('inStock') ? 'style="outline:2px solid var(--warn); outline-offset:2px;"' : ''}></td>
+        <td class="check"><input type="checkbox" ${d.featured ? 'checked' : ''} data-field="featured" ${fCls('featured') ? 'style="outline:2px solid var(--warn); outline-offset:2px;"' : ''}></td>
+        <td class="check"><input type="checkbox" ${d.deal ? 'checked' : ''} data-field="deal" ${fCls('deal') ? 'style="outline:2px solid var(--warn); outline-offset:2px;"' : ''}></td>
         <td class="actions"><button class="btn-icon" data-del="${d.id}" title="Delete"><i class="fa-regular fa-trash-can" style="color:var(--danger)"></i></button></td>
       </tr>`;
   }
@@ -486,7 +684,7 @@
       markDirty();
     });
 
-    // Field edits
+    // Field edits — apply without losing focus, and refresh dirty highlighting
     $('#prodBody').addEventListener('change', (e) => {
       const tr = e.target.closest('tr');
       if (!tr) return;
@@ -498,6 +696,25 @@
       if (e.target.type === 'checkbox') dish[field] = e.target.checked;
       else if (e.target.type === 'number') dish[field] = Number(e.target.value) || 0;
       else dish[field] = e.target.value;
+
+      // Refresh dirty highlighting on this row without re-rendering (keeps focus)
+      const state = dishState(dish, cat.id);
+      tr.classList.toggle('is-dirty', state === 'dirty');
+      tr.classList.toggle('is-new',   state === 'new');
+      // Per-field highlight
+      tr.querySelectorAll('input[data-field]').forEach((inp) => {
+        const f = inp.getAttribute('data-field');
+        const isDirty = state !== 'new' && fieldDirty(dish, f);
+        if (inp.type === 'checkbox') {
+          inp.style.outline = isDirty ? '2px solid var(--warn)' : '';
+          inp.style.outlineOffset = isDirty ? '2px' : '';
+        } else {
+          inp.classList.toggle('field-dirty', isDirty);
+        }
+      });
+
+      // Refresh sidebar so the category's dirty dot updates
+      refreshCatDirtyMarkers();
       markDirty();
     });
 
@@ -570,13 +787,20 @@
       sub.dishes.forEach((d) => {
         switch (action) {
           case 'discount': {
+            // MRP is the source of truth — recompute price only.  If MRP is missing
+            // we cannot fabricate one, so we skip this item silently.
             if (!isFinite(val) || val < 0 || val > 90) return;
-            const mrp = Number(d.mrp) || Number(d.price);
-            d.mrp = mrp;
+            const mrp = Number(d.mrp);
+            if (!isFinite(mrp) || mrp <= 0) return;
             d.price = Math.round(mrp * (1 - val / 100));
             break;
           }
-          case 'mrp-eq-price': d.mrp = d.price; break;
+          case 'reset-price': {
+            // Removes any discount without touching MRP.
+            const mrp = Number(d.mrp);
+            if (isFinite(mrp) && mrp > 0) d.price = mrp;
+            break;
+          }
           case 'mark-featured': d.featured = true; break;
           case 'unmark-featured': d.featured = false; break;
           case 'mark-deal': d.deal = true; break;
