@@ -196,6 +196,83 @@
               "featured": true,
               "deal": false,
               "mrp": 47
+            },
+            {
+              "id": 1346,
+              "name": "Maggi Hot & Sweet Sauce",
+              "price": 167,
+              "unit": "1KG",
+              "image": "images/products/MAGGI HOT & SWEET 12x1Kg N1 IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false,
+              "mrp": 190
+            },
+            {
+              "id": 1363,
+              "name": "Ching's Schezwan Chutney",
+              "price": 9,
+              "unit": "30G",
+              "image": "images/products/Ching's Schezwan Chutney 360x 30 gm.webp",
+              "inStock": true,
+              "featured": true,
+              "deal": false,
+              "mrp": 10
+            },
+            {
+              "id": 1366,
+              "name": "Ching's Red Chilli Sauce",
+              "price": 22,
+              "unit": "90G",
+              "image": "images/products/Ching's Red Chilli Sauce 48 x 90 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false,
+              "mrp": 25
+            },
+            {
+              "id": 1367,
+              "name": "Ching's Dark Soy Sauce",
+              "price": 22,
+              "unit": "90G",
+              "image": "images/products/Ching's Dark Soy Sauce 48 x 90 gm.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false,
+              "mrp": 25
+            },
+            {
+              "id": 1271,
+              "name": "Hellmann's Mayonnaise Roasted Garlic",
+              "price": 40,
+              "unit": "85G",
+              "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
+              "inStock": true,
+              "featured": true,
+              "deal": false,
+              "mrp": 46
+            },
+            {
+              "id": 1272,
+              "name": "Hellmann's Mayonnaise Smoky Tandoori",
+              "price": 40,
+              "unit": "85G",
+              "image": "images/products/HELLMANNS MAYO SMOKY TANDOORI 85GM RSL.webp",
+              "inStock": true,
+              "featured": true,
+              "deal": false,
+              "mrp": 46
+            },
+            {
+              "id": 1273,
+              "name": "Hellmann's Mayonnaise ",
+              "price": 35,
+              "unit": "85G",
+              "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
+              "inStock": true,
+              "featured": true,
+              "deal": false,
+              "mrp": 40
             }
           ]
         }
@@ -2115,55 +2192,8 @@
       ]
     },
     {
-      "id": "mayonnaise-spreads",
-      "order": 9,
-      "name": "Mayonnaise & Spreads",
-      "image": "images/categories/Mayonnaise___Spreads.png",
-      "subcategories": [
-        {
-          "id": "mayonnaise-spreads-all",
-          "name": "Mayonnaise & Spreads",
-          "dishes": [
-            {
-              "id": 1271,
-              "name": "Hellmann's Mayonnaise Roasted Garlic",
-              "price": 40,
-              "unit": "85G",
-              "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
-              "inStock": true,
-              "featured": true,
-              "deal": false,
-              "mrp": 46
-            },
-            {
-              "id": 1272,
-              "name": "Hellmann's Mayonnaise Smoky Tandoori",
-              "price": 40,
-              "unit": "85G",
-              "image": "images/products/HELLMANNS MAYO SMOKY TANDOORI 85GM RSL.webp",
-              "inStock": true,
-              "featured": true,
-              "deal": false,
-              "mrp": 46
-            },
-            {
-              "id": 1273,
-              "name": "Hellmann's Mayonnaise ",
-              "price": 35,
-              "unit": "85G",
-              "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
-              "inStock": true,
-              "featured": true,
-              "deal": false,
-              "mrp": 40
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": "health-drinks-nutrition",
-      "order": 10,
+      "order": 9,
       "name": "Health Drinks & Nutrition",
       "image": "images/categories/Health_Drinks___Nutrition.png",
       "subcategories": [
@@ -2375,7 +2405,7 @@
     },
     {
       "id": "baby-food-nutrition",
-      "order": 11,
+      "order": 10,
       "name": "Baby Food & Nutrition",
       "image": "images/categories/Baby_Nutrition___Care.png",
       "subcategories": [
@@ -2686,7 +2716,7 @@
     },
     {
       "id": "chocolates-confectionery",
-      "order": 12,
+      "order": 11,
       "name": "Chocolates & Confectionery",
       "image": "images/categories/Chocolates___Confectionery.png",
       "subcategories": [
@@ -2876,7 +2906,7 @@
     },
     {
       "id": "instant-foods-noodles",
-      "order": 13,
+      "order": 12,
       "name": "Instant Foods",
       "image": "images/categories/Instant_Food___Cooking.png",
       "subcategories": [
@@ -2962,50 +2992,6 @@
               "mrp": 20
             },
             {
-              "id": 1346,
-              "name": "Maggi Hot & Sweet Sauce",
-              "price": 167,
-              "unit": "1KG",
-              "image": "images/products/MAGGI HOT & SWEET 12x1Kg N1 IN.webp",
-              "inStock": true,
-              "featured": false,
-              "deal": false,
-              "mrp": 190
-            },
-            {
-              "id": 1363,
-              "name": "Ching's Schezwan Chutney",
-              "price": 9,
-              "unit": "30G",
-              "image": "images/products/Ching's Schezwan Chutney 360x 30 gm.webp",
-              "inStock": true,
-              "featured": true,
-              "deal": false,
-              "mrp": 10
-            },
-            {
-              "id": 1366,
-              "name": "Ching's Red Chilli Sauce",
-              "price": 22,
-              "unit": "90G",
-              "image": "images/products/Ching's Red Chilli Sauce 48 x 90 gm.webp",
-              "inStock": true,
-              "featured": false,
-              "deal": false,
-              "mrp": 25
-            },
-            {
-              "id": 1367,
-              "name": "Ching's Dark Soy Sauce",
-              "price": 22,
-              "unit": "90G",
-              "image": "images/products/Ching's Dark Soy Sauce 48 x 90 gm.webp",
-              "inStock": true,
-              "featured": false,
-              "deal": false,
-              "mrp": 25
-            },
-            {
               "id": 1384,
               "name": "Ching's Instant Sweet Corn Soup",
               "price": 9,
@@ -3088,7 +3074,7 @@
     },
     {
       "id": "coffee-beverages",
-      "order": 14,
+      "order": 13,
       "name": "Coffee & Beverages",
       "image": "images/categories/coffee-beverages.png",
       "subcategories": [
@@ -3212,7 +3198,7 @@
     },
     {
       "id": "staples-salt-sugar-pulses",
-      "order": 15,
+      "order": 14,
       "name": "Staples, Salt, Sugar & Pulses",
       "image": "images/categories/Salt__Dal__Pulses___Staples.png",
       "subcategories": [
@@ -3402,7 +3388,7 @@
     },
     {
       "id": "dairy-products",
-      "order": 16,
+      "order": 15,
       "name": "Dairy Products",
       "image": "images/categories/Dairy_Products.png",
       "subcategories": [
