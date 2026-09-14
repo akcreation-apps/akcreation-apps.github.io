@@ -1877,7 +1877,12 @@ p { color: var(--text); }
    PRODUCT QUICK-VIEW (bottom sheet on mobile, centered modal on desktop)
    Tap the product image inside a .prod-grid card to open.
    ================================================================ */
-.prod-grid .prod-card .prod-img { cursor: pointer; }
+.prod-grid .prod-card { cursor: pointer; }
+.prod-grid .prod-card .prod-add,
+.prod-grid .prod-card .qty-stepper,
+.prod-grid .prod-card .qty-stepper button,
+.prod-grid .prod-card .prod-wish { cursor: pointer; }
+.prod-grid .prod-card .qty-stepper span { cursor: default; }
 
 .pv-backdrop {
   position: fixed; inset: 0; z-index: 1050;
@@ -1899,8 +1904,9 @@ p { color: var(--text); }
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   max-height: 85vh;
   overflow-y: auto;
+  pointer-events: none;
 }
-.pv-sheet.open { transform: translateY(0); }
+.pv-sheet.open { transform: translateY(0); pointer-events: auto; }
 
 .pv-sheet::before {
   content: ''; display: block; margin: 0 auto 10px;

@@ -377,18 +377,20 @@
     if (!fromHistory && window.bbOverlay) window.bbOverlay.close('quickview');
   }
 
-  // Delegated click on the grid — tap the image (not the Add button) to open.
+  // Delegated click on the grid — tap anywhere on the card except the
+  // Add/qty-stepper/wish controls to open the quick-view.
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-pv-close]')) {
       e.preventDefault();
       closeQuickView();
       return;
     }
-    const img = e.target.closest('.prod-grid .prod-card .prod-img');
-    if (!img) return;
-    if (e.target.closest('[data-add-btn], [data-inc], [data-dec], .prod-wish')) return;
-    const card = img.closest('[data-product]');
+    // Ignore taps inside the quick-view sheet itself — controls live there.
+    if (e.target.closest('#pvSheet')) return;
+    const card = e.target.closest('.prod-grid .prod-card');
     if (!card) return;
+    // Don't hijack interactive controls on the card.
+    if (e.target.closest('[data-add-btn], [data-inc], [data-dec], .qty-stepper, .prod-wish, a, button')) return;
     e.preventDefault();
     openQuickView(card);
   });
