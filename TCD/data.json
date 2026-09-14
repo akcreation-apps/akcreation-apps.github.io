@@ -16,42 +16,42 @@
               "id": 103,
               "name": "Paneer Chilli",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 104,
               "name": "Paneer Manchurian",
               "price": 169,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 105,
               "name": "Honey Chilli Potato",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 106,
               "name": "Mushroom 65",
               "price": 169,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 107,
               "name": "Mushroom Manchurian",
               "price": 169,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 108,
               "name": "Mushroom Chilli",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -64,21 +64,21 @@
               "id": 201,
               "name": "Chilli Chicken",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 202,
               "name": "Chicken 65",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 205,
               "name": "Peri Peri Chicken",
               "price": 189,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -114,7 +114,7 @@
               "id": 304,
               "name": "Sezwan Fried Rice",
               "price": 139,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -123,21 +123,21 @@
               "price": 159,
               "offer_price": 199,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 307,
               "name": "Mix Veg Fried Rice",
               "price": 169,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 308,
               "name": "Mushroom Fried Rice",
               "price": 159,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -164,14 +164,14 @@
               "id": 403,
               "name": "Egg Fried Rice",
               "price": 159,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 404,
               "name": "Chicken Sezwan Fried Rice",
               "price": 159,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -180,14 +180,14 @@
               "price": 159,
               "offer_price": 199,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 406,
               "name": "NonVeg Mix Fried Rice",
               "price": 169,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -453,14 +453,14 @@
               "id": 2501,
               "name": "Chapati (Roti)",
               "price": 9,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2502,
               "name": "Lachha Paratha",
               "price": 39,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -472,14 +472,14 @@
               "id": 2601,
               "name": "Steam Rice",
               "price": 39,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2602,
               "name": "Basmati Rice",
               "price": 59,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -525,84 +525,84 @@
               "id": 2901,
               "name": "Dal Fry",
               "price": 79,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2902,
               "name": "Dal Lasooni",
               "price": 79,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2903,
               "name": "Veg Hyderabadi",
               "price": 159,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2904,
               "name": "Mili Jhuli Veg",
               "price": 159,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2905,
               "name": "Kadai Paneer",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2906,
               "name": "Methi Paneer",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2907,
               "name": "Mushroom Do Pyaja",
               "price": 189,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2908,
               "name": "Sunheri Veg",
               "price": 189,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2909,
               "name": "Paneer Lababdar",
               "price": 189,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2910,
               "name": "Paneer Butter Masala",
               "price": 189,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2911,
               "name": "Mushroom Masala",
               "price": 189,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 2912,
               "name": "Mushroom Butter Masala",
               "price": 199,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -615,21 +615,21 @@
               "id": 3001,
               "name": "Chicken Kasa",
               "price": 179,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 3002,
               "name": "Kadai Chicken",
               "price": 189,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
               "id": 3003,
               "name": "Chicken Butter Masala",
               "price": 199,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
