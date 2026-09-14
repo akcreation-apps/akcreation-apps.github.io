@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Catalog Editor · BankiMart</title>
+  <link rel="icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --brand: #16A34A; --brand-dark: #15803D; --brand-soft: #DCFCE7; --brand-tint: #F0FDF4;
+      --bg: #F5F5F1; --surface: #FFFFFF; --surface-2: #FAFAF7;
+      --ink: #0F172A; --text: #334155; --muted: #64748B;
+      --line: #E7E5E1; --danger: #E11D48; --warn: #F59E0B;
+      --shadow-1: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.04);
+      --shadow-2: 0 4px 12px rgba(15,23,42,0.05), 0 2px 6px rgba(15,23,42,0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg); color: var(--text); font-size: 14px;
+      min-height: 100vh; -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--brand-dark); text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+    input, select, textarea { font: inherit; color: var(--ink); background: var(--surface); }
+
+    /* Top bar */
+    .topbar {
+      background: var(--surface); border-bottom: 1px solid var(--line);
+      padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar h1 { color: var(--ink); font-size: 1rem; font-weight: 700; }
+    .topbar h1 .accent { color: var(--brand); }
+    .topbar .spacer { flex: 1; }
+    .topbar .status {
+      font-size: 0.78rem; padding: 4px 10px; border-radius: 999px;
+      background: var(--surface-2); color: var(--muted);
+    }
+    .topbar .status.dirty { background: #FEF3C7; color: #92400E; }
+    .topbar .status.saved { background: var(--brand-soft); color: var(--brand-dark); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+      transition: transform 0.1s, background 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-primary:hover { background: var(--brand-dark); }
+    .btn-ghost { background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); }
+    .btn-ghost:hover { background: var(--surface); border-color: var(--muted); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { opacity: 0.85; }
+    .btn-icon { width: 30px; height: 30px; border-radius: 6px; padding: 0; justify-content: center; }
+    .btn-icon:hover { background: var(--surface-2); }
+
+    /* Main layout */
+    .layout { display: grid; grid-template-columns: 320px 1fr; min-height: calc(100vh - 52px); }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+    /* Category panel */
+    .cat-panel { background: var(--surface); border-right: 1px solid var(--line); padding: 16px; }
+    .cat-panel h2 {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--muted); font-weight: 700; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cat-panel .add-cat {
+      font-size: 0.7rem; color: var(--brand-dark); font-weight: 700;
+    }
+    .cat-list { display: flex; flex-direction: column; gap: 4px; }
+    .cat-item {
+      display: grid; grid-template-columns: 32px 1fr auto; gap: 8px;
+      align-items: center; padding: 8px 10px;
+      border: 1px solid var(--line); border-radius: 8px;
+      background: var(--surface-2); cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .cat-item:hover { background: var(--surface); border-color: var(--muted); }
+    .cat-item.active { background: var(--brand-tint); border-color: var(--brand); }
+    .cat-item.dragging { opacity: 0.4; }
+    .cat-item.drag-over { border-color: var(--brand); background: var(--brand-soft); }
+    .cat-order {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 6px;
+      background: var(--ink); color: #fff; font-size: 0.7rem; font-weight: 700;
+      cursor: grab;
+    }
+    .cat-order:active { cursor: grabbing; }
+    .cat-name { color: var(--ink); font-weight: 600; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cat-count { color: var(--muted); font-size: 0.72rem; }
+
+    /* Products panel */
+    .prod-panel { padding: 16px 20px; overflow-x: auto; }
+    .panel-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+    }
+    .panel-head h2 { color: var(--ink); font-size: 1.05rem; font-weight: 700; }
+    .panel-head .cat-meta { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+    .panel-head .cat-name-edit {
+      background: transparent; border: 1px dashed transparent; padding: 4px 8px;
+      color: var(--ink); font-size: 1.05rem; font-weight: 700; width: 100%; max-width: 340px;
+    }
+    .panel-head .cat-name-edit:hover, .panel-head .cat-name-edit:focus {
+      border-color: var(--muted); background: var(--surface); outline: none;
+    }
+
+    /* Product table */
+    .prod-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .prod-table th {
+      background: var(--surface-2); color: var(--muted);
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;
+      font-weight: 700; padding: 10px 8px; text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .prod-table td { padding: 8px; border-bottom: 1px solid var(--line); font-size: 0.85rem; vertical-align: middle; }
+    .prod-table tr:last-child td { border-bottom: 0; }
+    .prod-table tr.dragging { opacity: 0.4; }
+    .prod-table tr.drag-over td { background: var(--brand-tint); }
+    .prod-table .drag-handle {
+      width: 24px; text-align: center; color: var(--muted); cursor: grab;
+      user-select: none;
+    }
+    .prod-table .drag-handle:active { cursor: grabbing; }
+
+    .prod-table input[type="text"], .prod-table input[type="number"] {
+      border: 1px solid transparent; padding: 6px 8px; border-radius: 6px;
+      background: transparent; width: 100%;
+    }
+    .prod-table input[type="text"]:hover, .prod-table input[type="number"]:hover { background: var(--surface-2); }
+    .prod-table input[type="text"]:focus, .prod-table input[type="number"]:focus {
+      background: var(--surface); border-color: var(--brand);
+      outline: none; box-shadow: 0 0 0 3px var(--brand-tint);
+    }
+    .prod-table td.name-cell input { min-width: 180px; }
+    .prod-table td.num input { max-width: 80px; text-align: right; }
+    .prod-table td.unit input { max-width: 80px; }
+    .prod-table td.check { text-align: center; width: 60px; }
+    .prod-table td.check input { transform: scale(1.2); accent-color: var(--brand); }
+    .prod-table td.actions { width: 40px; text-align: center; }
+
+    .id-cell {
+      color: var(--muted); font-family: monospace; font-size: 0.72rem;
+      background: var(--surface-2); padding: 3px 6px; border-radius: 4px;
+    }
+    .img-cell {
+      width: 40px; height: 40px; border-radius: 6px;
+      background: var(--surface-2); padding: 3px;
+    }
+    .img-cell img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-state i { font-size: 2rem; margin-bottom: 12px; opacity: 0.5; }
+
+    .footer-actions {
+      margin-top: 16px; padding: 12px 0; display: flex; gap: 10px; flex-wrap: wrap;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.5);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--surface); border-radius: 12px; padding: 24px;
+      width: min(500px, calc(100% - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal h3 { color: var(--ink); font-size: 1.05rem; margin-bottom: 8px; }
+    .modal p { color: var(--text); font-size: 0.9rem; margin-bottom: 16px; }
+    .modal .field { margin-bottom: 12px; }
+    .modal .field label { display: block; font-size: 0.78rem; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+    .modal .field input {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 0.9rem;
+    }
+    .modal .field input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+    .modal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+    /* Bulk-action bar */
+    .bulk-bar {
+      background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
+      padding: 8px 12px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      font-size: 0.82rem;
+    }
+    .bulk-bar label { color: var(--muted); font-weight: 600; }
+    .bulk-bar input, .bulk-bar select {
+      padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.82rem;
+    }
+    .bulk-bar .btn { padding: 5px 12px; font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <h1>🛒 Catalog Editor<span class="accent">.</span></h1>
+    <span class="status" id="status">not loaded</span>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost" id="btnReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+    <button class="btn btn-ghost" id="btnCopy"><i class="fa-solid fa-clipboard"></i> Copy JSON</button>
+    <button class="btn btn-primary" id="btnDownload"><i class="fa-solid fa-download"></i> Save &amp; Download</button>
+  </div>
+
+  <div class="layout">
+    <aside class="cat-panel">
+      <h2>Categories <button class="add-cat" id="btnAddCat"><i class="fa-solid fa-plus"></i> Add</button></h2>
+      <div class="cat-list" id="catList"></div>
+      <p style="font-size:0.72rem; color:var(--muted); margin-top:14px; line-height:1.5;">
+        Drag the numbered handle to reorder. Click a category to edit its products.
+      </p>
+    </aside>
+
+    <section class="prod-panel">
+      <div id="prodPanel">
+        <div class="empty-state">
+          <i class="fa-solid fa-hand-pointer"></i>
+          <p>Select a category on the left to edit its products.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Add product modal -->
+  <div class="modal-backdrop" id="addProdModal">
+    <div class="modal">
+      <h3>Add product</h3>
+      <p>Only id &amp; image are locked. Fill the rest and adjust later.</p>
+      <div class="field"><label>Name</label><input id="npName" placeholder="e.g. Kissan Fresh Tomato Ketchup"></div>
+      <div class="field"><label>MRP (₹)</label><input id="npMrp" type="number" min="0" step="0.5"></div>
+      <div class="field"><label>Price (₹)</label><input id="npPrice" type="number" min="0" step="0.5"></div>
+      <div class="field"><label>Unit (e.g. 500G, 1KG, 180ML)</label><input id="npUnit"></div>
+      <div class="field"><label>Image path (optional, will fall back to category image)</label><input id="npImage" placeholder="images/products/example.webp"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="npCancel">Cancel</button>
+        <button class="btn btn-primary" id="npSave">Add product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add category modal -->
+  <div class="modal-backdrop" id="addCatModal">
+    <div class="modal">
+      <h3>Add category</h3>
+      <div class="field"><label>Name</label><input id="ncName" placeholder="e.g. Cold Drinks"></div>
+      <div class="field"><label>ID (lowercase-hyphen)</label><input id="ncId" placeholder="cold-drinks"></div>
+      <div class="field"><label>Image path (optional)</label><input id="ncImage" placeholder="images/categories/Cold_Drinks.png"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="ncCancel">Cancel</button>
+        <button class="btn btn-primary" id="ncSave">Add category</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ==============================================================
+  // State
+  // ==============================================================
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  let data = null;                 // full JSON object
+  let activeCatId = null;          // currently selected category id
+  let dirty = false;               // unsaved changes flag
+
+  const setStatus = (label, cls = '') => {
+    const el = $('#status');
+    el.textContent = label;
+    el.className = 'status ' + cls;
+  };
+  const markDirty = () => { dirty = true; setStatus('unsaved changes', 'dirty'); };
+  const markSaved = () => { dirty = false; setStatus('saved', 'saved'); };
+
+  // ==============================================================
+  // Load
+  // ==============================================================
+  async function loadData() {
+    try {
+      setStatus('loading…');
+      const res = await fetch('data/products.json?_=' + Date.now());
+      data = await res.json();
+      // Sort by order for the editor
+      data.categories.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
+      renderCats();
+      if (activeCatId && data.categories.some(c => c.id === activeCatId)) {
+        renderProducts(activeCatId);
+      } else if (data.categories.length) {
+        activeCatId = data.categories[0].id;
+        renderProducts(activeCatId);
+      }
+      setStatus('loaded', 'saved');
+      dirty = false;
+    } catch (e) {
+      alert('Failed to load data/products.json — ' + e.message);
+      setStatus('load failed');
+    }
+  }
+
+  // Warn on unsaved leave
+  window.addEventListener('beforeunload', (e) => {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  // ==============================================================
+  // Category list (with drag-drop reorder)
+  // ==============================================================
+  function renderCats() {
+    const list = $('#catList');
+    list.innerHTML = data.categories.map((c, i) => {
+      const count = c.subcategories.reduce((s, sub) => s + sub.dishes.length, 0);
+      const active = c.id === activeCatId ? ' active' : '';
+      return `
+        <div class="cat-item${active}" data-cat-id="${c.id}" draggable="true">
+          <span class="cat-order" title="Drag to reorder">${c.order ?? (i + 1)}</span>
+          <div>
+            <div class="cat-name">${escapeHtml(c.name)}</div>
+            <div class="cat-count">${count} item${count === 1 ? '' : 's'}</div>
+          </div>
+          <button class="btn-icon" data-del-cat="${c.id}" title="Delete category"><i class="fa-regular fa-trash-can" style="color:var(--danger)"></i></button>
+        </div>`;
+    }).join('');
+
+    // Click to activate
+    list.querySelectorAll('.cat-item').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-del-cat]')) return;
+        activeCatId = el.getAttribute('data-cat-id');
+        renderCats();
+        renderProducts(activeCatId);
+      });
+    });
+
+    // Delete
+    list.querySelectorAll('[data-del-cat]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-del-cat');
+        const cat = data.categories.find(c => c.id === id);
+        if (!cat) return;
+        if (!confirm(`Delete category "${cat.name}" and all its products?`)) return;
+        data.categories = data.categories.filter(c => c.id !== id);
+        if (activeCatId === id) activeCatId = data.categories[0]?.id || null;
+        renumberCats();
+        renderCats();
+        renderProducts(activeCatId);
+        markDirty();
+      });
+    });
+
+    // Drag-drop reorder
+    let dragEl = null;
+    list.querySelectorAll('.cat-item').forEach((el) => {
+      el.addEventListener('dragstart', (e) => {
+        dragEl = el; el.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      el.addEventListener('dragend', () => {
+        el.classList.remove('dragging');
+        list.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
+      });
+      el.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (el === dragEl) return;
+        el.classList.add('drag-over');
+      });
+      el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+      el.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (el === dragEl || !dragEl) return;
+        const fromId = dragEl.getAttribute('data-cat-id');
+        const toId = el.getAttribute('data-cat-id');
+        const fromIdx = data.categories.findIndex(c => c.id === fromId);
+        const toIdx = data.categories.findIndex(c => c.id === toId);
+        const [moved] = data.categories.splice(fromIdx, 1);
+        data.categories.splice(toIdx, 0, moved);
+        renumberCats();
+        renderCats();
+        markDirty();
+      });
+    });
+  }
+
+  function renumberCats() {
+    data.categories.forEach((c, i) => c.order = i + 1);
+  }
+
+  // ==============================================================
+  // Product panel
+  // ==============================================================
+  function renderProducts(catId) {
+    const cat = data.categories.find(c => c.id === catId);
+    if (!cat) {
+      $('#prodPanel').innerHTML = `<div class="empty-state"><p>Category not found.</p></div>`;
+      return;
+    }
+    // Flatten all dishes across subcategories (usually only 1 subcategory)
+    const rows = [];
+    cat.subcategories.forEach((sub) => {
+      sub.dishes.forEach((d, i) => rows.push({ sub, dish: d, index: i }));
+    });
+
+    $('#prodPanel').innerHTML = `
+      <div class="panel-head">
+        <div>
+          <input class="cat-name-edit" id="catNameEdit" value="${escapeAttr(cat.name)}">
+          <div class="cat-meta">${rows.length} product${rows.length === 1 ? '' : 's'} · id <code>${cat.id}</code> · order ${cat.order}</div>
+        </div>
+        <button class="btn btn-primary" id="btnAddProd"><i class="fa-solid fa-plus"></i> Add product</button>
+      </div>
+
+      <div class="bulk-bar">
+        <label>Bulk apply to all in this category:</label>
+        <select id="bulkAction">
+          <option value="discount">Set discount %</option>
+          <option value="mrp-eq-price">Reset MRP = Price</option>
+          <option value="mark-featured">Mark all featured</option>
+          <option value="unmark-featured">Unmark all featured</option>
+          <option value="mark-deal">Mark all as Best Price</option>
+          <option value="unmark-deal">Unmark all Best Price</option>
+          <option value="in-stock">Mark all in stock</option>
+          <option value="out-stock">Mark all out of stock</option>
+        </select>
+        <input type="number" id="bulkValue" placeholder="e.g. 20" min="0" max="90" style="width:80px;">
+        <button class="btn btn-primary" id="bulkApply">Apply</button>
+      </div>
+
+      <table class="prod-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>ID</th>
+            <th>Img</th>
+            <th>Name</th>
+            <th>MRP</th>
+            <th>Price</th>
+            <th>Unit</th>
+            <th>Stock</th>
+            <th>Feat</th>
+            <th>Best</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="prodBody">
+          ${rows.map((r, idx) => renderRow(r.dish, idx)).join('')}
+        </tbody>
+      </table>
+
+      <div class="footer-actions">
+        <span style="color:var(--muted); font-size:0.78rem;">
+          <i class="fa-solid fa-lightbulb"></i> Tip: click "Save &amp; Download" in the top bar when done.
+        </span>
+      </div>
+    `;
+
+    wireProducts(cat);
+  }
+
+  function renderRow(d, idx) {
+    const img = d.image ? `<img src="${escapeAttr(d.image)}" alt="" loading="lazy" onerror="this.style.opacity=0.3">` : '';
+    return `
+      <tr draggable="true" data-idx="${idx}" data-id="${d.id}">
+        <td class="drag-handle" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></td>
+        <td><span class="id-cell">${d.id}</span></td>
+        <td><div class="img-cell">${img}</div></td>
+        <td class="name-cell"><input type="text" value="${escapeAttr(d.name)}" data-field="name"></td>
+        <td class="num"><input type="number" min="0" step="0.5" value="${d.mrp ?? d.price}" data-field="mrp"></td>
+        <td class="num"><input type="number" min="0" step="0.5" value="${d.price}" data-field="price"></td>
+        <td class="unit"><input type="text" value="${escapeAttr(d.unit || '')}" data-field="unit"></td>
+        <td class="check"><input type="checkbox" ${d.inStock ? 'checked' : ''} data-field="inStock"></td>
+        <td class="check"><input type="checkbox" ${d.featured ? 'checked' : ''} data-field="featured"></td>
+        <td class="check"><input type="checkbox" ${d.deal ? 'checked' : ''} data-field="deal"></td>
+        <td class="actions"><button class="btn-icon" data-del="${d.id}" title="Delete"><i class="fa-regular fa-trash-can" style="color:var(--danger)"></i></button></td>
+      </tr>`;
+  }
+
+  function wireProducts(cat) {
+    // Category name edit
+    $('#catNameEdit').addEventListener('change', (e) => {
+      cat.name = e.target.value.trim() || cat.name;
+      renderCats();
+      markDirty();
+    });
+
+    // Field edits
+    $('#prodBody').addEventListener('change', (e) => {
+      const tr = e.target.closest('tr');
+      if (!tr) return;
+      const id = tr.getAttribute('data-id');
+      const dish = findDish(cat, id);
+      if (!dish) return;
+      const field = e.target.getAttribute('data-field');
+      if (!field) return;
+      if (e.target.type === 'checkbox') dish[field] = e.target.checked;
+      else if (e.target.type === 'number') dish[field] = Number(e.target.value) || 0;
+      else dish[field] = e.target.value;
+      markDirty();
+    });
+
+    // Delete row
+    $('#prodBody').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-del]');
+      if (!btn) return;
+      const id = btn.getAttribute('data-del');
+      const dish = findDish(cat, id);
+      if (!dish) return;
+      if (!confirm(`Delete "${dish.name}"?`)) return;
+      cat.subcategories.forEach(sub => { sub.dishes = sub.dishes.filter(d => String(d.id) !== String(id)); });
+      renderProducts(cat.id);
+      renderCats();
+      markDirty();
+    });
+
+    // Add product
+    $('#btnAddProd').addEventListener('click', () => openAddProduct(cat));
+
+    // Bulk actions
+    $('#bulkApply').addEventListener('click', () => applyBulk(cat));
+
+    // Row drag-reorder within the same subcategory
+    let dragRow = null;
+    const body = $('#prodBody');
+    body.querySelectorAll('tr').forEach((row) => {
+      row.addEventListener('dragstart', () => { dragRow = row; row.classList.add('dragging'); });
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+        body.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
+      });
+      row.addEventListener('dragover', (e) => { e.preventDefault(); if (row !== dragRow) row.classList.add('drag-over'); });
+      row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (!dragRow || row === dragRow) return;
+        const fromId = dragRow.getAttribute('data-id');
+        const toId = row.getAttribute('data-id');
+        // Move within the (single) subcategory
+        cat.subcategories.forEach((sub) => {
+          const fromIdx = sub.dishes.findIndex(d => String(d.id) === String(fromId));
+          const toIdx = sub.dishes.findIndex(d => String(d.id) === String(toId));
+          if (fromIdx >= 0 && toIdx >= 0) {
+            const [moved] = sub.dishes.splice(fromIdx, 1);
+            sub.dishes.splice(toIdx, 0, moved);
+          }
+        });
+        renderProducts(cat.id);
+        markDirty();
+      });
+    });
+  }
+
+  function findDish(cat, id) {
+    for (const sub of cat.subcategories) {
+      const d = sub.dishes.find(d => String(d.id) === String(id));
+      if (d) return d;
+    }
+    return null;
+  }
+
+  // ==============================================================
+  // Bulk actions
+  // ==============================================================
+  function applyBulk(cat) {
+    const action = $('#bulkAction').value;
+    const val = Number($('#bulkValue').value);
+    cat.subcategories.forEach((sub) => {
+      sub.dishes.forEach((d) => {
+        switch (action) {
+          case 'discount': {
+            if (!isFinite(val) || val < 0 || val > 90) return;
+            const mrp = Number(d.mrp) || Number(d.price);
+            d.mrp = mrp;
+            d.price = Math.round(mrp * (1 - val / 100));
+            break;
+          }
+          case 'mrp-eq-price': d.mrp = d.price; break;
+          case 'mark-featured': d.featured = true; break;
+          case 'unmark-featured': d.featured = false; break;
+          case 'mark-deal': d.deal = true; break;
+          case 'unmark-deal': d.deal = false; break;
+          case 'in-stock': d.inStock = true; break;
+          case 'out-stock': d.inStock = false; break;
+        }
+      });
+    });
+    renderProducts(cat.id);
+    markDirty();
+  }
+
+  // ==============================================================
+  // Add product modal
+  // ==============================================================
+  function nextId() {
+    let max = 1000;
+    data.categories.forEach(c => c.subcategories.forEach(s => s.dishes.forEach(d => {
+      if (typeof d.id === 'number' && d.id > max) max = d.id;
+    })));
+    return max + 1;
+  }
+
+  function openAddProduct(cat) {
+    ['npName', 'npMrp', 'npPrice', 'npUnit', 'npImage'].forEach(id => ($('#' + id).value = ''));
+    $('#addProdModal').classList.add('open');
+    $('#npName').focus();
+    $('#npSave').onclick = () => {
+      const name = $('#npName').value.trim();
+      if (!name) { $('#npName').focus(); return; }
+      const mrp = Number($('#npMrp').value) || 0;
+      const price = Number($('#npPrice').value) || mrp;
+      const unit = $('#npUnit').value.trim() || '1PC';
+      const image = $('#npImage').value.trim() || cat.image;
+      const sub = cat.subcategories[0];
+      if (!sub) { alert('This category has no sub-container; add one first (via JSON)'); return; }
+      sub.dishes.unshift({
+        id: nextId(), name, price, mrp, unit, image,
+        inStock: true, featured: false, deal: false,
+      });
+      $('#addProdModal').classList.remove('open');
+      renderProducts(cat.id);
+      renderCats();
+      markDirty();
+    };
+    $('#npCancel').onclick = () => $('#addProdModal').classList.remove('open');
+  }
+
+  // ==============================================================
+  // Add category modal
+  // ==============================================================
+  $('#btnAddCat').addEventListener('click', () => {
+    ['ncName', 'ncId', 'ncImage'].forEach(id => ($('#' + id).value = ''));
+    $('#addCatModal').classList.add('open');
+    $('#ncName').focus();
+    $('#ncName').oninput = () => {
+      const s = $('#ncName').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      $('#ncId').value = s;
+    };
+    $('#ncSave').onclick = () => {
+      const name = $('#ncName').value.trim();
+      const id = $('#ncId').value.trim();
+      if (!name || !id) { $('#ncName').focus(); return; }
+      if (data.categories.some(c => c.id === id)) { alert('That id already exists.'); return; }
+      const cat = {
+        id, order: data.categories.length + 1, name,
+        image: $('#ncImage').value.trim() || 'images/categories/default.png',
+        subcategories: [{ id: id + '-all', name, dishes: [] }],
+      };
+      data.categories.push(cat);
+      renumberCats();
+      activeCatId = id;
+      $('#addCatModal').classList.remove('open');
+      renderCats();
+      renderProducts(id);
+      markDirty();
+    };
+    $('#ncCancel').onclick = () => $('#addCatModal').classList.remove('open');
+  });
+
+  // ==============================================================
+  // Save (download) + Copy
+  // ==============================================================
+  function serialize() {
+    // Ensure order numbers are current and consistent before saving
+    renumberCats();
+    return JSON.stringify(data, null, 2);
+  }
+
+  $('#btnDownload').addEventListener('click', () => {
+    const txt = serialize();
+    const blob = new Blob([txt], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'products.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    markSaved();
+    alert('products.json downloaded. Replace bankibites-grocerries/data/products.json with the file from your Downloads folder to publish.');
+  });
+
+  $('#btnCopy').addEventListener('click', async () => {
+    const txt = serialize();
+    try {
+      await navigator.clipboard.writeText(txt);
+      setStatus('copied to clipboard ✓', 'saved');
+      setTimeout(() => { if (!dirty) markSaved(); }, 1500);
+    } catch (e) {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      setStatus('copied (fallback)', 'saved');
+    }
+  });
+
+  $('#btnReload').addEventListener('click', () => {
+    if (dirty && !confirm('You have unsaved changes. Reload anyway?')) return;
+    loadData();
+  });
+
+  // Close modals on backdrop click
+  document.querySelectorAll('.modal-backdrop').forEach((m) => {
+    m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  // Escape closes modals
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+  });
+
+  // ==============================================================
+  // Helpers
+  // ==============================================================
+  function escapeHtml(s) {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function escapeAttr(s) {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+
+  // Init
+  loadData();
+  </script>
+</body>
+</html>

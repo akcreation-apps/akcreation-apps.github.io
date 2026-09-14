@@ -81,11 +81,12 @@
   fetch('data/products.json')
     .then((r) => r.json())
     .then((data) => {
+      // Sort categories by their `order` field — anything without one goes to the end.
+      data.categories.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
       renderSubnav(data);
       renderCategoryRows(data);
       renderDeals(data);
       if (window.bbRefreshInline) window.bbRefreshInline();
-      // Observer must attach AFTER sections are in the DOM
       setupScrollSpy();
     })
     .catch(() => {});

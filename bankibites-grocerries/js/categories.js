@@ -72,6 +72,8 @@
   fetch('data/products.json')
     .then((r) => r.json())
     .then((data) => {
+      // Sort categories by their `order` field — anything without one goes to the end.
+      data.categories.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
       state.catalog = data;
       const params = new URLSearchParams(location.search);
       const qCat = params.get('cat');
