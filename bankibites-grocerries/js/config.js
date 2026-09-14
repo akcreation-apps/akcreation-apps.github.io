@@ -84,7 +84,5 @@ window.BB_CONFIG = {
     titleLine2: 'Stay right there.',
     lede:
       'Your everyday kirana essentials, delivered to your door. No traffic. No queues. No carrying five bags while pretending everything is fine.',
-    ctaPrimary: 'Shop groceries',
-    ctaSecondary: "Today's deals",
   },
 };

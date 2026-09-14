@@ -51,8 +51,6 @@
   $$('[data-hero-t1]').forEach((el) => (el.textContent = H.titleLine1 || ''));
   $$('[data-hero-t2]').forEach((el) => (el.textContent = H.titleLine2 || ''));
   $$('[data-hero-lede]').forEach((el) => (el.textContent = H.lede || ''));
-  $$('[data-hero-cta-primary]').forEach((el) => (el.textContent = H.ctaPrimary || 'Start shopping'));
-  $$('[data-hero-cta-secondary]').forEach((el) => (el.textContent = H.ctaSecondary || 'View deals'));
 
   // Mobile search toggle (simple inline expand/collapse)
   const searchToggle = document.getElementById('searchToggle');
