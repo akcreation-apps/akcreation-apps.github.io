@@ -968,6 +968,7 @@
         /* Individual offer card */
         .offer-card {
             flex: 0 0 132px;
+            min-height: 232px;              /* Equalise heights across deals & favourites */
             scroll-snap-align: start;
             background: #fff;
             border-radius: 12px;
@@ -1068,7 +1069,10 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+            flex: 1;                        /* Fill remaining card height */
         }
+        /* Push add-to-cart control to the bottom so all cards align */
+        .offer-card .item-control.offer-card-control { margin-top: auto; }
         .offer-card-name {
             font-family: 'Inter', sans-serif;
             font-size: 0.72rem;
@@ -1110,7 +1114,8 @@
            so it doesn't cover the price row */
         .offer-card .item-control.offer-card-control {
             position: static;
-            margin-top: 6px;
+            margin-top: auto;               /* Push to bottom so all cards align */
+            padding-top: 6px;
             min-height: 30px;
             border-radius: 8px;
             overflow: hidden;
@@ -1138,12 +1143,100 @@
             .offers-title { font-size: 1.2rem; }
             .offers-subtitle { font-size: 0.78rem; }
             .offers-rail { padding: 4px 20px 12px; gap: 12px; scroll-padding-left: 20px; }
-            .offer-card { flex-basis: 152px; }
+            .offer-card { flex-basis: 152px; min-height: 250px; }
             .offer-card-name { font-size: 0.78rem; }
             .offer-price-now { font-size: 0.9rem; }
         }
         @media (min-width: 1200px) {
-            .offer-card { flex-basis: 168px; }
+            .offer-card { flex-basis: 168px; min-height: 260px; }
+        }
+
+        /* ============================================================
+           Your Favourite Picks — reuses .offers-* styles with a
+           personal (pink) accent instead of the sale (red/amber) look.
+           ============================================================ */
+        .favs-section {
+            background:
+                radial-gradient(1200px 220px at 20% 0%, rgba(216,27,96,0.10), transparent 60%),
+                radial-gradient(900px 200px at 85% 100%, rgba(236,72,153,0.08), transparent 60%),
+                linear-gradient(180deg, #fff0f5 0%, #fff 100%);
+            border-top: 1px solid rgba(216,27,96,0.12);
+            border-bottom: 1px solid rgba(236,72,153,0.15);
+        }
+        .favs-section .offers-eyebrow {
+            color: #ad1457;
+            background: rgba(216,27,96,0.10);
+            border-color: rgba(216,27,96,0.22);
+        }
+        .favs-section .offers-eyebrow .fa-heart { color: #d81b60; font-size: 0.62rem; }
+        .favs-section .offers-count-chip {
+            color: #d81b60;
+            border-color: rgba(216,27,96,0.25);
+        }
+        .favs-section .offers-rail::-webkit-scrollbar-thumb {
+            background: rgba(216,27,96,0.25);
+        }
+        .favs-section .offers-rail:focus-visible {
+            box-shadow: inset 0 0 0 2px rgba(216,27,96,0.35);
+        }
+        /* Hide the %OFF ribbon on favourite cards that aren't actually deals */
+        .favs-section .offer-card .offer-ribbon { display: none; }
+        .favs-section .offer-card[data-is-offer="true"] .offer-ribbon { display: inline-flex; }
+
+        @media (prefers-color-scheme: dark) {
+            /* Shared dark treatment for both rails so titles, cards and text
+               don't blend into the page background */
+            .offers-section,
+            .favs-section {
+                background:
+                    radial-gradient(1200px 220px at 20% 0%, rgba(239,68,68,0.18), transparent 60%),
+                    radial-gradient(900px 200px at 85% 100%, rgba(245,158,11,0.14), transparent 60%),
+                    linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+                border-top-color: rgba(245,158,11,0.22);
+                border-bottom-color: rgba(239,68,68,0.20);
+            }
+            .offers-section .offers-title,
+            .favs-section .offers-title { color: #f3f4f6; }
+            .offers-section .offers-subtitle,
+            .favs-section .offers-subtitle { color: rgba(243,244,246,0.72); }
+            .offers-section .offers-count-chip,
+            .favs-section .offers-count-chip { background: rgba(255,255,255,0.06); }
+            /* Card surface */
+            .offers-section .offer-card,
+            .favs-section .offer-card {
+                background: #1c1b24;
+                border-color: rgba(255,255,255,0.08);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.35);
+            }
+            .offers-section .offer-card-name,
+            .favs-section .offer-card-name,
+            .offers-section .offer-price-now,
+            .favs-section .offer-price-now { color: #f3f4f6; }
+            .offers-section .offer-price-was,
+            .favs-section .offer-price-was { color: rgba(243,244,246,0.55); }
+            .offers-section .offer-card-save,
+            .favs-section .offer-card-save { color: #34d399; }
+
+            /* Favourites — pink accent overrides */
+            .favs-section {
+                background:
+                    radial-gradient(1200px 220px at 20% 0%, rgba(236,72,153,0.20), transparent 60%),
+                    radial-gradient(900px 200px at 85% 100%, rgba(216,27,96,0.14), transparent 60%),
+                    linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+                border-top-color: rgba(236,72,153,0.28);
+                border-bottom-color: rgba(236,72,153,0.22);
+            }
+            .favs-section .offers-eyebrow {
+                color: #ff80ab;
+                background: rgba(236,72,153,0.16);
+                border-color: rgba(236,72,153,0.32);
+            }
+            .favs-section .offers-eyebrow .fa-heart { color: #ff80ab; }
+            .favs-section .offers-count-chip {
+                color: #ff80ab;
+                background: rgba(236,72,153,0.10);
+                border-color: rgba(236,72,153,0.35);
+            }
         }
 
         /* ── View Cart bar ── */
