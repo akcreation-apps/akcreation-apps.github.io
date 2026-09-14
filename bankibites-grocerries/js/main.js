@@ -101,6 +101,13 @@
     return all;
   }
 
+  // Shared comparator — featured items first, then cheapest → most expensive.
+  function sortByFeaturedThenPrice(a, b) {
+    const featDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+    if (featDiff !== 0) return featDiff;
+    return (Number(a.price) || 0) - (Number(b.price) || 0);
+  }
+
   function renderSubnav(data) {
     const wrap = $('#subnavInner');
     if (!wrap) return;
@@ -186,8 +193,7 @@
   }
 
   // The main event: one horizontal-scroll row of products PER category.
-  // Featured products float to the front of each rail (stable sort — order within
-  // featured/non-featured groups is preserved).
+  // Sort order: featured items first, then ascending by price within each group.
   function renderCategoryRows(data) {
     const wrap = $('#categoryRows');
     if (!wrap) return;
@@ -195,7 +201,7 @@
       .map((c) => {
         const items = c.subcategories.flatMap((sub) => sub.dishes).filter((d) => d.inStock);
         if (items.length === 0) return '';
-        items.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+        items.sort(sortByFeaturedThenPrice);
         const previews = items.slice(0, 10).map((p) => productCard({ ...p, categoryImage: c.image })).join('');
         return `
           <section class="prod-row-section" id="cat-${c.id}">
@@ -253,6 +259,7 @@
   // Deals rail:
   //   - Only shows products with `"deal": true` in products.json.
   //   - If no product is flagged, the whole section hides itself.
+  //   - Sorted featured-first, then cheapest → most expensive.
   function renderDeals(data) {
     const wrap = $('#dealsScroll');
     if (!wrap) return;
@@ -264,6 +271,7 @@
       return;
     }
     if (section) section.style.display = '';
+    deals.sort(sortByFeaturedThenPrice);
     wrap.innerHTML = deals.slice(0, 12).map((p) => productCard({ ...p })).join('');
   }
 

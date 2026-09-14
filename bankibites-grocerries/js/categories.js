@@ -152,6 +152,13 @@
     }
   }
 
+  // Shared comparator — featured items first, then cheapest → most expensive.
+  const sortByFeaturedThenPrice = (a, b) => {
+    const featDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+    if (featDiff !== 0) return featDiff;
+    return (Number(a.price) || 0) - (Number(b.price) || 0);
+  };
+
   function currentProducts() {
     const q = state.query.trim().toLowerCase();
     const tokens = q.split(/\s+/).filter(Boolean);
@@ -169,6 +176,7 @@
           })
         );
       });
+      items.sort(sortByFeaturedThenPrice);
       return { cat: null, items };
     }
 
@@ -181,6 +189,7 @@
         if (matches(d.name)) items.push({ ...d, categoryImage: cat.image, categoryName: cat.name });
       })
     );
+    items.sort(sortByFeaturedThenPrice);
     return { cat, items };
   }
 
