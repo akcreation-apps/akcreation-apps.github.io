@@ -3,6 +3,7 @@
  * Uses data-* attributes for add-to-cart (delegated in cart.js).
  */
 (function () {
+  if (window.BB_MAINTENANCE) return; // Site kill switch active — skip all init.
   const CFG = window.BB_CONFIG || {};
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));

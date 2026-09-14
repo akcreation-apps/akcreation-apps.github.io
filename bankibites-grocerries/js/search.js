@@ -5,6 +5,7 @@
  * Load AFTER config.js + cart.js on any page that has a search input.
  */
 (function () {
+  if (window.BB_MAINTENANCE) return; // Site kill switch active — skip all init.
   const CFG = window.BB_CONFIG || {};
   const money = (n) => (CFG.currency || '₹') + Number(n).toFixed(0);
   const html = (s) =>

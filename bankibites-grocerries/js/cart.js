@@ -4,6 +4,7 @@
  * (no inline onclick — avoids escaping issues in product names).
  */
 (function () {
+  if (window.BB_MAINTENANCE) return; // Site kill switch active — skip all init.
   const CFG = window.BB_CONFIG || {};
   const KEY = CFG.cartStorageKey || 'bb_grocery_cart_v1';
   const money = (n) => (CFG.currency || '₹') + Number(n).toFixed(0);
