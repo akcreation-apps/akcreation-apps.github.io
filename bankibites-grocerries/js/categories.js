@@ -34,6 +34,8 @@
   $$('[data-delivery-time]').forEach((el) => (el.textContent = CFG.deliveryTimeText));
   $$('[data-parent-brand]').forEach((el) => (el.textContent = CFG.parentBrand));
   $$('[data-parent-url]').forEach((el) => (el.href = CFG.parentUrl));
+  $$('[data-family-brand]').forEach((el) => (el.textContent = CFG.familyBrand || ''));
+  $$('[data-family-url]').forEach((el) => { if (CFG.familyUrl) el.href = CFG.familyUrl; });
   $$('[data-wa-link]').forEach((el) => {
     el.href = `https://wa.me/${(CFG.whatsappNumber || '').replace(/\D/g, '')}`;
   });
@@ -42,7 +44,7 @@
   });
   const yr = document.getElementById('year');
   if (yr) yr.textContent = new Date().getFullYear();
-  document.title = `Shop by Category · ${CFG.vendorName}`;
+  document.title = `Shop by Category · ${CFG.vendorName}${CFG.familyBrand ? ' (' + CFG.familyBrand + ' family)' : ''}`;
 
   // Mobile search toggle (simple inline expand/collapse)
   const searchToggle = document.getElementById('searchToggle');

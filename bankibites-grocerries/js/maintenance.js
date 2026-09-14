@@ -23,7 +23,8 @@
   const title = M.title || 'Restocking the shelves';
   const message = M.message || "We'll be back shortly.";
   const eta = M.eta || '';
-  const vendor = CFG.vendorName || 'BankiBites Grocerries';
+  const vendor = CFG.vendorName || 'BankiMart Grocerries';
+  const family = CFG.familyBrand || '';
   const supportPhone = CFG.supportPhone || '';
   const supportEmail = CFG.supportEmail || '';
   const igUrl = CFG.instagramUrl || '';
@@ -155,7 +156,7 @@
         ${eta ? `<div class="mm-eta"><i class="fa-solid fa-clock"></i> ${esc(eta)}</div>` : ''}
         ${support ? `<div class="mm-support">${support}</div>` : ''}
         <div class="mm-signoff">
-          <strong>${esc(vendor)}</strong> · Made in Odisha <span class="mm-heart">❤</span>
+          <strong>${esc(vendor)}</strong>${family ? ` · A ${esc(family)} family brand` : ''} · Made in Odisha <span class="mm-heart">❤</span>
         </div>
       </main>
     </div>

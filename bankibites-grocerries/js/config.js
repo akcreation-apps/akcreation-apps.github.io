@@ -72,6 +72,11 @@ window.BB_CONFIG = {
   instagramUrl: 'https://www.instagram.com/bankibites/',
 
   // Legal / attribution
+  // BankiMart is one storefront in the BankiBites family (kirana, grocery,
+  // delivery, etc.). Surfaced in headers/footers/meta so shoppers know both
+  // brands belong together.
+  familyBrand: 'BankiBites',
+  familyUrl: 'https://akcreation-apps.com/banki-bites/',
   parentBrand: 'AK Creation',
   parentUrl: 'https://akcreation-apps.com/services.html',
 

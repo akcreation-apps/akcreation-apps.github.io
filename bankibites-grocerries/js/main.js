@@ -40,6 +40,8 @@
   $$('[data-support-email]').forEach((el) => (el.textContent = CFG.supportEmail));
   $$('[data-parent-brand]').forEach((el) => (el.textContent = CFG.parentBrand));
   $$('[data-parent-url]').forEach((el) => (el.href = CFG.parentUrl));
+  $$('[data-family-brand]').forEach((el) => (el.textContent = CFG.familyBrand || ''));
+  $$('[data-family-url]').forEach((el) => { if (CFG.familyUrl) el.href = CFG.familyUrl; });
   $$('[data-wa-link]').forEach((el) => {
     el.href = `https://wa.me/${(CFG.whatsappNumber || '').replace(/\D/g, '')}`;
   });
@@ -283,5 +285,5 @@
   // Footer year
   const yr = document.getElementById('year');
   if (yr) yr.textContent = new Date().getFullYear();
-  document.title = `${CFG.vendorName} · ${CFG.tagline}`;
+  document.title = `${CFG.vendorName}${CFG.familyBrand ? ' · A ' + CFG.familyBrand + ' family brand' : ''}`;
 })();
