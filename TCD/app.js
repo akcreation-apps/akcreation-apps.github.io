@@ -443,10 +443,10 @@ document.addEventListener('DOMContentLoaded', async() => {
     };
 
     // Aggregate every dish ID the customer has ever ordered from
-    // localStorage['tcd_order_history'] — the same source the invoice/bill
-    // page reads. Ranked by number of past orders a dish appeared in
-    // (tiebreak by total quantity) so the most frequent ones come first,
-    // but *every* previously ordered dish is returned.
+    // localStorage['tcd_order_history'] — matching the invoice/bill page's
+    // filter exactly: only orders that were Approved by the admin and belong
+    // to this restaurant's admin_id are counted. Ranked by number of past
+    // orders a dish appeared in (tiebreak by total quantity).
     const computeFavouriteDishIds = () => {
         const raw = localStorage.getItem(lsKey('order_history'));
         if (!raw) return [];
@@ -456,6 +456,9 @@ document.addEventListener('DOMContentLoaded', async() => {
 
         const freq = new Map();
         hist.forEach(order => {
+            // Mirror invoice_scripts.js: skip anything not Approved for this admin
+            if (order?.api_call !== 'Approved') return;
+            if (typeof _cfg !== 'undefined' && order?.admin_id !== _cfg) return;
             // cart.js stores {order_id, admin_id, api_call, order_details: data}
             // where data.order_details is the cart array. Peek one level deeper.
             const cats = order?.order_details?.order_details || order?.order_details || [];
