@@ -1,5 +1,5 @@
 {
-  "version": 1.08,
+  "version": 1.09,
   "updated_at": "2026-09-14",
   "notification_actions": {
     "order": "🛒 ଅର୍ଡର କର",
@@ -7,48 +7,39 @@
   },
   "messages": {
   "lunch": [
-    "ବାପା Ganesh ଙ୍କ Bhog ସାରି ଗଲା... ଏବେ ଆପଣଙ୍କ Lunch ର ପାଳି । 😋",
+    "ବାପା Ganesh ଙ୍କ Bhog ସରି ଗଲା... ଏବେ ଆପଣଙ୍କ Lunch ର ପାଳି । 😋",
     "Modak ଖାଇ ମନ ଭରିଗଲା, କିନ୍ତୁ ପେଟ ? ଆମ Menu Ready । ❤️",
     "Pandal ଦେଖି ଫେରି ଆସିଲେ ? ଏବେ Full Meal Order କର । 😉",
     "ଆଜି Ganesh ପୂଜା... ରୋଷେଇକୁ Break, ଆମ App କୁ କାମ । 😄",
     "ପେଟ କହୁଛି 'Bappa Morya'... ମାନେ ଏବେ Order କର । 🤤",
     "ଢୋଲ ବାଜୁଛି, ପେଟ ମଧ୍ୟ ବାଜୁଛି... Order କରି ଚୁପ୍‌ କରାଅ । 🥁",
     "Prasad ପେଟ ଭରେନା... Fried Rice ପଠାଇବୁ କି ? 🍛",
-    "ମୂଷିକ ମହାରାଜ ଲଡ଼ୁ ନେଇଗଲେ, ଆମ Delivery Boy ଭାତ ନେଇ ଆସୁଛନ୍ତି । 😆",
+    "ମୂଷିକ ମହାରାଜ ଲଡ଼ୁ ନେଇଗଲେ, ଆମ Delivery Boy Lunch ନେଇ ଆସୁଛନ୍ତି । 😆",
     "ଆଜି Lunch ଟା Ganesh Style — ଢ଼େର ଢ଼େର, ଭରି ଭରି । 😋",
     "ପୂଜା ପାଇଁ ଉପାସ ଥିଲ ? ପୂଜା ପରେ Menu ପ୍ରସ୍ତୁତ । ❤️",
     "Modak ର ମିଠା ପରେ ଏକ ଝାଳ ଚିଲି ପନିର୍‌... Balance ଦରକାର । 😋",
-    "ବାପା Ganesh ଙ୍କ ପରି ପେଟ ମୋଟା କରିବେ ? ଏବେ Order କର । 🤭",
     "Pandal Hopping ପରେ ଭୋକ Double ଲାଗେ, ଆମେ ଜାଣୁ । 😄",
     "ଆଜି ରୋଷେଇ ଘର Puja Mode ରେ... ପେଟ ପାଇଁ ଆମ App । 😉",
     "Ganesh ପୂଜା ଦିନ Diet କଥା ଭୁଲି ଯାଅ । Order କରି ଦିଅ । 😂",
     "ଢୋଲ, Modak, Aarti, ତା ପରେ ଆମ App... Perfect Ganesh Puja । ❤️",
-    "ଫ୍ରିଜ୍‌ ଖୋଲିଲେ Puja ର Prasad ମିଳିବ, Lunch ମିଳିବନା । 😅",
+    "ଫ୍ରିଜ୍‌ ଖୋଲିଲେ Puja ର Prasad ମିଳିବ, Lunch ମିଳିବନି । 😅",
     "ଆଜି 'କଣ ଖାଇବି ?' ର ଉତ୍ତର Bappa ଙ୍କ ଆଶୀର୍ବାଦରେ ଆମ App ରେ । 😋",
     "ପୂଜା ଥାଳି ଖାଲି ହୋଇଗଲା ? ଆମ Thali ପ୍ରସ୍ତୁତ । 🍛",
     "Bappa Morya ! ପେଟ ମଧ୍ୟ Ready । 😉",
     "ବାପା Ganesh ଙ୍କ ଆଶୀର୍ବାଦ — 'ପେଟ ଭରି ଖାଅ' । Order ଦିଅ । 🙏"
   ],
   "snacks": [
-    "Puja ପରେ ସନ୍ଧ୍ୟାରେ Modak ସହ ଚା... କିନ୍ତୁ ପକୁଡ଼ି ମଧ୍ୟ ଦରକାର । ❤️",
     "Pandal ଦେଖିବାକୁ ଯିବେ ? ଆଗ ପେଟ ଭରି ନିଅ । 😉",
     "Ganesh ପୂଜା ର Evening — Veg Rolls, Veg Momos, ଆଉ Milkshake । 🌯",
     "ମୂଷିକ ମହାରାଜ Modak ଉପରେ Focus... ଆପଣ Snacks ଉପରେ । 😄",
-    "Bappa ଙ୍କ Bhog ପରେ ଆପଣଙ୍କ ପେଟ ର Bhog ? 🤭",
-    "ଆଜି Pandal Crowded ? Home ରେ ବସି Snacks Enjoy କର । 😌",
-    "ପୂଜା Vibe ସହିତ Veg Pizza Vibe... Match ହୋଇଯିବ । 🍕",
+    "ପୂଜା Vibe ସହିତ Pizza Vibe... Match ହୋଇଯିବ । 🍕",
     "Modak ମିଠା, ଚିଲି ପନିର୍‌ ଝାଳ... ଆଜି ଦୁଇଟାଯାକ ଚଳିବ । 😋",
-    "Ganesh Aarti ପରେ Veg Burger Aarti ? 🍔",
     "ମନ୍ତ୍ର ପଢି ସାରିଲି... ଏବେ Menu ପଢିବା ପାଳି । 😄",
-    "Dhak ର ଆୱାଜ ସହ ପେଟର ଆୱାଜ Match କରୁଛି ? 🥁",
     "Bappa Morya ! Snacks ମଧ୍ୟ Ready । 😉",
     "ଏକ ଠଣ୍ଡା Mocktail ସହ Puja ର ଗରମ Vibe । ❄️",
-    "Pandal ର Photo ତୋଳି ସାରିଲେ ? ଏବେ Snacks Order କର । 📸",
     "Modak ଖାଇ Sweet Overdose ? ଟିକେ Salty Fries Try କର । 🍟",
     "ଆଜି Evening ର Star — ଆପଣ, Bappa, ଆଉ Veg Sandwich । 🥪",
     "Family Puja ପରେ Family Snacks... Order ଦିଅ ଆମେ ଆସୁଛୁ । ❤️",
-    "ବାପା Ganesh ଙ୍କୁ 21 Modak, ଆପଣଙ୍କୁ 1 Full Meal । 😆",
-    "ପୂଜା ପରେ ଚା ଏକୁଟିଆ ? ପକୁଡ଼ି ମଧ୍ୟ ପଠାଉ । 😋",
     "Bappa ଙ୍କ Blessing ସହ ଏକ Chocolate Milkshake । 🥤",
     "Aarti Time Over ? Snacks Time Start । 😉",
     "Ganesh ପୂଜା Special Craving — Veg Chowmein । 🍜",
@@ -58,13 +49,10 @@
     "Bappa ଙ୍କ Selfie ପରେ Snacks ର Selfie । 📸"
   ],
   "dinner": [
-    "Puja Visarjan ପରେ ଘର ଫେରି ଭୋକ ? ଆମେ ଆସୁଛୁ । 😋",
-    "ବାପା Ganesh Bhog ଖାଇଛନ୍ତି... ଆଜି ରାତିରେ ଆପଣଙ୍କ ପାଳି । ❤️",
     "Ganesh Puja ର ରାତିରେ ରୋଷେଇ ? ଆରେ ନା, Order କର । 😉",
     "Modak ଖାଇ ପେଟ Sweet Sweet... ଏବେ Dinner ପାଳି । 🍛",
     "Pandal Hopping ର ଥକ୍କା... Fried Rice ର ଆରାମ । 😌",
     "Bappa Morya ! ଆଜି Dinner Special Order କର । 🙏",
-    "ପୂଜା ପରେ ପେଟ କହୁଛି 'ଆଉ ଟିକେ ଚଳିବ' । 😄",
     "Ganesh ପୂଜା ର Dinner — Full Family, Full Plate । ❤️",
     "Aarti ପରେ ପେଟର Aarti — Order ଦିଅ । 😉",
     "ମୂଷିକ ମହାରାଜ ଲଡ଼ୁ ନେଇଗଲେ, ଆମ Delivery Boy Dinner ଆଣୁଛନ୍ତି । 🐭",
@@ -74,8 +62,7 @@
     "Modak Full, ପେଟ ଅର୍ଦ୍ଧେକ ? Order କର ପୁରା କର । 😋",
     "Ganesh Chaturthi ର Dinner Combo — Fried Rice + Chilli Paneer । 🍛",
     "Puja Photos Upload ସାରିଲେ ? ଏବେ Food Upload କର ପେଟକୁ । 📸",
-    "ଆଜି ରାତିରେ Bappa ଙ୍କ ପରି ପେଟ ଭରନ୍ତୁ । 😄",
-    "ଢୋଲ ଚୁପ, Aarti ସାରି... ଏବେ କେବଳ Dinner । 😌"
+    "ଆଜି ରାତିରେ Bappa ଙ୍କ ପରି ପେଟ ଭରନ୍ତୁ । 😄"
   ]
 
   }
