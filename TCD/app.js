@@ -442,16 +442,17 @@ document.addEventListener('DOMContentLoaded', async() => {
         return card;
     };
 
-    // Compute the customer's most-frequently-ordered dish IDs from
-    // localStorage['tcd_order_history']. We rank by number of past orders a
-    // dish appeared in (tiebreak by total quantity) so a single bulk order
-    // can't dominate the list. Returns [] for first-time visitors (< 2 orders).
+    // Aggregate every dish ID the customer has ever ordered from
+    // localStorage['tcd_order_history'] — the same source the invoice/bill
+    // page reads. Ranked by number of past orders a dish appeared in
+    // (tiebreak by total quantity) so the most frequent ones come first,
+    // but *every* previously ordered dish is returned.
     const computeFavouriteDishIds = () => {
         const raw = localStorage.getItem(lsKey('order_history'));
         if (!raw) return [];
         let hist;
         try { hist = JSON.parse(raw) || []; } catch { return []; }
-        if (!Array.isArray(hist) || hist.length < 2) return [];
+        if (!Array.isArray(hist) || hist.length === 0) return [];
 
         const freq = new Map();
         hist.forEach(order => {
@@ -554,10 +555,10 @@ document.addEventListener('DOMContentLoaded', async() => {
                     shortcutsContainer.appendChild(offersShortcut);
                 }
 
-                // ── Your Favourite Picks (returning customers only) ───────────
+                // ── Your Favourite Picks (every dish ever ordered) ────────────
                 const favIds = computeFavouriteDishIds();
                 const favEntries = [];
-                if (favIds.length >= 2) {
+                if (favIds.length > 0) {
                     const byId = new Map();
                     data.menu.forEach(cat => cat.subcategories.forEach(sub =>
                         sub.dishes.forEach(d => byId.set(d.id, { dish: d, subcategory: sub }))));
@@ -567,8 +568,8 @@ document.addEventListener('DOMContentLoaded', async() => {
                     });
                 }
 
-                if (favEntries.length >= 2) {
-                    const topFavs = favEntries.slice(0, 8);
+                if (favEntries.length > 0) {
+                    const topFavs = favEntries;   // Show every past-ordered item
                     const favsSection = document.createElement('section');
                     favsSection.classList.add('offers-section', 'favs-section', 'category-block');
                     favsSection.id = 'Favourites';
@@ -581,9 +582,9 @@ document.addEventListener('DOMContentLoaded', async() => {
                                     <i class="fas fa-heart" aria-hidden="true"></i> Just for you
                                 </span>
                                 <h3 id="favs-heading" class="offers-title">Your Favourite Picks</h3>
-                                <p class="offers-subtitle">Dishes you order the most — one tap to add again</p>
+                                <p class="offers-subtitle">Everything you've ordered before — one tap to add again</p>
                             </div>
-                            <div class="offers-count-chip" aria-hidden="true">${topFavs.length} picks</div>
+                            <div class="offers-count-chip" aria-hidden="true">${topFavs.length} ${topFavs.length === 1 ? 'pick' : 'picks'}</div>
                         </div>
                         <div class="offers-rail favs-rail" role="list" tabindex="0" aria-label="Your favourite picks, scroll horizontally"></div>
                     `;
