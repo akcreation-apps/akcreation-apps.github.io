@@ -1842,7 +1842,7 @@
             },
             {
               "id": 1242,
-              "name": "Vaseline Deep Moisture Lotion (with Free)",
+              "name": "Vaseline Deep Moisture Lotion",
               "price": 383,
               "unit": "400ML",
               "image": "images/products/VDM LOTION 400ML WITH PSLG 50ML.webp",
@@ -1944,7 +1944,7 @@
             },
             {
               "id": 1250,
-              "name": "Vim Bar Face Wash",
+              "name": "Vim Bar",
               "price": 26,
               "unit": "300G",
               "image": "images/products/VIM BAR FW 300G.webp",
@@ -2279,17 +2279,6 @@
               "mrp": 345
             },
             {
-              "id": 1283,
-              "name": "Junior Horlicks Vanilla",
-              "price": 290,
-              "unit": "500G",
-              "image": "images/products/JUNIOR HLX VANILLA 500G ICON JAR.webp",
-              "inStock": true,
-              "featured": false,
-              "deal": false,
-              "mrp": 329
-            },
-            {
               "id": 1284,
               "name": "Mother's Horlicks Kesar",
               "price": 524,
@@ -2467,17 +2456,6 @@
               "featured": false,
               "deal": false,
               "mrp": 299
-            },
-            {
-              "id": 1299,
-              "name": "Cerelac Stage 3 Wheat Rice Mixed Fruit",
-              "price": 290,
-              "unit": "300G",
-              "image": "images/products/CERELAC STG3 WheRi Mix Frt 24x300g ZS IN.webp",
-              "inStock": true,
-              "featured": false,
-              "deal": false,
-              "mrp": 290
             },
             {
               "id": 1300,
@@ -3370,17 +3348,6 @@
               "featured": true,
               "deal": false,
               "mrp": 50
-            },
-            {
-              "id": 1393,
-              "name": "Schezwan Chutney",
-              "price": 79,
-              "unit": "250G",
-              "image": "images/products/Swwzwan Chutny 250.webp",
-              "inStock": true,
-              "featured": false,
-              "deal": false,
-              "mrp": 90
             }
           ]
         }
