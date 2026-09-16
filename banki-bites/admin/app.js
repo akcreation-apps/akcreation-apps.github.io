@@ -60,6 +60,28 @@ function showShell() {
 let currentUser = null;
 let renderedTabs = {};
 
+// ── BankiMart grocery maintenance probe ──────────────────────────────
+// Reads bankibites-grocerries/js/config.js as text and pulls the
+// `maintenance.enabled` flag out with a small regex. When true the admin
+// hides the Grocery tab and the Dashboard's Food/Grocery source toggle
+// so no one accidentally acts on orders while the storefront is offline.
+// Cached for the tab session — one HTTP fetch on load.
+let _bbGroceryMaintenanceCache = null;
+async function fetchGroceryMaintenance() {
+  if (_bbGroceryMaintenanceCache !== null) return _bbGroceryMaintenanceCache;
+  try {
+    const res = await fetch('https://akcreation-apps.com/bankibites-grocerries/js/config.js?v=' + Date.now());
+    if (!res.ok) { _bbGroceryMaintenanceCache = false; return false; }
+    const text = await res.text();
+    const m = text.match(/maintenance\s*:\s*\{[^}]*enabled\s*:\s*(true|false)/);
+    _bbGroceryMaintenanceCache = !!(m && m[1] === 'true');
+  } catch {
+    _bbGroceryMaintenanceCache = false;
+  }
+  return _bbGroceryMaintenanceCache;
+}
+window.bbGroceryMaintenance = fetchGroceryMaintenance;
+
 // ── Sidebar collapse / expand ────────────────────────────────────────
 // Persists across sessions via localStorage. Runs synchronously so the
 // initial paint uses the correct width (avoids a flash of expanded
@@ -140,6 +162,15 @@ document.addEventListener('DOMContentLoaded', () => {
       currentUser = user;
       $('#userEmail').textContent = user.email;
       showShell();
+      // Hide the Grocery tab entirely if the BankiMart storefront is in
+      // maintenance mode — no new grocery orders should be flowing in.
+      try {
+        const maintenance = await fetchGroceryMaintenance();
+        if (maintenance) {
+          const groceryBtn = document.getElementById('tab-btn-grocery');
+          if (groceryBtn) groceryBtn.hidden = true;
+        }
+      } catch {}
       // Ask once for browser-notification permission so we can alert on
       // new orders when this tab is backgrounded. Silent if already
       // granted/denied — no fallback prompt.
@@ -180,6 +211,12 @@ async function pickLandingTab(db) {
 }
 
 async function activateTab(name) {
+  // Grocery gate — if the storefront is in maintenance we redirect any
+  // attempt to open the Grocery tab back to Dashboard so admin never lands
+  // on stale data (and the sidebar button is already hidden anyway).
+  if (name === 'grocery' && await fetchGroceryMaintenance()) {
+    name = 'dashboard';
+  }
   document.querySelectorAll('.tab-btn').forEach(b => {
     const isActive = b.dataset.tab === name;
     b.classList.toggle('active', isActive);

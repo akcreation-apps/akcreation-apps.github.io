@@ -302,6 +302,19 @@ export async function renderDashboard(root, db) {
 
   try { await whenChartReady(); } catch (e) { console.warn('[dashboard] Chart.js unavailable:', e.message); }
   wireRangeControls(root, db);
+  // Hide the Food/Grocery source toggle when BankiMart storefront is in
+  // maintenance — admin should only see food-order analytics until the
+  // grocery flow comes back online.
+  try {
+    const maintenance = typeof window.bbGroceryMaintenance === 'function'
+      ? await window.bbGroceryMaintenance()
+      : false;
+    if (maintenance) {
+      state.source = 'food';
+      const sourceEl = root.querySelector('.dash-source');
+      if (sourceEl) sourceEl.hidden = true;
+    }
+  } catch {}
   root.querySelectorAll('[data-source]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const which = btn.dataset.source;
