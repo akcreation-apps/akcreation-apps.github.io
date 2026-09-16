@@ -11,6 +11,7 @@ const APP_NAME = 'bankimart-reader';
 const COLLECTION = 'bankibites_grocery_orders';
 const ENC_KEY = ['TCD', 'FOOD', 'CAFE'].join('-');
 const HKEY = 'bb_grocery_orders_v1';
+const TERMINAL_KEY = 'bb_grocery_terminal_v1';
 
 async function getReaderDb() {
   const existing = getApps().find(a => a.name === APP_NAME);
@@ -50,6 +51,19 @@ function loadLocalOrders() {
 }
 function loadLocalOrder(id) {
   return loadLocalOrders().find(x => x.orderId === id) || null;
+}
+function loadTerminalMap() {
+  try { return JSON.parse(localStorage.getItem(TERMINAL_KEY)) || {}; } catch { return {}; }
+}
+function saveTerminalMap(map) {
+  try { localStorage.setItem(TERMINAL_KEY, JSON.stringify(map)); } catch {}
+}
+function cacheTerminalStatus(id, status) {
+  if (!id || (status !== 'delivered' && status !== 'cancelled')) return;
+  const map = loadTerminalMap();
+  if (map[id] === status) return;
+  map[id] = status;
+  saveTerminalMap(map);
 }
 
 function fmtEtaDate(ymd) {
@@ -260,6 +274,17 @@ async function main() {
   if (!id) { renderError('Missing order id.'); return; }
 
   const localHit = loadLocalOrder(id);
+
+  // Terminal-cache short-circuit: if we've already confirmed this order is
+  // delivered, render it entirely from the local payload — no Firestore
+  // boot, no network round-trip. Delivered is a terminal state, so the
+  // server view can never change back.
+  const terminalMap = loadTerminalMap();
+  if (terminalMap[id] === 'delivered' && localHit?.payload) {
+    render({ ...localHit.payload, status: 'delivered' }, 'local');
+    return;
+  }
+
   // Paint the cached order immediately (as a tracker) so the page doesn't
   // sit on the skeleton spinner while Firestore boots. The live snapshot
   // overwrites this the instant it lands.
@@ -274,7 +299,17 @@ async function main() {
         return;
       }
       paintOffline('');
-      render(snap.data(), 'live');
+      const data = snap.data();
+      const status = data.status || 'new';
+      cacheTerminalStatus(id, status);
+      // Delivered orders render from the customer's own saved copy — the
+      // receipt only needs the server for the status flip; items, totals,
+      // place and ETA come from the local payload.
+      if (status === 'delivered' && localHit?.payload) {
+        render({ ...localHit.payload, status: 'delivered' }, 'local');
+        return;
+      }
+      render(data, 'live');
     }, err => {
       console.warn('[bill] snapshot error', err);
       paintOffline('Live updates unavailable — showing your saved copy.');
