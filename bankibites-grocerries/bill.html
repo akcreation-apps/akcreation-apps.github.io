@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#16A34A" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0A0B0F" media="(prefers-color-scheme: dark)">
   <meta name="color-scheme" content="light dark">
+  <meta name="format-detection" content="telephone=no">
   <meta name="robots" content="noindex, nofollow">
   <title>Your Order · BankiMart</title>
 
@@ -204,6 +205,12 @@
     }
     .bill-title { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; color: #0f172a; }
     .restaurant-info p { font-size: 11px; color: #475569; line-height: 1.7; margin: 0; }
+    /* Defensive override — iOS Safari (and Android WebViews) may still
+       auto-wrap phone-shaped strings in tel: anchors even with the
+       format-detection meta, so kill the default link styling inside
+       the receipt so the phone stays visually consistent with the rest
+       of the address block. */
+    #billContainer a, #billContainer a:visited { color: inherit; text-decoration: none; }
     .table-info { display: flex; justify-content: space-between; padding: 10px 20px; font-size: 11px; color: #334155; border-bottom: 1px dashed #94a3b8; }
     .table-info p { margin: 0; }
     .table-info .id { font-weight: 700; letter-spacing: .04em; }
