@@ -1271,6 +1271,21 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         Swal.fire({ icon: 'warning', title: 'No phone', text: 'This order has no customer phone number.', confirmButtonColor: '#FF6B35' });
         return;
       }
+      // Persist a partner-facing ETA that lands the delivery partner at the
+      // restaurant / doorstep 10 min BEFORE the time we just promised the
+      // customer. Fire-and-forget so the WhatsApp redirect isn't blocked
+      // if the write is slow. Clamp to at least 1 min from now so we don't
+      // stamp a past time when admin picks a very short customer ETA (e.g.
+      // 5 min → partner ETA would go negative).
+      try {
+        const partnerMins = Math.max(1, mins - 10);
+        const partnerEtaMs = Date.now() + partnerMins * 60000;
+        updateDoc(doc(db, COL.ORDERS, o.id), {
+          eta: Timestamp.fromMillis(partnerEtaMs),
+        }).catch(err => console.warn('[orders] partner ETA write failed:', err.message));
+      } catch (err) {
+        console.warn('[orders] partner ETA compute failed:', err.message);
+      }
       const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
       try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
       try { window.location.href = waUrl; return; } catch (e) {}
