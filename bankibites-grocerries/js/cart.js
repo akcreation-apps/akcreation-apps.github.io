@@ -576,7 +576,7 @@
       return `${i + 1}. ${it.name}${unit} — ${it.qty} × ${money(it.price)} = *${lineTotal}*`;
     });
     const msg = [
-      `🛒 *New Order · ${CFG.vendorName}*`,
+      `*New Order · ${CFG.vendorName}*`,
       `━━━━━━━━━━━━━━`,
       ...lines,
       `━━━━━━━━━━━━━━`,
@@ -584,8 +584,8 @@
       `*Delivery:* ${deliveryFee === 0 ? 'FREE' : money(deliveryFee)}`,
       `*Total:* *${money(total)}*`,
       `━━━━━━━━━━━━━━`,
-      `📍 *Deliver to:* ${place.label}`,
-      `🗓️ *Delivery:* ${eta.date} · ${eta.window}`,
+      `*Deliver to:* ${place.label}`,
+      `*Delivery:* ${eta.date} · ${eta.window}`,
       ``,
       `Please confirm the order.`,
     ].join('\n');
@@ -658,23 +658,43 @@
       console.warn('[bankimart] save flow error:', err);
     }
 
-    // Step 2 — swap the loader's content in-place to a success state, then
-    // fire the WhatsApp redirect after a short delay so the customer sees
-    // confirmation before the tab hands off. No second click required — the
-    // wa.me deep-link may show mobile Chrome's `api.whatsapp.com` interstitial
-    // (one extra tap) but that's a fair trade for a single, fast flow.
-    if (typeof Swal !== 'undefined' && Swal.isVisible && Swal.isVisible()) {
-      try {
-        Swal.update({
-          title: 'Order placed ✓',
-          html: '<div style="font-size:.95rem;color:#374151">Opening WhatsApp…</div>',
-          icon: 'success',
-          showConfirmButton: false,
-        });
-        if (Swal.hideLoading) Swal.hideLoading();
-      } catch {}
+    // Step 2 — close the loader cleanly. Calling Swal.fire back-to-back can
+    // race and instantly dismiss the follow-up modal on some devices, so
+    // explicit close + tiny delay lets the DOM settle before we show the
+    // confirm.
+    if (typeof Swal !== 'undefined') {
+      try { Swal.close(); } catch {}
+      await new Promise(r => setTimeout(r, 80));
     }
-    await new Promise(r => setTimeout(r, 500));
+
+    // Step 3 — mirror the TCD flow: the wa.me send must ride a fresh user
+    // gesture, otherwise mobile Chrome routes it through the
+    // `api.whatsapp.com` interstitial ("message sent" screen). Wrapping it
+    // behind an "Open WhatsApp" Swal confirm makes the button click itself
+    // the gesture, so WhatsApp opens directly and the visibilitychange
+    // reload in goToWhatsApp() drops the customer back onto the storefront
+    // when they return.
+    // Step 3 — mirrors TCD/cart.js:632-646 exactly. The click on the
+    // "Open WhatsApp" confirm is the fresh user gesture mobile Chrome
+    // needs so the wa.me deep-link opens WhatsApp directly instead of the
+    // api.whatsapp.com interstitial. Promise.resolve() wraps Swal.fire's
+    // return so .catch is always callable regardless of CDN build.
+    try {
+      await Promise.race([
+        Promise.resolve(Swal.fire({
+          title: 'Open WhatsApp to send your order',
+          icon: 'success',
+          html: '<div style="font-size:.95rem;line-height:1.5;color:#374151">Tap below — your order is ready.</div>',
+          confirmButtonText: 'Open WhatsApp',
+          confirmButtonColor: '#16a34a',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        })).catch(() => {}),
+        new Promise(resolve => setTimeout(resolve, 60000)),
+      ]);
+    } catch (err) {
+      console.error('[bankimart] confirm step failed (sending to WhatsApp anyway):', err);
+    }
 
     goToWhatsApp();
   }
