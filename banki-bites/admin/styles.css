@@ -2961,3 +2961,174 @@ button.fab:hover { background: var(--brand-dark); }
   .eta-bump-btn:hover,
   .eta-bump-btn:focus { background: #3b82f6; color: #fff; }
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Sidebar layout (desktop ≥ 900px)
+   Transforms the horizontal .tabbar into a fixed, collapsible left rail
+   without touching the JS tab-switching logic. Mobile falls through to
+   the existing horizontal scroll-strip layout.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Elements exist in the DOM at all sizes but only render as sidebar chrome
+   on desktop; hidden by default so mobile stays clean. */
+.sidebar-brand,
+.sidebar-collapse-btn,
+.topbar-hamburger { display: none; }
+
+@media (min-width: 900px) {
+  :root { --sidebar-w: 240px; }
+  body.sidebar-collapsed { --sidebar-w: 72px; }
+
+  #appShell {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "sidebar topbar"
+      "sidebar content"
+      "sidebar footer";
+    transition: grid-template-columns .22s cubic-bezier(.4,0,.2,1);
+  }
+  #appShell > .topbar        { grid-area: topbar; }
+  #appShell > .tabbar        { grid-area: sidebar; }
+  #appShell > .content       { grid-area: content; }
+  #appShell > .admin-footer  { grid-area: footer; }
+
+  /* Sidebar surface */
+  .tabbar {
+    position: sticky; top: 0;
+    display: flex; flex-direction: column;
+    height: 100vh;
+    width: var(--sidebar-w);
+    background: linear-gradient(180deg, #0f0e15 0%, #1a1a2e 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 0;
+    overflow: hidden; /* Nav owns its own scroll */
+    padding: 0;
+    z-index: 40;
+    transition: width .22s cubic-bezier(.4,0,.2,1);
+  }
+  .tabbar::-webkit-scrollbar { width: 0; }
+
+  /* Brand block at the top */
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 18px 18px 14px;
+    color: #fff;
+    font-family: 'Poppins', sans-serif; font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -.01em;
+    white-space: nowrap; overflow: hidden;
+    min-height: 62px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .sidebar-brand-logo { width: 28px; height: 28px; object-fit: contain; flex-shrink: 0; }
+  .sidebar-brand-text { transition: opacity .18s; }
+  body.sidebar-collapsed .sidebar-brand { justify-content: center; padding: 18px 12px 14px; }
+  body.sidebar-collapsed .sidebar-brand-text { opacity: 0; width: 0; overflow: hidden; }
+
+  /* Nav list — vertical, scrollable if it overflows */
+  .sidebar-nav {
+    display: flex; flex-direction: column;
+    padding: 10px 8px;
+    gap: 2px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+  }
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+  /* Nav item — flat row, icon + label */
+  .tabbar .tab-btn {
+    flex: 0 0 auto;
+    min-width: 0; min-height: 42px;
+    width: 100%;
+    padding: 10px 14px;
+    display: flex; flex-direction: row; align-items: center; gap: 12px;
+    font-size: .88rem; font-weight: 500;
+    color: rgba(255,255,255,0.72);
+    border: 0; border-radius: 8px;
+    background: transparent;
+    transition: background .12s, color .12s;
+    text-align: left;
+  }
+  .tabbar .tab-btn i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+  .tabbar .tab-btn span {
+    max-width: none;
+    transition: opacity .18s;
+  }
+  .tabbar .tab-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .tabbar .tab-btn.active {
+    background: rgba(255,107,53,0.16);
+    color: var(--brand);
+    border-bottom: 0;
+    font-weight: 600;
+  }
+  .tabbar .tab-btn.active i { color: var(--brand); }
+  .tabbar .tab-btn .tab-badge {
+    top: 6px; right: 10px;
+    box-shadow: 0 0 0 2px #1a1a2e;
+  }
+
+  /* Collapsed mode — icon-only pill, label fades out, tooltip via native `title` */
+  body.sidebar-collapsed .tabbar .tab-btn {
+    justify-content: center;
+    padding: 10px 0;
+  }
+  body.sidebar-collapsed .tabbar .tab-btn span { opacity: 0; width: 0; overflow: hidden; }
+  body.sidebar-collapsed .tabbar .tab-btn i { width: auto; }
+  body.sidebar-collapsed .tabbar .tab-btn .tab-badge { right: 8px; }
+
+  /* Collapse toggle at the bottom of the sidebar */
+  .sidebar-collapse-btn {
+    display: flex; align-items: center; gap: 10px;
+    margin: 8px; padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.72);
+    border-radius: 8px;
+    font-size: .82rem; font-weight: 600;
+    cursor: pointer;
+    transition: background .12s, color .12s;
+    flex-shrink: 0;
+  }
+  .sidebar-collapse-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .sidebar-collapse-btn i { transition: transform .22s; width: 20px; text-align: center; }
+  .sidebar-collapse-btn span { transition: opacity .18s; }
+  body.sidebar-collapsed .sidebar-collapse-btn { justify-content: center; padding: 10px 0; }
+  body.sidebar-collapsed .sidebar-collapse-btn span { opacity: 0; width: 0; overflow: hidden; }
+  body.sidebar-collapsed .sidebar-collapse-btn i { transform: rotate(180deg); }
+
+  /* Topbar sits on the right column; hamburger button hidden on desktop
+     since the sidebar is always visible and toggling is via collapse. */
+  .topbar {
+    position: sticky; top: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: none;
+    padding: 10px 20px;
+  }
+  .topbar .topbar-brand { color: var(--text); font-size: .95rem; }
+  .topbar .topbar-brand .topbar-logo,
+  .topbar .topbar-brand span:not(.user-email) { display: none; } /* brand lives in sidebar */
+  .topbar .user-email { color: var(--text-2, var(--muted)); max-width: none; }
+  .topbar .btn-outline-light { color: var(--text); border-color: var(--border); }
+  .topbar .btn-outline-light:hover { background: var(--page-bg, var(--brand-soft)); color: var(--text); }
+
+  .content { padding: 24px 24px 72px; max-width: none; }
+}
+
+/* Mobile — sidebar becomes a slide-in drawer instead of the horizontal
+   scroll-strip when the user taps the hamburger. Defaults to the classic
+   horizontal tabbar so behaviour stays familiar on small screens. */
+@media (max-width: 899.98px) {
+  .sidebar-brand,
+  .sidebar-collapse-btn { display: none; }
+  .sidebar-nav {
+    display: contents; /* Let tab buttons participate in the horizontal .tabbar flex */
+  }
+}

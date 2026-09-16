@@ -58,6 +58,9 @@
     <h1 class="sr-only">BankiBites Admin</h1>
     <header class="topbar">
       <div class="topbar-brand">
+        <button id="sidebarExpandBtn" class="topbar-hamburger" type="button" aria-label="Expand sidebar" title="Expand sidebar">
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
         <img src="/banki-bites/banki-bites-logo.png" alt="" class="topbar-logo">
         <span>Admin</span>
       </div>
@@ -70,14 +73,24 @@
     </header>
 
     <nav class="tabbar" role="tablist" aria-label="Admin sections">
-      <button id="tab-btn-dashboard" class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true"  aria-controls="tab-dashboard"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Dashboard</span></button>
-      <button id="tab-btn-orders"    class="tab-btn"        data-tab="orders"    role="tab" aria-selected="false" aria-controls="tab-orders"><i class="fas fa-receipt"    aria-hidden="true"></i><span>Orders</span></button>
-      <button id="tab-btn-grocery"   class="tab-btn"        data-tab="grocery"   role="tab" aria-selected="false" aria-controls="tab-grocery"><i class="fas fa-basket-shopping" aria-hidden="true"></i><span>Grocery</span></button>
-      <button id="tab-btn-partners"  class="tab-btn"        data-tab="partners"  role="tab" aria-selected="false" aria-controls="tab-partners"><i class="fas fa-store"    aria-hidden="true"></i><span>Partners</span></button>
-      <button id="tab-btn-staff"     class="tab-btn"        data-tab="staff"     role="tab" aria-selected="false" aria-controls="tab-staff"><i class="fas fa-motorcycle" aria-hidden="true"></i><span>Delivery</span></button>
-      <button id="tab-btn-customers" class="tab-btn"        data-tab="customers" role="tab" aria-selected="false" aria-controls="tab-customers"><i class="fas fa-users"      aria-hidden="true"></i><span>Customers</span></button>
-      <button id="tab-btn-broadcast" class="tab-btn"        data-tab="broadcast" role="tab" aria-selected="false" aria-controls="tab-broadcast"><i class="fas fa-bullhorn"   aria-hidden="true"></i><span>Broadcast</span></button>
-      <button id="tab-btn-report"    class="tab-btn"        data-tab="report"    role="tab" aria-selected="false" aria-controls="tab-report"><i class="fas fa-file-invoice" aria-hidden="true"></i><span>Report</span></button>
+      <div class="sidebar-brand" aria-hidden="true">
+        <img src="/banki-bites/banki-bites-logo.png" alt="" class="sidebar-brand-logo">
+        <span class="sidebar-brand-text">BankiBites</span>
+      </div>
+      <div class="sidebar-nav">
+        <button id="tab-btn-dashboard" class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true"  aria-controls="tab-dashboard" title="Dashboard"><i class="fas fa-chart-line" aria-hidden="true"></i><span>Dashboard</span></button>
+        <button id="tab-btn-orders"    class="tab-btn"        data-tab="orders"    role="tab" aria-selected="false" aria-controls="tab-orders" title="Orders"><i class="fas fa-receipt"    aria-hidden="true"></i><span>Orders</span></button>
+        <button id="tab-btn-grocery"   class="tab-btn"        data-tab="grocery"   role="tab" aria-selected="false" aria-controls="tab-grocery" title="Grocery"><i class="fas fa-basket-shopping" aria-hidden="true"></i><span>Grocery</span></button>
+        <button id="tab-btn-partners"  class="tab-btn"        data-tab="partners"  role="tab" aria-selected="false" aria-controls="tab-partners" title="Partners"><i class="fas fa-store"    aria-hidden="true"></i><span>Partners</span></button>
+        <button id="tab-btn-staff"     class="tab-btn"        data-tab="staff"     role="tab" aria-selected="false" aria-controls="tab-staff" title="Delivery"><i class="fas fa-motorcycle" aria-hidden="true"></i><span>Delivery</span></button>
+        <button id="tab-btn-customers" class="tab-btn"        data-tab="customers" role="tab" aria-selected="false" aria-controls="tab-customers" title="Customers"><i class="fas fa-users"      aria-hidden="true"></i><span>Customers</span></button>
+        <button id="tab-btn-broadcast" class="tab-btn"        data-tab="broadcast" role="tab" aria-selected="false" aria-controls="tab-broadcast" title="Broadcast"><i class="fas fa-bullhorn"   aria-hidden="true"></i><span>Broadcast</span></button>
+        <button id="tab-btn-report"    class="tab-btn"        data-tab="report"    role="tab" aria-selected="false" aria-controls="tab-report" title="Report"><i class="fas fa-file-invoice" aria-hidden="true"></i><span>Report</span></button>
+      </div>
+      <button id="sidebarCollapseBtn" class="sidebar-collapse-btn" type="button" aria-label="Collapse sidebar" title="Collapse sidebar">
+        <i class="fas fa-angles-left" aria-hidden="true"></i>
+        <span>Collapse</span>
+      </button>
     </nav>
 
     <main class="content">

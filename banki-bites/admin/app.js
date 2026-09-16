@@ -60,6 +60,30 @@ function showShell() {
 let currentUser = null;
 let renderedTabs = {};
 
+// ── Sidebar collapse / expand ────────────────────────────────────────
+// Persists across sessions via localStorage. Runs synchronously so the
+// initial paint uses the correct width (avoids a flash of expanded
+// sidebar on reload when the user last had it collapsed).
+const SIDEBAR_LS_KEY = 'bb_admin_sidebar_collapsed';
+try {
+  if (localStorage.getItem(SIDEBAR_LS_KEY) === '1') {
+    document.body.classList.add('sidebar-collapsed');
+  }
+} catch {}
+function toggleSidebar(forceCollapsed) {
+  const willCollapse = typeof forceCollapsed === 'boolean'
+    ? forceCollapsed
+    : !document.body.classList.contains('sidebar-collapsed');
+  document.body.classList.toggle('sidebar-collapsed', willCollapse);
+  try { localStorage.setItem(SIDEBAR_LS_KEY, willCollapse ? '1' : '0'); } catch {}
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
+  const expandBtn = document.getElementById('sidebarExpandBtn');
+  if (collapseBtn) collapseBtn.addEventListener('click', () => toggleSidebar());
+  if (expandBtn) expandBtn.addEventListener('click', () => toggleSidebar(false));
+});
+
 (async function init() {
   try {
     const auth = await getAuthInstance();

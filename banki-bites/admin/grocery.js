@@ -66,7 +66,7 @@ export async function renderGrocery(root, db) {
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 10px 16px;
+        padding: 10px 12px;
         border: 0;
         background: transparent;
         color: #4b5563;
@@ -76,6 +76,12 @@ export async function renderGrocery(root, db) {
         cursor: pointer;
         transition: background 0.15s, color 0.15s, box-shadow 0.15s;
         letter-spacing: 0.01em;
+        white-space: nowrap;
+        min-width: 0;
+      }
+      @media (max-width: 380px) {
+        .gr-subnav-btn { padding: 10px 8px; font-size: 0.82rem; gap: 6px; }
+        .gr-subnav-btn i { font-size: 0.8rem; }
       }
       .gr-subnav-btn i { font-size: 0.85rem; opacity: 0.85; }
       .gr-subnav-btn:hover { color: #111827; }
@@ -125,6 +131,9 @@ export async function renderGrocery(root, db) {
           </select>
           <i class="fas fa-chevron-down orders-filter__caret" aria-hidden="true"></i>
         </label>
+        <button type="button" id="grClearFilters" class="orders-filter-clear" aria-label="Clear all filters" hidden>
+          <i class="fas fa-xmark" aria-hidden="true"></i> Clear
+        </button>
       </div>
       <div id="grOrdersList" class="card-list grid-2"><div class="bb-loader-block">Listening for grocery orders…</div></div>
     </div>
@@ -140,6 +149,9 @@ export async function renderGrocery(root, db) {
           </select>
           <i class="fas fa-chevron-down orders-filter__caret" aria-hidden="true"></i>
         </label>
+        <button type="button" id="grRunsClearFilter" class="orders-filter-clear" aria-label="Clear filter" hidden>
+          <i class="fas fa-xmark" aria-hidden="true"></i> Clear
+        </button>
         <button id="grPlanRunBtn" class="btn btn-sm btn-primary" style="margin-left:auto">
           <i class="fas fa-plus mr-1"></i> Plan a run
         </button>
@@ -177,7 +189,24 @@ function mountOrders(root, db) {
   const listEl = root.querySelector('#grOrdersList');
   const statusFilter = root.querySelector('#grStatusFilter');
   const etaFilter = root.querySelector('#grEtaFilter');
+  const clearBtn = root.querySelector('#grClearFilters');
   let all = [];
+
+  // Highlight the active filter wrappers and reveal the Clear button only
+  // when the current selection differs from the defaults. Mirrors the food
+  // orders tab's UX.
+  function updateFilterActiveState() {
+    const defaults = { grStatusFilter: 'active', grEtaFilter: 'all' };
+    let any = false;
+    for (const [id, def] of Object.entries(defaults)) {
+      const sel = root.querySelector('#' + id);
+      const wrap = sel && sel.closest('.orders-filter');
+      const isActive = sel && sel.value !== def;
+      if (wrap) wrap.classList.toggle('orders-filter--active', !!isActive);
+      if (isActive) any = true;
+    }
+    if (clearBtn) clearBtn.hidden = !any;
+  }
 
   function refreshEtaOptions() {
     const set = new Set();
@@ -223,8 +252,17 @@ function mountOrders(root, db) {
     });
   }
 
-  statusFilter.addEventListener('change', paint);
-  etaFilter.addEventListener('change', paint);
+  const onFilterChange = () => { updateFilterActiveState(); paint(); };
+  statusFilter.addEventListener('change', onFilterChange);
+  etaFilter.addEventListener('change', onFilterChange);
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      statusFilter.value = 'active';
+      etaFilter.value = 'all';
+      onFilterChange();
+    });
+  }
+  updateFilterActiveState();
 
   const sinceTs = Timestamp.fromDate(startOfLastMonth());
   const q = query(collection(db, COL.GROCERY_ORDERS), where('created_at', '>=', sinceTs));
@@ -831,7 +869,15 @@ async function deleteOrder(db, o) {
 function mountRuns(root, db) {
   const listEl = root.querySelector('#grRunsList');
   const filterEl = root.querySelector('#grRunsFilter');
+  const clearBtn = root.querySelector('#grRunsClearFilter');
   let allRuns = [];
+
+  function updateRunsFilterState() {
+    const isActive = filterEl.value !== 'active';
+    const wrap = filterEl.closest('.orders-filter');
+    if (wrap) wrap.classList.toggle('orders-filter--active', isActive);
+    if (clearBtn) clearBtn.hidden = !isActive;
+  }
 
   function paintRuns() {
     const f = filterEl.value;
@@ -849,7 +895,15 @@ function mountRuns(root, db) {
     listEl.innerHTML = '';
     filtered.forEach(r => listEl.appendChild(renderRunCard(db, r, root)));
   }
-  filterEl.addEventListener('change', paintRuns);
+  const onFilterChange = () => { updateRunsFilterState(); paintRuns(); };
+  filterEl.addEventListener('change', onFilterChange);
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      filterEl.value = 'active';
+      onFilterChange();
+    });
+  }
+  updateRunsFilterState();
 
   const q = query(collection(db, COL.DELIVERY_RUNS), orderBy('run_date', 'desc'));
   if (_runsUnsub) { try { _runsUnsub(); } catch {} _runsUnsub = null; }
