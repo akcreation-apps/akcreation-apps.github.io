@@ -272,7 +272,7 @@
           <h5>${escapeHTML(it.name)}</h5>
           <div class="cart-item-meta">${escapeHTML(it.unit)} · <span class="cart-item-price">${money(it.price)}</span></div>
           <div class="qty-stepper">
-            <button type="button" data-dec="${it.id}" aria-label="Decrease">−</button>
+            <button type="button" data-dec="${it.id}" aria-label="Decrease"${it.qty <= 1 ? ' disabled aria-disabled="true"' : ''}>−</button>
             <span>${it.qty}</span>
             <button type="button" data-inc="${it.id}" aria-label="Increase">+</button>
           </div>
@@ -320,19 +320,24 @@
 
     foot.innerHTML = `
       ${banner}
-      <div class="cart-eta">
-        <i class="fa-solid fa-truck-fast"></i>
-        <div>
-          <span>Arriving on</span>
-          <strong>${escapeHTML(eta.day)}, ${escapeHTML(eta.date)}</strong>
-          <em>${escapeHTML(eta.window)}</em>
+      <div class="cart-foot-grid">
+        <div class="cart-eta">
+          <i class="fa-solid fa-truck-fast"></i>
+          <div>
+            <strong>${escapeHTML(eta.day)}, ${escapeHTML(eta.date)}</strong>
+            <em>${escapeHTML(eta.window)}</em>
+          </div>
+        </div>
+        <div class="cart-summary">
+          <div class="row"><span>Items (${totalCount()})</span><span>${money(sub2)}</span></div>
+          <div class="row"><span>Delivery</span><span>${deliveryFee === 0 ? 'FREE' : money(deliveryFee)}</span></div>
+          <div class="row total"><span>Total</span><strong>${money(sub2 + deliveryFee)}</strong></div>
         </div>
       </div>
-      <div class="cart-summary">
-        <div class="row"><span>Items (${totalCount()})</span><span>${money(sub2)}</span></div>
-        <div class="row"><span>Delivery</span><span>${deliveryFee === 0 ? 'FREE' : money(deliveryFee)}</span></div>
-        <div class="row total"><span>Total</span><strong>${money(sub2 + deliveryFee)}</strong></div>
-      </div>
+      <p class="cart-disclaimer">
+        <i class="fa-solid fa-circle-info"></i>
+        Product images are illustrative — actual pack may vary.
+      </p>
       <button type="button" class="${placeOrderClass}" ${placeOrderAttrs}>
         <i class="fa-brands fa-whatsapp"></i> ${placeOrderLabel}
       </button>
@@ -733,13 +738,29 @@
     const decEl = e.target.closest('[data-dec]');
     if (decEl) {
       e.preventDefault();
+      if (decEl.disabled) return;
       dec(decEl.dataset.dec);
       return;
     }
     const rmEl = e.target.closest('[data-remove]');
     if (rmEl) {
       e.preventDefault();
-      remove(rmEl.dataset.remove);
+      const id = rmEl.dataset.remove;
+      const it = cart.find((x) => String(x.id) === String(id));
+      const name = it ? it.name : 'this item';
+      if (window.Swal) {
+        Swal.fire({
+          title: 'Remove from cart?',
+          text: `“${name}” will be removed from your cart.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, remove',
+          cancelButtonText: 'Keep',
+          confirmButtonColor: '#e11d48',
+        }).then((res) => { if (res.isConfirmed) remove(id); });
+      } else {
+        remove(id);
+      }
       return;
     }
   });

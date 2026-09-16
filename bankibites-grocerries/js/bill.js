@@ -210,11 +210,10 @@ function renderBill(order) {
       <p class="thank-you">** Thank you — order again soon! **</p>
 
       <div class="service-note">
-        <strong>Disclaimer</strong>
-        ${esc(vendorShort)} is a market-sourcing service. Item prices reflect
-        what our shopper paid at the local market on your behalf; the
-        delivery charge covers pickup and doorstep delivery.
+        <strong>Disclaimer:</strong> ${esc(vendorShort)} is a market-sourcing service. 
+        We arrange the requested items locally on your behalf and handle pickup and doorstep delivery.
       </div>
+
 
       <button class="download-button" id="downloadBillBtn">
         <i class="fa-solid fa-download" style="margin-right:6px"></i> Download bill

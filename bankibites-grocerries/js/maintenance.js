@@ -149,8 +149,7 @@ function renderMaintenanceScreen(M) {
   const eta = M.eta || '';
   const vendor = CFG.vendorName || 'BankiMart Grocerries';
   const family = CFG.familyBrand || '';
-  const supportPhone = CFG.supportPhone || '';
-  const supportEmail = CFG.supportEmail || '';
+  const whatsappNumber = String(CFG.whatsappNumber || '').replace(/\D/g, '');
   const igUrl = CFG.instagramUrl || '';
 
   document.title = title + ' · ' + vendor;
@@ -310,11 +309,8 @@ function renderMaintenanceScreen(M) {
   `;
 
   const support = [
-    supportPhone
-      ? `<a href="tel:${esc(supportPhone.replace(/\s+/g, ''))}"><i class="fa-solid fa-phone"></i> ${esc(supportPhone)}</a>`
-      : '',
-    supportEmail
-      ? `<a href="mailto:${esc(supportEmail)}"><i class="fa-solid fa-envelope"></i> ${esc(supportEmail)}</a>`
+    whatsappNumber
+      ? `<a href="https://wa.me/${esc(whatsappNumber)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</a>`
       : '',
     igUrl
       ? `<a href="${esc(igUrl)}" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> Instagram</a>`

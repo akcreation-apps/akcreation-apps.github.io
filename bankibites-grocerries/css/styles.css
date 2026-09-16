@@ -1115,29 +1115,30 @@ p { color: var(--text); }
 .cart-empty p { color: var(--muted); font-size: 0.85rem; margin-bottom: var(--s-4); }
 
 .cart-item {
-  display: grid; grid-template-columns: 60px 1fr 32px; gap: 12px;
-  align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line);
+  display: grid; grid-template-columns: 44px 1fr 28px; gap: 8px;
+  align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line);
 }
 .cart-item:last-child { border-bottom: 0; }
 .cart-item-img {
-  width: 60px; height: 60px; border-radius: 10px;
-  background: var(--surface-2); padding: 6px;
+  width: 44px; height: 44px; border-radius: 8px;
+  background: var(--surface-2); padding: 4px;
   display: flex; align-items: center; justify-content: center;
 }
 .cart-item-img img { width: 100%; height: 100%; object-fit: contain; }
 .cart-item-info { min-width: 0; }
 .cart-item-info h5 {
-  color: var(--ink); font-size: 0.85rem; font-weight: 600;
-  line-height: 1.3; margin-bottom: 4px;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  color: var(--ink); font-size: 0.8rem; font-weight: 600;
+  line-height: 1.25; margin-bottom: 2px;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
 }
-.cart-item-meta { font-size: 0.7rem; color: var(--muted); margin-bottom: 6px; }
+.cart-item-meta { font-size: 0.68rem; color: var(--muted); margin-bottom: 4px; }
 .cart-item-price { color: var(--brand-dark); font-weight: 700; }
-.cart-item-info .qty-stepper { width: 110px; height: 32px; border-radius: 8px; }
-.cart-item-info .qty-stepper button { width: 32px; font-size: 1rem; }
-.cart-item-info .qty-stepper span { font-size: 0.82rem; }
+.cart-item-info .qty-stepper { width: 92px; height: 26px; border-radius: 6px; }
+.cart-item-info .qty-stepper button { width: 26px; font-size: 0.9rem; }
+.cart-item-info .qty-stepper span { font-size: 0.78rem; }
 .cart-item-remove {
-  color: var(--muted); width: 32px; height: 32px; border-radius: 50%;
+  color: var(--muted); width: 28px; height: 28px; border-radius: 50%;
+  font-size: 0.85rem;
   transition: color 0.15s, background 0.15s;
 }
 .cart-item-remove:hover { color: var(--accent-2); background: rgba(225,29,72,0.08); }
@@ -1164,19 +1165,40 @@ p { color: var(--text); }
   font-size: 1.2rem;
 }
 
+/* The drawer becomes a strict two-panel vertical split so the product
+   list (.cart-body) claims every free pixel that the header + footer
+   don't need. The footer is capped so long product lists always win. */
+.cart-drawer { min-height: 0; }
+.cart-body { min-height: 0; flex: 1 1 0; }
 .cart-foot {
-  padding: var(--s-4) var(--s-5) calc(var(--s-4) + env(safe-area-inset-bottom));
+  flex: 0 0 auto;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
   background: var(--surface);
+  /* Cap the footer's share of the drawer so products always dominate. */
+  max-height: 42vh;
+  overflow-y: auto;
 }
+/* Split footer — ETA card on the left, totals card on the right so the
+   drawer's product list keeps as much vertical room as possible. Each
+   card manages its own internal layout so nothing gets clipped. */
+.cart-foot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: stretch;
+}
+.cart-foot-grid .cart-eta { margin-bottom: 0; }
+.cart-foot-grid .cart-summary { margin-bottom: 0; }
 .cart-free-line {
-  padding: 10px 12px; margin-bottom: 10px;
-  border-radius: 10px; background: var(--brand-tint);
-  color: var(--brand-dark); font-size: 0.8rem; font-weight: 500;
-  display: grid; grid-template-columns: auto 1fr; gap: 10px;
-  align-items: start; line-height: 1.4;
+  padding: 6px 10px; margin-bottom: 6px;
+  border-radius: 8px; background: var(--brand-tint);
+  color: var(--brand-dark); font-size: 0.74rem; font-weight: 500;
+  display: grid; grid-template-columns: auto 1fr; gap: 8px;
+  align-items: center; line-height: 1.35;
 }
-.cart-free-line > i { font-size: 0.9rem; margin-top: 2px; }
+.cart-free-line > i { font-size: 0.8rem; margin-top: 0; }
 .cart-free-line > span { min-width: 0; overflow-wrap: anywhere; }
 .cart-free-line.success { background: var(--brand-soft); }
 .cart-free-line strong { font-weight: 700; }
@@ -1188,37 +1210,77 @@ p { color: var(--text); }
   .cart-free-line.warn { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
 }
 
-/* Delivery ETA box in cart drawer */
+/* Product-image disclaimer inside the cart drawer — small italic note above
+   the Place Order button so the customer sees it right before committing. */
+.cart-disclaimer {
+  display: flex; align-items: flex-start; gap: 6px;
+  margin: 6px 0 8px;
+  padding: 0 2px;
+  font-size: 0.66rem;
+  line-height: 1.4;
+  color: var(--muted);
+  font-style: italic;
+}
+.cart-disclaimer i { color: var(--muted); font-size: 0.7rem; margin-top: 2px; flex-shrink: 0; opacity: 0.85; }
+
+/* Delivery ETA — sits in the left half of the split footer. Icon on the
+   left, date + time-window stacked in a text column so both stay fully
+   readable inside the narrower column. */
 .cart-eta {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; margin-bottom: var(--s-4);
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px;
   background: var(--surface-2);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 8px;
   color: var(--text);
+  min-width: 0;
 }
 .cart-eta > i {
-  width: 34px; height: 34px; border-radius: 10px;
+  width: 30px; height: 30px; border-radius: 8px;
   background: var(--brand); color: #fff;
   display: inline-flex; align-items: center; justify-content: center;
   font-size: 0.85rem; flex-shrink: 0;
 }
-.cart-eta > div { display: flex; flex-direction: column; line-height: 1.25; gap: 2px; }
-.cart-eta span {
-  font-size: 0.7rem; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+/* Text stacks vertically inside the narrower column: date on top,
+   time-window pill underneath. Both stay fully visible — no clipping. */
+.cart-eta > div {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 3px; flex: 1 1 auto; min-width: 0; line-height: 1.2;
 }
-.cart-eta strong { color: var(--ink); font-size: 0.9rem; font-weight: 700; }
-.cart-eta em { font-style: normal; font-size: 0.78rem; color: var(--brand-dark); font-weight: 600; }
-.cart-summary { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--s-4); }
-.cart-summary .row { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text); }
+.cart-eta strong {
+  color: var(--ink); font-size: 0.82rem; font-weight: 700;
+  letter-spacing: -.01em;
+  white-space: normal; word-break: break-word;
+}
+.cart-eta em {
+  font-style: normal; font-size: 0.72rem;
+  color: var(--brand-dark); font-weight: 700;
+  padding: 2px 7px; border-radius: 999px;
+  background: var(--brand-soft);
+  white-space: nowrap;
+}
+/* Bill lines — compact horizontal totals card */
+.cart-summary {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 6px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-width: 0;
+}
+.cart-summary .row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 8px; font-size: 0.78rem; color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
 .cart-summary .row.total {
-  padding-top: 10px; margin-top: 4px;
+  padding-top: 5px; margin-top: 2px;
   border-top: 1px dashed var(--line);
-  font-size: 1rem; color: var(--ink); font-weight: 700;
+  font-size: 0.95rem; color: var(--ink); font-weight: 700;
 }
 .cart-summary .row.total strong { color: var(--brand-dark); }
-.cart-foot .btn { margin-bottom: 8px; }
+.cart-foot .btn { margin-bottom: 0; }
+.cart-foot .btn-wa { padding: 10px 16px; font-size: 0.9rem; min-height: 44px; }
 
 /* ================================================================
    LOCATION PICKER (bottom-sheet on mobile, centered modal on desktop)
