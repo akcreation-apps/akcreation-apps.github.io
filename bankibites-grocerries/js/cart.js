@@ -472,6 +472,24 @@
   }
   window.bbOpenPlace = openPlace;
 
+  // Storefront-offline check. Uses the cached maintenance flag first
+  // (instant) and then confirms with a fresh Firestore read so a stale
+  // "online" cache can't let an order slip through after admin flipped
+  // the switch. Returns true when the storefront is offline.
+  async function isStorefrontOffline() {
+    const M = window.bbGroceryMaintenance;
+    if (!M) return false;
+    try {
+      const cached = M.cached && M.cached();
+      if (cached && cached.enabled === true) return true;
+      if (typeof M.ensureFresh === 'function') {
+        const fresh = await M.ensureFresh();
+        return !!(fresh && fresh.enabled === true);
+      }
+    } catch { /* fail-open — don't block on a failed check */ }
+    return false;
+  }
+
   const HKEY = 'bb_grocery_orders_v1';
   function pushLocalOrder(entry) {
     let arr = [];
@@ -492,6 +510,29 @@
     const sub2 = subtotal();
     const minOrder = Number(CFG.minOrder) || 0;
     if (sub2 < minOrder) return;
+
+    // Storefront-offline guard — verify the maintenance flag before
+    // touching the cart or WhatsApp handoff. Uses the cache first for
+    // instant blocking, then confirms with a fresh Firestore read so a
+    // customer who cached "online" earlier can't slip an order through
+    // after admin just flipped to offline.
+    if (await isStorefrontOffline()) {
+      if (typeof Swal !== 'undefined') {
+        await Swal.fire({
+          icon: 'info',
+          title: 'We\'re taking a short break',
+          html: 'BankiMart is temporarily offline and not accepting new orders right now. Please try again in a little while.',
+          confirmButtonText: 'Got it',
+          confirmButtonColor: '#16A34A',
+        });
+      } else {
+        alert("BankiMart is temporarily offline. Please try again in a little while.");
+      }
+      // Force a reload so maintenance.js repaints the maintenance screen
+      // — the customer shouldn't stay staring at a cart they can't submit.
+      location.reload();
+      return;
+    }
 
     const place = getPlace();
     if (!place) { openPlace(); return; }

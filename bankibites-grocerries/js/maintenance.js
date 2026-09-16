@@ -48,72 +48,88 @@ function revealShop() {
   const s = document.getElementById('bb-mm-guard');
   if (s) s.remove();
 }
-async function fetchRemoteMaintenance() {
-  try {
-    const [{ initializeApp, getApps }, { getFirestore, doc, getDoc }] = await Promise.all([
-      import('https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js'),
-      import('https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js'),
-    ]);
-    let app = getApps().find(a => a.name === 'bankimart-reader');
-    if (!app) {
-      if (typeof CryptoJS === 'undefined') return null;
-      const res = await fetch('https://akcreation-apps.com/TCD/credentials.json?v=' + Date.now());
-      if (!res.ok) return null;
-      const c = await res.json();
-      const decrypt = v => CryptoJS.AES.decrypt(v, ['TCD','FOOD','CAFE'].join('-'))
-        .toString(CryptoJS.enc.Utf8);
-      app = initializeApp({
-        apiKey:            decrypt(c.API_KEY),
-        authDomain:        decrypt(c.AUTH_DOMAIN),
-        projectId:         decrypt(c.ID),
-        storageBucket:     decrypt(c.STORAGE_BUCKET),
-        messagingSenderId: decrypt(c.MESSAGING_SENDER_ID),
-        appId:             decrypt(c.APP_ID),
-        measurementId:     decrypt(c.MEASUREMENT_ID),
-      }, 'bankimart-reader');
-    }
-    const db = getFirestore(app);
-    const snap = await getDoc(doc(db, 'bankibites_meta', 'bankimart_maintenance'));
-    if (!snap.exists()) return { enabled: false };
-    const d = snap.data();
-    return {
-      enabled: d.enabled === true,
-      title: d.title || '',
-      message: d.message || '',
-      eta: d.eta || '',
-    };
-  } catch (err) {
-    console.warn('[maintenance] remote fetch failed:', err.message);
-    return null;
+// Reusable Firebase reader — the same named app used by other modules.
+async function getMaintenanceReader() {
+  const [{ initializeApp, getApps }, { getFirestore, doc, getDoc, onSnapshot }] = await Promise.all([
+    import('https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js'),
+    import('https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js'),
+  ]);
+  let app = getApps().find(a => a.name === 'bankimart-reader');
+  if (!app) {
+    if (typeof CryptoJS === 'undefined') throw new Error('CryptoJS unavailable');
+    const res = await fetch('https://akcreation-apps.com/TCD/credentials.json?v=' + Date.now());
+    if (!res.ok) throw new Error('credentials fetch failed');
+    const c = await res.json();
+    const decrypt = v => CryptoJS.AES.decrypt(v, ['TCD','FOOD','CAFE'].join('-'))
+      .toString(CryptoJS.enc.Utf8);
+    app = initializeApp({
+      apiKey:            decrypt(c.API_KEY),
+      authDomain:        decrypt(c.AUTH_DOMAIN),
+      projectId:         decrypt(c.ID),
+      storageBucket:     decrypt(c.STORAGE_BUCKET),
+      messagingSenderId: decrypt(c.MESSAGING_SENDER_ID),
+      appId:             decrypt(c.APP_ID),
+      measurementId:     decrypt(c.MEASUREMENT_ID),
+    }, 'bankimart-reader');
   }
+  const db = getFirestore(app);
+  return { doc: doc(db, 'bankibites_meta', 'bankimart_maintenance'), getDoc, onSnapshot };
 }
-// Kick off the async check regardless of the current sync verdict. If the
-// remote and cache disagree, we mount the maintenance screen in-place
-// (going offline) or reveal the shop (coming back online) — no reload.
-(function syncRemoteMaintenance() {
+
+// Expose a live-reading helper so cart.js (checkout guard) can call it.
+// Returns the last-known state synchronously; a fresh fetch runs whenever
+// the caller invokes ensureFresh().
+window.bbGroceryMaintenance = {
+  cached: readCachedMaintenance,
+  ensureFresh: async () => {
+    try {
+      const { doc: ref, getDoc } = await getMaintenanceReader();
+      const snap = await getDoc(ref);
+      const remote = snap.exists()
+        ? { enabled: snap.data().enabled === true, title: snap.data().title || '', message: snap.data().message || '', eta: snap.data().eta || '' }
+        : { enabled: false };
+      try { localStorage.setItem(REMOTE_KEY, JSON.stringify(remote)); } catch {}
+      return remote;
+    } catch (err) {
+      console.warn('[maintenance] fresh fetch failed:', err.message);
+      return readCachedMaintenance() || { enabled: false };
+    }
+  },
+};
+
+// Kick off a LIVE subscription. Any admin flip pushes down in ~200 ms and
+// we react in-place — go offline instantly, or reload back into the shop.
+(function subscribeRemoteMaintenance() {
   const cached = readCachedMaintenance();
   const cachedOn = !!(cached && cached.enabled);
-  fetchRemoteMaintenance().then(remote => {
-    if (!remote) {
-      // Fetch failed (permissions, offline). Fail-open so the shop still
-      // renders for first-time visitors instead of an infinite blank.
+  getMaintenanceReader().then(({ doc: ref, onSnapshot }) => {
+    let firstSnap = true;
+    onSnapshot(ref, snap => {
+      const remote = snap.exists()
+        ? { enabled: snap.data().enabled === true, title: snap.data().title || '', message: snap.data().message || '', eta: snap.data().eta || '' }
+        : { enabled: false };
+      try { localStorage.setItem(REMOTE_KEY, JSON.stringify(remote)); } catch {}
+      if (firstSnap) {
+        firstSnap = false;
+        if (remote.enabled && !window.BB_MAINTENANCE) {
+          renderMaintenanceScreen(remote);
+        } else if (!remote.enabled && cachedOn) {
+          setTimeout(() => location.reload(), 200);
+        } else {
+          revealShop();
+        }
+        return;
+      }
+      // Subsequent snapshots — live flips.
+      if (remote.enabled && !window.BB_MAINTENANCE) {
+        renderMaintenanceScreen(remote);
+      } else if (!remote.enabled && window.BB_MAINTENANCE) {
+        location.reload();
+      }
+    }, err => {
+      console.warn('[maintenance] subscribe failed:', err.message);
       revealShop();
-      return;
-    }
-    try { localStorage.setItem(REMOTE_KEY, JSON.stringify(remote)); } catch {}
-    if (remote.enabled && !window.BB_MAINTENANCE) {
-      // Flipped ON while page was loading (or first visit) — apply the
-      // maintenance screen directly. renderMaintenanceScreen owns the
-      // reveal too via body.innerHTML replacement.
-      renderMaintenanceScreen(remote);
-    } else if (!remote.enabled && cachedOn) {
-      // Was offline in cache, now back online — reload so any half-hidden
-      // storefront state (BB_MAINTENANCE flag, hidden body) is cleared.
-      setTimeout(() => location.reload(), 200);
-    } else {
-      // Steady state — just reveal the guarded body.
-      revealShop();
-    }
+    });
   }).catch(() => { revealShop(); });
 })();
 
