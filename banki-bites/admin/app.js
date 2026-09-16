@@ -60,27 +60,59 @@ function showShell() {
 let currentUser = null;
 let renderedTabs = {};
 
-// ── BankiMart grocery maintenance probe ──────────────────────────────
-// Reads bankibites-grocerries/js/config.js as text and pulls the
-// `maintenance.enabled` flag out with a small regex. When true the admin
-// hides the Grocery tab and the Dashboard's Food/Grocery source toggle
-// so no one accidentally acts on orders while the storefront is offline.
-// Cached for the tab session — one HTTP fetch on load.
+// ── BankiMart grocery maintenance flag ───────────────────────────────
+// Reads the admin-controlled maintenance flag from Firestore at
+// `bankibites_meta/bankimart_maintenance`. When enabled, admin panel:
+//   • The Dashboard hides the Food/Grocery source toggle (forces Food).
+//   • The Grocery tab replaces its Orders/Runs sub-views with a status
+//     card so admin can only toggle the flag back off — no risk of
+//     acting on stale in-flight orders.
+// Cached per tab-session; call `invalidateGroceryMaintenance()` after
+// admin writes so the very next check sees the new state.
 let _bbGroceryMaintenanceCache = null;
 async function fetchGroceryMaintenance() {
   if (_bbGroceryMaintenanceCache !== null) return _bbGroceryMaintenanceCache;
   try {
-    const res = await fetch('https://akcreation-apps.com/bankibites-grocerries/js/config.js?v=' + Date.now());
-    if (!res.ok) { _bbGroceryMaintenanceCache = false; return false; }
-    const text = await res.text();
-    const m = text.match(/maintenance\s*:\s*\{[^}]*enabled\s*:\s*(true|false)/);
-    _bbGroceryMaintenanceCache = !!(m && m[1] === 'true');
-  } catch {
+    const db = await getDb();
+    const { doc: docFn, getDoc } = await import('https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js');
+    const snap = await getDoc(docFn(db, COL.META, 'bankimart_maintenance'));
+    _bbGroceryMaintenanceCache = snap.exists() && snap.data().enabled === true;
+  } catch (err) {
+    console.warn('[admin] maintenance flag fetch failed:', err.message);
     _bbGroceryMaintenanceCache = false;
   }
   return _bbGroceryMaintenanceCache;
 }
+function invalidateGroceryMaintenance() { _bbGroceryMaintenanceCache = null; }
 window.bbGroceryMaintenance = fetchGroceryMaintenance;
+window.bbGroceryMaintenanceInvalidate = invalidateGroceryMaintenance;
+
+// Live-subscribe to the maintenance doc so the Grocery tab hides / shows
+// the instant admin flips the switch (from this tab or another). Called
+// once per session after auth.
+let _groceryTabUnsub = null;
+async function subscribeGroceryMaintenance(db) {
+  if (_groceryTabUnsub) return;
+  try {
+    const { doc: docFn, onSnapshot } = await import('https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js');
+    _groceryTabUnsub = onSnapshot(docFn(db, COL.META, 'bankimart_maintenance'), snap => {
+      const off = snap.exists() && snap.data().enabled === true;
+      _bbGroceryMaintenanceCache = off;
+      const groceryBtn = document.getElementById('tab-btn-grocery');
+      if (groceryBtn) groceryBtn.hidden = off;
+      // If the currently-active tab was Grocery and admin just took the
+      // storefront offline, bounce back to Dashboard so admin isn't left
+      // staring at a hidden tab's stale content.
+      if (off && groceryBtn?.classList.contains('active')) {
+        activateTab('dashboard');
+      }
+    }, err => {
+      console.warn('[admin] maintenance flag subscribe failed:', err.message);
+    });
+  } catch (err) {
+    console.warn('[admin] maintenance flag subscribe init failed:', err.message);
+  }
+}
 
 // ── Sidebar collapse / expand ────────────────────────────────────────
 // Persists across sessions via localStorage. Runs synchronously so the
@@ -162,15 +194,10 @@ document.addEventListener('DOMContentLoaded', () => {
       currentUser = user;
       $('#userEmail').textContent = user.email;
       showShell();
-      // Hide the Grocery tab entirely if the BankiMart storefront is in
-      // maintenance mode — no new grocery orders should be flowing in.
-      try {
-        const maintenance = await fetchGroceryMaintenance();
-        if (maintenance) {
-          const groceryBtn = document.getElementById('tab-btn-grocery');
-          if (groceryBtn) groceryBtn.hidden = true;
-        }
-      } catch {}
+      // Live-hide the Grocery tab whenever the storefront is in maintenance.
+      // Admin toggles the flag from Partners → BankiMart card; this listener
+      // mirrors any change (from this tab or another) instantly.
+      subscribeGroceryMaintenance(await getDb());
       // Ask once for browser-notification permission so we can alert on
       // new orders when this tab is backgrounded. Silent if already
       // granted/denied — no fallback prompt.
@@ -211,12 +238,6 @@ async function pickLandingTab(db) {
 }
 
 async function activateTab(name) {
-  // Grocery gate — if the storefront is in maintenance we redirect any
-  // attempt to open the Grocery tab back to Dashboard so admin never lands
-  // on stale data (and the sidebar button is already hidden anyway).
-  if (name === 'grocery' && await fetchGroceryMaintenance()) {
-    name = 'dashboard';
-  }
   document.querySelectorAll('.tab-btn').forEach(b => {
     const isActive = b.dataset.tab === name;
     b.classList.toggle('active', isActive);

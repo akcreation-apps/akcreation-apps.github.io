@@ -1,6 +1,6 @@
 import { COL } from '../firebase-config.js';
 import {
-  collection, getDocs, query, where, Timestamp, doc, setDoc,
+  collection, getDocs, query, where, Timestamp, doc, setDoc, onSnapshot,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isCancelled, isPayoutPaid, isPayoutPending,
@@ -302,19 +302,11 @@ export async function renderDashboard(root, db) {
 
   try { await whenChartReady(); } catch (e) { console.warn('[dashboard] Chart.js unavailable:', e.message); }
   wireRangeControls(root, db);
-  // Hide the Food/Grocery source toggle when BankiMart storefront is in
-  // maintenance — admin should only see food-order analytics until the
-  // grocery flow comes back online.
-  try {
-    const maintenance = typeof window.bbGroceryMaintenance === 'function'
-      ? await window.bbGroceryMaintenance()
-      : false;
-    if (maintenance) {
-      state.source = 'food';
-      const sourceEl = root.querySelector('.dash-source');
-      if (sourceEl) sourceEl.hidden = true;
-    }
-  } catch {}
+  // Live-subscribe to BankiMart storefront maintenance. When enabled we
+  // hide the Food/Grocery toggle and force `state.source = 'food'`; when
+  // disabled the toggle re-appears. Also refreshes the current view any
+  // time the flag flips so admin never sees stale data.
+  await subscribeMaintenanceToggle(root, db);
   root.querySelectorAll('[data-source]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const which = btn.dataset.source;
@@ -473,6 +465,37 @@ function renderRangeControls() {
       <label>To <input type="date" id="dashRangeTo" value="${toISO}"></label>
     </div>
   `;
+}
+
+// Live-subscribe to bankibites_meta/bankimart_maintenance so the Food/Grocery
+// source toggle reflects the storefront state without a page reload. When
+// the flag flips, we hide/show the toggle and refresh the current view.
+let _dashMaintenanceUnsub = null;
+async function subscribeMaintenanceToggle(root, db) {
+  const apply = async (enabled) => {
+    const sourceEl = root.querySelector('.dash-source');
+    if (sourceEl) sourceEl.hidden = enabled;
+    // Force back to food data whenever grocery goes offline so charts
+    // never show partial grocery data while the storefront is down.
+    if (enabled && state.source !== 'food') {
+      state.source = 'food';
+      root.querySelectorAll('[data-source]').forEach(b => {
+        const active = b.dataset.source === 'food';
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      await refresh(root, db);
+    }
+  };
+  // Detach any previous listener from an earlier render.
+  if (_dashMaintenanceUnsub) { try { _dashMaintenanceUnsub(); } catch {} _dashMaintenanceUnsub = null; }
+  const ref = doc(db, COL.META, 'bankimart_maintenance');
+  _dashMaintenanceUnsub = onSnapshot(ref, snap => {
+    const enabled = snap.exists() && snap.data().enabled === true;
+    apply(enabled);
+  }, err => {
+    console.warn('[dashboard] maintenance flag listener failed:', err.message);
+  });
 }
 
 function wireRangeControls(root, db) {

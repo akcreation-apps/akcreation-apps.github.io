@@ -97,6 +97,7 @@ export async function renderGrocery(root, db) {
         .gr-subnav-btn:hover { color: #f3f4f6; }
         .gr-subnav-btn.is-active { background: #1c1f27; color: #f3f4f6; box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
       }
+
     </style>
     <div class="gr-subnav" role="tablist" aria-label="Grocery view">
       <button type="button" class="gr-subnav-btn is-active" data-sub="orders" role="tab" aria-selected="true">

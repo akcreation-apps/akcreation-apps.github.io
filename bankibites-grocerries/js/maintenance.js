@@ -1,17 +1,90 @@
 /**
  * Maintenance-mode renderer.
- * Reads window.BB_CONFIG.maintenance (set by config.js) and, if
- * `enabled: true`, replaces the entire document body with a
- * self-contained, animated maintenance screen.
+ * The authoritative flag lives at `bankibites_meta/bankimart_maintenance`
+ * in Firestore — admin toggles it from the BankiBites Admin → Grocery
+ * tab. Storefront pages check a localStorage cache synchronously for
+ * a flash-free repeat visit, and fetch the fresh remote state in the
+ * background. If cache and remote disagree, we save the fresh copy and
+ * reload so the next paint matches reality.
  *
  * Load this AFTER config.js on any page that should honor the kill
- * switch. Pages that only need to read the flag (e.g. a parent hub
- * showing an "Open Grocerries" button) should include config.js
- * only — no side effects there anymore.
+ * switch. config.js itself no longer carries the flag; it just supplies
+ * vendor branding used by the maintenance screen.
  */
+// ── Live remote flag (Firestore) ────────────────────────────────────
+// The authoritative maintenance state lives at
+// `bankibites_meta/bankimart_maintenance` in Firestore — admin toggles
+// it from BankiBites Admin → Partners. We use a hybrid strategy:
+//   1. Synchronous: read the cached last-seen flag from localStorage;
+//      if it's on, render the maintenance screen immediately so repeat
+//      visits during downtime don't flash the storefront.
+//   2. Async: fetch fresh state from Firestore in the background. If the
+//      cached and remote flags disagree, update localStorage and reload
+//      so the next paint matches reality.
+const REMOTE_KEY = 'bb_grocery_maintenance_v1';
+function readCachedMaintenance() {
+  try { return JSON.parse(localStorage.getItem(REMOTE_KEY)) || null; }
+  catch { return null; }
+}
+async function fetchRemoteMaintenance() {
+  try {
+    const [{ initializeApp, getApps }, { getFirestore, doc, getDoc }] = await Promise.all([
+      import('https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js'),
+    ]);
+    let app = getApps().find(a => a.name === 'bankimart-reader');
+    if (!app) {
+      if (typeof CryptoJS === 'undefined') return null;
+      const res = await fetch('https://akcreation-apps.com/TCD/credentials.json?v=' + Date.now());
+      if (!res.ok) return null;
+      const c = await res.json();
+      const decrypt = v => CryptoJS.AES.decrypt(v, ['TCD','FOOD','CAFE'].join('-'))
+        .toString(CryptoJS.enc.Utf8);
+      app = initializeApp({
+        apiKey:            decrypt(c.API_KEY),
+        authDomain:        decrypt(c.AUTH_DOMAIN),
+        projectId:         decrypt(c.ID),
+        storageBucket:     decrypt(c.STORAGE_BUCKET),
+        messagingSenderId: decrypt(c.MESSAGING_SENDER_ID),
+        appId:             decrypt(c.APP_ID),
+        measurementId:     decrypt(c.MEASUREMENT_ID),
+      }, 'bankimart-reader');
+    }
+    const db = getFirestore(app);
+    const snap = await getDoc(doc(db, 'bankibites_meta', 'bankimart_maintenance'));
+    if (!snap.exists()) return { enabled: false };
+    const d = snap.data();
+    return {
+      enabled: d.enabled === true,
+      title: d.title || '',
+      message: d.message || '',
+      eta: d.eta || '',
+    };
+  } catch (err) {
+    console.warn('[maintenance] remote fetch failed:', err.message);
+    return null;
+  }
+}
+// Kick off the async check regardless of the current sync verdict. If the
+// remote and cache disagree, save the fresh copy and reload so the next
+// paint matches reality.
+(function syncRemoteMaintenance() {
+  const cached = readCachedMaintenance();
+  const cachedOn = !!(cached && cached.enabled);
+  fetchRemoteMaintenance().then(remote => {
+    if (!remote) return;
+    try { localStorage.setItem(REMOTE_KEY, JSON.stringify(remote)); } catch {}
+    if (!!remote.enabled !== cachedOn) {
+      // State changed while the page was loading — reload so the render
+      // matches. Deferred one paint so any critical UI is stable first.
+      setTimeout(() => location.reload(), 400);
+    }
+  }).catch(() => {});
+})();
+
 (function renderMaintenanceIfEnabled() {
   const CFG = window.BB_CONFIG || {};
-  const M = CFG.maintenance || {};
+  const M = readCachedMaintenance() || {};
   if (!M.enabled) return;
 
   const esc = (s) =>

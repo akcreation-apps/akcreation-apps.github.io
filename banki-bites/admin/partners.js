@@ -1,6 +1,6 @@
 import { COL } from '../firebase-config.js';
 import {
-  collection, getDocs, doc, setDoc, deleteDoc, orderBy, query, where, writeBatch, Timestamp,
+  collection, getDocs, doc, setDoc, deleteDoc, orderBy, query, where, writeBatch, Timestamp, onSnapshot,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, startOfLastMonth, isDelivered, truncateName } from '../analytics.js';
 
@@ -55,6 +55,71 @@ function isValidPhone(raw) {
 
 export async function renderPartners(root, db) {
   root.innerHTML = `
+    <style>
+      /* BankiMart storefront status card — sits at the top of the
+         Partners tab so admin always has a route to bring the storefront
+         back online. Green when live, amber when offline. */
+      .bm-store {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0; border-radius: 10px;
+        background: #ffffff;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 2px rgba(15,23,42,.04);
+      }
+      .bm-store--offline { border-color: #f59e0b; background: #fef8ec; }
+      .bm-store-icon {
+        width: 34px; height: 34px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: #dcfce7; color: #15803d; font-size: .9rem;
+        flex-shrink: 0;
+      }
+      .bm-store--offline .bm-store-icon { background: #fef3c7; color: #b45309; }
+      .bm-store-title {
+        flex: 1 1 auto; min-width: 0;
+        font-size: .88rem; font-weight: 700;
+        color: #0f172a; margin: 0; letter-spacing: -.01em;
+        line-height: 1.25;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .bm-store-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 12px; border-radius: 7px; border: 0;
+        font-size: .78rem; font-weight: 700; cursor: pointer;
+        transition: background .12s, transform .06s;
+        white-space: nowrap;
+      }
+      .bm-store-btn:active { transform: scale(.97); }
+      .bm-store-btn--off { background: #dc2626; color: #fff; }
+      .bm-store-btn--off:hover { background: #b91c1c; }
+      .bm-store-btn--on { background: #16a34a; color: #fff; }
+      .bm-store-btn--on:hover { background: #15803d; }
+      /* Narrow phones — clip the subtitle to one line so long copy
+         doesn't push the card to two rows of text. */
+      @media (max-width: 420px) {
+        .bm-store { gap: 10px; padding: 8px 10px; }
+        .bm-store-icon { width: 30px; height: 30px; font-size: .82rem; }
+        .bm-store-title { font-size: .82rem; }
+        .bm-store-btn { padding: 6px 10px; font-size: .72rem; gap: 4px; }
+        .bm-store-btn span { display: none; }
+      }
+      @media (prefers-color-scheme: dark) {
+        .bm-store { background: #14161c; border-color: #262a33; }
+        .bm-store--offline { background: #3f2d0b; border-color: #b45309; }
+        .bm-store-icon { background: rgba(22,163,74,.15); color: #4ade80; }
+        .bm-store--offline .bm-store-icon { background: rgba(245,158,11,.15); color: #fbbf24; }
+        .bm-store-title { color: #f1f5f9; }
+        .bm-store-sub { color: #94a3b8; }
+      }
+    </style>
+    <div id="bmStoreCard" class="bm-store" hidden>
+      <div class="bm-store-icon"><i class="fas fa-store"></i></div>
+      <p class="bm-store-title" id="bmStoreTitle">BankiMart · Live</p>
+      <button type="button" id="bmStoreBtn" class="bm-store-btn bm-store-btn--off">
+        <i class="fas fa-power-off"></i> <span id="bmStoreBtnLabel">Take offline</span>
+      </button>
+    </div>
+
     <details class="stats-block">
       <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Partner insights</summary>
       <div class="stats-block-body">
@@ -81,10 +146,75 @@ export async function renderPartners(root, db) {
     <div id="partnersList" class="card-list"><div class="bb-loader-block">Loading restaurants…</div></div>
   `;
   document.getElementById('addPartnerBtn').addEventListener('click', () => openEditor(db, null, root));
+  wireStorefrontToggle(root, db);
   try { await whenChartReady(); } catch (e) { console.warn('[partners] Chart.js unavailable:', e.message); }
   wireStatsBlockResize(root.querySelector('.stats-block'));
   await loadPartners(db, root);
   await renderPartnerCharts(db);
+}
+
+// ── BankiMart storefront maintenance toggle ─────────────────────────
+// The single source of truth lives at bankibites_meta/bankimart_maintenance.
+// When enabled, the storefront's maintenance.js reads the flag and swaps
+// customer pages for the maintenance screen; here we mirror the state on
+// the card and flip the doc when admin taps the button.
+function wireStorefrontToggle(root, db) {
+  const card = root.querySelector('#bmStoreCard');
+  const btn = root.querySelector('#bmStoreBtn');
+  const btnLabel = root.querySelector('#bmStoreBtnLabel');
+  const title = root.querySelector('#bmStoreTitle');
+  if (!card || !btn) return;
+
+  const paint = (enabled) => {
+    card.hidden = false;
+    card.classList.toggle('bm-store--offline', enabled);
+    title.textContent = enabled ? 'BankiMart · Offline' : 'BankiMart · Live';
+    btnLabel.textContent = enabled ? 'Take online' : 'Take offline';
+    btn.classList.toggle('bm-store-btn--on', enabled);
+    btn.classList.toggle('bm-store-btn--off', !enabled);
+  };
+
+  // Live-subscribe so the card reflects a change made from another tab.
+  const ref = doc(db, COL.META, 'bankimart_maintenance');
+  onSnapshot(ref, snap => {
+    const enabled = snap.exists() && snap.data().enabled === true;
+    paint(enabled);
+  }, err => {
+    console.warn('[partners] maintenance flag listener failed:', err.message);
+    paint(false);
+  });
+
+  btn.addEventListener('click', async () => {
+    const currentlyOffline = card.classList.contains('bm-store--offline');
+    const nextEnabled = !currentlyOffline;
+    const ok = await Swal.fire({
+      icon: nextEnabled ? 'warning' : 'question',
+      title: nextEnabled ? 'Take BankiMart storefront offline?' : 'Bring BankiMart back online?',
+      html: nextEnabled
+        ? "Customers won't be able to place new grocery orders and will see the maintenance screen instead. Existing orders keep working."
+        : 'Customers can place new grocery orders again.',
+      showCancelButton: true,
+      confirmButtonText: nextEnabled ? 'Take offline' : 'Bring online',
+      confirmButtonColor: nextEnabled ? '#dc2626' : '#16a34a',
+      reverseButtons: true,
+    });
+    if (!ok.isConfirmed) return;
+    try {
+      window.bbBusy('Saving…');
+      await setDoc(ref, {
+        enabled: nextEnabled,
+        updated_at: Timestamp.now(),
+      }, { merge: true });
+      // Bust the tab-session cache so Dashboard's next check hits fresh state.
+      if (typeof window.bbGroceryMaintenanceInvalidate === 'function') {
+        window.bbGroceryMaintenanceInvalidate();
+      }
+      window.bbDone();
+    } catch (err) {
+      window.bbDone();
+      Swal.fire({ icon: 'error', title: 'Save failed', text: err.message });
+    }
+  });
 }
 
 async function renderPartnerCharts(db) {

@@ -91,22 +91,8 @@ window.BB_CONFIG = {
       'Your everyday kirana essentials, delivered to your door. No traffic. No queues. No carrying five bags while pretending everything is fine.',
   },
 
-  // -----------------------------------------------------------------
-  // SITE KILL SWITCH — flip `enabled: true` to take the entire website
-  // offline and show the branded maintenance screen instead. All pages
-  // (index, categories, search, ...) load this config first, so a single
-  // toggle here disables the whole storefront.
-  // -----------------------------------------------------------------
-  maintenance: {
-    enabled: true,
-    title: 'Restocking the shelves',
-    message:
-      "BankiBites is polishing the counters and refilling the aisles. We'll be back shortly with fresher shelves and a smoother checkout.",
-    eta: '', // e.g. 'in about 30 minutes' or 'Back tomorrow at 9 AM'
-  },
 };
 
-// Maintenance renderer lives in js/maintenance.js — load that AFTER
-// this file on any page that should honor the kill switch. Consumers
-// that only need to read the flag (e.g. a parent hub) can include this
-// file alone with no side effects.
+// Maintenance is admin-controlled: js/maintenance.js pulls the live flag
+// from Firestore at `bankibites_meta/bankimart_maintenance`. Toggle it
+// from BankiBites Admin → Grocery tab; no config change is needed here.
