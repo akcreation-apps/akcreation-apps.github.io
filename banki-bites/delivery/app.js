@@ -216,11 +216,6 @@ async function listenOrders(user) {
     });
     _allOrders = orders;
     if (_currentView === 'earnings') renderEarnings();
-    orders.sort((a, b) => {
-      const ta = a.created_at?.toMillis?.() || 0;
-      const tb = b.created_at?.toMillis?.() || 0;
-      return tb - ta;
-    });
     const filtered = orders.filter(o => {
       if (filter === 'delivered') {
         if (o.status !== 'delivered') return false;
@@ -229,6 +224,34 @@ async function listenOrders(user) {
       }
       return o.status !== 'delivered' && o.status !== 'cancelled';
     });
+    // Sort by context: on the Active tab the rider wants the earliest ETA
+    // on top (soonest deadline first, no-ETA orders last so they don't
+    // crowd out time-critical drops). On History we keep the reverse-chrono
+    // "most recent first" ordering. Grocery-run stops live in a separate
+    // container (#groceryRuns) and are pre-sorted by run sequence — this
+    // block doesn't touch them.
+    if (filter === 'delivered') {
+      filtered.sort((a, b) => {
+        const ta = toDateSafe(a.delivered_at) || toDateSafe(a.created_at);
+        const tb = toDateSafe(b.delivered_at) || toDateSafe(b.created_at);
+        return (tb?.getTime() || 0) - (ta?.getTime() || 0);
+      });
+    } else {
+      filtered.sort((a, b) => {
+        const ea = toDateSafe(a.eta);
+        const eb = toDateSafe(b.eta);
+        // Both have ETA — soonest first.
+        if (ea && eb) return ea.getTime() - eb.getTime();
+        // Only one has ETA — the ETA'd order is more urgent.
+        if (ea) return -1;
+        if (eb) return 1;
+        // Neither has ETA — fall back to newest created_at first so the
+        // freshest incoming order sits nearer the top of the fallback list.
+        const ca = a.created_at?.toMillis?.() || 0;
+        const cb = b.created_at?.toMillis?.() || 0;
+        return cb - ca;
+      });
+    }
     // History tab also lists completed grocery runs (one synthetic entry
     // per run) so restaurant deliveries and grocery runs share the same UI.
     // Zero-earning runs surface as "Not eligible" via the payout_applicable
