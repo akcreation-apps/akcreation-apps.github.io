@@ -35,6 +35,7 @@ function mountStaffChart(id, config) {
 }
 
 let _staffOrdersCache = null;
+let _staffRunsCache = null;         // completed grocery runs across all staff
 let _staffFeeRules = null;
 let _staffRoot = null;
 let _staffDb = null;
@@ -107,6 +108,44 @@ async function refreshStaffOrders(db, { force = false } = {}) {
     () => query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs)),
     { ttlMs: 2 * 60_000, force },
   );
+  // Also pull completed grocery runs since the same cutoff. Turned into
+  // synthetic order-shaped rows so the existing payout UI treats them
+  // exactly like a restaurant delivery — one row per run, one payout per run.
+  _staffRunsCache = await cachedGetDocs(
+    'delivery_runs:completed:sinceLastMonth',
+    () => query(
+      collection(db, COL.DELIVERY_RUNS),
+      where('status', '==', 'completed'),
+      where('created_at', '>=', sinceTs),
+    ),
+    { ttlMs: 2 * 60_000, force },
+  );
+}
+
+// Convert a completed run doc into a synthetic order the payout UI can
+// consume. Matches the shape used by the delivery PWA so both sides stay
+// in sync.
+function runToSyntheticOrder(r) {
+  const stops = (r.order_ids || []).length;
+  const deliveredAt = r.completed_at || r.created_at || null;
+  return {
+    id: `run_${r.id}`,
+    __grocery_run: true,
+    __run_id: r.id,
+    status: 'delivered',
+    payout_applicable: true,
+    payout_paid: r.payout_paid === true,
+    payout_paid_at: r.payout_paid_at || null,
+    payout_amount: Number(r.partner_earning) || 0,
+    delivered_at: deliveredAt,
+    created_at: r.created_at || deliveredAt,
+    delivery_staff_id: r.partner_uid || null,
+    restaurant_name: 'BankiMart · Grocery',
+    customer: { name: `${stops} stop${stops === 1 ? '' : 's'}${r.run_date ? ' · ' + r.run_date : ''}` },
+    place: '',
+    total: Number.isFinite(+r.total_value) ? +r.total_value : undefined,
+    run_date: r.run_date,
+  };
 }
 
 function renderStaffCharts() {
@@ -255,7 +294,12 @@ async function loadStaff(db, root, { force = false } = {}) {
 }
 
 function staffOrdersFor(uid) {
-  return (_staffOrdersCache || []).filter(o => o.delivery_staff_id === uid && isDelivered(o) && o.payout_applicable !== false);
+  const restaurantOrders = (_staffOrdersCache || [])
+    .filter(o => o.delivery_staff_id === uid && isDelivered(o) && o.payout_applicable !== false);
+  const groceryRunOrders = (_staffRunsCache || [])
+    .filter(r => r.partner_uid === uid)
+    .map(runToSyntheticOrder);
+  return [...restaurantOrders, ...groceryRunOrders];
 }
 
 function renderCard(db, root, uid, s) {
@@ -466,17 +510,33 @@ function renderCard(db, root, uid, s) {
       const batch = writeBatch(db);
       const now = Timestamp.now();
       const ids = checked.map(c => c.dataset.order);
+      // Split ids by their target collection. Grocery-run synthetic rows are
+      // prefixed `run_<runId>` and write to bankibites_delivery_runs; the
+      // rest are restaurant order ids in bankibites_orders.
+      const runIds = [];
+      const orderIds = [];
       for (const id of ids) {
+        if (id.startsWith('run_')) runIds.push(id.slice(4));
+        else orderIds.push(id);
+      }
+      for (const id of orderIds) {
         batch.update(doc(db, COL.ORDERS, id), { payout_paid: true, payout_paid_at: now });
+      }
+      for (const rid of runIds) {
+        batch.update(doc(db, COL.DELIVERY_RUNS, rid), { payout_paid: true, payout_paid_at: now });
       }
       await batch.commit();
       window.bbDone();
-      // Reflect in cache and re-render. Local mutation keeps this tab snappy;
-      // invalidating the shared cache ensures other tabs (Dashboard) refetch.
+      // Reflect in local caches so the current tab re-renders without a
+      // round-trip. Other tabs pick up via cache invalidation.
       for (const o of _staffOrdersCache) {
-        if (ids.includes(o.id)) { o.payout_paid = true; o.payout_paid_at = now; }
+        if (orderIds.includes(o.id)) { o.payout_paid = true; o.payout_paid_at = now; }
+      }
+      for (const r of (_staffRunsCache || [])) {
+        if (runIds.includes(r.id)) { r.payout_paid = true; r.payout_paid_at = now; }
       }
       invalidateCache('orders:sinceLastMonth');
+      invalidateCache('delivery_runs:completed:sinceLastMonth');
       Swal.fire({ icon: 'success', title: 'Saved', timer: 1100, showConfirmButton: false });
       loadStaff(db, root);
       renderStaffCharts();

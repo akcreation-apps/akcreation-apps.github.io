@@ -27,7 +27,12 @@
       "Bash(command -v python3)",
       "Bash(ffmpeg -y -i Egg_Tadka.png -c:v libwebp -lossless 0 -q:v 85 Egg_Tadka.webp)",
       "Bash(ffmpeg -y -i Tadka.png -c:v libwebp -lossless 0 -q:v 85 Tadka.webp)",
-      "Bash(grep -E \"\\\\.js$\")"
+      "Bash(grep -E \"\\\\.js$\")",
+      "Bash(file *.webp)",
+      "Bash(where realesrgan-ncnn-vulkan *)",
+      "Bash(where waifu2x-ncnn-vulkan *)",
+      "Bash(where ffmpeg *)",
+      "Bash(grep -n \"paidAlreadyInit\\\\|isNewUnprocessed\\\\|value=\\\\\"\\\\${paidAlready\" banki-bites/admin/grocery.js)"
     ]
   },
   "enableAllProjectMcpServers": true,

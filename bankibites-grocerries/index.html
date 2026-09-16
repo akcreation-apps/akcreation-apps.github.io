@@ -170,10 +170,18 @@
     <div class="vcb-cta">View Cart <i class="fa-solid fa-arrow-right"></i></div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="js/config.js"></script>
   <script src="js/maintenance.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/search.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/order-history.js"></script>
+  <script type="module">
+    import { writeGroceryOrder, warmWriterConnection } from './js/order-write.js';
+    window.bbWriteGroceryOrder = writeGroceryOrder;
+    warmWriterConnection();
+  </script>
 </body>
 </html>

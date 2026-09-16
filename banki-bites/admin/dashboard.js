@@ -21,6 +21,9 @@ const MAX_FETCH_DAYS = 60;
 const RANGE_LS_KEY = 'bb_admin_dashboard_range';
 const state = {
   range: loadRangeState(),
+  // Which collection drives the whole dashboard. Toggled via the Food /
+  // Grocery segmented control at the top of the page.
+  source: 'food',
 };
 
 function loadRangeState() {
@@ -95,6 +98,31 @@ function normalizeRange(input) {
   return { preset, from, to, cutAt, label };
 }
 
+// Flatten a bankibites_grocery_orders doc into the same shape the dashboard's
+// existing renderers expect for bankibites_orders. Purely presentational — no
+// writes touch the doc. Missing analogues (extra_charges, discount, eta, etc.)
+// resolve to sensible defaults so charts stay quiet instead of throwing.
+function normaliseGroceryOrder(o) {
+  const subtotal = Number(o.subtotal) || 0;
+  const fee = Number(o.delivery_fee_final ?? o.delivery_fee_estimated ?? 0);
+  const total = Number.isFinite(+o.total_estimated)
+    ? +o.total_estimated
+    : subtotal + (Number.isFinite(fee) ? fee : 0);
+  return {
+    ...o,
+    restaurant_name: o.restaurant_name || 'BankiMart · Grocery',
+    restaurant_id:   o.restaurant_id   || 'bankimart',
+    place: o.place || o.customer?.address || '',
+    total,
+    subtotal,
+    extra_charges: 0,
+    discount: 0,
+    paid_already: Number.isFinite(+o.paid_already) ? +o.paid_already : 0,
+    paid_method: o.payment_method || o.paid_method || '',
+    payout_amount: undefined,  // let feeForOrder fall back to near/far rules
+  };
+}
+
 function mountChart(id, config) {
   const old = charts.get(id);
   if (old) { try { old.destroy(); } catch {} }
@@ -107,6 +135,34 @@ function mountChart(id, config) {
 
 export async function renderDashboard(root, db) {
   root.innerHTML = `
+    <style>
+      .dash-source {
+        display: flex; gap: 10px; padding: 6px;
+        background: #f3f4f6; border-radius: 12px;
+        margin: 0 0 12px; width: 100%;
+      }
+      .dash-source-btn {
+        flex: 1 1 0;
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 10px 16px;
+        border: 0; background: transparent;
+        color: #4b5563; font-weight: 600; font-size: 0.9rem;
+        border-radius: 8px; cursor: pointer;
+        transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+      }
+      .dash-source-btn:hover { color: #111827; }
+      .dash-source-btn.is-active {
+        background: #fff; color: #111827;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+      }
+      .dash-source-btn.is-active i { color: var(--brand, #16a34a); }
+      @media (prefers-color-scheme: dark) {
+        .dash-source { background: #14161c; }
+        .dash-source-btn { color: #9ca3af; }
+        .dash-source-btn:hover { color: #f3f4f6; }
+        .dash-source-btn.is-active { background: #1c1f27; color: #f3f4f6; box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+      }
+    </style>
     <div class="section-header section-header--compact">
       <h3 class="m-0"><i class="fas fa-chart-line text-primary mr-1"></i> Dashboard</h3>
       <div class="d-flex" style="gap:6px;flex-wrap:wrap">
@@ -119,6 +175,15 @@ export async function renderDashboard(root, db) {
           <span class="d-none d-sm-inline ml-1" aria-hidden="true">Refresh</span>
         </button>
       </div>
+    </div>
+
+    <div class="dash-source" role="tablist" aria-label="Data source">
+      <button type="button" class="dash-source-btn is-active" data-source="food" role="tab" aria-selected="true">
+        <i class="fas fa-utensils"></i> Food
+      </button>
+      <button type="button" class="dash-source-btn" data-source="grocery" role="tab" aria-selected="false">
+        <i class="fas fa-basket-shopping"></i> Grocery
+      </button>
     </div>
 
     <div id="dashRange" class="dash-range" role="toolbar" aria-label="Date range">
@@ -237,6 +302,19 @@ export async function renderDashboard(root, db) {
 
   try { await whenChartReady(); } catch (e) { console.warn('[dashboard] Chart.js unavailable:', e.message); }
   wireRangeControls(root, db);
+  root.querySelectorAll('[data-source]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const which = btn.dataset.source;
+      if (state.source === which) return;
+      state.source = which;
+      root.querySelectorAll('[data-source]').forEach(b => {
+        const active = b.dataset.source === which;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      await refresh(root, db);
+    });
+  });
   await refresh(root, db);
   document.getElementById('dashRefresh').addEventListener('click', async () => {
     const btn = document.getElementById('dashRefresh');
@@ -429,21 +507,22 @@ async function refresh(root, db) {
   const mom = { from: startOfLastMonth(), to: new Date() };
   const fetchFrom = state.range.from < mom.from ? state.range.from : mom.from;
   const sinceTs = Timestamp.fromDate(fetchFrom);
+  // Swap the collection based on the Food/Grocery toggle. Everything else
+  // (partners, staff, customers, fee rules) is shared across both flows.
+  const sourceCol = state.source === 'grocery' ? COL.GROCERY_ORDERS : COL.ORDERS;
   const [ordersSnap, partnersSnap, staffSnap, customersSnap, rules] = await Promise.all([
-    getDocs(query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs))),
+    getDocs(query(collection(db, sourceCol), where('created_at', '>=', sinceTs))),
     getDocs(collection(db, COL.PARTNERS)),
     getDocs(collection(db, COL.STAFF)),
-    // Customers collection carries each phone's created_at (first-time
-    // upsert), which the "New vs Repeat" chart uses to classify orders — this
-    // knowledge predates the current fetch window so a customer who first
-    // ordered months ago is correctly tagged as "Repeat" even if their only
-    // order inside the range is the earliest one we've fetched.
     getDocs(collection(db, COL.CUSTOMERS)),
     loadFeeRules(db, { autoSeed: true }),
   ]);
 
   const ordersAll = [];
-  ordersSnap.forEach(d => ordersAll.push({ id: d.id, ...d.data() }));
+  ordersSnap.forEach(d => {
+    const raw = { id: d.id, ...d.data() };
+    ordersAll.push(state.source === 'grocery' ? normaliseGroceryOrder(raw) : raw);
+  });
   const partners = [];
   partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
   const staff = [];

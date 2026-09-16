@@ -14,6 +14,7 @@ import {
   toDateSafe, bucketByDay, chartPalette, whenChartReady, fmtINR, startOfDay, startOfLastMonth,
   truncateName, isOnTime,
 } from '../analytics.js';
+import { mountGroceryRuns } from './grocery-runs.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -116,6 +117,13 @@ let currentUser = null;
       _currentView = b.dataset.view;
       const ordersListEl = $('#ordersList');
       const earningsEl = $('#earningsView');
+      const groceryRunsEl = $('#groceryRuns');
+      // Grocery runs container is only used on the Active tab (for dispatched
+      // runs with interactive stop cards). History & Earnings inline runs
+      // into their own lists, so hide the container everywhere else.
+      if (groceryRunsEl) groceryRunsEl.hidden = _currentView !== 'active';
+      // Tell grocery-runs.js which slice to paint into the container.
+      import('./grocery-runs.js').then(mod => mod.setGroceryRunsView(_currentView)).catch(() => {});
       if (_currentView === 'earnings') {
         ordersListEl.hidden = true;
         earningsEl.hidden = false;
@@ -179,6 +187,7 @@ let currentUser = null;
     try { _feeRules = await loadFeeRules(db, { force: true }); } catch {}
     await loadPartnerContacts(db);
     listenOrders(user);
+    mountGroceryRuns(db, user);
   });
 })();
 
@@ -220,9 +229,56 @@ async function listenOrders(user) {
       }
       return o.status !== 'delivered' && o.status !== 'cancelled';
     });
+    // History tab also lists completed grocery runs (one synthetic entry
+    // per run) so restaurant deliveries and grocery runs share the same UI.
+    // Zero-earning runs surface as "Not eligible" via the payout_applicable
+    // flag on the synthetic object.
+    if (filter === 'delivered') {
+      import('./grocery-runs.js').then(mod => {
+        try {
+          const synths = mod.getCompletedRunsAsSyntheticOrders()
+            .filter(o => {
+              const t = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+              return t && t >= since;
+            });
+          if (!synths.length) return;
+          // Merge and re-sort chronologically so grocery runs interleave with
+          // restaurant deliveries by delivered_at.
+          const merged = [...filtered, ...synths].sort((a, b) => {
+            const ta = (toDateSafe(a.delivered_at) || toDateSafe(a.created_at))?.getTime() || 0;
+            const tb = (toDateSafe(b.delivered_at) || toDateSafe(b.created_at))?.getTime() || 0;
+            return tb - ta;
+          });
+          listEl.innerHTML = '';
+          merged.forEach(o => listEl.appendChild(renderCard(db, o)));
+        } catch (err) {
+          console.warn('[delivery] grocery history merge failed:', err.message);
+        }
+      });
+    }
     if (!filtered.length) {
       const sinceLabel = since.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-      listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>${filter === 'delivered' ? `Nothing delivered since ${sinceLabel}.` : 'No active deliveries.'}</p></div>`;
+      // Active tab: don't show "No active deliveries" if grocery-run stops
+      // are already visible above the list. Async-check the module and paint
+      // the empty state only when both restaurant orders AND grocery stops
+      // are empty. History tab already includes grocery runs inline so its
+      // filtered array reflects both.
+      if (filter !== 'delivered') {
+        import('./grocery-runs.js').then(mod => {
+          try {
+            const groceryStops = mod.activeGroceryStopCount ? mod.activeGroceryStopCount() : 0;
+            if (groceryStops > 0) {
+              listEl.innerHTML = '';
+            } else {
+              listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No active deliveries.</p></div>`;
+            }
+          } catch {
+            listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No active deliveries.</p></div>`;
+          }
+        });
+        return;
+      }
+      listEl.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Nothing delivered since ${sinceLabel}.</p></div>`;
       return;
     }
     listEl.innerHTML = '';
@@ -722,9 +778,34 @@ async function renderEarnings() {
       </div>
     </details>
   `;
+  // Grocery-run earnings live on the run doc (partner_earning) — not on
+  // individual orders. Pull them as synthetic "order-like" objects from
+  // grocery-runs.js and merge into the main pipeline so they participate in
+  // KPIs (today/week/month/lifetime) and the Payout history list.
+  let groceryOrders = [];
+  try {
+    const mod = await import('./grocery-runs.js');
+    // Force a fresh fetch so admin's mark-paid write is reflected immediately
+    // even if the live snapshot listener hasn't propagated yet. Falls back to
+    // the module's cached _allRuns if this call fails.
+    if (currentUser?.uid) {
+      const db = await getDb();
+      await mod.fetchAllRunsForPartner(db, currentUser.uid);
+    }
+    groceryOrders = mod.getCompletedRunsAsSyntheticOrders();
+    mod.onGroceryRunsChanged(() => {
+      if (_currentView === 'earnings') renderEarnings();
+    });
+  } catch (err) {
+    console.warn('[earnings] grocery runs merge skipped:', err.message);
+  }
   try { await whenChartReady(); } catch (e) { console.warn('[earnings] Chart.js unavailable:', e.message); }
   const p = chartPalette();
-  const orders = (_allOrders || []).filter(isDelivered).filter(o => o.payout_applicable !== false);
+  // Merge restaurant deliveries + synthetic grocery-run objects so every
+  // downstream stat (KPIs / charts / history / pending) treats them uniformly.
+  const orders = [...(_allOrders || []), ...groceryOrders]
+    .filter(isDelivered)
+    .filter(o => o.payout_applicable !== false);
 
   // KPI window helpers
   const now = new Date();

@@ -1073,6 +1073,14 @@ p { color: var(--text); }
   transition: opacity 0.2s, visibility 0.2s;
   z-index: 1100;
 }
+
+/* SweetAlert2 defaults to z-index 1060, which sits BEHIND the cart drawer
+   (1200) and its backdrop (1100). Bump every SwAl surface above the drawer
+   so the checkout loader / confirm is actually visible when placeOrder()
+   fires from inside the cart. */
+.swal2-container { z-index: 2000 !important; }
+.swal2-backdrop-show { z-index: 2000 !important; }
+.swal2-popup { z-index: 2001 !important; }
 .cart-backdrop.open { opacity: 1; visibility: visible; }
 
 .cart-drawer {

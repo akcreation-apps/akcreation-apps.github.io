@@ -312,7 +312,7 @@
 
     const placeOrderAttrs = belowMin
       ? 'disabled aria-disabled="true"'
-      : 'data-place-order';
+      : 'data-place-order="1"';
     const placeOrderClass = belowMin ? 'btn btn-wa is-disabled' : 'btn btn-wa';
     const placeOrderLabel = belowMin
       ? `Add ${money(minOrder - sub2)} more to place order`
@@ -333,7 +333,7 @@
         <div class="row"><span>Delivery</span><span>${deliveryFee === 0 ? 'FREE' : money(deliveryFee)}</span></div>
         <div class="row total"><span>Total</span><strong>${money(sub2 + deliveryFee)}</strong></div>
       </div>
-      <button class="${placeOrderClass}" ${placeOrderAttrs}>
+      <button type="button" class="${placeOrderClass}" ${placeOrderAttrs}>
         <i class="fa-brands fa-whatsapp"></i> ${placeOrderLabel}
       </button>
     `;
@@ -472,31 +472,63 @@
   }
   window.bbOpenPlace = openPlace;
 
-  // Called by cart drawer's "Place Order via WhatsApp" button
-  function placeOrder() {
+  const HKEY = 'bb_grocery_orders_v1';
+  function pushLocalOrder(entry) {
+    let arr = [];
+    try { arr = JSON.parse(localStorage.getItem(HKEY)) || []; } catch (e) { arr = []; }
+    arr.unshift(entry);
+    if (arr.length > 20) arr.length = 20;
+    try { localStorage.setItem(HKEY, JSON.stringify(arr)); } catch {}
+  }
+
+  // Called by cart drawer's "Place Order" button.
+  // Flow (matches BankiBites restaurant pattern): write order to Firestore
+  // (best-effort, silent), save to localStorage so the customer can re-open
+  // the bill, then redirect straight to WhatsApp so the customer can share
+  // their name/address there. Admin fills in customer details from the WA
+  // message.
+  async function placeOrder() {
     if (cart.length === 0) return;
     const sub2 = subtotal();
     const minOrder = Number(CFG.minOrder) || 0;
-    if (sub2 < minOrder) return;   // defense: button should already be disabled
+    if (sub2 < minOrder) return;
 
     const place = getPlace();
-    if (!place) {
-      openPlace();
-      return;
-    }
+    if (!place) { openPlace(); return; }
 
-    // One line per item: "1. Name (unit) — 2 × ₹120 = *₹240*"
+    const threshold = CFG.freeDeliveryThreshold || 0;
+    const flatFee = Number(CFG.deliveryFee) || 0;
+    const deliveryFee = sub2 >= threshold ? 0 : flatFee;
+    const total = sub2 + deliveryFee;
+    const eta = computeEta();
+    const pad = n => String(n).padStart(2, '0');
+    const etaDate = `${eta.target.getFullYear()}-${pad(eta.target.getMonth()+1)}-${pad(eta.target.getDate())}`;
+
+    const payload = {
+      items: cart.map(it => ({
+        id: it.id, name: it.name, price: Number(it.price) || 0,
+        unit: it.unit || '', image: it.image || '', qty: Number(it.qty) || 0,
+      })),
+      subtotal: sub2,
+      delivery_fee_estimated: deliveryFee,
+      total_estimated: total,
+      place: place.label,
+      place_custom: place.id === 'custom',
+      customer: { name: '', phone: '' },
+      eta_date: etaDate,
+      eta_window: eta.window,
+    };
+
+    // Build the WhatsApp message up-front so we can redirect immediately in
+    // the user's click gesture. The DB write races the tab handoff — most of
+    // the time it wins (mobile Chrome keeps the tab alive during the WA
+    // handoff), but even if it doesn't, the write is retried inside
+    // order-write.js.
     const lines = cart.map((it, i) => {
       const unit = it.unit ? ` (${it.unit})` : '';
       const lineTotal = money(it.price * it.qty);
       return `${i + 1}. ${it.name}${unit} — ${it.qty} × ${money(it.price)} = *${lineTotal}*`;
     });
-    const threshold = CFG.freeDeliveryThreshold || 0;
-    const flatFee = Number(CFG.deliveryFee) || 0;
-    const deliveryFee = sub2 >= threshold ? 0 : flatFee;
-    const total = sub2 + deliveryFee;
-
-    const eta = computeEta();
     const msg = [
       `🛒 *New Order · ${CFG.vendorName}*`,
       `━━━━━━━━━━━━━━`,
@@ -511,10 +543,94 @@
       ``,
       `Please confirm the order.`,
     ].join('\n');
-
     const phone = (CFG.whatsappNumber || '').replace(/\D/g, '');
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-    window.location.href = url;
+    const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+
+    // TCD-style two-step flow: (1) a "Saving your order…" loader while the
+    // Firestore write finishes; (2) a "Open WhatsApp" confirm whose button
+    // press is a fresh user gesture — mobile Chrome needs that so the wa.me
+    // deep-link opens WhatsApp directly (no api.whatsapp.com interstitial).
+    const goToWhatsApp = () => {
+      // Silent safety net for vivo / older Android where the wa.me Intent
+      // sometimes drops `text` — the customer can long-press → Paste.
+      try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch {}
+      // Clear cart optimistically at the moment of hand-off.
+      cart = [];
+      save();
+      // Force a clean reload the moment the customer returns to this tab —
+      // otherwise the "Order placed" Swal (and the hidden cart drawer) stay
+      // frozen on top of the storefront. Matches TCD's post-checkout behaviour.
+      try {
+        const onReturn = () => {
+          if (document.visibilityState !== 'visible') return;
+          document.removeEventListener('visibilitychange', onReturn);
+          window.removeEventListener('pageshow', onReturn);
+          location.reload();
+        };
+        document.addEventListener('visibilitychange', onReturn);
+        window.addEventListener('pageshow', onReturn);
+      } catch {}
+      try { window.location.href = waUrl; return; } catch {}
+      try { window.location.assign(waUrl); return; } catch {}
+      try { window.open(waUrl, '_self'); return; } catch {}
+      try { window.open(waUrl, '_blank'); } catch {}
+    };
+
+    // Step 1 — open the loader immediately. Swal.fire() inserts the popup
+    // into the DOM synchronously; we then yield one animation frame so the
+    // browser paints BEFORE the Firestore write kicks off. Without the frame
+    // yield the write can finish faster than the paint on a good connection
+    // and the customer never sees the loader flash in.
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        title: 'Saving your order…',
+        html: '<div style="font-size:.9rem;color:#6b7280">Hang tight, this only takes a moment.</div>',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading(),
+      });
+    }
+    await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+
+    const writeOrder = async () => {
+      if (typeof window.bbWriteGroceryOrder !== 'function') {
+        const mod = await import('./order-write.js');
+        window.bbWriteGroceryOrder = mod.writeGroceryOrder;
+      }
+      const { id } = await window.bbWriteGroceryOrder(payload);
+      pushLocalOrder({ orderId: id, payload, savedAt: Date.now() });
+    };
+
+    // Bounded write — never trap the customer on the loader.
+    try {
+      await Promise.race([
+        writeOrder().catch(err => console.warn('[bankimart] order write failed:', err)),
+        new Promise(resolve => setTimeout(resolve, 10000)),
+      ]);
+    } catch (err) {
+      console.warn('[bankimart] save flow error:', err);
+    }
+
+    // Step 2 — swap the loader's content in-place to a success state, then
+    // fire the WhatsApp redirect after a short delay so the customer sees
+    // confirmation before the tab hands off. No second click required — the
+    // wa.me deep-link may show mobile Chrome's `api.whatsapp.com` interstitial
+    // (one extra tap) but that's a fair trade for a single, fast flow.
+    if (typeof Swal !== 'undefined' && Swal.isVisible && Swal.isVisible()) {
+      try {
+        Swal.update({
+          title: 'Order placed ✓',
+          html: '<div style="font-size:.95rem;color:#374151">Opening WhatsApp…</div>',
+          icon: 'success',
+          showConfirmButton: false,
+        });
+        if (Swal.hideLoading) Swal.hideLoading();
+      } catch {}
+    }
+    await new Promise(r => setTimeout(r, 500));
+
+    goToWhatsApp();
   }
   window.bbPlaceOrder = placeOrder;
 

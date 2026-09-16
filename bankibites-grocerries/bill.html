@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="theme-color" content="#16A34A" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A0B0F" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Your Order · BankiMart</title>
+
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────────── */
+    :root {
+      --page-bg: #f5f6f8;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-2: #475569;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --line-2: #cbd5e1;
+      --brand: #16A34A;
+      --brand-2: #15803d;
+      --brand-soft: #dcfce7;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --wa: #25D366;
+      --shadow-1: 0 1px 2px rgba(15, 23, 42, .06);
+      --shadow-2: 0 4px 12px rgba(15, 23, 42, .06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page-bg: #0b0d12;
+        --surface: #14171d;
+        --text: #f1f5f9;
+        --text-2: #cbd5e1;
+        --muted: #94a3b8;
+        --line: #232833;
+        --line-2: #334155;
+        --brand: #22c55e;
+        --brand-2: #16a34a;
+        --brand-soft: #052e16;
+        --blue: #60a5fa;
+        --blue-soft: #0e2450;
+        --amber: #fbbf24;
+        --amber-soft: #3f2d0b;
+        --danger: #f87171;
+        --danger-soft: #3f0f11;
+        --shadow-1: 0 1px 2px rgba(0, 0, 0, .4);
+        --shadow-2: 0 6px 18px rgba(0, 0, 0, .35);
+      }
+    }
+
+    /* ── Page shell ───────────────────────────────────────────────── */
+    * { box-sizing: border-box; }
+    body.bill-body {
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 5;
+    }
+    .topbar a { color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+    .topbar .back-icon { width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-2); }
+    .topbar .back-icon:hover { background: var(--page-bg); color: var(--text); }
+    .topbar .brand { font-weight: 800; font-size: 1.05rem; letter-spacing: -.01em; }
+    .topbar .brand .accent { color: var(--brand); }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 20px 16px 40px; }
+    .offline-banner {
+      background: var(--amber-soft); color: var(--amber);
+      padding: 10px 14px; border-radius: 10px; margin-bottom: 14px;
+      font-size: .85rem; text-align: center; font-weight: 500;
+    }
+
+    /* ── Skeleton ─────────────────────────────────────────────────── */
+    .skeleton {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 16px; padding: 48px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      color: var(--muted); text-align: center;
+    }
+    .skeleton i { font-size: 1.5rem; color: var(--brand); }
+
+    /* ── Tracker (pre-delivery) ───────────────────────────────────── */
+    .tracker {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-1);
+    }
+    .tracker-hero {
+      padding: 28px 20px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .tracker-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 12px;
+    }
+    .tracker-icon--confirmed { background: var(--brand-soft); color: var(--brand); }
+    .tracker-icon--active { background: var(--blue-soft); color: var(--blue); }
+    .tracker-icon--pending { background: var(--amber-soft); color: var(--amber); }
+    .tracker-title {
+      font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em;
+      margin: 0 0 6px; color: var(--text);
+    }
+    .tracker-sub { color: var(--muted); font-size: .9rem; line-height: 1.5; margin: 0; }
+    .tracker-meta { padding: 16px 20px; display: grid; gap: 12px; }
+    .tracker-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: .9rem;
+    }
+    .tracker-row-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--page-bg); color: var(--text-2);
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: .85rem;
+    }
+    .tracker-row-body { min-width: 0; flex: 1; }
+    .tracker-row-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+    .tracker-row-value { color: var(--text); font-weight: 500; word-break: break-word; }
+    .tracker-note {
+      background: var(--page-bg);
+      color: var(--text-2);
+      font-size: .82rem; line-height: 1.55;
+      padding: 12px 20px; margin: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    /* ── Cancelled card ───────────────────────────────────────────── */
+    .cancelled {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--danger);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-1);
+    }
+    .cancelled i { color: var(--danger); font-size: 1.5rem; margin-bottom: 10px; }
+    .cancelled h3 { margin: 0 0 6px; font-weight: 800; font-size: 1.05rem; }
+    .cancelled p { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.5; }
+    .cancelled .id { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px; background: var(--page-bg); color: var(--text-2); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
+
+    /* ── Actions ──────────────────────────────────────────────────── */
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 13px 16px;
+      border-radius: 12px; font-weight: 700; font-size: .95rem;
+      text-decoration: none; border: 0; cursor: pointer;
+      min-height: 48px; letter-spacing: -.005em;
+      transition: transform .06s, background .15s, color .15s;
+      font-family: inherit;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn-wa { background: var(--wa); color: #fff; }
+    .btn-wa:hover { background: #1ebe58; }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--line-2); }
+    .btn-ghost:hover { background: var(--page-bg); }
+    .btn-danger-outline { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+    .btn-danger-outline:hover { background: var(--danger); color: #fff; }
+
+    /* ── Receipt (delivered) ──────────────────────────────────────
+       Deliberately a white paper card in every theme so the PNG
+       export from html2canvas stays legible. Monospace + dashed
+       separators keep the "printed receipt" aesthetic. */
+    #billContainer {
+      background: #ffffff; color: #0f172a;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12.5px; line-height: 1.5;
+      max-width: 400px; margin: 0 auto;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, .12);
+    }
+    .bill-header {
+      text-align: center;
+      padding: 20px 20px 14px;
+      border-bottom: 1px dashed #94a3b8;
+    }
+    .bill-title { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; color: #0f172a; }
+    .restaurant-info p { font-size: 11px; color: #475569; line-height: 1.7; margin: 0; }
+    .table-info { display: flex; justify-content: space-between; padding: 10px 20px; font-size: 11px; color: #334155; border-bottom: 1px dashed #94a3b8; }
+    .table-info p { margin: 0; }
+    .table-info .id { font-weight: 700; letter-spacing: .04em; }
+    .separator { border: none; border-top: 1px dashed #cbd5e1; margin: 0; }
+    .bill-items { list-style: none; padding: 10px 20px; margin: 0; }
+    .bill-item { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 4px 0; font-size: 12.5px; }
+    .bill-item .qtyname { flex: 1; min-width: 0; word-break: break-word; color: #0f172a; }
+    .bill-item .price { white-space: nowrap; flex-shrink: 0; font-weight: 600; color: #0f172a; }
+    .bill-item-sub { font-size: 10.5px; color: #64748b; padding-left: 14px; padding-top: 2px; }
+    .bill-totals { padding: 10px 20px 4px; font-size: 12px; color: #334155; }
+    .bill-totals .row { display: flex; justify-content: space-between; padding: 3px 0; }
+    #billTotal {
+      font-size: 14px; font-weight: 800; text-align: right;
+      padding: 12px 20px 10px;
+      border-top: 2px solid #0f172a; margin-top: 2px;
+      letter-spacing: .04em;
+      color: #0f172a;
+    }
+    .thank-you { text-align: center; padding: 10px 20px 8px; font-size: 11px; color: #64748b; border-top: 1px dashed #cbd5e1; }
+    .service-note {
+      margin: 8px 20px 2px; padding: 0;
+      background: transparent; border: 0;
+      font-size: 9.5px; color: #64748b;
+      font-style: italic; line-height: 1.5; text-align: center;
+    }
+    .service-note strong {
+      display: inline; font-style: normal;
+      font-size: 9.5px; letter-spacing: .04em;
+      text-transform: uppercase; color: #64748b;
+      margin-right: 4px;
+    }
+    .service-note strong::after { content: ':'; }
+    .download-button {
+      display: block; width: calc(100% - 40px); margin: 14px 20px 20px;
+      background: #0f172a; color: #fff; border: none; padding: 12px;
+      font-size: 12px; font-family: 'Courier New', monospace; font-weight: 800;
+      cursor: pointer; letter-spacing: .8px; text-transform: uppercase;
+      border-radius: 6px;
+      transition: background .15s;
+    }
+    .download-button:hover { background: #1e293b; }
+
+    /* ── Footer ────────────────────────────────────────────────── */
+    .site-footer {
+      text-align: center; padding: 24px 16px 32px;
+      color: var(--muted); font-size: .8rem;
+    }
+    .site-footer a { color: inherit; text-decoration: none; font-weight: 600; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* ── Mobile tweaks ───────────────────────────────────────────── */
+    @media (max-width: 400px) {
+      .wrap { padding: 16px 12px 32px; }
+      .tracker-hero { padding: 22px 16px 16px; }
+      .tracker-meta { padding: 14px 16px; }
+      #billContainer { font-size: 12px; }
+      .bill-header { padding: 16px 14px 12px; }
+      .bill-items { padding: 8px 14px; }
+      .bill-totals { padding: 8px 14px 4px; }
+      #billTotal { padding: 10px 14px 8px; }
+      .service-note { margin: 10px 14px 4px; }
+      .download-button { width: calc(100% - 28px); margin: 12px 14px 14px; }
+    }
+  </style>
+</head>
+<body class="bill-body">
+  <header class="topbar">
+    <a href="index.html" class="back-icon" id="topbarBack" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></a>
+    <a href="index.html" class="brand">BankiMart<span class="accent">.</span></a>
+  </header>
+  <script>
+    // If the customer arrived from the "My Orders" panel (order-history.js
+    // sets bbReopenOrders when they tap View), rewrite the back button so
+    // going back returns them to the panel — not the storefront homepage.
+    (function () {
+      try {
+        if (sessionStorage.getItem('bbReopenOrders') === '1') {
+          const back = document.getElementById('topbarBack');
+          if (back) back.setAttribute('href', 'index.html?openOrders=1');
+        }
+      } catch {}
+    })();
+  </script>
+
+  <main class="wrap">
+    <div id="offlineBanner" class="offline-banner" hidden></div>
+    <div id="billRoot">
+      <div class="skeleton"><i class="fa-solid fa-circle-notch fa-spin"></i> <span>Loading your order…</span></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. · Made in Odisha ❤️</p>
+  </footer>
+  <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="js/config.js"></script>
+  <script type="module" src="js/bill.js"></script>
+</body>
+</html>

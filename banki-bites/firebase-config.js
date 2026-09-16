@@ -147,4 +147,6 @@ export const COL = {
   STAFF:    'bankibites_delivery_staff',
   CUSTOMERS:'bankibites_customers',
   META:     'bankibites_meta',
+  GROCERY_ORDERS: 'bankibites_grocery_orders',
+  DELIVERY_RUNS:  'bankibites_delivery_runs',
 };

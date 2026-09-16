@@ -1003,3 +1003,258 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   .kpi-hero-label { font-size: 0.6rem; }
   .kpi-hero-sub { font-size: 0.62rem; }
 }
+
+/* ===========================================================================
+   Grocery-run active cards (delivery partner Active tab)
+   Compact one-run card + list of stop rows so a boy with 5 stops isn't
+   scrolling three screens. Auto-themes via prefers-color-scheme.
+   =========================================================================== */
+.gr-run {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand, #16a34a);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.gr-run-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.gr-run-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.gr-run-title i { color: var(--brand, #16a34a); }
+.gr-run-stat {
+  margin-left: auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--brand, #16a34a);
+  font-size: 0.95rem;
+}
+.gr-run-stat-sep { color: var(--muted); margin: 0 2px; font-weight: 500; }
+.gr-run-notes {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  background: #fef3c7;
+  color: #78350f;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.gr-run-notes i {
+  color: #b45309;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+@media (prefers-color-scheme: dark) {
+  .gr-run-notes { background: #3f2d0b; color: #fde68a; }
+  .gr-run-notes i { color: #fbbf24; }
+}
+.gr-run-stops { display: flex; flex-direction: column; gap: 6px; }
+
+.gr-stop {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  background: var(--bg, #fafafa);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: opacity 0.15s, background 0.15s;
+}
+.gr-stop-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.gr-stop--next {
+  border-color: var(--brand, #16a34a);
+  background: rgba(22, 163, 74, 0.06);
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1);
+}
+.gr-stop--done {
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+.gr-stop--done .gr-stop-num {
+  background: var(--success, #16a34a);
+  color: #fff;
+}
+.gr-stop-actions--done {
+  color: var(--muted);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+}
+.gr-stop-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--border);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  align-self: flex-start;
+}
+.gr-stop--next .gr-stop-num {
+  background: var(--brand, #16a34a);
+  color: #fff;
+}
+.gr-stop-body { min-width: 0; }
+.gr-stop-id {
+  font-family: ui-monospace, Menlo, Consolas, "SF Mono", monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--brand, #16a34a);
+  line-height: 1.15;
+  margin-bottom: 1px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.gr-stop-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.gr-stop-addr {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.gr-stop-meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.gr-stop-footer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+.gr-stop-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+/* Slightly bigger tap targets since each icon now stands on its own —
+   also stretches nicely across the full card width. */
+.gr-stop-actions .icon-action {
+  width: 44px;
+  height: 40px;
+  min-width: 44px;
+  font-size: 1.1rem;
+}
+/* On the "done" state we show a single centred lock — override to keep
+   it middle-aligned instead of stretched. */
+.gr-stop-actions--done {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 1rem;
+  min-height: 40px;
+}
+.gr-stop-actions .icon-action {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+}
+.gr-stop-actions .deliver-btn {
+  color: #fff;
+  background: var(--success, #16a34a);
+  border-color: var(--success, #16a34a);
+}
+.gr-stop-actions .deliver-btn:hover,
+.gr-stop-actions .deliver-btn:focus {
+  background: #15803d;
+  border-color: #15803d;
+  color: #fff;
+}
+
+/* Inline pay chip inside the meta row — smaller than the food-order
+   pay-chip so it fits alongside items count + total. */
+.gr-pay {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.gr-pay i { font-size: 0.7rem; }
+.gr-pay--cod {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+.gr-pay--paid {
+  background: #dcfce7;
+  color: #14532d;
+  border-color: #16a34a;
+}
+.gr-next-chip {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--brand, #16a34a);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .gr-run { background: var(--surface); }
+  .gr-stop { background: #14161c; }
+  .gr-stop--next { background: rgba(34, 197, 94, 0.09); }
+  .gr-pay--cod { background: #3f2d0b; color: #fbbf24; border-color: #b45309; }
+  .gr-pay--paid { background: #052e16; color: #86efac; border-color: #16a34a; }
+}
+
+@media (max-width: 360px) {
+  .gr-stop { grid-template-columns: 28px 1fr auto; padding: 6px; }
+  .gr-stop-num { width: 28px; height: 28px; font-size: 0.82rem; }
+  .gr-stop-actions .icon-action { width: 30px; height: 30px; min-width: 30px; }
+}
