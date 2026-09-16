@@ -14,17 +14,39 @@
 // ── Live remote flag (Firestore) ────────────────────────────────────
 // The authoritative maintenance state lives at
 // `bankibites_meta/bankimart_maintenance` in Firestore — admin toggles
-// it from BankiBites Admin → Partners. We use a hybrid strategy:
-//   1. Synchronous: read the cached last-seen flag from localStorage;
-//      if it's on, render the maintenance screen immediately so repeat
-//      visits during downtime don't flash the storefront.
-//   2. Async: fetch fresh state from Firestore in the background. If the
-//      cached and remote flags disagree, update localStorage and reload
-//      so the next paint matches reality.
+// it from BankiBites Admin → Partners. Strategy:
+//   1. Sync check on load: read the cached flag from localStorage. If
+//      it says on, render the maintenance screen immediately (repeat
+//      visits during downtime never flash the storefront).
+//   2. Async check: fetch fresh state from Firestore. First-visit
+//      customers (empty cache) get the body hidden until the check
+//      resolves, so they never see the shop flash. Live flips promote
+//      the maintenance screen in-place without a full reload.
 const REMOTE_KEY = 'bb_grocery_maintenance_v1';
 function readCachedMaintenance() {
   try { return JSON.parse(localStorage.getItem(REMOTE_KEY)) || null; }
   catch { return null; }
+}
+// First-visit hide: if we have no cached answer yet, hide the body via
+// a class on <html> until the async check confirms whether we're in
+// maintenance mode. Injected before any rendering happens so no paint
+// slips through. Safe to leave on repeat visits too (cache-hit code
+// removes it as soon as the sync render runs).
+(function guardFirstPaint() {
+  const cached = readCachedMaintenance();
+  if (cached) return;    // repeat visit — cache decides, no guard needed
+  const style = document.createElement('style');
+  style.id = 'bb-mm-guard';
+  style.textContent = 'html.bb-mm-guard body{visibility:hidden !important}';
+  (document.head || document.documentElement).appendChild(style);
+  document.documentElement.classList.add('bb-mm-guard');
+  // Fail-open: never trap the customer if the async check hangs.
+  setTimeout(() => document.documentElement.classList.remove('bb-mm-guard'), 4000);
+})();
+function revealShop() {
+  document.documentElement.classList.remove('bb-mm-guard');
+  const s = document.getElementById('bb-mm-guard');
+  if (s) s.remove();
 }
 async function fetchRemoteMaintenance() {
   try {
@@ -66,26 +88,39 @@ async function fetchRemoteMaintenance() {
   }
 }
 // Kick off the async check regardless of the current sync verdict. If the
-// remote and cache disagree, save the fresh copy and reload so the next
-// paint matches reality.
+// remote and cache disagree, we mount the maintenance screen in-place
+// (going offline) or reveal the shop (coming back online) — no reload.
 (function syncRemoteMaintenance() {
   const cached = readCachedMaintenance();
   const cachedOn = !!(cached && cached.enabled);
   fetchRemoteMaintenance().then(remote => {
-    if (!remote) return;
-    try { localStorage.setItem(REMOTE_KEY, JSON.stringify(remote)); } catch {}
-    if (!!remote.enabled !== cachedOn) {
-      // State changed while the page was loading — reload so the render
-      // matches. Deferred one paint so any critical UI is stable first.
-      setTimeout(() => location.reload(), 400);
+    if (!remote) {
+      // Fetch failed (permissions, offline). Fail-open so the shop still
+      // renders for first-time visitors instead of an infinite blank.
+      revealShop();
+      return;
     }
-  }).catch(() => {});
+    try { localStorage.setItem(REMOTE_KEY, JSON.stringify(remote)); } catch {}
+    if (remote.enabled && !window.BB_MAINTENANCE) {
+      // Flipped ON while page was loading (or first visit) — apply the
+      // maintenance screen directly. renderMaintenanceScreen owns the
+      // reveal too via body.innerHTML replacement.
+      renderMaintenanceScreen(remote);
+    } else if (!remote.enabled && cachedOn) {
+      // Was offline in cache, now back online — reload so any half-hidden
+      // storefront state (BB_MAINTENANCE flag, hidden body) is cleared.
+      setTimeout(() => location.reload(), 200);
+    } else {
+      // Steady state — just reveal the guarded body.
+      revealShop();
+    }
+  }).catch(() => { revealShop(); });
 })();
 
-(function renderMaintenanceIfEnabled() {
+// Extract the maintenance-screen renderer so both the sync (cache-hit)
+// path and the async (live-flip / first-visit) path can call it.
+function renderMaintenanceScreen(M) {
   const CFG = window.BB_CONFIG || {};
-  const M = readCachedMaintenance() || {};
-  if (!M.enabled) return;
 
   const esc = (s) =>
     String(s == null ? '' : s)
@@ -184,6 +219,10 @@ async function fetchRemoteMaintenance() {
       display:flex;align-items:center;justify-content:center;gap:6px;}
     .mm-signoff strong{color:var(--mm-ink);font-weight:700;}
     .mm-signoff .mm-heart{color:#EF4444;}
+    /* Mobile default — the two wrappers act as pass-through containers so
+       the status pill, visual, and content flow top-to-bottom exactly as
+       before. Overridden below at >=780px to become grid columns. */
+    .mm-card-visual, .mm-card-content { display: contents; }
     @media (prefers-reduced-motion:reduce){
       .mm-blob,.mm-basket,.mm-ripple,.mm-title,.mm-dot::after,.mm-card{animation:none!important;}
       .mm-ripple{opacity:.2;}
@@ -191,6 +230,66 @@ async function fetchRemoteMaintenance() {
     @media (max-width:400px){
       .mm-visual{width:112px;height:112px;}
       .mm-card{padding:30px 22px 24px;border-radius:20px;}
+    }
+    /* ── Desktop / large tablet — two-column hero layout ─────────────
+       Above 780px the card stretches wide with the animated visual on the
+       left and the message column on the right. Typography scales up,
+       spacing breathes, and a subtle dot grid sits behind everything for
+       polish. Mobile styles (default) stay untouched. */
+    @media (min-width:780px){
+      .mm-stage{
+        padding:40px;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(134,239,172,.12), transparent 40%),
+          radial-gradient(circle at 80% 80%, rgba(147,197,253,.10), transparent 40%),
+          var(--mm-bg);
+      }
+      .mm-stage::before{
+        content:"";position:absolute;inset:0;pointer-events:none;
+        background-image:radial-gradient(rgba(15,23,42,.05) 1px, transparent 1px);
+        background-size:24px 24px;
+        mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
+        -webkit-mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
+      }
+      @media (prefers-color-scheme:dark){
+        .mm-stage::before{background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);}
+      }
+      .mm-card{
+        max-width:920px;
+        display:grid;grid-template-columns:minmax(280px,380px) 1fr;
+        gap:56px;align-items:center;text-align:left;
+        padding:56px 60px;border-radius:32px;
+      }
+      .mm-card-visual{display:flex;flex-direction:column;align-items:flex-start;gap:24px;}
+      .mm-card-content{display:block;min-width:0;}
+      .mm-visual{
+        width:220px;height:220px;margin:0;
+      }
+      .mm-card-visual .mm-status{margin-bottom:0;font-size:12px;padding:8px 14px;}
+      .mm-title{
+        font-size:clamp(2.4rem,3.6vw,3.2rem);
+        line-height:1.1;
+        margin:0 0 18px;
+      }
+      .mm-lede{
+        font-size:1.05rem;line-height:1.65;
+        margin:0 0 28px;max-width:52ch;
+      }
+      .mm-eta{
+        font-size:.95rem;padding:11px 18px;margin-bottom:28px;
+      }
+      .mm-support{
+        justify-content:flex-start;gap:10px;margin-bottom:24px;
+      }
+      .mm-support a{padding:10px 16px;font-size:.86rem;}
+      .mm-signoff{
+        justify-content:flex-start;font-size:.72rem;letter-spacing:.16em;
+      }
+    }
+    /* Extra-wide screens — a touch more max-width, no other changes. */
+    @media (min-width:1200px){
+      .mm-card{max-width:1040px;padding:64px 72px;gap:72px;}
+      .mm-visual{width:240px;height:240px;}
     }
   `;
 
@@ -217,19 +316,23 @@ async function fetchRemoteMaintenance() {
         <span class="mm-blob mm-blob-3"></span>
       </div>
       <main class="mm-card">
-        <div class="mm-status"><span class="mm-dot"></span> System restocking · Live</div>
-        <div class="mm-visual" aria-hidden="true">
-          <span class="mm-ripple mm-r-1"></span>
-          <span class="mm-ripple mm-r-2"></span>
-          <span class="mm-ripple mm-r-3"></span>
-          <div class="mm-basket"><img src="images/logo.png" alt="${esc(vendor)}"></div>
+        <div class="mm-card-visual">
+          <div class="mm-status"><span class="mm-dot"></span> System restocking · Live</div>
+          <div class="mm-visual" aria-hidden="true">
+            <span class="mm-ripple mm-r-1"></span>
+            <span class="mm-ripple mm-r-2"></span>
+            <span class="mm-ripple mm-r-3"></span>
+            <div class="mm-basket"><img src="images/logo.png" alt="${esc(vendor)}"></div>
+          </div>
         </div>
-        <h1 class="mm-title">${esc(title)}</h1>
-        <p class="mm-lede">${esc(message)}</p>
-        ${eta ? `<div class="mm-eta"><i class="fa-solid fa-clock"></i> ${esc(eta)}</div>` : ''}
-        ${support ? `<div class="mm-support">${support}</div>` : ''}
-        <div class="mm-signoff">
-          <strong>${esc(vendor)}</strong>${family ? ` · A ${esc(family)} family brand` : ''} · Made in Odisha <span class="mm-heart">❤</span>
+        <div class="mm-card-content">
+          <h1 class="mm-title">${esc(title)}</h1>
+          <p class="mm-lede">${esc(message)}</p>
+          ${eta ? `<div class="mm-eta"><i class="fa-solid fa-clock"></i> ${esc(eta)}</div>` : ''}
+          ${support ? `<div class="mm-support">${support}</div>` : ''}
+          <div class="mm-signoff">
+            <strong>${esc(vendor)}</strong>${family ? ` · A ${esc(family)} family brand` : ''} · Made in Odisha <span class="mm-heart">❤</span>
+          </div>
         </div>
       </main>
     </div>
@@ -242,8 +345,18 @@ async function fetchRemoteMaintenance() {
     // or fetching data — they will still execute, but this flag lets us guard
     // side-effects that might be expensive or noisy.
     window.BB_MAINTENANCE = true;
+    // The maintenance markup is our new visible content — drop the first-
+    // visit guard so it can render.
+    revealShop();
   };
 
   if (document.body) apply();
   else document.addEventListener('DOMContentLoaded', apply);
+}
+
+// Sync entry — repeat visits during downtime render the maintenance
+// screen instantly from the cached flag, no fetch needed.
+(function renderMaintenanceIfCached() {
+  const M = readCachedMaintenance() || {};
+  if (M.enabled) renderMaintenanceScreen(M);
 })();

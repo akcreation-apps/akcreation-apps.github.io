@@ -32,7 +32,8 @@
       "Bash(where realesrgan-ncnn-vulkan *)",
       "Bash(where waifu2x-ncnn-vulkan *)",
       "Bash(where ffmpeg *)",
-      "Bash(grep -n \"paidAlreadyInit\\\\|isNewUnprocessed\\\\|value=\\\\\"\\\\${paidAlready\" banki-bites/admin/grocery.js)"
+      "Bash(grep -n \"paidAlreadyInit\\\\|isNewUnprocessed\\\\|value=\\\\\"\\\\${paidAlready\" banki-bites/admin/grocery.js)",
+      "Bash(grep *)"
     ]
   },
   "enableAllProjectMcpServers": true,
