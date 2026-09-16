@@ -241,27 +241,18 @@ function renderBill(order) {
 function wireDownload(order) {
   const btn = document.getElementById('downloadBillBtn');
   if (!btn) return;
-  btn.addEventListener('click', () => {
-    if (typeof html2canvas !== 'function') {
-      alert('Download unavailable — please refresh and try again.');
-      return;
-    }
-    btn.style.visibility = 'hidden';
-    const container = document.getElementById('billContainer');
-    html2canvas(container, { useCORS: true, backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
-      const now = new Date();
-      const pad = n => String(n).padStart(2, '0');
-      const stamp = `${pad(now.getDate())}${pad(now.getMonth()+1)}${String(now.getFullYear()).slice(-2)}`;
-      const filename = `${(CFG.vendorShort || 'BankiMart').replace(/\W+/g, '')}_${shortOrderId(window.__ORDER_ID)}_${stamp}_Bill.png`;
+  btn.addEventListener('click', function () {
+    this.style.display = 'none';
+    const billContainer = document.getElementById('billContainer');
+    html2canvas(billContainer, { useCORS: true }).then(canvas => {
       const link = document.createElement('a');
+      const now = new Date();
+      const shortId = shortOrderId(window.__ORDER_ID);
+      const filename = `${shortId}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}_${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getFullYear()).slice(-2)}_Bill.png`;
       link.href = canvas.toDataURL('image/png');
       link.download = filename;
       link.click();
-      btn.style.visibility = 'visible';
-    }).catch(err => {
-      console.warn('[bill] download failed:', err);
-      btn.style.visibility = 'visible';
-      alert('Could not download the bill. Please try again.');
+      this.style.display = 'block';
     });
   });
 }
