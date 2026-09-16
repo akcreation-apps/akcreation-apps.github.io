@@ -98,7 +98,7 @@ window.BB_CONFIG = {
   // toggle here disables the whole storefront.
   // -----------------------------------------------------------------
   maintenance: {
-    enabled: false,
+    enabled: true,
     title: 'Restocking the shelves',
     message:
       "BankiBites is polishing the counters and refilling the aisles. We'll be back shortly with fresher shelves and a smoother checkout.",
