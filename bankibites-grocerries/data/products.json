@@ -268,7 +268,7 @@
               "name": "Hellmann's Mayonnaise ",
               "price": 35,
               "unit": "85G",
-              "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
+              "image": "images/products/HELLMANNS MAYO 85GM RSL.webp",
               "inStock": true,
               "featured": true,
               "deal": false,
@@ -348,7 +348,7 @@
               "name": "Red Label Natural Care",
               "price": 123,
               "unit": "250G",
-              "image": "images/products/RL NC A C 250G - 4 PANEL.webp",
+              "image": "images/products/RED LABEL NATURAL CARE.webp",
               "inStock": true,
               "featured": true,
               "deal": false,
@@ -359,7 +359,7 @@
               "name": "Red Label Natural Care",
               "price": 44,
               "unit": "100G",
-              "image": "images/products/RL NC C 100G 4 PANEL.webp",
+              "image": "images/products/RED LABEL NATURAL CARE.webp",
               "inStock": true,
               "featured": false,
               "deal": false,
@@ -534,6 +534,10 @@
         }
       ]
     },
+
+
+
+
     {
       "id": "personal-care-hygiene",
       "order": 3,
@@ -592,6 +596,8 @@
         }
       ]
     },
+
+
     {
       "id": "hair-care",
       "order": 4,
@@ -962,7 +968,7 @@
               "name": "Lifebuoy Lemon Aloe Fresh",
               "price": 114,
               "unit": "100G",
-              "image": "images/products/LB LEMON ALOE FRESH 100G B4G1.webp",
+              "image": "images/products/Lifebuy lemon alovera.webp",
               "inStock": true,
               "featured": true,
               "deal": false,
@@ -1060,6 +1066,8 @@
         }
       ]
     },
+
+
     {
       "id": "skin-care-cosmetics",
       "order": 6,
@@ -1471,7 +1479,7 @@
               "name": "Pond's Hydra Miracle Super Lotion Gel",
               "price": 66,
               "unit": "25ML",
-              "image": "images/products/PNDS HY MR SUP LT GL 25ML.webp",
+              "image": "images/products/PONDS HYDRA MIRACLE SUPER LOTION GEL.webp",
               "inStock": true,
               "featured": false,
               "deal": false,
@@ -1842,7 +1850,7 @@
             },
             {
               "id": 1242,
-              "name": "Vaseline Deep Moisture Lotion",
+              "name": "Vaseline Deep Moisture Lotion (with Free)",
               "price": 383,
               "unit": "400ML",
               "image": "images/products/VDM LOTION 400ML WITH PSLG 50ML.webp",
@@ -1867,7 +1875,7 @@
               "name": "Vaseline Petroleum Jelly",
               "price": 84,
               "unit": "40G",
-              "image": "images/products/VPJ 40G.webp",
+              "image": "images/products/VPJ 20G.webp",
               "inStock": true,
               "featured": false,
               "deal": false,
@@ -1944,7 +1952,7 @@
             },
             {
               "id": 1250,
-              "name": "Vim Bar",
+              "name": "Vim Bar Face Wash",
               "price": 26,
               "unit": "300G",
               "image": "images/products/VIM BAR FW 300G.webp",
@@ -2045,6 +2053,11 @@
         }
       ]
     },
+
+
+
+
+
     {
       "id": "laundry-care",
       "order": 8,
@@ -2191,6 +2204,10 @@
         }
       ]
     },
+
+
+
+
     {
       "id": "health-drinks-nutrition",
       "order": 9,
@@ -2279,6 +2296,17 @@
               "mrp": 345
             },
             {
+              "id": 1283,
+              "name": "Junior Horlicks Vanilla",
+              "price": 290,
+              "unit": "500G",
+              "image": "images/products/JUNIOR HLX VANILLA 500G ICON JAR.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false,
+              "mrp": 329
+            },
+            {
               "id": 1284,
               "name": "Mother's Horlicks Kesar",
               "price": 524,
@@ -2294,7 +2322,7 @@
               "name": "Horlicks ",
               "price": 378,
               "unit": "1KG",
-              "image": "images/products/STD HORLICKS 1KG CS POUCH EAST.webp",
+              "image": "images/products/HORLICS 1KG.webp",
               "inStock": true,
               "featured": false,
               "deal": false,
@@ -2316,7 +2344,7 @@
               "name": "Horlicks",
               "price": 387,
               "unit": "1KG",
-              "image": "images/products/STD. HORLICKS ICON JAR 1KG EAST.webp",
+              "image": "images/products/HORLICS 1KG.webp",
               "inStock": true,
               "featured": false,
               "deal": false,
@@ -2392,6 +2420,14 @@
         }
       ]
     },
+
+
+
+
+
+
+
+
     {
       "id": "baby-food-nutrition",
       "order": 10,
@@ -2456,6 +2492,17 @@
               "featured": false,
               "deal": false,
               "mrp": 299
+            },
+            {
+              "id": 1299,
+              "name": "Cerelac Stage 3 Wheat Rice Mixed Fruit",
+              "price": 290,
+              "unit": "300G",
+              "image": "images/products/CERELAC STG3 WheRi Mix Frt 24x300g ZS IN.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false,
+              "mrp": 290
             },
             {
               "id": 1300,
@@ -2692,6 +2739,15 @@
         }
       ]
     },
+
+
+
+
+
+
+
+
+
     {
       "id": "chocolates-confectionery",
       "order": 11,
@@ -3050,6 +3106,8 @@
         }
       ]
     },
+
+
     {
       "id": "coffee-beverages",
       "order": 13,
@@ -3174,6 +3232,12 @@
         }
       ]
     },
+
+
+
+
+
+
     {
       "id": "staples-salt-sugar-pulses",
       "order": 14,
@@ -3277,7 +3341,7 @@
               "name": "OI Pink Rock Salt",
               "price": 132,
               "unit": "1KG",
-              "image": "images/categories/Salt__Dal__Pulses___Staples.png",
+              "image": "images/products/OI PINK ROCK SALT 1KG.webp",
               "inStock": true,
               "featured": true,
               "deal": false,
@@ -3348,6 +3412,17 @@
               "featured": true,
               "deal": false,
               "mrp": 50
+            },
+            {
+              "id": 1393,
+              "name": "Schezwan Chutney",
+              "price": 79,
+              "unit": "250G",
+              "image": "images/products/Swwzwan Chutny 250.webp",
+              "inStock": true,
+              "featured": false,
+              "deal": false,
+              "mrp": 90
             }
           ]
         }
@@ -3391,3 +3466,4 @@
     }
   ]
 }
+
