@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="theme-color" content="#1A1A2E">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Menu Availability</title>
+
+  <link rel="icon" id="favicon" href="">
+  <link rel="apple-touch-icon" id="appleTouchIcon" href="">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="restaurant.js"></script>
+  <script src="common.js"></script>
+
+  <style>
+    :root {
+      --primary: #FF6B35;
+      --navy: #1A1A2E;
+      --muted: #6b6b6b;
+      --border: #e9ecef;
+      --green: #25D366;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f0f2f5; color: #1a1a1a; margin: 0; padding-bottom: 70px; }
+
+    .sticky-header { position: sticky; top: 0; z-index: 200; }
+
+    .top-nav {
+      background: var(--navy); padding: 8px 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+    .top-nav img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .nav-info { flex: 1; min-width: 0; }
+    .nav-title { color: #fff; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.92rem; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-subtitle { color: var(--primary); font-size: 0.65rem; font-weight: 500; }
+
+    /* Shop toggle — purely local, no spinner */
+    .shop-toggle {
+      flex-shrink: 0; display: flex; align-items: center; gap: 5px;
+      padding: 6px 11px; border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+      border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.45);
+      background: transparent; cursor: pointer; transition: all 0.2s; line-height: 1;
+    }
+    .shop-toggle:active { transform: scale(0.94); }
+    .shop-toggle .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+    .shop-toggle.open   { border-color: var(--green); color: var(--green); }
+    .shop-toggle.open   .dot { background: var(--green); box-shadow: 0 0 5px var(--green); }
+    .shop-toggle.closed { border-color: var(--primary); color: var(--primary); }
+    .shop-toggle.closed .dot { background: var(--primary); }
+    .shop-toggle.changed { outline: 2px solid rgba(255,255,255,0.4); outline-offset: 2px; }
+
+    .tab-bar {
+      background: var(--navy); display: flex; padding: 0 14px; gap: 4px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .tab-btn {
+      flex: 1; background: none; border: none; color: rgba(255,255,255,0.45);
+      font-family: 'Poppins', sans-serif; font-size: 0.77rem; font-weight: 600;
+      padding: 10px 0; border-bottom: 3px solid transparent;
+      cursor: pointer; transition: color 0.15s, border-color 0.15s; text-align: center;
+    }
+    .tab-btn.active { color: #fff; border-bottom-color: var(--primary); }
+    .tab-count {
+      display: inline-block; background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.8);
+      border-radius: 999px; font-size: 0.62rem; padding: 1px 6px; margin-left: 4px; vertical-align: middle;
+    }
+    .tab-btn.active .tab-count { background: var(--primary); color: #fff; }
+
+    .keyword-bar {
+      background: #fff; padding: 8px 12px; border-bottom: 1px solid var(--border);
+      overflow-x: auto; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .keyword-bar::-webkit-scrollbar { display: none; }
+    .filter-label { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; flex-shrink: 0; }
+    .keyword-chip {
+      display: inline-flex; align-items: center; gap: 3px; padding: 5px 11px; border-radius: 999px;
+      border: 2px solid var(--primary); background: var(--primary); color: #fff;
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; user-select: none;
+      transition: background 0.15s, color 0.15s, opacity 0.15s; flex-shrink: 0; min-height: 32px;
+    }
+    .keyword-chip input { display: none; }
+    .keyword-chip.chip-inactive { background: transparent; color: var(--primary); text-decoration: line-through; opacity: 0.6; }
+    .kw-count { font-size: 0.63rem; font-weight: 400; }
+
+    .search-bar {
+      background: #fff; padding: 7px 12px; border-bottom: 2px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .search-icon { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; }
+    .search-bar input {
+      flex: 1; border: none; outline: none; font-family: 'Inter', sans-serif;
+      font-size: 0.84rem; color: #1a1a1a; background: transparent; min-width: 0;
+    }
+    .search-bar input::placeholder { color: #bbb; }
+    .search-clear { background: none; border: none; padding: 4px 2px; color: var(--muted); cursor: pointer; font-size: 0.75rem; flex-shrink: 0; line-height: 1; }
+
+    .page-intro { background: var(--navy); padding: 10px 14px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .page-intro p { font-size: 0.72rem; color: rgba(255,255,255,0.5); margin: 0 0 6px; }
+    .admin-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.68rem; font-weight: 600; padding: 3px 9px; border-radius: 999px;
+    }
+    .admin-status.loading { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
+    .admin-status.loaded  { background: rgba(37,211,102,0.2); color: var(--green); }
+    .admin-status.error   { background: rgba(255,107,53,0.2); color: var(--primary); }
+
+    .menu-body { padding: 10px; }
+
+    .category-card { background: #fff; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid var(--border); }
+    .category-header { background: var(--navy); color: #fff; padding: 0 12px; display: flex; align-items: center; gap: 10px; min-height: 46px; }
+    .cat-checkbox { width: 18px; height: 18px; flex-shrink: 0; cursor: pointer; accent-color: var(--primary); }
+    .cat-title { flex: 1; font-family: 'Poppins', sans-serif; font-size: 0.86rem; font-weight: 700; }
+    .cat-count { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 2px 8px; font-size: 0.67rem; font-weight: 500; white-space: nowrap; }
+
+    .subcategory-label { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); padding: 7px 14px 3px; border-top: 1px dashed var(--border); }
+    .subcategory-label.first-sub { border-top: none; padding-top: 6px; }
+
+    .item-row {
+      display: flex; align-items: center; padding: 0 12px; min-height: 46px;
+      border-bottom: 1px solid #f4f4f4; border-left: 3px solid transparent;
+      margin: 0; cursor: pointer; transition: background 0.1s, border-left-color 0.2s; gap: 10px;
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-row input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--primary); cursor: pointer; }
+    .item-name { flex: 1; font-size: 0.84rem; font-weight: 500; line-height: 1.35; padding: 10px 0; }
+    .item-row:has(input:not(:checked)) .item-name { text-decoration: line-through; color: #bbb; }
+
+    .item-row.change-disable { background: rgba(255,107,53,0.07); border-left-color: var(--primary); }
+    .item-row.change-disable .item-name::after { content: ' (disabling)'; font-size: 0.68rem; font-weight: 700; color: var(--primary); font-style: italic; }
+    .item-row.change-enable  { background: rgba(37,211,102,0.07); border-left-color: var(--green); }
+    .item-row.change-enable  .item-name::after { content: ' (enabling)'; font-size: 0.68rem; font-weight: 700; color: var(--green); font-style: italic; }
+
+    .no-results { text-align: center; padding: 40px 20px; color: var(--muted); display: none; }
+    .no-results i { font-size: 2rem; margin-bottom: 8px; display: block; }
+    .no-results p { font-size: 0.84rem; font-weight: 500; margin: 0; }
+
+    .unavail-section { padding: 10px; }
+    .unavail-empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+    .unavail-empty i { font-size: 2.5rem; color: var(--green); margin-bottom: 10px; display: block; }
+    .unavail-empty p { font-size: 0.88rem; font-weight: 600; margin: 0; }
+    .unavail-group { background: #fff; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid var(--border); }
+    .unavail-cat-header { background: #fff3ef; padding: 9px 14px; font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--navy); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .unavail-cat-header .badge { background: var(--primary); color: #fff; border-radius: 999px; padding: 2px 8px; font-size: 0.63rem; }
+    .unavail-item { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f4f4f4; font-size: 0.82rem; font-weight: 500; gap: 8px; }
+    .unavail-item:last-child { border-bottom: none; }
+    .unavail-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+
+    .loading { text-align: center; padding: 50px 20px; color: var(--muted); }
+    .loading .spinner-border { color: var(--primary); }
+
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
+      background: #fff; border-top: 1px solid var(--border); padding: 8px 10px;
+      display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+    .action-bar .btn-sm { font-size: 0.7rem; padding: 6px 9px; border-radius: 7px; white-space: nowrap; min-height: 36px; }
+    .change-count {
+      font-size: 0.73rem; font-weight: 700; white-space: nowrap; flex-shrink: 0;
+      padding: 4px 9px; border-radius: 999px; background: #f0f2f5; color: var(--muted);
+      transition: background 0.2s, color 0.2s;
+    }
+    .change-count.has-changes { background: rgba(255,107,53,0.12); color: var(--primary); }
+    .btn-whatsapp {
+      background: var(--green); color: #fff; border: none; border-radius: 22px;
+      padding: 8px 13px; font-weight: 700; font-size: 0.78rem;
+      display: flex; align-items: center; gap: 5px; margin-left: auto;
+      cursor: pointer; transition: opacity 0.15s; white-space: nowrap; min-height: 38px;
+    }
+    .btn-whatsapp:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    footer { text-align: center; padding: 16px 14px 80px; font-size: 0.75rem; color: var(--muted); }
+    footer a { color: var(--primary); text-decoration: none; }
+
+    @media (min-width: 576px) {
+      .menu-body, .unavail-section { padding: 12px 16px; }
+      .top-nav { padding: 10px 20px; }
+      .item-row { padding: 0 16px; min-height: 48px; }
+      .item-name { font-size: 0.86rem; }
+    }
+    @media (min-width: 768px) {
+      .menu-body, .unavail-section { max-width: 720px; margin: 0 auto; padding: 16px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sticky-header">
+    <nav class="top-nav">
+      <img id="restaurantLogo" src="" alt="">
+      <div class="nav-info">
+        <div class="nav-title" id="restaurantTitle"></div>
+        <div class="nav-subtitle">Menu Availability Manager</div>
+      </div>
+      <button class="shop-toggle" id="shopToggle" title="Tap to toggle open / closed">
+        <span class="dot"></span>
+        <span id="shopStatusText">…</span>
+      </button>
+    </nav>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" id="menuTabBtn"><i class="fas fa-list mr-1"></i> Menu</button>
+      <button class="tab-btn" id="unavailTabBtn">
+        <i class="fas fa-ban mr-1"></i> Unavailable
+        <span class="tab-count" id="unavailBadge">0</span>
+      </button>
+    </div>
+
+    <div class="keyword-bar" id="keyword-bar">
+      <span class="filter-label">Filter:</span>
+    </div>
+
+    <div class="search-bar" id="searchBar">
+      <i class="fas fa-search search-icon"></i>
+      <input type="search" id="searchInput" placeholder="Search items…" autocomplete="off">
+      <button id="searchClear" class="search-clear" style="display:none" aria-label="Clear search">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="page-intro">
+    <p>Synced with Admin Panel. Uncheck items <strong style="color:rgba(255,255,255,0.8)">not available</strong> today — send changes to admin via WhatsApp to update.</p>
+    <div class="admin-status loading" id="adminStatus">
+      <i class="fas fa-circle-notch fa-spin"></i> Connecting to Admin Panel…
+    </div>
+  </div>
+
+  <div id="menuSection">
+    <div class="menu-body" id="menu-body">
+      <div class="loading">
+        <div class="spinner-border mb-3" role="status"></div>
+        <p>Loading menu…</p>
+      </div>
+    </div>
+    <div class="no-results" id="noResults">
+      <i class="fas fa-search"></i>
+      <p id="noResultsMsg">No items found</p>
+    </div>
+  </div>
+
+  <div id="unavailSection" class="unavail-section" style="display:none;">
+    <div class="unavail-empty">
+      <i class="fas fa-check-circle"></i>
+      <p>All items are currently available!</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+  </footer>
+
+  <div class="action-bar" id="action-bar" style="display:none;">
+    <button class="btn btn-outline-secondary btn-sm" id="uncheckAllBtn"><i class="fas fa-times-circle"></i> None</button>
+    <button class="btn btn-outline-success btn-sm" id="checkAllBtn"><i class="fas fa-check-circle"></i> All</button>
+    <span class="change-count" id="changeCount">No changes</span>
+    <button class="btn-whatsapp" id="sendBtn" disabled>
+      <i class="fab fa-whatsapp"></i> Send Changes
+    </button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
+    import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // Auto-configure from restaurant.js — no manual edits needed for new restaurants
+    const RESTAURANT_NAME = RESTAURANT.name;
+    const WHATSAPP_NUMBER = RESTAURANT.wpFallback.replace('+', '');
+    document.getElementById('restaurantTitle').textContent = RESTAURANT.name;
+    document.getElementById('restaurantLogo').src          = RESTAURANT.logo;
+    document.getElementById('restaurantLogo').alt          = RESTAURANT.name;
+    document.title                                         = `Menu Availability — ${RESTAURANT.name}`;
+    document.getElementById('favicon').href                = RESTAURANT.logo;
+    document.getElementById('appleTouchIcon').href         = RESTAURANT.logo;
+    const CANDIDATE_KEYWORDS = ['chicken','mutton','paneer','mushroom','egg','fish','prawn'];
+    const MIN_MATCHES        = 3;
+
+    const catCheckboxes = new Map();
+
+    // Baseline: what Admin Panel currently has
+    let originalDisabledIds = [];
+    let originalShopStatus  = null;
+
+    // Current UI state
+    let currentShopStatus = null;
+    let lastOpenTime      = null;
+    let lastCloseTime     = null;
+
+    let dataLoaded = false;
+    let activeTab  = 'menu';
+
+    // ── Tabs ───────────────────────────────────────────────
+    document.getElementById('menuTabBtn').addEventListener('click',   () => switchTab('menu'));
+    document.getElementById('unavailTabBtn').addEventListener('click', () => switchTab('unavail'));
+
+    function switchTab(tab) {
+      activeTab = tab;
+      const isMenu = tab === 'menu';
+      document.getElementById('menuTabBtn').classList.toggle('active', isMenu);
+      document.getElementById('unavailTabBtn').classList.toggle('active', !isMenu);
+      document.getElementById('menuSection').style.display    = isMenu ? '' : 'none';
+      document.getElementById('unavailSection').style.display = isMenu ? 'none' : '';
+      document.getElementById('keyword-bar').style.display    = isMenu ? '' : 'none';
+      document.getElementById('searchBar').style.display      = isMenu ? '' : 'none';
+      document.getElementById('uncheckAllBtn').style.display  = isMenu ? '' : 'none';
+      document.getElementById('checkAllBtn').style.display    = isMenu ? '' : 'none';
+      if (!isMenu) renderUnavailSection();
+    }
+
+    // ── Shop toggle (local only — saved on Send) ───────────
+    document.getElementById('shopToggle').addEventListener('click', () => {
+      if (!dataLoaded) return;
+      currentShopStatus = currentShopStatus === 'open' ? 'closed' : 'open';
+      applyShopStatus(currentShopStatus);
+      updateCounts();
+    });
+
+    function applyShopStatus(status) {
+      currentShopStatus = status;
+      const btn  = document.getElementById('shopToggle');
+      const text = document.getElementById('shopStatusText');
+      btn.classList.remove('open', 'closed', 'changed');
+
+      if (status === 'open') {
+        btn.classList.add('open');
+        const t = lastOpenTime && lastCloseTime
+          ? ` ${String(lastOpenTime).padStart(2,'0')}:00–${String(lastCloseTime).padStart(2,'0')}:00`
+          : '';
+        text.textContent = `Open${t}`;
+      } else if (status === 'closed') {
+        btn.classList.add('closed');
+        text.textContent = 'Closed';
+      } else {
+        text.textContent = '–';
+      }
+
+      if (dataLoaded && originalShopStatus !== null && status !== originalShopStatus) {
+        btn.classList.add('changed');
+      }
+    }
+
+    // ── Normalise ──────────────────────────────────────────
+    function normaliseMenu(menuArray) {
+      return menuArray.map(cat => ({
+        category: cat.category,
+        subcategories: cat.subcategories.map(sub => ({
+          label: sub.type ? `${sub.name} (${sub.type})` : sub.name,
+          items: sub.dishes.map(d => ({ id: d.id, name: d.name }))
+        }))
+      }));
+    }
+
+    function detectKeywords(name) {
+      const lower = name.toLowerCase();
+      return CANDIDATE_KEYWORDS.filter(kw => lower.includes(kw)).join(' ');
+    }
+
+    // ── Render menu ────────────────────────────────────────
+    function renderMenu(normalisedMenu) {
+      const body = document.getElementById('menu-body');
+      body.innerHTML = '';
+      catCheckboxes.clear();
+
+      normalisedMenu.forEach(cat => {
+        const totalItems = cat.subcategories.reduce((a, s) => a + s.items.length, 0);
+        const card = document.createElement('div');
+        card.className = 'category-card';
+
+        const hdr = document.createElement('div');
+        hdr.className = 'category-header';
+
+        const catCb = document.createElement('input');
+        catCb.type = 'checkbox'; catCb.checked = true; catCb.className = 'cat-checkbox';
+        catCb.title = `Toggle all ${cat.category}`;
+        catCb.addEventListener('change', () => onCategoryToggle(cat.category, catCb.checked));
+        catCheckboxes.set(cat.category, catCb);
+
+        const titleEl = document.createElement('span');
+        titleEl.className = 'cat-title'; titleEl.textContent = cat.category;
+
+        const countEl = document.createElement('span');
+        countEl.className = 'cat-count'; countEl.textContent = `${totalItems} items`;
+
+        hdr.appendChild(catCb); hdr.appendChild(titleEl); hdr.appendChild(countEl);
+        card.appendChild(hdr);
+
+        const cardBody = document.createElement('div');
+        cat.subcategories.forEach((sub, idx) => {
+          const subHd = document.createElement('div');
+          subHd.className = 'subcategory-label' + (idx === 0 ? ' first-sub' : '');
+          subHd.textContent = sub.label;
+          cardBody.appendChild(subHd);
+
+          sub.items.forEach(item => {
+            const label = document.createElement('label');
+            label.className = 'item-row';
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox'; cb.checked = true;
+            cb.dataset.itemId   = item.id;
+            cb.dataset.name     = item.name;
+            cb.dataset.category = cat.category;
+            cb.dataset.keywords = detectKeywords(item.name);
+            cb.addEventListener('change', onItemChange);
+
+            const nameEl = document.createElement('span');
+            nameEl.className = 'item-name'; nameEl.textContent = item.name;
+
+            label.appendChild(cb); label.appendChild(nameEl);
+            cardBody.appendChild(label);
+          });
+        });
+
+        card.appendChild(cardBody);
+        body.appendChild(card);
+      });
+    }
+
+    function onItemChange() {
+      updateCategoryCheckbox(this.dataset.category);
+      updateCounts();
+    }
+
+    // ── Category checkbox ──────────────────────────────────
+    function onCategoryToggle(catName, isChecked) {
+      document.querySelectorAll('.item-row input').forEach(cb => {
+        if (cb.dataset.category === catName) cb.checked = isChecked;
+      });
+      updateCategoryCheckbox(catName);
+      updateCounts();
+    }
+
+    function updateCategoryCheckbox(catName) {
+      const catCb = catCheckboxes.get(catName);
+      if (!catCb) return;
+      const items = [...document.querySelectorAll('.item-row input')].filter(c => c.dataset.category === catName);
+      const n = items.filter(c => c.checked).length;
+      catCb.checked       = n === items.length;
+      catCb.indeterminate = n > 0 && n < items.length;
+    }
+
+    function updateAllCategoryCheckboxes() {
+      catCheckboxes.forEach((_, name) => updateCategoryCheckbox(name));
+    }
+
+    // ── Keyword bar ────────────────────────────────────────
+    function buildKeywordBar(normalisedMenu) {
+      const counts = {};
+      CANDIDATE_KEYWORDS.forEach(kw => counts[kw] = 0);
+      normalisedMenu.forEach(cat =>
+        cat.subcategories.forEach(sub =>
+          sub.items.forEach(item => {
+            const lower = item.name.toLowerCase();
+            CANDIDATE_KEYWORDS.forEach(kw => { if (lower.includes(kw)) counts[kw]++; });
+          })
+        )
+      );
+      const bar = document.getElementById('keyword-bar');
+      CANDIDATE_KEYWORDS.forEach(kw => {
+        if (counts[kw] < MIN_MATCHES) return;
+        const chip = document.createElement('label');
+        chip.className = 'keyword-chip'; chip.dataset.keyword = kw; chip.title = `${counts[kw]} items`;
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.checked = true;
+        cb.addEventListener('change', () => onKeywordToggle(kw, cb.checked));
+        chip.appendChild(cb);
+        chip.appendChild(document.createTextNode(` ${kw.charAt(0).toUpperCase() + kw.slice(1)} `));
+        const sp = document.createElement('span'); sp.className = 'kw-count'; sp.textContent = `(${counts[kw]})`;
+        chip.appendChild(sp);
+        bar.appendChild(chip);
+      });
+    }
+
+    function onKeywordToggle(keyword, isChecked) {
+      document.querySelector(`.keyword-chip[data-keyword="${keyword}"]`).classList.toggle('chip-inactive', !isChecked);
+      document.querySelectorAll('.item-row input').forEach(cb => {
+        const kws = cb.dataset.keywords ? cb.dataset.keywords.split(' ').filter(Boolean) : [];
+        if (!kws.includes(keyword)) return;
+        if (!isChecked) {
+          cb.checked = false;
+        } else {
+          const anyOff = kws.some(kw => {
+            const c = document.querySelector(`.keyword-chip[data-keyword="${kw}"] input`);
+            return c && !c.checked;
+          });
+          if (!anyOff) cb.checked = true;
+        }
+      });
+      updateAllCategoryCheckboxes();
+      updateCounts();
+    }
+
+    // ── Search ─────────────────────────────────────────────
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      searchClear.style.display = q ? '' : 'none';
+      filterBySearch(q);
+    });
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchClear.style.display = 'none';
+      filterBySearch('');
+      searchInput.focus();
+    });
+
+    function filterBySearch(q) {
+      let totalVisible = 0;
+      document.querySelectorAll('.category-card').forEach(card => {
+        let cardVisible = false;
+        const cardBody = card.lastElementChild;
+        let currentLabel = null, labelHasVisible = false;
+        [...cardBody.children].forEach(el => {
+          if (el.classList.contains('subcategory-label')) {
+            if (currentLabel) currentLabel.style.display = labelHasVisible ? '' : 'none';
+            currentLabel = el; labelHasVisible = false;
+          } else if (el.classList.contains('item-row')) {
+            const match = !q || el.querySelector('.item-name').textContent.toLowerCase().includes(q);
+            el.style.display = match ? '' : 'none';
+            if (match) { cardVisible = true; labelHasVisible = true; totalVisible++; }
+          }
+        });
+        if (currentLabel) currentLabel.style.display = labelHasVisible ? '' : 'none';
+        card.style.display = cardVisible ? '' : 'none';
+      });
+      const noResults = document.getElementById('noResults');
+      if (q && totalVisible === 0) {
+        document.getElementById('noResultsMsg').textContent = `No items match "${searchInput.value.trim()}"`;
+        noResults.style.display = '';
+      } else {
+        noResults.style.display = 'none';
+      }
+    }
+
+    // ── Change tracking ────────────────────────────────────
+    function getChanges() {
+      const disabled = [], enabled = [];
+      document.querySelectorAll('.item-row input').forEach(cb => {
+        const id = Number(cb.dataset.itemId);
+        const wasDisabled = originalDisabledIds.includes(id);
+        if (!cb.checked && !wasDisabled) disabled.push(cb);
+        if ( cb.checked &&  wasDisabled) enabled.push(cb);
+      });
+      const shopChanged = originalShopStatus !== null && currentShopStatus !== originalShopStatus;
+      return { disabled, enabled, shopChanged };
+    }
+
+    function updateChangeHighlights() {
+      if (!dataLoaded) return;
+      document.querySelectorAll('.item-row').forEach(row => {
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (!cb) return;
+        const id = Number(cb.dataset.itemId);
+        const wasDisabled   = originalDisabledIds.includes(id);
+        const isNowDisabled = !cb.checked;
+        row.classList.remove('change-disable', 'change-enable');
+        if (!wasDisabled &&  isNowDisabled) row.classList.add('change-disable');
+        if ( wasDisabled && !isNowDisabled) row.classList.add('change-enable');
+      });
+    }
+
+    function updateCounts() {
+      const unchecked = document.querySelectorAll('.item-row input:not(:checked)').length;
+      document.getElementById('unavailBadge').textContent = unchecked;
+      updateChangeHighlights();
+
+      if (dataLoaded) {
+        const { disabled, enabled, shopChanged } = getChanges();
+        const total = disabled.length + enabled.length + (shopChanged ? 1 : 0);
+        const countEl = document.getElementById('changeCount');
+        countEl.textContent = total === 0 ? 'No changes' : `${total} change${total !== 1 ? 's' : ''}`;
+        countEl.classList.toggle('has-changes', total > 0);
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('shopToggle').classList.toggle('changed', shopChanged);
+      }
+
+      if (activeTab === 'unavail') renderUnavailSection();
+    }
+
+    function renderUnavailSection() {
+      const unchecked = [...document.querySelectorAll('.item-row input:not(:checked)')];
+      const section = document.getElementById('unavailSection');
+      if (unchecked.length === 0) {
+        section.innerHTML = `<div class="unavail-empty"><i class="fas fa-check-circle"></i><p>All items are currently available!</p></div>`;
+        return;
+      }
+      const grouped = {};
+      unchecked.forEach(cb => {
+        if (!grouped[cb.dataset.category]) grouped[cb.dataset.category] = [];
+        grouped[cb.dataset.category].push(cb.dataset.name);
+      });
+      section.innerHTML = Object.entries(grouped).map(([cat, items]) => `
+        <div class="unavail-group">
+          <div class="unavail-cat-header">${cat} <span class="badge">${items.length}</span></div>
+          ${items.map(n => `<div class="unavail-item"><span class="dot"></span>${n}</div>`).join('')}
+        </div>`).join('');
+    }
+
+    // ── Send WhatsApp (read-only — admin updates Firebase manually) ──
+    function sendWhatsApp() {
+      const { disabled, enabled, shopChanged } = getChanges();
+      const hasAnyChange = disabled.length > 0 || enabled.length > 0 || shopChanged;
+
+      const today = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const lines = [`📋 Menu Changes - ${RESTAURANT_NAME}`, `📅 ${today}`, ''];
+
+      if (!hasAnyChange) {
+        lines.push('No Changes in today\'s menu ✅');
+        lines.push('All items are as per current settings.');
+      } else {
+        if (shopChanged) {
+          lines.push(currentShopStatus === 'closed' ? '🏪 Shop Status: Closed for today' : '🏪 Shop Status: Open for today');
+          lines.push('');
+        }
+        if (enabled.length > 0) {
+          lines.push(`✅ Now Available (${enabled.length}):`);
+          enabled.forEach(cb => lines.push(`• ${cb.dataset.name} [${cb.dataset.category}]`));
+          lines.push('');
+        }
+        if (disabled.length > 0) {
+          lines.push(`🚫 Now Unavailable (${disabled.length}):`);
+          disabled.forEach(cb => lines.push(`• ${cb.dataset.name} [${cb.dataset.category}]`));
+          lines.push('');
+        }
+        const itemCount = disabled.length + enabled.length;
+        const parts = [];
+        if (shopChanged) parts.push('shop status');
+        if (itemCount > 0) parts.push(`${itemCount} item${itemCount !== 1 ? 's' : ''}`);
+        lines.push(`Total changes: ${parts.join(' + ')}`);
+      }
+
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n').trim())}`, '_blank');
+
+      // Reset baseline so change highlights clear after sending
+      originalDisabledIds = [...document.querySelectorAll('.item-row input:not(:checked)')]
+        .map(cb => Number(cb.dataset.itemId));
+      originalShopStatus = currentShopStatus;
+      updateChangeHighlights();
+      updateCounts();
+    }
+
+    // ── Bulk actions ───────────────────────────────────────
+    document.getElementById('uncheckAllBtn').addEventListener('click', () => {
+      document.querySelectorAll('.item-row input').forEach(cb => cb.checked = false);
+      document.querySelectorAll('.keyword-chip').forEach(c => { c.classList.add('chip-inactive'); c.querySelector('input').checked = false; });
+      updateAllCategoryCheckboxes(); updateCounts();
+    });
+    document.getElementById('checkAllBtn').addEventListener('click', () => {
+      document.querySelectorAll('.item-row input').forEach(cb => cb.checked = true);
+      document.querySelectorAll('.keyword-chip').forEach(c => { c.classList.remove('chip-inactive'); c.querySelector('input').checked = true; });
+      updateAllCategoryCheckboxes(); updateCounts();
+    });
+    document.getElementById('sendBtn').addEventListener('click', sendWhatsApp);
+
+    // ── Fetch from Admin Panel ─────────────────────────────
+    async function fetchAdminData() {
+      try {
+        const credentials = await get_credentials();
+        if (!credentials) throw new Error('no credentials');
+        const cfg = _cfg;
+        const app = initializeApp({
+          apiKey:            decrypt_values(credentials.API_KEY,             cfg),
+          authDomain:        decrypt_values(credentials.AUTH_DOMAIN,         cfg),
+          projectId:         decrypt_values(credentials.ID,                  cfg),
+          storageBucket:     decrypt_values(credentials.STORAGE_BUCKET,      cfg),
+          messagingSenderId: decrypt_values(credentials.MESSAGING_SENDER_ID, cfg),
+          appId:             decrypt_values(credentials.APP_ID,              cfg),
+        }, 'availability');
+        const db   = getFirestore(app);
+        const snap = await getDocs(collection(db, decrypt_values(credentials.DB_NAME, cfg)));
+
+        let result = { disabledIds: [], shopStatus: null, openTime: null, closeTime: null };
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          if (d.disabled_items !== undefined) result.disabledIds = JSON.parse(d.disabled_items);
+          if (d.shop_status    !== undefined) result.shopStatus  = d.shop_status;
+          if (d.opening_time   !== undefined) result.openTime    = d.opening_time;
+          if (d.closing_time   !== undefined) result.closeTime   = d.closing_time;
+        });
+        return result;
+      } catch (e) {
+        console.warn('Admin Panel:', e);
+        return null;
+      }
+    }
+
+    // ── Init ───────────────────────────────────────────────
+    async function init() {
+      try {
+        const [menuRes, adminData] = await Promise.all([
+          fetch('data.json').then(r => r.json()),
+          fetchAdminData()
+        ]);
+
+        const normalised = normaliseMenu(menuRes.menu);
+        renderMenu(normalised);
+        buildKeywordBar(normalised);
+
+        const statusEl = document.getElementById('adminStatus');
+        if (!adminData) {
+          statusEl.className = 'admin-status error';
+          statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Could not connect to Admin Panel';
+          applyShopStatus(null);
+        } else {
+          // Baseline
+          originalDisabledIds = adminData.disabledIds;
+          originalShopStatus  = adminData.shopStatus;
+          lastOpenTime        = adminData.openTime;
+          lastCloseTime       = adminData.closeTime;
+
+          // Apply Admin Panel state to UI
+          applyShopStatus(adminData.shopStatus);
+          originalDisabledIds.forEach(id => {
+            const cb = document.querySelector(`.item-row input[data-item-id="${id}"]`);
+            if (cb) cb.checked = false;
+          });
+          updateAllCategoryCheckboxes();
+
+          statusEl.className = 'admin-status loaded';
+          statusEl.innerHTML = originalDisabledIds.length > 0
+            ? `<i class="fas fa-check-circle"></i> Synced — ${originalDisabledIds.length} item${originalDisabledIds.length !== 1 ? 's' : ''} currently unavailable`
+            : '<i class="fas fa-check-circle"></i> Synced with Admin Panel — all items available';
+        }
+
+        dataLoaded = true;
+        updateCounts();
+        document.getElementById('action-bar').style.display = 'flex';
+
+      } catch (err) {
+        document.getElementById('menu-body').innerHTML =
+          `<div class="text-center p-4 text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>Failed to load menu. Use a local server.</div>`;
+        document.getElementById('adminStatus').className = 'admin-status error';
+        document.getElementById('adminStatus').innerHTML = '<i class="fas fa-exclamation-circle"></i> Load error';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

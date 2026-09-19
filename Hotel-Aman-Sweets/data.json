@@ -1,0 +1,197 @@
+{
+  "_OFFER_KEYS_DOCS": [
+    "To feature a dish in the top Deals of the Day rail, add TWO optional keys to that dish:",
+    "  offer_price (number) \u2014 fake higher MRP; must be strictly greater than price. Renders strikethrough.",
+    "  is_offer (boolean, true) \u2014 include this dish in the horizontal Deals rail at the top of the menu."
+  ],
+  "menu": [
+    {
+      "category": "Indian",
+      "subcategories": [
+        {
+          "name": "Thali N Meals",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 101,
+              "name": "Veg Thali",
+              "price": 99,
+              "available_time": "",
+              "not_available_time": 15
+            }
+          ]
+        },
+        {
+          "name": "Snacks",
+          "dishes": [
+            {
+              "id": 151,
+              "name": "Bara Ghuguni (5pc)",
+              "price": 39,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 152,
+              "name": "Aloo Chap Ghuguni (5pc)",
+              "price": 39,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 153,
+              "name": "Singeda Ghuguni (4pc)",
+              "price": 39,
+              "available_time": 16,
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Chinese",
+      "subcategories": [
+        {
+          "name": "MainCourse",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 201,
+              "name": "Mix Veg Chowmein",
+              "price": 59,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 202,
+              "name": "Paneer Chowmein",
+              "price": 69,
+              "available_time": 16,
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "South Indian",
+      "subcategories": [
+        {
+          "name": "Dosa",
+          "type": "Veg",
+          "dishes": [
+            {
+              "id": 301,
+              "name": "Masala Dosa",
+              "price": 59,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 302,
+              "name": "Chomein Dosa",
+              "price": 69,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 303,
+              "name": "Mix Veg Paneer Dosa",
+              "price": 79,
+              "available_time": 16,
+              "not_available_time": ""
+            },
+            {
+              "id": 304,
+              "name": "Mix Dosa",
+              "price": 99,
+              "available_time": 16,
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Sweets",
+      "subcategories": [
+        {
+          "name": "Sweets",
+          "dishes": [
+            {
+              "id": 401,
+              "name": "Chena Poda (50g)",
+              "price": 29,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 402,
+              "name": "Chena Poda (500g)",
+              "price": 219,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 403,
+              "name": "Rasagola (50g)",
+              "price": 19,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 404,
+              "name": "Rasagola (500g)",
+              "price": 179,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 405,
+              "name": "Gulabjamun (50g)",
+              "price": 19,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 406,
+              "name": "Gulabjamun (500g)",
+              "price": 189,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 407,
+              "name": "Motichur Laddu (50g)",
+              "price": 19,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 408,
+              "name": "Motichur Laddu (500g)",
+              "price": 169,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 409,
+              "name": "Chena Gaja (50g)",
+              "price": 19,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 410,
+              "name": "Chena Gaja (500g)",
+              "price": 169,
+              "available_time": "",
+              "not_available_time": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
