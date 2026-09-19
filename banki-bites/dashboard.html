@@ -1050,12 +1050,22 @@
     function hours(p) {
       const o = parseInt(p.opening_hour, 10), c = parseInt(p.closing_hour, 10);
       if (isNaN(o) || isNaN(c)) return null;
-      return { o, c };
+      const bs = parseInt(p.break_start_hour, 10);
+      const be = parseInt(p.break_end_hour, 10);
+      const hasBreak = Number.isFinite(bs) && Number.isFinite(be) && bs < be && bs >= o && be <= c;
+      return { o, c, bs: hasBreak ? bs : null, be: hasBreak ? be : null };
     }
     function isOpen(p) {
       const h = hours(p); if (!h) return false;
       const now = new Date().getHours();
-      return now >= h.o && now < h.c;
+      if (now < h.o || now >= h.c) return false;
+      if (h.bs != null && now >= h.bs && now < h.be) return false;
+      return true;
+    }
+    function isOnBreak(p) {
+      const h = hours(p); if (!h || h.bs == null) return false;
+      const now = new Date().getHours();
+      return now >= h.o && now < h.c && now >= h.bs && now < h.be;
     }
     const CLOSING_SOON_THRESHOLD_MINUTES = 30;
     function minutesUntilClose(p) {
@@ -1148,11 +1158,13 @@
         grid.innerHTML = visible.map(p => {
           const h = hours(p);
           const manuallyClosed = p.is_active === false;
+          const onBreak = !manuallyClosed && isOnBreak(p);
           const scheduledOpen = !manuallyClosed && isOpen(p);
           const showHours  = !!h;
           const clickable = !manuallyClosed && (scheduledOpen || !showHours);
           const opensAt = h ? fmt(h.o) : '';
           const closesAt = h ? fmt(h.c) : '';
+          const reopensAt = onBreak ? fmt(h.be) : '';
           const mtc = scheduledOpen ? minutesUntilClose(p) : null;
           const closingSoon = mtc !== null && mtc <= CLOSING_SOON_THRESHOLD_MINUTES;
           const services = Array.isArray(p.services) ? p.services.filter(s => !isBlank(s)) : [];
@@ -1170,7 +1182,9 @@
 
           const ariaClosedText = manuallyClosed
             ? ', temporary closed'
-            : `, currently closed, opens at ${opensAt}`;
+            : onBreak
+              ? `, on break, reopens at ${reopensAt}`
+              : `, currently closed, opens at ${opensAt}`;
 
           return `
           <a class="rest-card${clickable ? '' : ' rest-card-closed'}"
@@ -1211,13 +1225,21 @@
                      <span class="cf-dot" aria-hidden="true"></span>
                      <span class="cf-status">Temporary Closed</span>
                    </div>`
-                : `<div class="closed-footer">
-                     <span class="cf-dot" aria-hidden="true"></span>
-                     <span class="cf-status">Closed</span>
-                     <span class="cf-sep" aria-hidden="true"></span>
-                     <span class="cf-opens">Opens at</span>
-                     <span class="cf-time">${escapeHtml(opensAt)}</span>
-                   </div>`
+                : onBreak
+                  ? `<div class="closed-footer">
+                       <span class="cf-dot" aria-hidden="true"></span>
+                       <span class="cf-status">On break</span>
+                       <span class="cf-sep" aria-hidden="true"></span>
+                       <span class="cf-opens">Reopens at</span>
+                       <span class="cf-time">${escapeHtml(reopensAt)}</span>
+                     </div>`
+                  : `<div class="closed-footer">
+                       <span class="cf-dot" aria-hidden="true"></span>
+                       <span class="cf-status">Closed</span>
+                       <span class="cf-sep" aria-hidden="true"></span>
+                       <span class="cf-opens">Opens at</span>
+                       <span class="cf-time">${escapeHtml(opensAt)}</span>
+                     </div>`
             }
           </a>`;
         }).join('');

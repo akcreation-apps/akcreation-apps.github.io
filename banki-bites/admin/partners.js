@@ -17,7 +17,7 @@ function mountPartnerChart(id, config) {
 
 const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
-  opening_hour: '08', closing_hour: '22', address: '', point_of_contact: '',
+  opening_hour: '08', closing_hour: '22', break_start_hour: '', break_end_hour: '', address: '', point_of_contact: '',
   is_active: true, is_removed: false, is_veg: false, is_homemade: false, is_separate_price: false,
   sort_order: 0, sync_collection: '', sync_doc_id: '',
 };
@@ -462,6 +462,11 @@ async function openEditor(db, existing, root) {
         <div class="form-group col-6"><label>Open hour (0-23)</label><input class="form-control" name="opening_hour" value="${escapeAttr(p.opening_hour)}"></div>
         <div class="form-group col-6"><label>Close hour (0-23)</label><input class="form-control" name="closing_hour" value="${escapeAttr(p.closing_hour)}"></div>
       </div>
+      <div class="form-row">
+        <div class="form-group col-6"><label>Break start hour (0-23, optional)</label><input class="form-control" name="break_start_hour" value="${escapeAttr(p.break_start_hour || '')}"></div>
+        <div class="form-group col-6"><label>Break end hour (0-23, optional)</label><input class="form-control" name="break_end_hour" value="${escapeAttr(p.break_end_hour || '')}"></div>
+      </div>
+      <small class="text-muted d-block" style="margin-top:-.25rem;margin-bottom:.75rem">Leave both blank for no break. Break must fall inside open/close hours.</small>
       <div class="form-group"><label>Address</label><textarea class="form-control" name="address" rows="2">${escapeHtml(p.address)}</textarea></div>
       <div class="form-group">
         <label>Point of contact (10-digit mobile) <span class="text-danger">*</span></label>
@@ -531,6 +536,8 @@ async function openEditor(db, existing, root) {
         sort_order: parseInt(fd.get('sort_order')) || maxPos,
         opening_hour: fd.get('opening_hour').trim(),
         closing_hour: fd.get('closing_hour').trim(),
+        break_start_hour: (fd.get('break_start_hour') || '').trim(),
+        break_end_hour:   (fd.get('break_end_hour')   || '').trim(),
         address: fd.get('address').trim(),
         point_of_contact: pocRaw ? normalisePhone(pocRaw) : '',
         is_active: f.querySelector('#paIsActive').checked,
@@ -561,6 +568,29 @@ async function openEditor(db, existing, root) {
       }
       data.opening_hour = String(oh).padStart(2, '0');
       data.closing_hour = String(ch).padStart(2, '0');
+      const bsRaw = data.break_start_hour;
+      const beRaw = data.break_end_hour;
+      if (bsRaw === '' && beRaw === '') {
+        data.break_start_hour = '';
+        data.break_end_hour = '';
+      } else {
+        const bs = parseInt(bsRaw);
+        const be = parseInt(beRaw);
+        if (isNaN(bs) || bs < 0 || bs > 23 || isNaN(be) || be < 0 || be > 23) {
+          Swal.showValidationMessage('Break hours must both be between 0 and 23, or both blank');
+          return false;
+        }
+        if (bs >= be) {
+          Swal.showValidationMessage('Break start must be earlier than break end');
+          return false;
+        }
+        if (bs < oh || be > ch) {
+          Swal.showValidationMessage('Break must fall inside the open/close window');
+          return false;
+        }
+        data.break_start_hour = String(bs).padStart(2, '0');
+        data.break_end_hour   = String(be).padStart(2, '0');
+      }
       // Point of contact is mandatory for both add and edit — every partner
       // must have a reachable phone before the record can be saved.
       if (!pocRaw) {
