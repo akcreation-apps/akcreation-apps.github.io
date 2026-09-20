@@ -294,6 +294,14 @@
                   "mrp": 10,
                   "image": "images/products/Ching's Schezwan Chutney 360x 30 gm.webp",
                   "inStock": true
+                },
+                {
+                  "id": 1393,
+                  "unit": "250G",
+                  "price": 79,
+                  "mrp": 90,
+                  "image": "images/products/Swwzwan Chutny 250.webp",
+                  "inStock": true
                 }
               ]
             },
@@ -4561,23 +4569,6 @@
                   "price": 44,
                   "mrp": 50,
                   "image": "images/products/TATA LITE SALT PACKED 25 X 1 KG (NEW).webp",
-                  "inStock": true
-                }
-              ]
-            },
-            {
-              "id": 1393,
-              "name": "Schezwan Chutney",
-              "featured": false,
-              "deal": false,
-              "image": "images/products/Swwzwan Chutny 250.webp",
-              "variants": [
-                {
-                  "id": 1393,
-                  "unit": "250G",
-                  "price": 79,
-                  "mrp": 90,
-                  "image": "images/products/Swwzwan Chutny 250.webp",
                   "inStock": true
                 }
               ]
