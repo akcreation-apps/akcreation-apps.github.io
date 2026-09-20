@@ -84,6 +84,7 @@
     .then((data) => {
       // Sort categories by their `order` field — anything without one goes to the end.
       data.categories.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
+      registerCatalog(data);
       renderSubnav(data);
       renderCategoryRows(data);
       renderDeals(data);
@@ -91,6 +92,25 @@
       setupScrollSpy();
     })
     .catch(() => {});
+
+  // Default variant = first in-stock, else first. Single-variant products just
+  // use variants[0] so the rest of the code has one shape to worry about.
+  function displayVariant(p) {
+    const vs = p.variants || [];
+    return vs.find((v) => v.inStock !== false) || vs[0] || {};
+  }
+
+  // Global product lookup so cart.js can resolve `data-open-variant="<id>"`
+  // back to the full product (with all variants) when it opens the picker.
+  function registerCatalog(data) {
+    const map = new Map();
+    data.categories.forEach((cat) => {
+      cat.subcategories.forEach((sub) => {
+        sub.dishes.forEach((p) => map.set(String(p.id), { ...p, categoryName: cat.name, categoryId: cat.id, categoryImage: cat.image }));
+      });
+    });
+    window.bbCatalogById = map;
+  }
 
   function collectAll(data) {
     const all = [];
@@ -106,13 +126,13 @@
   function sortByFeaturedThenPrice(a, b) {
     const featDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
     if (featDiff !== 0) return featDiff;
-    return (Number(a.price) || 0) - (Number(b.price) || 0);
+    return (displayVariant(a).price || 0) - (displayVariant(b).price || 0);
   }
 
   function renderSubnav(data) {
     const wrap = $('#subnavInner');
     if (!wrap) return;
-    const hasDeals = collectAll(data).some((p) => p.inStock && p.deal === true);
+    const hasDeals = collectAll(data).some((p) => p.deal === true && (p.variants || []).some((v) => v.inStock !== false));
     const offerChip = hasDeals
       ? `<a class="subnav-item offer active" data-cat-nav="deals" href="#deals"><i class="fa-solid fa-fire"></i>Offers</a>`
       : '';
@@ -206,7 +226,8 @@
     if (!wrap) return;
     wrap.innerHTML = data.categories
       .map((c) => {
-        const items = c.subcategories.flatMap((sub) => sub.dishes).filter((d) => d.inStock);
+        const items = c.subcategories.flatMap((sub) => sub.dishes)
+          .filter((d) => (d.variants || []).some((v) => v.inStock !== false));
         if (items.length === 0) return '';
         items.sort(sortByFeaturedThenPrice);
         const previews = items.slice(0, 10).map((p) => productCard({ ...p, categoryImage: c.image })).join('');
@@ -226,19 +247,35 @@
   }
 
   function productCard(p) {
-    const mrp = Number(p.mrp) || Number(p.price);
-    const price = Number(p.price);
+    const dv = displayVariant(p);
+    const price = Number(dv.price) || 0;
+    const mrp = Number(dv.mrp) || price;
     const hasDiscount = mrp > price;
     const disc = hasDiscount ? Math.round(((mrp - price) / mrp) * 100) : 0;
     const isDeal = p.deal === true;
     const brand = brandOf(p.name);
-    const img = encPath(p.image || p.categoryImage);
+    const img = encPath(dv.image || p.image || p.categoryImage);
+    const multi = (p.variants || []).length > 1;
+    const unitLabel = multi
+      ? `${html(dv.unit)} <span class="prod-size-chip">${p.variants.length} sizes</span>`
+      : html(dv.unit || '');
+    const addBtn = multi
+      ? `<button type="button" class="prod-add" data-open-variant="${attr(p.id)}">
+           <i class="fa-solid fa-plus"></i> Add
+         </button>`
+      : `<button type="button" class="prod-add" data-add-btn="${attr(dv.id)}"
+             data-name="${attr(p.name)}" data-price="${price}"
+             data-unit="${attr(dv.unit)}" data-image="${attr(img)}">
+           <i class="fa-solid fa-plus"></i> Add
+         </button>`;
     return `
       <article class="prod-card${isDeal ? ' is-deal' : ''}"
-        data-product data-id="${attr(p.id)}"
+        data-product data-id="${attr(dv.id)}"
+        data-product-key="${attr(p.id)}"
         data-name="${attr(p.name)}"
-        data-price="${p.price}"
-        data-unit="${attr(p.unit)}"
+        data-price="${price}"
+        data-mrp="${mrp}"
+        data-unit="${attr(dv.unit)}"
         data-image="${attr(img)}">
         <div class="prod-img">
           ${hasDiscount ? `<span class="badge badge-brand prod-badge">${disc}% OFF</span>` : ''}
@@ -248,16 +285,12 @@
         <div class="prod-body">
           <span class="prod-brand">${html(brand)}</span>
           <h4 class="prod-name">${html(p.name)}</h4>
-          <div class="prod-meta"><span>${html(p.unit)}</span></div>
+          <div class="prod-meta"><span>${unitLabel}</span></div>
           <div class="prod-price-row">
-            <span class="prod-price">${money(price)}</span>
+            <span class="prod-price">${multi ? 'From ' : ''}${money(price)}</span>
             ${hasDiscount ? `<span class="prod-mrp">${money(mrp)}</span>` : ''}
           </div>
-          <div class="prod-add-shell" data-add-shell>
-            <button type="button" class="prod-add" data-add-btn="${attr(p.id)}">
-              <i class="fa-solid fa-plus"></i> Add
-            </button>
-          </div>
+          <div class="prod-add-shell" data-add-shell>${addBtn}</div>
         </div>
       </article>
     `;
@@ -270,7 +303,7 @@
   function renderDeals(data) {
     const wrap = $('#dealsScroll');
     if (!wrap) return;
-    const deals = collectAll(data).filter((p) => p.inStock && p.deal === true);
+    const deals = collectAll(data).filter((p) => p.deal === true && (p.variants || []).some((v) => v.inStock !== false));
     const section = document.getElementById('deals');
     if (deals.length === 0) {
       if (section) section.style.display = 'none';

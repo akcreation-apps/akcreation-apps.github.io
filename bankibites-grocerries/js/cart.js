@@ -733,16 +733,35 @@
       return;
     }
 
+    // Multi-variant product: open the size picker instead of adding directly.
+    const pickBtn = e.target.closest('[data-open-variant]');
+    if (pickBtn) {
+      e.preventDefault();
+      const key = pickBtn.getAttribute('data-open-variant');
+      const product = window.bbCatalogById?.get(String(key));
+      if (!product || !window.bbVariantPicker) return;
+      window.bbVariantPicker.open(product, (variant) => {
+        addItem({
+          id: variant.id,
+          name: product.name,
+          price: Number(variant.price),
+          unit: variant.unit,
+          image: variant.image || product.image,
+        });
+      });
+      return;
+    }
+
     const addBtn = e.target.closest('[data-add-btn]');
     if (addBtn) {
       e.preventDefault();
       const card = addBtn.closest('[data-product]') || addBtn;
       const payload = {
-        id: card.dataset.id || addBtn.dataset.addBtn,
-        name: card.dataset.name || addBtn.dataset.name,
-        price: parseFloat(card.dataset.price || addBtn.dataset.price),
-        unit: card.dataset.unit || addBtn.dataset.unit,
-        image: card.dataset.image || addBtn.dataset.image,
+        id: addBtn.dataset.addBtn || card.dataset.id,
+        name: addBtn.dataset.name || card.dataset.name,
+        price: parseFloat(addBtn.dataset.price || card.dataset.price),
+        unit: addBtn.dataset.unit || card.dataset.unit,
+        image: addBtn.dataset.image || card.dataset.image,
       };
       if (!payload.id || !payload.name || isNaN(payload.price)) return;
       addItem(payload);

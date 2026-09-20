@@ -72,12 +72,27 @@
 
   const state = { catalog: null, activeCat: null, query: '', mode: 'category' };
 
+  // Default variant for card display = first in-stock, else first.
+  const displayVariant = (p) => {
+    const vs = p.variants || [];
+    return vs.find((v) => v.inStock !== false) || vs[0] || {};
+  };
+
   fetch('data/products.json')
     .then((r) => r.json())
     .then((data) => {
       // Sort categories by their `order` field — anything without one goes to the end.
       data.categories.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
       state.catalog = data;
+      // Register a global catalog so cart.js can look up a product from a card
+      // click and open the variant picker with all the sizes.
+      const map = new Map();
+      data.categories.forEach((cat) => {
+        cat.subcategories.forEach((sub) => {
+          sub.dishes.forEach((p) => map.set(String(p.id), { ...p, categoryName: cat.name, categoryId: cat.id, categoryImage: cat.image }));
+        });
+      });
+      window.bbCatalogById = map;
       const params = new URLSearchParams(location.search);
       const qCat = params.get('cat');
       const qSearch = (params.get('q') || '').trim();
@@ -131,14 +146,17 @@
 
   function renderSidebar() {
     const list = $('#catList');
+    // Count variants (SKUs), not merged products, so the sidebar total feels
+    // consistent with what a shopper actually browses.
+    const countVariants = (sub) => sub.dishes.reduce((s, d) => s + (d.variants || []).length, 0);
     const total = state.catalog.categories.reduce(
-      (s, c) => s + c.subcategories.reduce((s2, sub) => s2 + sub.dishes.length, 0),
+      (s, c) => s + c.subcategories.reduce((s2, sub) => s2 + countVariants(sub), 0),
       0
     );
     $('#catTotalCount').textContent = total + ' items';
     list.innerHTML = state.catalog.categories
       .map((c) => {
-        const count = c.subcategories.reduce((s, sub) => s + sub.dishes.length, 0);
+        const count = c.subcategories.reduce((s, sub) => s + countVariants(sub), 0);
         return `
         <button class="cat-side-item${c.id === state.activeCat ? ' active' : ''}" data-cat="${attr(c.id)}">
           <span class="csi-ico"><i class="fa-solid ${CATEGORY_ICONS[c.id] || 'fa-basket-shopping'}"></i></span>
@@ -172,13 +190,19 @@
   const sortByFeaturedThenPrice = (a, b) => {
     const featDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
     if (featDiff !== 0) return featDiff;
-    return (Number(a.price) || 0) - (Number(b.price) || 0);
+    return (displayVariant(a).price || 0) - (displayVariant(b).price || 0);
   };
 
   function currentProducts() {
     const q = state.query.trim().toLowerCase();
     const tokens = q.split(/\s+/).filter(Boolean);
-    const matches = (name) => !tokens.length || tokens.every((t) => name.toLowerCase().includes(t));
+    const matches = (text) => !tokens.length || tokens.every((t) => text.toLowerCase().includes(t));
+    // A product matches if any of its {name, category, variant units} contain
+    // every token — this lets "kissan 1kg" find the merged product.
+    const productMatches = (d, catName) => {
+      const units = (d.variants || []).map((v) => v.unit || '').join(' ');
+      return matches(d.name + ' ' + catName + ' ' + units);
+    };
 
     if (state.mode === 'search' && q) {
       // Global search — across every category
@@ -186,7 +210,7 @@
       state.catalog.categories.forEach((cat) => {
         cat.subcategories.forEach((sub) =>
           sub.dishes.forEach((d) => {
-            if (matches(d.name) || matches(cat.name)) {
+            if (productMatches(d, cat.name)) {
               items.push({ ...d, categoryImage: cat.image, categoryName: cat.name });
             }
           })
@@ -202,7 +226,7 @@
     const items = [];
     cat.subcategories.forEach((sub) =>
       sub.dishes.forEach((d) => {
-        if (matches(d.name)) items.push({ ...d, categoryImage: cat.image, categoryName: cat.name });
+        if (productMatches(d, cat.name)) items.push({ ...d, categoryImage: cat.image, categoryName: cat.name });
       })
     );
     items.sort(sortByFeaturedThenPrice);
@@ -260,20 +284,35 @@
   }
 
   function productCard(p) {
-    const mrp = Number(p.mrp) || Number(p.price);
-    const price = Number(p.price);
+    const dv = displayVariant(p);
+    const price = Number(dv.price) || 0;
+    const mrp = Number(dv.mrp) || price;
     const hasDiscount = mrp > price;
     const disc = hasDiscount ? Math.round(((mrp - price) / mrp) * 100) : 0;
     const isDeal = p.deal === true;
     const brand = brandOf(p.name);
-    const img = encPath(p.image || p.categoryImage);
+    const img = encPath(dv.image || p.image || p.categoryImage);
+    const multi = (p.variants || []).length > 1;
+    const unitLabel = multi
+      ? `${html(dv.unit)} <span class="prod-size-chip">${p.variants.length} sizes</span>`
+      : html(dv.unit || '');
+    const addBtn = multi
+      ? `<button type="button" class="prod-add" data-open-variant="${attr(p.id)}">
+           <i class="fa-solid fa-plus"></i> Add
+         </button>`
+      : `<button type="button" class="prod-add" data-add-btn="${attr(dv.id)}"
+             data-name="${attr(p.name)}" data-price="${price}"
+             data-unit="${attr(dv.unit)}" data-image="${attr(img)}">
+           <i class="fa-solid fa-plus"></i> Add
+         </button>`;
     return `
       <article class="prod-card${isDeal ? ' is-deal' : ''}"
-        data-product data-id="${attr(p.id)}"
+        data-product data-id="${attr(dv.id)}"
+        data-product-key="${attr(p.id)}"
         data-name="${attr(p.name)}"
-        data-price="${p.price}"
+        data-price="${price}"
         data-mrp="${mrp}"
-        data-unit="${attr(p.unit)}"
+        data-unit="${attr(dv.unit)}"
         data-image="${attr(img)}">
         <div class="prod-img">
           ${hasDiscount ? `<span class="badge badge-brand prod-badge">${disc}% OFF</span>` : ''}
@@ -283,16 +322,12 @@
         <div class="prod-body">
           <span class="prod-brand">${html(brand)}</span>
           <h4 class="prod-name">${html(p.name)}</h4>
-          <div class="prod-meta"><span>${html(p.unit)}</span></div>
+          <div class="prod-meta"><span>${unitLabel}</span></div>
           <div class="prod-price-row">
-            <span class="prod-price">${money(price)}</span>
+            <span class="prod-price">${multi ? 'From ' : ''}${money(price)}</span>
             ${hasDiscount ? `<span class="prod-mrp">${money(mrp)}</span>` : ''}
           </div>
-          <div class="prod-add-shell" data-add-shell>
-            <button type="button" class="prod-add" data-add-btn="${attr(p.id)}">
-              <i class="fa-solid fa-plus"></i> Add
-            </button>
-          </div>
+          <div class="prod-add-shell" data-add-shell>${addBtn}</div>
         </div>
       </article>`;
   }
@@ -340,6 +375,10 @@
 
   function openQuickView(card) {
     ensureQuickView();
+    const productKey = card.dataset.productKey || card.dataset.id;
+    const product = window.bbCatalogById?.get(String(productKey));
+    const multi = product && (product.variants || []).length > 1;
+
     const id = card.dataset.id;
     const name = card.dataset.name || '';
     const price = Number(card.dataset.price) || 0;
@@ -353,9 +392,9 @@
     $('#pvImg').alt = name;
     $('#pvBrand').textContent = brandOf(name);
     $('#pvName').textContent = name;
-    $('#pvUnit').textContent = unit || '';
-    $('#pvUnit').style.display = unit ? '' : 'none';
-    $('#pvPrice').textContent = money(price);
+    $('#pvUnit').textContent = multi ? `${unit} · ${product.variants.length} sizes` : (unit || '');
+    $('#pvUnit').style.display = (unit || multi) ? '' : 'none';
+    $('#pvPrice').textContent = (multi ? 'From ' : '') + money(price);
 
     const mrpEl = $('#pvMrp');
     const offEl = $('#pvOff');
@@ -367,15 +406,26 @@
     }
 
     const btn = $('#pvAddBtn');
-    btn.setAttribute('data-add-btn', id);
-    btn.dataset.name = name;
-    btn.dataset.price = price;
-    btn.dataset.unit = unit;
-    btn.dataset.image = image;
-    btn.innerHTML = `<i class="fa-solid fa-plus"></i> Add to basket`;
     // Drop any stepper left over from a previous product — cart.js will
     // recreate a fresh one for the current id if needed.
     $('#pvSheet [data-stepper]')?.remove();
+    if (multi) {
+      btn.removeAttribute('data-add-btn');
+      btn.setAttribute('data-open-variant', productKey);
+      delete btn.dataset.name;
+      delete btn.dataset.price;
+      delete btn.dataset.unit;
+      delete btn.dataset.image;
+      btn.innerHTML = `<i class="fa-solid fa-layer-group"></i> Choose a size`;
+    } else {
+      btn.removeAttribute('data-open-variant');
+      btn.setAttribute('data-add-btn', id);
+      btn.dataset.name = name;
+      btn.dataset.price = price;
+      btn.dataset.unit = unit;
+      btn.dataset.image = image;
+      btn.innerHTML = `<i class="fa-solid fa-plus"></i> Add to basket`;
+    }
     btn.style.display = '';
 
     $('#pvBackdrop').classList.add('open');

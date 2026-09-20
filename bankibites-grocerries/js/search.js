@@ -29,16 +29,33 @@
       });
     return catalogPromise;
   }
+  // Emit one search row per variant so a query like "kissan 1kg" still lands
+  // on the right size. Each row is a self-contained {id, name, price, unit,
+  // image} — plus productKey so the Add button can open the picker pre-selected
+  // on that size for multi-variant products.
   function flatten(data) {
     const all = [];
     data.categories.forEach((cat) => {
       cat.subcategories.forEach((sub) => {
         sub.dishes.forEach((d) => {
-          all.push({
-            ...d,
-            image: d.image || cat.image,
-            categoryId: cat.id,
-            categoryName: cat.name,
+          const variants = d.variants || [];
+          if (variants.length === 0) return;
+          const productKey = d.id;
+          const multi = variants.length > 1;
+          variants.forEach((v) => {
+            if (v.inStock === false) return;
+            all.push({
+              id: v.id,
+              productKey,
+              multi,
+              name: d.name,
+              price: Number(v.price),
+              mrp: Number(v.mrp ?? v.price),
+              unit: v.unit,
+              image: v.image || d.image || cat.image,
+              categoryId: cat.id,
+              categoryName: cat.name,
+            });
           });
         });
       });
@@ -52,7 +69,7 @@
     // Split into tokens — every token must be substring-matched
     const tokens = q.split(/\s+/);
     return list.filter((p) => {
-      const hay = (p.name + ' ' + p.categoryName).toLowerCase();
+      const hay = (p.name + ' ' + p.categoryName + ' ' + (p.unit || '')).toLowerCase();
       return tokens.every((t) => hay.includes(t));
     });
   }

@@ -402,11 +402,79 @@
   // ==============================================================
   // Load
   // ==============================================================
+  // The storefront stores same-name pack sizes as a single product with a
+  // variants[] array. The editor is easier to reason about as a flat table
+  // (one row per SKU) — so we un-group on load and re-group on save. The
+  // dirty detector and every row-level handler continues to see the flat
+  // shape it was originally built for.
+  function flattenForEdit(raw) {
+    const clone = JSON.parse(JSON.stringify(raw));
+    clone.categories.forEach((cat) => {
+      cat.subcategories.forEach((sub) => {
+        const flat = [];
+        sub.dishes.forEach((p) => {
+          const variants = Array.isArray(p.variants) ? p.variants : [p];
+          variants.forEach((v) => {
+            flat.push({
+              id: v.id,
+              name: p.name,
+              price: Number(v.price ?? p.price ?? 0),
+              mrp: Number(v.mrp ?? p.mrp ?? v.price ?? 0),
+              unit: v.unit ?? p.unit ?? '',
+              image: v.image ?? p.image ?? '',
+              inStock: v.inStock !== false,
+              featured: p.featured === true,
+              deal: p.deal === true,
+            });
+          });
+        });
+        sub.dishes = flat;
+      });
+    });
+    return clone;
+  }
+
+  function groupForSave(flat) {
+    const clone = JSON.parse(JSON.stringify(flat));
+    clone.categories.forEach((cat) => {
+      cat.subcategories.forEach((sub) => {
+        const groups = new Map();
+        const order = [];
+        sub.dishes.forEach((d) => {
+          const key = String(d.name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+          if (!groups.has(key)) { groups.set(key, []); order.push(key); }
+          groups.get(key).push(d);
+        });
+        sub.dishes = order.map((key) => {
+          const rows = groups.get(key);
+          const first = rows[0];
+          return {
+            id: first.id,
+            name: first.name,
+            featured: rows.some((r) => r.featured === true),
+            deal: rows.some((r) => r.deal === true),
+            image: first.image,
+            variants: rows.map((r) => ({
+              id: r.id,
+              unit: r.unit,
+              price: Number(r.price) || 0,
+              mrp: Number(r.mrp ?? r.price) || 0,
+              image: r.image,
+              inStock: r.inStock !== false,
+            })),
+          };
+        });
+      });
+    });
+    return clone;
+  }
+
   async function loadData() {
     try {
       setStatus('loading…');
       const res = await fetch('data/products.json?_=' + Date.now());
-      data = await res.json();
+      const raw = await res.json();
+      data = flattenForEdit(raw);
       // Sort by order for the editor
       data.categories.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
       originalData = deepClone(data);
@@ -597,6 +665,15 @@
     cat.subcategories.forEach((sub) => {
       sub.dishes.forEach((d, i) => rows.push({ sub, dish: d, index: i }));
     });
+    // Count how many rows share the same normalised name — used to render a
+    // small "×N sizes" badge in the Name cell so it's obvious which rows will
+    // merge back into a single storefront product on save.
+    const groupCounts = new Map();
+    rows.forEach(({ dish }) => {
+      const k = String(dish.name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      groupCounts.set(k, (groupCounts.get(k) || 0) + 1);
+    });
+    window.__bbGroupCounts = groupCounts;
 
     $('#prodPanel').innerHTML = `
       <div class="panel-head">
@@ -665,7 +742,11 @@
         <td class="drag-handle" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></td>
         <td><span class="id-cell">${d.id}</span></td>
         <td><div class="img-cell">${img}</div></td>
-        <td class="name-cell"><input class="${fCls('name')}" type="text" value="${escapeAttr(d.name)}" data-field="name"></td>
+        <td class="name-cell"><input class="${fCls('name')}" type="text" value="${escapeAttr(d.name)}" data-field="name">${(() => {
+          const k = String(d.name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+          const n = (window.__bbGroupCounts && window.__bbGroupCounts.get(k)) || 1;
+          return n > 1 ? `<span title="Rows sharing this name are merged into one variant group on save" style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--brand-soft);color:var(--brand-dark);font-size:0.65rem;font-weight:700;">×${n} sizes</span>` : '';
+        })()}</td>
         <td class="num"><input class="${fCls('mrp')}" type="number" min="0" step="0.5" value="${d.mrp ?? ''}" data-field="mrp" placeholder="—"></td>
         <td class="num"><input class="${fCls('price')}" type="number" min="0" step="0.5" value="${d.price}" data-field="price"></td>
         <td class="unit"><input class="${fCls('unit')}" type="text" value="${escapeAttr(d.unit || '')}" data-field="unit"></td>
@@ -888,7 +969,10 @@
   function serialize() {
     // Ensure order numbers are current and consistent before saving
     renumberCats();
-    return JSON.stringify(data, null, 2);
+    // Re-group same-name rows into a single product with a variants[] array.
+    // The storefront expects the merged shape.
+    const grouped = groupForSave(data);
+    return JSON.stringify(grouped, null, 2);
   }
 
   $('#btnDownload').addEventListener('click', () => {

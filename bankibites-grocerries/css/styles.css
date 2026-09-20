@@ -559,6 +559,10 @@ p { color: var(--text); }
 .prod-meta .rating { display: inline-flex; align-items: center; gap: 3px; color: var(--ink); font-weight: 600; }
 .prod-meta .rating i { color: var(--star); font-size: 0.7rem; }
 .prod-meta .dot { width: 3px; height: 3px; background: var(--muted); border-radius: 50%; }
+.prod-meta .prod-size-chip { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-dark); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.02em; margin-left: 4px; }
+@media (prefers-color-scheme: dark) {
+  .prod-meta .prod-size-chip { background: var(--brand-soft); color: var(--brand); }
+}
 
 .prod-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: auto; padding-top: 2px; flex-wrap: wrap; }
 .prod-price { font-size: 0.9rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
