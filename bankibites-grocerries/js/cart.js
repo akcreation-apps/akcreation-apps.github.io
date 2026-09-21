@@ -592,10 +592,8 @@
     const phone = (CFG.whatsappNumber || '').replace(/\D/g, '');
     const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
 
-    // TCD-style two-step flow: (1) a "Saving your order…" loader while the
-    // Firestore write finishes; (2) a "Open WhatsApp" confirm whose button
-    // press is a fresh user gesture — mobile Chrome needs that so the wa.me
-    // deep-link opens WhatsApp directly (no api.whatsapp.com interstitial).
+    // Single-step flow: after the "Saving your order…" loader closes, we
+    // navigate straight to wa.me — no second confirm click.
     const goToWhatsApp = () => {
       // Silent safety net for vivo / older Android where the wa.me Intent
       // sometimes drops `text` — the customer can long-press → Paste.
@@ -665,35 +663,6 @@
     if (typeof Swal !== 'undefined') {
       try { Swal.close(); } catch {}
       await new Promise(r => setTimeout(r, 80));
-    }
-
-    // Step 3 — mirror the TCD flow: the wa.me send must ride a fresh user
-    // gesture, otherwise mobile Chrome routes it through the
-    // `api.whatsapp.com` interstitial ("message sent" screen). Wrapping it
-    // behind an "Open WhatsApp" Swal confirm makes the button click itself
-    // the gesture, so WhatsApp opens directly and the visibilitychange
-    // reload in goToWhatsApp() drops the customer back onto the storefront
-    // when they return.
-    // Step 3 — mirrors TCD/cart.js:632-646 exactly. The click on the
-    // "Open WhatsApp" confirm is the fresh user gesture mobile Chrome
-    // needs so the wa.me deep-link opens WhatsApp directly instead of the
-    // api.whatsapp.com interstitial. Promise.resolve() wraps Swal.fire's
-    // return so .catch is always callable regardless of CDN build.
-    try {
-      await Promise.race([
-        Promise.resolve(Swal.fire({
-          title: 'Open WhatsApp to send your order',
-          icon: 'success',
-          html: '<div style="font-size:.95rem;line-height:1.5;color:#374151">Tap below — your order is ready.</div>',
-          confirmButtonText: 'Open WhatsApp',
-          confirmButtonColor: '#16a34a',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-        })).catch(() => {}),
-        new Promise(resolve => setTimeout(resolve, 60000)),
-      ]);
-    } catch (err) {
-      console.error('[bankimart] confirm step failed (sending to WhatsApp anyway):', err);
     }
 
     goToWhatsApp();
