@@ -315,6 +315,28 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
 }
 .items-block .order-items li:last-child { border-bottom: 0; }
 
+.delivery-summary-addr {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.delivery-summary-addr i {
+  color: var(--brand);
+  font-size: 0.8rem;
+  margin-right: 5px;
+}
+.delivery-summary-addr strong {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
 .addr-block {
   background: var(--surface-soft);
   border: 1px solid var(--border-soft);

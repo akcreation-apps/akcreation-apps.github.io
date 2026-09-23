@@ -551,11 +551,16 @@ function renderCard(db, o) {
       <div class="ec-row">
         <div class="delivery-summary-main">
           <div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</div>
-          <div class="delivery-summary-sub">
-            <span class="ec-meta">${created.toLocaleString('en-IN')}${hasItems ? ' · ' + items.length + ' items' : ''}</span>
-            ${!isClosed ? etaSummaryChip : ''}
-            ${!isClosed ? paymentSummaryChip : ''}
-          </div>
+          ${(hasName || hasAddress) ? `
+            <div class="delivery-summary-addr">
+              <i class="fas fa-location-dot" aria-hidden="true"></i>
+              <span>${hasName ? `<strong>${escapeHtml(displayCustomerName)}</strong>` : ''}${hasName && hasAddress ? ' · ' : ''}${hasAddress ? escapeHtml(c.address) : ''}${hasItems ? ` · ${items.length} item${items.length === 1 ? '' : 's'}` : ''}</span>
+            </div>` : (hasItems ? `<div class="delivery-summary-sub"><span class="ec-meta">${items.length} item${items.length === 1 ? '' : 's'}</span></div>` : '')}
+          ${(!isClosed && (etaSummaryChip || paymentSummaryChip)) ? `
+            <div class="delivery-summary-sub">
+              ${etaSummaryChip}
+              ${paymentSummaryChip}
+            </div>` : ''}
           ${deliveredMeta}
         </div>
         <span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>
