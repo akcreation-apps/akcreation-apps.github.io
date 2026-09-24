@@ -115,6 +115,7 @@ function renderTracker(order, source) {
   const eta = order.eta_date
     ? `${fmtEtaDate(order.eta_date)}${order.eta_window ? ' · ' + order.eta_window : ''}`
     : '';
+  const placedOn = fmtReceiptDate(order.created_at);
 
   document.getElementById('billRoot').innerHTML = `
     <div class="tracker">
@@ -131,6 +132,14 @@ function renderTracker(order, source) {
             <div class="tracker-row-value">#${esc(shortId)}</div>
           </div>
         </div>
+        ${placedOn ? `
+        <div class="tracker-row">
+          <div class="tracker-row-icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="tracker-row-body">
+            <div class="tracker-row-label">Placed on</div>
+            <div class="tracker-row-value">${esc(placedOn)}</div>
+          </div>
+        </div>` : ''}
         ${eta ? `
         <div class="tracker-row">
           <div class="tracker-row-icon"><i class="fa-solid fa-truck-fast"></i></div>
@@ -179,7 +188,8 @@ function renderBill(order) {
   const subtotal = Number(order.subtotal) || 0;
   const deliveryFee = Number(order.delivery_fee_final ?? order.delivery_fee_estimated ?? 0);
   const grand = subtotal + deliveryFee;
-  const dateStr = fmtReceiptDate(order.delivered_at || order.created_at);
+  const placedStr = fmtReceiptDate(order.created_at);
+  const deliveredStr = fmtReceiptDate(order.delivered_at);
   const vendorName = (CFG.vendorName || 'BankiBites Groceries').toUpperCase();
   const vendorShort = CFG.vendorShort || 'BankiBites';
   const address = CFG.fullAddress || CFG.city || '';
@@ -208,7 +218,10 @@ function renderBill(order) {
 
       <div class="table-info">
         <p class="id">#${esc(shortId)}</p>
-        <p>${esc(dateStr)}</p>
+      </div>
+      <div class="bill-dates" style="padding:8px 20px;font-size:11px;color:#0f172a;border-bottom:1px dashed #94a3b8;font-family:'Courier New',Courier,monospace;">
+        ${placedStr ? `<div style="display:flex;justify-content:space-between;padding:2px 0;color:#0f172a;"><span style="font-weight:700;color:#0f172a;">Placed</span><span style="color:#0f172a;">${esc(placedStr)}</span></div>` : ''}
+        ${deliveredStr ? `<div style="display:flex;justify-content:space-between;padding:2px 0;color:#0f172a;"><span style="font-weight:700;color:#0f172a;">Delivered</span><span style="color:#0f172a;">${esc(deliveredStr)}</span></div>` : ''}
       </div>
 
       <hr class="separator">
@@ -279,7 +292,7 @@ async function main() {
   // Paint the cached order immediately (as a tracker) so the page doesn't
   // sit on the skeleton spinner while Firestore boots. The live snapshot
   // overwrites this the instant it lands.
-  if (localHit?.payload) render({ ...localHit.payload, status: 'new' }, 'local');
+  if (localHit?.payload) render({ created_at: localHit.savedAt, ...localHit.payload, status: 'new' }, 'local');
 
   try {
     const db = await getReaderDb();
