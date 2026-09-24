@@ -272,7 +272,7 @@ async function main() {
   // server view can never change back.
   const terminalMap = loadTerminalMap();
   if (terminalMap[id] === 'delivered' && localHit?.payload) {
-    render({ ...localHit.payload, status: 'delivered' }, 'local');
+    render({ created_at: localHit.savedAt, ...localHit.payload, status: 'delivered' }, 'local');
     return;
   }
 
@@ -297,7 +297,12 @@ async function main() {
       // receipt only needs the server for the status flip; items, totals,
       // place and ETA come from the local payload.
       if (status === 'delivered' && localHit?.payload) {
-        render({ ...localHit.payload, status: 'delivered' }, 'local');
+        render({
+          created_at: localHit.savedAt,
+          ...localHit.payload,
+          delivered_at: data.delivered_at || null,
+          status: 'delivered',
+        }, 'local');
         return;
       }
       render(data, 'live');
