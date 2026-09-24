@@ -8,8 +8,9 @@
   <meta name="keywords" content="cab service Banki, taxi Banki Cuttack, cab booking Banki Odisha, outstation cab Cuttack, taxi Banki 754008, airport transfer Bhubaneswar, Cuttack railway cab, Anvisha Travels, cab near Banki, local taxi Banki Cuttack">
   <meta name="robots" content="index, follow">
   <meta name="author" content="Anvisha Travels">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#0a0908">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#FFF8EE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#100A08" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="https://akcreation-apps.com/anvisha-travels/">
 
   <!-- OG / Social -->
@@ -33,17 +34,17 @@
   <link rel="icon" href="logo.webp" sizes="any">
   <link rel="apple-touch-icon" href="logo.webp">
 
-  <link rel="preload" href="banner.jpg" as="image" fetchpriority="high">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=Noto+Sans+Oriya:wght@400;500;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+  <script src="app.js" defer></script>
 
   <script type="application/ld+json">
   {
@@ -96,1474 +97,657 @@
     ]
   }
   </script>
-
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      /* Editorial dark palette — ink + brass + cream */
-      --ink:        #0a0908;
-      --ink-2:      #100e0c;
-      --ink-3:      #17140f;
-      --surface:    #1c1813;
-      --surface-2:  #221d16;
-      --hairline:   #2a241c;
-      --hairline-2: #3a3226;
-
-      --brass:      #c9a15a;
-      --brass-2:    #e0bc7b;
-      --brass-dim:  rgba(201,161,90,0.10);
-      --brass-glow: rgba(201,161,90,0.22);
-
-      --cream:      #f5efe3;
-      --cream-2:    #d9cfbd;
-      --muted:      #8a8073;
-      --muted-2:    #635a4f;
-
-      --green:      #22c55e;
-      --green-2:    #16a34a;
-      --red:        #ef4444;
-
-      --r-xs: 6px;
-      --r-sm: 10px;
-      --r-md: 14px;
-      --r-lg: 20px;
-
-      --pad:  22px;
-      --pad-lg: 40px;
-
-      --shadow-1: 0 1px 2px rgba(0,0,0,.4);
-      --shadow-2: 0 12px 40px rgba(0,0,0,.45);
-      --shadow-3: 0 30px 80px -20px rgba(0,0,0,.6);
-
-      --serif: 'Fraunces', 'Times New Roman', serif;
-      --sans:  'Inter', system-ui, -apple-system, sans-serif;
-    }
-
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--sans);
-      background: var(--ink);
-      color: var(--cream);
-      min-height: 100vh;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      line-height: 1.5;
-    }
-
-    ::selection { background: var(--brass); color: var(--ink); }
-
-    /* Subtle background gradient warmth */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background:
-        radial-gradient(1200px 600px at 15% -10%, rgba(201,161,90,0.08), transparent 60%),
-        radial-gradient(900px 500px at 110% 20%, rgba(201,161,90,0.05), transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .page { position: relative; z-index: 1; }
-
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-
-    /* ═══════════════════════════════════════════
-       NAVIGATION
-    ═══════════════════════════════════════════ */
-    .nav {
-      position: sticky;
-      top: 0; z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px var(--pad);
-      background: rgba(10,9,8,0.72);
-      backdrop-filter: blur(20px) saturate(1.3);
-      -webkit-backdrop-filter: blur(20px) saturate(1.3);
-      border-bottom: 1px solid var(--hairline);
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-mark {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: var(--ink-2);
-      border: 1px solid var(--hairline-2);
-      display: grid; place-items: center;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .brand-mark img { width: 32px; height: 32px; object-fit: contain; }
-    .brand-text { line-height: 1.1; }
-    .brand-name {
-      font-family: var(--serif);
-      font-weight: 600;
-      font-size: 16px;
-      letter-spacing: -0.01em;
-      color: var(--cream);
-      display: block;
-    }
-    .brand-tag {
-      font-size: 10.5px;
-      color: var(--muted);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      font-weight: 500;
-      margin-top: 2px;
-    }
-
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--brass);
-      color: var(--ink);
-      font-family: var(--sans);
-      font-weight: 600;
-      font-size: 13px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      transition: background .2s, transform .15s, box-shadow .2s;
-      box-shadow: 0 4px 20px var(--brass-glow);
-      white-space: nowrap;
-    }
-    .nav-cta:hover { background: var(--brass-2); transform: translateY(-1px); }
-    .nav-cta:active { transform: translateY(0); }
-
-    /* ═══════════════════════════════════════════
-       HERO
-    ═══════════════════════════════════════════ */
-    .hero {
-      position: relative;
-      overflow: hidden;
-      padding: 44px var(--pad) 32px;
-      text-align: center;
-    }
-
-    .hero-image {
-      display: none;
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 10;
-      max-height: 320px;
-      border-radius: var(--r-lg);
-      overflow: hidden;
-      margin: 28px auto 0;
-      max-width: 900px;
-      box-shadow: var(--shadow-3);
-      border: 1px solid var(--hairline);
-    }
-    .hero-image img { width: 100%; height: 100%; object-fit: cover; }
-    .hero-image::after {
-      content: '';
-      position: absolute; inset: 0;
-      background:
-        linear-gradient(to top, rgba(10,9,8,0.55), transparent 40%),
-        linear-gradient(to bottom, rgba(10,9,8,0.15), transparent 20%);
-      pointer-events: none;
-    }
-    .hero-image-tag {
-      position: absolute;
-      left: 16px; bottom: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(10,9,8,0.65);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(245,239,227,0.12);
-      color: var(--cream);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      padding: 6px 12px;
-      border-radius: 999px;
-    }
-    .hero-image-tag .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green); box-shadow: 0 0 8px var(--green);
-    }
-
-    .kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: var(--brass);
-      margin-bottom: 20px;
-    }
-    .kicker::before, .kicker::after {
-      content: '';
-      width: 28px; height: 1px;
-      background: linear-gradient(to right, transparent, var(--brass));
-    }
-    .kicker::after { background: linear-gradient(to left, transparent, var(--brass)); }
-
-    .hero-title {
-      font-family: var(--serif);
-      font-weight: 500;
-      font-size: clamp(2.4rem, 9vw, 3.6rem);
-      line-height: 1.02;
-      letter-spacing: -0.03em;
-      color: var(--cream);
-      margin-bottom: 18px;
-    }
-    .hero-title em {
-      font-style: italic;
-      font-weight: 400;
-      color: var(--brass);
-      background: linear-gradient(180deg, var(--brass-2), var(--brass));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-lead {
-      font-size: 15px;
-      color: var(--cream-2);
-      line-height: 1.65;
-      max-width: 500px;
-      margin: 0 auto 26px;
-    }
-
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-      max-width: 500px;
-      margin: 26px auto 0;
-      border-top: 1px solid var(--hairline);
-      border-bottom: 1px solid var(--hairline);
-      padding: 16px 0;
-    }
-    .stat { text-align: center; position: relative; }
-    .stat + .stat::before {
-      content: '';
-      position: absolute; left: 0; top: 15%; bottom: 15%;
-      width: 1px; background: var(--hairline);
-    }
-    .stat-num {
-      font-family: var(--serif);
-      font-weight: 600;
-      font-size: 22px;
-      color: var(--brass);
-      line-height: 1;
-      letter-spacing: -0.02em;
-    }
-    .stat-label {
-      font-size: 10.5px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      margin-top: 6px;
-      font-weight: 500;
-    }
-
-    /* ═══════════════════════════════════════════
-       BOOKING FORM — the star of the page
-    ═══════════════════════════════════════════ */
-    .booking-wrap {
-      padding: 36px var(--pad) 8px;
-      scroll-margin-top: 76px;
-    }
-
-    .book-card {
-      background: linear-gradient(180deg, var(--ink-3) 0%, var(--surface) 100%);
-      border: 1px solid var(--hairline-2);
-      border-radius: var(--r-lg);
-      box-shadow: var(--shadow-3);
-      overflow: hidden;
-      position: relative;
-    }
-    /* Brass accent line on top */
-    .book-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--brass), transparent);
-      opacity: 0.7;
-    }
-
-    .book-head {
-      padding: 22px 24px 18px;
-      border-bottom: 1px solid var(--hairline);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .book-head-icon {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background:
-        linear-gradient(180deg, rgba(201,161,90,0.20), rgba(201,161,90,0.05));
-      border: 1px solid rgba(201,161,90,0.25);
-      display: grid; place-items: center;
-      color: var(--brass);
-      font-size: 16px;
-      flex-shrink: 0;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-    }
-    .book-head h2 {
-      font-family: var(--serif);
-      font-weight: 600;
-      font-size: 20px;
-      letter-spacing: -0.015em;
-      color: var(--cream);
-      line-height: 1.2;
-    }
-    .book-head-sub {
-      font-size: 12.5px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .book-body { padding: 22px 24px 24px; }
-
-    .label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--cream-2);
-      margin-bottom: 9px;
-    }
-    .label i { color: var(--brass); font-size: 11px; }
-    .label .req { color: var(--brass); margin-left: -3px; }
-
-    .field, .select {
-      width: 100%;
-      background: var(--ink-2);
-      border: 1px solid var(--hairline-2);
-      border-radius: var(--r-sm);
-      color: var(--cream);
-      font-family: var(--sans);
-      font-size: 16px;
-      font-weight: 500;
-      padding: 14px 15px;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s, background .2s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .field:hover, .select:hover { border-color: #4b4133; background: #16130f; }
-    .field:focus, .select:focus {
-      border-color: var(--brass);
-      background: var(--ink-2);
-      box-shadow: 0 0 0 3px rgba(201,161,90,0.14);
-    }
-    .field::placeholder { color: #6c6558; font-weight: 400; }
-
-    .field[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.5) sepia(1) saturate(3) hue-rotate(5deg);
-      cursor: pointer;
-    }
-    .select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a8073' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 40px;
-      cursor: pointer;
-    }
-    .select option { background: var(--ink-2); color: var(--cream); }
-
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .field-group { margin-bottom: 16px; }
-    .field-group:last-of-type { margin-bottom: 0; }
-
-    .field.invalid, .select.invalid {
-      border-color: var(--red) !important;
-      box-shadow: 0 0 0 3px rgba(239,68,68,0.14) !important;
-    }
-
-    .field-msg {
-      display: none;
-      color: var(--red);
-      font-size: 11.5px;
-      margin-top: 7px;
-      font-weight: 500;
-      display: none;
-    }
-    .field-msg.show { display: flex; align-items: center; gap: 6px; }
-
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--hairline-2), transparent);
-      margin: 22px 0;
-    }
-
-    .opt-wrap {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height .4s ease, opacity .3s ease;
-    }
-    .opt-wrap.visible { max-height: 240px; opacity: 1; }
-
-    .opt-head {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--cream-2);
-      margin-bottom: 10px;
-    }
-    .opt-head i { color: var(--brass); }
-    .opt-tag {
-      background: var(--brass-dim);
-      color: var(--brass);
-      font-size: 9.5px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      padding: 3px 8px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      border: 1px solid rgba(201,161,90,0.22);
-    }
-
-    .cta-book {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      background: linear-gradient(180deg, #29c964, #1fa54f);
-      color: #0a1a10;
-      font-family: var(--sans);
-      font-weight: 700;
-      font-size: 15.5px;
-      padding: 17px;
-      border-radius: var(--r-sm);
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      margin-top: 22px;
-      transition: transform .15s, box-shadow .2s, filter .2s;
-      box-shadow: 0 8px 32px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.15);
-      letter-spacing: -0.005em;
-    }
-    .cta-book:hover { transform: translateY(-1px); box-shadow: 0 12px 40px rgba(34,197,94,0.40), inset 0 1px 0 rgba(255,255,255,0.2); filter: brightness(1.05); }
-    .cta-book:active { transform: translateY(0); }
-    .cta-book:disabled, .cta-book.disabled {
-      background: linear-gradient(180deg, #2a2620, #201c17);
-      color: var(--muted-2);
-      cursor: not-allowed;
-      box-shadow: none;
-      pointer-events: none;
-      filter: none;
-    }
-    .cta-book i { font-size: 20px; }
-    .cta-book .arrow { margin-left: 2px; transition: transform .2s; }
-    .cta-book:hover .arrow { transform: translateX(3px); }
-
-    .cta-helper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      text-align: center;
-      font-size: 12.5px;
-      color: var(--muted);
-      margin-top: 14px;
-      line-height: 1.5;
-    }
-    .cta-helper i { color: var(--muted); font-size: 11px; }
-
-    /* ═══════════════════════════════════════════
-       SERVICES
-    ═══════════════════════════════════════════ */
-    .services { padding: 60px var(--pad) 44px; }
-
-    .section-title-block {
-      text-align: center;
-      margin-bottom: 34px;
-    }
-    .eyebrow {
-      display: inline-block;
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: var(--brass);
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-family: var(--serif);
-      font-weight: 500;
-      font-size: clamp(1.7rem, 5vw, 2.2rem);
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      color: var(--cream);
-    }
-    .section-title em {
-      font-style: italic;
-      color: var(--brass);
-    }
-
-    .svc-list {
-      list-style: none;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0;
-    }
-
-    .svc {
-      display: grid;
-      grid-template-columns: 44px 1fr auto;
-      align-items: start;
-      gap: 18px;
-      padding: 24px 4px;
-      border-bottom: 1px solid var(--hairline);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity .55s ease, transform .55s ease;
-      position: relative;
-    }
-    .svc:first-child { border-top: 1px solid var(--hairline); }
-    .svc.in { opacity: 1; transform: translateY(0); }
-
-    .svc-num {
-      font-family: var(--serif);
-      font-weight: 500;
-      font-size: 26px;
-      color: var(--brass);
-      line-height: 1;
-      letter-spacing: -0.02em;
-      padding-top: 2px;
-    }
-
-    .svc-body h3 {
-      font-family: var(--serif);
-      font-weight: 500;
-      font-size: 18px;
-      line-height: 1.3;
-      letter-spacing: -0.01em;
-      color: var(--cream);
-      margin-bottom: 6px;
-    }
-    .svc-body p {
-      font-size: 13.5px;
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 46ch;
-    }
-
-    .svc-icon {
-      width: 42px; height: 42px;
-      border-radius: 10px;
-      background: var(--brass-dim);
-      border: 1px solid rgba(201,161,90,0.18);
-      display: grid; place-items: center;
-      font-size: 18px;
-      align-self: center;
-    }
-
-    /* ═══════════════════════════════════════════
-       PROMISE / WHY US
-    ═══════════════════════════════════════════ */
-    .promise {
-      padding: 48px var(--pad);
-      background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%);
-      border-top: 1px solid var(--hairline);
-      border-bottom: 1px solid var(--hairline);
-    }
-
-    .promise-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .promise-item {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-    .promise-icon {
-      width: 38px; height: 38px;
-      border-radius: 10px;
-      background: var(--ink-3);
-      border: 1px solid var(--hairline-2);
-      display: grid; place-items: center;
-      color: var(--brass);
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-    .promise-item h4 {
-      font-family: var(--serif);
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--cream);
-      margin-bottom: 4px;
-      letter-spacing: -0.005em;
-    }
-    .promise-item p {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    /* ═══════════════════════════════════════════
-       HOW IT WORKS
-    ═══════════════════════════════════════════ */
-    .how { padding: 56px var(--pad) 48px; }
-
-    .steps {
-      list-style: none;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-      max-width: 720px;
-      margin: 0 auto;
-      counter-reset: step;
-    }
-
-    .step {
-      display: grid;
-      grid-template-columns: 52px 1fr;
-      gap: 18px;
-      align-items: center;
-      padding: 20px 22px;
-      background: var(--ink-2);
-      border: 1px solid var(--hairline);
-      border-radius: var(--r-md);
-      transition: border-color .2s, background .2s;
-    }
-    .step:hover { border-color: var(--hairline-2); background: var(--ink-3); }
-
-    .step-num {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 20%, rgba(201,161,90,0.18), transparent 70%), var(--ink-3);
-      border: 1px solid rgba(201,161,90,0.30);
-      display: grid; place-items: center;
-      font-family: var(--serif);
-      font-weight: 500;
-      font-size: 20px;
-      color: var(--brass);
-      letter-spacing: -0.02em;
-    }
-    .step-body h4 {
-      font-family: var(--serif);
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--cream);
-      margin-bottom: 3px;
-      letter-spacing: -0.005em;
-    }
-    .step-body p { font-size: 13px; color: var(--muted); line-height: 1.55; }
-
-    /* ═══════════════════════════════════════════
-       CTA STRIP
-    ═══════════════════════════════════════════ */
-    .cta-strip {
-      padding: 44px var(--pad);
-      text-align: center;
-      border-top: 1px solid var(--hairline);
-      background: radial-gradient(600px 200px at 50% 100%, rgba(201,161,90,0.10), transparent 70%);
-    }
-    .cta-strip .call-line {
-      font-family: var(--serif);
-      font-weight: 500;
-      font-size: clamp(1.4rem, 4vw, 1.8rem);
-      color: var(--cream);
-      letter-spacing: -0.015em;
-      margin-bottom: 12px;
-    }
-    .cta-strip .call-line em { color: var(--brass); font-style: italic; }
-    .cta-strip .sub {
-      font-size: 13.5px;
-      color: var(--muted);
-      margin-bottom: 22px;
-    }
-    .cta-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btn-outline, .btn-solid {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      border-radius: 999px;
-      font-family: var(--sans);
-      font-weight: 600;
-      font-size: 13.5px;
-      cursor: pointer;
-      transition: all .2s;
-      border: 1px solid var(--brass);
-      text-decoration: none;
-    }
-    .btn-outline { background: transparent; color: var(--brass); }
-    .btn-outline:hover { background: var(--brass-dim); }
-    .btn-solid { background: var(--brass); color: var(--ink); border-color: var(--brass); }
-    .btn-solid:hover { background: var(--brass-2); transform: translateY(-1px); }
-
-    /* ═══════════════════════════════════════════
-       FOOTER
-    ═══════════════════════════════════════════ */
-    footer {
-      text-align: center;
-      padding: 26px var(--pad);
-      border-top: 1px solid var(--hairline);
-      font-size: 12.5px;
-      color: var(--muted);
-      background: var(--ink);
-    }
-    footer a { color: var(--brass); font-weight: 600; }
-    footer a:hover { color: var(--brass-2); }
-
-    /* ═══════════════════════════════════════════
-       FLATPICKR DARK
-    ═══════════════════════════════════════════ */
-    .flatpickr-calendar {
-      background: var(--ink-3) !important; border: 1px solid var(--hairline-2) !important;
-      border-radius: 14px !important; box-shadow: 0 20px 60px rgba(0,0,0,.75) !important;
-      font-family: var(--sans) !important; color: var(--cream) !important;
-    }
-    .flatpickr-months,.flatpickr-month,.flatpickr-weekdays,
-    .flatpickr-weekdaycontainer,.flatpickr-innerContainer,
-    .flatpickr-rContainer,.flatpickr-days,.dayContainer {
-      background: var(--ink-3) !important; color: var(--cream) !important;
-    }
-    .flatpickr-days,.dayContainer { border-color: var(--hairline-2) !important; }
-    .flatpickr-current-month,
-    .flatpickr-current-month .flatpickr-monthDropdown-months,
-    .flatpickr-current-month input.cur-year { color: var(--cream) !important; background: transparent !important; }
-    .flatpickr-monthDropdown-months { background: var(--ink-3) !important; }
-    .flatpickr-weekday { color: var(--muted) !important; background: transparent !important; font-weight: 600 !important; }
-    .flatpickr-day { color: var(--cream) !important; background: transparent !important; border-color: transparent !important; border-radius: 8px !important; }
-    .flatpickr-day:hover,.flatpickr-day:focus { background: var(--surface-2) !important; border-color: var(--surface-2) !important; color: var(--cream) !important; }
-    .flatpickr-day.today { border-color: var(--brass) !important; color: var(--brass) !important; font-weight: 700 !important; }
-    .flatpickr-day.selected,.flatpickr-day.selected:hover,
-    .flatpickr-day.startRange,.flatpickr-day.endRange {
-      background: var(--brass) !important; border-color: var(--brass) !important; color: var(--ink) !important; font-weight: 700 !important;
-    }
-    .flatpickr-day.flatpickr-disabled,.flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay {
-      color: #3a3428 !important; text-decoration: line-through !important;
-    }
-    .flatpickr-prev-month,.flatpickr-next-month { fill: var(--muted) !important; }
-    .flatpickr-prev-month svg,.flatpickr-next-month svg { fill: var(--muted) !important; }
-    .flatpickr-prev-month:hover svg,.flatpickr-next-month:hover svg { fill: var(--brass) !important; }
-    #ride-date { cursor: pointer; }
-
-    /* ═══════════════════════════════════════════
-       ANIMATIONS
-    ═══════════════════════════════════════════ */
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .rise { opacity: 0; animation: rise .8s cubic-bezier(0.16,1,0.3,1) forwards; }
-    .d1 { animation-delay: .05s; }
-    .d2 { animation-delay: .16s; }
-    .d3 { animation-delay: .28s; }
-    .d4 { animation-delay: .40s; }
-    .d5 { animation-delay: .52s; }
-
-    /* ═══════════════════════════════════════════
-       DESKTOP  ≥ 768px
-    ═══════════════════════════════════════════ */
-    @media (min-width: 768px) {
-      :root { --pad: 40px; }
-      .page { max-width: 1160px; margin: 0 auto; }
-
-      .hero { padding: 64px var(--pad) 40px; }
-      .hero-image { display: block; max-height: 380px; margin-top: 36px; }
-
-      .booking-wrap { max-width: 620px; margin-left: auto; margin-right: auto; padding-top: 44px; }
-      .book-body { padding: 26px 28px 28px; }
-
-      .services { padding: 80px var(--pad) 60px; }
-
-      .svc-list { grid-template-columns: 1fr 1fr; gap: 0 40px; }
-      .svc:nth-child(2) { border-top: 1px solid var(--hairline); }
-
-      .promise-grid { grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
-      .promise { padding: 60px var(--pad); }
-
-      .how { padding: 72px var(--pad) 60px; }
-      .steps { grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-      .step { padding: 24px 20px; grid-template-columns: 44px 1fr; }
-      .step-num { width: 44px; height: 44px; font-size: 17px; }
-    }
-
-    /* ═══════════════════════════════════════════
-       A11Y
-    ═══════════════════════════════════════════ */
-    .sr-only {
-      position: absolute; width: 1px; height: 1px;
-      padding: 0; margin: -1px; overflow: hidden;
-      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
-    }
-    .sr-skip {
-      position: absolute; top: -100%; left: 16px;
-      background: var(--brass); color: var(--ink);
-      padding: 10px 20px; z-index: 9999;
-      font-weight: 700; font-size: 14px;
-      border-radius: 0 0 var(--r-sm) var(--r-sm);
-    }
-    .sr-skip:focus { top: 0; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .rise, .svc { animation: none; opacity: 1; transform: none; transition: none; }
-      .opt-wrap { transition: none; }
-      .nav-cta:hover, .cta-book:hover, .btn-solid:hover { transform: none; }
-    }
-
-    /* ── Disabled past time options (mobile iOS ignores `hidden` on <option>,
-       so we lean on disabled + a "· Past" label so users never guess) ── */
-    .select option:disabled {
-      color: var(--muted-2) !important;
-      background: var(--ink-2) !important;
-      font-style: italic;
-    }
-    .field-msg.warn { display: none; color: var(--brass); }
-    .field-msg.warn.show { display: flex; align-items: center; gap: 6px; }
-  </style>
 </head>
 <body>
   <a href="#booking-form" class="sr-skip">Skip to booking form</a>
 
-  <div class="page">
-
-    <!-- ═══ NAV ═══ -->
-    <header class="nav">
-      <a href="#" class="brand" aria-label="Anvisha Travels — home">
-        <div class="brand-mark">
-          <img src="logo.webp" alt="Anvisha Travels logo" width="32" height="32" loading="eager">
-        </div>
-        <div class="brand-text">
-          <span class="brand-name">Anvisha Travels</span>
-          <span class="brand-tag">Banki · Cuttack</span>
-        </div>
+  <!-- ═══ NAV ═══ -->
+  <header class="site-nav" role="banner">
+    <a href="#" class="brand" aria-label="Anvisha Travels — home">
+      <div class="brand-mark">
+        <img src="logo.webp" alt="" width="32" height="32" loading="eager">
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Anvisha Travels</span>
+        <span class="brand-tag">ଅନ୍ଭିଶା ଟ୍ରାଭେଲ୍ସ</span>
+      </div>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#fleet">Fleet</a>
+      <a href="#how">How it works</a>
+    </nav>
+    <div class="nav-right">
+      <a href="tel:+919658141900" class="nav-call" aria-label="Call Anvisha Travels at +91 96581 41900">
+        <i class="fas fa-phone" aria-hidden="true"></i>
       </a>
-      <button type="button" class="nav-cta" onclick="scrollToForm()">
-        <i class="fas fa-calendar-check"></i> Book Ride
+      <button type="button" class="nav-cta" data-scroll-to="#booking-form">
+        <i class="fas fa-calendar-check" aria-hidden="true"></i>
+        <span>Book Ride</span>
       </button>
-    </header>
+    </div>
+  </header>
+
+  <main id="main">
 
     <!-- ═══ HERO ═══ -->
-    <section class="hero" aria-labelledby="hero-heading">
-      <p class="kicker rise d1">Odisha · Est. Local Service</p>
-      <h1 id="hero-heading" class="hero-title rise d2">
-        Every journey,<br>booked with <em>elegance.</em>
-      </h1>
-      <p class="hero-lead rise d3">
-        Premium cabs across Banki, Cuttack &amp; beyond. Chauffeur-driven,
-        clean interiors, transparent fares — booked in under a minute on WhatsApp.
-      </p>
+    <section class="hero" id="hero" aria-labelledby="hero-heading">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="hero-kicker rise d1">Banki · Cuttack · Since Forever</p>
+          <h1 id="hero-heading" class="hero-title rise d2">
+            Wherever Odisha goes,<br>we <em>go too.</em>
+          </h1>
+          <p class="hero-lead rise d3">
+            Trusted cabs from Banki to Cuttack, Bhubaneswar, Puri &amp; beyond —
+            driven by neighbours you already know. <strong>24/7</strong>, one WhatsApp away.
+          </p>
+          <div class="hero-ctas rise d4">
+            <button type="button" class="btn btn-primary" data-scroll-to="#booking-form">
+              <i class="fas fa-car-side" aria-hidden="true"></i>
+              <span>Take me for a ride</span>
+              <i class="fas fa-arrow-right arrow" aria-hidden="true"></i>
+            </button>
+            <a href="tel:+919658141900" class="btn btn-ghost">
+              <i class="fas fa-phone" aria-hidden="true"></i>
+              <span>+91 96581 41900</span>
+            </a>
+          </div>
+        </div>
 
-      <div class="stat-row rise d4">
-        <div class="stat">
-          <div class="stat-num">24/7</div>
-          <div class="stat-label">Available</div>
+        <div class="hero-stats rise d5" aria-label="Service highlights">
+          <div class="hero-stat">
+            <span class="num" data-target="24" data-suffix="/7">24/7</span>
+            <span class="lbl">Running</span>
+          </div>
+          <div class="hero-stat">
+            <span class="num" data-target="3" data-suffix="+">3+</span>
+            <span class="lbl">Cities</span>
+          </div>
+          <div class="hero-stat">
+            <span class="num" data-target="100" data-suffix="%">100%</span>
+            <span class="lbl">Verified</span>
+          </div>
         </div>
-        <div class="stat">
-          <div class="stat-num">3+</div>
-          <div class="stat-label">Cities</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">100%</div>
-          <div class="stat-label">Verified</div>
-        </div>
-      </div>
-
-      <div class="hero-image rise d5">
-        <img src="banner.jpg" alt="Anvisha Travels cab service — Banki, Cuttack, Odisha" loading="eager" fetchpriority="high" width="1200" height="380">
-        <span class="hero-image-tag"><span class="dot"></span> Live · Book now</span>
       </div>
     </section>
+
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
 
     <!-- ═══ BOOKING FORM ═══ -->
-    <section class="booking-wrap" id="booking-form" aria-labelledby="book-heading">
-      <div class="book-card">
-        <div class="book-head">
-          <div class="book-head-icon"><i class="fas fa-route"></i></div>
-          <div>
-            <h2 id="book-heading">Reserve your ride</h2>
-            <p class="book-head-sub">A few details — we&rsquo;ll confirm on WhatsApp</p>
-          </div>
-        </div>
-
-        <div class="book-body">
-
-          <div class="field-group">
-            <label class="label" for="cust-name"><i class="fas fa-user"></i>Full name <span class="req">*</span></label>
-            <input type="text" class="field" id="cust-name" placeholder="Your full name" required autocomplete="name" maxlength="60">
-          </div>
-
-          <div class="field-group">
-            <label class="label" for="cust-phone"><i class="fas fa-phone"></i>Phone number <span class="req">*</span></label>
-            <input type="tel" class="field" id="cust-phone" placeholder="10-digit mobile number" required
-                   inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" autocomplete="tel-national" aria-describedby="phone-msg">
-            <p id="phone-msg" class="field-msg" role="alert" aria-live="polite">
-              <i class="fas fa-circle-exclamation"></i> Enter a valid 10-digit Indian mobile number
-            </p>
-          </div>
-
-          <div class="field-group row-2">
+    <section class="booking" id="booking-form" aria-labelledby="book-heading">
+      <div class="container">
+        <div class="book-card">
+          <div class="book-head">
+            <div class="book-head-icon"><i class="fas fa-route" aria-hidden="true"></i></div>
             <div>
-              <label class="label" for="ride-date"><i class="fas fa-calendar"></i>Date</label>
-              <input type="date" class="field" id="ride-date" min="">
-            </div>
-            <div>
-              <label class="label" for="ride-time"><i class="fas fa-clock"></i>Time</label>
-              <select class="select" id="ride-time" aria-describedby="time-msg"></select>
+              <h2 id="book-heading">Reserve your ride</h2>
+              <p class="book-head-sub">A few details — we&rsquo;ll confirm on WhatsApp</p>
             </div>
           </div>
-          <p id="time-msg" class="field-msg warn" role="alert" aria-live="polite">
-            <i class="fas fa-clock-rotate-left"></i> Selected time has already passed — pick an upcoming slot
-          </p>
 
-          <div class="field-group">
-            <label class="label" for="passengers"><i class="fas fa-users"></i>Passengers</label>
-            <select class="select" id="passengers">
-              <option value="">How many?</option>
-              <option value="1">1 passenger</option>
-              <option value="2">2 passengers</option>
-              <option value="3">3 passengers</option>
-              <option value="4">4 passengers</option>
-              <option value="5">5 passengers</option>
-              <option value="6">6 passengers</option>
-              <option value="7">7 passengers</option>
-              <option value="8+">8+ passengers</option>
-            </select>
-            <div id="pax-custom-wrap" style="display:none;margin-top:10px;">
-              <input type="number" id="pax-custom" class="field" min="8" max="50"
-                placeholder="Enter exact number (e.g. 10)" aria-describedby="pax-error">
-              <p id="pax-error" class="field-msg" role="alert" aria-live="polite">
-                <i class="fas fa-circle-exclamation"></i> Number must be 8 or more
+          <form class="book-body" id="booking-form-inner" novalidate autocomplete="on" onsubmit="return false;">
+
+            <div class="field-group">
+              <label class="label" for="cust-name"><i class="fas fa-user" aria-hidden="true"></i>Full name <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" class="field" id="cust-name" placeholder="Your full name" required autocomplete="name" maxlength="60">
+            </div>
+
+            <div class="field-group">
+              <label class="label" for="cust-phone"><i class="fas fa-phone" aria-hidden="true"></i>Phone number <span class="req" aria-hidden="true">*</span></label>
+              <input type="tel" class="field" id="cust-phone" placeholder="10-digit mobile number" required
+                     inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" autocomplete="tel-national" aria-describedby="phone-msg">
+              <p id="phone-msg" class="field-msg" role="alert" aria-live="polite">
+                <i class="fas fa-circle-exclamation" aria-hidden="true"></i> Enter a valid 10-digit Indian mobile number
               </p>
             </div>
-          </div>
 
-          <div class="opt-wrap" id="location-section">
-            <div class="divider"></div>
-            <p class="opt-head">
-              <i class="fas fa-map-pin"></i> Where to?
-              <span class="opt-tag">optional</span>
+            <div class="field-group row-2">
+              <div>
+                <label class="label" for="ride-date"><i class="fas fa-calendar" aria-hidden="true"></i>Date</label>
+                <input type="date" class="field" id="ride-date" min="">
+              </div>
+              <div>
+                <label class="label" for="ride-time"><i class="fas fa-clock" aria-hidden="true"></i>Time</label>
+                <select class="select" id="ride-time" aria-describedby="time-msg"></select>
+              </div>
+            </div>
+            <p id="time-msg" class="field-msg warn" role="alert" aria-live="polite">
+              <i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Selected time has already passed — pick an upcoming slot
             </p>
-            <input type="text" class="field" id="destination" placeholder="e.g. Cuttack Railway Station">
-          </div>
 
-          <button class="cta-book" id="wa-btn" onclick="openWhatsApp()">
-            <i class="fab fa-whatsapp"></i>
-            <span>Book via WhatsApp</span>
-            <i class="fas fa-arrow-right arrow"></i>
-          </button>
+            <div class="field-group">
+              <label class="label" for="passengers"><i class="fas fa-users" aria-hidden="true"></i>Passengers</label>
+              <select class="select" id="passengers">
+                <option value="">How many?</option>
+                <option value="1">1 passenger</option>
+                <option value="2">2 passengers</option>
+                <option value="3">3 passengers</option>
+                <option value="4">4 passengers</option>
+                <option value="5">5 passengers</option>
+                <option value="6">6 passengers</option>
+                <option value="7">7 passengers</option>
+                <option value="8+">8+ passengers</option>
+              </select>
+              <div id="pax-custom-wrap" style="display:none;margin-top:10px;">
+                <input type="number" id="pax-custom" class="field" min="8" max="50"
+                  placeholder="Enter exact number (e.g. 10)" aria-describedby="pax-error">
+                <p id="pax-error" class="field-msg" role="alert" aria-live="polite">
+                  <i class="fas fa-circle-exclamation" aria-hidden="true"></i> Number must be 8 or more
+                </p>
+              </div>
+            </div>
 
-          <p class="cta-helper" id="helper-text">
-            <i class="fas fa-info-circle"></i> Fill in all required fields to continue
-          </p>
+            <div class="opt-wrap" id="location-section">
+              <div class="divider"></div>
+              <p class="opt-head">
+                <i class="fas fa-map-pin" aria-hidden="true"></i> Where to?
+                <span class="opt-tag">optional</span>
+              </p>
+              <input type="text" class="field" id="destination" placeholder="e.g. Cuttack Railway Station" maxlength="200">
+            </div>
 
+            <div id="wa-preview" class="wa-preview" aria-live="polite">
+              <div class="avatar" aria-hidden="true"><i class="fab fa-whatsapp"></i></div>
+              <div class="bubble">
+                <b>Message preview</b><br>
+                Fill the fields — we&rsquo;ll compose your WhatsApp message here as you type.
+                <span class="dots"><span></span><span></span><span></span></span>
+              </div>
+            </div>
+
+            <button type="button" class="cta-book" id="wa-btn" onclick="openWhatsApp()">
+              <i class="fab fa-whatsapp" aria-hidden="true"></i>
+              <span>Book via WhatsApp</span>
+              <i class="fas fa-arrow-right arrow" aria-hidden="true"></i>
+              <svg class="drive-car" viewBox="0 0 40 24" aria-hidden="true">
+                <path d="M 3 15 L 8 6 Q 10 4 14 4 L 30 4 Q 34 4 36 6 L 40 15 L 40 20 L 3 20 Z" fill="#052611"/>
+                <rect x="10" y="7" width="10" height="6" fill="#fff" opacity="0.75"/>
+                <rect x="21" y="7" width="8" height="6" fill="#fff" opacity="0.75"/>
+                <circle cx="12" cy="20" r="3" fill="#052611"/>
+                <circle cx="30" cy="20" r="3" fill="#052611"/>
+              </svg>
+            </button>
+
+            <p class="cta-helper" id="helper-text">
+              <i class="fas fa-info-circle" aria-hidden="true"></i> Fill in all required fields to continue
+            </p>
+
+            <div id="book-summary-chip" class="book-summary-chip" aria-hidden="true"></div>
+
+            <noscript>
+              <p style="margin-top:14px;font-size:13px;color:var(--muted);text-align:center;">
+                For live booking, please enable JavaScript, or call <a href="tel:+919658141900" style="color:var(--brand);font-weight:700;">+91 96581 41900</a>.
+              </p>
+            </noscript>
+
+          </form>
         </div>
       </div>
     </section>
+
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
 
     <!-- ═══ SERVICES ═══ -->
-    <section class="services" aria-labelledby="svc-heading">
-      <header class="section-title-block">
-        <p class="eyebrow" id="svc-heading">Our Services</p>
-        <h2 class="section-title">Rides for <em>every</em> occasion</h2>
-      </header>
+    <section class="services" id="services" aria-labelledby="svc-heading">
+      <div class="container">
+        <header class="section-title-block">
+          <p class="eyebrow">Our Services</p>
+          <h2 class="section-title" id="svc-heading">Rides for <em>every</em> occasion</h2>
+          <p class="section-lead">Hover a route below to see it drawn on the map. Tap to pre-fill the booking.</p>
+        </header>
 
-      <ol class="svc-list">
-        <li class="svc">
-          <span class="svc-num">01</span>
-          <div class="svc-body">
-            <h3>Local Cab Rides</h3>
-            <p>Quick, affordable trips within Banki and the surrounding Cuttack district.</p>
-          </div>
-          <span class="svc-icon" aria-hidden="true">🚗</span>
-        </li>
+        <div class="map-wrap" aria-hidden="true">
+          <svg viewBox="-35 -10 800 500" preserveAspectRatio="xMidYMid meet">
+            <!-- Rough Odisha outline -->
+            <path class="odisha-outline" d="M 120 90 Q 200 70 260 90 Q 340 80 400 110 Q 480 120 540 150 Q 600 190 620 250 Q 610 310 570 360 Q 520 410 450 430 Q 380 440 320 420 Q 250 400 200 360 Q 150 320 130 260 Q 110 200 120 90 Z"/>
+            <path class="odisha-shade" d="M 200 200 Q 260 190 320 210 Q 380 220 420 260 Q 430 310 400 340 Q 340 360 280 340 Q 220 320 200 270 Z" opacity="0.4"/>
 
-        <li class="svc">
-          <span class="svc-num">02</span>
-          <div class="svc-body">
-            <h3>Outstation Trips</h3>
-            <p>Long-distance rides to Bhubaneswar, Puri, Konark &amp; beyond.</p>
-          </div>
-          <span class="svc-icon" aria-hidden="true">🛣️</span>
-        </li>
+            <!-- Routes (initially invisible; toggled active on hover of card) -->
+            <path class="map-route" data-route="1" d="M 300 250 Q 320 245 340 250 Q 360 258 380 250 Q 400 255 420 250 Q 400 260 380 260 Q 340 265 300 250 Z"/>
+            <path class="map-route" data-route="2" d="M 320 250 Q 340 280 360 310 Q 370 340 380 370"/>
+            <path class="map-route" data-route="3" d="M 320 250 Q 360 260 400 280 Q 420 290 440 300"/>
+            <path class="map-route" data-route="4" d="M 320 250 Q 280 260 250 280 Q 220 300 200 320"/>
 
-        <li class="svc">
-          <span class="svc-num">03</span>
-          <div class="svc-body">
-            <h3>Airport &amp; Railway</h3>
-            <p>Timely pickups to Bhubaneswar Airport and Cuttack Railway Station.</p>
-          </div>
-          <span class="svc-icon" aria-hidden="true">✈️</span>
-        </li>
+            <!-- Labels -->
+            <g fill="#4A3B2E" font-family="Inter,sans-serif" font-size="10" font-weight="500" opacity="0.45">
+              <text x="220" y="150" text-anchor="middle">ODISHA</text>
+            </g>
 
-        <li class="svc">
-          <span class="svc-num">04</span>
-          <div class="svc-body">
-            <h3>Wedding &amp; Events</h3>
-            <p>Group cab hire for weddings &amp; special occasions — presentable and on time.</p>
-          </div>
-          <span class="svc-icon" aria-hidden="true">💒</span>
-        </li>
-      </ol>
-    </section>
-
-    <!-- ═══ PROMISE ═══ -->
-    <section class="promise" aria-labelledby="promise-heading">
-      <header class="section-title-block">
-        <p class="eyebrow" id="promise-heading">Why ride with us</p>
-        <h2 class="section-title">The <em>Anvisha</em> promise</h2>
-      </header>
-
-      <div class="promise-grid">
-        <div class="promise-item">
-          <div class="promise-icon"><i class="fas fa-shield-halved"></i></div>
-          <div>
-            <h4>Verified drivers</h4>
-            <p>Every chauffeur is background-checked and locally known.</p>
-          </div>
+            <!-- Pins -->
+            <g class="map-pin" data-pin="1">
+              <circle class="pin-pulse" cx="320" cy="250" r="6"/>
+              <circle class="pin-dot"   cx="320" cy="250" r="6"/>
+              <text x="320" y="235">Banki</text>
+            </g>
+            <g class="map-pin" data-pin="3-ctc">
+              <circle class="pin-pulse" cx="380" cy="260" r="6"/>
+              <circle class="pin-dot"   cx="380" cy="260" r="6"/>
+              <text x="405" y="255">Cuttack</text>
+            </g>
+            <g class="map-pin" data-pin="3-bbs">
+              <circle class="pin-pulse" cx="410" cy="298" r="6"/>
+              <circle class="pin-dot"   cx="410" cy="298" r="6"/>
+              <text x="440" y="303">Bhubaneswar</text>
+            </g>
+            <g class="map-pin" data-pin="2">
+              <circle class="pin-pulse" cx="380" cy="370" r="6"/>
+              <circle class="pin-dot"   cx="380" cy="370" r="6"/>
+              <text x="380" y="390">Puri</text>
+            </g>
+          </svg>
         </div>
-        <div class="promise-item">
-          <div class="promise-icon"><i class="fas fa-tag"></i></div>
-          <div>
-            <h4>Transparent fares</h4>
-            <p>Fixed pricing shared upfront. No surprises, no surge.</p>
-          </div>
-        </div>
-        <div class="promise-item">
-          <div class="promise-icon"><i class="fas fa-clock"></i></div>
-          <div>
-            <h4>Always on time</h4>
-            <p>Cars arrive punctually, day or night — we treat time like yours.</p>
-          </div>
+
+        <div class="route-cards">
+          <button type="button" class="route-card" data-route="1" data-dest="">
+            <div class="rc-head">
+              <span class="rc-num">01</span>
+              <span class="rc-icon" aria-hidden="true">🏘️</span>
+            </div>
+            <h3>The Neighbourhood Loop</h3>
+            <p>Quick hops around Banki, Athagarh &amp; greater Cuttack district. Under 10 minutes to your door.</p>
+            <span class="rc-cta">Local rides <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+          </button>
+
+          <button type="button" class="route-card" data-route="2" data-dest="Puri Jagannath Temple">
+            <div class="rc-head">
+              <span class="rc-num">02</span>
+              <span class="rc-icon" aria-hidden="true">🌊</span>
+            </div>
+            <h3>The Coastline Run</h3>
+            <p>Puri temple in the morning, Konark by lunch, Chandrabhaga by sunset. We know every shortcut.</p>
+            <span class="rc-cta">Outstation <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+          </button>
+
+          <button type="button" class="route-card" data-route="3" data-dest="Biju Patnaik Airport, Bhubaneswar">
+            <div class="rc-head">
+              <span class="rc-num">03</span>
+              <span class="rc-icon" aria-hidden="true">✈️</span>
+            </div>
+            <h3>The Take-off Trail</h3>
+            <p>Timed to your PNR. Airport and Cuttack Railway drops we&rsquo;ve done a thousand times.</p>
+            <span class="rc-cta">Airport &amp; rail <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+          </button>
+
+          <button type="button" class="route-card" data-route="4" data-dest="">
+            <div class="rc-head">
+              <span class="rc-num">04</span>
+              <span class="rc-icon" aria-hidden="true">💐</span>
+            </div>
+            <h3>The Baraat Convoy</h3>
+            <p>Marigolds on the bonnet, cars polished to a shine. Your wedding day deserves no less.</p>
+            <span class="rc-cta">Weddings &amp; events <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- ═══ HOW IT WORKS ═══ -->
-    <section class="how" aria-labelledby="how-heading">
-      <header class="section-title-block">
-        <p class="eyebrow" id="how-heading">How it works</p>
-        <h2 class="section-title">Booked in <em>three</em> steps</h2>
-      </header>
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
 
-      <ol class="steps">
-        <li class="step">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <h4>Enter details</h4>
-            <p>Name, phone, date, time &amp; passengers.</p>
+    <!-- ═══ FLEET ═══ -->
+    <section class="fleet" id="fleet" aria-labelledby="fleet-heading">
+      <div class="container">
+        <header class="section-title-block">
+          <p class="eyebrow">Pick your ride</p>
+          <h2 class="section-title" id="fleet-heading">Every party <em>size</em>, sorted</h2>
+          <p class="section-lead">Tap a car — we&rsquo;ll match the passenger field for you.</p>
+        </header>
+
+        <div class="fleet-grid">
+          <button type="button" class="fleet-car" data-pax="3">
+            <svg class="fleet-svg" viewBox="0 0 220 110" aria-hidden="true">
+              <path d="M 20 60 L 40 30 Q 46 22 60 22 L 160 22 Q 174 22 180 30 L 200 60 L 200 82 Q 200 88 194 88 L 190 88 Q 190 100 176 100 Q 162 100 162 88 L 58 88 Q 58 100 44 100 Q 30 100 30 88 L 26 88 Q 20 88 20 82 Z" fill="#E85D1A"/>
+              <path d="M 48 60 L 60 34 Q 64 30 72 30 L 148 30 Q 156 30 160 34 L 172 60 Z" fill="#C9410F"/>
+              <path d="M 56 58 L 66 38 Q 70 34 76 34 L 106 34 L 106 58 Z" fill="#fff" opacity="0.8"/>
+              <path d="M 114 58 L 114 34 L 144 34 Q 150 34 154 38 L 164 58 Z" fill="#fff" opacity="0.8"/>
+              <rect x="20" y="76" width="180" height="3" fill="#1B1410"/>
+              <circle cx="44" cy="90" r="12" fill="#1B1410"/><circle cx="44" cy="90" r="6" fill="#8B6F4E"/>
+              <circle cx="176" cy="90" r="12" fill="#1B1410"/><circle cx="176" cy="90" r="6" fill="#8B6F4E"/>
+            </svg>
+            <h3>Compact Hatchback</h3>
+            <span class="cap">Wagon R · Alto</span>
+            <span class="use">Best for 1–4 <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+          </button>
+
+          <button type="button" class="fleet-car popular" data-pax="4">
+            <span class="fleet-badge" aria-label="Most popular vehicle"><i class="fas fa-star" aria-hidden="true"></i> Most Popular</span>
+            <svg class="fleet-svg" viewBox="0 0 220 110" aria-hidden="true">
+              <path d="M 10 66 L 30 34 Q 34 28 44 28 L 90 28 L 96 20 Q 100 16 110 16 L 130 16 Q 140 16 144 20 L 150 28 L 180 28 Q 190 28 194 34 L 210 66 L 210 82 Q 210 88 204 88 L 200 88 Q 200 100 186 100 Q 172 100 172 88 L 48 88 Q 48 100 34 100 Q 20 100 20 88 L 16 88 Q 10 88 10 82 Z" fill="#0B7A75"/>
+              <path d="M 50 64 L 60 32 L 105 32 L 105 64 Z" fill="#fff" opacity="0.8"/>
+              <path d="M 115 64 L 115 32 L 160 32 L 170 64 Z" fill="#fff" opacity="0.8"/>
+              <rect x="10" y="76" width="200" height="3" fill="#1B1410"/>
+              <circle cx="36" cy="90" r="12" fill="#1B1410"/><circle cx="36" cy="90" r="6" fill="#8B6F4E"/>
+              <circle cx="184" cy="90" r="12" fill="#1B1410"/><circle cx="184" cy="90" r="6" fill="#8B6F4E"/>
+            </svg>
+            <h3>Sedan</h3>
+            <span class="cap">Dzire · Amaze</span>
+            <span class="use">Best for 3–5 <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+          </button>
+
+          <button type="button" class="fleet-car" data-pax="6">
+            <svg class="fleet-svg" viewBox="0 0 220 110" aria-hidden="true">
+              <path d="M 10 70 L 22 26 Q 26 18 40 18 L 180 18 Q 194 18 198 26 L 210 70 L 210 84 Q 210 90 204 90 L 200 90 Q 200 100 186 100 Q 172 100 172 90 L 48 90 Q 48 100 34 100 Q 20 100 20 90 L 16 90 Q 10 90 10 84 Z" fill="#B45309"/>
+              <path d="M 40 66 L 50 32 L 105 32 L 105 66 Z" fill="#fff" opacity="0.8"/>
+              <path d="M 115 66 L 115 32 L 170 32 L 180 66 Z" fill="#fff" opacity="0.8"/>
+              <rect x="105" y="30" width="4" height="36" fill="#B45309"/>
+              <rect x="10" y="78" width="200" height="3" fill="#1B1410"/>
+              <circle cx="40" cy="92" r="12" fill="#1B1410"/><circle cx="40" cy="92" r="6" fill="#8B6F4E"/>
+              <circle cx="180" cy="92" r="12" fill="#1B1410"/><circle cx="180" cy="92" r="6" fill="#8B6F4E"/>
+              <rect x="14" y="26" width="10" height="4" fill="#FFDCA8"/>
+            </svg>
+            <h3>7-Seater</h3>
+            <span class="cap">Ertiga · Innova</span>
+            <span class="use">Best for 6–8 <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
+
+    <!-- ═══ COUNTERS ═══ -->
+    <section class="counters" id="counters" aria-labelledby="counters-heading">
+      <div class="container">
+        <header class="section-title-block">
+          <p class="eyebrow">This month on the road</p>
+          <h2 class="section-title" id="counters-heading">Real receipts, <em>real</em> passengers</h2>
+        </header>
+
+        <div class="counter-grid">
+          <div class="counter">
+            <span class="num" data-target="500" data-suffix="+">0</span>
+            <span class="lbl">Rides completed</span>
           </div>
-        </li>
-        <li class="step">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <h4>Send on WhatsApp</h4>
-            <p>Tap the green button — we get your request instantly.</p>
+          <div class="counter">
+            <span class="num" data-target="18340">0</span>
+            <span class="lbl">Kilometres driven</span>
           </div>
-        </li>
-        <li class="step">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <h4>Ride confirmed</h4>
-            <p>We reply with driver &amp; car details. That&rsquo;s it.</p>
+          <div class="counter">
+            <span class="num" data-target="4.9" data-decimals="1" data-suffix="★">0</span>
+            <span class="lbl">Average rating</span>
           </div>
-        </li>
-      </ol>
+        </div>
+        <p class="counter-note">Numbers refresh weekly. Every trip signed off in-app.</p>
+      </div>
+    </section>
+
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
+
+    <!-- ═══ PROMISE ═══ -->
+    <section class="promise" id="promise" aria-labelledby="promise-heading">
+      <div class="container">
+        <header class="section-title-block">
+          <p class="eyebrow">The Anvisha Promise</p>
+          <h2 class="section-title" id="promise-heading">Three promises, <em>signed</em> and kept</h2>
+        </header>
+
+        <div class="postcard-grid">
+          <article class="postcard">
+            <span class="stamp">Anvisha</span>
+            <div class="pc-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
+            <h3>Your driver is a neighbour, not a stranger.</h3>
+            <p>Every chauffeur is background-checked, locally rooted, and known by name in Banki.</p>
+            <div class="signature">— Anvisha team</div>
+          </article>
+          <article class="postcard">
+            <span class="stamp">Anvisha</span>
+            <div class="pc-icon"><i class="fas fa-tag" aria-hidden="true"></i></div>
+            <h3>The fare you&rsquo;re quoted is the fare you pay.</h3>
+            <p>No surge. No hidden waiting charges. What we say on WhatsApp is what you pay at the drop.</p>
+            <div class="signature">— Anvisha team</div>
+          </article>
+          <article class="postcard">
+            <span class="stamp">Anvisha</span>
+            <div class="pc-icon"><i class="fas fa-clock" aria-hidden="true"></i></div>
+            <h3>Punctual, and always in touch.</h3>
+            <p>Pickups scheduled to the minute. Your driver calls before arrival — you always know exactly when the car will be at your door.</p>
+            <div class="signature">— Anvisha team</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
+
+    <!-- ═══ REVIEWS ═══ -->
+    <section class="reviews" id="reviews" aria-labelledby="reviews-heading">
+      <div class="container">
+        <header class="section-title-block">
+          <p class="eyebrow">What our riders say</p>
+          <h2 class="section-title" id="reviews-heading">Postcards from <em>the road</em></h2>
+        </header>
+
+        <div class="postcard-grid">
+          <article class="postcard review">
+            <div class="rv-head">
+              <div class="rv-avatar" aria-hidden="true">S</div>
+              <div>
+                <div class="rv-name">Sushmita R.</div>
+                <div class="rv-city">Cuttack</div>
+              </div>
+            </div>
+            <p>&ldquo;Booked a 4 AM airport drop. Driver called at 3:45 to say he was outside. That never happens with the apps.&rdquo;</p>
+            <div class="stars" aria-label="5 out of 5">★★★★★</div>
+          </article>
+          <article class="postcard review">
+            <div class="rv-head">
+              <div class="rv-avatar" aria-hidden="true">P</div>
+              <div>
+                <div class="rv-name">Priyabrata M.</div>
+                <div class="rv-city">Banki</div>
+              </div>
+            </div>
+            <p>&ldquo;Uses them for my daughter&rsquo;s college run. Same driver most weeks now — she knows him by name.&rdquo;</p>
+            <div class="stars" aria-label="5 out of 5">★★★★★</div>
+          </article>
+          <article class="postcard review">
+            <div class="rv-head">
+              <div class="rv-avatar" aria-hidden="true">A</div>
+              <div>
+                <div class="rv-name">Ajay S.</div>
+                <div class="rv-city">Bhubaneswar</div>
+              </div>
+            </div>
+            <p>&ldquo;Wedding party of 40. Six cars, all on time, all clean. Anvisha owned the day.&rdquo;</p>
+            <div class="stars" aria-label="5 out of 5">★★★★★</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
+
+    <!-- ═══ HOW IT WORKS ═══ -->
+    <section class="how" id="how" aria-labelledby="how-heading">
+      <div class="container">
+        <header class="section-title-block">
+          <p class="eyebrow">A ride in three stops</p>
+          <h2 class="section-title" id="how-heading">Booked before <em>the kettle boils</em></h2>
+        </header>
+
+        <div class="how-wrap">
+          <div class="how-road" aria-hidden="true">
+            <svg viewBox="0 0 1000 180" preserveAspectRatio="xMidYMid meet">
+              <path class="road"      d="M 40 90 Q 250 40 500 90 T 960 90"/>
+              <path class="road-dash" d="M 40 90 Q 250 40 500 90 T 960 90"/>
+              <g>
+                <circle class="stop" cx="60"  cy="90" r="18"/>
+                <text class="stop-num" x="60"  y="90">1</text>
+              </g>
+              <g>
+                <circle class="stop" cx="500" cy="90" r="18"/>
+                <text class="stop-num" x="500" y="90">2</text>
+              </g>
+              <g>
+                <circle class="stop" cx="940" cy="90" r="18"/>
+                <text class="stop-num" x="940" y="90">3</text>
+              </g>
+              <g id="how-car" transform="translate(-25, -18)">
+                <path d="M 5 20 L 12 8 Q 15 4 22 4 L 44 4 Q 51 4 54 8 L 61 20 L 61 30 L 5 30 Z" fill="#E85D1A"/>
+                <rect x="14" y="10" width="14" height="10" fill="#fff" opacity="0.8"/>
+                <rect x="30" y="10" width="14" height="10" fill="#fff" opacity="0.8"/>
+                <circle cx="16" cy="32" r="5" fill="#1B1410"/>
+                <circle cx="50" cy="32" r="5" fill="#1B1410"/>
+              </g>
+            </svg>
+          </div>
+
+          <ol class="steps">
+            <li class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <h4>Tell us where</h4>
+                <p>Name, phone, when, how many. Under a minute.</p>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <h4>We ping back</h4>
+                <p>Driver name, car number &amp; ETA on WhatsApp — usually in 5 minutes.</p>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <h4>Enjoy the ride</h4>
+                <p>Clean interior, safe driver, honest fare. That&rsquo;s the whole thing.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <div class="route-sep" aria-hidden="true">
+      <svg viewBox="0 0 1200 22" preserveAspectRatio="none"><line x1="0" y1="11" x2="1200" y2="11"/></svg>
+    </div>
+
+    <!-- ═══ WHATSAPP PREVIEW MOCK ═══ -->
+    <section class="preview" id="preview" aria-labelledby="preview-heading">
+      <div class="container">
+        <header class="section-title-block">
+          <p class="eyebrow">How the WhatsApp handoff looks</p>
+          <h2 class="section-title" id="preview-heading">You send it. We <em>reply</em>.</h2>
+          <p class="section-lead">No app to install, no OTPs, no menus. Just a thread with a real human.</p>
+        </header>
+
+        <div class="phone-mock" aria-hidden="true">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <div class="p-avatar">A</div>
+              <div class="p-info">
+                <div class="p-name">Anvisha Travels</div>
+                <div class="p-status">online</div>
+              </div>
+            </div>
+            <div class="p-bubble out">
+              🚗 <b>Anvisha Travels - Ride Request</b><br>
+              👤 Sushmita R. · 📞 98765 43210<br>
+              📅 Tue, 12 Feb · 🕕 6:30 AM<br>
+              👥 2 passengers · 🎯 BBSR Airport
+              <span class="ts">6:12 AM<span class="ticks">✓✓</span></span>
+            </div>
+            <div class="p-bubble in">
+              Confirmed! Rakesh · <b>OD-05-CE-7842</b><br>
+              Arriving 6:20 AM 🚗
+              <span class="ts">6:14 AM</span>
+            </div>
+            <div class="p-bubble out">
+              🙏 Thanks!
+              <span class="ts">6:15 AM<span class="ticks">✓✓</span></span>
+            </div>
+            <div class="p-bubble in">
+              Safe travels ✨
+              <span class="ts">6:15 AM</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ═══ CTA STRIP ═══ -->
-    <section class="cta-strip">
-      <p class="call-line">Ready when you are — <em>anytime.</em></p>
-      <p class="sub">Or call us directly for immediate assistance</p>
-      <div class="cta-actions">
-        <a href="tel:+919658141900" class="btn-outline"><i class="fas fa-phone"></i> +91 96581 41900</a>
-        <button type="button" class="btn-solid" onclick="scrollToForm()"><i class="fas fa-calendar-check"></i> Book a Ride</button>
+    <section class="cta-strip" aria-labelledby="cta-strip-heading">
+      <h2 id="cta-strip-heading" class="sr-only">Ready to book</h2>
+      <div class="container">
+        <p class="cta-line">The road is waiting. <em>So are we.</em></p>
+        <p class="cta-sub">Book on WhatsApp, or call — either way, we&rsquo;ll be there.</p>
+        <div class="cta-actions">
+          <button type="button" class="btn btn-primary" data-scroll-to="#booking-form">
+            <i class="fab fa-whatsapp" aria-hidden="true"></i>
+            <span>Book on WhatsApp</span>
+            <i class="fas fa-arrow-right arrow" aria-hidden="true"></i>
+          </button>
+          <a href="tel:+919658141900" class="btn btn-ghost">
+            <i class="fas fa-phone" aria-hidden="true"></i>
+            <span>+91 96581 41900</span>
+          </a>
+        </div>
+        <p class="cta-micro">Or just wave us down in Banki — we probably know you already.</p>
       </div>
     </section>
 
-    <footer>
-      <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html" rel="noopener noreferrer" title="AK Creation — Web & App Development, Odisha">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
-    </footer>
+  </main>
 
-  </div>
+  <a href="https://wa.me/919658141900?text=%F0%9F%9A%97%20*Anvisha%20Travels%20-%20Booking%20Enquiry*%0A%0AHi!%20I%20would%20like%20to%20book%20a%20cab.%20Could%20you%20please%20share%3A%0A%E2%80%A2%20Available%20cars%0A%E2%80%A2%20Fare%20estimate%0A%E2%80%A2%20Booking%20process%0A%0AThank%20you!" class="wa-fab" aria-label="Chat with Anvisha Travels on WhatsApp — sends a booking enquiry message" target="_blank" rel="noopener noreferrer">
+    <i class="fab fa-whatsapp" aria-hidden="true"></i>
+  </a>
 
-<script>
-  /* ── Scroll to form ── */
-  function scrollToForm() {
-    document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  <footer role="contentinfo">
+    <div class="foot-contact">
+      <a href="tel:+919658141900"><i class="fas fa-phone" aria-hidden="true"></i> +91 96581 41900</a>
+      <a href="https://wa.me/919658141900?text=%F0%9F%9A%97%20*Anvisha%20Travels%20-%20Booking%20Enquiry*%0A%0AHi!%20I%20would%20like%20to%20book%20a%20cab.%20Could%20you%20please%20share%3A%0A%E2%80%A2%20Available%20cars%0A%E2%80%A2%20Fare%20estimate%0A%E2%80%A2%20Booking%20process%0A%0AThank%20you!" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp us</a>
+      <span><i class="fas fa-location-dot" aria-hidden="true"></i> Banki, Cuttack, Odisha 754008</span>
+    </div>
+    <p class="foot-tagline">ଆପଣଙ୍କ ଯାତ୍ରା, ଆମର ଦାୟିତ୍ୱ</p>
+    <p class="foot-copy">&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html" rel="noopener noreferrer" title="AK Creation — Web &amp; App Development, Odisha">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+  </footer>
 
-  /* ── DOM refs ── */
-  var custName        = document.getElementById('cust-name');
-  var custPhone       = document.getElementById('cust-phone');
-  var phoneMsg        = document.getElementById('phone-msg');
-  var dateInput       = document.getElementById('ride-date');
-  var timeSelect      = document.getElementById('ride-time');
-  var passengerSelect = document.getElementById('passengers');
-  var locationSection = document.getElementById('location-section');
-  var waBtn           = document.getElementById('wa-btn');
-  var helperText      = document.getElementById('helper-text');
-  var paxCustomWrap   = document.getElementById('pax-custom-wrap');
-  var paxCustom       = document.getElementById('pax-custom');
+  <!-- CryptoJS — used by shared firebase-config setup -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
-  var PHONE_RE = /^[6-9]\d{9}$/;
+  <!-- Silent booking draft writer (module — preserves anvisha_bookings contract) -->
+  <script type="module">
+    import { getDb, COL } from './firebase-config.js';
+    import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 
-  var timeMsg = document.getElementById('time-msg');
+    function clip(s, n) { return (s == null ? '' : String(s)).slice(0, n); }
 
-  /* ── 1-hour time slots — store base label so we can toggle "· Past" ── */
-  (function() {
-    for (var h = 0; h < 24; h++) {
-      var h12  = (h % 12) || 12;
-      var ampm = h < 12 ? 'AM' : 'PM';
-      var opt  = document.createElement('option');
-      opt.value = (h < 10 ? '0' + h : h) + ':00';
-      opt.dataset.label = h12 + ':00 ' + ampm;
-      opt.textContent = opt.dataset.label;
-      timeSelect.appendChild(opt);
-    }
-  })();
-
-  function getNextHourValue() {
-    var h = new Date().getHours() + 1;
-    if (h >= 24) return null;         // past 11 PM — no more slots today
-    return (h < 10 ? '0' + h : h) + ':00';
-  }
-
-  function ymd(d) {
-    var y = d.getFullYear();
-    var m = d.getMonth() + 1;
-    var day = d.getDate();
-    return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
-  }
-
-  function isToday(dateStr) { return dateStr === ymd(new Date()); }
-
-  /* Mark past hours disabled + relabel with "· Past". Never hide — iOS Safari
-     ignores hidden on <option>, so users would see them and get confused. */
-  function filterTimeForToday() {
-    var now = new Date();
-    var nowMin = now.getHours() * 60 + now.getMinutes();
-    var firstFuture = null;
-    Array.from(timeSelect.options).forEach(function(opt) {
-      var p = opt.value.split(':');
-      var slotMin = parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
-      var past = slotMin <= nowMin;
-      opt.disabled = past;
-      opt.hidden = false;
-      opt.textContent = past ? (opt.dataset.label + '  ·  Past') : opt.dataset.label;
-      if (!past && !firstFuture) firstFuture = opt.value;
-    });
-    return firstFuture;
-  }
-
-  function enableAllTimeOptions() {
-    Array.from(timeSelect.options).forEach(function(opt) {
-      opt.disabled = false;
-      opt.hidden = false;
-      opt.textContent = opt.dataset.label;
-    });
-  }
-
-  function applySmartTimeSelect() {
-    var nextHour = getNextHourValue();
-    if (nextHour) timeSelect.value = nextHour;
-    if (!timeSelect.value || (timeSelect.options[timeSelect.selectedIndex] && timeSelect.options[timeSelect.selectedIndex].disabled)) {
-      var fe = Array.from(timeSelect.options).find(function(o) { return !o.disabled; });
-      timeSelect.value = fe ? fe.value : '';
-    }
-  }
-
-  /* If today is fully past (after 11 PM), auto-roll to tomorrow so the user
-     never lands on a fully-disabled dropdown. */
-  function ensureBookableDate() {
-    if (!isToday(dateInput.value)) return;
-    var future = Array.from(timeSelect.options).some(function(o) { return !o.disabled; });
-    if (!future) {
-      var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-      dateInput.value = ymd(tomorrow);
-      if (dateInput._flatpickr) dateInput._flatpickr.setDate(tomorrow, false);
-      enableAllTimeOptions();
-      applySmartTimeSelect();
-    }
-  }
-
-  /* Hard guard: never allow a booking whose date+time is in the past. */
-  function isBookingInFuture() {
-    if (!dateInput.value || !timeSelect.value) return false;
-    var d = dateInput.value.split('-');
-    var t = timeSelect.value.split(':');
-    var picked = new Date(+d[0], +d[1] - 1, +d[2], +t[0], +t[1], 0, 0);
-    return picked.getTime() > Date.now();
-  }
-
-  /* ── Flatpickr ── */
-  flatpickr(dateInput, {
-    minDate:       'today',
-    defaultDate:   'today',
-    dateFormat:    'Y-m-d',
-    disableMobile: true,
-    onChange: function(selectedDates, dateStr) {
-      if (isToday(dateStr)) {
-        filterTimeForToday();
-        if (timeSelect.selectedOptions[0] && timeSelect.selectedOptions[0].disabled) {
-          applySmartTimeSelect();
-        }
-      } else {
-        enableAllTimeOptions();
+    window.saveBookingDraft = async function (payload) {
+      try {
+        const db = await getDb();
+        await addDoc(collection(db, COL.BOOKINGS), {
+          date:        clip(payload.date, 10),
+          time:        clip(payload.time, 5),
+          timeLabel:   clip(payload.timeLabel, 12),
+          passengers:  clip(payload.passengers, 4),
+          destination: payload.destination ? clip(payload.destination, 200) : null,
+          source:      'web',
+          status:      'new',
+          customer:    payload.customer
+            ? { name: clip(payload.customer.name, 60), phone: clip(payload.customer.phone, 15) }
+            : null,
+          createdAt:   serverTimestamp(),
+          updatedAt:   serverTimestamp(),
+        });
+      } catch (e) {
+        console.warn('[anvisha] booking draft write failed:', e && e.message);
       }
-      update();
-    }
-  });
-
-  filterTimeForToday();
-  applySmartTimeSelect();
-  ensureBookableDate();
-
-  /* Re-check every minute so an idle user can't submit a slot that just
-     rolled into the past while they were filling in the form. */
-  setInterval(function() {
-    if (isToday(dateInput.value)) {
-      filterTimeForToday();
-      if (timeSelect.selectedOptions[0] && timeSelect.selectedOptions[0].disabled) {
-        applySmartTimeSelect();
-      }
-      ensureBookableDate();
-      update();
-    }
-  }, 60 * 1000);
-
-  function formatDate(val) {
-    if (!val) return '';
-    var p      = val.split('-');
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return p[2] + ' ' + months[+p[1] - 1] + ' ' + p[0];
-  }
-
-  function getPax() {
-    if (passengerSelect.value === '8+') {
-      var n = parseInt(paxCustom.value, 10);
-      return (n >= 8) ? String(n) : '';
-    }
-    return passengerSelect.value;
-  }
-
-  /* ── Name / Phone ── */
-  custName.addEventListener('input', update);
-
-  custPhone.addEventListener('input', function() {
-    var cleaned = this.value.replace(/\D/g, '').slice(0, 10);
-    if (cleaned !== this.value) this.value = cleaned;
-    if (this.value === '') {
-      this.classList.remove('invalid');
-      phoneMsg.classList.remove('show');
-    } else if (!PHONE_RE.test(this.value)) {
-      this.classList.add('invalid');
-      if (this.value.length === 10) phoneMsg.classList.add('show');
-      else phoneMsg.classList.remove('show');
-    } else {
-      this.classList.remove('invalid');
-      phoneMsg.classList.remove('show');
-    }
-    update();
-  });
-
-  /* ── Passenger events ── */
-  passengerSelect.addEventListener('change', function() {
-    if (this.value === '8+') {
-      paxCustomWrap.style.display = 'block';
-      paxCustom.focus();
-    } else {
-      paxCustomWrap.style.display = 'none';
-      paxCustom.value = '';
-      paxCustom.classList.remove('invalid');
-      document.getElementById('pax-error').classList.remove('show');
-    }
-    update();
-  });
-
-  paxCustom.addEventListener('input', function() {
-    var n = parseInt(this.value, 10);
-    var paxError = document.getElementById('pax-error');
-    if (this.value === '') {
-      this.classList.remove('invalid');
-      paxError.classList.remove('show');
-    } else if (n < 8) {
-      this.classList.add('invalid');
-      paxError.classList.add('show');
-    } else {
-      this.classList.remove('invalid');
-      paxError.classList.remove('show');
-    }
-    update();
-  });
-
-  /* ── WhatsApp ── */
-  function buildWAUrl() {
-    var time  = timeSelect.options[timeSelect.selectedIndex].text;
-    var pax   = getPax();
-    var name  = custName.value.trim();
-    var phone = custPhone.value.trim();
-    var dest  = document.getElementById('destination').value.trim();
-
-    var text = '%F0%9F%9A%97 *Anvisha Travels - Ride Request*%0A%0A'
-      + '%F0%9F%91%A4 *Name:* '       + encodeURIComponent(name)  + '%0A'
-      + '%F0%9F%93%9E *Phone:* '      + encodeURIComponent(phone) + '%0A'
-      + '%F0%9F%93%85 *Date:* '       + encodeURIComponent(formatDate(dateInput.value)) + '%0A'
-      + '%F0%9F%95%9B *Time:* '       + encodeURIComponent(time)  + '%0A'
-      + '%F0%9F%91%A5 *Passengers:* ' + encodeURIComponent(pax)   + '%0A';
-    if (dest) text += '%F0%9F%8E%AF *Destination:* ' + encodeURIComponent(dest) + '%0A';
-    text += '%0A%E2%9C%85 Please confirm my booking. Thank you!';
-
-    return 'https://wa.me/919658141900?text=' + text;
-  }
-
-  function buildBookingPayload() {
-    return {
-      date:        dateInput.value,
-      time:        timeSelect.value,
-      timeLabel:   timeSelect.options[timeSelect.selectedIndex].text,
-      passengers:  getPax(),
-      destination: document.getElementById('destination').value.trim() || null,
-      customer:    { name: custName.value.trim(), phone: custPhone.value.trim() },
-      source:      'web',
-      status:      'new',
     };
-  }
-
-  function openWhatsApp() {
-    if (waBtn.disabled) return;
-    // Final guard — if the clock rolled while the user was typing, refuse to send.
-    if (isToday(dateInput.value)) {
-      filterTimeForToday();
-      if (timeSelect.options[timeSelect.selectedIndex] && timeSelect.options[timeSelect.selectedIndex].disabled) {
-        applySmartTimeSelect();
-        update();
-      }
-    }
-    if (!isBookingInFuture()) {
-      timeMsg.classList.add('show');
-      timeSelect.classList.add('invalid');
-      update();
-      return;
-    }
-    try {
-      if (typeof window.saveBookingDraft === 'function') {
-        window.saveBookingDraft(buildBookingPayload());
-      }
-    } catch (_) {}
-    var a = document.createElement('a');
-    a.href = buildWAUrl();
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-
-  /* ── Form gate ── */
-  function update() {
-    var nameOk  = custName.value.trim().length >= 2;
-    var phoneOk = PHONE_RE.test(custPhone.value.trim());
-    var futureOk = isBookingInFuture();
-
-    // Show/hide the "past time" warning under the time dropdown.
-    if (dateInput.value && timeSelect.value && !futureOk) {
-      timeMsg.classList.add('show');
-      timeSelect.classList.add('invalid');
-    } else {
-      timeMsg.classList.remove('show');
-      timeSelect.classList.remove('invalid');
-    }
-
-    var ok = nameOk && phoneOk && futureOk && getPax();
-    if (ok) {
-      locationSection.classList.add('visible');
-      waBtn.disabled = false;
-      waBtn.classList.remove('disabled');
-      helperText.innerHTML = '<i class="fab fa-whatsapp" style="color:var(--green)"></i> Tap below — we\'ll confirm on WhatsApp within minutes';
-    } else {
-      waBtn.disabled = true;
-      waBtn.classList.add('disabled');
-      if (dateInput.value && timeSelect.value && !futureOk) {
-        helperText.innerHTML = '<i class="fas fa-clock-rotate-left"></i> Please choose a future date &amp; time';
-      } else {
-        helperText.innerHTML = '<i class="fas fa-info-circle"></i> Fill in all required fields to continue';
-      }
-    }
-  }
-
-  timeSelect.addEventListener('change', update);
-  document.getElementById('destination').addEventListener('input', update);
-
-  /* ── Service row animations ── */
-  var rows = document.querySelectorAll('.svc');
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.15 });
-    rows.forEach(function(r, i) {
-      r.style.transitionDelay = (i * 0.08) + 's';
-      io.observe(r);
-    });
-  } else {
-    rows.forEach(function(r) { r.classList.add('in'); });
-  }
-
-  document.getElementById('footer-year').textContent = new Date().getFullYear();
-  update();
-</script>
-
-<!-- CryptoJS — used by shared firebase-config setup -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<!-- Silent booking draft writer -->
-<script type="module">
-  import { getDb, COL } from './firebase-config.js';
-  import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-
-  function clip(s, n) { return (s == null ? '' : String(s)).slice(0, n); }
-
-  window.saveBookingDraft = async function (payload) {
-    try {
-      const db = await getDb();
-      await addDoc(collection(db, COL.BOOKINGS), {
-        date:        clip(payload.date, 10),
-        time:        clip(payload.time, 5),
-        timeLabel:   clip(payload.timeLabel, 12),
-        passengers:  clip(payload.passengers, 4),
-        destination: payload.destination ? clip(payload.destination, 200) : null,
-        source:      'web',
-        status:      'new',
-        customer:    payload.customer
-          ? { name: clip(payload.customer.name, 60), phone: clip(payload.customer.phone, 15) }
-          : null,
-        createdAt:   serverTimestamp(),
-        updatedAt:   serverTimestamp(),
-      });
-    } catch (e) {
-      console.warn('[anvisha] booking draft write failed:', e && e.message);
-    }
-  };
-</script>
+  </script>
 </body>
 </html>
