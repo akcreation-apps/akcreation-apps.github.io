@@ -147,7 +147,7 @@ function renderMaintenanceScreen(M) {
   const title = M.title || 'Restocking the shelves';
   const message = M.message || "We'll be back shortly.";
   const eta = M.eta || '';
-  const vendor = CFG.vendorName || 'BankiMart Grocerries';
+  const vendor = CFG.vendorName || 'BankiBites Groceries';
   const family = CFG.familyBrand || '';
   const whatsappNumber = String(CFG.whatsappNumber || '').replace(/\D/g, '');
   const igUrl = CFG.instagramUrl || '';

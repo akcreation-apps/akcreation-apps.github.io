@@ -110,7 +110,7 @@ function normaliseGroceryOrder(o) {
     : subtotal + (Number.isFinite(fee) ? fee : 0);
   return {
     ...o,
-    restaurant_name: o.restaurant_name || 'BankiMart · Grocery',
+    restaurant_name: o.restaurant_name || 'BankiBites Groceries',
     restaurant_id:   o.restaurant_id   || 'bankimart',
     place: o.place || o.customer?.address || '',
     total,

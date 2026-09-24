@@ -180,8 +180,8 @@ function renderBill(order) {
   const deliveryFee = Number(order.delivery_fee_final ?? order.delivery_fee_estimated ?? 0);
   const grand = subtotal + deliveryFee;
   const dateStr = fmtReceiptDate(order.delivered_at || order.created_at);
-  const vendorName = (CFG.vendorName || 'BankiMart').toUpperCase();
-  const vendorShort = CFG.vendorShort || 'BankiMart';
+  const vendorName = (CFG.vendorName || 'BankiBites Groceries').toUpperCase();
+  const vendorShort = CFG.vendorShort || 'BankiBites';
   const address = CFG.fullAddress || CFG.city || '';
   const supportPhone = CFG.supportPhone || '';
 

@@ -1,12 +1,12 @@
 /**
- * BankiBites Grocerries — Central vendor config.
+ * BankiBites Groceries — Central vendor config.
  * Change values here — every page reads from window.BB_CONFIG.
  * (Modeled after TCD's per-restaurant config pattern.)
  */
 window.BB_CONFIG = {
   // Brand
-  vendorName: 'BankiMart Grocerries',
-  vendorShort: 'BankiMart',
+  vendorName: 'BankiBites Groceries',
+  vendorShort: 'BankiBites',
   vendorAccent: '.',
   tagline: 'Fresh essentials, delivered.',
 
@@ -72,9 +72,9 @@ window.BB_CONFIG = {
   instagramUrl: 'https://www.instagram.com/bankibites/',
 
   // Legal / attribution
-  // BankiMart is one storefront in the BankiBites family (kirana, grocery,
-  // delivery, etc.). Surfaced in headers/footers/meta so shoppers know both
-  // brands belong together.
+  // BankiBites Groceries is one storefront in the BankiBites family (kirana,
+  // grocery, delivery, etc.). Surfaced in headers/footers/meta so shoppers know
+  // the brands belong together.
   familyBrand: 'BankiBites',
   familyUrl: 'https://akcreation-apps.com/banki-bites/',
   parentBrand: 'AK Creation',

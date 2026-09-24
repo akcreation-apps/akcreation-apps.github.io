@@ -140,7 +140,7 @@ function runToSyntheticOrder(r) {
     delivered_at: deliveredAt,
     created_at: r.created_at || deliveredAt,
     delivery_staff_id: r.partner_uid || null,
-    restaurant_name: 'BankiMart · Grocery',
+    restaurant_name: 'BankiBites Groceries',
     customer: { name: `${stops} stop${stops === 1 ? '' : 's'}${r.run_date ? ' · ' + r.run_date : ''}` },
     place: '',
     total: Number.isFinite(+r.total_value) ? +r.total_value : undefined,

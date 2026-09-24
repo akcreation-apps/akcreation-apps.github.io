@@ -526,12 +526,12 @@
         await Swal.fire({
           icon: 'info',
           title: 'We\'re taking a short break',
-          html: 'BankiMart is temporarily offline and not accepting new orders right now. Please try again in a little while.',
+          html: 'BankiBites Groceries is temporarily offline and not accepting new orders right now. Please try again in a little while.',
           confirmButtonText: 'Got it',
           confirmButtonColor: '#16A34A',
         });
       } else {
-        alert("BankiMart is temporarily offline. Please try again in a little while.");
+        alert("BankiBites Groceries is temporarily offline. Please try again in a little while.");
       }
       // Force a reload so maintenance.js repaints the maintenance screen
       // — the customer shouldn't stay staring at a cart they can't submit.

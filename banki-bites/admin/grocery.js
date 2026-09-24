@@ -354,7 +354,7 @@ function renderOrderCard(db, o, root, suggestedName = '') {
     <summary class="order-summary">
       <div class="order-summary-main">
         <div class="ec-title">
-          <span class="restaurant-name">BankiMart · #${esc(o.id.slice(-6).toUpperCase())}</span>
+          <span class="restaurant-name">BankiBites Groceries · #${esc(o.id.slice(-6).toUpperCase())}</span>
           <span class="order-total">${fmtINR(grand)}</span>
         </div>
         <div class="ec-meta">${created ? created.toLocaleString('en-IN') : ''} · ${nItems} item${nItems === 1 ? '' : 's'}${cust.address ? ' · ' + esc(cust.address) : ''}</div>

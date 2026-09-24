@@ -114,7 +114,7 @@ export async function renderPartners(root, db) {
     </style>
     <div id="bmStoreCard" class="bm-store" hidden>
       <div class="bm-store-icon"><i class="fas fa-store"></i></div>
-      <p class="bm-store-title" id="bmStoreTitle">BankiMart · Live</p>
+      <p class="bm-store-title" id="bmStoreTitle">BankiBites Groceries · Live</p>
       <button type="button" id="bmStoreBtn" class="bm-store-btn bm-store-btn--off">
         <i class="fas fa-power-off"></i> <span id="bmStoreBtnLabel">Take offline</span>
       </button>
@@ -168,7 +168,7 @@ function wireStorefrontToggle(root, db) {
   const paint = (enabled) => {
     card.hidden = false;
     card.classList.toggle('bm-store--offline', enabled);
-    title.textContent = enabled ? 'BankiMart · Offline' : 'BankiMart · Live';
+    title.textContent = enabled ? 'BankiBites Groceries · Offline' : 'BankiBites Groceries · Live';
     btnLabel.textContent = enabled ? 'Take online' : 'Take offline';
     btn.classList.toggle('bm-store-btn--on', enabled);
     btn.classList.toggle('bm-store-btn--off', !enabled);
@@ -189,7 +189,7 @@ function wireStorefrontToggle(root, db) {
     const nextEnabled = !currentlyOffline;
     const ok = await Swal.fire({
       icon: nextEnabled ? 'warning' : 'question',
-      title: nextEnabled ? 'Take BankiMart storefront offline?' : 'Bring BankiMart back online?',
+      title: nextEnabled ? 'Take BankiBites Groceries storefront offline?' : 'Bring BankiBites Groceries back online?',
       html: nextEnabled
         ? "Customers won't be able to place new grocery orders and will see the maintenance screen instead. Existing orders keep working."
         : 'Customers can place new grocery orders again.',
