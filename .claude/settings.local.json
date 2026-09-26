@@ -34,7 +34,8 @@
       "Bash(where ffmpeg *)",
       "Bash(grep -n \"paidAlreadyInit\\\\|isNewUnprocessed\\\\|value=\\\\\"\\\\${paidAlready\" banki-bites/admin/grocery.js)",
       "Bash(grep *)",
-      "Bash(xargs wc *)"
+      "Bash(xargs wc *)",
+      "Bash(git -C \"/c/Users/anil.sahoo_aeccgloba/PycharmProjects/AKS_personal/akcreation-apps.github.io\" status --short)"
     ]
   },
   "enableAllProjectMcpServers": true,

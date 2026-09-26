@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Attendance History</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-calendar-days text-muted" style="font-size:0.85em;"></i> Attendance History</h1>
+        <p class="ks-subtle">All punches from your assigned sites over the last 60 days.</p>
+      </div>
+    </div>
+    <div id="content">
+      <div class="ks-table-wrap"><div style="padding:16px;">
+        <div class="ks-skel ks-skel-lg"></div>
+        <div class="ks-skel"></div>
+      </div></div>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, setYear } from "../assets/ui.js";
+    import { collectionGroup, query, where, orderBy, getDocs, doc, getDoc, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    const { profile } = await requireRole(["manager", "admin"]);
+    mountTopbar({
+      role: "manager",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function typeBadge(type) {
+      const t = String(type || "").toLowerCase();
+      if (t === "in" || t === "checkin" || t === "punchin") {
+        return `<span class="badge badge-approved">${escapeHtml(type)}</span>`;
+      }
+      if (t === "out" || t === "checkout" || t === "punchout") {
+        return `<span class="badge badge-info">${escapeHtml(type)}</span>`;
+      }
+      return `<span class="badge badge-muted">${escapeHtml(type ?? "")}</span>`;
+    }
+
+    const sinceDate = new Date(Date.now() - 60 * 24 * 3600 * 1000);
+    const sites = profile.assignedSiteIds ?? [];
+    const content = document.getElementById('content');
+
+    if (sites.length === 0) {
+      content.innerHTML = `
+        <div class="ks-panel">
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-location-crosshairs"></i></div>
+            <p class="ks-empty-title">No sites assigned</p>
+            <p class="ks-empty-text">Ask an admin to assign at least one site to your account.</p>
+          </div>
+        </div>`;
+    } else {
+      const q = query(collectionGroup(db, "punches"), where("siteId", "in", sites.slice(0, 10)), where("ts", ">=", sinceDate), orderBy("ts", "desc"));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        content.innerHTML = `
+          <div class="ks-panel">
+            <div class="ks-empty">
+              <div class="ks-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+              <p class="ks-empty-title">No punches in the last 60 days</p>
+              <p class="ks-empty-text">Once employees start punching in, records will show up here.</p>
+            </div>
+          </div>`;
+      } else {
+        const nameCache = new Map();
+        async function nameOf(uid) {
+          if (nameCache.has(uid)) return nameCache.get(uid);
+          const s = await getDoc(doc(db, "attn_users", uid));
+          const n = s.data()?.name ?? uid;
+          nameCache.set(uid, n);
+          return n;
+        }
+        const rowsHtml = [];
+        for (const d of snap.docs) {
+          const p = d.data();
+          const uid = d.ref.parent.parent.id;
+          const nm = await nameOf(uid);
+          const dt = p.ts?.toDate?.();
+          rowsHtml.push(`
+            <tr>
+              <td>
+                <div>${dt ? escapeHtml(dt.toLocaleDateString()) : ""}</div>
+                <div class="text-muted small">${dt ? escapeHtml(dt.toLocaleTimeString()) : ""}</div>
+              </td>
+              <td>${escapeHtml(nm)}</td>
+              <td>${typeBadge(p.type)}</td>
+              <td class="text-muted">${escapeHtml(p.siteId || "")}</td>
+              <td>${p.edited ? '<span class="badge badge-pending">edited</span>' : '<span class="text-muted small">—</span>'}</td>
+            </tr>
+          `);
+        }
+        content.innerHTML = `
+          <div class="ks-table-wrap">
+            <div class="ks-table-scroll">
+              <table class="table">
+                <thead><tr><th style="min-width:150px;">When</th><th>Employee</th><th>Type</th><th>Site</th><th>Status</th></tr></thead>
+                <tbody>${rowsHtml.join("")}</tbody>
+              </table>
+            </div>
+          </div>`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-gauge-high text-muted" style="font-size:0.85em;"></i> Today at a glance</h1>
+        <p class="ks-subtle" id="date-line">Loading…</p>
+      </div>
+    </div>
+
+    <!-- KPI row -->
+    <div class="ks-kpi-grid" id="kpi-grid">
+      <div class="ks-kpi ks-kpi--present"><div class="ks-kpi-icon"><i class="fa-solid fa-user-check"></i></div>
+        <div class="ks-kpi-body"><div class="ks-kpi-label">Present today</div><div class="ks-kpi-value" id="kpi-present">—</div>
+          <div class="ks-kpi-hint"><span id="kpi-active-total">—</span> active</div></div></div>
+      <div class="ks-kpi ks-kpi--in"><div class="ks-kpi-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+        <div class="ks-kpi-body"><div class="ks-kpi-label">Currently in</div><div class="ks-kpi-value" id="kpi-in">—</div>
+          <div class="ks-kpi-hint">Not yet checked out</div></div></div>
+      <div class="ks-kpi ks-kpi--absent"><div class="ks-kpi-icon"><i class="fa-solid fa-user-slash"></i></div>
+        <div class="ks-kpi-body"><div class="ks-kpi-label">Absent</div><div class="ks-kpi-value" id="kpi-absent">—</div>
+          <div class="ks-kpi-hint">No punch yet</div></div></div>
+      <div class="ks-kpi"><div class="ks-kpi-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div class="ks-kpi-body"><div class="ks-kpi-label">Total punches</div><div class="ks-kpi-value" id="kpi-punches">—</div>
+          <div class="ks-kpi-hint">In &amp; out combined</div></div></div>
+    </div>
+
+    <!-- Missing checkout alert -->
+    <div id="missing-checkout-slot"></div>
+
+    <div class="ks-grid ks-grid-2">
+      <div>
+        <div class="ks-panel" style="margin-bottom:16px;">
+          <div class="ks-panel-header">
+            <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-location-dot"></i></span>Per-site headcount</h3>
+          </div>
+          <div id="site-headcount"><div class="ks-skel"></div></div>
+        </div>
+
+        <div class="ks-section-head" style="margin-top:24px;">
+          <div>
+            <h2 style="font-size:1.15rem;"><i class="fa-solid fa-user-check text-muted" style="font-size:0.85em;"></i> Pending Approvals</h2>
+            <p class="ks-subtle">Review new sign-ups from the Android app.</p>
+          </div>
+        </div>
+
+        <div id="pending-list">
+          <div class="ks-skel ks-skel-panel"></div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="ks-stat">
+          <div class="ks-stat-icon"><i class="fa-solid fa-key"></i></div>
+          <div class="ks-stat-body">
+            <div class="ks-stat-label">Today's Access Code</div>
+            <div class="ks-stat-value" id="today-code">— — — —</div>
+            <div class="ks-stat-hint">Format: CC DD MM YY. Rotates daily.</div>
+          </div>
+        </div>
+
+        <div class="ks-panel" style="margin-top:16px;">
+          <div class="ks-panel-header">
+            <h3 class="ks-panel-title"><i class="fa-solid fa-circle-info text-muted"></i> Quick help</h3>
+          </div>
+          <ul class="text-muted small mb-0" style="padding-left:1.1em;">
+            <li><strong>Admin</strong>: full portal access</li>
+            <li><strong>Manager</strong>: view/edit daily punches for assigned sites</li>
+            <li><strong>Employee</strong>: punches in via the Android app</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
+    import {
+      collection, doc, onSnapshot, writeBatch, addDoc, serverTimestamp,
+      collectionGroup, query, where
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    const { user } = await requireRole(["admin"]);
+    const adminUid = user.uid;
+
+    mountTopbar({
+      role: "admin",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    document.getElementById("date-line").textContent =
+      new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    // ============================================================
+    // Data — three lightweight snapshots feed KPI + pending + code
+    // ============================================================
+    let allUsers = [];      // full user list (approved + others)
+    let allSites = new Map(); // id -> site
+    let todayPunches = [];  // today's punches across sites
+
+    // Live users (one subscription, reused everywhere)
+    onSnapshot(collection(db, "attn_users"), (snap) => {
+      allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      recomputeKpis();
+    });
+
+    // Live sites (also feeds pending-approval site chips)
+    const availableSites = [];
+    onSnapshot(collection(db, "attn_sites"), (snap) => {
+      availableSites.length = 0;
+      allSites.clear();
+      snap.forEach(d => {
+        const s = d.data();
+        allSites.set(d.id, s);
+        if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
+      });
+      recomputeKpis();
+    });
+
+    // Today's punches — bounded by startOfDay so read cost stays flat
+    const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+    const todayQ = query(collectionGroup(db, "punches"), where("ts", ">=", startOfDay));
+    onSnapshot(todayQ, (snap) => {
+      todayPunches = snap.docs.map(d => ({
+        id: d.id,
+        uid: d.ref.parent.parent.id,
+        ...d.data()
+      }));
+      recomputeKpis();
+    });
+
+    function isIn(type)  { const t = String(type||"").toLowerCase(); return t === "in"  || t === "checkin"  || t === "punchin"; }
+    function isOut(type) { const t = String(type||"").toLowerCase(); return t === "out" || t === "checkout" || t === "punchout"; }
+
+    function recomputeKpis() {
+      // Employees eligible to punch = approved + role in [employee, manager] + at least 1 site
+      const activeUsers = allUsers.filter(u =>
+        u.status === "approved" &&
+        (u.role === "employee" || u.role === "manager") &&
+        (u.assignedSiteIds ?? []).length > 0
+      );
+      const activeUidSet = new Set(activeUsers.map(u => u.id));
+
+      // Group today's punches by uid, sorted by time
+      const byUid = new Map();
+      for (const p of todayPunches) {
+        if (!p.ts?.toDate) continue;
+        if (!byUid.has(p.uid)) byUid.set(p.uid, []);
+        byUid.get(p.uid).push(p);
+      }
+      for (const arr of byUid.values()) arr.sort((a, b) => a.ts.toDate() - b.ts.toDate());
+
+      const presentUids = new Set(byUid.keys());
+      let currentlyIn = 0;
+      const missingCheckout = [];
+
+      for (const [uid, punches] of byUid.entries()) {
+        const last = punches[punches.length - 1];
+        if (isIn(last.type)) {
+          currentlyIn++;
+          missingCheckout.push({ uid, at: last.ts.toDate(), siteId: last.siteId });
+        }
+      }
+
+      const absent = Math.max(0, activeUsers.filter(u => !presentUids.has(u.id)).length);
+
+      document.getElementById("kpi-present").textContent = presentUids.size;
+      document.getElementById("kpi-active-total").textContent = activeUsers.length;
+      document.getElementById("kpi-in").textContent = currentlyIn;
+      document.getElementById("kpi-absent").textContent = absent;
+      document.getElementById("kpi-punches").textContent = todayPunches.length;
+
+      renderSiteHeadcount(byUid);
+      renderMissingCheckout(missingCheckout);
+    }
+
+    function renderSiteHeadcount(byUid) {
+      const perSite = new Map();
+      for (const punches of byUid.values()) {
+        const sid = punches[0]?.siteId;
+        if (!sid) continue;
+        perSite.set(sid, (perSite.get(sid) || 0) + 1);
+      }
+      const el = document.getElementById("site-headcount");
+      if (perSite.size === 0) {
+        el.innerHTML = `<p class="text-muted small mb-0">No punches at any site yet today.</p>`;
+        return;
+      }
+      const chips = [];
+      for (const [sid, count] of perSite.entries()) {
+        const name = allSites.get(sid)?.name ?? sid;
+        chips.push(`<span class="ks-site-chip"><i class="fa-solid fa-location-dot text-muted"></i> ${escapeHtml(name)} · <strong>${count}</strong></span>`);
+      }
+      el.innerHTML = `<div class="ks-site-chips">${chips.join("")}</div>`;
+    }
+
+    function renderMissingCheckout(list) {
+      const slot = document.getElementById("missing-checkout-slot");
+      if (list.length === 0) { slot.innerHTML = ""; return; }
+      const names = list.slice(0, 6).map(({ uid, at }) => {
+        const nm = allUsers.find(u => u.id === uid)?.name ?? uid.slice(0, 6);
+        return `<strong>${escapeHtml(nm)}</strong> <span class="text-muted small">(in at ${escapeHtml(at.toLocaleTimeString())})</span>`;
+      }).join(", ");
+      const more = list.length > 6 ? ` <span class="text-muted small">and ${list.length - 6} more</span>` : "";
+      slot.innerHTML = `
+        <div class="ks-alert">
+          <div class="ks-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="ks-alert-body">
+            <p class="ks-alert-title">Still checked in (no punch-out yet)</p>
+            <div>${names}${more}</div>
+          </div>
+        </div>`;
+    }
+
+    // ============================================================
+    // Pending approvals — unchanged flow, restyled
+    // ============================================================
+    async function approve(targetUid, role, assignedSiteIds) {
+      const batch = writeBatch(db);
+      batch.update(doc(db, "attn_users", targetUid), {
+        status: "approved", role, assignedSiteIds,
+        approvedBy: adminUid, approvedAt: serverTimestamp()
+      });
+      batch.delete(doc(db, "attn_pendingApprovals", targetUid));
+      await batch.commit();
+      await addDoc(collection(db, "attn_auditLog"), {
+        actor: adminUid, action: "approveUser", targetUser: targetUid,
+        details: { role, assignedSiteIds }, at: serverTimestamp()
+      });
+    }
+    async function reject(targetUid, reason) {
+      const batch = writeBatch(db);
+      batch.update(doc(db, "attn_users", targetUid), {
+        status: "rejected", rejectedReason: reason, rejectedAt: serverTimestamp()
+      });
+      batch.delete(doc(db, "attn_pendingApprovals", targetUid));
+      await batch.commit();
+      await addDoc(collection(db, "attn_auditLog"), {
+        actor: adminUid, action: "rejectUser", targetUser: targetUid,
+        details: { reason }, at: serverTimestamp()
+      });
+    }
+
+    const list = document.getElementById('pending-list');
+    onSnapshot(collection(db, "attn_pendingApprovals"), (snap) => {
+      if (snap.empty) {
+        list.innerHTML = `
+          <div class="ks-panel">
+            <div class="ks-empty">
+              <div class="ks-empty-icon"><i class="fa-solid fa-inbox"></i></div>
+              <p class="ks-empty-title">All caught up</p>
+              <p class="ks-empty-text">No pending sign-up requests right now.</p>
+            </div>
+          </div>`;
+        return;
+      }
+      list.innerHTML = '';
+      snap.forEach(d => {
+        const p = d.data();
+        const card = document.createElement('div');
+        card.className = 'ks-panel';
+        const sitesHtml = availableSites.length === 0
+          ? `<em class="text-muted">No sites created yet. Add one at <a href="sites.html">Sites</a>.</em>`
+          : `<div class="ks-chips">
+              ${availableSites.map(s => `
+                <label class="ks-chip">
+                  <input type="checkbox" value="${escapeHtml(s.id)}" data-site>
+                  <span>${escapeHtml(s.name)}</span>
+                </label>`).join("")}
+            </div>`;
+        card.innerHTML = `
+          <div class="ks-approval-meta">
+            <span class="ks-avatar">${initials(p.name || "?")}</span>
+            <div class="ks-approval-body">
+              <div class="ks-approval-name">${escapeHtml(p.name || "Unnamed")}</div>
+              <div class="ks-approval-contact">
+                ${p.contact ? `<i class="fa-solid fa-phone" style="font-size:.75em;"></i> ${escapeHtml(p.contact)} · ` : ""}
+                ${p.email ? `<i class="fa-solid fa-envelope" style="font-size:.75em;"></i> ${escapeHtml(p.email)}` : ""}
+              </div>
+            </div>
+            <span class="badge badge-pending">Pending</span>
+          </div>
+          <div class="ks-approval-section">
+            <label class="ks-approval-label">Role</label>
+            <select class="form-control" data-role style="max-width:220px;">
+              <option value="employee">Employee (Android app)</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="ks-approval-section">
+            <label class="ks-approval-label">Assigned sites</label>
+            ${sitesHtml}
+          </div>
+          <div class="ks-approval-actions">
+            <button class="btn btn-success" data-approve><i class="fa-solid fa-check"></i> Approve</button>
+            <button class="btn btn-outline-danger" data-reject><i class="fa-solid fa-xmark"></i> Reject</button>
+          </div>`;
+
+        card.querySelector('[data-approve]').onclick = async () => {
+          const role = card.querySelector('[data-role]').value;
+          const assignedSiteIds = Array.from(card.querySelectorAll('[data-site]:checked')).map(x => x.value);
+          if (role !== 'admin' && assignedSiteIds.length === 0) {
+            const proceed = await openModal({
+              title: "No sites selected",
+              bodyHtml: `<p>This user won't be able to punch in without an assigned site. Approve anyway?</p>`,
+              confirmLabel: "Approve anyway",
+              confirmClass: "btn btn-success",
+            });
+            if (!proceed) return;
+          }
+          try {
+            await approve(d.id, role, assignedSiteIds);
+            showToast(`Approved ${p.name || "user"}`, "success");
+          } catch (e) { showToast(e.message, "danger"); }
+        };
+        card.querySelector('[data-reject]').onclick = async () => {
+          await openModal({
+            title: `Reject ${p.name || "user"}?`,
+            bodyHtml: `
+              <label class="ks-field-label" for="reject-reason">Reason (optional)</label>
+              <textarea id="reject-reason" class="form-control" rows="3" placeholder="Why is this request being rejected?"></textarea>`,
+            confirmLabel: "Reject",
+            confirmClass: "btn btn-outline-danger",
+            onConfirm: async (modal) => {
+              const reason = modal.querySelector("#reject-reason").value.trim();
+              await reject(d.id, reason);
+              showToast(`Rejected ${p.name || "user"}`, "warn");
+            },
+          });
+        };
+        list.appendChild(card);
+      });
+    });
+
+    // ============================================================
+    // Daily access code — same formula as the Android app
+    // ============================================================
+    (() => {
+      const d = new Date();
+      const yyyy = String(d.getFullYear()).padStart(4, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const code = yyyy.slice(0, 2) + dd + mm + yyyy.slice(2, 4);
+      document.getElementById('today-code').textContent =
+        code.slice(0, 2) + " " + code.slice(2, 4) + " " + code.slice(4, 6) + " " + code.slice(6, 8);
+    })();
+  </script>
+</body>
+</html>

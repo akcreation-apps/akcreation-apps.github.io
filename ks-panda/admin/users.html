@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Users</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-users text-muted" style="font-size:0.85em;"></i> Users</h1>
+        <p class="ks-subtle">All approved and pending accounts. Change roles or reassign sites, then save the row.</p>
+      </div>
+    </div>
+
+    <div class="ks-table-wrap">
+      <div class="ks-table-scroll">
+        <table class="table">
+          <thead><tr>
+            <th>User</th>
+            <th style="min-width:150px;">Role</th>
+            <th>Status</th>
+            <th style="min-width:220px;">Sites</th>
+            <th class="ks-table-actions"></th>
+          </tr></thead>
+          <tbody id="tbody">
+            <tr><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
+    import { collection, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    const { user: adminUser } = await requireRole(["admin"]);
+    const adminUid = adminUser.uid;
+    mountTopbar({
+      role: "admin",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    const availableSites = [];
+    onSnapshot(collection(db, "attn_sites"), (snap) => {
+      availableSites.length = 0;
+      snap.forEach(d => {
+        const s = d.data();
+        if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
+      });
+      render();
+    });
+
+    let latestUsers = [];
+    const tbody = document.getElementById('tbody');
+    onSnapshot(collection(db, "attn_users"), (snap) => {
+      latestUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      render();
+    });
+
+    function render() {
+      if (latestUsers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5">
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+            <p class="ks-empty-title">No users yet</p>
+            <p class="ks-empty-text">New sign-ups from the Android app will show up here.</p>
+          </div>
+        </td></tr>`;
+        return;
+      }
+      tbody.innerHTML = '';
+      latestUsers.forEach(u => {
+        const badgeClass = { pending: 'badge-pending', approved: 'badge-approved', rejected: 'badge-rejected', disabled: 'badge-muted' }[u.status] ?? 'badge-muted';
+        const assigned = new Set(u.assignedSiteIds ?? []);
+        const sitesCells = availableSites.length === 0
+          ? '<em class="text-muted small">No sites</em>'
+          : `<div class="ks-chips">
+              ${availableSites.map(s => `
+                <label class="ks-chip">
+                  <input type="checkbox" value="${escapeHtml(s.id)}" ${assigned.has(s.id) ? 'checked' : ''} data-site>
+                  <span>${escapeHtml(s.name)}</span>
+                </label>`).join("")}
+            </div>`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="ks-avatar" style="width:36px;height:36px;font-size:.85rem;">${initials(u.name || u.email || "?")}</span>
+              <div>
+                <div style="font-weight:600;">${escapeHtml(u.name || "—")}</div>
+                <div class="text-muted" style="font-size:.8rem;">${escapeHtml(u.email || "")}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <select class="form-control" data-role>
+              <option value="employee"${u.role === 'employee' ? ' selected' : ''}>Employee</option>
+              <option value="manager"${u.role === 'manager' ? ' selected' : ''}>Manager</option>
+              <option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>
+            </select>
+          </td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span></td>
+          <td>${sitesCells}</td>
+          <td class="ks-table-actions">
+            <button class="btn btn-sm btn-primary" data-save><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            ${u.status === "approved"
+              ? '<button class="btn btn-sm btn-outline-danger" data-toggle-status style="margin-left:6px;"><i class="fa-solid fa-user-slash"></i> Deactivate</button>'
+              : u.status === "disabled"
+              ? '<button class="btn btn-sm btn-outline-primary" data-toggle-status style="margin-left:6px;"><i class="fa-solid fa-user-check"></i> Reactivate</button>'
+              : ''}
+          </td>`;
+        const toggleBtn = tr.querySelector('[data-toggle-status]');
+        if (toggleBtn) {
+          toggleBtn.onclick = async () => {
+            const isApproved = u.status === "approved";
+            const nextStatus = isApproved ? "disabled" : "approved";
+            const verb = isApproved ? "Deactivate" : "Reactivate";
+            await openModal({
+              title: `${verb} ${u.name || "user"}?`,
+              bodyHtml: isApproved
+                ? `<p>They will no longer be able to sign in or punch. You can reactivate later.</p>`
+                : `<p>They will regain sign-in and punch access with their current role and site assignments.</p>`,
+              confirmLabel: verb,
+              confirmClass: isApproved ? "btn btn-outline-danger" : "btn btn-primary",
+              onConfirm: async () => {
+                await updateDoc(doc(db, "attn_users", u.id), {
+                  status: nextStatus,
+                  ...(isApproved
+                    ? { disabledAt: serverTimestamp(), disabledBy: adminUid }
+                    : { reactivatedAt: serverTimestamp(), reactivatedBy: adminUid }),
+                });
+                await addDoc(collection(db, "attn_auditLog"), {
+                  actor: adminUid,
+                  action: isApproved ? "deactivateUser" : "reactivateUser",
+                  targetUser: u.id,
+                  details: { previousStatus: u.status, newStatus: nextStatus },
+                  at: serverTimestamp(),
+                });
+                showToast(`${verb}d ${u.name || "user"}`, isApproved ? "warn" : "success");
+              },
+            });
+          };
+        }
+        tr.querySelector('[data-save]').onclick = async (ev) => {
+          const btn = ev.currentTarget;
+          const role = tr.querySelector('[data-role]').value;
+          const assignedSiteIds = Array.from(tr.querySelectorAll('[data-site]:checked')).map(x => x.value);
+          btn.disabled = true;
+          const original = btn.innerHTML;
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+          try {
+            await updateDoc(doc(db, "attn_users", u.id), { role, assignedSiteIds });
+            showToast(`Saved ${u.name || "user"}`, "success");
+          } catch (e) {
+            showToast(e.message, "danger");
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = original;
+          }
+        };
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>

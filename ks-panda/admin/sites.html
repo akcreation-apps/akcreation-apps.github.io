@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Sites</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-location-dot text-muted" style="font-size:0.85em;"></i> Sites</h1>
+        <p class="ks-subtle">Physical locations where employees can punch in. Each user can be assigned one or more sites.</p>
+      </div>
+    </div>
+
+    <div class="ks-panel" style="margin-bottom:20px;">
+      <div class="ks-panel-header">
+        <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-plus"></i></span>Add a new site</h3>
+      </div>
+      <form id="new-site" autocomplete="off">
+        <div class="ks-form-grid ks-form-grid-4">
+          <div>
+            <label class="ks-field-label" for="site-name">Name</label>
+            <input class="form-control" id="site-name" name="name" placeholder="e.g., Cuttack Warehouse" required>
+          </div>
+          <div>
+            <label class="ks-field-label" for="site-address">Address</label>
+            <input class="form-control" id="site-address" name="address" placeholder="Street, city">
+          </div>
+          <div>
+            <label class="ks-field-label" for="site-lat">Latitude</label>
+            <input class="form-control" id="site-lat" name="lat" type="number" step="any" placeholder="20.4625">
+          </div>
+          <div>
+            <label class="ks-field-label" for="site-lng">Longitude</label>
+            <input class="form-control" id="site-lng" name="lng" type="number" step="any" placeholder="85.8828">
+          </div>
+        </div>
+        <div class="ks-form-grid ks-form-grid-2" style="margin-top:12px;">
+          <div>
+            <label class="ks-field-label" for="site-radius">Geofence radius (metres)</label>
+            <input class="form-control" id="site-radius" name="radiusMeters" type="number" min="10" step="10" value="150" placeholder="150">
+            <div class="text-muted small" style="margin-top:4px;">Punches from outside this radius are blocked by the Android app.</div>
+          </div>
+        </div>
+        <div class="ks-form-actions">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-plus"></i> Add site</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="ks-table-wrap">
+      <div class="ks-table-scroll">
+        <table class="table">
+          <thead><tr>
+            <th>Name</th><th>Address</th><th>Lat, Lng</th><th>Radius</th><th>Status</th><th class="ks-table-actions"></th>
+          </tr></thead>
+          <tbody id="tbody">
+            <tr><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, showToast, openModal, setYear } from "../assets/ui.js";
+    import { collection, addDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    await requireRole(["admin"]);
+    mountTopbar({
+      role: "admin",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    const tbody = document.getElementById('tbody');
+    onSnapshot(collection(db, "attn_sites"), (snap) => {
+      if (snap.empty) {
+        tbody.innerHTML = `<tr><td colspan="6">
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+            <p class="ks-empty-title">No sites yet</p>
+            <p class="ks-empty-text">Add your first site above.</p>
+          </div>
+        </td></tr>`;
+        return;
+      }
+      tbody.innerHTML = '';
+      snap.forEach(d => {
+        const s = d.data();
+        const isActive = s.active !== false;
+        const radius = Number.isFinite(s.radiusMeters) ? s.radiusMeters : null;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(s.name || "")}</strong></td>
+          <td class="text-muted">${escapeHtml(s.address || "—")}</td>
+          <td class="text-muted"><code>${s.lat ?? "—"}, ${s.lng ?? "—"}</code></td>
+          <td>
+            ${radius
+              ? `<span class="badge badge-info">${radius} m</span>`
+              : `<span class="badge badge-pending" title="No geofence radius — Android app cannot restrict location"><i class="fa-solid fa-triangle-exclamation" style="font-size:.7em;"></i> unset</span>`}
+            <button class="btn btn-sm btn-outline-secondary" data-edit-radius style="margin-left:6px;padding:2px 8px;min-height:28px;font-size:.75rem;">Edit</button>
+          </td>
+          <td>${isActive
+              ? '<span class="badge badge-approved"><i class="fa-solid fa-circle-check" style="font-size:.7em;"></i> Active</span>'
+              : '<span class="badge badge-rejected"><i class="fa-solid fa-circle-xmark" style="font-size:.7em;"></i> Off</span>'}</td>
+          <td class="ks-table-actions">
+            <button class="btn btn-sm btn-outline-secondary" data-toggle>
+              <i class="fa-solid ${isActive ? "fa-toggle-on" : "fa-toggle-off"}"></i>
+              ${isActive ? "Disable" : "Enable"}
+            </button>
+          </td>`;
+        tr.querySelector('[data-edit-radius]').onclick = async () => {
+          await openModal({
+            title: `Geofence radius — ${s.name || "site"}`,
+            bodyHtml: `
+              <p class="text-muted small">Distance from the site's coordinates within which employees can punch. Typical range 50–500 m.</p>
+              <label class="ks-field-label" for="rad-input">Radius (metres)</label>
+              <input id="rad-input" type="number" min="10" step="10" class="form-control" value="${radius ?? 150}">
+            `,
+            confirmLabel: "Save",
+            onConfirm: async (modal) => {
+              const v = parseInt(modal.querySelector("#rad-input").value, 10);
+              if (!Number.isFinite(v) || v < 10) { showToast("Enter a radius ≥ 10 m", "warn"); return false; }
+              await updateDoc(doc(db, "attn_sites", d.id), { radiusMeters: v });
+              showToast(`Radius set to ${v} m`, "success");
+            },
+          });
+        };
+        tr.querySelector('[data-toggle]').onclick = async (ev) => {
+          const btn = ev.currentTarget;
+          btn.disabled = true;
+          try {
+            await updateDoc(doc(db, "attn_sites", d.id), { active: !isActive });
+            showToast(`Site ${!isActive ? "enabled" : "disabled"}`, "success");
+          } catch (e) {
+            showToast(e.message, "danger");
+            btn.disabled = false;
+          }
+        };
+        tbody.appendChild(tr);
+      });
+    });
+
+    document.getElementById('new-site').onsubmit = async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const submit = e.target.querySelector('button[type=submit]');
+      submit.disabled = true;
+      try {
+        const radius = parseInt(fd.get('radiusMeters'), 10);
+        await addDoc(collection(db, "attn_sites"), {
+          name: fd.get('name'),
+          address: fd.get('address') || '',
+          lat: parseFloat(fd.get('lat')) || null,
+          lng: parseFloat(fd.get('lng')) || null,
+          radiusMeters: Number.isFinite(radius) && radius >= 10 ? radius : 150,
+          active: true,
+          createdAt: new Date(),
+        });
+        showToast("Site added", "success");
+        e.target.reset();
+      } catch (err) {
+        showToast(err.message, "danger");
+      } finally {
+        submit.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

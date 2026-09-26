@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <title>KS Panda — Sign in</title>
+  <meta name="description" content="KS Panda attendance portal for admins and managers.">
+  <link rel="canonical" href="https://akcreation-apps.com/ks-panda/login.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="KS Panda">
+  <meta property="og:title" content="KS Panda — Attendance Portal">
+  <meta property="og:description" content="Sign in to manage attendance, approvals, and audit logs.">
+  <meta property="og:url" content="https://akcreation-apps.com/ks-panda/login.html">
+  <meta property="og:image" content="https://akcreation-apps.com/ks-panda/logo.png">
+  <meta property="og:image:width" content="1163">
+  <meta property="og:image:height" content="1163">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="KS Panda — Attendance Portal">
+  <meta name="twitter:description" content="Sign in to manage attendance, approvals, and audit logs.">
+  <meta name="twitter:image" content="https://akcreation-apps.com/ks-panda/logo.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="ks-page">
+  <main class="ks-shell">
+    <section class="ks-card">
+      <img src="logo.png" alt="KS Panda" class="ks-logo">
+      <h1 class="ks-title">KS Panda</h1>
+      <p class="ks-subtitle">Attendance portal</p>
+      <p class="ks-hint">Admin &amp; manager access only.<br>Employees should use the Android app.</p>
+      <button id="btn-google" class="btn ks-btn-primary" type="button">
+        <span class="ks-google-mark">G</span> Sign in with Google
+      </button>
+      <p id="err" class="ks-error" hidden></p>
+    </section>
+  </main>
+  <footer class="ks-footer">&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { auth, googleProvider, db } from "./assets/firebase-init.js";
+    import { signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const err = document.getElementById('err');
+    const showErr = (m) => { err.textContent = m; err.hidden = false; };
+    document.getElementById('btn-google').onclick = async () => {
+      err.hidden = true;
+      try { await signInWithPopup(auth, googleProvider); }
+      catch (e) { showErr(e.message); }
+    };
+    onAuthStateChanged(auth, async (u) => {
+      if (!u) return;
+      const snap = await getDoc(doc(db, "attn_users", u.uid));
+      const d = snap.data();
+      if (!d || d.status !== "approved") return showErr("Account not approved for portal access.");
+      if (d.role === "admin") location.href = "admin/dashboard.html";
+      else if (d.role === "manager") location.href = "manager/dashboard.html";
+      else showErr("Employees must use the Android app.");
+    });
+  </script>
+  <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

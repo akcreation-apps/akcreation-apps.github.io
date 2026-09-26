@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Audit Log</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-clipboard-list text-muted" style="font-size:0.85em;"></i> Audit Log</h1>
+        <p class="ks-subtle">Every admin action and manager punch-edit, newest first. Showing the last 200 events.</p>
+      </div>
+    </div>
+
+    <div class="ks-table-wrap">
+      <div class="ks-table-scroll">
+        <table class="table">
+          <thead><tr>
+            <th style="min-width:170px;">When</th>
+            <th>Actor</th>
+            <th>Action</th>
+            <th>Target</th>
+            <th style="min-width:260px;">Details</th>
+          </tr></thead>
+          <tbody id="tbody">
+            <tr><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, setYear } from "../assets/ui.js";
+    import { collection, query, orderBy, limit, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    await requireRole(["admin"]);
+    mountTopbar({
+      role: "admin",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    const ACTION_MAP = {
+      approveUser:    { label: "Approved user",    cls: "badge-approved", icon: "fa-user-check" },
+      rejectUser:     { label: "Rejected user",    cls: "badge-rejected", icon: "fa-user-xmark" },
+      deactivateUser: { label: "Deactivated user", cls: "badge-pending",  icon: "fa-user-slash" },
+      reactivateUser: { label: "Reactivated user", cls: "badge-approved", icon: "fa-user-check" },
+      editPunch:      { label: "Edited punch",     cls: "badge-info",     icon: "fa-pen" },
+    };
+    function actionBadge(action) {
+      const meta = ACTION_MAP[action] || { label: action, cls: "badge-muted", icon: "fa-circle" };
+      return `<span class="badge ${meta.cls}"><i class="fa-solid ${meta.icon}" style="font-size:.7em;"></i> ${escapeHtml(meta.label)}</span>`;
+    }
+
+    const nameCache = new Map();
+    async function nameOf(uid) {
+      if (!uid) return '';
+      if (nameCache.has(uid)) return nameCache.get(uid);
+      const s = await getDoc(doc(db, "attn_users", uid));
+      const n = s.data()?.name ?? uid;
+      nameCache.set(uid, n);
+      return n;
+    }
+
+    const tbody = document.getElementById('tbody');
+    const q = query(collection(db, "attn_auditLog"), orderBy("at", "desc"), limit(200));
+    onSnapshot(q, async (snap) => {
+      if (snap.empty) {
+        tbody.innerHTML = `<tr><td colspan="5">
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-clipboard"></i></div>
+            <p class="ks-empty-title">Nothing logged yet</p>
+            <p class="ks-empty-text">Admin actions and punch edits will appear here.</p>
+          </div>
+        </td></tr>`;
+        return;
+      }
+      tbody.innerHTML = '';
+      for (const d of snap.docs) {
+        const e = d.data();
+        const tr = document.createElement('tr');
+        const when = e.at?.toDate?.() ?? null;
+        tr.innerHTML = `
+          <td>
+            <div>${when ? escapeHtml(when.toLocaleDateString()) : ""}</div>
+            <div class="text-muted small">${when ? escapeHtml(when.toLocaleTimeString()) : ""}</div>
+          </td>
+          <td>${escapeHtml(await nameOf(e.actor))}</td>
+          <td>${actionBadge(e.action)}</td>
+          <td>${e.targetUser ? escapeHtml(await nameOf(e.targetUser)) : '<span class="text-muted">—</span>'}</td>
+          <td><code>${escapeHtml(JSON.stringify(e.details ?? {}))}</code></td>`;
+        tbody.appendChild(tr);
+      }
+    });
+  </script>
+</body>
+</html>

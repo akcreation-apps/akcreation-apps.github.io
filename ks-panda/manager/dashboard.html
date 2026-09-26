@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Today's Roster</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-clock text-muted" style="font-size:0.85em;"></i> Today's Roster</h1>
+        <p class="ks-subtle" id="date-line">Loading…</p>
+      </div>
+    </div>
+    <div id="roster">
+      <div class="ks-table-wrap"><div style="padding:16px;">
+        <div class="ks-skel ks-skel-lg"></div>
+        <div class="ks-skel"></div>
+        <div class="ks-skel"></div>
+      </div></div>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
+    import {
+      collectionGroup, query, where, orderBy, onSnapshot,
+      collection, doc, getDoc, updateDoc, addDoc, serverTimestamp, Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    const { user, profile } = await requireRole(["manager", "admin"]);
+    const editorUid = user.uid;
+    const editorRole = profile.role;
+    mountTopbar({
+      role: "manager",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    document.getElementById("date-line").textContent =
+      new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+    async function editPunch(uid, punchId, newDate, reason, before) {
+      const punchRef = doc(db, "attn_attendance", uid, "punches", punchId);
+      const after = { ts: Timestamp.fromDate(newDate), edited: true };
+      await updateDoc(punchRef, after);
+      await addDoc(collection(punchRef, "edits"), {
+        editedBy: editorUid, editedByRole: editorRole,
+        editedAt: serverTimestamp(), reason, before, after
+      });
+      await addDoc(collection(db, "attn_auditLog"), {
+        actor: editorUid, action: "editPunch",
+        targetUser: uid, targetPunchId: punchId,
+        details: { newTs: newDate.toISOString(), reason }, at: serverTimestamp()
+      });
+    }
+
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function toDatetimeLocal(date) {
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function typeBadge(type) {
+      const t = String(type || "").toLowerCase();
+      if (t === "in" || t === "checkin" || t === "punchin") {
+        return `<span class="badge badge-approved"><i class="fa-solid fa-right-to-bracket" style="font-size:.7em;"></i> ${escapeHtml(type)}</span>`;
+      }
+      if (t === "out" || t === "checkout" || t === "punchout") {
+        return `<span class="badge badge-info"><i class="fa-solid fa-right-from-bracket" style="font-size:.7em;"></i> ${escapeHtml(type)}</span>`;
+      }
+      return `<span class="badge badge-muted">${escapeHtml(type ?? "")}</span>`;
+    }
+
+    const roster = document.getElementById('roster');
+    const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+
+    const sites = profile.assignedSiteIds ?? [];
+    if (sites.length === 0) {
+      roster.innerHTML = `
+        <div class="ks-panel">
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-location-crosshairs"></i></div>
+            <p class="ks-empty-title">No sites assigned</p>
+            <p class="ks-empty-text">Ask an admin to assign at least one site to your account.</p>
+          </div>
+        </div>`;
+    } else {
+      const q = query(
+        collectionGroup(db, "punches"),
+        where("siteId", "in", sites.slice(0, 10)),
+        where("ts", ">=", startOfDay),
+        orderBy("ts", "desc")
+      );
+      onSnapshot(q, async (snap) => {
+        if (snap.empty) {
+          roster.innerHTML = `
+            <div class="ks-panel">
+              <div class="ks-empty">
+                <div class="ks-empty-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                <p class="ks-empty-title">No punches yet today</p>
+                <p class="ks-empty-text">Punches from the Android app will appear here in real time.</p>
+              </div>
+            </div>`;
+          return;
+        }
+
+        const wrap = document.createElement('div');
+        wrap.className = 'ks-table-wrap';
+        wrap.innerHTML = `
+          <div class="ks-table-scroll">
+            <table class="table">
+              <thead><tr>
+                <th>Employee</th><th>Type</th><th>Time</th><th>Site</th><th>Status</th>
+                <th class="ks-table-actions"></th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>`;
+        const tbody = wrap.querySelector('tbody');
+
+        for (const d of snap.docs) {
+          const p = d.data();
+          const uid = d.ref.parent.parent.id;
+          const uSnap = await getDoc(doc(db, "attn_users", uid));
+          const name = uSnap.data()?.name ?? uid;
+          const punchDate = p.ts?.toDate?.() ?? null;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span class="ks-avatar" style="width:34px;height:34px;font-size:.8rem;">${initials(name)}</span>
+                <div style="font-weight:600;">${escapeHtml(name)}</div>
+              </div>
+            </td>
+            <td>${typeBadge(p.type)}</td>
+            <td><strong>${punchDate ? escapeHtml(punchDate.toLocaleTimeString()) : ""}</strong></td>
+            <td class="text-muted">${escapeHtml(p.siteId || "")}</td>
+            <td>${p.edited ? '<span class="badge badge-pending"><i class="fa-solid fa-pen" style="font-size:.7em;"></i> Edited</span>' : '<span class="text-muted small">—</span>'}</td>
+            <td class="ks-table-actions">
+              <button class="btn btn-sm btn-outline-primary" data-edit><i class="fa-solid fa-pen-to-square"></i> Edit time</button>
+            </td>`;
+
+          tr.querySelector('[data-edit]').onclick = async () => {
+            const currentDt = punchDate ? toDatetimeLocal(punchDate) : "";
+            await openModal({
+              title: `Edit punch — ${name}`,
+              bodyHtml: `
+                <div>
+                  <div class="text-muted small" style="margin-bottom:12px;">
+                    ${typeBadge(p.type)} at ${escapeHtml(p.siteId || "")}
+                  </div>
+                  <label class="ks-field-label" for="edit-time">New time</label>
+                  <input type="datetime-local" id="edit-time" class="form-control" value="${escapeHtml(currentDt)}" required>
+                </div>
+                <div>
+                  <label class="ks-field-label" for="edit-reason">Reason <span class="text-muted">(required)</span></label>
+                  <textarea id="edit-reason" class="form-control" rows="3" placeholder="Why is this being adjusted?" required></textarea>
+                </div>
+              `,
+              confirmLabel: "Save change",
+              confirmClass: "btn btn-primary",
+              onConfirm: async (modal) => {
+                const iso = modal.querySelector("#edit-time").value;
+                const reason = modal.querySelector("#edit-reason").value.trim();
+                if (!iso) { showToast("Pick a new time first", "warn"); return false; }
+                if (!reason) { showToast("Reason is required", "warn"); return false; }
+                await editPunch(uid, d.id, new Date(iso), reason, {
+                  ts: p.ts, siteId: p.siteId, type: p.type
+                });
+                showToast("Punch updated", "success");
+              },
+            });
+          };
+          tbody.appendChild(tr);
+        }
+        roster.innerHTML = '';
+        roster.appendChild(wrap);
+      });
+    }
+  </script>
+</body>
+</html>
