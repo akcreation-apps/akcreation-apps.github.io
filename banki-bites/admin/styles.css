@@ -3132,3 +3132,51 @@ button.fab:hover { background: var(--brand-dark); }
     display: contents; /* Let tab buttons participate in the horizontal .tabbar flex */
   }
 }
+
+/* Grocery → Requested keywords table */
+.gr-req-table {
+  display: block;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface, #fff);
+}
+.gr-req-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 90px 130px 56px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border, #e5e7eb);
+  font-size: 0.9rem;
+}
+.gr-req-row:first-child { border-top: 0; }
+.gr-req-row--head {
+  background: var(--page-bg, #f8fafc);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #6b7280);
+}
+.gr-req-cell--rank  { color: var(--muted, #6b7280); font-variant-numeric: tabular-nums; }
+.gr-req-cell--kw    { min-width: 0; overflow-wrap: anywhere; }
+.gr-req-cell--count { text-align: right; font-variant-numeric: tabular-nums; }
+.gr-req-cell--seen  { color: var(--muted, #6b7280); font-size: 0.82rem; }
+.gr-req-cell--act   { text-align: right; }
+.gr-req-footer {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--muted, #6b7280);
+  text-align: center;
+}
+@media (max-width: 640px) {
+  .gr-req-row { grid-template-columns: 32px 1fr 68px 44px; gap: 6px; padding: 8px 10px; }
+  .gr-req-cell--seen { display: none; }
+}
+@media (prefers-color-scheme: dark) {
+  .gr-req-table { background: #14161c; border-color: #262a34; }
+  .gr-req-row { border-top-color: #262a34; }
+  .gr-req-row--head { background: #1c1f27; color: #9ca3af; }
+  .gr-req-cell--rank, .gr-req-cell--seen, .gr-req-footer { color: #9ca3af; }
+}

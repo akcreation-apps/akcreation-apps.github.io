@@ -250,6 +250,9 @@
     $('#cardMetaText').textContent = inSearch ? ` matching "${state.query}"` : '';
 
     if (items.length === 0) {
+      if (inSearch && typeof window.bbLogMissingSearch === 'function') {
+        window.bbLogMissingSearch(state.query);
+      }
       $('#catContent').innerHTML = `
         <div class="empty-state">
           <div class="empty-ico"><i class="fa-solid fa-magnifying-glass"></i></div>

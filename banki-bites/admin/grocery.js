@@ -106,6 +106,9 @@ export async function renderGrocery(root, db) {
       <button type="button" class="gr-subnav-btn" data-sub="runs" role="tab" aria-selected="false">
         <i class="fas fa-truck-fast"></i> Delivery runs
       </button>
+      <button type="button" class="gr-subnav-btn" data-sub="requested" role="tab" aria-selected="false">
+        <i class="fas fa-magnifying-glass"></i> Requested
+      </button>
     </div>
 
     <div id="groceryOrdersPane" class="grocery-pane">
@@ -137,6 +140,28 @@ export async function renderGrocery(root, db) {
         </button>
       </div>
       <div id="grOrdersList" class="card-list grid-2"><div class="bb-loader-block">Listening for grocery orders…</div></div>
+    </div>
+
+    <div id="groceryRequestedPane" class="grocery-pane" hidden>
+      <div class="section-header section-header--compact orders-filter-bar">
+        <label class="orders-filter" style="flex:1;min-width:0;">
+          <i class="fas fa-magnifying-glass orders-filter__icon" aria-hidden="true"></i>
+          <input id="grReqFilterInput" type="search" class="orders-filter__select" placeholder="Filter keywords…" aria-label="Filter keywords">
+        </label>
+        <label class="orders-filter">
+          <i class="fas fa-sort orders-filter__icon" aria-hidden="true"></i>
+          <select id="grReqSort" class="orders-filter__select" aria-label="Sort by">
+            <option value="count">Most searched</option>
+            <option value="recent">Recently searched</option>
+            <option value="alpha">A → Z</option>
+          </select>
+          <i class="fas fa-chevron-down orders-filter__caret" aria-hidden="true"></i>
+        </label>
+        <button id="grReqRefreshBtn" type="button" class="btn btn-sm btn-outline-secondary" title="Refresh">
+          <i class="fas fa-arrows-rotate"></i>
+        </button>
+      </div>
+      <div id="grReqList" class="card-list"><div class="bb-loader-block">Loading requested items…</div></div>
     </div>
 
     <div id="groceryRunsPane" class="grocery-pane" hidden>
@@ -177,7 +202,9 @@ export async function renderGrocery(root, db) {
       });
       root.querySelector('#groceryOrdersPane').hidden = which !== 'orders';
       root.querySelector('#groceryRunsPane').hidden = which !== 'runs';
+      root.querySelector('#groceryRequestedPane').hidden = which !== 'requested';
       if (which === 'runs') mountRuns(root, db);
+      if (which === 'requested') mountRequested(root, db);
     });
   });
 
@@ -278,6 +305,129 @@ function mountOrders(root, db) {
   }, err => {
     listEl.innerHTML = `<div class="empty-state"><i class="fas fa-triangle-exclamation"></i><p>${esc(err.message)}</p></div>`;
   });
+}
+
+// ── Requested (missing-search) sub-view ─────────────────────────────────
+// One-shot getDocs on mount + explicit Refresh — no live subscription, so
+// storefront bumps don't drip reads into an open admin tab. Cache lives at
+// module scope so re-entering the sub-tab paints from memory without any
+// Firestore reads.
+let _reqCache = null; // Array<{id, ...}> once loaded
+function mountRequested(root, db) {
+  const listEl   = root.querySelector('#grReqList');
+  const filterEl = root.querySelector('#grReqFilterInput');
+  const sortEl   = root.querySelector('#grReqSort');
+  const refreshEl= root.querySelector('#grReqRefreshBtn');
+  let all = _reqCache || [];
+
+  function paint() {
+    const q = (filterEl.value || '').trim().toLowerCase();
+    const sortMode = sortEl.value || 'count';
+    let rows = q ? all.filter(r => (r.query_lc || r.query || '').includes(q)) : all.slice();
+    rows.sort((a, b) => {
+      if (sortMode === 'alpha') return (a.query || '').localeCompare(b.query || '');
+      if (sortMode === 'recent') return (b.last_seen?.toMillis?.() || 0) - (a.last_seen?.toMillis?.() || 0);
+      // default: count desc, break ties by most recent
+      const d = (b.count_total || 0) - (a.count_total || 0);
+      return d !== 0 ? d : (b.last_seen?.toMillis?.() || 0) - (a.last_seen?.toMillis?.() || 0);
+    });
+
+    if (!rows.length) {
+      listEl.innerHTML = all.length
+        ? `<div class="empty-state"><i class="fas fa-filter"></i><p>No keywords match "${esc(q)}".</p></div>`
+        : `<div class="empty-state"><i class="fas fa-face-smile"></i><p>No missing searches yet — shoppers are finding everything they need.</p></div>`;
+      return;
+    }
+
+    listEl.innerHTML = `
+      <div class="gr-req-table" role="table" aria-label="Requested keywords">
+        <div class="gr-req-row gr-req-row--head" role="row">
+          <span class="gr-req-cell gr-req-cell--rank" role="columnheader">#</span>
+          <span class="gr-req-cell gr-req-cell--kw" role="columnheader">Keyword</span>
+          <span class="gr-req-cell gr-req-cell--count" role="columnheader">Searches</span>
+          <span class="gr-req-cell gr-req-cell--seen" role="columnheader">Last seen</span>
+          <span class="gr-req-cell gr-req-cell--act" role="columnheader" aria-label="Actions"></span>
+        </div>
+        ${rows.map((r, i) => `
+          <div class="gr-req-row" role="row" data-id="${escAttr(r.id)}">
+            <span class="gr-req-cell gr-req-cell--rank" role="cell">${i + 1}</span>
+            <span class="gr-req-cell gr-req-cell--kw" role="cell">${esc(r.query || r.query_lc || r.id)}</span>
+            <span class="gr-req-cell gr-req-cell--count" role="cell"><strong>${Number(r.count_total || 0)}</strong></span>
+            <span class="gr-req-cell gr-req-cell--seen" role="cell">${esc(fmtRelative(toDate(r.last_seen)))}</span>
+            <span class="gr-req-cell gr-req-cell--act" role="cell">
+              <button type="button" class="btn btn-sm btn-outline-danger" data-del-req="${escAttr(r.id)}" title="Delete keyword">
+                <i class="fas fa-trash"></i>
+              </button>
+            </span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="gr-req-footer">Showing ${rows.length} of ${all.length} keyword${all.length === 1 ? '' : 's'}</div>
+    `;
+
+    listEl.querySelectorAll('[data-del-req]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-del-req');
+        const row = all.find(r => r.id === id);
+        const label = row?.query || id;
+        const ok = await Swal.fire({
+          icon: 'question',
+          title: 'Delete this keyword?',
+          html: `<strong>${esc(label)}</strong><br><small class="text-muted">If a shopper searches it again, it'll be re-tracked from 1.</small>`,
+          showCancelButton: true,
+          confirmButtonText: 'Delete',
+          confirmButtonColor: '#dc2626',
+        }).then(r => r.isConfirmed);
+        if (!ok) return;
+        try {
+          await deleteDoc(doc(db, COL.MISSING_SEARCHES, id));
+          all = all.filter(r => r.id !== id);
+          _reqCache = all;
+          paint();
+        } catch (err) {
+          Swal.fire('Delete failed', err.message || String(err), 'error');
+        }
+      });
+    });
+  }
+
+  filterEl.addEventListener('input', paint);
+  sortEl.addEventListener('change', paint);
+  refreshEl.addEventListener('click', () => load(true));
+
+  async function load(force) {
+    // Skip the fetch when re-entering the tab if we already have data — the
+    // Refresh button (force=true) is the only way to spend reads again.
+    if (!force && _reqCache) { paint(); return; }
+    listEl.innerHTML = '<div class="bb-loader-block">Loading requested items…</div>';
+    try {
+      const snap = await getDocs(
+        query(collection(db, COL.MISSING_SEARCHES), orderBy('count_total', 'desc'))
+      );
+      all = [];
+      snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+      _reqCache = all;
+      paint();
+    } catch (err) {
+      listEl.innerHTML = `<div class="empty-state"><i class="fas fa-triangle-exclamation"></i><p>${esc(err.message)}</p></div>`;
+    }
+  }
+  load(false);
+}
+
+function fmtRelative(d) {
+  if (!d) return '—';
+  const diff = Date.now() - d.getTime();
+  const s = Math.floor(diff / 1000);
+  if (s < 60) return 'just now';
+  const m = Math.floor(s / 60);
+  if (m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + ' hr ago';
+  const day = Math.floor(h / 24);
+  if (day === 1) return 'yesterday';
+  if (day < 7) return day + ' days ago';
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }
 
 function chipLabel(name, phone) {

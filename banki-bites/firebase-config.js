@@ -149,4 +149,5 @@ export const COL = {
   META:     'bankibites_meta',
   GROCERY_ORDERS: 'bankibites_grocery_orders',
   DELIVERY_RUNS:  'bankibites_delivery_runs',
+  MISSING_SEARCHES: 'bankibites_grocery_missing_searches',
 };

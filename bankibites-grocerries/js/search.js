@@ -7,6 +7,57 @@
 (function () {
   if (window.BB_MAINTENANCE) return; // Site kill switch active — skip all init.
   const CFG = window.BB_CONFIG || {};
+
+  // ---------- Missing-search logger ----------
+  // When a shopper searches and we return 0 rows, log the query to Firestore
+  // so admin can see what customers want that we don't stock yet. Rate-limited
+  // by day + deduped so one spelling doesn't burn the whole quota.
+  const MS_DKEY  = CFG.missingSearchDateStorageKey   || 'bb_grocery_missing_search_date';
+  const MS_CKEY  = CFG.missingSearchCountStorageKey  || 'bb_grocery_missing_search_count';
+  const MS_LKEY  = CFG.missingSearchLoggedStorageKey || 'bb_grocery_missing_search_logged';
+  const MS_LIMIT = Number(CFG.missingSearchDailyLimit) || 0;
+  const MS_MIN   = Number(CFG.missingSearchMinChars) || 3;
+  const MS_WAIT  = Number(CFG.missingSearchDebounceMs) || 1200;
+
+  function msRollDay() {
+    const today = new Date().toDateString();
+    if (localStorage.getItem(MS_DKEY) !== today) {
+      localStorage.setItem(MS_DKEY, today);
+      localStorage.removeItem(MS_CKEY);
+      localStorage.removeItem(MS_LKEY);
+    }
+    return today;
+  }
+  function msLoggedSet() {
+    try { return new Set(JSON.parse(localStorage.getItem(MS_LKEY) || '[]')); }
+    catch { return new Set(); }
+  }
+  function msMarkLogged(qLc) {
+    const set = msLoggedSet();
+    set.add(qLc);
+    try { localStorage.setItem(MS_LKEY, JSON.stringify(Array.from(set))); } catch {}
+    const count = parseInt(localStorage.getItem(MS_CKEY) || '0', 10) + 1;
+    try { localStorage.setItem(MS_CKEY, String(count)); } catch {}
+  }
+  function logMissingSearch(query) {
+    if (MS_LIMIT <= 0) return;
+    const q = String(query || '').trim();
+    if (q.length < MS_MIN) return;
+    const qLc = q.toLowerCase();
+    msRollDay();
+    if (msLoggedSet().has(qLc)) return;
+    const count = parseInt(localStorage.getItem(MS_CKEY) || '0', 10);
+    if (count >= MS_LIMIT) return;
+    // Reserve the slot before the async write so a burst of empty queries
+    // can't all sneak past the cap while writes are in flight.
+    msMarkLogged(qLc);
+    import('./missing-search-write.js')
+      .then(mod => mod.writeMissingSearch({ query: q, page: location.pathname }))
+      .catch(err => console.warn('[bankimart] missing-search log failed:', err));
+  }
+  // Exposed so categories.js (results page) can also log direct-URL landings.
+  window.bbLogMissingSearch = logMissingSearch;
+
   const money = (n) => (CFG.currency || '₹') + Number(n).toFixed(0);
   const html = (s) =>
     String(s == null ? '' : s)
@@ -101,6 +152,7 @@
 
     let currentMatches = [];
     let currentQuery = '';
+    let msTimer = null;
 
     const close = () => {
       dd.classList.remove('open');
@@ -116,6 +168,7 @@
     input.addEventListener('input', () => {
       const q = input.value;
       currentQuery = q;
+      if (msTimer) { clearTimeout(msTimer); msTimer = null; }
       if (!q.trim()) {
         close();
         return;
@@ -124,6 +177,13 @@
         if (currentQuery !== q) return; // stale
         currentMatches = match(all, q).slice(0, 40);
         renderDropdown(dd, currentMatches, q, goToResults);
+        // Only log when the shopper has stopped typing AND the settled query
+        // still returns nothing — avoids spamming the log with prefixes.
+        if (currentMatches.length === 0) {
+          msTimer = setTimeout(() => {
+            if (currentQuery === q) logMissingSearch(q);
+          }, MS_WAIT);
+        }
       });
     });
 

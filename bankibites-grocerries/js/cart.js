@@ -520,6 +520,34 @@
     const minOrder = Number(CFG.minOrder) || 0;
     if (sub2 < minOrder) return;
 
+    // Daily order cap — same pattern as TCD (localStorage counter, rolls over
+    // at local midnight). Purely client-side, so a determined user could reset
+    // it, but it stops honest double-taps and casual spam.
+    const dailyLimit = Number(CFG.dailyOrderLimit) || 0;
+    const DKEY = CFG.orderDateStorageKey || 'bb_grocery_order_date';
+    const CKEY = CFG.orderCountStorageKey || 'bb_grocery_order_count';
+    const today = new Date().toDateString();
+    const lastOrderDate = localStorage.getItem(DKEY);
+    let ordersToday = parseInt(localStorage.getItem(CKEY) || '0', 10);
+    if (lastOrderDate && lastOrderDate !== today) {
+      localStorage.removeItem(DKEY);
+      localStorage.removeItem(CKEY);
+      ordersToday = 0;
+    }
+    if (dailyLimit > 0 && ordersToday >= dailyLimit) {
+      if (typeof Swal !== 'undefined') {
+        await Swal.fire({
+          icon: 'info',
+          title: 'Daily Limit Reached',
+          text: `You have placed the maximum of ${dailyLimit} orders for today. Please try again tomorrow!`,
+          confirmButtonColor: '#16A34A',
+        });
+      } else {
+        alert(`You have placed the maximum of ${dailyLimit} orders for today. Please try again tomorrow!`);
+      }
+      return;
+    }
+
     // Storefront-offline guard — verify the maintenance flag before
     // touching the cart or WhatsApp handoff. Uses the cache first for
     // instant blocking, then confirms with a fresh Firestore read so a
@@ -599,6 +627,12 @@
     // Single-step flow: after the "Saving your order…" loader closes, we
     // navigate straight to wa.me — no second confirm click.
     const goToWhatsApp = () => {
+      // Bump the daily counter at the moment of hand-off (matches TCD's
+      // pattern — we only count orders that actually left the browser).
+      try {
+        localStorage.setItem(DKEY, today);
+        localStorage.setItem(CKEY, String(ordersToday + 1));
+      } catch {}
       // Silent safety net for vivo / older Android where the wa.me Intent
       // sometimes drops `text` — the customer can long-press → Paste.
       try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch {}

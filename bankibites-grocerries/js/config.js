@@ -21,6 +21,10 @@ window.BB_CONFIG = {
   freeDeliveryThreshold: 499,   // subtotal at/above which delivery is FREE
   deliveryFee: 30,              // flat delivery charge when subtotal < threshold
   minOrder: 150,                // minimum cart subtotal to place an order
+  dailyOrderLimit: 5,           // max orders one browser can place per calendar day
+  missingSearchDailyLimit: 10,  // max "no-result" search terms one browser logs per day
+  missingSearchMinChars: 3,     // ignore very short queries (typing noise)
+  missingSearchDebounceMs: 1200,// wait this long after last keystroke before logging
   deliveryTimeText: 'Next-day delivery',
 
   // Delivery ETA rule (local time, 24h).
@@ -42,6 +46,11 @@ window.BB_CONFIG = {
   // whose item image paths are broken after the .webp migration).
   cartStorageKey: 'bb_grocery_cart_v2',
   locationStorageKey: 'bb_grocery_place_v1',
+  orderDateStorageKey: 'bb_grocery_order_date',
+  orderCountStorageKey: 'bb_grocery_order_count',
+  missingSearchDateStorageKey: 'bb_grocery_missing_search_date',
+  missingSearchCountStorageKey: 'bb_grocery_missing_search_count',
+  missingSearchLoggedStorageKey: 'bb_grocery_missing_search_logged',
 
   // Preset delivery places (grid style, matching TCD's place picker).
   // For anything outside this list, users pick "Other" and type the full address.
