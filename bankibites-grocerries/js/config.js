@@ -19,8 +19,8 @@ window.BB_CONFIG = {
   fullAddress: 'Banki, Cuttack, Odisha — 754008',
   // ------- Money / cart rules (all editable here) -------
   freeDeliveryThreshold: 499,   // subtotal at/above which delivery is FREE
-  deliveryFee: 40,              // flat delivery charge when subtotal < threshold
-  minOrder: 149,                // minimum cart subtotal to place an order
+  deliveryFee: 30,              // flat delivery charge when subtotal < threshold
+  minOrder: 150,                // minimum cart subtotal to place an order
   deliveryTimeText: 'Next-day delivery',
 
   // Delivery ETA rule (local time, 24h).
@@ -28,7 +28,7 @@ window.BB_CONFIG = {
   // between `windowStart` and `windowEnd`.  Orders at/after cutoff roll over
   // to the day after that.
   delivery: {
-    cutoffHour: 22,   // 10 PM
+    cutoffHour: 19,   // 6 PM
     windowStart: 10,  // 10 AM
     windowEnd: 12,    // 12 PM (noon)
   },

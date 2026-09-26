@@ -50,7 +50,7 @@
   // Order at/after cutoff → day-after-tomorrow's window.
   function computeEta(now) {
     now = now || new Date();
-    const d = CFG.delivery || { cutoffHour: 22, windowStart: 10, windowEnd: 12 };
+    const d = CFG.delivery;
     const target = new Date(now);
     target.setHours(0, 0, 0, 0);
     target.setDate(target.getDate() + (now.getHours() >= d.cutoffHour ? 2 : 1));
@@ -74,12 +74,14 @@
       return hh + ' ' + suf;
     };
     const win = fmtHour(d.windowStart) + ' – ' + fmtHour(d.windowEnd);
+    const cutoff = `Order by ${fmtHour(d.cutoffHour)} for next-day delivery`;
 
     return {
       day: dayLabel,
       date: dateLabel,
       shortDate,
       window: win,
+      cutoff,
       // Always includes the date so "Day after tomorrow" isn't ambiguous.
       // e.g. "Tomorrow, Sep 13 · 10 AM – 12 PM" or "Sun, Sep 14 · 10 AM – 12 PM"
       short: (diff === 1 ? `Tomorrow, ${shortDate}` : dateLabel) + ` · ${win}`,
@@ -96,6 +98,7 @@
     document.querySelectorAll('[data-eta-day]').forEach((el) => (el.textContent = eta.day));
     document.querySelectorAll('[data-eta-window]').forEach((el) => (el.textContent = eta.window));
     document.querySelectorAll('[data-eta-date]').forEach((el) => (el.textContent = eta.date));
+    document.querySelectorAll('[data-eta-cutoff]').forEach((el) => (el.textContent = eta.cutoff));
   }
   window.bbPaintEta = paintEta;
   // Safe path encoder — idempotent (skips paths that already look encoded).
@@ -326,6 +329,7 @@
           <div>
             <strong>${escapeHTML(eta.day)}, ${escapeHTML(eta.date)}</strong>
             <em>${escapeHTML(eta.window)}</em>
+            <small class="cart-eta-cutoff" data-eta-cutoff>${escapeHTML(eta.cutoff)}</small>
           </div>
         </div>
         <div class="cart-summary">
@@ -797,7 +801,7 @@
     renderInlineControls();
     renderLocationChip();
     paintEta();
-    // Refresh the ETA once a minute so a page left open through the 10 PM cutoff
+    // Refresh the ETA once a minute so a page left open through the cutoff hour
     // updates without a reload.
     setInterval(paintEta, 60 * 1000);
     // First visit — no saved place → prompt user (TCD-style entry picker)

@@ -1263,6 +1263,26 @@ p { color: var(--text); }
   background: var(--brand-soft);
   white-space: nowrap;
 }
+.cart-eta-cutoff {
+  display: block; margin-top: 4px;
+  font-size: 0.7rem; color: var(--muted); font-weight: 500;
+}
+@media (prefers-color-scheme: dark) {
+  .cart-eta-cutoff { color: var(--muted); }
+}
+/* Hero cutoff hint — sits directly under the arrival chip */
+.hero-cutoff {
+  margin: 6px 0 10px;
+  font-size: 0.78rem; color: var(--muted); font-weight: 500;
+}
+/* Trust-strip cutoff hint — smaller sub-line under "Tomorrow · 10 AM – 12 PM" */
+.trust-mini .trust-cutoff {
+  display: block; margin-top: 2px;
+  font-size: 0.68rem; color: var(--muted); font-weight: 500;
+}
+@media (prefers-color-scheme: dark) {
+  .hero-cutoff, .trust-mini .trust-cutoff { color: var(--muted); }
+}
 /* Bill lines — compact horizontal totals card */
 .cart-summary {
   display: flex; flex-direction: column; gap: 2px;
