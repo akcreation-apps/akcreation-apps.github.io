@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Reports</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .ks-missing-row td { background: var(--danger-soft); }
+    .ks-missing-row td:first-child { border-left: 3px solid var(--danger); }
+    .ks-missing-badge { color: var(--danger); font-weight: 700; }
+    .ks-hours-total {
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+      color: var(--brand);
+      font-weight: 700;
+    }
+    .ks-emp-panel + .ks-emp-panel { margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-file-arrow-down text-muted" style="font-size:0.85em;"></i> Attendance Report</h1>
+        <p class="ks-subtle">Pick a date range and see every employee's punches, grouped and totalled. Download the full report as CSV.</p>
+      </div>
+      <div class="ks-section-actions">
+        <span class="badge badge-info" title="Daily generation limit per browser">
+          <i class="fa-solid fa-shield-halved"></i> <span id="quota-lbl">— / 3 today</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="ks-panel" style="margin-bottom:20px;">
+      <div class="ks-panel-header">
+        <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-sliders"></i></span>Date range</h3>
+      </div>
+      <form id="report-form" autocomplete="off">
+        <div class="ks-form-grid ks-form-grid-4">
+          <div>
+            <label class="ks-field-label" for="rep-from">From</label>
+            <input class="form-control" type="date" id="rep-from" required>
+          </div>
+          <div>
+            <label class="ks-field-label" for="rep-to">To</label>
+            <input class="form-control" type="date" id="rep-to" required>
+          </div>
+        </div>
+        <div class="ks-form-actions">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-play"></i> Generate report</button>
+          <button class="btn btn-outline-secondary" type="button" id="btn-csv" disabled><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="rate-limit-slot"></div>
+
+    <div id="report-out">
+      <div class="ks-panel">
+        <div class="ks-empty">
+          <div class="ks-empty-icon"><i class="fa-solid fa-chart-column"></i></div>
+          <p class="ks-empty-title">No report yet</p>
+          <p class="ks-empty-text">Pick a date range and click Generate.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, showToast, initials, setYear } from "../assets/ui.js";
+    import {
+      collection, collectionGroup, onSnapshot, query, where, orderBy, getDocs, Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    const { user: adminUser } = await requireRole(["admin"]);
+    mountTopbar({
+      role: "admin",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+    function csvCell(v) {
+      const s = v == null ? "" : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+    function isIn(type)  { const t = String(type||"").toLowerCase(); return t === "in"  || t === "checkin"  || t === "punchin"; }
+    function isOut(type) { const t = String(type||"").toLowerCase(); return t === "out" || t === "checkout" || t === "punchout"; }
+    function fmtDuration(ms) {
+      if (!Number.isFinite(ms) || ms < 0) return "—";
+      const totalMin = Math.round(ms / 60000);
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return `${h}h ${String(m).padStart(2, "0")}m`;
+    }
+    function dayKey(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    }
+    function timeStr(d) { return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
+    function dateStr(d) { return d.toLocaleDateString(); }
+    function dayStr(d)  { return d.toLocaleDateString(undefined, { weekday: "short" }); }
+
+    // ============================================================
+    // Rate limiter — max 3 report generations per browser per day
+    // ============================================================
+    const RATE_KEY = "ks_report_runs";
+    const RATE_LIMIT = 3;
+    function readQuota() {
+      const today = new Date().toISOString().slice(0, 10);
+      let s;
+      try { s = JSON.parse(localStorage.getItem(RATE_KEY) || "{}"); } catch { s = {}; }
+      if (s.date !== today) s = { date: today, count: 0 };
+      return s;
+    }
+    function renderQuota() {
+      const s = readQuota();
+      document.getElementById("quota-lbl").textContent = `${s.count} / ${RATE_LIMIT} today`;
+      const slot = document.getElementById("rate-limit-slot");
+      if (s.count >= RATE_LIMIT) {
+        slot.innerHTML = `
+          <div class="ks-alert ks-alert--danger">
+            <div class="ks-alert-icon"><i class="fa-solid fa-ban"></i></div>
+            <div class="ks-alert-body">
+              <p class="ks-alert-title">Daily report limit reached</p>
+              <div>You've generated ${RATE_LIMIT} reports today from this browser. The counter resets at midnight.</div>
+            </div>
+          </div>`;
+      } else {
+        slot.innerHTML = "";
+      }
+    }
+    function tryConsumeQuota() {
+      const s = readQuota();
+      if (s.count >= RATE_LIMIT) return false;
+      s.count += 1;
+      localStorage.setItem(RATE_KEY, JSON.stringify(s));
+      renderQuota();
+      return true;
+    }
+    renderQuota();
+
+    // ============================================================
+    // Lookup caches — one live snapshot each so lookups are O(1)
+    // ============================================================
+    const usersById = new Map();
+    const sitesById = new Map();
+    onSnapshot(collection(db, "attn_users"), (snap) => {
+      usersById.clear();
+      snap.forEach(d => usersById.set(d.id, d.data()));
+    });
+    onSnapshot(collection(db, "attn_sites"), (snap) => {
+      sitesById.clear();
+      snap.forEach(d => sitesById.set(d.id, d.data()));
+    });
+
+    // Default date range: last 30 days
+    (() => {
+      const to = new Date();
+      const from = new Date(); from.setDate(from.getDate() - 30);
+      const iso = d => d.toISOString().slice(0, 10);
+      document.getElementById("rep-from").value = iso(from);
+      document.getElementById("rep-to").value = iso(to);
+    })();
+
+    let lastReport = null; // { rangeFrom, rangeTo, employees: [ { uid, name, role, totalMs, hasMissing, days: [ { date, day, pairs, totalMs, siteNames } ] } ] }
+    const outEl = document.getElementById("report-out");
+    const csvBtn = document.getElementById("btn-csv");
+
+    document.getElementById("report-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const fromStr = document.getElementById("rep-from").value;
+      const toStr = document.getElementById("rep-to").value;
+      if (!fromStr || !toStr) { showToast("Pick a date range", "warn"); return; }
+      const from = new Date(fromStr); from.setHours(0, 0, 0, 0);
+      const to = new Date(toStr); to.setHours(23, 59, 59, 999);
+      if (from > to) { showToast("‘From’ must be before ‘To’", "warn"); return; }
+
+      if (!tryConsumeQuota()) {
+        showToast(`Daily limit of ${RATE_LIMIT} reports reached`, "danger");
+        return;
+      }
+
+      const submit = e.target.querySelector('button[type=submit]');
+      submit.disabled = true;
+      const original = submit.innerHTML;
+      submit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating…`;
+      outEl.innerHTML = `<div class="ks-panel"><div class="ks-skel"></div><div class="ks-skel"></div><div class="ks-skel"></div></div>`;
+
+      try {
+        const q = query(
+          collectionGroup(db, "punches"),
+          where("ts", ">=", Timestamp.fromDate(from)),
+          where("ts", "<=", Timestamp.fromDate(to)),
+          orderBy("ts", "asc")
+        );
+        const snap = await getDocs(q);
+
+        // Group punches by uid → by dayKey
+        const byUid = new Map();
+        for (const d of snap.docs) {
+          const p = d.data();
+          const uid = d.ref.parent.parent.id;
+          const ts = p.ts?.toDate?.();
+          if (!ts) continue;
+          if (!byUid.has(uid)) byUid.set(uid, new Map());
+          const dayMap = byUid.get(uid);
+          const k = dayKey(ts);
+          if (!dayMap.has(k)) dayMap.set(k, []);
+          dayMap.get(k).push({ ts, type: p.type, siteId: p.siteId, edited: !!p.edited });
+        }
+
+        const employees = [];
+        for (const [uid, dayMap] of byUid.entries()) {
+          const u = usersById.get(uid);
+          const name = u?.name || u?.email || uid;
+          const role = u?.role || "";
+          const days = [];
+          let totalMs = 0;
+          let hasMissing = false;
+
+          // Sort day keys chronologically
+          const sortedKeys = [...dayMap.keys()].sort();
+          for (const k of sortedKeys) {
+            const punches = dayMap.get(k).sort((a, b) => a.ts - b.ts);
+            const pairs = pairInOut(punches);
+            let dayMs = 0;
+            const siteNames = new Set();
+            let dayHasMissing = false;
+            for (const pair of pairs) {
+              if (pair.in?.siteId) siteNames.add(siteNameOf(pair.in.siteId));
+              if (pair.out?.siteId) siteNames.add(siteNameOf(pair.out.siteId));
+              if (pair.in && pair.out) {
+                pair.ms = pair.out.ts - pair.in.ts;
+                dayMs += pair.ms;
+              } else {
+                dayHasMissing = true;
+              }
+            }
+            if (dayHasMissing) hasMissing = true;
+            totalMs += dayMs;
+            days.push({
+              date: new Date(punches[0].ts),
+              key: k,
+              pairs,
+              totalMs: dayMs,
+              siteNames: [...siteNames],
+              hasMissing: dayHasMissing,
+            });
+          }
+
+          employees.push({ uid, name, role, totalMs, hasMissing, days });
+        }
+        // Sort employees by name
+        employees.sort((a, b) => a.name.localeCompare(b.name));
+
+        lastReport = { rangeFrom: from, rangeTo: to, employees };
+        renderReport(lastReport);
+        csvBtn.disabled = employees.length === 0;
+      } catch (err) {
+        // Firestore's SDK returns { code, message, ... }. Both "rule denied" and
+        // "missing collection-group index" surface as code="permission-denied"
+        // with the same message. Dump everything so we can tell them apart.
+        console.error("[reports] Firestore query failed", err);
+        const code = err?.code || "unknown";
+        const raw = JSON.stringify({ code, message: err?.message, name: err?.name }, null, 2);
+        outEl.innerHTML = `
+          <div class="ks-alert ks-alert--danger">
+            <div class="ks-alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <div class="ks-alert-body">
+              <p class="ks-alert-title">Could not load report — ${escapeHtml(code)}</p>
+              <div>${escapeHtml(err?.message || String(err))}</div>
+              <details style="margin-top:8px;">
+                <summary class="text-muted small" style="cursor:pointer;">Raw error (share this if reporting the bug)</summary>
+                <pre style="white-space:pre-wrap;font-size:.78rem;background:var(--surface-alt);padding:8px;border-radius:6px;margin-top:6px;">${escapeHtml(raw)}</pre>
+              </details>
+            </div>
+          </div>`;
+      } finally {
+        submit.disabled = false;
+        submit.innerHTML = original;
+      }
+    };
+
+    function siteNameOf(siteId) {
+      if (!siteId) return "—";
+      return sitesById.get(siteId)?.name || siteId;
+    }
+
+    // Pair adjacent in/out punches. Any dangling "in" without a matching
+    // subsequent "out" becomes a pair with `out = null` (missing checkout).
+    // Stray "out" without a preceding "in" is treated as an orphan pair (in = null).
+    function pairInOut(punches) {
+      const pairs = [];
+      let openIn = null;
+      for (const p of punches) {
+        if (isIn(p.type)) {
+          if (openIn) {
+            // Two consecutive "in" — close the previous as missing
+            pairs.push({ in: openIn, out: null, missing: true });
+          }
+          openIn = p;
+        } else if (isOut(p.type)) {
+          if (openIn) {
+            pairs.push({ in: openIn, out: p });
+            openIn = null;
+          } else {
+            pairs.push({ in: null, out: p, missing: true });
+          }
+        }
+      }
+      if (openIn) pairs.push({ in: openIn, out: null, missing: true });
+      return pairs;
+    }
+
+    function renderReport(report) {
+      const { rangeFrom, rangeTo, employees } = report;
+      if (employees.length === 0) {
+        outEl.innerHTML = `
+          <div class="ks-panel">
+            <div class="ks-empty">
+              <div class="ks-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+              <p class="ks-empty-title">No punches in this range</p>
+              <p class="ks-empty-text">${dateStr(rangeFrom)} → ${dateStr(rangeTo)}</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const missingCount = employees.filter(e => e.hasMissing).length;
+      const summary = `
+        <div class="ks-panel" style="margin-bottom:16px;">
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+            <div><strong>${employees.length}</strong> <span class="text-muted">employees</span></div>
+            <div><strong>${dateStr(rangeFrom)}</strong> → <strong>${dateStr(rangeTo)}</strong></div>
+            ${missingCount > 0
+              ? `<div class="ks-missing-badge"><i class="fa-solid fa-triangle-exclamation"></i> ${missingCount} with missing checkout</div>`
+              : `<div class="text-success"><i class="fa-solid fa-circle-check"></i> All checkouts complete</div>`}
+          </div>
+        </div>`;
+
+      const panels = employees.map(emp => renderEmployeePanel(emp)).join("");
+      outEl.innerHTML = summary + panels;
+    }
+
+    function renderEmployeePanel(emp) {
+      const rows = emp.days.map(day => {
+        const inParts = day.pairs.map(p => p.in ? timeStr(p.in.ts) : `<span class="ks-missing-badge">missing</span>`).join("<br>");
+        const outParts = day.pairs.map(p => p.out ? timeStr(p.out.ts) : `<span class="ks-missing-badge">missing</span>`).join("<br>");
+        const hoursCell = day.hasMissing
+          ? `<span class="ks-missing-badge">${fmtDuration(day.totalMs)}${day.totalMs > 0 ? " (partial)" : ""}</span>`
+          : `<span class="ks-hours-total">${fmtDuration(day.totalMs)}</span>`;
+        const cls = day.hasMissing ? 'class="ks-missing-row"' : '';
+        return `
+          <tr ${cls}>
+            <td>${dateStr(day.date)}</td>
+            <td class="text-muted small">${dayStr(day.date)}</td>
+            <td class="text-muted">${escapeHtml(day.siteNames.join(", ") || "—")}</td>
+            <td>${inParts || "—"}</td>
+            <td>${outParts || "—"}</td>
+            <td>${hoursCell}</td>
+          </tr>`;
+      }).join("");
+
+      return `
+        <div class="ks-panel ks-emp-panel">
+          <div class="ks-panel-header">
+            <h3 class="ks-panel-title" style="display:flex;align-items:center;gap:10px;">
+              <span class="ks-avatar" style="width:34px;height:34px;font-size:.8rem;">${initials(emp.name)}</span>
+              <span>${escapeHtml(emp.name)} <span class="text-muted small" style="font-weight:500;">· ${escapeHtml(emp.role)}</span></span>
+            </h3>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              ${emp.hasMissing ? `<span class="badge badge-rejected"><i class="fa-solid fa-triangle-exclamation" style="font-size:.7em;"></i> Missing checkout</span>` : ""}
+              <div><span class="text-muted small">Total:</span> <span class="ks-hours-total">${fmtDuration(emp.totalMs)}</span></div>
+            </div>
+          </div>
+          <div class="ks-table-wrap"><div class="ks-table-scroll">
+            <table class="table">
+              <thead><tr>
+                <th style="min-width:110px;">Date</th>
+                <th>Day</th>
+                <th>Site</th>
+                <th>In</th>
+                <th>Out</th>
+                <th>Hours</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div></div>
+        </div>`;
+    }
+
+    csvBtn.onclick = () => {
+      if (!lastReport || lastReport.employees.length === 0) return;
+      const { rangeFrom, rangeTo, employees } = lastReport;
+      const header = ["Employee", "Role", "Date", "Day", "Site", "In", "Out", "Hours", "Notes"];
+      const lines = [header.map(csvCell).join(",")];
+      for (const emp of employees) {
+        for (const day of emp.days) {
+          for (const p of day.pairs) {
+            const notes = p.missing ? (p.in && !p.out ? "MISSING_CHECKOUT" : "MISSING_CHECKIN") : "";
+            const siteNames = [p.in?.siteId, p.out?.siteId]
+              .filter(Boolean)
+              .map(id => siteNameOf(id));
+            const site = [...new Set(siteNames)].join(" / ");
+            const inStr = p.in ? timeStr(p.in.ts) : "";
+            const outStr = p.out ? timeStr(p.out.ts) : "";
+            const hours = (p.in && p.out) ? fmtDuration(p.out.ts - p.in.ts) : "";
+            lines.push([emp.name, emp.role, dateStr(day.date), dayStr(day.date), site, inStr, outStr, hours, notes].map(csvCell).join(","));
+          }
+          if (day.pairs.length === 0) {
+            lines.push([emp.name, emp.role, dateStr(day.date), dayStr(day.date), "", "", "", "", "NO_PUNCHES"].map(csvCell).join(","));
+          }
+        }
+        // Totals row per employee
+        lines.push([emp.name, emp.role, "", "", "", "", "", fmtDuration(emp.totalMs), "TOTAL"].map(csvCell).join(","));
+      }
+      const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const fn = `attendance_all_${rangeFrom.toISOString().slice(0,10)}_${rangeTo.toISOString().slice(0,10)}.csv`;
+      const a = document.createElement("a");
+      a.href = url; a.download = fn;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      showToast("CSV downloaded", "success");
+    };
+  </script>
+</body>
+</html>
