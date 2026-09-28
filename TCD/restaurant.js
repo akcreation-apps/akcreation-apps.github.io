@@ -7,7 +7,7 @@ const RESTAURANT = {
     wpFallback:     "+917749984274",
     minOrder:       200,
     deliveryCharge: 50,
-    etaMinutes:     75
+    etaMinutes:     60
 };
 
 function lsKey(key) { return RESTAURANT.prefix + '_' + key; }

@@ -106,7 +106,6 @@
               "name": "Singapore Noodles",
               "price": 139,
               "offer_price": 169,
-              "is_offer": true,
               "available_time": 17,
               "not_available_time": ""
             },
@@ -122,7 +121,6 @@
               "name": "Paneer Fried Rice",
               "price": 159,
               "offer_price": 199,
-              "is_offer": true,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -179,7 +177,6 @@
               "name": "Chicken Fried Rice",
               "price": 159,
               "offer_price": 199,
-              "is_offer": true,
               "available_time": 12,
               "not_available_time": ""
             },
@@ -204,8 +201,8 @@
             {
               "id": 501,
               "name": "Mix Veg Burger",
-              "price": 69,
-              "offer_price": 99,
+              "price": 49,
+              "offer_price": 69,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -213,7 +210,9 @@
             {
               "id": 502,
               "name": "Paneer Cheese Burger",
-              "price": 139,
+              "price": 99,
+              "offer_price": 139,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -226,8 +225,8 @@
             {
               "id": 601,
               "name": "Egg Burger",
-              "price": 59,
-              "offer_price": 99,
+              "price": 49,
+              "offer_price": 59,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -235,8 +234,8 @@
             {
               "id": 602,
               "name": "Chicken Cheese Burger",
-              "price": 159,
-              "offer_price": 199,
+              "price": 99,
+              "offer_price": 159,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -250,8 +249,8 @@
             {
               "id": 701,
               "name": "Mix Veg Sandwich",
-              "price": 59,
-              "offer_price": 99,
+              "price": 49,
+              "offer_price": 59,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -259,8 +258,8 @@
             {
               "id": 702,
               "name": "Corn Cheese Sandwich",
-              "price": 119,
-              "offer_price": 149,
+              "price": 99,
+              "offer_price": 119,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -268,7 +267,9 @@
             {
               "id": 703,
               "name": "Peri Peri Paneer Sandwich",
-              "price": 139,
+              "price": 99,
+              "offer_price": 139,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -281,8 +282,8 @@
             {
               "id": 801,
               "name": "Casun Chicken Sandwich",
-              "price": 159,
-              "offer_price": 199,
+              "price": 99,
+              "offer_price": 159,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -296,15 +297,17 @@
             {
               "id": 831,
               "name": "Red Sauce Pasta",
-              "price": 139,
+              "price": 99,
+              "offer_price": 139,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 832,
               "name": "White Sauce Pasta",
-              "price": 139,
-              "offer_price": 169,
+              "price": 99,
+              "offer_price": 139,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -312,7 +315,9 @@
             {
               "id": 833,
               "name": "Pink Sauce Pasta",
-              "price": 139,
+              "price": 99,
+              "offer_price": 139,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -352,7 +357,9 @@
             {
               "id": 901,
               "name": "Margarita Pizza (small)",
-              "price": 139,
+              "price": 99,
+              "offer_price": 139,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -366,7 +373,9 @@
             {
               "id": 903,
               "name": "Farm House Pizza (small)",
-              "price": 179,
+              "price": 99,
+              "offer_price": 179,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -380,7 +389,9 @@
             {
               "id": 905,
               "name": "Corn Paneer Pizza (small)",
-              "price": 199,
+              "price": 99,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -421,7 +432,9 @@
             {
               "id": 1001,
               "name": "Italian Chicken Pizza (small)",
-              "price": 199,
+              "price": 99,
+              "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -678,7 +691,9 @@
             {
               "id": 1302,
               "name": "Blue Lagoon",
-              "price": 99,
+              "price": 49,
+              "offer_price": 99,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -713,7 +728,9 @@
             {
               "id": 1307,
               "name": "Green Apple Mojito",
-              "price": 99,
+              "price": 49,
+              "offer_price": 99,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -746,8 +763,8 @@
             {
               "id": 1403,
               "name": "Chocolate Milk Shake",
-              "price": 119,
-              "offer_price": 149,
+              "price": 69,
+              "offer_price": 119,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -769,7 +786,9 @@
             {
               "id": 1406,
               "name": "Banana Milk Shake",
-              "price": 119,
+              "price": 69,
+              "offer_price": 119,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -777,6 +796,24 @@
               "id": 1407,
               "name": "Guava Milk Shake",
               "price": 119,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1408,
+              "name": "KitKat Milk Shake",
+              "price": 69,
+              "offer_price": 119,
+              "is_offer": true,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 1409,
+              "name": "Oreo Milk Shake",
+              "price": 69,
+              "offer_price": 119,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -788,8 +825,8 @@
             {
               "id": 1501,
               "name": "Cold Coffee",
-              "price": 119,
-              "offer_price": 149,
+              "price": 69,
+              "offer_price": 119,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
