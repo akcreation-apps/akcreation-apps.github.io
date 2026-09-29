@@ -39,35 +39,43 @@ window.bbDone = function () {
 let _feeRules = null;
 let _allOrders = [];
 let _currentView = 'active';
-// Map<normalizedRestaurantName, 10-digit phone> — populated once on sign-in so
-// the delivery card can render a "Call restaurant" button beside "Call customer"
-// on assigned orders. Keyed by lowercased name; falls back to restaurant_id
-// slug (also lowercased) when the order lacks a restaurant_name.
-const _partnerContactByName = new Map();
-const _partnerContactById = new Map();
+// Map<lookupKey, 10-digit phone> — populated once on sign-in so the delivery
+// card can render a "Call restaurant" banner on assigned orders. Each partner
+// is registered under every stable identifier we might see on an order:
+// display name (lower), name-slug, doc ID, and sync_collection (which is what
+// the restaurant apps write as restaurant_id). This keeps the lookup working
+// after admins rename a partner, since only the display name changes — the
+// doc ID and sync_collection stay stable.
+const _partnerPhoneByKey = new Map();
+const _slugify = s => String(s || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const _normKey = s => String(s || '').trim().toLowerCase();
 async function loadPartnerContacts(db) {
   try {
     const snap = await getDocs(collection(db, COL.PARTNERS));
-    _partnerContactByName.clear();
-    _partnerContactById.clear();
+    _partnerPhoneByKey.clear();
     snap.forEach(d => {
       const p = d.data() || {};
       const phone = String(p.point_of_contact || '').replace(/\D/g, '');
       if (phone.length !== 10) return;
-      if (!isBlank(p.name)) _partnerContactByName.set(String(p.name).trim().toLowerCase(), phone);
-      _partnerContactById.set(String(d.id).toLowerCase(), phone);
+      const keys = [
+        _normKey(p.name),
+        _slugify(p.name),
+        _normKey(d.id),
+        _slugify(d.id),
+        _normKey(p.sync_collection),
+        _slugify(p.sync_collection),
+      ];
+      keys.forEach(k => { if (k) _partnerPhoneByKey.set(k, phone); });
     });
   } catch (err) {
     console.warn('[delivery] loadPartnerContacts failed:', err.message);
   }
 }
 function lookupPartnerPhone(o) {
-  if (!isBlank(o?.restaurant_name)) {
-    const p = _partnerContactByName.get(String(o.restaurant_name).trim().toLowerCase());
-    if (p) return p;
-  }
-  if (!isBlank(o?.restaurant_id)) {
-    const p = _partnerContactById.get(String(o.restaurant_id).trim().toLowerCase());
+  const candidates = [o?.restaurant_name, o?.restaurant_id];
+  for (const c of candidates) {
+    if (isBlank(c)) continue;
+    const p = _partnerPhoneByKey.get(_normKey(c)) || _partnerPhoneByKey.get(_slugify(c));
     if (p) return p;
   }
   return '';
