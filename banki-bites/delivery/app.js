@@ -21,19 +21,31 @@ const $ = sel => document.querySelector(sel);
 // Global busy overlay — shown during every Firestore write/action-read so the
 // agent gets immediate feedback instead of a frozen card. Uses SweetAlert2
 // which is already loaded by delivery/index.html.
+//
+// Race guard: Swal.fire() opens the modal asynchronously (next frame). When
+// the awaited work (e.g. updateDoc from cache) resolves faster than the modal
+// renders, bbDone can fire *before* the modal is on-screen — leaving it to
+// open into a stuck black backdrop after the work is already done. The token
+// lets a "done before open" call cancel the modal from inside didOpen.
+let _bbBusyToken = 0;
 window.bbBusy = function (message = 'Working…') {
   if (!window.Swal) return;
+  const token = ++_bbBusyToken;
   Swal.fire({
     title: message,
     allowOutsideClick: false,
     allowEscapeKey: false,
     showConfirmButton: false,
-    didOpen: () => Swal.showLoading(),
+    didOpen: () => {
+      Swal.showLoading();
+      if (_bbBusyToken !== token) Swal.close();
+    },
   });
 };
 window.bbDone = function () {
   if (!window.Swal) return;
-  if (Swal.isLoading && Swal.isLoading()) Swal.close();
+  _bbBusyToken++;
+  if (Swal.isVisible && Swal.isVisible()) Swal.close();
 };
 
 let _feeRules = null;

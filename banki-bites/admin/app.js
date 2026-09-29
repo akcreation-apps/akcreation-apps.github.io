@@ -24,21 +24,29 @@ const $ = sel => document.querySelector(sel);
 // Pages share SweetAlert2 (loaded in admin/index.html), so we piggy-back on
 // its dialog. Window-attached so submodules (orders.js, staff.js, etc.) can
 // call it without an explicit import.
+// Race guard: Swal.fire() opens the modal asynchronously. When the awaited
+// work finishes faster than the modal renders, bbDone can fire *before* the
+// modal is on-screen — leaving a stuck black backdrop after the work is done.
+// The token lets a "done before open" call cancel the modal from inside didOpen.
+let _bbBusyToken = 0;
 window.bbBusy = function (message = 'Working…') {
   if (!window.Swal) return;
+  const token = ++_bbBusyToken;
   Swal.fire({
     title: message,
     allowOutsideClick: false,
     allowEscapeKey: false,
     showConfirmButton: false,
-    didOpen: () => Swal.showLoading(),
+    didOpen: () => {
+      Swal.showLoading();
+      if (_bbBusyToken !== token) Swal.close();
+    },
   });
 };
 window.bbDone = function () {
   if (!window.Swal) return;
-  // Only close if the busy dialog is the currently open one — avoids
-  // accidentally dismissing a confirm/error dialog the caller showed next.
-  if (Swal.isLoading && Swal.isLoading()) Swal.close();
+  _bbBusyToken++;
+  if (Swal.isVisible && Swal.isVisible()) Swal.close();
 };
 
 const authLoading = $('#authLoading');
