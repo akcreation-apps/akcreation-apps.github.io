@@ -1150,10 +1150,15 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   });
 
   // Copy items in a restaurant-friendly plain-text format so admins can paste
-  // straight into the partner's WhatsApp/phone. Format:
+  // straight into the partner's WhatsApp/phone. Quantity is placed at the end
+  // of every item line, wrapped in WhatsApp bold (*×N*), so restaurants stop
+  // missing counts when they read down a long list. Format:
   //   <Restaurant name>
-  //   • 2 × Chicken Biryani
-  //   • 1 × Paneer Butter Masala
+  //   Order time: …
+  //
+  //   Items:
+  //   • Chicken Biryani  →  *×2*
+  //   • Paneer Butter Masala  →  *×1*
   card.querySelector('[data-act="copyItems"]').addEventListener('click', async (ev) => {
     const btn = ev.currentTarget;
     const items = o.items || [];
@@ -1170,7 +1175,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     lines.push(`Order time: ${orderTime}`);
     lines.push('');
     lines.push('Items:');
-    items.forEach(i => { lines.push(`• ${i.qty} × ${i.name}`); });
+    items.forEach(i => {
+      const qty = Number.isFinite(+i.qty) && +i.qty > 0 ? +i.qty : 1;
+      lines.push(`• ${i.name}  →  *×${qty}*`);
+    });
     const text = lines.join('\n');
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
