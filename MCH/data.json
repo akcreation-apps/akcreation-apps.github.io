@@ -16,49 +16,49 @@
               "id": 101,
               "name": "Mushroom 65",
               "price": 129,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 102,
               "name": "Mushroom Chilli",
               "price": 129,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 103,
               "name": "Mushroom Manchurian",
               "price": 129,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 105,
               "name": "Paneer 65",
               "price": 139,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 106,
               "name": "Paneer Chilli",
               "price": 139,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 107,
               "name": "Paneer Manchurian",
               "price": 139,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 113,
               "name": "Chilli Kobi",
               "price": 139,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             }
           ]
@@ -71,28 +71,28 @@
               "id": 201,
               "name": "Chicken 65",
               "price": 129,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 202,
               "name": "Chilli Chicken",
               "price": 129,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 203,
               "name": "Chicken Manchurian",
               "price": 129,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
               "id": 205,
               "name": "Lemon Chicken",
               "price": 129,
-              "available_time": "",
+              "available_time": 18,
               "not_available_time": ""
             },
             {
