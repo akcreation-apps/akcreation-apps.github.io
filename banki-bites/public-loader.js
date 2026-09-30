@@ -27,9 +27,33 @@ async function loadFromJson() {
   return res.json();
 }
 
+// banki-bites-partners.json is the authoritative source for eta_minutes on both
+// web and Android. Overlay its values onto Firestore partners (matched by name)
+// so a single JSON edit updates ETA everywhere without touching Firestore.
+async function overlayEtaFromJson(fsData) {
+  try {
+    const jsonData = await loadFromJson();
+    const etaByName = new Map(
+      (jsonData.partners || [])
+        .filter(p => p && p.name != null && p.eta_minutes != null)
+        .map(p => [p.name, Number(p.eta_minutes)])
+    );
+    if (etaByName.size) {
+      fsData.partners = (fsData.partners || []).map(p => {
+        const eta = etaByName.get(p && p.name);
+        return eta != null ? { ...p, eta_minutes: eta } : p;
+      });
+    }
+  } catch (e) {
+    console.warn('ETA overlay from JSON skipped:', e.message);
+  }
+  return fsData;
+}
+
 window._bankiBitesImpl = async function () {
   try {
-    return await loadFromFirestore();
+    const fsData = await loadFromFirestore();
+    return await overlayEtaFromJson(fsData);
   } catch (e) {
     console.warn('Firestore partner load failed, using JSON fallback:', e.message);
     return loadFromJson();

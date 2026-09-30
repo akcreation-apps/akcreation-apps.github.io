@@ -13,7 +13,7 @@
       "opening_hour": "10",
       "closing_hour": "22",
       "address": "BJP Party Office Side, Banki College Road, Banki 754008",
-      "eta_minutes": 75,
+      "eta_minutes": 60,
       "is_active": true
     },
     {
@@ -26,7 +26,7 @@
       "closing_hour": "22",
       "address": "Banki College Road, Banki 754008",
       "eta_minutes": 45,
-      "is_active": true
+      "is_active": false
     },
     {
       "name": "Maa Charchika Hotel N Restaurant",

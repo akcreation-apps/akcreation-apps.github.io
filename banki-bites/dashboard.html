@@ -1170,8 +1170,8 @@
           const services = Array.isArray(p.services) ? p.services.filter(s => !isBlank(s)) : [];
           const showRating = !isBlank(p.rating);
           const showAddr   = !isBlank(p.address);
-          // ETA comes from the partner record (eta_minutes). Displayed as a
-          // "X–Y min" band so customers can compare fastest kitchens at a glance.
+          // ETA comes from the partner record (eta_minutes) so both web and
+          // Android read the same source (banki-bites-partners.json / Firestore).
           const etaMin = Number(p.eta_minutes) || 0;
           const etaBand = etaMin
             ? `${Math.max(15, etaMin - 10)}–${etaMin} min`
