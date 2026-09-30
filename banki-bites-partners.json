@@ -51,6 +51,17 @@
       "address": "Banki Khordha Road, Banki, Odisha 754008",
       "eta_minutes": 45,
       "is_active": true
+    },
+    {
+      "name": "Hello Pizza",
+      "logo": "https://akcreation-apps.com/Hello-Pizza/hello-pizza-logo.png",
+      "url": "https://akcreation-apps.com/Hello-Pizza/?table=COD",
+      "services": ["Continental", "Drinks"],
+      "opening_hour": "16",
+      "closing_hour": "21",
+      "address": "Banki, Odisha 754008",
+      "eta_minutes": 45,
+      "is_active": true
     }
   ]
 }
