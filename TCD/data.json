@@ -6,192 +6,6 @@
   ],
   "menu": [
     {
-      "category": "Chinese",
-      "subcategories": [
-        {
-          "name": "Starter",
-          "type": "Veg",
-          "dishes": [
-            {
-              "id": 103,
-              "name": "Paneer Chilli",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 104,
-              "name": "Paneer Manchurian",
-              "price": 169,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 105,
-              "name": "Honey Chilli Potato",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 106,
-              "name": "Mushroom 65",
-              "price": 169,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 107,
-              "name": "Mushroom Manchurian",
-              "price": 169,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 108,
-              "name": "Mushroom Chilli",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Starter",
-          "type": "NonVeg",
-          "dishes": [
-            {
-              "id": 201,
-              "name": "Chilli Chicken",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 202,
-              "name": "Chicken 65",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 205,
-              "name": "Peri Peri Chicken",
-              "price": 189,
-              "available_time": 12,
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "MainCourse",
-          "type": "Veg",
-          "dishes": [
-            {
-              "id": 301,
-              "name": "Hakka Noodles",
-              "price": 139,
-              "available_time": 17,
-              "not_available_time": ""
-            },
-            {
-              "id": 302,
-              "name": "Sezwan Noodles",
-              "price": 139,
-              "available_time": 17,
-              "not_available_time": ""
-            },
-            {
-              "id": 303,
-              "name": "Singapore Noodles",
-              "price": 139,
-              "offer_price": 169,
-              "available_time": 17,
-              "not_available_time": ""
-            },
-            {
-              "id": 304,
-              "name": "Sezwan Fried Rice",
-              "price": 139,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 305,
-              "name": "Paneer Fried Rice",
-              "price": 159,
-              "offer_price": 199,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 307,
-              "name": "Mix Veg Fried Rice",
-              "price": 169,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 308,
-              "name": "Mushroom Fried Rice",
-              "price": 159,
-              "available_time": 12,
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "MainCourse",
-          "type": "NonVeg",
-          "dishes": [
-            {
-              "id": 401,
-              "name": "Chicken Hakka Noodles",
-              "price": 169,
-              "available_time": 17,
-              "not_available_time": ""
-            },
-            {
-              "id": 402,
-              "name": "Chicken Sezwan Noodles",
-              "price": 169,
-              "available_time": 17,
-              "not_available_time": ""
-            },
-            {
-              "id": 403,
-              "name": "Egg Fried Rice",
-              "price": 159,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 404,
-              "name": "Chicken Sezwan Fried Rice",
-              "price": 159,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 405,
-              "name": "Chicken Fried Rice",
-              "price": 159,
-              "offer_price": 199,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 406,
-              "name": "NonVeg Mix Fried Rice",
-              "price": 169,
-              "available_time": 12,
-              "not_available_time": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
       "category": "Continental",
       "subcategories": [
         {
@@ -330,21 +144,27 @@
             {
               "id": 851,
               "name": "Red Sauce Chicken Pasta",
-              "price": 169,
+              "price": 99,
+              "offer_price": 169,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 852,
               "name": "White Sauce Chicken Pasta",
-              "price": 169,
+              "price": 99,
+              "offer_price": 169,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
             {
               "id": 853,
               "name": "Pink Sauce Chicken Pasta",
-              "price": 169,
+              "price": 99,
+              "offer_price": 169,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             }
@@ -364,13 +184,6 @@
               "not_available_time": ""
             },
             {
-              "id": 902,
-              "name": "Margarita Pizza (medium)",
-              "price": 259,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 903,
               "name": "Farm House Pizza (small)",
               "price": 99,
@@ -380,46 +193,11 @@
               "not_available_time": ""
             },
             {
-              "id": 904,
-              "name": "Farm House Pizza (medium)",
-              "price": 289,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 905,
               "name": "Corn Paneer Pizza (small)",
               "price": 99,
               "offer_price": 199,
               "is_offer": true,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 906,
-              "name": "Corn Paneer Pizza (medium)",
-              "price": 309,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 907,
-              "name": "Margarita Pizza (large)",
-              "price": 359,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 908,
-              "name": "Farm House Pizza (large)",
-              "price": 389,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 909,
-              "name": "Corn Paneer Pizza (large)",
-              "price": 409,
               "available_time": "",
               "not_available_time": ""
             }
@@ -437,212 +215,53 @@
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
-            },
-            {
-              "id": 1002,
-              "name": "Italian Chicken Pizza (medium)",
-              "price": 309,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1003,
-              "name": "Italian Chicken Pizza (large)",
-              "price": 409,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "category": "Indian",
-      "subcategories": [
-        {
-          "name": "Roti N Paratha",
-          "dishes": [
-            {
-              "id": 2501,
-              "name": "Chapati (Roti)",
-              "price": 9,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2502,
-              "name": "Lachha Paratha",
-              "price": 39,
-              "available_time": 12,
-              "not_available_time": ""
             }
           ]
         },
         {
-          "name": "Rice",
+          "name": "Starter",
+          "type": "Veg",
           "dishes": [
             {
-              "id": 2601,
-              "name": "Steam Rice",
-              "price": 39,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2602,
-              "name": "Basmati Rice",
+              "id": 1601,
+              "name": "French Fries",
               "price": 59,
-              "available_time": 12,
+              "offer_price": 79,
+              "is_offer": true,
+              "available_time": "",
               "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Biryani",
-          "type": "Veg",
-          "dishes": [
+            },
             {
-              "id": 2701,
-              "name": "Veg Biryani (Half)",
-              "price": 139,
-              "available_time": 12,
+              "id": 1602,
+              "name": "Peri Peri Paneer Finger (8Pc)",
+              "price": 99,
+              "offer_price": 149,
+              "is_offer": true,
+              "available_time": "",
               "not_available_time": ""
             }
           ]
         },
         {
-          "name": "Biryani",
+          "name": "Starter",
           "type": "NonVeg",
           "dishes": [
             {
-              "id": 2801,
-              "name": "Chicken Biryani (2pc)",
-              "price": 129,
-              "available_time": 12,
+              "id": 1701,
+              "name": "Peri Peri Chicken (8Pc)",
+              "price": 99,
+              "offer_price": 149,
+              "is_offer": true,
+              "available_time": "",
               "not_available_time": ""
             },
             {
-              "id": 2802,
-              "name": "Chicken Biryani (3pc)",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Curry",
-          "type": "Veg",
-          "dishes": [
-            {
-              "id": 2901,
-              "name": "Dal Fry",
-              "price": 79,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2902,
-              "name": "Dal Lasooni",
-              "price": 79,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2903,
-              "name": "Veg Hyderabadi",
-              "price": 159,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2904,
-              "name": "Mili Jhuli Veg",
-              "price": 159,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2905,
-              "name": "Kadai Paneer",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2906,
-              "name": "Methi Paneer",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2907,
-              "name": "Mushroom Do Pyaja",
-              "price": 189,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2908,
-              "name": "Sunheri Veg",
-              "price": 189,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2909,
-              "name": "Paneer Lababdar",
-              "price": 189,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2910,
-              "name": "Paneer Butter Masala",
-              "price": 189,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2911,
-              "name": "Mushroom Masala",
-              "price": 189,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 2912,
-              "name": "Mushroom Butter Masala",
-              "price": 199,
-              "available_time": 12,
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Curry",
-          "type": "NonVeg",
-          "dishes": [
-            {
-              "id": 3001,
-              "name": "Chicken Kasa",
-              "price": 179,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 3002,
-              "name": "Kadai Chicken",
-              "price": 189,
-              "available_time": 12,
-              "not_available_time": ""
-            },
-            {
-              "id": 3003,
-              "name": "Chicken Butter Masala",
-              "price": 199,
-              "available_time": 12,
+              "id": 1702,
+              "name": "Chicken Popcorn (10Pc)",
+              "price": 99,
+              "offer_price": 149,
+              "is_offer": true,
+              "available_time": "",
               "not_available_time": ""
             }
           ]
@@ -653,75 +272,14 @@
       "category": "Drinks",
       "subcategories": [
         {
-          "name": "Smoothies",
-          "dishes": [
-            {
-              "id": 1102,
-              "name": "Mix Fruit Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1103,
-              "name": "Pineapple Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1104,
-              "name": "Kiwi Smoothie",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            }
-          ]
-        },
-        {
           "name": "Mocktails",
           "dishes": [
-            {
-              "id": 1301,
-              "name": "Virgin Mojito",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
             {
               "id": 1302,
               "name": "Blue Lagoon",
               "price": 49,
               "offer_price": 99,
               "is_offer": true,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1303,
-              "name": "Fresh Lime Soda",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1304,
-              "name": "Pineapple Mojito",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1305,
-              "name": "Kiwi Cooler",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1306,
-              "name": "Mango Cooler",
-              "price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -733,33 +291,12 @@
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
-            },
-            {
-              "id": 1308,
-              "name": "Orange Mojito",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1309,
-              "name": "TCD Special Guava Lagoon",
-              "price": 99,
-              "available_time": "",
-              "not_available_time": ""
             }
           ]
         },
         {
           "name": "Shake",
           "dishes": [
-            {
-              "id": 1401,
-              "name": "Vanila Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
             {
               "id": 1403,
               "name": "Chocolate Milk Shake",
@@ -770,32 +307,11 @@
               "not_available_time": ""
             },
             {
-              "id": 1404,
-              "name": "Mango Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1405,
-              "name": "Mix Fruit Milk Shake",
-              "price": 119,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 1406,
               "name": "Banana Milk Shake",
               "price": 69,
               "offer_price": 119,
               "is_offer": true,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1407,
-              "name": "Guava Milk Shake",
-              "price": 119,
               "available_time": "",
               "not_available_time": ""
             },
