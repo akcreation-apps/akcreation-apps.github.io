@@ -70,15 +70,6 @@
               "not_available_time": ""
             },
             {
-              "id": 702,
-              "name": "Corn Cheese Sandwich",
-              "price": 99,
-              "offer_price": 119,
-              "is_offer": true,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
               "id": 703,
               "name": "Peri Peri Paneer Sandwich",
               "price": 99,
