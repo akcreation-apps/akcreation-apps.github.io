@@ -1,11 +1,227 @@
 {
-    "wDhyZr98HN1qHLCfkDMe": {
-        "total_cart_value": 349,
-        "created_at": "2026-08-29T13:26:31.098000+00:00",
-        "triggered_to": "+917749984274",
+    "hlMZcKK9RHQKt9kIDdnu": {
+        "total_cart_value": 857,
+        "created_at": "2026-09-28T06:26:40.062000+00:00",
+        "triggered_to": "+919114191989",
         "tcd_place_custom": true,
         "table_no": "COD",
-        "tcd_place": "Dianipatna, badamba, 754031",
+        "tcd_place": "Harirajpur, Basanta Utsav(Dola padia front)",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 19,
+                            "image_src": "src/Bend_Candle.webp",
+                            "quantity": 1,
+                            "id": 402,
+                            "name": "Bend Candle"
+                        }
+                    ],
+                    "name": "Candles N Baloons"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Preety_Rasmalai.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 116,
+                            "size": 1,
+                            "price": 799,
+                            "flavour": "",
+                            "name": "Preety Rasmalai"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "src/Party_Cap.webp",
+                            "quantity": 1,
+                            "id": 301,
+                            "name": "Party Cap"
+                        }
+                    ],
+                    "name": "Caps N Crowns"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "Fy6gzpgAufHIyzuoku21": {
+        "total_cart_value": 699,
+        "created_at": "2026-09-27T09:12:40.067000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Choco_Woco.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 212,
+                            "size": 1.5,
+                            "price": 699,
+                            "flavour": "BlueBerry",
+                            "name": "Choco Woco"
+                        }
+                    ],
+                    "name": "Shiny"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "SxmEEJtwuAzwtvlqPInu": {
+        "total_cart_value": 1263,
+        "created_at": "2026-09-22T11:58:05.814000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Sky_Fyy.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 108,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Sky Fyy"
+                        },
+                        {
+                            "image_src": "src/Cutty_Pink.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 102,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "Pineapple",
+                            "name": "Cutty Pink"
+                        },
+                        {
+                            "image_src": "src/Rosy_White.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 107,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "Strawberry",
+                            "name": "Rosy White"
+                        },
+                        {
+                            "image_src": "src/Sweet_Heart.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 110,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "Butter Scotch",
+                            "name": "Sweet Heart"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Matty_Brown.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 203,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "Chocolate",
+                            "name": "Matty Brown"
+                        }
+                    ],
+                    "name": "Shiny"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 49,
+                            "image_src": "src/Queen_Crown.webp",
+                            "quantity": 1,
+                            "id": 303,
+                            "name": "Queen Crown"
+                        }
+                    ],
+                    "name": "Caps N Crowns"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 19,
+                            "image_src": "src/Bend_Candle.webp",
+                            "quantity": 1,
+                            "id": 402,
+                            "name": "Bend Candle"
+                        }
+                    ],
+                    "name": "Candles N Baloons"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "gq6TuM6Qj874qpNmPdut": {
+        "total_cart_value": 289,
+        "created_at": "2026-09-20T06:40:59.197000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Sweet_Heart.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 110,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Sweet Heart"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "Rw00QRl5IPoOGW1d2CBA": {
+        "total_cart_value": 349,
+        "created_at": "2026-09-16T07:16:51.472000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
         "order_details": [
             {
                 "category": {
@@ -26,40 +242,179 @@
             }
         ],
         "delivery_charges": 50,
-        "status": "Rejected"
+        "status": "Approved"
     },
-    "mz9MF5xtBH8n092ROipW": {
-        "total_cart_value": 419,
-        "created_at": "2026-08-26T13:37:54.161000+00:00",
-        "triggered_to": "+917749984274",
+    "nULhP9DrKXCOiCyiapQ6": {
+        "total_cart_value": 478,
+        "created_at": "2026-09-15T15:03:05.066000+00:00",
+        "triggered_to": "+919114191989",
         "tcd_place_custom": true,
         "table_no": "COD",
-        "tcd_place": "Raghunathpur",
+        "tcd_place": "Kumusara ,mahal sahi, mahal padia sani madira",
         "order_details": [
             {
                 "category": {
                     "dish_details": [
                         {
-                            "image_src": "src/Choco_Nuts.webp",
+                            "image_src": "src/Rosy_White.webp",
                             "type": "",
                             "quantity": 1,
-                            "id": 211,
+                            "id": 107,
                             "size": 0.5,
-                            "price": 419,
+                            "price": 239,
                             "flavour": "BlueBerry",
-                            "name": "Choco Nuts"
+                            "name": "Rosy White"
+                        },
+                        {
+                            "image_src": "src/Sweet_Heart.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 110,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Sweet Heart"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "VG6z5RdZuHaAAx8XYAdf": {
+        "total_cart_value": 289,
+        "created_at": "2026-09-13T15:10:32.478000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Vabe ramachandra pur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Cutty_Pink.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 102,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Cutty Pink"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "3YdTp07uZFHL5oBbA8fh": {
+        "total_cart_value": 289,
+        "created_at": "2026-09-13T11:01:41.344000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Harirajpur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Matty_Brown.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 203,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Matty Brown"
                         }
                     ],
                     "name": "Shiny"
                 }
             }
         ],
+        "delivery_charges": 50,
         "status": "Rejected"
     },
-    "s0GAFwYVuQN1QbbnjQO4": {
-        "total_cart_value": 548,
-        "created_at": "2026-08-26T06:19:09.613000+00:00",
-        "triggered_to": "+917749984274",
+    "9j0fuIfp2X9A7jPj4M63": {
+        "created_at": "2026-09-10T11:23:53.108000+00:00",
+        "total_cart_value": 599,
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Jagadguru kripalu university banara",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Dual_Heart.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "size": 1,
+                            "id": 112,
+                            "price": 599,
+                            "flavour": "",
+                            "name": "Dual Heart"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "kP4z5X4vsSEfehNTB9ol": {
+        "total_cart_value": 308,
+        "created_at": "2026-09-09T05:38:35.823000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Sky_Fyy.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "size": 0.5,
+                            "id": 108,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Sky Fyy"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 19,
+                            "image_src": "src/Bend_Candle.webp",
+                            "quantity": 1,
+                            "id": 402,
+                            "name": "Bend Candle"
+                        }
+                    ],
+                    "name": "Candles N Baloons"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "cbJxrzm053homKmic60Q": {
+        "total_cart_value": 699,
+        "created_at": "2026-09-09T02:39:53.417000+00:00",
+        "triggered_to": "+919114191989",
         "tcd_place_custom": false,
         "table_no": "COD",
         "tcd_place": "Khamaranga",
@@ -68,15 +423,344 @@
                 "category": {
                     "dish_details": [
                         {
-                            "image_src": "src/Choco_Oreo.webp",
+                            "image_src": "src/Sky_Fyy.webp",
+                            "quantity": 1,
+                            "type": "",
+                            "id": 108,
+                            "size": 1.5,
+                            "price": 699,
+                            "flavour": "BlueBerry",
+                            "name": "Sky Fyy"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "IGLNhAqUUgvv6HviCL4T": {
+        "total_cart_value": 409,
+        "created_at": "2026-09-06T06:01:50.065000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Baniasahi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Melti_Choco.webp",
+                            "quantity": 1,
+                            "type": "",
+                            "id": 215,
+                            "size": 0.5,
+                            "price": 359,
+                            "flavour": "",
+                            "name": "Melti Choco"
+                        }
+                    ],
+                    "name": "Shiny"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "0GvA0diRiiSrMeDhg0LM": {
+        "created_at": "2026-09-05T10:48:05.467000+00:00",
+        "total_cart_value": 308,
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Srichandrapur college road, prince mess lane,  banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "name": "Bend Candle",
+                            "image_src": "src/Bend_Candle.webp",
+                            "quantity": 1,
+                            "id": 402,
+                            "price": 19
+                        }
+                    ],
+                    "name": "Candles N Baloons"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Matty_Brown.webp",
+                            "quantity": 1,
+                            "type": "",
+                            "size": 0.5,
+                            "id": 203,
+                            "price": 239,
+                            "flavour": "Chocolate",
+                            "name": "Matty Brown"
+                        }
+                    ],
+                    "name": "Shiny"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "lY60jBdxDaXdJJFbiJrE": {
+        "total_cart_value": 289,
+        "created_at": "2026-09-05T09:08:16.305000+00:00",
+        "triggered_to": "+917749984274",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Bada mantri sahi 17 No word",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Rosy_White.webp",
+                            "quantity": 1,
+                            "type": "",
+                            "size": 0.5,
+                            "id": 107,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Rosy White"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "vfQOVjAf3QjttCzkwvwG": {
+        "total_cart_value": 1113,
+        "created_at": "2026-09-04T11:51:57.071000+00:00",
+        "triggered_to": "+917749984274",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Charchika",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Cutty_Pink.webp",
                             "type": "",
                             "quantity": 1,
-                            "id": 213,
-                            "size": 0.5,
-                            "price": 259,
-                            "flavour": "",
-                            "name": "Choco Oreo"
+                            "size": 2,
+                            "id": 102,
+                            "price": 899,
+                            "flavour": "BlueBerry",
+                            "name": "Cutty Pink"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "src/Party_Cap.webp",
+                            "quantity": 1,
+                            "id": 301,
+                            "name": "Party Cap"
+                        }
+                    ],
+                    "name": "Caps N Crowns"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "name": "Bend Candle",
+                            "image_src": "src/Bend_Candle.webp",
+                            "quantity": 1,
+                            "id": 402,
+                            "price": 19
                         },
+                        {
+                            "name": "Spark Candle",
+                            "image_src": "src/Spark_Candle.webp",
+                            "quantity": 1,
+                            "id": 401,
+                            "price": 29
+                        },
+                        {
+                            "price": 39,
+                            "image_src": "src/Balloon_(30pc).webp",
+                            "quantity": 1,
+                            "id": 403,
+                            "name": "Balloon (30pc)"
+                        },
+                        {
+                            "name": "HBD Printed Balloon (10pc)",
+                            "image_src": "src/HBD_Printed_Balloon_(10pc).webp",
+                            "quantity": 1,
+                            "id": 404,
+                            "price": 39
+                        }
+                    ],
+                    "name": "Candles N Baloons"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "name": "Snow Spray",
+                            "image_src": "src/Snow_Spray.webp",
+                            "quantity": 1,
+                            "id": 502,
+                            "price": 49
+                        }
+                    ],
+                    "name": "Party Spray N Banners"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "xY0qUl0YHYqrp9T3ATiE": {
+        "created_at": "2026-09-04T06:14:04.925000+00:00",
+        "total_cart_value": 289,
+        "triggered_to": "+917749984274",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Cutty_Teddy.webp",
+                            "quantity": 1,
+                            "type": "",
+                            "size": 0.5,
+                            "id": 214,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Cutty Teddy"
+                        }
+                    ],
+                    "name": "Shiny"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "Ukt47BeQdCnFFx7HgQes": {
+        "created_at": "2026-09-02T09:20:08.047000+00:00",
+        "total_cart_value": 289,
+        "triggered_to": "+917749984274",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "image_src": "src/Sweet_Heart.webp",
+                            "type": "",
+                            "quantity": 1,
+                            "id": 110,
+                            "size": 0.5,
+                            "price": 239,
+                            "flavour": "BlueBerry",
+                            "name": "Sweet Heart"
+                        }
+                    ],
+                    "name": "Creamy"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "AJsY4S4kHvkU1UEykUoj": {
+        "total_cart_value": 216,
+        "created_at": "2026-09-02T07:20:36.810000+00:00",
+        "triggered_to": "+917749984274",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Ranapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 49,
+                            "image_src": "src/Queen_Crown.webp",
+                            "quantity": 1,
+                            "id": 303,
+                            "name": "Queen Crown"
+                        }
+                    ],
+                    "name": "Caps N Crowns"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 39,
+                            "image_src": "src/Balloon_(30pc).webp",
+                            "quantity": 1,
+                            "id": 403,
+                            "name": "Balloon (30pc)"
+                        },
+                        {
+                            "price": 29,
+                            "image_src": "src/Spark_Candle.webp",
+                            "quantity": 1,
+                            "id": 401,
+                            "name": "Spark Candle"
+                        }
+                    ],
+                    "name": "Candles N Baloons"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 49,
+                            "image_src": "src/Snow_Spray.webp",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Snow Spray"
+                        }
+                    ],
+                    "name": "Party Spray N Banners"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "DNgttABbEbGXSRJ1eLb6": {
+        "total_cart_value": 339,
+        "created_at": "2026-09-01T09:00:02.936000+00:00",
+        "triggered_to": "+917749984274",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Banki patapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
                         {
                             "image_src": "src/Melti_Choco.webp",
                             "type": "",
@@ -92,138 +776,12 @@
                 }
             }
         ],
-        "status": "Rejected"
-    },
-    "Meg9NOWA6UvrF4Myvmq7": {
-        "total_cart_value": 439,
-        "created_at": "2026-08-24T10:44:02.594000+00:00",
-        "triggered_to": "+917749984274",
-        "tcd_place_custom": true,
-        "table_no": "COD",
-        "tcd_place": "Ragadi",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "image_src": "src/Pinky_Choco.webp",
-                            "type": "",
-                            "quantity": 1,
-                            "id": 104,
-                            "size": 1,
-                            "price": 439,
-                            "flavour": "Strawberry",
-                            "name": "Pinky Choco"
-                        }
-                    ],
-                    "name": "Creamy"
-                }
-            }
-        ],
-        "status": "Approved"
-    },
-    "HHMhhqulRnSGF1TasNzT": {
-        "total_cart_value": 699,
-        "created_at": "2026-08-20T15:26:30.599000+00:00",
-        "triggered_to": "+917749984274",
-        "tcd_place_custom": false,
-        "table_no": "COD",
-        "tcd_place": "Khamaranga",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "image_src": "src/Choco_Woco.webp",
-                            "type": "",
-                            "quantity": 1,
-                            "id": 212,
-                            "size": 1.5,
-                            "price": 699,
-                            "flavour": "BlueBerry",
-                            "name": "Choco Woco"
-                        }
-                    ],
-                    "name": "Shiny"
-                }
-            }
-        ],
-        "status": "Approved"
-    },
-    "pgseoqc2jHmq74t2zfEe": {
-        "total_cart_value": 599,
-        "created_at": "2026-08-16T09:32:04.043000+00:00",
-        "triggered_to": "+917749984274",
-        "tcd_place_custom": false,
-        "table_no": "COD",
-        "tcd_place": "College Square",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "image_src": "src/Dual_Heart.webp",
-                            "type": "",
-                            "quantity": 1,
-                            "id": 112,
-                            "size": 1,
-                            "price": 599,
-                            "flavour": "",
-                            "name": "Dual Heart"
-                        }
-                    ],
-                    "name": "Creamy"
-                }
-            }
-        ],
-        "status": "Rejected"
-    },
-    "skiWwzwVp7Pt3SB0SGqP": {
-        "total_cart_value": 318,
-        "created_at": "2026-08-15T13:50:42.418000+00:00",
-        "triggered_to": "+917749984274",
-        "tcd_place_custom": false,
-        "table_no": "COD",
-        "tcd_place": "Khamaranga",
-        "order_details": [
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 29,
-                            "image_src": "src/Spark_Candle.webp",
-                            "quantity": 1,
-                            "id": 401,
-                            "name": "Spark Candle"
-                        }
-                    ],
-                    "name": "Candles N Baloons"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "image_src": "src/White_Magic.webp",
-                            "type": "",
-                            "quantity": 1,
-                            "id": 111,
-                            "size": 0.5,
-                            "price": 239,
-                            "flavour": "BlueBerry",
-                            "name": "White Magic"
-                        }
-                    ],
-                    "name": "Creamy"
-                }
-            }
-        ],
         "delivery_charges": 50,
         "status": "Approved"
     },
-    "BLg0lJWBwb5nOKQOyu0E": {
-        "total_cart_value": 318,
-        "created_at": "2026-08-12T12:18:08.430000+00:00",
+    "rqDF7nxwmMouCQQiG0LK": {
+        "total_cart_value": 409,
+        "created_at": "2026-09-01T07:08:14.192000+00:00",
         "triggered_to": "+917749984274",
         "tcd_place_custom": false,
         "table_no": "COD",
@@ -233,60 +791,46 @@
                 "category": {
                     "dish_details": [
                         {
-                            "image_src": "src/Orange_Candy.webp",
+                            "image_src": "src/Choco_Nuts.webp",
                             "type": "",
                             "quantity": 1,
-                            "id": 204,
+                            "id": 211,
                             "size": 0.5,
-                            "price": 239,
-                            "flavour": "Pineapple",
-                            "name": "Orange Candy"
+                            "price": 359,
+                            "flavour": "",
+                            "name": "Choco Nuts"
                         }
                     ],
                     "name": "Shiny"
-                }
-            },
-            {
-                "category": {
-                    "dish_details": [
-                        {
-                            "price": 29,
-                            "image_src": "src/Spark_Candle.webp",
-                            "quantity": 1,
-                            "id": 401,
-                            "name": "Spark Candle"
-                        }
-                    ],
-                    "name": "Candles N Baloons"
                 }
             }
         ],
         "delivery_charges": 50,
         "status": "Approved"
     },
-    "jiA9ljRajy66QXnZFeEN": {
+    "qi8OTCu4ij19xeFeVt4H": {
         "total_cart_value": 289,
-        "created_at": "2026-08-02T06:39:11.771000+00:00",
+        "created_at": "2026-09-01T05:46:19.186000+00:00",
         "triggered_to": "+917749984274",
-        "tcd_place_custom": true,
+        "tcd_place_custom": false,
         "table_no": "COD",
-        "tcd_place": "Copa",
+        "tcd_place": "Banki",
         "order_details": [
             {
                 "category": {
                     "dish_details": [
                         {
-                            "image_src": "src/Cutty_Preety.webp",
+                            "image_src": "src/Cutty_Teddy.webp",
                             "type": "",
                             "quantity": 1,
-                            "id": 103,
+                            "id": 214,
                             "size": 0.5,
                             "price": 239,
                             "flavour": "BlueBerry",
-                            "name": "Cutty Preety"
+                            "name": "Cutty Teddy"
                         }
                     ],
-                    "name": "Creamy"
+                    "name": "Shiny"
                 }
             }
         ],
