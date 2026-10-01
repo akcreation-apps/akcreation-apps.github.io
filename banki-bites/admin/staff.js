@@ -357,6 +357,7 @@ function renderCard(db, root, uid, s) {
           <label class="toggle-inline"><input type="checkbox" data-act="onlyPending" checked> Only pending</label>
           <span class="payout-selected-total" data-el="selectedTotal" hidden><i class="fas fa-coins"></i> Selected: <strong data-el="selectedAmount">₹0</strong></span>
           <button class="btn btn-sm btn-pay" data-act="markPaid"><i class="fas fa-check-circle mr-1"></i>Mark selected as paid</button>
+          <button class="btn btn-sm btn-pay-all" data-act="markAllPending"><i class="fas fa-check-double mr-1"></i>Mark all pending</button>
         </div>
         <div class="payouts-list" data-el="payouts"></div>
       </div>
@@ -489,6 +490,16 @@ function renderCard(db, root, uid, s) {
     }).join('');
   }
   renderPayoutHistory();
+
+  el.querySelector('[data-act="markAllPending"]').addEventListener('click', () => {
+    // Just ticks every visible pending checkbox so the admin can review the
+    // selection (and its total) before hitting "Mark selected as paid". Does
+    // NOT trigger the paid write itself.
+    const pending = payoutsEl.querySelectorAll('input[type="checkbox"]:not(:disabled)');
+    if (!pending.length) return;
+    pending.forEach(c => { c.checked = true; });
+    updateSelectedTotal();
+  });
 
   el.querySelector('[data-act="markPaid"]').addEventListener('click', async () => {
     const checked = [...payoutsEl.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)')];

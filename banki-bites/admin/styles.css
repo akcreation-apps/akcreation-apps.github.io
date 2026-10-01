@@ -1648,6 +1648,37 @@ button.fab:hover { background: var(--brand-dark); }
 .btn-pay:focus-visible { outline: 2px solid var(--success); outline-offset: 2px; }
 .btn-pay[disabled], .btn-pay.disabled { opacity: 0.55; cursor: not-allowed; }
 .btn-pay i { font-size: 0.78rem; }
+
+/* "Mark all pending as paid" — same pill shape as .btn-pay but a bolder,
+   filled accent so admins recognise it as the sweep-everything action
+   distinct from the per-row "Mark selected" variant. */
+.btn-pay-all {
+  background: var(--success);
+  color: #fff;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  line-height: 1.2;
+  border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 4px;
+  min-height: 0;
+  transition: background 0.15s, color 0.15s, transform 0.05s;
+}
+.btn-pay-all:hover, .btn-pay-all:focus {
+  background: #0f8a3e;
+  color: #fff;
+  text-decoration: none;
+}
+.btn-pay-all:active { transform: translateY(1px); }
+.btn-pay-all:focus-visible { outline: 2px solid var(--success); outline-offset: 2px; }
+.btn-pay-all[disabled], .btn-pay-all.disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-pay-all i { font-size: 0.78rem; }
+
+@media (prefers-color-scheme: dark) {
+  .btn-pay-all { background: var(--success); color: #0b0b0f; }
+  .btn-pay-all:hover, .btn-pay-all:focus { background: #22c55e; color: #0b0b0f; }
+}
 .toggle-inline {
   font-size: 0.78rem; color: var(--muted);
   display: inline-flex; align-items: center; gap: 6px; margin: 0;
