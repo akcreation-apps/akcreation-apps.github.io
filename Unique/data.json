@@ -16,6 +16,7 @@
               "id": 11,
               "name": "Chicken Soup",
               "price": 39,
+              "vendor_price": 27,
               "available_time": "",
               "not_available_time": ""
             },
@@ -23,6 +24,7 @@
               "id": 12,
               "name": "Mutton Soup",
               "price": 49,
+              "vendor_price": 31.5,
               "offer_price": 69,
               "is_offer": true,
               "available_time": "",
@@ -44,6 +46,7 @@
               "id": 101,
               "name": "Veg Manchurian",
               "price": 69,
+              "vendor_price": 54,
               "offer_price": 99,
               "is_offer": true,
               "available_time": "",
@@ -53,6 +56,7 @@
               "id": 102,
               "name": "Paneer Chilli",
               "price": 119,
+              "vendor_price": 90,
               "available_time": "",
               "not_available_time": ""
             }
@@ -66,6 +70,7 @@
               "id": 201,
               "name": "Egg Chap (4Pc)",
               "price": 69,
+              "vendor_price": 54,
               "available_time": "",
               "not_available_time": 20
             },
@@ -73,6 +78,7 @@
               "id": 202,
               "name": "Chicken Pakoda (5Pc)",
               "price": 79,
+              "vendor_price": 58.5,
               "available_time": "",
               "not_available_time": ""
             },
@@ -80,6 +86,7 @@
               "id": 203,
               "name": "Chicken Popcorn (10Pc)",
               "price": 69,
+              "vendor_price": 54,
               "offer_price": 99,
               "is_offer": true,
               "available_time": "",
@@ -89,6 +96,7 @@
               "id": 204,
               "name": "Chicken Wings (5Pc)",
               "price": 119,
+              "vendor_price": 90,
               "offer_price": 169,
               "is_offer": true,
               "available_time": "",
@@ -98,6 +106,7 @@
               "id": 205,
               "name": "Chicken Lollipop Dry (5Pc)",
               "price": 119,
+              "vendor_price": 90,
               "offer_price": 169,
               "is_offer": true,
               "available_time": "",
@@ -107,6 +116,7 @@
               "id": 206,
               "name": "Chicken Lollipop Chilli (4Pc)",
               "price": 139,
+              "vendor_price": 108,
               "offer_price": 169,
               "is_offer": true,
               "available_time": "",
@@ -116,6 +126,7 @@
               "id": 207,
               "name": "Chilli Chicken",
               "price": 129,
+              "vendor_price": 99,
               "offer_price": 149,
               "is_offer": true,
               "available_time": "",
@@ -125,6 +136,7 @@
               "id": 208,
               "name": "Chicken Manchurian",
               "price": 99,
+              "vendor_price": 72,
               "offer_price": 139,
               "is_offer": true,
               "available_time": "",
@@ -134,6 +146,7 @@
               "id": 209,
               "name": "Chicken 65",
               "price": 139,
+              "vendor_price": 108,
               "offer_price": 169,
               "is_offer": true,
               "available_time": "",
@@ -149,6 +162,7 @@
               "id": 301,
               "name": "Veg Roll",
               "price": 59,
+              "vendor_price": 45,
               "available_time": "",
               "not_available_time": ""
             },
@@ -156,6 +170,7 @@
               "id": 302,
               "name": "Paneer Roll",
               "price": 69,
+              "vendor_price": 54,
               "available_time": "",
               "not_available_time": ""
             },
@@ -163,6 +178,7 @@
               "id": 303,
               "name": "Veg Chowmein",
               "price": 69,
+              "vendor_price": 54,
               "available_time": "",
               "not_available_time": ""
             },
@@ -170,6 +186,7 @@
               "id": 304,
               "name": "Paneer Chowmein",
               "price": 69,
+              "vendor_price": 54,
               "offer_price": 99,
               "is_offer": true,
               "available_time": "",
@@ -185,6 +202,7 @@
               "id": 401,
               "name": "Single Egg Roll",
               "price": 69,
+              "vendor_price": 54,
               "available_time": "",
               "not_available_time": ""
             },
@@ -192,6 +210,7 @@
               "id": 402,
               "name": "Double Egg Roll",
               "price": 79,
+              "vendor_price": 58.5,
               "available_time": "",
               "not_available_time": ""
             },
@@ -199,6 +218,7 @@
               "id": 403,
               "name": "Single Egg Chowmein",
               "price": 69,
+              "vendor_price": 54,
               "available_time": "",
               "not_available_time": ""
             },
@@ -206,6 +226,7 @@
               "id": 404,
               "name": "Double Egg Chowmein",
               "price": 79,
+              "vendor_price": 63,
               "available_time": "",
               "not_available_time": ""
             }
@@ -223,6 +244,7 @@
               "id": 501,
               "name": "Plain Paratha",
               "price": 19,
+              "vendor_price": 9,
               "available_time": "",
               "not_available_time": ""
             }
@@ -236,6 +258,7 @@
               "id": 601,
               "name": "Veg Biryani (Full)",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": ""
             }
@@ -249,6 +272,7 @@
               "id": 701,
               "name": "Chicken Biryani (3pc 1Egg)",
               "price": 129,
+              "vendor_price": 99,
               "offer_price": 149,
               "is_offer": true,
               "available_time": "",

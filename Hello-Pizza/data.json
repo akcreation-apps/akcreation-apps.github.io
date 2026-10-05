@@ -16,6 +16,7 @@
               "id": 101,
               "name": "Classic Pizza (small)",
               "price": 159,
+              "vendor_price": 120.9,
               "available_time": "",
               "not_available_time": ""
             },
@@ -23,6 +24,7 @@
               "id": 102,
               "name": "Classic Pizza (medium)",
               "price": 279,
+              "vendor_price": 223.2,
               "available_time": "",
               "not_available_time": ""
             },
@@ -30,6 +32,7 @@
               "id": 103,
               "name": "Classic Pizza (large)",
               "price": 479,
+              "vendor_price": 409.2,
               "available_time": "",
               "not_available_time": ""
             },
@@ -37,6 +40,7 @@
               "id": 104,
               "name": "Paneer Pizza (small)",
               "price": 179,
+              "vendor_price": 139.5,
               "available_time": "",
               "not_available_time": ""
             },
@@ -44,6 +48,7 @@
               "id": 105,
               "name": "Paneer Pizza (medium)",
               "price": 299,
+              "vendor_price": 241.8,
               "available_time": "",
               "not_available_time": ""
             },
@@ -51,6 +56,7 @@
               "id": 106,
               "name": "Paneer Pizza (large)",
               "price": 519,
+              "vendor_price": 446.4,
               "available_time": "",
               "not_available_time": ""
             },
@@ -58,6 +64,7 @@
               "id": 107,
               "name": "Mushroom Pizza (small)",
               "price": 179,
+              "vendor_price": 139.5,
               "available_time": "",
               "not_available_time": ""
             },
@@ -65,6 +72,7 @@
               "id": 108,
               "name": "Mushroom Pizza (medium)",
               "price": 299,
+              "vendor_price": 241.8,
               "available_time": "",
               "not_available_time": ""
             },
@@ -72,6 +80,7 @@
               "id": 109,
               "name": "Mushroom Pizza (large)",
               "price": 519,
+              "vendor_price": 446.4,
               "available_time": "",
               "not_available_time": ""
             }
@@ -85,6 +94,7 @@
               "id": 201,
               "name": "Chicken Pizza (small)",
               "price": 229,
+              "vendor_price": 176.7,
               "available_time": "",
               "not_available_time": ""
             },
@@ -92,6 +102,7 @@
               "id": 202,
               "name": "Chicken Pizza (medium)",
               "price": 359,
+              "vendor_price": 297.6,
               "available_time": "",
               "not_available_time": ""
             },
@@ -99,6 +110,7 @@
               "id": 203,
               "name": "Chicken Pizza (large)",
               "price": 589,
+              "vendor_price": 511.5,
               "available_time": "",
               "not_available_time": ""
             }
@@ -112,6 +124,7 @@
               "id": 301,
               "name": "Classic Burger",
               "price": 69,
+              "vendor_price": 54,
               "available_time": "",
               "not_available_time": ""
             },
@@ -119,6 +132,7 @@
               "id": 302,
               "name": "Cheese Burger",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": ""
             }
@@ -132,6 +146,7 @@
               "id": 401,
               "name": "Chicken Classic Burger",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": ""
             },
@@ -139,6 +154,7 @@
               "id": 402,
               "name": "Chicken Cheese Burger",
               "price": 109,
+              "vendor_price": 81,
               "available_time": "",
               "not_available_time": ""
             }
@@ -152,6 +168,7 @@
               "id": 501,
               "name": "Grilled Classic Sandwitch",
               "price": 69,
+              "vendor_price": 54,
               "available_time": "",
               "not_available_time": ""
             },
@@ -159,6 +176,7 @@
               "id": 502,
               "name": "Grilled Paneer Sandwitch",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": ""
             },
@@ -166,6 +184,7 @@
               "id": 503,
               "name": "Grilled Mushroom Sandwitch",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": ""
             }
@@ -178,6 +197,7 @@
               "id": 601,
               "name": "French Fries (small)",
               "price": 69,
+              "vendor_price": 53.1,
               "available_time": "",
               "not_available_time": ""
             },
@@ -185,6 +205,7 @@
               "id": 602,
               "name": "French Fries (large)",
               "price": 119,
+              "vendor_price": 90,
               "offer_price": 139,
               "is_offer": true,
               "available_time": "",
@@ -200,6 +221,7 @@
               "id": 701,
               "name": "Crispy Chicken Finger (5pc)",
               "price": 179,
+              "vendor_price": 126,
               "available_time": "",
               "not_available_time": ""
             }
@@ -217,6 +239,7 @@
               "id": 801,
               "name": "Chocolate Milk Shake",
               "price": 109,
+              "vendor_price": 80.1,
               "available_time": "",
               "not_available_time": ""
             },
@@ -224,6 +247,7 @@
               "id": 802,
               "name": "Butter Scotch Milk Shake",
               "price": 109,
+              "vendor_price": 80.1,
               "available_time": "",
               "not_available_time": ""
             }
@@ -236,6 +260,7 @@
               "id": 901,
               "name": "Cold Coffee",
               "price": 109,
+              "vendor_price": 80.1,
               "available_time": "",
               "not_available_time": ""
             }

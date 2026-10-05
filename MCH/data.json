@@ -16,6 +16,7 @@
               "id": 101,
               "name": "Mushroom 65",
               "price": 129,
+              "vendor_price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -23,6 +24,7 @@
               "id": 102,
               "name": "Mushroom Chilli",
               "price": 129,
+              "vendor_price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -30,6 +32,7 @@
               "id": 103,
               "name": "Mushroom Manchurian",
               "price": 129,
+              "vendor_price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -37,6 +40,7 @@
               "id": 105,
               "name": "Paneer 65",
               "price": 139,
+              "vendor_price": 103.5,
               "available_time": "",
               "not_available_time": ""
             },
@@ -44,6 +48,7 @@
               "id": 106,
               "name": "Paneer Chilli",
               "price": 139,
+              "vendor_price": 103.5,
               "available_time": "",
               "not_available_time": ""
             },
@@ -51,6 +56,7 @@
               "id": 107,
               "name": "Paneer Manchurian",
               "price": 139,
+              "vendor_price": 103.5,
               "available_time": "",
               "not_available_time": ""
             },
@@ -58,6 +64,7 @@
               "id": 113,
               "name": "Chilli Kobi",
               "price": 139,
+              "vendor_price": 103.5,
               "available_time": "",
               "not_available_time": ""
             }
@@ -71,6 +78,7 @@
               "id": 201,
               "name": "Chicken 65",
               "price": 129,
+              "vendor_price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -78,6 +86,7 @@
               "id": 202,
               "name": "Chilli Chicken",
               "price": 129,
+              "vendor_price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -85,6 +94,7 @@
               "id": 203,
               "name": "Chicken Manchurian",
               "price": 129,
+              "vendor_price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -92,6 +102,7 @@
               "id": 205,
               "name": "Lemon Chicken",
               "price": 129,
+              "vendor_price": 99,
               "available_time": "",
               "not_available_time": ""
             },
@@ -99,6 +110,7 @@
               "id": 212,
               "name": "Fish Fry (1pc)",
               "price": 49,
+              "vendor_price": 36,
               "available_time": "",
               "not_available_time": ""
             }
@@ -117,6 +129,7 @@
               "id": 502,
               "name": "Veg Biryani (Half)",
               "price": 119,
+              "vendor_price": 90,
               "available_time": "",
               "not_available_time": ""
             }
@@ -130,6 +143,7 @@
               "id": 601,
               "name": "Chicken Biryani (3pc 1Egg)",
               "price": 139,
+              "vendor_price": 108,
               "available_time": "",
               "not_available_time": ""
             },
@@ -137,6 +151,7 @@
               "id": 602,
               "name": "Chicken 65 Biryani (6pc)",
               "price": 159,
+              "vendor_price": 117,
               "offer_price": 199,
               "is_offer": true,
               "available_time": "",
@@ -146,6 +161,7 @@
               "id": 603,
               "name": "Fry Pcs Biryani (4pc)",
               "price": 179,
+              "vendor_price": 135,
               "available_time": "",
               "not_available_time": ""
             },
@@ -153,6 +169,7 @@
               "id": 604,
               "name": "Maa Charchika Special Chicken Biryani",
               "price": 219,
+              "vendor_price": 162,
               "available_time": "",
               "not_available_time": ""
             }
@@ -166,6 +183,7 @@
               "id": 701,
               "name": "Veg Thali",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": 16
             },
@@ -173,6 +191,7 @@
               "id": 702,
               "name": "Mix Veg Thali",
               "price": 159,
+              "vendor_price": 117,
               "available_time": "",
               "not_available_time": 16
             },
@@ -180,6 +199,7 @@
               "id": 703,
               "name": "Mushroom Thali",
               "price": 159,
+              "vendor_price": 117,
               "available_time": "",
               "not_available_time": 16
             },
@@ -187,6 +207,7 @@
               "id": 704,
               "name": "Paneer Thali",
               "price": 159,
+              "vendor_price": 117,
               "available_time": "",
               "not_available_time": 16
             }
@@ -200,6 +221,7 @@
               "id": 801,
               "name": "Fish Thali",
               "price": 109,
+              "vendor_price": 81,
               "offer_price": 149,
               "is_offer": true,
               "available_time": "",
@@ -209,6 +231,7 @@
               "id": 802,
               "name": "Chicken Thali",
               "price": 159,
+              "vendor_price": 117,
               "available_time": "",
               "not_available_time": 16
             },
@@ -216,6 +239,7 @@
               "id": 804,
               "name": "Prawn Thali",
               "price": 219,
+              "vendor_price": 162,
               "available_time": "",
               "not_available_time": 16,
               "non_available_days": [
@@ -229,6 +253,7 @@
               "id": 805,
               "name": "Mutton Thali",
               "price": 229,
+              "vendor_price": 171,
               "available_time": "",
               "not_available_time": 16,
               "non_available_days": [
@@ -242,6 +267,7 @@
               "id": 806,
               "name": "Crab Thali",
               "price": 249,
+              "vendor_price": 180,
               "available_time": "",
               "not_available_time": 16,
               "non_available_days": [
@@ -261,6 +287,7 @@
               "id": 901,
               "name": "Paneer Mix Veg",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": 20
             },
@@ -268,6 +295,7 @@
               "id": 902,
               "name": "Mushroom Masala",
               "price": 119,
+              "vendor_price": 90,
               "available_time": "",
               "not_available_time": ""
             },
@@ -275,6 +303,7 @@
               "id": 903,
               "name": "Paneer Masala",
               "price": 119,
+              "vendor_price": 90,
               "available_time": "",
               "not_available_time": ""
             },
@@ -282,6 +311,7 @@
               "id": 904,
               "name": "Tadka",
               "price": 59,
+              "vendor_price": 45,
               "available_time": 19,
               "not_available_time": ""
             },
@@ -289,6 +319,7 @@
               "id": 905,
               "name": "Chana Masala",
               "price": 69,
+              "vendor_price": 54,
               "available_time": 19,
               "not_available_time": ""
             },
@@ -296,6 +327,7 @@
               "id": 906,
               "name": "Chana Paneer",
               "price": 99,
+              "vendor_price": 72,
               "available_time": 19,
               "not_available_time": ""
             },
@@ -303,6 +335,7 @@
               "id": 907,
               "name": "Special Veg Tadka",
               "price": 99,
+              "vendor_price": 72,
               "available_time": 19,
               "not_available_time": ""
             }
@@ -316,6 +349,7 @@
               "id": 1001,
               "name": "Chicken Curry",
               "price": 99,
+              "vendor_price": 72,
               "available_time": "",
               "not_available_time": ""
             },
@@ -323,6 +357,7 @@
               "id": 1003,
               "name": "Chicken Kasa",
               "price": 119,
+              "vendor_price": 90,
               "available_time": "",
               "not_available_time": ""
             },
@@ -330,6 +365,7 @@
               "id": 1005,
               "name": "Mutton Masala",
               "price": 169,
+              "vendor_price": 126,
               "available_time": "",
               "not_available_time": "",
               "non_available_days": [
@@ -343,6 +379,7 @@
               "id": 1006,
               "name": "Prawns Masala",
               "price": 169,
+              "vendor_price": 126,
               "available_time": "",
               "not_available_time": "",
               "non_available_days": [
@@ -356,6 +393,7 @@
               "id": 1007,
               "name": "Crab Masala",
               "price": 169,
+              "vendor_price": 126,
               "available_time": "",
               "not_available_time": "",
               "non_available_days": [
@@ -369,6 +407,7 @@
               "id": 1008,
               "name": "Egg Tadka",
               "price": 69,
+              "vendor_price": 54,
               "available_time": 19,
               "not_available_time": ""
             },
@@ -376,6 +415,7 @@
               "id": 1009,
               "name": "Egg Bhuj Curry",
               "price": 49,
+              "vendor_price": 36,
               "offer_price": 69,
               "is_offer": true,
               "available_time": 19,
@@ -385,6 +425,7 @@
               "id": 1010,
               "name": "Macha Munda Mixture",
               "price": 109,
+              "vendor_price": 81,
               "available_time": 19,
               "not_available_time": ""
             },
@@ -392,6 +433,7 @@
               "id": 1011,
               "name": "Fish Curry (1pc)",
               "price": 49,
+              "vendor_price": 36,
               "available_time": "",
               "not_available_time": 16
             }
@@ -404,6 +446,7 @@
               "id": 1101,
               "name": "Chapati (Roti)",
               "price": 9,
+              "vendor_price": 5.4,
               "available_time": "",
               "not_available_time": ""
             },
@@ -411,6 +454,7 @@
               "id": 1102,
               "name": "Lachha Paratha",
               "price": 39,
+              "vendor_price": 27,
               "available_time": "",
               "not_available_time": ""
             },
@@ -418,6 +462,7 @@
               "id": 1103,
               "name": "Plain Naan",
               "price": 19,
+              "vendor_price": 9,
               "available_time": 19,
               "not_available_time": ""
             },
@@ -425,6 +470,7 @@
               "id": 1104,
               "name": "Butter Naan",
               "price": 39,
+              "vendor_price": 27,
               "available_time": 19,
               "not_available_time": ""
             }
