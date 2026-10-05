@@ -40,11 +40,12 @@
             if (last != null) idValue = String(last + 1);
         }
 
-        // Top line: id, name, price, remove
+        // Top line: id, name, price, vendor_price, remove
         const line1 = el('div', { class: 'dish-line' });
         line1.appendChild(el('input', { type: 'number', class: 'id-input', placeholder: 'ID', 'data-field': 'id', value: idValue, min: '1' }));
         line1.appendChild(el('input', { type: 'text', class: 'name-input', placeholder: 'Dish name *', 'data-field': 'name', value: (dish && dish.name) || '' }));
         line1.appendChild(el('input', { type: 'number', class: 'price-input', placeholder: 'Price *', min: '0', 'data-field': 'price', value: (dish && dish.price != null ? dish.price : '') }));
+        line1.appendChild(el('input', { type: 'number', class: 'vendor-input', placeholder: 'Vendor price', min: '0', step: '0.01', 'data-field': 'vendor_price', value: (dish && dish.vendor_price != null && dish.vendor_price !== '' ? dish.vendor_price : '') }));
         line1.appendChild(el('button', {
             type: 'button', class: 'remove-btn', title: 'Remove dish',
             onclick: () => row.remove()
@@ -178,6 +179,11 @@
 
                     const idVal = row.querySelector('input[data-field=id]').value.trim();
                     if (idVal !== '') dish.id = Number(idVal);
+
+                    // vendor_price is optional in the UI; missing/blank → 0 so downstream
+                    // report math (qty × vendor_price) stays safe without a lookup fallback.
+                    const vp = row.querySelector('input[data-field=vendor_price]').value.trim();
+                    dish.vendor_price = vp === '' ? 0 : Number(vp);
 
                     const op = row.querySelector('input[data-field=offer_price]').value.trim();
                     if (op !== '') dish.offer_price = Number(op);

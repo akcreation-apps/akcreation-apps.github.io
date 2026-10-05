@@ -164,10 +164,24 @@ def build_menu(categories: list, starting_id: int = 101) -> dict:
                     dish_id = int(dish_id)
                     next_id = max(next_id, dish_id + 1)
 
+                # vendor_price: optional in the UI. Blank/missing → 0 so every dish
+                # emits a numeric vendor_price (keeps the BankiBites report math
+                # safe without a lookup fallback). Supports decimals.
+                vp_raw = d.get("vendor_price")
+                if vp_raw in (None, ""):
+                    vp_value = 0
+                else:
+                    try:
+                        vp_num = float(vp_raw)
+                        vp_value = int(vp_num) if vp_num.is_integer() else vp_num
+                    except (TypeError, ValueError):
+                        vp_value = 0
+
                 ordered = {
                     "id": dish_id,
                     "name": str(d["name"]).strip(),
                     "price": int(d["price"]),
+                    "vendor_price": vp_value,
                 }
                 if d.get("offer_price") not in (None, "", 0):
                     ordered["offer_price"] = int(d["offer_price"])
@@ -214,6 +228,7 @@ def menu_to_categories(menu_doc: dict) -> list:
                     "id": d.get("id"),
                     "name": d.get("name", ""),
                     "price": d.get("price", 0),
+                    "vendor_price": d.get("vendor_price", ""),
                     "offer_price": d.get("offer_price"),
                     "is_offer": bool(d.get("is_offer")),
                     "available_time": d.get("available_time", ""),

@@ -25,6 +25,56 @@ function esc(s) {
   ));
 }
 
+// Resolve <folder>/data.json dynamically from the order's restaurant_id.
+// Same candidate-chain approach as the ETA loader in orders.js:
+//   1. Explicit override for legacy folders whose name doesn't match the prefix.
+//   2. restaurant_id as-is  (e.g. "TCD", "MCH", "A1", "Unique").
+//   3. restaurant_id.toLowerCase() (onboarding-tool convention).
+// New restaurants onboarded via the tool work with zero code change here.
+const _restaurantIdToFolder = {
+  ANVISHA: 'Anvisha-Kitchen',
+  'BISWAL-BAKERY': 'Biswal',
+  'HELLO-PIZZA': 'Hello-Pizza',
+};
+
+const vendorPriceCache = new Map();
+
+async function _fetchVendorMap(folder) {
+  const res = await fetch(`../../${folder}/data.json?v=${Date.now()}`);
+  if (!res.ok) throw new Error(`data.json ${res.status}`);
+  const data = await res.json();
+  const map = new Map();
+  (data.menu || []).forEach(cat => (cat.subcategories || []).forEach(sc => (sc.dishes || []).forEach(d => {
+    if (d && d.name) {
+      const vp = Number(d.vendor_price);
+      map.set(String(d.name).trim(), Number.isFinite(vp) ? vp : 0);
+    }
+  })));
+  return map;
+}
+
+async function getVendorPriceMap(restaurantId) {
+  if (!restaurantId) return new Map();
+  if (vendorPriceCache.has(restaurantId)) return vendorPriceCache.get(restaurantId);
+  const candidates = [];
+  if (_restaurantIdToFolder[restaurantId]) candidates.push(_restaurantIdToFolder[restaurantId]);
+  candidates.push(restaurantId);
+  if (restaurantId.toLowerCase() !== restaurantId) candidates.push(restaurantId.toLowerCase());
+  for (const folder of candidates) {
+    try {
+      const map = await _fetchVendorMap(folder);
+      vendorPriceCache.set(restaurantId, map);
+      return map;
+    } catch {
+      // 404 is normal for non-matching candidates — try the next one
+    }
+  }
+  console.warn(`[report] vendor_price unavailable for ${restaurantId} (tried: ${candidates.join(', ')})`);
+  const empty = new Map();
+  vendorPriceCache.set(restaurantId, empty);
+  return empty;
+}
+
 export async function renderReport(root, db) {
   root.innerHTML = `
     <div class="report-tab">
@@ -244,8 +294,18 @@ export async function renderReport(root, db) {
       .report-tab table.items-tbl tbody tr:last-child td { border-bottom: none; }
       .report-tab table.items-tbl tbody tr:hover td { background: var(--surface-2); }
       .report-tab table.items-tbl th:last-child,
-      .report-tab table.items-tbl td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+      .report-tab table.items-tbl td:last-child,
+      .report-tab table.items-tbl th:nth-last-child(2),
+      .report-tab table.items-tbl td:nth-last-child(2) { text-align: right; font-variant-numeric: tabular-nums; }
       .report-tab table.items-tbl td:last-child { font-weight: 700; color: var(--text-strong); }
+      .report-tab table.items-tbl tfoot th {
+        padding: 10px 12px; text-align: left;
+        background: var(--surface-2);
+        color: var(--text-strong); font-weight: 800;
+        border-top: 1px solid var(--border);
+        font-size: 0.85rem;
+      }
+      .report-tab table.items-tbl tfoot th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
 
       .report-tab .rest-footer {
         margin-top: 12px; padding-top: 12px;
@@ -367,16 +427,18 @@ async function generate(db, iso, out, printBtn, excelBtn) {
     const groups = new Map();
     for (const o of delivered) {
       const key = (o.restaurant_name || o.restaurant_id || 'Unknown').toString().trim() || 'Unknown';
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(o);
+      if (!groups.has(key)) groups.set(key, { list: [], restaurant_id: o.restaurant_id || '' });
+      groups.get(key).list.push(o);
     }
 
-    let dayGross = 0, dayDiscount = 0, dayDelivery = 0, dayExtra = 0, dayOrders = delivered.length;
+    let dayGross = 0, dayDiscount = 0, dayDelivery = 0, dayExtra = 0, dayPayable = 0, dayOrders = delivered.length;
     const cards = [];
     const restaurants = [];
     const sortedGroups = [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
-    for (const [restName, list] of sortedGroups) {
+    for (const [restName, group] of sortedGroups) {
+      const list = group.list;
+      const vendorMap = await getVendorPriceMap(group.restaurant_id);
       const items = new Map();
       let gross = 0, discount = 0, delivery = 0, extra = 0;
       for (const o of list) {
@@ -400,10 +462,15 @@ async function generate(db, iso, out, printBtn, excelBtn) {
           }
         }
       }
+      let payable = 0;
+      for (const [name, qty] of items) {
+        payable += qty * (vendorMap.get(name) || 0);
+      }
       dayGross    += gross;
       dayDiscount += discount;
       dayDelivery += delivery;
       dayExtra    += extra;
+      dayPayable  += payable;
 
       const sortedItems = [...items.entries()]
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
@@ -412,11 +479,16 @@ async function generate(db, iso, out, printBtn, excelBtn) {
         name: restName,
         orders: list.length,
         items: sortedItems,
-        gross, discount, delivery, extra,
+        vendorMap,
+        gross, discount, delivery, extra, payable,
       });
 
       const rows = sortedItems
-        .map(([name, qty]) => `<tr><td>${esc(name)}</td><td>${qty}</td></tr>`)
+        .map(([name, qty]) => {
+          const vp = Number.isFinite(vendorMap.get(name)) ? vendorMap.get(name) : 0;
+          const line = qty * vp;
+          return `<tr><td>${esc(name)}</td><td>${qty}</td><td>${fmtINR(vp)}</td><td>${fmtINR(line)}</td></tr>`;
+        })
         .join('');
 
       const initial = (restName.trim().charAt(0) || '?').toUpperCase();
@@ -435,7 +507,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
           </summary>
           <div class="rpt-card-body">
             ${rows
-              ? `<table class="items-tbl"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>${rows}</tbody></table>`
+              ? `<table class="items-tbl"><thead><tr><th>Item</th><th>Qty</th><th>Vendor Price</th><th>Payable</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th>Total</th><th></th><th></th><th>${fmtINR(payable)}</th></tr></tfoot></table>`
               : `<p class="text-muted" style="margin:10px 0 0;">No line items recorded on these orders.</p>`}
             <div class="rest-footer">
               <div class="foot-cell"><span class="foot-lbl">Gross</span><span class="foot-val">${fmtINR(gross)}</span></div>
@@ -443,6 +515,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
               <div class="foot-cell"><span class="foot-lbl">Net</span><span class="foot-val">${fmtINR(gross - discount)}</span></div>
               <div class="foot-cell"><span class="foot-lbl">Delivery</span><span class="foot-val">${fmtINR(delivery)}</span></div>
               <div class="foot-cell"><span class="foot-lbl">Extra charges</span><span class="foot-val">${fmtINR(extra)}</span></div>
+              <div class="foot-cell"><span class="foot-lbl">Payable Price</span><span class="foot-val">${fmtINR(payable)}</span></div>
             </div>
           </div>
         </details>
@@ -487,6 +560,10 @@ async function generate(db, iso, out, printBtn, excelBtn) {
           <div class="rpt-kpi-head"><i class="fas fa-indian-rupee-sign"></i> Total extra charges</div>
           <div class="rpt-kpi-val">${fmtINR(dayExtra)}</div>
         </div>
+        <div class="rpt-kpi is-cost">
+          <div class="rpt-kpi-head"><i class="fas fa-hand-holding-dollar"></i> Payable Price</div>
+          <div class="rpt-kpi-val">${fmtINR(dayPayable)}</div>
+        </div>
       </div>
       <div class="rpt-cards">
         ${cards.join('')}
@@ -495,7 +572,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
     printBtn.disabled = false;
     excelBtn.disabled = false;
     return {
-      iso, dayOrders, dayGross, dayDiscount, dayDelivery, dayExtra,
+      iso, dayOrders, dayGross, dayDiscount, dayDelivery, dayExtra, dayPayable,
       restaurants,
     };
   } catch (e) {
@@ -524,24 +601,29 @@ function exportExcel(data) {
   rows.push(`<tr><td><b>Net</b></td><td>${money(data.dayGross - data.dayDiscount)}</td></tr>`);
   rows.push(`<tr><td><b>Total delivery cost</b></td><td>${money(data.dayDelivery)}</td></tr>`);
   rows.push(`<tr><td><b>Total extra charges</b></td><td>${money(data.dayExtra)}</td></tr>`);
-  rows.push(`<tr><td colspan="2">&nbsp;</td></tr>`);
+  rows.push(`<tr><td><b>Payable Price</b></td><td>${money(data.dayPayable)}</td></tr>`);
+  rows.push(`<tr><td colspan="4">&nbsp;</td></tr>`);
 
   for (const r of data.restaurants) {
-    rows.push(`<tr><th colspan="2" style="background:#f3f4f6;font-size:12pt;">${esc(r.name)} — ${r.orders} order${r.orders === 1 ? '' : 's'}</th></tr>`);
-    rows.push(`<tr><th style="background:#e5e7eb;">Item</th><th style="background:#e5e7eb;">Qty</th></tr>`);
+    rows.push(`<tr><th colspan="4" style="background:#f3f4f6;font-size:12pt;">${esc(r.name)} — ${r.orders} order${r.orders === 1 ? '' : 's'}</th></tr>`);
+    rows.push(`<tr><th style="background:#e5e7eb;">Item</th><th style="background:#e5e7eb;">Qty</th><th style="background:#e5e7eb;">Vendor Price</th><th style="background:#e5e7eb;">Payable</th></tr>`);
     if (r.items.length === 0) {
-      rows.push(`<tr><td colspan="2"><i>No line items recorded</i></td></tr>`);
+      rows.push(`<tr><td colspan="4"><i>No line items recorded</i></td></tr>`);
     } else {
       for (const [name, qty] of r.items) {
-        rows.push(`<tr><td>${esc(name)}</td><td>${qty}</td></tr>`);
+        const vp = Number.isFinite(r.vendorMap?.get(name)) ? r.vendorMap.get(name) : 0;
+        const line = qty * vp;
+        rows.push(`<tr><td>${esc(name)}</td><td>${qty}</td><td>${money(vp)}</td><td>${money(line)}</td></tr>`);
       }
+      rows.push(`<tr><td><b>Total Payable</b></td><td></td><td></td><td><b>${money(r.payable)}</b></td></tr>`);
     }
-    rows.push(`<tr><td><b>Gross</b></td><td>${money(r.gross)}</td></tr>`);
-    rows.push(`<tr><td><b>Discount</b></td><td>${money(r.discount)}</td></tr>`);
-    rows.push(`<tr><td><b>Net</b></td><td>${money(r.gross - r.discount)}</td></tr>`);
-    rows.push(`<tr><td><b>Delivery cost</b></td><td>${money(r.delivery)}</td></tr>`);
-    rows.push(`<tr><td><b>Extra charges</b></td><td>${money(r.extra)}</td></tr>`);
-    rows.push(`<tr><td colspan="2">&nbsp;</td></tr>`);
+    rows.push(`<tr><td><b>Gross</b></td><td colspan="3">${money(r.gross)}</td></tr>`);
+    rows.push(`<tr><td><b>Discount</b></td><td colspan="3">${money(r.discount)}</td></tr>`);
+    rows.push(`<tr><td><b>Net</b></td><td colspan="3">${money(r.gross - r.discount)}</td></tr>`);
+    rows.push(`<tr><td><b>Delivery cost</b></td><td colspan="3">${money(r.delivery)}</td></tr>`);
+    rows.push(`<tr><td><b>Extra charges</b></td><td colspan="3">${money(r.extra)}</td></tr>`);
+    rows.push(`<tr><td><b>Payable Price</b></td><td colspan="3">${money(r.payable)}</td></tr>`);
+    rows.push(`<tr><td colspan="4">&nbsp;</td></tr>`);
   }
 
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
