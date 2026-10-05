@@ -13,6 +13,38 @@ const EXPIRING_TEMPLATE = 'ନମସ୍କାର {name} !\n\n⏰ ଆପଣଙ୍
 const QUEUE_KEY = 'bb_broadcast_queue_v1';
 const NAME_FALLBACK = 'Dear';
 
+// Guard-rails to avoid tripping WhatsApp's bulk/velocity spam heuristics —
+// the kind of thing that gets a Business-app number blocked for 24h after
+// rapid identical sends. See the 2026-01 incident notes.
+const COOLDOWN_MS = 20_000;
+const DAILY_CAP = 25;
+const CAP_KEY = 'bb_broadcast_sent_v1';
+// Lighter guard-rails for the "Offer expiring" utility segment: faster pacing,
+// higher cap, and the cap is a *warning* with a "Proceed anyway" override
+// rather than a hard block. Trip-wire for the admin, not a wall.
+const UTILITY_COOLDOWN_MS = 5_000;
+const UTILITY_DAILY_CAP = 50;
+const UTILITY_CAP_KEY = 'bb_broadcast_utility_sent_v1';
+
+function todayKey() {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+function readSentToday(key = CAP_KEY) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(key) || 'null');
+    if (raw && raw.date === todayKey()) return Number(raw.count) || 0;
+  } catch (e) {}
+  return 0;
+}
+function bumpSentToday(key = CAP_KEY) {
+  try {
+    const n = readSentToday(key) + 1;
+    localStorage.setItem(key, JSON.stringify({ date: todayKey(), count: n }));
+    return n;
+  } catch (e) { return 0; }
+}
+
 // Look back this many days when computing "last order" — anyone whose most
 // recent order is older than this is treated as "never" for the win-back
 // segments. 180 days covers every meaningful lifecycle cohort cheaply.
@@ -617,16 +649,53 @@ export async function renderBroadcast(root, db) {
       return;
     }
     const personalised = /\{\s*name\s*\}/i.test(body);
+    // "Offer expiring" is a transactional utility reminder (Odia only, no URL,
+    // per-recipient {discount}/{expiry} variation, and the recipient has an
+    // active offer they engaged with). Lower spam risk — gets the lighter
+    // guard set (5s cooldown, 50/day soft cap with override). Everything
+    // else keeps the strict 20s / 25/day hard cap.
+    const isUtility = (activeSeg === 'expiring');
+    const capLimit = isUtility ? UTILITY_DAILY_CAP : DAILY_CAP;
+    const capKey = isUtility ? UTILITY_CAP_KEY : CAP_KEY;
+    const cooldownMs = isUtility ? UTILITY_COOLDOWN_MS : COOLDOWN_MS;
+    const sentToday = readSentToday(capKey);
+    const remainingToday = Math.max(0, capLimit - sentToday);
+    // Hard block for promo broadcasts; utility just records the overage so
+    // the warning banner below can nudge the admin.
+    if (!isUtility && remainingToday <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Daily cap reached',
+        html: `You've already sent <strong>${sentToday}</strong> broadcasts today.<br>WhatsApp blocks numbers that send high volumes of identical messages. Try again tomorrow.`,
+      });
+      return;
+    }
+    const hasVariable = /\{\s*(discount|expiry)\s*\}/i.test(body);
+    const warnings = [];
+    if (!isUtility && recipients.length > remainingToday) {
+      warnings.push(`Only <strong>${remainingToday}</strong> of these ${recipients.length} will be queued today (daily safety cap is ${capLimit}).`);
+    }
+    if (isUtility && (sentToday + recipients.length) > capLimit) {
+      warnings.push(`You've already sent <strong>${sentToday}</strong> reminders today and this run adds <strong>${recipients.length}</strong> more — over the soft cap of ${capLimit}/day. Consider splitting into two sessions a few hours apart.`);
+    }
+    if (!personalised && !hasVariable) {
+      warnings.push(`Your message is byte-identical for every recipient. WhatsApp's spam filter looks for this — insert <code>{name}</code> to personalise.`);
+    }
+    const queuedCount = isUtility ? recipients.length : Math.min(recipients.length, remainingToday);
+    const cooldownNote = isUtility
+      ? `one at a time with a ${cooldownMs/1000}s cooldown between sends (soft cap ${capLimit}/day for reminders).`
+      : `one at a time with a ${cooldownMs/1000}s cooldown between sends.`;
     const confirm = await Swal.fire({
       title: 'Start broadcast?',
-      html: `You're about to send this message to <strong>${recipients.length}</strong> recipient(s),
-             one at a time. WhatsApp opens for each — return to this tab to send the next one.
-             ${personalised ? '<br><br><i class="fas fa-user"></i> <em>Each message is personalised with the recipient\'s first name.</em>' : ''}`,
+      html: `You're about to send this message to <strong>${queuedCount}</strong> recipient(s), ${cooldownNote}
+             ${personalised ? '<br><br><i class="fas fa-user"></i> <em>Each message is personalised with the recipient\'s first name.</em>' : ''}
+             ${warnings.length ? '<hr><div style="text-align:left;color:#b45309"><i class="fas fa-triangle-exclamation"></i> ' + warnings.join('<br><br><i class="fas fa-triangle-exclamation"></i> ') + '</div>' : ''}`,
       showCancelButton: true,
       confirmButtonText: 'Start',
     });
     if (!confirm.isConfirmed) return;
-    saveQueue({ body, imageUrl, recipients, index: 0 });
+    if (!isUtility && recipients.length > remainingToday) recipients.length = remainingToday;
+    saveQueue({ body, imageUrl, recipients, index: 0, segment: activeSeg });
     runNextInQueue();
   });
 
@@ -673,8 +742,31 @@ async function runNextInQueue() {
     Swal.fire({ icon: 'success', title: 'Broadcast complete', text: 'All selected recipients have been sent.' });
     return;
   }
+  // Utility reminders (offer-expiring) use lighter guard-rails: 5s cooldown
+  // and a soft 50/day cap that's a warning, not a block. Promo broadcasts
+  // use the strict 20s / hard 25/day cap.
+  const isUtility = (q.segment === 'expiring');
+  const capLimit = isUtility ? UTILITY_DAILY_CAP : DAILY_CAP;
+  const capKey = isUtility ? UTILITY_CAP_KEY : CAP_KEY;
+  const cooldownMs = isUtility ? UTILITY_COOLDOWN_MS : COOLDOWN_MS;
+  // Hard-block mid-run only for promo broadcasts. Utility runs are allowed
+  // to continue past the soft cap — the admin already saw the warning.
+  if (!isUtility && readSentToday(capKey) >= capLimit) {
+    clearQueue();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Daily cap reached',
+      text: `Stopped at ${capLimit} sends for today. Resume tomorrow.`,
+    });
+    return;
+  }
   const r = q.recipients[q.index];
   const remaining = q.recipients.length - q.index;
+  // Cooldown gate: if we sent one less than cooldownMs ago, hold the Swal
+  // open with a countdown before enabling "Send". Prevents the rapid-fire
+  // sequential wa.me pattern that trips WhatsApp velocity checks.
+  const now = Date.now();
+  const waitMs = Math.max(0, cooldownMs - (now - (q.lastSentAt || 0)));
   // Build personalised message for this recipient. Old queues (created before
   // {name} support) carry a pre-built `message` string — honour that as-is.
   const finalMessage = (typeof q.body === 'string')
@@ -699,10 +791,43 @@ async function runNextInQueue() {
     denyButtonText: 'Skip',
     cancelButtonText: 'Stop broadcast',
     width: 560,
+    didOpen: (modal) => {
+      if (waitMs <= 0) return;
+      const confirmBtn = Swal.getConfirmButton();
+      if (!confirmBtn) return;
+      const originalHtml = confirmBtn.innerHTML;
+      confirmBtn.disabled = true;
+      let left = Math.ceil(waitMs / 1000);
+      confirmBtn.innerHTML = `<i class="far fa-clock"></i> Wait ${left}s`;
+      const timer = setInterval(() => {
+        left -= 1;
+        if (left <= 0) {
+          clearInterval(timer);
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = originalHtml;
+        } else {
+          confirmBtn.innerHTML = `<i class="far fa-clock"></i> Wait ${left}s`;
+        }
+      }, 1000);
+      // Cancel the timer if the modal is dismissed early.
+      const obs = new MutationObserver(() => {
+        if (!document.body.contains(modal)) { clearInterval(timer); obs.disconnect(); }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+    },
   });
   if (res.isConfirmed) {
     q.index += 1;
+    q.lastSentAt = Date.now();
     saveQueue(q);
+    const totalToday = bumpSentToday(capKey);
+    if (!isUtility && totalToday >= capLimit) {
+      // Trim the rest of the queue so the next tick stops cleanly with the
+      // cap message instead of silently losing the remaining recipients.
+      // Utility runs don't trim — soft cap already warned the admin.
+      q.recipients.length = q.index;
+      saveQueue(q);
+    }
     // Resume the queue automatically when the admin returns to the tab. On
     // mobile (especially iOS Safari) the bfcache restores the page without
     // re-running renderBroadcast's bootstrap, so without this listener the
