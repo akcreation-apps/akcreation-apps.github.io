@@ -25,6 +25,14 @@ function esc(s) {
   ));
 }
 
+// Like fmtINR but preserves 2 decimal places so qty × payable_price reconciles
+// exactly with the Payable total — fmtINR rounds and users were seeing mismatches.
+function fmtINR2(n) {
+  const num = Number(n);
+  if (!Number.isFinite(num)) return '₹0.00';
+  return '₹' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 // Resolve <folder>/data.json dynamically from the order's restaurant_id.
 // Same candidate-chain approach as the ETA loader in orders.js:
 //   1. Explicit override for legacy folders whose name doesn't match the prefix.
@@ -483,11 +491,12 @@ async function generate(db, iso, out, printBtn, excelBtn) {
         gross, discount, delivery, extra, payable,
       });
 
+      const totalQty = sortedItems.reduce((s, [, q]) => s + (Number(q) || 0), 0);
       const rows = sortedItems
         .map(([name, qty]) => {
           const vp = Number.isFinite(vendorMap.get(name)) ? vendorMap.get(name) : 0;
           const line = qty * vp;
-          return `<tr><td>${esc(name)}</td><td>${qty}</td><td>${fmtINR(vp)}</td><td>${fmtINR(line)}</td></tr>`;
+          return `<tr><td>${esc(name)}</td><td>${qty}</td><td>${fmtINR2(vp)}</td><td>${fmtINR2(line)}</td></tr>`;
         })
         .join('');
 
@@ -507,7 +516,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
           </summary>
           <div class="rpt-card-body">
             ${rows
-              ? `<table class="items-tbl"><thead><tr><th>Item</th><th>Qty</th><th>Vendor Price</th><th>Payable</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th>Total</th><th></th><th></th><th>${fmtINR(payable)}</th></tr></tfoot></table>`
+              ? `<table class="items-tbl"><thead><tr><th>Item</th><th>Qty</th><th>Payable Price</th><th>Payable</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th>Total</th><th>${totalQty}</th><th></th><th>${fmtINR2(payable)}</th></tr></tfoot></table>`
               : `<p class="text-muted" style="margin:10px 0 0;">No line items recorded on these orders.</p>`}
             <div class="rest-footer">
               <div class="foot-cell"><span class="foot-lbl">Gross</span><span class="foot-val">${fmtINR(gross)}</span></div>
@@ -515,7 +524,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
               <div class="foot-cell"><span class="foot-lbl">Net</span><span class="foot-val">${fmtINR(gross - discount)}</span></div>
               <div class="foot-cell"><span class="foot-lbl">Delivery</span><span class="foot-val">${fmtINR(delivery)}</span></div>
               <div class="foot-cell"><span class="foot-lbl">Extra charges</span><span class="foot-val">${fmtINR(extra)}</span></div>
-              <div class="foot-cell"><span class="foot-lbl">Payable Price</span><span class="foot-val">${fmtINR(payable)}</span></div>
+              <div class="foot-cell"><span class="foot-lbl">Payable Price</span><span class="foot-val">${fmtINR2(payable)}</span></div>
             </div>
           </div>
         </details>
@@ -562,7 +571,7 @@ async function generate(db, iso, out, printBtn, excelBtn) {
         </div>
         <div class="rpt-kpi is-cost">
           <div class="rpt-kpi-head"><i class="fas fa-hand-holding-dollar"></i> Payable Price</div>
-          <div class="rpt-kpi-val">${fmtINR(dayPayable)}</div>
+          <div class="rpt-kpi-val">${fmtINR2(dayPayable)}</div>
         </div>
       </div>
       <div class="rpt-cards">
@@ -606,16 +615,18 @@ function exportExcel(data) {
 
   for (const r of data.restaurants) {
     rows.push(`<tr><th colspan="4" style="background:#f3f4f6;font-size:12pt;">${esc(r.name)} — ${r.orders} order${r.orders === 1 ? '' : 's'}</th></tr>`);
-    rows.push(`<tr><th style="background:#e5e7eb;">Item</th><th style="background:#e5e7eb;">Qty</th><th style="background:#e5e7eb;">Vendor Price</th><th style="background:#e5e7eb;">Payable</th></tr>`);
+    rows.push(`<tr><th style="background:#e5e7eb;">Item</th><th style="background:#e5e7eb;">Qty</th><th style="background:#e5e7eb;">Payable Price</th><th style="background:#e5e7eb;">Payable</th></tr>`);
     if (r.items.length === 0) {
       rows.push(`<tr><td colspan="4"><i>No line items recorded</i></td></tr>`);
     } else {
+      let totalQty = 0;
       for (const [name, qty] of r.items) {
         const vp = Number.isFinite(r.vendorMap?.get(name)) ? r.vendorMap.get(name) : 0;
         const line = qty * vp;
+        totalQty += Number(qty) || 0;
         rows.push(`<tr><td>${esc(name)}</td><td>${qty}</td><td>${money(vp)}</td><td>${money(line)}</td></tr>`);
       }
-      rows.push(`<tr><td><b>Total Payable</b></td><td></td><td></td><td><b>${money(r.payable)}</b></td></tr>`);
+      rows.push(`<tr><td><b>Total</b></td><td><b>${totalQty}</b></td><td></td><td><b>${money(r.payable)}</b></td></tr>`);
     }
     rows.push(`<tr><td><b>Gross</b></td><td colspan="3">${money(r.gross)}</td></tr>`);
     rows.push(`<tr><td><b>Discount</b></td><td colspan="3">${money(r.discount)}</td></tr>`);
