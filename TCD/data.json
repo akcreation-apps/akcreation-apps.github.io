@@ -8,7 +8,6 @@
     {
       "category": "Continental",
       "subcategories": [
-
         {
           "name": "Starter",
           "type": "Veg",
@@ -34,8 +33,8 @@
             {
               "id": 1603,
               "name": "Veg Momo (6Pc)",
-              "price": 39,
-              "offer_price": 59,
+              "price": 49,
+              "offer_price": 69,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -43,8 +42,8 @@
             {
               "id": 1604,
               "name": "Veg Fried Momo (6Pc)",
-              "price": 49,
-              "offer_price": 69,
+              "price": 59,
+              "offer_price": 79,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -52,8 +51,8 @@
             {
               "id": 1605,
               "name": "Veg Popcorn Momo (6Pc)",
-              "price": 59,
-              "offer_price": 79,
+              "price": 69,
+              "offer_price": 89,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -61,8 +60,8 @@
             {
               "id": 1606,
               "name": "Peri Peri Veg Momo (6Pc)",
-              "price": 59,
-              "offer_price": 79,
+              "price": 69,
+              "offer_price": 89,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -70,8 +69,8 @@
             {
               "id": 1607,
               "name": "Malai Veg Momo (6Pc)",
-              "price": 79,
-              "offer_price": 109,
+              "price": 89,
+              "offer_price": 119,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -79,8 +78,8 @@
             {
               "id": 1608,
               "name": "Gravy Veg Momo (6Pc)",
-              "price": 79,
-              "offer_price": 109,
+              "price": 89,
+              "offer_price": 119,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -88,15 +87,6 @@
             {
               "id": 1609,
               "name": "Paneer Momo (6Pc)",
-              "price": 49,
-              "offer_price": 69,
-              "is_offer": true,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1610,
-              "name": "Paneer Fried Momo (6Pc)",
               "price": 59,
               "offer_price": 79,
               "is_offer": true,
@@ -104,8 +94,8 @@
               "not_available_time": ""
             },
             {
-              "id": 1611,
-              "name": "Paneer Popcorn Momo (6Pc)",
+              "id": 1610,
+              "name": "Paneer Fried Momo (6Pc)",
               "price": 69,
               "offer_price": 89,
               "is_offer": true,
@@ -113,10 +103,19 @@
               "not_available_time": ""
             },
             {
+              "id": 1611,
+              "name": "Paneer Popcorn Momo (6Pc)",
+              "price": 79,
+              "offer_price": 99,
+              "is_offer": true,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
               "id": 1612,
               "name": "Peri Peri Paneer Momo (6Pc)",
-              "price": 69,
-              "offer_price": 89,
+              "price": 79,
+              "offer_price": 99,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
@@ -166,15 +165,6 @@
             {
               "id": 1703,
               "name": "Chicken Momo (6Pc)",
-              "price": 49,
-              "offer_price": 69,
-              "is_offer": true,
-              "available_time": "",
-              "not_available_time": ""
-            },
-            {
-              "id": 1704,
-              "name": "Chicken Fried Momo (6Pc)",
               "price": 59,
               "offer_price": 79,
               "is_offer": true,
@@ -182,8 +172,8 @@
               "not_available_time": ""
             },
             {
-              "id": 1705,
-              "name": "Chicken Popcorn Momo (6Pc)",
+              "id": 1704,
+              "name": "Chicken Fried Momo (6Pc)",
               "price": 69,
               "offer_price": 89,
               "is_offer": true,
@@ -191,10 +181,19 @@
               "not_available_time": ""
             },
             {
+              "id": 1705,
+              "name": "Chicken Popcorn Momo (6Pc)",
+              "price": 79,
+              "offer_price": 99,
+              "is_offer": true,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
               "id": 1706,
               "name": "Peri Peri Chicken Momo (6Pc)",
-              "price": 69,
-              "offer_price": 89,
+              "price": 79,
+              "offer_price": 99,
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
