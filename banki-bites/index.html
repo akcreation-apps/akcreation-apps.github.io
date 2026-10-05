@@ -1465,7 +1465,7 @@
       if (!badge || !label) return;
       const istNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
       const minutes = istNow.getHours() * 60 + istNow.getMinutes();
-      const isOpen = minutes >= 12 * 60 && minutes < 22 * 60;
+      const isOpen = minutes >= 11 * 60 && minutes < 22 * 60;
       badge.classList.toggle('closed', !isOpen);
       label.textContent = isOpen ? 'Open Now' : 'Closed Now';
       setTimeout(updateHoursStatus, 60 * 1000);
