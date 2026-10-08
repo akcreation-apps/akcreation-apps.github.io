@@ -843,6 +843,24 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       </div>
     </div>
 
+    <div class="order-section order-section--note">
+      <details class="admin-note-details"${o.admin_delivery_note ? ' open' : ''}>
+        <summary class="admin-note-summary">
+          <i class="fas fa-sticky-note" aria-hidden="true"></i>
+          <span>Note to delivery partner</span>
+          ${o.admin_delivery_note ? '<span class="admin-note-badge" aria-label="Note set">1</span>' : ''}
+          <i class="fas fa-chevron-down admin-note-chevron" aria-hidden="true"></i>
+        </summary>
+        <textarea class="form-control form-control-sm admin-note-input"
+                  data-f="adminNote"
+                  rows="2"
+                  maxlength="500"
+                  placeholder="e.g. Call before entering gate · Hand to Mrs. Sahoo only · Collect empty tiffin"
+        >${escapeHtml(o.admin_delivery_note || '')}</textarea>
+        <small class="text-muted">Visible to the delivery partner on their order card.</small>
+      </details>
+    </div>
+
     <div class="ec-actions order-actions">
       ${cust.phone && status !== 'delivered' && status !== 'cancelled' && !isFake ? `
       <button class="btn btn-sm btn-outline-primary mr-auto" data-act="notifyEta" title="Send ETA greeting on WhatsApp">
@@ -1578,6 +1596,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       extra_charges: extraChargesManual,
       cancel_reason: newStatus === 'cancelled' ? cancelReasonNext : null,
     };
+
+    const noteTrim = (card.querySelector('[data-f="adminNote"]')?.value || '').trim().slice(0, 500);
+    patch.admin_delivery_note = noteTrim || null;
 
     // Keep `is_fake` aligned with the chosen status so the Mark-as-Fake button
     // and the status dropdown produce identical end-state. Selecting "fake"

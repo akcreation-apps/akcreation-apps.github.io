@@ -1280,3 +1280,40 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   .gr-stop-num { width: 28px; height: 28px; font-size: 0.82rem; }
   .gr-stop-actions .icon-action { width: 30px; height: 30px; min-width: 30px; }
 }
+
+/* ===== Admin note callout — must be unmissable for the driver ===== */
+.admin-note-callout {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-left: 4px solid var(--brand, #ea580c);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  color: #7c2d12;
+}
+.admin-note-callout-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.admin-note-callout-head i { color: var(--brand, #ea580c); }
+.admin-note-callout-body {
+  font-size: 0.98rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-weight: 500;
+}
+@media (prefers-color-scheme: dark) {
+  .admin-note-callout {
+    background: #2a1a0f;
+    border-color: #7c3a12;
+    border-left-color: var(--brand, #fb923c);
+    color: #fed7aa;
+  }
+}

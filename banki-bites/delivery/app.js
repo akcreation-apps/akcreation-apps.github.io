@@ -553,6 +553,16 @@ function renderCard(db, o) {
        </div>`
     : '';
 
+  const noteBlock = o.admin_delivery_note
+    ? `<div class="admin-note-callout" role="note">
+         <div class="admin-note-callout-head">
+           <i class="fas fa-sticky-note" aria-hidden="true"></i>
+           <span>Note from admin</span>
+         </div>
+         <div class="admin-note-callout-body">${escapeHtml(o.admin_delivery_note)}</div>
+       </div>`
+    : '';
+
   // Items list is shown inline (not collapsible) inside the expanded card so
   // tapping near the Call button never toggles anything underneath.
   const itemsBlock = hasItems
@@ -596,6 +606,7 @@ function renderCard(db, o) {
            </div>`
         : ''}
       ${collectBanner}
+      ${noteBlock}
       ${addrBlock}
       ${itemsBlock}
       <div class="delivery-actions-spacer" aria-hidden="true"></div>

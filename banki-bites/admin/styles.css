@@ -3211,3 +3211,55 @@ button.fab:hover { background: var(--brand-dark); }
   .gr-req-row--head { background: #1c1f27; color: #9ca3af; }
   .gr-req-cell--rank, .gr-req-cell--seen, .gr-req-footer { color: #9ca3af; }
 }
+
+/* ===== Admin "Note to delivery partner" (collapsible) ===== */
+.order-section--note { padding: 6px 10px; }
+.admin-note-details > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  padding: 2px 0;
+  user-select: none;
+}
+.admin-note-details > summary::-webkit-details-marker { display: none; }
+.admin-note-summary > i.fa-sticky-note { color: var(--brand); font-size: 0.9rem; }
+.admin-note-badge {
+  background: var(--brand-soft, #fff0e8);
+  color: var(--brand);
+  font-size: 0.65rem;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.admin-note-chevron {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+.admin-note-details[open] .admin-note-chevron { transform: rotate(180deg); }
+.admin-note-input {
+  margin-top: 8px;
+  resize: vertical;
+  min-height: 60px;
+  width: 100%;
+  font-family: inherit;
+}
+@media (prefers-color-scheme: dark) {
+  .admin-note-badge { background: #3a2416; color: #ffb088; }
+  .admin-note-input {
+    background: #14161c;
+    border-color: #2a2f3a;
+    color: #e5e7eb;
+  }
+  .admin-note-input::placeholder { color: #6b7280; }
+}
