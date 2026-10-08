@@ -843,6 +843,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       </div>
     </div>
 
+    ${(status === 'new' || status === 'assigned' || status === 'out_for_delivery') ? `
     <div class="order-section order-section--note">
       <details class="admin-note-details"${o.admin_delivery_note ? ' open' : ''}>
         <summary class="admin-note-summary">
@@ -859,7 +860,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         >${escapeHtml(o.admin_delivery_note || '')}</textarea>
         <small class="text-muted">Visible to the delivery partner on their order card.</small>
       </details>
-    </div>
+    </div>` : ''}
 
     <div class="ec-actions order-actions">
       ${cust.phone && status !== 'delivered' && status !== 'cancelled' && !isFake ? `
@@ -1597,8 +1598,11 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       cancel_reason: newStatus === 'cancelled' ? cancelReasonNext : null,
     };
 
-    const noteTrim = (card.querySelector('[data-f="adminNote"]')?.value || '').trim().slice(0, 500);
-    patch.admin_delivery_note = noteTrim || null;
+    const noteEl = card.querySelector('[data-f="adminNote"]');
+    if (noteEl) {
+      const noteTrim = (noteEl.value || '').trim().slice(0, 500);
+      patch.admin_delivery_note = noteTrim || null;
+    }
 
     // Keep `is_fake` aligned with the chosen status so the Mark-as-Fake button
     // and the status dropdown produce identical end-state. Selecting "fake"
