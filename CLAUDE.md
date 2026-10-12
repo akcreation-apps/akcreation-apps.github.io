@@ -40,7 +40,7 @@ Deployment is via git push to `main` — GitHub Pages serves directly from the r
 
 ### Restaurant Apps (the "all restaurants" set)
 
-When a request says "apply to **all restaurants**", "change in **every restaurant**", or similar, the canonical scope is these 6 folders. Each is a structural clone of the same restaurant POS template (identical `app.js` / `index.html` / `cart.js` / `restaurant.js` layout), so edits usually apply verbatim across all six with the same `old_string` anchors.
+When a request says "apply to **all restaurants**", "change in **every restaurant**", or similar, the canonical scope is these 8 folders. Each is a structural clone of the same restaurant POS template (identical `app.js` / `index.html` / `cart.js` / `restaurant.js` layout), so edits usually apply verbatim across all eight with the same `old_string` anchors.
 
 | Folder | Name | localStorage prefix |
 |---|---|---|
@@ -50,13 +50,15 @@ When a request says "apply to **all restaurants**", "change in **every restauran
 | `/A1/` | A1 | `a1_` |
 | `/Anvisha-Kitchen/` | Anvisha Kitchen | `anvisha_` (see its `restaurant.js`) |
 | `/Hello-Pizza/` | Hello Pizza | `hellopizza_` (see its `restaurant.js`) |
+| `/Hotel-Aman-Sweets/` | Hotel Aman Sweets | `hotel-aman-sweets_` (see its `restaurant.js`) |
+| `/Biswal/` | Biswal Bakery | `biswal-bakery_` (see its `restaurant.js`) |
 
 **Rules when editing "all restaurants":**
 - Apply the change to every folder in this table — never partial.
 - Each folder has its own `restaurant.js` defining the `lsKey()` prefix, so `localStorage` is automatically isolated per shop; you don't need to hard-code prefixes in shared logic.
 - Each folder has its own `/admin/`, `credentials.json`, `data.json`, and Firestore collection — never share Firebase config across folders.
-- After a batch edit, `node --check <folder>/app.js` on all six + grep for the expected markers to confirm no folder was skipped.
-- **Not part of this set** (leave untouched unless named explicitly): `/foodelo/`, `/banki-bites/`, `/banki-transport/`, `/friendsXI/`, `/anil-kr/`, `/ak-stocks/`, the BPUT root pages. `/banki-bites/bulk-orders.json` currently lists only TCD/MCH/Unique for the bulk-order flow, but the "all restaurants" set includes A1, Anvisha-Kitchen, and Hello-Pizza too.
+- After a batch edit, `node --check <folder>/app.js` on all eight + grep for the expected markers to confirm no folder was skipped.
+- **Not part of this set** (leave untouched unless named explicitly): `/foodelo/`, `/banki-bites/`, `/banki-transport/`, `/friendsXI/`, `/anil-kr/`, `/ak-stocks/`, the BPUT root pages. `/banki-bites/bulk-orders.json` currently lists only TCD/MCH/Unique for the bulk-order flow, but the "all restaurants" set includes A1, Anvisha-Kitchen, Hello-Pizza, Hotel-Aman-Sweets, and Biswal too.
 
 ### Shared Assets
 - `/assets/css/` — shared stylesheets

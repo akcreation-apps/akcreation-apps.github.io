@@ -2,6 +2,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js';
 import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { initCrossSearch } from '../banki-bites/cross-search.js';
+import { syncOrderHistoryStatuses } from './order-history-sync.js';
 
 const crossSearch = initCrossSearch({
     noResultsEl: document.getElementById('noResults'),
@@ -700,6 +701,13 @@ document.addEventListener('DOMContentLoaded', async() => {
     }
     renderMenu(); // Initial render of menu
     updateViewCartBar();
+
+    // Reconcile any "Initiated" orders against Firestore in the background so
+    // Favourite Picks shows past orders even if the user never opens the bill
+    // page (which used to be the only place this sync happened).
+    syncOrderHistoryStatuses()
+        .then(changed => { if (changed) renderMenu(); })
+        .catch(err => console.error('order history sync failed', err));
 
     if (bestsellerFilterBtn) {
         bestsellerFilterBtn.addEventListener('click', () => {
