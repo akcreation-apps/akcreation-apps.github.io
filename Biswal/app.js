@@ -407,6 +407,7 @@ document.addEventListener('DOMContentLoaded', async() => {
         const unavailableNote = computeUnavailableNote(dish);
         const menuItem = document.createElement('div');
         menuItem.classList.add('menu-item', 'cake-item');
+        menuItem.id = `dish-${dish.id}`;
         if (unavailableNote) menuItem.classList.add('unavailable');
         menuItem.setAttribute('role', 'article');
         menuItem.setAttribute('aria-label', `${dish.name} — from ₹${prices[0]}`);
@@ -578,43 +579,122 @@ document.addEventListener('DOMContentLoaded', async() => {
         return menuItem;
     };
 
-    // Zomato-style horizontal-rail card used only inside the Offers section
+    // Zomato-style horizontal-rail card used inside the Offers and Favourites sections
     const buildOfferRailCard = (dish, subcategory) => {
         const unavailableNote = computeUnavailableNote(dish);
         const url = get_dish_url(dish.name);
-        const pct = Math.round((dish.offer_price - dish.price) / dish.offer_price * 100);
-        const savings = Math.round(dish.offer_price - dish.price);
+        const isNonVeg = subcategory.type === 'NonVeg';
+        // Cakes carry cake_price_list instead of a flat price — size/flavour are
+        // picked on the main grid card, so the rail just teases "From ₹X" and
+        // scrolls down to the real picker on tap.
+        const cakeDish = isCake(dish);
+        const cakePrices = cakeDish ? parseNumArray(dish.cake_price_list) : [];
+        const fromPrice = cakeDish && cakePrices.length ? Math.min(...cakePrices) : null;
+        const isOffer = !cakeDish
+            && dish.is_offer === true
+            && typeof dish.offer_price === 'number'
+            && dish.offer_price > dish.price;
+        const pct = isOffer ? Math.round((dish.offer_price - dish.price) / dish.offer_price * 100) : 0;
+        const savings = isOffer ? Math.round(dish.offer_price - dish.price) : 0;
 
         const card = document.createElement('article');
         card.className = 'offer-card';
         if (unavailableNote) card.classList.add('unavailable');
+        if (cakeDish) card.classList.add('offer-card-cake');
         card.setAttribute('role', 'listitem');
+        if (isOffer) card.dataset.isOffer = 'true';
         card.setAttribute('aria-label',
-            `${dish.name} — ₹${dish.price}, ${pct}% off from ₹${dish.offer_price}`);
+            cakeDish
+                ? `${dish.name} — ${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}, from ₹${fromPrice ?? ''}`
+                : isOffer
+                    ? `${dish.name} — ${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}, ${pct}% off from ₹${dish.offer_price}`
+                    : `${dish.name} — ${isNonVeg ? 'Non-vegetarian' : 'Vegetarian'}, ₹${dish.price}`);
 
         card.innerHTML = `
             <div class="offer-card-media">
                 <img src="${url}" alt="${dish.name}" class="offer-card-img" loading="lazy">
+                ${isOffer ? `
                 <span class="offer-ribbon">
                     <span class="offer-ribbon-pct">${pct}%</span>
                     <span class="offer-ribbon-off">OFF</span>
-                </span>
+                </span>` : ''}
+                <span class="offer-diet ${isNonVeg ? 'nonveg' : 'veg'}" aria-hidden="true"></span>
                 ${bestsellerNames.has(dish.name) ? '<span class="offer-bestseller">🔥 Bestseller</span>' : ''}
             </div>
             <div class="offer-card-body">
                 <h4 class="offer-card-name" title="${dish.name}">${dish.name}</h4>
                 <div class="offer-card-price">
-                    <span class="offer-price-now">₹${dish.price.toFixed(0)}</span>
-                    <span class="offer-price-was">₹${dish.offer_price.toFixed(0)}</span>
+                    ${cakeDish
+                        ? `<span class="offer-price-now">From ₹${(fromPrice ?? 0).toFixed(0)}</span>`
+                        : `<span class="offer-price-now">₹${dish.price.toFixed(0)}</span>
+                           ${isOffer ? `<span class="offer-price-was">₹${dish.offer_price.toFixed(0)}</span>` : ''}`}
                 </div>
-                <div class="offer-card-save">You save ₹${savings}</div>
-                <div class="offer-card-control item-control"></div>
+                ${isOffer ? `<div class="offer-card-save">You save ₹${savings}</div>` : ''}
+                ${cakeDish
+                    ? `<button type="button" class="offer-card-control offer-card-pick" aria-label="Pick size for ${dish.name}">Pick size</button>`
+                    : `<div class="offer-card-control item-control"></div>`}
             </div>
         `;
-        const offerControl = card.querySelector('.item-control');
-        offerControl.dataset.cartKey = `${subcategory.name}||${dish.id}`;
-        renderControl(offerControl, subcategory, dish, false, unavailableNote);
+        if (cakeDish) {
+            const pickBtn = card.querySelector('.offer-card-pick');
+            const jumpToCake = (e) => {
+                e.preventDefault();
+                // Scroll to the full cake card in the category grid so the user
+                // can pick size + flavour. The card id is set by buildCakeCard.
+                const target = document.getElementById(`dish-${dish.id}`);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+            pickBtn.addEventListener('click', jumpToCake);
+            card.addEventListener('click', (e) => {
+                // Don't double-trigger when the button itself is clicked
+                if (e.target.closest('.offer-card-pick')) return;
+                jumpToCake(e);
+            });
+            card.style.cursor = 'pointer';
+        } else {
+            const offerControl = card.querySelector('.item-control');
+            offerControl.dataset.cartKey = `${subcategory.name}||${dish.id}`;
+            renderControl(offerControl, subcategory, dish, false, unavailableNote);
+        }
         return card;
+    };
+
+    // Aggregate every dish ID the customer has ever ordered from
+    // localStorage['biswal-bakery_order_history'] — matching the invoice/bill page's
+    // filter exactly: only orders that were Approved by the admin and belong
+    // to this restaurant's admin_id are counted. Ranked by number of past
+    // orders a dish appeared in (tiebreak by total quantity).
+    const computeFavouriteDishIds = () => {
+        const raw = localStorage.getItem(lsKey('order_history'));
+        if (!raw) return [];
+        let hist;
+        try { hist = JSON.parse(raw) || []; } catch { return []; }
+        if (!Array.isArray(hist) || hist.length === 0) return [];
+
+        const freq = new Map();
+        hist.forEach(order => {
+            // Mirror invoice_scripts.js: skip anything not Approved for this admin
+            if (order?.api_call !== 'Approved') return;
+            if (typeof _cfg !== 'undefined' && order?.admin_id !== _cfg) return;
+            // cart.js stores {order_id, admin_id, api_call, order_details: data}
+            // where data.order_details is the cart array. Peek one level deeper.
+            const cats = order?.order_details?.order_details || order?.order_details || [];
+            if (!Array.isArray(cats)) return;
+            const seen = new Set();
+            cats.forEach(cat => {
+                (cat?.category?.dish_details || []).forEach(d => {
+                    if (typeof d.id !== 'number') return;
+                    const cur = freq.get(d.id) || { qty: 0, orders: 0 };
+                    cur.qty += (d.quantity || 1);
+                    if (!seen.has(d.id)) { cur.orders += 1; seen.add(d.id); }
+                    freq.set(d.id, cur);
+                });
+            });
+        });
+
+        return [...freq.entries()]
+            .sort((a, b) => (b[1].orders - a[1].orders) || (b[1].qty - a[1].qty))
+            .map(([id]) => id);
     };
 
     const renderMenu = () => {
@@ -693,6 +773,68 @@ document.addEventListener('DOMContentLoaded', async() => {
                     });
                     offersShortcut.appendChild(offersLink);
                     shortcutsContainer.appendChild(offersShortcut);
+                }
+
+                // ── Your Favourite Picks (every dish ever ordered) ────────────
+                const favIds = computeFavouriteDishIds();
+                const favEntries = [];
+                if (favIds.length > 0) {
+                    const byId = new Map();
+                    data.menu.forEach(cat => cat.subcategories.forEach(sub =>
+                        sub.dishes.forEach(d => byId.set(d.id, { dish: d, subcategory: sub }))));
+                    favIds.forEach(id => {
+                        const hit = byId.get(id);
+                        if (hit && isDishRenderable(hit.dish, hit.subcategory)) favEntries.push(hit);
+                    });
+                }
+
+                if (favEntries.length > 0) {
+                    const topFavs = favEntries;   // Show every past-ordered item
+                    const favsSection = document.createElement('section');
+                    favsSection.classList.add('offers-section', 'favs-section', 'category-block');
+                    favsSection.id = 'Favourites';
+                    favsSection.setAttribute('aria-labelledby', 'favs-heading');
+
+                    favsSection.innerHTML = `
+                        <div class="offers-head">
+                            <div class="offers-head-text">
+                                <span class="offers-eyebrow">
+                                    <i class="fas fa-heart" aria-hidden="true"></i> Just for you
+                                </span>
+                                <h3 id="favs-heading" class="offers-title">Your Favourite Picks</h3>
+                                <p class="offers-subtitle">Everything you've ordered before — one tap to add again</p>
+                            </div>
+                            <div class="offers-count-chip" aria-hidden="true">${topFavs.length} ${topFavs.length === 1 ? 'pick' : 'picks'}</div>
+                        </div>
+                        <div class="offers-rail favs-rail" role="list" tabindex="0" aria-label="Your favourite picks, scroll horizontally"></div>
+                    `;
+
+                    const favsRail = favsSection.querySelector('.favs-rail');
+                    topFavs.forEach(({ dish, subcategory }) => {
+                        favsRail.appendChild(buildOfferRailCard(dish, subcategory));
+                    });
+
+                    menuContainer.appendChild(favsSection);
+
+                    // Shortcut chip for Favourites (mirrors the Deals chip)
+                    const favsShortcut = document.createElement('div');
+                    favsShortcut.classList.add('shortcut-card');
+                    const favsLink = document.createElement('a');
+                    favsLink.href = '#Favourites';
+                    favsLink.className = 'shortcut';
+                    favsLink.textContent = '❤️ Favourites';
+                    favsLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.querySelectorAll('.shortcut-card').forEach(c => c.classList.remove('active'));
+                        favsShortcut.classList.add('active');
+                        scrollChipIntoView(favsShortcut);
+                        _spyIgnore = true;
+                        clearTimeout(_spyIgnoreTimer);
+                        _spyIgnoreTimer = setTimeout(() => { _spyIgnore = false; }, 1000);
+                        scrollToCategory('Favourites');
+                    });
+                    favsShortcut.appendChild(favsLink);
+                    shortcutsContainer.appendChild(favsShortcut);
                 }
 
                 // Render categories and dishes
