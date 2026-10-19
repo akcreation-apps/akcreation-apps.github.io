@@ -533,79 +533,8 @@ if (placeOrderButton) placeOrderButton.addEventListener('click', async () => {
         console.error('All navigation attempts to WhatsApp failed.');
     };
 
-    // Cross-restaurant key — once acknowledged on any restaurant (TCD/A1/MCH),
-    // the customer is treated as informed everywhere.
-    const _hintAckKey = 'bankibites_hint_ack';
-    const hintAcked = (() => { try { return localStorage.getItem(_hintAckKey) === 'true'; } catch (e) { return false; } })();
-
     try {
-        // Step 1 — First-time customers see an educational popup explaining
-        // the paste fallback (vivo / cold-start Intent bug where WhatsApp
-        // opens blank). The "Continue" confirm stays disabled until the
-        // customer ticks the acknowledgement checkbox.
-        if (!hintAcked) {
-            const popupHtml = `
-                <div style="font-size:.92rem;line-height:1.55;text-align:left">
-                    <p style="margin:0 0 .55rem;font-weight:600;color:#111827">WhatsApp will open with your order. If it shows a <u>blank message</u>:</p>
-                    <ol style="margin:.25rem 0 .6rem 1.15rem;padding:0;color:#92400e">
-                        <li style="margin-bottom:.25rem"><b>Long-press</b> the message box</li>
-                        <li style="margin-bottom:.25rem">Tap <b>Paste</b></li>
-                        <li>Tap <b>Send</b> ✅</li>
-                    </ol>
-                    <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:.5rem .7rem;color:#92400e;font-size:.86rem;font-weight:500">
-                        📋 Your order is already copied — pasting sends the exact same details.
-                    </div>
-                    <label style="display:flex;align-items:center;gap:.5rem;margin-top:.75rem;font-size:.88rem;color:#374151;cursor:pointer;user-select:none">
-                        <input type="checkbox" id="paste-hint-ack-cb" style="width:18px;height:18px;cursor:pointer">
-                        <span>Don't show this again — I've got it</span>
-                    </label>
-                </div>`;
-            // Mandatory wait — customer MUST tick the checkbox and click
-            // Continue. No timeout, no escape: the popup blocks the order
-            // flow until acknowledged.
-            const result = await Swal.fire({
-                title: 'One last step',
-                icon: 'info',
-                html: popupHtml,
-                confirmButtonText: 'Continue',
-                confirmButtonColor: '#16a34a',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                focusConfirm: false,
-                didOpen: () => {
-                    const btn = Swal.getConfirmButton();
-                    const cb  = document.getElementById('paste-hint-ack-cb');
-                    const setBtnEnabled = (enabled) => {
-                        if (!btn) return;
-                        btn.disabled = !enabled;
-                        btn.style.opacity = enabled ? '1' : '0.5';
-                        btn.style.cursor  = enabled ? 'pointer' : 'not-allowed';
-                        btn.style.filter  = enabled ? 'none' : 'grayscale(40%)';
-                    };
-                    setBtnEnabled(false);
-                    if (cb) cb.addEventListener('change', () => setBtnEnabled(cb.checked));
-                },
-                preConfirm: () => {
-                    const cb = document.getElementById('paste-hint-ack-cb');
-                    if (!cb || !cb.checked) {
-                        Swal.showValidationMessage('Please tick the box to confirm you understand.');
-                        return false;
-                    }
-                    return true;
-                },
-            });
-            // Only proceed if the customer actually confirmed (clicked
-            // Continue with the checkbox ticked). Any other outcome means
-            // the popup was dismissed unexpectedly — log and bail to avoid
-            // saving an unconfirmed order.
-            if (!result || !result.isConfirmed) {
-                console.warn('Educational popup dismissed without confirmation; aborting order flow.');
-                return;
-            }
-            try { localStorage.setItem(_hintAckKey, 'true'); } catch (e) {}
-        }
-
-        // Step 2 — Saving loader. Awaits Firestore write so the order is
+        // Saving loader. Awaits Firestore write so the order is
         // guaranteed persisted before the customer leaves the page.
         Swal.fire({
             title: 'Saving your order…',
