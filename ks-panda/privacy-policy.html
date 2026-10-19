@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="theme-color" content="#0D1117">
+    <title>Privacy Policy – KS Panda</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0D1117;
+            color: #CCCCCC;
+            line-height: 1.7;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1A237E 0%, #0D1117 100%);
+            padding: 48px 24px 36px;
+            text-align: center;
+            border-bottom: 2px solid #7986CB;
+        }
+
+        header .logo-ring {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid #7986CB;
+            margin-bottom: 16px;
+        }
+
+        header .logo-ring span {
+            font-size: 18px;
+            font-weight: 900;
+            color: #7986CB;
+            letter-spacing: 0.05em;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #7986CB;
+            letter-spacing: 0.06em;
+        }
+
+        header .subtitle {
+            color: #AAAAAA;
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+
+        header .badge {
+            display: inline-block;
+            margin-top: 14px;
+            background: #1A1A2E;
+            border: 1px solid #7986CB55;
+            color: #7986CB;
+            font-size: 0.8rem;
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        section {
+            background: #161B22;
+            border-radius: 10px;
+            border: 1px solid #21262D;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+        }
+
+        section h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #7986CB;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #21262D;
+        }
+
+        section p {
+            margin-bottom: 12px;
+            color: #CCCCCC;
+            font-size: 0.95rem;
+        }
+
+        section p:last-child { margin-bottom: 0; }
+
+        section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        section ul li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+            color: #CCCCCC;
+            font-size: 0.95rem;
+        }
+
+        section ul li::before {
+            content: '▸';
+            color: #7986CB;
+            position: absolute;
+            left: 0;
+        }
+
+        .highlight { color: #7986CB; font-weight: 600; }
+        .muted { color: #888; font-size: 0.88rem; }
+
+        a { color: #7986CB; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .tag {
+            display: inline-block;
+            background: #1E3A1A;
+            color: #5DBA55;
+            border: 1px solid #5DBA5544;
+            font-size: 0.78rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .tag-warn {
+            background: #3A2A10;
+            color: #F4A825;
+            border: 1px solid #F4A82544;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #0A0E14;
+            color: #555;
+            font-size: 0.85rem;
+            border-top: 1px solid #21262D;
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5rem; }
+            section { padding: 20px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-ring"><span>KS</span></div>
+    <h1>Privacy Policy</h1>
+    <p class="subtitle">KS Panda — Employee Attendance App</p>
+    <span class="badge">Effective Date: October 19, 2026</span>
+</header>
+
+<div class="container">
+
+    <section>
+        <h2>Overview</h2>
+        <p>
+            <span class="highlight">KS Panda</span> is an employee attendance Android application
+            developed by <span class="highlight">AKCreation Apps</span>. It helps employees punch in
+            and out of their assigned work sites, optionally with geofence verification, and gives
+            administrators and managers tools to review attendance.
+        </p>
+        <p>
+            This Privacy Policy explains what information the app accesses, how it is used, where
+            it is stored, and your rights. We are committed to protecting your privacy and operate
+            in compliance with <span class="highlight">Google Play's User Data Policy</span>.
+        </p>
+    </section>
+
+    <section>
+        <h2>Information We Collect</h2>
+        <p>KS Panda collects only the information required to record and verify your attendance:</p>
+        <ul>
+            <li>
+                <span class="highlight">Account information</span> — your name, email address, and
+                a unique Google user ID, obtained when you sign in with Google. This is used to
+                create and identify your employee profile.
+            </li>
+            <li>
+                <span class="highlight">Profile details</span> — the full name and mobile number
+                you provide during the initial signup step, along with your role (employee / manager
+                / admin), approval status, and the work sites assigned to you by your administrator.
+            </li>
+            <li>
+                <span class="highlight">Attendance records</span> — each punch (in or out) records
+                the punch type, the selected site, the timestamp, and your device's location
+                (latitude, longitude, GPS accuracy) at the moment of the punch.
+            </li>
+            <li>
+                <span class="highlight">Edit requests</span> — if you request a correction to a
+                punch, the requested time, type, and your reason are stored together with the
+                original punch reference.
+            </li>
+            <li>
+                <span class="highlight">Device location</span> — the app reads your current GPS
+                location only when you tap Punch In or Punch Out. Location is required for
+                geofence-enabled sites to verify you are physically on-site; for sites without a
+                configured geofence, the location is best-effort and does not block the punch.
+            </li>
+            <li>
+                <span class="highlight">Local preferences</span> — your theme choice (system /
+                light / dark) and biometric lock preference are saved on your device only.
+            </li>
+        </ul>
+        <p class="muted">
+            KS Panda does not collect your contact list, photos, SMS, call logs, microphone input,
+            camera input, or browsing history.
+        </p>
+    </section>
+
+    <section>
+        <h2>How We Use Your Information</h2>
+        <ul>
+            <li>To authenticate you and link each punch to your identity.</li>
+            <li>To verify you are within the allowed geofence of the selected work site at the time of punch.</li>
+            <li>To calculate daily, weekly, and monthly worked hours in your history view.</li>
+            <li>To notify you with a local reminder if you forget to punch out at the end of a shift.</li>
+            <li>To let managers and administrators review attendance for their teams.</li>
+            <li>To process edit-request approvals or rejections initiated by your manager.</li>
+        </ul>
+        <p class="muted">
+            We do not use your information for advertising, profiling, or any form of commercial
+            sale. We do not share your data with any third party outside the systems described below.
+        </p>
+    </section>
+
+    <section>
+        <h2>Permissions Used</h2>
+        <ul>
+            <li>
+                <span class="highlight">INTERNET</span> — required to sign in and to read/write
+                your profile, sites, and attendance records in our secure backend.
+            </li>
+            <li>
+                <span class="highlight">ACCESS_FINE_LOCATION / ACCESS_COARSE_LOCATION</span> —
+                required to capture your location when you punch in or out, so the geofence check
+                can confirm you are at the correct site. Location is only read in response to your
+                tap on the Punch button and when the Home screen is open (to show live distance
+                from the selected site). The app does not track your location continuously in the
+                background.
+            </li>
+            <li>
+                <span class="highlight">POST_NOTIFICATIONS</span> — required (on Android 13+) to
+                show the local "forgot to punch out" reminder.
+            </li>
+            <li>
+                <span class="highlight">VIBRATE</span> — used only to provide short haptic feedback
+                when you tap the Punch button.
+            </li>
+            <li>
+                <span class="highlight">USE_BIOMETRIC</span> (implicit) — used only when you
+                opt in to the biometric app-lock. Biometric verification is performed entirely
+                on-device by Android; no biometric data ever leaves your device or is sent to our servers.
+            </li>
+        </ul>
+        <p>
+            <span class="tag">✓ No Camera</span>
+            <span class="tag">✓ No Microphone</span>
+            <span class="tag">✓ No Contacts</span>
+            <span class="tag">✓ No SMS / Call logs</span>
+            <span class="tag tag-warn">⚑ Location (on-demand, foreground only)</span>
+        </p>
+    </section>
+
+    <section>
+        <h2>Where Your Data Is Stored</h2>
+        <p>
+            KS Panda uses <span class="highlight">Google Firebase</span> as its secure backend:
+        </p>
+        <ul>
+            <li>
+                <span class="highlight">Firebase Authentication</span> handles your Google sign-in.
+            </li>
+            <li>
+                <span class="highlight">Cloud Firestore</span> stores your profile, assigned sites,
+                attendance punches, and edit requests inside a dedicated namespace
+                (<code>attn_*</code> collections) within the <code>akcreation-apps</code>
+                Firebase project.
+            </li>
+            <li>
+                Access to these collections is restricted by Firebase security rules so that
+                employees can only read and write their own records, and only approved managers
+                and administrators can view team data.
+            </li>
+            <li>
+                All communication between the app and Firebase is encrypted in transit using
+                <span class="highlight">HTTPS/TLS</span>.
+            </li>
+        </ul>
+        <p>
+            Firebase itself may process limited diagnostic information (for example, device model
+            and crash signals) as described in
+            <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Firebase's Privacy Information</a>.
+        </p>
+    </section>
+
+    <section>
+        <h2>Administration Panel</h2>
+        <p>
+            Users whose profile is marked as <span class="highlight">admin</span> or
+            <span class="highlight">manager</span> may open an administration dashboard from the
+            Profile screen. This launches
+            <a href="https://akcreation-apps.com/ks-panda" target="_blank" rel="noopener">https://akcreation-apps.com/ks-panda</a>
+            in your device's external web browser; the dashboard reuses the same Firebase account
+            and security rules as the mobile app.
+        </p>
+    </section>
+
+    <section>
+        <h2>Data Sharing &amp; Third Parties</h2>
+        <p>
+            We do <span class="highlight">not</span> sell, trade, or rent your personal information
+            to any third party. The only sub-processors involved are:
+        </p>
+        <ul>
+            <li>
+                <span class="highlight">Google LLC</span> — provider of Firebase Authentication,
+                Cloud Firestore, and Google Play Services used by the app. See
+                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.
+            </li>
+            <li>
+                <span class="highlight">Your employer</span> — managers and administrators within
+                your own organisation can see attendance records of the employees they manage, as
+                part of the ordinary purpose of this application.
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Data Retention</h2>
+        <p>
+            Attendance punches and profile records are retained for as long as the app is in use
+            by your organisation, so you and your manager can review historical attendance.
+            Edit-request documents are retained in the same way. Local preferences (theme,
+            biometric lock) and the forgot-to-punch-out reminder are stored only on your device
+            and are removed when you uninstall the app or clear its data.
+        </p>
+        <p>
+            If your organisation stops using KS Panda, your administrator can request bulk deletion
+            of the organisation's records by contacting us at the email address below.
+        </p>
+    </section>
+
+    <section>
+        <h2>Data Security</h2>
+        <p>
+            All network traffic between the app and Firebase is encrypted with HTTPS/TLS. Firestore
+            security rules restrict reads and writes to the authenticated owner (and authorised
+            managers/admins). Biometric lock, if enabled, requires an on-device biometric match
+            before the app can be viewed.
+        </p>
+    </section>
+
+    <section>
+        <h2>Children's Privacy</h2>
+        <p>
+            KS Panda is an employee tool and is not directed at children under the age of 13.
+            We do not knowingly collect personal information from children. If you believe a child
+            has used the app, please contact us so we can remove the account.
+        </p>
+    </section>
+
+    <section>
+        <h2>Your Rights</h2>
+        <ul>
+            <li>You may sign out of the app at any time from the Profile screen.</li>
+            <li>You may clear all local app data (theme preference, biometric setting, reminders) at any time via your device's Settings → Apps → KS Panda → Clear Data.</li>
+            <li>You may request a copy of, or deletion of, your attendance records by contacting us at the email below. Where legally required, we will respond within a reasonable timeframe.</li>
+            <li>You may uninstall the app at any time without penalty.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Changes to This Policy</h2>
+        <p>
+            We may update this Privacy Policy from time to time. The "Effective Date" at the top
+            of this page will reflect the date of the latest revision. Continued use of the app
+            after changes constitutes acceptance of the updated policy.
+        </p>
+    </section>
+
+    <section>
+        <h2>Contact Us</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please contact:</p>
+        <ul>
+            <li>Developer: <span class="highlight">AKCreation Apps</span></li>
+            <li>Email: <a href="mailto:akcreation072k19@gmail.com">akcreation072k19@gmail.com</a></li>
+            <li>App: KS Panda on Google Play</li>
+            <li>Web: <a href="https://akcreation-apps.com/ks-panda" target="_blank" rel="noopener">akcreation-apps.com/ks-panda</a></li>
+        </ul>
+    </section>
+
+</div>
+
+<footer>
+    &copy; 2026 AKCreation Apps · KS Panda · All rights reserved.
+</footer>
+
+</body>
+</html>
