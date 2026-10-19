@@ -66,8 +66,9 @@
     <div class="card" style="text-align:center; margin-top:20px;">
         <h2>Get the Android App</h2>
         <p>Download our app to explore all resume designs, see their pricing, and request your custom resume.</p>
-        <a id="apkLink" class="btn-primary">⬇️ Download Android App</a>
+        <a id="playStoreLink" class="btn-primary" target="_blank" rel="noopener" aria-label="Get Grade Calculator (BPUT Based) on Google Play">▶ Get it on Google Play</a>
         <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students.</p>
+        <p style="margin-top:4px; font-size:13px; color:#888;">💰 In-app wallet: watch an ad for free coins or buy a coin pack — coins unlock premium features.</p>
     </div>
 
     <!-- FAQ Section -->
@@ -218,9 +219,8 @@
     fetch("app_info.json")
       .then(response => response.json())
       .then(data => {
-        const link = document.getElementById("apkLink");
-        link.href = data.apkUrl;
-        link.setAttribute("download", data.apkFile);
+        const link = document.getElementById("playStoreLink");
+        link.href = data.playStoreUrl;
       })
       .catch(err => console.error("Error loading APK JSON:", err));
 </script>

@@ -196,9 +196,10 @@
     <!-- Android App Download -->
     <div class="card" style="text-align: center; margin-top: 20px;">
         <h2>📱 Get Our Android App</h2>
-        <p>Download the Grade Calculator (BPUT Based) Android app for faster access and offline usage.</p>
-        <a id="apkLink" download class="download-btn">⬇️ Download APK</a>
+        <p>Get the Grade Calculator (BPUT Based) Android app on Google Play for faster access and offline usage.</p>
+        <a id="playStoreLink" class="download-btn" target="_blank" rel="noopener" aria-label="Get Grade Calculator (BPUT Based) on Google Play">▶ Get it on Google Play</a>
         <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students.</p>
+        <p style="margin-top:4px; font-size:13px; color:#888;">💰 In-app wallet: watch an ad for free coins or buy a coin pack — coins unlock premium features.</p>
     </div>
 
     <!-- FAQs -->
@@ -374,9 +375,8 @@
     fetch("app_info.json")
       .then(response => response.json())
       .then(data => {
-        const link = document.getElementById("apkLink");
-        link.href = data.apkUrl;
-        link.setAttribute("download", data.apkFile);
+        const link = document.getElementById("playStoreLink");
+        link.href = data.playStoreUrl;
       })
       .catch(err => console.error("Error loading APK JSON:", err));
 </script>

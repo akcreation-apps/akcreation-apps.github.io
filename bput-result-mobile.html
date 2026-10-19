@@ -68,8 +68,9 @@
     <article class="card" style="text-align:center; margin-top:20px;" aria-labelledby="app-title">
         <h2 id="app-title">Check Results Instantly Using Our Android App</h2>
         <p>Our <strong>BPUT Grade Calculator App</strong> provides direct access to the results page, along with tools for SGPA, CGPA, Percentage, and Marks calculations.</p>
-        <a id="apkLink" class="btn-primary" aria-label="Download BPUT Grade Calculator Android App">⬇️ Download Android App</a>
+        <a id="playStoreLink" class="btn-primary" target="_blank" rel="noopener" aria-label="Get BPUT Grade Calculator on Google Play">▶ Get it on Google Play</a>
         <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students across Odisha.</p>
+        <p style="margin-top:4px; font-size:13px; color:#888;">💰 In-app wallet: watch an ad for free coins or buy a coin pack — coins unlock premium features.</p>
     </article>
 
     <!-- FAQs -->
@@ -155,9 +156,8 @@
     fetch("app_info.json")
       .then(response => response.json())
       .then(data => {
-        const link = document.getElementById("apkLink");
-        link.href = data.apkUrl;
-        link.setAttribute("download", data.apkFile);
+        const link = document.getElementById("playStoreLink");
+        link.href = data.playStoreUrl;
       })
       .catch(err => console.error("Error loading APK JSON:", err));
 </script>

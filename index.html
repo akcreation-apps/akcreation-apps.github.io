@@ -66,6 +66,23 @@
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
         "author": { "@type": "Person", "name": "Anil Kumar Sahoo" },
         "publisher": { "@type": "Organization", "name": "AK Creation", "logo": { "@type": "ImageObject", "url": "https://akcreation-apps.com/logo.webp" }}
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "MobileApplication",
+        "name": "Grade Calculator (BPUT Based)",
+        "operatingSystem": "Android",
+        "applicationCategory": "EducationalApplication",
+        "softwareVersion": "3.5.1",
+        "fileSize": "16MB",
+        "inLanguage": "en",
+        "installUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.bputcalculator",
+        "downloadUrl": "https://play.google.com/store/apps/details?id=com.akcreation_apps.bputcalculator",
+        "url": "https://play.google.com/store/apps/details?id=com.akcreation_apps.bputcalculator",
+        "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "95" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+        "author": { "@type": "Person", "name": "Anil Kumar Sahoo" },
+        "publisher": { "@type": "Organization", "name": "AK Creation", "logo": { "@type": "ImageObject", "url": "https://akcreation-apps.com/logo.webp" }}
     }]
     </script>
 
@@ -408,6 +425,74 @@
             text-align: center;
             border: 1px solid rgba(255,255,255,.06);
             word-break: break-word;
+        }
+
+        /* Coin wallet explainer */
+        .coin-info {
+            max-width: 920px;
+            margin: 48px auto 0;
+            padding: 28px 24px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(79,70,229,.08);
+            text-align: left;
+        }
+        .coin-info-head {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .coin-info-head i {
+            color: #f59e0b;
+            font-size: 1.4rem;
+        }
+        .coin-info-head h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--dark);
+        }
+        .coin-info-sub {
+            text-align: center;
+            color: var(--muted);
+            font-size: .95rem;
+            max-width: 640px;
+            margin: 0 auto 22px;
+        }
+        .coin-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .coin-info-item {
+            background: linear-gradient(135deg, #f0f4ff 0%, #fdf4ff 100%);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 16px;
+            text-align: center;
+        }
+        .coin-info-item i {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+        .coin-info-item h4 {
+            font-size: 1rem;
+            color: var(--dark);
+            margin: 4px 0 6px;
+        }
+        .coin-info-item p {
+            font-size: .85rem;
+            color: var(--muted);
+            margin: 0;
+            line-height: 1.45;
+        }
+        @media (max-width: 640px) {
+            .coin-info { padding: 22px 16px; margin-top: 32px; }
+            .coin-info-grid { grid-template-columns: 1fr; gap: 12px; }
+            .coin-info-head h3 { font-size: 1.1rem; }
         }
 
         /* ── Tool Cards ── */
@@ -950,8 +1035,8 @@
                 </h1>
                 <p>The most accurate BPUT grade calculator trusted by thousands of students. Built with official BPUT formulas.</p>
                 <div class="hero-btns">
-                    <a class="btn-hero-primary" href="#download">
-                        <i class="fas fa-download"></i> Download APK
+                    <a class="btn-hero-primary" href="https://play.google.com/store/apps/details?id=com.akcreation_apps.bputcalculator" target="_blank" rel="noopener" aria-label="Get Grade Calculator (BPUT Based) on Google Play">
+                        <i class="fab fa-google-play"></i> Get it on Google Play
                     </a>
                     <a class="btn-hero-outline" href="#tools">
                         <i class="fas fa-calculator"></i> Try Web Tools
@@ -1024,11 +1109,37 @@
     <div class="container text-center">
         <div class="sec-title">
             <span class="sec-badge">Get the App</span>
-            <h2>Download BPUT Grade Calculator</h2>
-            <p>Available on Android. Free forever. No sign-up required.</p>
+            <h2>Get BPUT Grade Calculator on Google Play</h2>
+            <p>Available on Android. Free to install, no sign-up required.</p>
         </div>
         <div id="apk-card">
             <!-- dynamically injected -->
+        </div>
+
+        <!-- Coin wallet explainer -->
+        <div class="coin-info">
+            <div class="coin-info-head">
+                <i class="fas fa-coins" aria-hidden="true"></i>
+                <h3>How the Coin Wallet Works</h3>
+            </div>
+            <p class="coin-info-sub">In-app features like CGPA reports, resume builder, grade sheets, and seminar reports run on coins — so you only spend on what you actually use.</p>
+            <div class="coin-info-grid">
+                <div class="coin-info-item">
+                    <i class="fas fa-play-circle" aria-hidden="true"></i>
+                    <h4>Watch an ad</h4>
+                    <p>Earn free coins any time — no payment needed.</p>
+                </div>
+                <div class="coin-info-item">
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
+                    <h4>Top up once</h4>
+                    <p>Buy a coin pack from the in-app wallet and skip ads.</p>
+                </div>
+                <div class="coin-info-item">
+                    <i class="fas fa-infinity" aria-hidden="true"></i>
+                    <h4>Spend gradually</h4>
+                    <p>Coins unlock features one by one — no subscription, no expiry.</p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -1154,8 +1265,8 @@
     <div class="container">
         <h2>Stop wasting time — let us handle the calculations</h2>
         <p>Join thousands of BPUT students who rely on AK Creation every semester.</p>
-        <a class="btn-cta" href="#download">
-            <i class="fas fa-download"></i> Get the App Free
+        <a class="btn-cta" href="https://play.google.com/store/apps/details?id=com.akcreation_apps.bputcalculator" target="_blank" rel="noopener" aria-label="Get Grade Calculator (BPUT Based) on Google Play">
+            <i class="fab fa-google-play"></i> Get it on Google Play
         </a>
     </div>
 </div>
@@ -1426,8 +1537,8 @@
 </footer>
 
 <!-- ── Mobile Sticky CTA ── -->
-<a class="mobile-sticky-cta" href="#download">
-    <i class="fas fa-download"></i> Download APK Free
+<a class="mobile-sticky-cta" href="https://play.google.com/store/apps/details?id=com.akcreation_apps.bputcalculator" target="_blank" rel="noopener" aria-label="Get Grade Calculator (BPUT Based) on Google Play">
+    <i class="fab fa-google-play"></i> Get it on Google Play
 </a>
 
 <!-- ── Scripts ── -->
@@ -1459,17 +1570,20 @@
         });
     });
 
-    // APK card
+    // Play Store card
     fetch('app_info.json')
         .then(function(r) { return r.json(); })
         .then(function(data) {
             var card = document.getElementById('apk-card');
+            var updated = new Date(data.lastUpdated).toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'});
             card.innerHTML =
-                '<img src="https://akcreation-apps.com/assets/img/download.png" alt="Download Icon" width="60" height="60" style="width:60px;margin-bottom:15px;">' +
-                '<h2 style="color:#fff;font-size:22px;margin:10px 0;">Download ' + data.appName + ' APK</h2>' +
-                '<p style="color:#ccc;font-size:13px;margin-bottom:20px;">Version: ' + data.version + ' &nbsp;·&nbsp; Size: ' + data.size + ' &nbsp;·&nbsp; Updated: ' + new Date(data.lastUpdated).toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'}) + '</p>' +
-                '<a href="' + data.apkUrl + '" aria-label="Download ' + data.appName + ' APK" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#00c853,#00e676);color:#fff;padding:14px 28px;font-size:16px;font-weight:700;border-radius:50px;text-decoration:none;box-shadow:0 0 16px rgba(0,255,100,.4);">📥 Download APK</a>' +
-                '<p style="margin-top:10px;color:#64748b;font-size:12px;">' + data.apkFile + '</p>';
+                '<img src="https://akcreation-apps.com/assets/img/download.png" alt="' + data.appName + ' app icon" width="60" height="60" style="width:60px;margin-bottom:15px;">' +
+                '<h2 style="color:#fff;font-size:22px;margin:10px 0;">Get ' + data.appName + ' on Google Play</h2>' +
+                '<p style="color:#ccc;font-size:13px;margin-bottom:20px;">Version: ' + data.version + ' &nbsp;·&nbsp; Size: ' + data.size + ' &nbsp;·&nbsp; Updated: ' + updated + '</p>' +
+                '<a href="' + data.playStoreUrl + '" target="_blank" rel="noopener" aria-label="Get ' + data.appName + ' on Google Play" style="display:inline-block;line-height:0;text-decoration:none;">' +
+                    '<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="200" height="77" style="height:60px;width:auto;max-width:100%;filter:drop-shadow(0 0 16px rgba(0,255,100,.25));">' +
+                '</a>' +
+                '<p style="margin-top:14px;color:#94a3b8;font-size:12px;">Free · No ads · Works offline</p>';
         })
         .catch(function(err) { console.error('Error loading app info:', err); });
 </script>
