@@ -11,8 +11,10 @@
   <title>BankiBites Admin</title>
 
   <link rel="apple-touch-icon" sizes="180x180" href="/banki-bites/banki-bites-logo.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/banki-bites/banki-bites-logo.png">
   <link rel="icon" type="image/png" href="/banki-bites/banki-bites-logo.png">
   <link rel="shortcut icon" href="/banki-bites/banki-bites-logo.png">
+  <link rel="manifest" href="/banki-bites/admin/manifest.webmanifest">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,6 +68,11 @@
       </div>
       <div class="topbar-user">
         <span id="userEmail" class="user-email"></span>
+        <button id="installAppBtn" class="btn btn-sm btn-outline-light" type="button" hidden
+                title="Install BankiBites Admin app">
+          <i class="fas fa-download" aria-hidden="true"></i>
+          <span class="d-none d-md-inline ml-1">Install app</span>
+        </button>
         <button id="signOutBtn" class="btn btn-sm btn-outline-light" title="Sign out">
           <i class="fas fa-sign-out-alt"></i>
         </button>
@@ -111,5 +118,48 @@
 
   <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
   <script type="module" src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/banki-bites/admin/sw.js', { scope: '/banki-bites/admin/' })
+          .catch(() => {});
+      });
+    }
+    (function () {
+      const btn = document.getElementById('installAppBtn');
+      if (!btn) return;
+      let deferred = null;
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isStandalone = () =>
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferred = e;
+        if (!isStandalone()) btn.hidden = false;
+      });
+
+      btn.addEventListener('click', async () => {
+        if (deferred) {
+          deferred.prompt();
+          await deferred.userChoice;
+          deferred = null;
+          btn.hidden = true;
+        } else if (isIOS && !isStandalone()) {
+          Swal.fire({
+            title: 'Install BankiBites Admin',
+            html: 'Tap the <b>Share</b> icon in Safari, then choose <b>Add to Home Screen</b>.',
+            icon: 'info',
+            confirmButtonText: 'Got it'
+          });
+        }
+      });
+
+      if (isIOS && !isStandalone()) btn.hidden = false;
+
+      window.addEventListener('appinstalled', () => { btn.hidden = true; deferred = null; });
+    })();
+  </script>
 </body>
 </html>
