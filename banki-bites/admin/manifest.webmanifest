@@ -1,0 +1,18 @@
+{
+  "name": "BankiBites Admin",
+  "short_name": "BB Admin",
+  "description": "BankiBites admin console — orders, delivery, broadcasts.",
+  "id": "/banki-bites/admin/",
+  "start_url": "/banki-bites/admin/",
+  "scope": "/banki-bites/admin/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0d12",
+  "theme_color": "#FF6B35",
+  "lang": "en-IN",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/banki-bites/banki-bites-logo.png", "sizes": "any", "type": "image/png", "purpose": "any" },
+    { "src": "/banki-bites/banki-bites-logo.png", "sizes": "any", "type": "image/png", "purpose": "maskable" }
+  ]
+}
