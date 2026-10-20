@@ -16,10 +16,27 @@ const STATUS_FILTERS = [
   { key: 'new',         label: 'New',                match: b => (b.status || 'new') === 'new' || b.status === 'confirmed' },
   { key: 'allocated',   label: 'Allocated',          match: b => b.status === 'allocated' },
   { key: 'trip_done',   label: 'Trip Completed',     match: b => b.status === 'completed' },
-  { key: 'paid',        label: 'Payment Completed',  match: b => b.status === 'completed' && !!b.paid },
-  { key: 'unpaid',      label: 'Payment Pending',    match: b => b.status === 'completed' && !b.paid },
+  { key: 'paid',        label: 'Payment Completed',  match: b => b.status === 'completed' && getPayment(b).status === 'paid' },
+  { key: 'partial',     label: 'Payment Partial',    match: b => b.status === 'completed' && getPayment(b).status === 'partial' },
+  { key: 'unpaid',      label: 'Payment Pending',    match: b => b.status === 'completed' && getPayment(b).status === 'unpaid' },
   { key: 'all',         label: 'All',                match: () => true },
 ];
+
+// Normalises paid/partial/unpaid across legacy + new docs. Legacy docs only
+// have a `paid: boolean`; new docs also carry `paymentStatus` + `collectedAmount`.
+// Returns derived { status, received, outstanding } so KPIs/referrals don't have
+// to branch on the schema.
+export function getPayment(b) {
+  const fare = Number(b.fare || 0);
+  let status = b.paymentStatus;
+  if (!status) status = b.paid ? 'paid' : 'unpaid';
+  if (status === 'paid')    return { status, received: fare, outstanding: 0 };
+  if (status === 'partial') {
+    const collected = Math.max(0, Math.min(fare, Number(b.collectedAmount || 0)));
+    return { status, received: collected, outstanding: Math.max(0, fare - collected) };
+  }
+  return { status: 'unpaid', received: 0, outstanding: fare };
+}
 
 export async function renderBookings(ctx) {
   const { panel, db } = ctx;
@@ -124,16 +141,14 @@ function renderRow(b) {
       </div>
       <div class="flex-row" style="gap:6px;">
         <span class="chip ${status}">${labelFor(status)}</span>
-        ${status === 'completed' ? (b.paid
-          ? `<span class="chip completed" title="Payment received"><i class="fas fa-circle-check" aria-hidden="true"></i> Paid</span>`
-          : `<span class="chip cancelled" title="Payment pending"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Pending</span>`) : ''}
+        ${status === 'completed' ? paymentChip(b) : ''}
       </div>
     </div>
     <div class="row-meta">
       ${dest ? `<div><b>Route</b> ${dest}</div>` : ''}
       <div><b>Customer</b> ${customer.name ? escapeHtml(customer.name) : '<i class="text-muted-an">unidentified</i>'}${customer.phone ? ' · ' + escapeHtml(customer.phone) : ''}</div>
       ${allocated}
-      ${b.fare ? `<div><b>Fare</b> ₹${escapeHtml(String(b.fare))}${b.paid ? ' · paid' : ''}</div>` : ''}
+      ${b.fare ? `<div><b>Fare</b> ₹${escapeHtml(String(b.fare))}${fareSuffix(b)}</div>` : ''}
       ${b.fuel ? `<div><b>Fuel</b> ${escapeHtml(b.fuel.type || '—')} · ${b.fuel.qty != null ? escapeHtml(String(b.fuel.qty)) + ' · ' : ''}₹${escapeHtml(String(b.fuel.cost ?? 0))}</div>` : ''}
       ${b.referral ? `<div><b>Referral</b> ${escapeHtml(b.referral)}</div>` : ''}
       <div><b>Source</b> ${escapeHtml(b.source || 'web')}</div>
@@ -158,6 +173,26 @@ function labelFor(s) {
     new: 'New', confirmed: 'Confirmed', allocated: 'Allocated',
     in_progress: 'On trip', completed: 'Completed', cancelled: 'Cancelled',
   })[s] || s;
+}
+
+function _initPay(b) {
+  if (b && b.paymentStatus) return b.paymentStatus;
+  if (b && b.paid) return 'paid';
+  return 'unpaid';
+}
+
+function paymentChip(b) {
+  const p = getPayment(b);
+  if (p.status === 'paid')    return `<span class="chip completed" title="Payment received"><i class="fas fa-circle-check" aria-hidden="true"></i> Paid</span>`;
+  if (p.status === 'partial') return `<span class="chip partial" title="Partial payment received"><i class="fas fa-adjust" aria-hidden="true"></i> Partial</span>`;
+  return `<span class="chip cancelled" title="Payment pending"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Pending</span>`;
+}
+
+function fareSuffix(b) {
+  const p = getPayment(b);
+  if (p.status === 'paid')    return ' · paid';
+  if (p.status === 'partial') return ` · ₹${p.received} collected · ₹${p.outstanding} pending`;
+  return '';
 }
 
 async function handleAction(db, action, id, bookings) {
@@ -579,9 +614,20 @@ export async function openBookingModal(db, existing) {
         <div class="f-group">
           <label class="f-label" for="bm-paid">Paid?</label>
           <select id="bm-paid" class="f-select">
-            <option value="false" ${!b.paid ? 'selected' : ''}>No</option>
-            <option value="true"  ${b.paid ? 'selected' : ''}>Yes</option>
+            <option value="unpaid"  ${_initPay(b) === 'unpaid'  ? 'selected' : ''}>No</option>
+            <option value="partial" ${_initPay(b) === 'partial' ? 'selected' : ''}>Partial</option>
+            <option value="paid"    ${_initPay(b) === 'paid'    ? 'selected' : ''}>Yes</option>
           </select>
+        </div>
+      </div>
+      <div id="bm-partial-row" class="f-row cols-2" ${_initPay(b) === 'partial' ? '' : 'hidden'}>
+        <div class="f-group">
+          <label class="f-label" for="bm-collected">Collected amount (₹)</label>
+          <input id="bm-collected" type="number" class="f-input" value="${b.collectedAmount != null ? escapeAttr(String(b.collectedAmount)) : ''}" min="0" step="50" inputmode="numeric" autocomplete="off">
+        </div>
+        <div class="f-group">
+          <label class="f-label" for="bm-remaining">Remaining (₹)</label>
+          <input id="bm-remaining" type="text" class="f-input" value="" readonly tabindex="-1" aria-readonly="true">
         </div>
       </div>
       <div class="f-group mb-12" style="position:relative;">
@@ -670,6 +716,26 @@ export async function openBookingModal(db, existing) {
         if (c) applyCustomer(c);
       });
 
+      // Partial-payment row: toggle visibility + live-compute remaining.
+      const payEl       = document.getElementById('bm-paid');
+      const partialRow  = document.getElementById('bm-partial-row');
+      const fareEl      = document.getElementById('bm-fare');
+      const collectedEl = document.getElementById('bm-collected');
+      const remainingEl = document.getElementById('bm-remaining');
+      function syncPartial() {
+        const isPartial = payEl.value === 'partial';
+        if (isPartial) partialRow.removeAttribute('hidden');
+        else partialRow.setAttribute('hidden', '');
+        const fare = Number(fareEl.value || 0);
+        const col  = Number(collectedEl.value || 0);
+        const rem  = Math.max(0, fare - col);
+        remainingEl.value = isFinite(rem) ? `₹${rem}` : '';
+      }
+      payEl.addEventListener('change', syncPartial);
+      fareEl.addEventListener('input', syncPartial);
+      collectedEl.addEventListener('input', syncPartial);
+      syncPartial();
+
       // "Use suggested AT N" — restores the suggestion if user wiped it.
       newBtn && newBtn.addEventListener('click', () => {
         nameEl.value  = suggestedName;
@@ -689,12 +755,31 @@ export async function openBookingModal(db, existing) {
       }
       const fareRaw = document.getElementById('bm-fare').value;
       const fare    = fareRaw === '' ? null : Number(fareRaw);
-      const paid    = document.getElementById('bm-paid').value === 'true';
+      const paymentStatus = document.getElementById('bm-paid').value; // 'paid' | 'partial' | 'unpaid'
+      const paid    = paymentStatus === 'paid';
       // Paid bookings must have a fare — otherwise the P&L / payments KPIs
       // record a "paid" doc with no amount, which silently corrupts revenue.
       if (paid && (!Number.isFinite(fare) || fare <= 0)) {
         Swal.showValidationMessage('Set a fare amount before marking the booking as paid.');
         return false;
+      }
+      let collectedAmount = null;
+      if (paymentStatus === 'partial') {
+        if (!Number.isFinite(fare) || fare <= 0) {
+          Swal.showValidationMessage('Set a fare amount before marking the booking as partial.');
+          return false;
+        }
+        const colRaw = document.getElementById('bm-collected').value;
+        const col    = colRaw === '' ? NaN : Number(colRaw);
+        if (!Number.isFinite(col) || col <= 0) {
+          Swal.showValidationMessage('Enter the collected amount (greater than 0) for a partial payment.');
+          return false;
+        }
+        if (col >= fare) {
+          Swal.showValidationMessage('Collected amount must be less than fare. Use "Yes" if fully paid.');
+          return false;
+        }
+        collectedAmount = col;
       }
       const phoneRaw = document.getElementById('bm-phone').value.trim();
       const phone    = phoneRaw ? normalisePhone(phoneRaw) : '';
@@ -724,6 +809,8 @@ export async function openBookingModal(db, existing) {
         },
         fare,
         paid,
+        paymentStatus,
+        collectedAmount,
         fuel,
         referral,
       };

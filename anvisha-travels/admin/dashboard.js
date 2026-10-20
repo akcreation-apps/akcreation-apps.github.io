@@ -4,6 +4,7 @@ import {
   fmtINR, fmtNum, toDateSafe, startOfDay, startOfMonth, addDays, groupBy, topN,
   chartPalette, applyChartGlobalDefaults, wireStatsBlockResize,
 } from './analytics.js';
+import { getPayment } from './bookings.js';
 
 const RANGE_LS_KEY = 'av_admin_dashboard_range';
 
@@ -86,6 +87,7 @@ export async function renderDashboard(ctx) {
     <h3 class="card-title mb-12" style="margin-top:18px;">Payments</h3>
     <div class="kpi-grid" id="pay-kpis">
       ${kpi('paid',     'Payment received')}
+      ${kpi('partial',  'Payment partial')}
       ${kpi('pending',  'Payment pending', 'pending-card')}
       ${kpi('paid_amt', 'Received (₹)')}
       ${kpi('pending_amt', 'Outstanding (₹)')}
@@ -248,18 +250,22 @@ export async function renderDashboard(ctx) {
     setKpi('aov',       fmtINR(aov));
 
     // ── Payments ──
-    const paidBookings    = completedBookings.filter(b => !!b.paid);
-    const pendingBookings = completedBookings.filter(b => !b.paid);
-    const paidAmt    = paidBookings.reduce((a, b) => a + Number(b.fare || 0), 0);
-    const pendingAmt = pendingBookings.reduce((a, b) => a + Number(b.fare || 0), 0);
-    setKpi('paid',        fmtNum(paidBookings.length));
-    setKpi('pending',     fmtNum(pendingBookings.length));
-    setKpi('paid_amt',    fmtINR(paidAmt));
-    setKpi('pending_amt', fmtINR(pendingAmt));
+    const pay = completedBookings.map(getPayment);
+    const paidCount    = pay.filter(p => p.status === 'paid').length;
+    const partialCount = pay.filter(p => p.status === 'partial').length;
+    const pendingCount = pay.filter(p => p.status === 'unpaid').length;
+    const receivedAmt    = pay.reduce((a, p) => a + p.received, 0);
+    const outstandingAmt = pay.reduce((a, p) => a + p.outstanding, 0);
+    setKpi('paid',        fmtNum(paidCount));
+    setKpi('partial',     fmtNum(partialCount));
+    setKpi('pending',     fmtNum(pendingCount));
+    setKpi('paid_amt',    fmtINR(receivedAmt));
+    setKpi('pending_amt', fmtINR(outstandingAmt));
     const pendingCard = document.getElementById('kpi-pending-card');
     if (pendingCard) {
-      pendingCard.style.borderColor = pendingBookings.length > 0 ? 'rgba(239,68,68,0.45)' : 'rgba(34,197,94,0.45)';
-      pendingCard.style.background  = pendingBookings.length > 0 ? 'rgba(239,68,68,0.06)' : 'rgba(34,197,94,0.06)';
+      const anyOwed = outstandingAmt > 0;
+      pendingCard.style.borderColor = anyOwed ? 'rgba(239,68,68,0.45)' : 'rgba(34,197,94,0.45)';
+      pendingCard.style.background  = anyOwed ? 'rgba(239,68,68,0.06)' : 'rgba(34,197,94,0.06)';
     }
 
     // Clear old charts before re-drawing

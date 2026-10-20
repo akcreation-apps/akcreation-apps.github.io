@@ -1,6 +1,7 @@
 import { COL } from '../firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { fmtDate, fmtTimeLabel, fmtINR, fmtNum } from './analytics.js';
+import { getPayment } from './bookings.js';
 
 // Referrals tab: list every referral name that appears on a booking, with a
 // count + total fare + paid vs pending totals. Click a referral to drill in
@@ -42,8 +43,13 @@ export async function renderReferrals(ctx) {
     const fare = Number(b.fare || 0);
     a.count += 1;
     a.fare  += fare;
-    if (b.status === 'completed' && b.paid) a.paid += fare;
-    else a.pending += fare;
+    if (b.status === 'completed') {
+      const p = getPayment(b);
+      a.paid    += p.received;
+      a.pending += p.outstanding;
+    } else {
+      a.pending += fare;
+    }
     a.bookings.push(b);
   }
 
@@ -151,10 +157,13 @@ export async function renderReferrals(ctx) {
 function renderBookingRow(b) {
   const status = b.status || 'new';
   const customer = b.customer || {};
+  const p = getPayment(b);
   const payChip = status === 'completed'
-    ? (b.paid
+    ? (p.status === 'paid'
         ? `<span class="chip completed"><i class="fas fa-circle-check"></i> Paid</span>`
-        : `<span class="chip cancelled"><i class="fas fa-hourglass-half"></i> Pending</span>`)
+        : p.status === 'partial'
+          ? `<span class="chip partial"><i class="fas fa-adjust"></i> Partial</span>`
+          : `<span class="chip cancelled"><i class="fas fa-hourglass-half"></i> Pending</span>`)
     : `<span class="chip ${status}">${labelFor(status)}</span>`;
   return `
     <div class="row-card">
