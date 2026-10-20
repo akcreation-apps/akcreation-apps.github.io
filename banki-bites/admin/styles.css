@@ -3263,3 +3263,47 @@ button.fab:hover { background: var(--brand-dark); }
   }
   .admin-note-input::placeholder { color: #6b7280; }
 }
+
+/* ===== Install-as-app floating action button ===== */
+.install-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #FF6B35;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.35), 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.install-fab:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255, 107, 53, 0.45); }
+.install-fab:active { transform: translateY(0); }
+.install-fab:focus-visible { outline: 3px solid #ffd4bf; outline-offset: 2px; }
+.install-fab[hidden] { display: none !important; }
+.install-fab-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #fff;
+  padding: 2px;
+  object-fit: contain;
+}
+@media (max-width: 480px) {
+  .install-fab { right: 12px; bottom: 12px; padding: 9px 14px; font-size: 13px; }
+}
+@media (prefers-color-scheme: dark) {
+  .install-fab {
+    background: #FF6B35;
+    color: #0b0d12;
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.5), 0 2px 6px rgba(0, 0, 0, 0.6);
+  }
+  .install-fab-logo { background: #0b0d12; }
+}

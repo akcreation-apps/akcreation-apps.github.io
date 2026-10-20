@@ -68,11 +68,6 @@
       </div>
       <div class="topbar-user">
         <span id="userEmail" class="user-email"></span>
-        <button id="installAppBtn" class="btn btn-sm btn-outline-light" type="button" hidden
-                title="Install BankiBites Admin app">
-          <i class="fas fa-download" aria-hidden="true"></i>
-          <span class="d-none d-md-inline ml-1">Install app</span>
-        </button>
         <button id="signOutBtn" class="btn btn-sm btn-outline-light" title="Sign out">
           <i class="fas fa-sign-out-alt"></i>
         </button>
@@ -115,6 +110,12 @@
       <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
     </footer>
   </div>
+
+  <button id="installAppBtn" class="install-fab" type="button" hidden
+          title="Install BankiBites Admin app">
+    <img src="/banki-bites/banki-bites-logo.png" alt="" class="install-fab-logo">
+    <span>Install app</span>
+  </button>
 
   <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
   <script type="module" src="app.js"></script>
