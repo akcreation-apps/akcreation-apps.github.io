@@ -9,7 +9,7 @@ const FOOTER = 'ଏହିପରି message ଆଉ ପାଇବାକୁ ନ ଚ�
 // Default body for the "Offer expiring" segment — auto-loaded when the
 // admin picks that segment and the composer is empty. Uses the {name},
 // {discount}, {expiry} placeholders supported by personalize().
-const EXPIRING_TEMPLATE = 'ନମସ୍କାର {name} !\n\n⏰ ଆପଣଙ୍କ *₹{discount} OFF* BankiBites coupon *{expiry}* ରେ expire ହୋଇଯିବ — ଆଜି ଏହାକୁ use କରିବାର ଠିକ୍ ଦିନ 😋\n\nOffer ଶେଷ ହେବା ପୂର୍ବରୁ BankiBites app କିମ୍ବା website ରେ order କରନ୍ତୁ ।';
+const EXPIRING_TEMPLATE = 'ନମସ୍କାର {name} !\n\n⏰ ଆପଣଙ୍କ *₹{discount}/- OFF (Above 200/-)* BankiBites coupon *{expiry}* ରେ expire ହୋଇଯିବ — ଆଜି ଏହାକୁ use କରିବାର ଠିକ୍ ଦିନ 😋\n\nOffer ଶେଷ ହେବା ପୂର୍ବରୁ BankiBites app କିମ୍ବା website ରେ order କରନ୍ତୁ ।';
 const QUEUE_KEY = 'bb_broadcast_queue_v1';
 const NAME_FALLBACK = 'Dear';
 
