@@ -450,7 +450,8 @@ function renderOrderCard(db, o, root, suggestedName = '') {
   const feeShown = (['assigned', 'out_for_delivery', 'delivered'].includes(status))
     ? (o.delivery_fee_final ?? o.delivery_fee_estimated ?? 0)
     : (o.delivery_fee_estimated ?? 0);
-  const grand = (Number(o.subtotal) || 0) + Number(feeShown || 0);
+  const extraCharges = Number.isFinite(+o.extra_charges) ? +o.extra_charges : 0;
+  const grand = (Number(o.subtotal) || 0) + Number(feeShown || 0) + extraCharges;
   // Fully-paid means we've recorded either an explicit collected flag or a
   // paid_already >= total on a saved order. Brand-new customer orders come
   // in as isNewUnprocessed and default the toggle to OFF so admin actively
@@ -573,7 +574,17 @@ function renderOrderCard(db, o, root, suggestedName = '') {
       <div class="order-items" style="list-style:none;padding:0;margin-bottom:.75rem">
         <div style="display:flex;justify-content:space-between"><span>Subtotal</span><span>${fmtINR(o.subtotal)}</span></div>
         <div style="display:flex;justify-content:space-between"><span>Delivery${o.delivery_fee_final == null ? ' (est.)' : ''}</span><span>${fmtINR(feeShown)}</span></div>
-        <div style="display:flex;justify-content:space-between;font-weight:700"><span>Total</span><span>${fmtINR(grand)}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <span>Extra charges <small class="text-muted">(out-of-zone etc.)</small></span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span class="rupee">₹</span>
+            <input class="form-control form-control-sm" data-f="extraCharges"
+                   type="number" min="0" step="1" inputmode="numeric"
+                   style="max-width:90px;text-align:right"
+                   value="${extraCharges || ''}" placeholder="0">
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-weight:700"><span>Total</span><span data-el="grandTotal">${fmtINR(grand)}</span></div>
       </div>
       <label class="field">
         <span class="field-label">Status</span>
@@ -748,10 +759,14 @@ function wireSave(db, card, o) {
   const paidAlreadyIn = card.querySelector('[data-f="paidAlready"]');
   const collectIn     = card.querySelector('[data-f="collectAmount"]');
   const methodSel     = card.querySelector('[data-f="method"]');
+  const extraIn       = card.querySelector('[data-f="extraCharges"]');
+  const grandTotalEl  = card.querySelector('[data-el="grandTotal"]');
   const fullyPaidHint = card.querySelector('[data-el="fullyPaidHint"]');
   const collectHelp   = card.querySelector('[data-el="collectHelp"]');
-  const orderTotal = (Number(o.subtotal) || 0) +
+  const baseTotal = (Number(o.subtotal) || 0) +
     Number(o.delivery_fee_final ?? o.delivery_fee_estimated ?? 0);
+  const getExtra = () => Math.max(0, parseFloat(extraIn?.value) || 0);
+  let orderTotal = baseTotal + getExtra();
 
   // Force-populate the prepaid + collect + method fields whenever no
   // payment has been saved yet. Some browsers / password managers wipe
@@ -795,6 +810,13 @@ function wireSave(db, card, o) {
   // Listen on both `input` and `change` so we cover typing, paste, spinner
   // arrows, and mobile numeric keyboards uniformly.
   ['input', 'change'].forEach(ev => paidAlreadyIn.addEventListener(ev, recomputeCollect));
+  if (extraIn) {
+    ['input', 'change'].forEach(ev => extraIn.addEventListener(ev, () => {
+      orderTotal = baseTotal + getExtra();
+      if (grandTotalEl) grandTotalEl.textContent = fmtINR(orderTotal);
+      recomputeCollect();
+    }));
+  }
   collectIn.addEventListener('input', () => {
     // Only mark as overridden if the admin's value diverges from the
     // computed one. Typing "540" then deleting back to computed 540
@@ -883,6 +905,7 @@ function wireSave(db, card, o) {
         payment_collected: fullyPaid,
         payment_method: (paidToggleOn || prepaid > 0) ? method : '',
         cancel_reason: status === 'cancelled' ? cancelReasonNext : null,
+        extra_charges: getExtra(),
       };
       // Keep `is_fake` aligned with the chosen status so the Flag-as-Fake
       // button and the status dropdown produce identical end-state.
@@ -1127,7 +1150,8 @@ function renderRunCard(db, r) {
         );
         const rows = stops.filter(Boolean).map((o, i) => {
           const fee = Number(o.delivery_fee_final ?? o.delivery_fee_estimated ?? 0);
-          const total = (Number(o.subtotal) || 0) + fee;
+          const extra = Number(o.extra_charges) || 0;
+          const total = (Number(o.subtotal) || 0) + fee + extra;
           return `
             <div class="entity-card" style="padding:.5rem .65rem;margin-bottom:.35rem">
               <div class="ec-title" style="font-size:.9rem">
@@ -1203,7 +1227,8 @@ async function editRun(db, r) {
 
   const stopsHtml = stops.length ? stops.map((o, i) => {
     const fee = Number(o.delivery_fee_final ?? o.delivery_fee_estimated ?? 0);
-    const total = (Number(o.subtotal) || 0) + fee;
+    const extra = Number(o.extra_charges) || 0;
+    const total = (Number(o.subtotal) || 0) + fee + extra;
     const shortId = String(o.id || '').slice(-6).toUpperCase();
     const name = o.customer?.name || '(no name)';
     const phone = o.customer?.phone || '';

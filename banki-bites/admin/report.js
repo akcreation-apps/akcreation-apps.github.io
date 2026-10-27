@@ -83,6 +83,34 @@ async function getVendorPriceMap(restaurantId) {
   return empty;
 }
 
+// Grocery vendor-price lookup — single flat products.json keyed by product id.
+// Cached for the lifetime of the admin tab; cache-busted via ?v= on each cold
+// fetch so edits to the JSON show up without a full refresh.
+let _groceryVendorMap = null;
+async function getGroceryVendorPriceMap() {
+  if (_groceryVendorMap) return _groceryVendorMap;
+  const map = new Map();
+  try {
+    const res = await fetch(`../../bankibites-grocerries/data/products.json?v=${Date.now()}`);
+    if (!res.ok) throw new Error(`products.json ${res.status}`);
+    const data = await res.json();
+    (function walk(x) {
+      if (Array.isArray(x)) { x.forEach(walk); return; }
+      if (x && typeof x === 'object') {
+        if (x.id != null && 'vendor_price' in x) {
+          const vp = Number(x.vendor_price);
+          map.set(String(x.id), Number.isFinite(vp) ? vp : 0);
+        }
+        for (const k in x) walk(x[k]);
+      }
+    })(data);
+  } catch (e) {
+    console.warn('[report] grocery vendor_price map unavailable:', e.message || e);
+  }
+  _groceryVendorMap = map;
+  return map;
+}
+
 export async function renderReport(root, db) {
   root.innerHTML = `
     <div class="report-tab">
@@ -388,10 +416,37 @@ export async function renderReport(root, db) {
   let lastReport = null;
 
   runBtn.addEventListener('click', async () => {
-    lastReport = await generate(db, dateInput.value, out, printBtn, excelBtn);
+    const pick = await Swal.fire({
+      title: 'Generate Report',
+      html: `
+        <div style="text-align:left;display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="radio" name="bbReportType" value="food" checked>
+            <span><strong>Food Orders</strong><br><small style="color:#64748b;">Delivered orders for the selected date</small></span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="radio" name="bbReportType" value="grocery">
+            <span><strong>Grocery Orders</strong><br><small style="color:#64748b;">All orders in <code>order_confirmed</code> or <code>assigned</code> state</small></span>
+          </label>
+        </div>`,
+      showCancelButton: true,
+      confirmButtonText: 'Generate',
+      focusConfirm: false,
+      preConfirm: () => document.querySelector('input[name="bbReportType"]:checked')?.value || 'food',
+    });
+    if (!pick.isConfirmed) return;
+    if (pick.value === 'grocery') {
+      lastReport = await generateGroceryReport(db, out, printBtn, excelBtn);
+    } else {
+      lastReport = await generate(db, dateInput.value, out, printBtn, excelBtn);
+    }
   });
   printBtn.addEventListener('click', () => window.print());
-  excelBtn.addEventListener('click', () => { if (lastReport) exportExcel(lastReport); });
+  excelBtn.addEventListener('click', () => {
+    if (!lastReport) return;
+    if (lastReport.kind === 'grocery') exportGroceryExcel(lastReport);
+    else exportExcel(lastReport);
+  });
 }
 
 async function generate(db, iso, out, printBtn, excelBtn) {
@@ -646,6 +701,231 @@ function exportExcel(data) {
   const a = document.createElement('a');
   a.href = url;
   a.download = `bankibites-daily-report-${data.iso}.xls`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function generateGroceryReport(db, out, printBtn, excelBtn) {
+  window.bbBusy?.('Building grocery pick-list…');
+  try {
+    // Narrow the Firestore scan to the last 3 days (today + 2 prior). Pending orders
+    // (`order_confirmed`/`assigned`) that pre-date this window are stale and shouldn't
+    // bias the pick-list anyway. The time filter alone keeps the server-side read
+    // count bounded by recent volume instead of lifetime volume.
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2, 0, 0, 0, 0);
+    const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+    const windowKey = `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
+    const orders = await cachedGetDocs(
+      `grocery-report:pending:${windowKey}`,
+      () => query(
+        collection(db, COL.GROCERY_ORDERS),
+        where('created_at', '>=', Timestamp.fromDate(start)),
+        where('created_at', '<',  Timestamp.fromDate(end)),
+      ),
+      { ttlMs: 60_000 },
+    );
+    const pending = orders.filter(o => o.status === 'order_confirmed' || o.status === 'assigned');
+
+    if (pending.length === 0) {
+      out.innerHTML = `
+        <div class="rpt-empty">
+          <div class="rpt-empty-icon"><i class="fas fa-basket-shopping"></i></div>
+          <h3>No pending grocery orders</h3>
+          <p>Nothing is currently in <code>order_confirmed</code> or <code>assigned</code> state.</p>
+        </div>`;
+      printBtn.disabled = true;
+      excelBtn.disabled = true;
+      return null;
+    }
+
+    const confirmedCount = pending.filter(o => o.status === 'order_confirmed').length;
+    const assignedCount  = pending.filter(o => o.status === 'assigned').length;
+
+    // Per-order financials — grocery has no discount field, so Net = Gross (items only).
+    // Grand total adds the locked (or estimated) delivery fee plus any admin-entered
+    // extra charges (e.g. out-of-zone fee) per order.
+    let grossSales = 0, deliveryFees = 0, extraCharges = 0;
+    for (const o of pending) {
+      grossSales   += Number(o.subtotal) || 0;
+      deliveryFees += Number(o.delivery_fee_final ?? o.delivery_fee_estimated ?? 0);
+      extraCharges += Number(o.extra_charges) || 0;
+    }
+    const netSales   = grossSales;
+    const grandTotal = grossSales + deliveryFees + extraCharges;
+
+    const agg = new Map();
+    for (const o of pending) {
+      if (!Array.isArray(o.items)) continue;
+      for (const it of o.items) {
+        const id = it?.id != null && it.id !== '' ? String(it.id) : (it?.name || '').trim();
+        if (!id) continue;
+        const name = (it?.name || '').trim() || id;
+        const unit = (it?.unit || '').toString().trim();
+        const price = Number(it?.price) || 0;
+        const qty = Number(it?.qty) || 0;
+        const prev = agg.get(id);
+        if (prev) {
+          prev.qty += qty;
+          if (price > 0) prev.price = price;
+          if (!prev.unit && unit) prev.unit = unit;
+        } else {
+          agg.set(id, { id, name, unit, price, qty });
+        }
+      }
+    }
+
+    const vendorMap = await getGroceryVendorPriceMap();
+    const rows = [...agg.values()]
+      .map(r => {
+        const vp = Number(vendorMap.get(String(r.id))) || 0;
+        return { ...r, vendorPrice: vp, totalVendorPrice: vp * r.qty };
+      })
+      .sort((a, b) =>
+        a.name.localeCompare(b.name) || String(a.id).localeCompare(String(b.id))
+      );
+    const totalPrice       = rows.reduce((s, r) => s + r.price, 0);
+    const totalQty         = rows.reduce((s, r) => s + r.qty, 0);
+    const orderValue       = rows.reduce((s, r) => s + r.price * r.qty, 0);
+    const totalVendorPrice = rows.reduce((s, r) => s + r.vendorPrice, 0);
+    const totalVendorCost  = rows.reduce((s, r) => s + r.totalVendorPrice, 0);
+
+    const todayIso = todayLocalISO();
+    const prettyDate = new Date(todayIso + 'T00:00:00').toLocaleDateString('en-IN', {
+      weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+    });
+
+    const bodyRows = rows.map(r => `
+      <tr>
+        <td>${esc(r.id)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.unit || '')}</td>
+        <td>${r.qty}</td>
+        <td>${fmtINR2(r.vendorPrice)}</td>
+        <td>${fmtINR2(r.price)}</td>
+        <td>${fmtINR2(r.totalVendorPrice)}</td>
+        <td>${fmtINR2(r.price * r.qty)}</td>
+      </tr>`).join('');
+
+    out.innerHTML = `
+      <div class="rpt-kpis">
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-head"><i class="far fa-calendar-check"></i> Generated</div>
+          <div class="rpt-kpi-val">${esc(prettyDate)}</div>
+        </div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-head"><i class="fas fa-receipt"></i> Pending orders</div>
+          <div class="rpt-kpi-val">${pending.length}<small>order${pending.length === 1 ? '' : 's'}</small></div>
+        </div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-head"><i class="fas fa-circle-check"></i> Order confirmed</div>
+          <div class="rpt-kpi-val">${confirmedCount}</div>
+        </div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-head"><i class="fas fa-user-check"></i> Assigned</div>
+          <div class="rpt-kpi-val">${assignedCount}</div>
+        </div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-head"><i class="fas fa-boxes-stacked"></i> Distinct products</div>
+          <div class="rpt-kpi-val">${rows.length}</div>
+        </div>
+        <div class="rpt-kpi is-money">
+          <div class="rpt-kpi-head"><i class="fas fa-indian-rupee-sign"></i> Gross sales</div>
+          <div class="rpt-kpi-val">${fmtINR2(grossSales)}</div>
+        </div>
+        <div class="rpt-kpi is-net">
+          <div class="rpt-kpi-head"><i class="fas fa-wallet"></i> Net sales</div>
+          <div class="rpt-kpi-val">${fmtINR2(netSales)}</div>
+        </div>
+        <div class="rpt-kpi is-cost">
+          <div class="rpt-kpi-head"><i class="fas fa-motorcycle"></i> Delivery fees</div>
+          <div class="rpt-kpi-val">${fmtINR2(deliveryFees)}</div>
+        </div>
+        <div class="rpt-kpi is-cost">
+          <div class="rpt-kpi-head"><i class="fas fa-indian-rupee-sign"></i> Extra charges</div>
+          <div class="rpt-kpi-val">${fmtINR2(extraCharges)}</div>
+        </div>
+        <div class="rpt-kpi is-money">
+          <div class="rpt-kpi-head"><i class="fas fa-hand-holding-dollar"></i> Grand total</div>
+          <div class="rpt-kpi-val">${fmtINR2(grandTotal)}</div>
+        </div>
+      </div>
+      <details class="report-card" open>
+        <summary>
+          <span class="rest-name">
+            <span class="rest-avatar" aria-hidden="true"><i class="fas fa-basket-shopping"></i></span>
+            <span class="rest-label">
+              <b>Grocery pick-list</b>
+              <span class="rest-meta"><i class="fas fa-receipt"></i> ${pending.length} pending order${pending.length === 1 ? '' : 's'}</span>
+            </span>
+          </span>
+        </summary>
+        <div class="rpt-card-body">
+          <table class="items-tbl">
+            <thead>
+              <tr><th>Product ID</th><th>Name</th><th>Unit</th><th>Qty</th><th>Vendor Price</th><th>Each Price</th><th>Total Vendor Price</th><th>Total Price</th></tr>
+            </thead>
+            <tbody>${bodyRows}</tbody>
+            <tfoot>
+              <tr><th>Total</th><th></th><th></th><th>${totalQty}</th><th></th><th></th><th>${fmtINR2(totalVendorCost)}</th><th>${fmtINR2(orderValue)}</th></tr>
+            </tfoot>
+          </table>
+        </div>
+      </details>
+    `;
+    printBtn.disabled = false;
+    excelBtn.disabled = false;
+    return {
+      kind: 'grocery', iso: todayIso, rows,
+      orderCount: pending.length, confirmedCount, assignedCount,
+      totalPrice, totalQty, orderValue, totalVendorPrice, totalVendorCost,
+      grossSales, netSales, deliveryFees, extraCharges, grandTotal,
+    };
+  } catch (e) {
+    console.error('[report] generateGroceryReport failed', e);
+    out.innerHTML = `<p class="text-danger" style="margin:16px 0;">Failed to build grocery report: ${esc(e.message || e)}</p>`;
+    printBtn.disabled = true;
+    excelBtn.disabled = true;
+    return null;
+  } finally {
+    window.bbDone?.();
+  }
+}
+
+function exportGroceryExcel(data) {
+  const money = n => (Number(n) || 0).toFixed(2);
+  const rows = [];
+
+  rows.push(`<tr><th colspan="8" style="font-size:14pt;background:#4f46e5;color:#fff;">BankiBites — Grocery Pending Pick-list</th></tr>`);
+  rows.push(`<tr><td><b>Generated</b></td><td colspan="7">${esc(data.iso)}</td></tr>`);
+  rows.push(`<tr><td><b>Pending orders</b></td><td colspan="7">${data.orderCount}</td></tr>`);
+  rows.push(`<tr><td><b>Order confirmed</b></td><td colspan="7">${data.confirmedCount}</td></tr>`);
+  rows.push(`<tr><td><b>Assigned</b></td><td colspan="7">${data.assignedCount}</td></tr>`);
+  rows.push(`<tr><td><b>Distinct products</b></td><td colspan="7">${data.rows.length}</td></tr>`);
+  rows.push(`<tr><td><b>Gross sales</b></td><td colspan="7">${money(data.grossSales)}</td></tr>`);
+  rows.push(`<tr><td><b>Net sales</b></td><td colspan="7">${money(data.netSales)}</td></tr>`);
+  rows.push(`<tr><td><b>Delivery fees</b></td><td colspan="7">${money(data.deliveryFees)}</td></tr>`);
+  rows.push(`<tr><td><b>Extra charges</b></td><td colspan="7">${money(data.extraCharges)}</td></tr>`);
+  rows.push(`<tr><td><b>Grand total</b></td><td colspan="7">${money(data.grandTotal)}</td></tr>`);
+  rows.push(`<tr><td colspan="8">&nbsp;</td></tr>`);
+
+  rows.push(`<tr><th style="background:#e5e7eb;">Product ID</th><th style="background:#e5e7eb;">Name</th><th style="background:#e5e7eb;">Unit</th><th style="background:#e5e7eb;">Qty</th><th style="background:#e5e7eb;">Vendor Price</th><th style="background:#e5e7eb;">Each Price</th><th style="background:#e5e7eb;">Total Vendor Price</th><th style="background:#e5e7eb;">Total Price</th></tr>`);
+  for (const r of data.rows) {
+    rows.push(`<tr><td>${esc(r.id)}</td><td>${esc(r.name)}</td><td>${esc(r.unit || '')}</td><td>${r.qty}</td><td>${money(r.vendorPrice)}</td><td>${money(r.price)}</td><td>${money(r.totalVendorPrice)}</td><td>${money(r.price * r.qty)}</td></tr>`);
+  }
+  rows.push(`<tr><td><b>Total</b></td><td></td><td></td><td><b>${data.totalQty}</b></td><td></td><td></td><td><b>${money(data.totalVendorCost)}</b></td><td><b>${money(data.orderValue)}</b></td></tr>`);
+
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Grocery Pending</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+<body><table border="1" cellspacing="0" cellpadding="4">${rows.join('')}</table></body></html>`;
+
+  const blob = new Blob(['﻿' + html], { type: 'application/vnd.ms-excel' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bankibites-grocery-pending-${data.iso}.xls`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
