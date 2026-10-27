@@ -41,7 +41,8 @@
       "WebSearch",
       "WebFetch(domain:faq.whatsapp.com)",
       "WebFetch(domain:techcrunch.com)",
-      "WebFetch(domain:sinch.com)"
+      "WebFetch(domain:sinch.com)",
+      "Bash(pip install *)"
     ]
   },
   "enableAllProjectMcpServers": true,

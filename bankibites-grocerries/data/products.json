@@ -11,24 +11,24 @@
           "name": "Sauces, Ketchup, Jam & Chutney",
           "dishes": [
             {
-              "id": 1058,
+              "id": 2059,
               "name": "Kissan Fresh Tomato Ketchup",
               "featured": true,
               "deal": false,
               "image": "images/products/KISAN FRESH TOMATO KETHUP 500G.webp",
               "variants": [
                 {
-                  "id": 1058,
+                  "id": 2059,
                   "unit": "500G",
-                  "price": 106,
+                  "price": 111,
                   "mrp": 120,
                   "image": "images/products/KISAN FRESH TOMATO KETHUP 500G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1059,
+                  "id": 2060,
                   "unit": "1KG",
-                  "price": 150,
+                  "price": 156,
                   "mrp": 170,
                   "image": "images/products/KISSAN FTK 1KG PRICEDROP-RJP NS.webp",
                   "inStock": true
@@ -36,14 +36,14 @@
               ]
             },
             {
-              "id": 1060,
+              "id": 2011,
               "name": "Kissan Imli Khajoor Chutney",
               "featured": true,
               "deal": false,
               "image": "images/products/KISSAN IMLI KHAJOOR CHUTNEY 100 GM DOY.webp",
               "variants": [
                 {
-                  "id": 1060,
+                  "id": 2011,
                   "unit": "100G",
                   "price": 43,
                   "mrp": 49,
@@ -53,14 +53,14 @@
               ]
             },
             {
-              "id": 1061,
+              "id": 2012,
               "name": "Kissan Lehsun Mirch Chutney",
               "featured": true,
               "deal": false,
               "image": "images/products/KISSAN LEHSUN MIRCH CHUTNEY 100 GM DOY.webp",
               "variants": [
                 {
-                  "id": 1061,
+                  "id": 2012,
                   "unit": "100G",
                   "price": 43,
                   "mrp": 49,
@@ -68,7 +68,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1062,
+                  "id": 2013,
                   "unit": "200G",
                   "price": 79,
                   "mrp": 90,
@@ -78,16 +78,16 @@
               ]
             },
             {
-              "id": 1063,
+              "id": 2058,
               "name": "Kissan Lemon Squash",
               "featured": false,
               "deal": false,
               "image": "images/products/KISSAN LEMON SQUASH 750 ML-9M 2025.webp",
               "variants": [
                 {
-                  "id": 1063,
+                  "id": 2058,
                   "unit": "750ML",
-                  "price": 144,
+                  "price": 151,
                   "mrp": 164,
                   "image": "images/products/KISSAN LEMON SQUASH 750 ML-9M 2025.webp",
                   "inStock": true
@@ -95,16 +95,16 @@
               ]
             },
             {
-              "id": 1064,
+              "id": 2137,
               "name": "Kissan Sweet & Spicy Sauce",
               "featured": false,
               "deal": false,
               "image": "images/products/KISSAN SWEET & SPICY SAUCE 200G.webp",
               "variants": [
                 {
-                  "id": 1064,
+                  "id": 2137,
                   "unit": "200G",
-                  "price": 62,
+                  "price": 65,
                   "mrp": 70,
                   "image": "images/products/KISSAN SWEET & SPICY SAUCE 200G.webp",
                   "inStock": true
@@ -112,16 +112,16 @@
               ]
             },
             {
-              "id": 1065,
+              "id": 2138,
               "name": "Kissan Sweet & Spicy",
               "featured": false,
               "deal": false,
               "image": "images/products/KISSAN SWEET&SPICY 425 GM DOY.webp",
               "variants": [
                 {
-                  "id": 1065,
+                  "id": 2138,
                   "unit": "425G",
-                  "price": 70,
+                  "price": 74,
                   "mrp": 80,
                   "image": "images/products/KISSAN SWEET&SPICY 425 GM DOY.webp",
                   "inStock": true
@@ -129,24 +129,24 @@
               ]
             },
             {
-              "id": 1067,
+              "id": 2056,
               "name": "Knorr Dark Soya Sauce",
               "featured": false,
               "deal": false,
               "image": "images/products/KNORR DARK SOYA SAUCE 85G.webp",
               "variants": [
                 {
-                  "id": 1067,
+                  "id": 2056,
                   "unit": "85G",
-                  "price": 20,
+                  "price": 22,
                   "mrp": 23,
                   "image": "images/products/KNORR DARK SOYA SAUCE 85G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1066,
+                  "id": 2053,
                   "unit": "200G",
-                  "price": 53,
+                  "price": 56,
                   "mrp": 60,
                   "image": "images/products/KNORR DARK SOYA SAUCE 200 GM.webp",
                   "inStock": true
@@ -154,24 +154,24 @@
               ]
             },
             {
-              "id": 1069,
+              "id": 2057,
               "name": "Knorr Green Chilli Sauce",
               "featured": false,
               "deal": false,
               "image": "images/products/KNORR GREEN CHILLI SAUCE 90G.webp",
               "variants": [
                 {
-                  "id": 1069,
+                  "id": 2057,
                   "unit": "90G",
-                  "price": 22,
+                  "price": 23,
                   "mrp": 25,
                   "image": "images/products/KNORR GREEN CHILLI SAUCE 90G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1068,
+                  "id": 2055,
                   "unit": "200G",
-                  "price": 53,
+                  "price": 56,
                   "mrp": 60,
                   "image": "images/products/KNORR GREEN CHILLI SAUCE 200 GM-12M.webp",
                   "inStock": true
@@ -179,16 +179,16 @@
               ]
             },
             {
-              "id": 1070,
+              "id": 2054,
               "name": "Knorr Red Chilli Sauce",
               "featured": false,
               "deal": false,
               "image": "images/products/KNORR RED CHILLI SAUCE 200 GM-12M.webp",
               "variants": [
                 {
-                  "id": 1070,
+                  "id": 2054,
                   "unit": "200G",
-                  "price": 48,
+                  "price": 51,
                   "mrp": 55,
                   "image": "images/products/KNORR RED CHILLI SAUCE 200 GM-12M.webp",
                   "inStock": true
@@ -196,16 +196,16 @@
               ]
             },
             {
-              "id": 1071,
+              "id": 2140,
               "name": "Kissan Fresh Tomato Ketchup Doypack",
               "featured": false,
               "deal": false,
               "image": "images/products/KSN FTK DOY PACK 825 GM NS.webp",
               "variants": [
                 {
-                  "id": 1071,
+                  "id": 2140,
                   "unit": "825G",
-                  "price": 87,
+                  "price": 91,
                   "mrp": 99,
                   "image": "images/products/KSN FTK DOY PACK 825 GM NS.webp",
                   "inStock": true
@@ -213,16 +213,16 @@
               ]
             },
             {
-              "id": 1072,
+              "id": 2052,
               "name": "Kissan Mixed Fruit Jam Red Label",
               "featured": false,
               "deal": false,
               "image": "images/products/KSN MXD FRT JAM 200G RL RJP.webp",
               "variants": [
                 {
-                  "id": 1072,
+                  "id": 2052,
                   "unit": "200G",
-                  "price": 79,
+                  "price": 83,
                   "mrp": 90,
                   "image": "images/products/KSN MXD FRT JAM 200G RL RJP.webp",
                   "inStock": true
@@ -230,14 +230,14 @@
               ]
             },
             {
-              "id": 1371,
+              "id": 3016,
               "name": "S&J Tomato Ketchup",
               "featured": false,
               "deal": false,
               "image": "images/products/S&J Tomato Ketchup 48X95Gm(15).webp",
               "variants": [
                 {
-                  "id": 1371,
+                  "id": 3016,
                   "unit": "95G",
                   "price": 13,
                   "mrp": 15,
@@ -247,16 +247,16 @@
               ]
             },
             {
-              "id": 1374,
+              "id": 3021,
               "name": "S&J Ginger Garlic Paste",
               "featured": true,
               "deal": false,
               "image": "images/products/S&J Ginger Garlic Paste 200g New.webp",
               "variants": [
                 {
-                  "id": 1374,
+                  "id": 3021,
                   "unit": "200G",
-                  "price": 41,
+                  "price": 40,
                   "mrp": 47,
                   "image": "images/products/S&J Ginger Garlic Paste 200g New.webp",
                   "inStock": true
@@ -264,16 +264,16 @@
               ]
             },
             {
-              "id": 1346,
+              "id": 1055,
               "name": "Maggi Hot & Sweet Sauce",
               "featured": false,
               "deal": false,
               "image": "images/products/MAGGI HOT & SWEET 12x1Kg N1 IN.webp",
               "variants": [
                 {
-                  "id": 1346,
+                  "id": 1055,
                   "unit": "1KG",
-                  "price": 167,
+                  "price": 175,
                   "mrp": 190,
                   "image": "images/products/MAGGI HOT & SWEET 12x1Kg N1 IN.webp",
                   "inStock": true
@@ -281,14 +281,14 @@
               ]
             },
             {
-              "id": 1363,
+              "id": 3008,
               "name": "Ching's Schezwan Chutney",
               "featured": true,
               "deal": false,
               "image": "images/products/Ching's Schezwan Chutney 360x 30 gm.webp",
               "variants": [
                 {
-                  "id": 1363,
+                  "id": 3008,
                   "unit": "30G",
                   "price": 9,
                   "mrp": 10,
@@ -296,9 +296,9 @@
                   "inStock": true
                 },
                 {
-                  "id": 1393,
+                  "id": 3044,
                   "unit": "250G",
-                  "price": 79,
+                  "price": 83,
                   "mrp": 90,
                   "image": "images/products/Swwzwan Chutny 250.webp",
                   "inStock": true
@@ -306,14 +306,14 @@
               ]
             },
             {
-              "id": 1366,
+              "id": 3011,
               "name": "Ching's Red Chilli Sauce",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Red Chilli Sauce 48 x 90 gm.webp",
               "variants": [
                 {
-                  "id": 1366,
+                  "id": 3011,
                   "unit": "90G",
                   "price": 22,
                   "mrp": 25,
@@ -323,14 +323,14 @@
               ]
             },
             {
-              "id": 1367,
+              "id": 3012,
               "name": "Ching's Dark Soy Sauce",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Dark Soy Sauce 48 x 90 gm.webp",
               "variants": [
                 {
-                  "id": 1367,
+                  "id": 3012,
                   "unit": "90G",
                   "price": 22,
                   "mrp": 25,
@@ -340,16 +340,16 @@
               ]
             },
             {
-              "id": 1271,
+              "id": 2050,
               "name": "Hellmann's Mayonnaise Roasted Garlic",
               "featured": true,
               "deal": false,
               "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
               "variants": [
                 {
-                  "id": 1271,
+                  "id": 2050,
                   "unit": "85G",
-                  "price": 40,
+                  "price": 43,
                   "mrp": 46,
                   "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
                   "inStock": true
@@ -357,16 +357,16 @@
               ]
             },
             {
-              "id": 1272,
+              "id": 2049,
               "name": "Hellmann's Mayonnaise Smoky Tandoori",
               "featured": true,
               "deal": false,
               "image": "images/products/HELLMANNS MAYO SMOKY TANDOORI 85GM RSL.webp",
               "variants": [
                 {
-                  "id": 1272,
+                  "id": 2049,
                   "unit": "85G",
-                  "price": 40,
+                  "price": 43,
                   "mrp": 46,
                   "image": "images/products/HELLMANNS MAYO SMOKY TANDOORI 85GM RSL.webp",
                   "inStock": true
@@ -374,16 +374,16 @@
               ]
             },
             {
-              "id": 1273,
+              "id": 2051,
               "name": "Hellmann's Mayonnaise",
               "featured": true,
               "deal": false,
               "image": "images/products/HELLMANNS MAYO 85GM RSL.webp",
               "variants": [
                 {
-                  "id": 1273,
+                  "id": 2051,
                   "unit": "85G",
-                  "price": 35,
+                  "price": 37,
                   "mrp": 40,
                   "image": "images/products/HELLMANNS MAYO 85GM RSL.webp",
                   "inStock": true
@@ -405,16 +405,16 @@
           "name": "Tea & Tea Products",
           "dishes": [
             {
-              "id": 1089,
+              "id": 2066,
               "name": "Lipton Green Honey Lemon Tea Bags",
               "featured": true,
               "deal": false,
               "image": "images/products/LIPTON GREEN HONEY LEMON 1.4GX10S TBV.webp",
               "variants": [
                 {
-                  "id": 1089,
+                  "id": 2066,
                   "unit": "14G",
-                  "price": 57,
+                  "price": 60,
                   "mrp": 65,
                   "image": "images/products/LIPTON GREEN HONEY LEMON 1.4GX10S TBV.webp",
                   "inStock": true
@@ -422,16 +422,16 @@
               ]
             },
             {
-              "id": 1090,
+              "id": 2067,
               "name": "Lipton Green Tea Clear & Light Tea Bags",
               "featured": false,
               "deal": false,
               "image": "images/products/LIPTON GREEN TEA CLR & LIGHT 1.3GX10S TB.webp",
               "variants": [
                 {
-                  "id": 1090,
+                  "id": 2067,
                   "unit": "13G",
-                  "price": 66,
+                  "price": 69,
                   "mrp": 75,
                   "image": "images/products/LIPTON GREEN TEA CLR & LIGHT 1.3GX10S TB.webp",
                   "inStock": true
@@ -439,16 +439,16 @@
               ]
             },
             {
-              "id": 1091,
+              "id": 2065,
               "name": "Lipton Green Tulsi Natural Tea Bags",
               "featured": false,
               "deal": false,
               "image": "images/products/LIPTON GRN TULSI NAT 1.3GX10S TBV.webp",
               "variants": [
                 {
-                  "id": 1091,
+                  "id": 2065,
                   "unit": "13G",
-                  "price": 57,
+                  "price": 60,
                   "mrp": 65,
                   "image": "images/products/LIPTON GRN TULSI NAT 1.3GX10S TBV.webp",
                   "inStock": true
@@ -456,16 +456,16 @@
               ]
             },
             {
-              "id": 1092,
+              "id": 2122,
               "name": "Red Label Dust",
               "featured": false,
               "deal": false,
               "image": "images/products/RED LABEL DUST ODISHA P 250GM.webp",
               "variants": [
                 {
-                  "id": 1092,
+                  "id": 2122,
                   "unit": "250G",
-                  "price": 97,
+                  "price": 100,
                   "mrp": 110,
                   "image": "images/products/RED LABEL DUST ODISHA P 250GM.webp",
                   "inStock": true
@@ -473,16 +473,16 @@
               ]
             },
             {
-              "id": 1093,
+              "id": 2121,
               "name": "Red Label Leaf",
               "featured": false,
               "deal": false,
               "image": "images/products/RED LABEL LEAF AP 250G.webp",
               "variants": [
                 {
-                  "id": 1093,
+                  "id": 2121,
                   "unit": "250G",
-                  "price": 88,
+                  "price": 94,
                   "mrp": 100,
                   "image": "images/products/RED LABEL LEAF AP 250G.webp",
                   "inStock": true
@@ -490,24 +490,24 @@
               ]
             },
             {
-              "id": 1095,
+              "id": 2124,
               "name": "Red Label Natural Care",
               "featured": true,
               "deal": false,
               "image": "images/products/RED LABEL NATURAL CARE.webp",
               "variants": [
                 {
-                  "id": 1095,
+                  "id": 2124,
                   "unit": "100G",
-                  "price": 44,
+                  "price": 46,
                   "mrp": 50,
                   "image": "images/products/RED LABEL NATURAL CARE.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1094,
+                  "id": 2123,
                   "unit": "250G",
-                  "price": 123,
+                  "price": 128,
                   "mrp": 140,
                   "image": "images/products/RED LABEL NATURAL CARE.webp",
                   "inStock": true
@@ -515,24 +515,24 @@
               ]
             },
             {
-              "id": 1096,
+              "id": 2158,
               "name": "Taaza Leaf Elaichi",
               "featured": true,
               "deal": false,
               "image": "images/products/TAAZA LEAF ELAICHI 100G POLY.webp",
               "variants": [
                 {
-                  "id": 1096,
+                  "id": 2158,
                   "unit": "100G",
-                  "price": 22,
+                  "price": 23,
                   "mrp": 25,
                   "image": "images/products/TAAZA LEAF ELAICHI 100G POLY.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1097,
+                  "id": 2157,
                   "unit": "250G",
-                  "price": 53,
+                  "price": 56,
                   "mrp": 60,
                   "image": "images/products/TAAZA LEAF ELAICHI 250G POLY.webp",
                   "inStock": true
@@ -540,49 +540,57 @@
               ]
             },
             {
-              "id": 1098,
+              "id": 2155,
               "name": "Taaza Leaf",
               "featured": false,
               "deal": false,
               "image": "images/products/TAAZA LF 250G PILLOWPACK.webp",
               "variants": [
                 {
-                  "id": 1098,
+                  "id": 2155,
                   "unit": "250G",
-                  "price": 66,
+                  "price": 69,
                   "mrp": 75,
                   "image": "images/products/TAAZA LF 250G PILLOWPACK.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1099,
+                  "id": 2156,
                   "unit": "250G",
-                  "price": 44,
+                  "price": 46,
                   "mrp": 50,
                   "image": "images/products/TAAZA LF 250G POLY NEC PD.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1100,
+                  "id": 2159,
                   "unit": "250G",
-                  "price": 53,
+                  "price": 56,
                   "mrp": 60,
                   "image": "images/products/TAAZA LF 250G POLY PRICE DROP.webp",
+                  "inStock": true
+                },
+                {
+                  "id": 2212,
+                  "unit": "250G",
+                  "price": 56,
+                  "mrp": 60,
+                  "image": "images/products/TAAZA LF 250G POLYPD BCU.webp",
                   "inStock": true
                 }
               ]
             },
             {
-              "id": 1102,
+              "id": 2161,
               "name": "Taaza Masala Chaska Elaichi",
               "featured": false,
               "deal": false,
               "image": "images/products/TAAZA MASALACHASKA ELAICHI100GPPD.webp",
               "variants": [
                 {
-                  "id": 1102,
+                  "id": 2161,
                   "unit": "100G",
-                  "price": 26,
+                  "price": 28,
                   "mrp": 30,
                   "image": "images/products/TAAZA MASALACHASKA ELAICHI100GPPD.webp",
                   "inStock": true
@@ -590,16 +598,16 @@
               ]
             },
             {
-              "id": 1358,
+              "id": 3003,
               "name": "Tata Tea Agni Leaf Extra Josh",
               "featured": false,
               "deal": false,
               "image": "images/products/TTAgni Lf Extra Josh 225g MF PP-AL02.webp",
               "variants": [
                 {
-                  "id": 1358,
+                  "id": 3003,
                   "unit": "225G",
-                  "price": 48,
+                  "price": 50,
                   "mrp": 55,
                   "image": "images/products/TTAgni Lf Extra Josh 225g MF PP-AL02.webp",
                   "inStock": true
@@ -607,32 +615,32 @@
               ]
             },
             {
-              "id": 1373,
+              "id": 3018,
               "name": "Tata Tea Agni Leaf",
               "featured": false,
               "deal": false,
               "image": "images/products/TTAgni Lf 500g PP-STGP-AL01-MF.webp",
               "variants": [
                 {
-                  "id": 1373,
+                  "id": 3018,
                   "unit": "500G",
-                  "price": 106,
+                  "price": 110,
                   "mrp": 120,
                   "image": "images/products/TTAgni Lf 500g PP-STGP-AL01-MF.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1362,
+                  "id": 3007,
                   "unit": "1KG",
-                  "price": 176,
+                  "price": 182,
                   "mrp": 200,
                   "image": "images/products/TTAgni Lf 1 kg PP- STGP-AL01-MF.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1377,
+                  "id": 3025,
                   "unit": "1KG",
-                  "price": 207,
+                  "price": 214,
                   "mrp": 235,
                   "image": "images/products/TTAgni Lf 1 kg PP- STGP-AL04-MF.webp",
                   "inStock": true
@@ -640,32 +648,32 @@
               ]
             },
             {
-              "id": 1364,
+              "id": 3009,
               "name": "Tata Tea Premium Dust",
               "featured": true,
               "deal": false,
               "image": "images/products/Tata Tea Pr Dust 50gm Polypack Cuttack.webp",
               "variants": [
                 {
-                  "id": 1364,
+                  "id": 3009,
                   "unit": "50G",
-                  "price": 18,
+                  "price": 19,
                   "mrp": 20,
                   "image": "images/products/Tata Tea Pr Dust 50gm Polypack Cuttack.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1368,
+                  "id": 3013,
                   "unit": "250G",
-                  "price": 88,
+                  "price": 91,
                   "mrp": 100,
                   "image": "images/products/Tata Tea Pr Dust 250gm Polypack Cuttack.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1378,
+                  "id": 3026,
                   "unit": "500G",
-                  "price": 176,
+                  "price": 182,
                   "mrp": 200,
                   "image": "images/products/Tata Tea Pr Dust 500gm Polypack Cutack.webp",
                   "inStock": true
@@ -673,16 +681,16 @@
               ]
             },
             {
-              "id": 1370,
+              "id": 3015,
               "name": "Tata Tea Buff Dust",
               "featured": false,
               "deal": false,
               "image": "images/products/TATA TEA BUFF DUST 1 KG - OR01-MF.webp",
               "variants": [
                 {
-                  "id": 1370,
+                  "id": 3015,
                   "unit": "1KG",
-                  "price": 317,
+                  "price": 250,
                   "mrp": 360,
                   "image": "images/products/TATA TEA BUFF DUST 1 KG - OR01-MF.webp",
                   "inStock": true
@@ -690,16 +698,16 @@
               ]
             },
             {
-              "id": 1382,
+              "id": 3030,
               "name": "Tata Tea Premium Leaf",
               "featured": false,
               "deal": false,
               "image": "images/products/Tata Tea Pr Lf 250g PP-OR-Spcl pr.webp",
               "variants": [
                 {
-                  "id": 1382,
+                  "id": 3030,
                   "unit": "250G",
-                  "price": 88,
+                  "price": 91,
                   "mrp": 100,
                   "image": "images/products/Tata Tea Pr Lf 250g PP-OR-Spcl pr.webp",
                   "inStock": true
@@ -721,16 +729,16 @@
           "name": "Personal Care & Hygiene",
           "dishes": [
             {
-              "id": 1128,
+              "id": 2010,
               "name": "Closeup Toothpaste",
               "featured": true,
               "deal": false,
               "image": "images/products/CLOSEUP EF+ TP 150G ROI.webp",
               "variants": [
                 {
-                  "id": 1128,
+                  "id": 2010,
                   "unit": "150G",
-                  "price": 114,
+                  "price": 118,
                   "mrp": 129,
                   "image": "images/products/CLOSEUP EF+ TP 150G ROI.webp",
                   "inStock": true
@@ -738,24 +746,24 @@
               ]
             },
             {
-              "id": 1129,
+              "id": 2098,
               "name": "Pepsodent Germi Check",
               "featured": true,
               "deal": false,
               "image": "images/products/PEP GC ACTIONS 100G.webp",
               "variants": [
                 {
-                  "id": 1129,
+                  "id": 2098,
                   "unit": "100G",
-                  "price": 54,
+                  "price": 56,
                   "mrp": 61,
                   "image": "images/products/PEP GC ACTIONS 100G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1130,
+                  "id": 2097,
                   "unit": "200G",
-                  "price": 115,
+                  "price": 120,
                   "mrp": 131,
                   "image": "images/products/PEP GC ACTIONS 200G.webp",
                   "inStock": true
@@ -763,16 +771,16 @@
               ]
             },
             {
-              "id": 1131,
+              "id": 2180,
               "name": "V Wash",
               "featured": true,
               "deal": false,
               "image": "images/products/V WASH 20ML.webp",
               "variants": [
                 {
-                  "id": 1131,
+                  "id": 2180,
                   "unit": "20ML",
-                  "price": 44,
+                  "price": 42,
                   "mrp": 50,
                   "image": "images/products/V WASH 20ML.webp",
                   "inStock": true
@@ -794,16 +802,16 @@
           "name": "Hair Care",
           "dishes": [
             {
-              "id": 1132,
+              "id": 2002,
               "name": "CAC Hair Oil",
               "featured": false,
               "deal": false,
               "image": "images/products/CAC HAIR OIL 75M.webp",
               "variants": [
                 {
-                  "id": 1132,
+                  "id": 2002,
                   "unit": "75ML",
-                  "price": 48,
+                  "price": 50,
                   "mrp": 55,
                   "image": "images/products/CAC HAIR OIL 75M.webp",
                   "inStock": true
@@ -811,16 +819,16 @@
               ]
             },
             {
-              "id": 1133,
+              "id": 2032,
               "name": "Dove Daily Shine Shampoo",
               "featured": true,
               "deal": false,
               "image": "images/products/DOVE DAILY SHINE MID SHAMPOO 180ML.webp",
               "variants": [
                 {
-                  "id": 1133,
+                  "id": 2032,
                   "unit": "180ML",
-                  "price": 166,
+                  "price": 172,
                   "mrp": 189,
                   "image": "images/products/DOVE DAILY SHINE MID SHAMPOO 180ML.webp",
                   "inStock": true
@@ -828,16 +836,16 @@
               ]
             },
             {
-              "id": 1134,
+              "id": 2036,
               "name": "Dove Damage Care Bio Protein Care Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE DAN CARE BIO-PROTEIN CARE SH 180ML.webp",
               "variants": [
                 {
-                  "id": 1134,
+                  "id": 2036,
                   "unit": "180ML",
-                  "price": 151,
+                  "price": 157,
                   "mrp": 172,
                   "image": "images/products/DOVE DAN CARE BIO-PROTEIN CARE SH 180ML.webp",
                   "inStock": true
@@ -845,16 +853,16 @@
               ]
             },
             {
-              "id": 1135,
+              "id": 2035,
               "name": "Dove Dryness Care Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE DRYNESS CARE MID SHAMPOO 180ML.webp",
               "variants": [
                 {
-                  "id": 1135,
+                  "id": 2035,
                   "unit": "180ML",
-                  "price": 151,
+                  "price": 157,
                   "mrp": 172,
                   "image": "images/products/DOVE DRYNESS CARE MID SHAMPOO 180ML.webp",
                   "inStock": true
@@ -862,16 +870,16 @@
               ]
             },
             {
-              "id": 1136,
+              "id": 2037,
               "name": "Dove Hair Fall Rescue Nourished Roots Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE HFR NR SH 180ML.webp",
               "variants": [
                 {
-                  "id": 1136,
+                  "id": 2037,
                   "unit": "180ML",
-                  "price": 151,
+                  "price": 157,
                   "mrp": 172,
                   "image": "images/products/DOVE HFR NR SH 180ML.webp",
                   "inStock": true
@@ -879,16 +887,16 @@
               ]
             },
             {
-              "id": 1137,
+              "id": 2033,
               "name": "Dove Intense Repair Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE INTENSE REPAIR MID SHAMPOO 180ML.webp",
               "variants": [
                 {
-                  "id": 1137,
+                  "id": 2033,
                   "unit": "180ML",
-                  "price": 151,
+                  "price": 157,
                   "mrp": 172,
                   "image": "images/products/DOVE INTENSE REPAIR MID SHAMPOO 180ML.webp",
                   "inStock": true
@@ -896,16 +904,16 @@
               ]
             },
             {
-              "id": 1138,
+              "id": 2014,
               "name": "Dove Daily Shine Bio-Protein Conditioner (Tube)",
               "featured": false,
               "deal": false,
               "image": "images/products/DV COND DAILY SHINE BIOPRO CARE TUBE75ML.webp",
               "variants": [
                 {
-                  "id": 1138,
+                  "id": 2014,
                   "unit": "75ML",
-                  "price": 106,
+                  "price": 110,
                   "mrp": 120,
                   "image": "images/products/DV COND DAILY SHINE BIOPRO CARE TUBE75ML.webp",
                   "inStock": true
@@ -913,16 +921,16 @@
               ]
             },
             {
-              "id": 1139,
+              "id": 2132,
               "name": "Sunsilk Long & Lustrous Shampoo",
               "featured": true,
               "deal": false,
               "image": "images/products/SUNSILK LT&L SHP 180M.webp",
               "variants": [
                 {
-                  "id": 1139,
+                  "id": 2132,
                   "unit": "180ML",
-                  "price": 116,
+                  "price": 120,
                   "mrp": 132,
                   "image": "images/products/SUNSILK LT&L SHP 180M.webp",
                   "inStock": true
@@ -930,16 +938,16 @@
               ]
             },
             {
-              "id": 1140,
+              "id": 2133,
               "name": "Sunsilk Nourishing Softness & Shine Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/SUNSILK NOURISH S&S SH 80ML.webp",
               "variants": [
                 {
-                  "id": 1140,
+                  "id": 2133,
                   "unit": "80ML",
-                  "price": 50,
+                  "price": 52,
                   "mrp": 57,
                   "image": "images/products/SUNSILK NOURISH S&S SH 80ML.webp",
                   "inStock": true
@@ -947,16 +955,16 @@
               ]
             },
             {
-              "id": 1141,
+              "id": 2136,
               "name": "Sunsilk Super Shine Serum",
               "featured": false,
               "deal": false,
               "image": "images/products/SUNSILK SUPER SHINE SERUM 20ML.webp",
               "variants": [
                 {
-                  "id": 1141,
+                  "id": 2136,
                   "unit": "20ML",
-                  "price": 66,
+                  "price": 69,
                   "mrp": 75,
                   "image": "images/products/SUNSILK SUPER SHINE SERUM 20ML.webp",
                   "inStock": true
@@ -964,24 +972,24 @@
               ]
             },
             {
-              "id": 1143,
+              "id": 2134,
               "name": "Sunsilk Thick & Long Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/SUNSILK T&L SHAMPOO 80ML.webp",
               "variants": [
                 {
-                  "id": 1143,
+                  "id": 2134,
                   "unit": "80ML",
-                  "price": 48,
+                  "price": 50,
                   "mrp": 54,
                   "image": "images/products/SUNSILK T&L SHAMPOO 80ML.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1142,
+                  "id": 2135,
                   "unit": "180ML",
-                  "price": 152,
+                  "price": 158,
                   "mrp": 173,
                   "image": "images/products/SUNSILK T&L SHAMPOO 180ML.webp",
                   "inStock": true
@@ -989,16 +997,16 @@
               ]
             },
             {
-              "id": 1144,
+              "id": 2143,
               "name": "TRESemme Keratin Smooth+ Conditioner",
               "featured": true,
               "deal": false,
               "image": "images/products/TRES KERATIN SMOOTH CONDR 80ML.webp",
               "variants": [
                 {
-                  "id": 1144,
+                  "id": 2143,
                   "unit": "80ML",
-                  "price": 115,
+                  "price": 120,
                   "mrp": 131,
                   "image": "images/products/TRES KERATIN SMOOTH CONDR 80ML.webp",
                   "inStock": true
@@ -1006,16 +1014,16 @@
               ]
             },
             {
-              "id": 1145,
+              "id": 2141,
               "name": "TRESemme Keratin Smooth+Conditioner",
               "featured": false,
               "deal": false,
               "image": "images/products/TRES KT STH CONDR 190ML.webp",
               "variants": [
                 {
-                  "id": 1145,
+                  "id": 2141,
                   "unit": "190ML",
-                  "price": 194,
+                  "price": 200,
                   "mrp": 220,
                   "image": "images/products/TRES KT STH CONDR 190ML.webp",
                   "inStock": true
@@ -1023,16 +1031,16 @@
               ]
             },
             {
-              "id": 1146,
+              "id": 2147,
               "name": "TRESemme Climate Protection Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME CLIMATE PROTECTION SHAMPOO 185M.webp",
               "variants": [
                 {
-                  "id": 1146,
+                  "id": 2147,
                   "unit": "185ML",
-                  "price": 154,
+                  "price": 160,
                   "mrp": 175,
                   "image": "images/products/TRESEMME CLIMATE PROTECTION SHAMPOO 185M.webp",
                   "inStock": true
@@ -1040,32 +1048,32 @@
               ]
             },
             {
-              "id": 1147,
+              "id": 2148,
               "name": "TRESemme Hair Fall Defense Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME HAIR FALL DEFENSE SHAMPOO185ML.webp",
               "variants": [
                 {
-                  "id": 1147,
+                  "id": 2148,
                   "unit": "85ML",
-                  "price": 151,
+                  "price": 157,
                   "mrp": 172,
                   "image": "images/products/TRESEMME HAIR FALL DEFENSE SHAMPOO185ML.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1148,
+                  "id": 2152,
                   "unit": "85ML",
-                  "price": 57,
+                  "price": 60,
                   "mrp": 65,
                   "image": "images/products/TRESEMME HAIRFALL DEFENSE 85MLSHAMPOO.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1149,
+                  "id": 2151,
                   "unit": "180ML",
-                  "price": 151,
+                  "price": 157,
                   "mrp": 172,
                   "image": "images/products/TRESEMME HAIRFALL DEFENSE180ML SHAMPOO.webp",
                   "inStock": true
@@ -1073,16 +1081,16 @@
               ]
             },
             {
-              "id": 1150,
+              "id": 2144,
               "name": "TRESemme Hair Fall Defense + Conditioner",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME HF DEFENSE +CONDR 80ML.webp",
               "variants": [
                 {
-                  "id": 1150,
+                  "id": 2144,
                   "unit": "80ML",
-                  "price": 115,
+                  "price": 120,
                   "mrp": 131,
                   "image": "images/products/TRESEMME HF DEFENSE +CONDR 80ML.webp",
                   "inStock": true
@@ -1090,16 +1098,16 @@
               ]
             },
             {
-              "id": 1151,
+              "id": 2142,
               "name": "TRESemme Hair Fall Defense Conditioner",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME HF DEFENSE CONDR 80ML.webp",
               "variants": [
                 {
-                  "id": 1151,
+                  "id": 2142,
                   "unit": "80ML",
-                  "price": 79,
+                  "price": 82,
                   "mrp": 90,
                   "image": "images/products/TRESEMME HF DEFENSE CONDR 80ML.webp",
                   "inStock": true
@@ -1107,16 +1115,16 @@
               ]
             },
             {
-              "id": 1152,
+              "id": 2145,
               "name": "TRESemme Keratin Smooth+ Serum",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME KERATIN SMOOTH SERUM 25ML.webp",
               "variants": [
                 {
-                  "id": 1152,
+                  "id": 2145,
                   "unit": "25ML",
-                  "price": 87,
+                  "price": 90,
                   "mrp": 99,
                   "image": "images/products/TRESEMME KERATIN SMOOTH SERUM 25ML.webp",
                   "inStock": true
@@ -1124,16 +1132,16 @@
               ]
             },
             {
-              "id": 1153,
+              "id": 2149,
               "name": "TRESemme Keratin Smooth+ Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME KERATIN SMOOTH+ SH 36X180ML.webp",
               "variants": [
                 {
-                  "id": 1153,
+                  "id": 2149,
                   "unit": "180ML",
-                  "price": 166,
+                  "price": 172,
                   "mrp": 189,
                   "image": "images/products/TRESEMME KERATIN SMOOTH+ SH 36X180ML.webp",
                   "inStock": true
@@ -1141,16 +1149,16 @@
               ]
             },
             {
-              "id": 1154,
+              "id": 2146,
               "name": "TRESemme Smooth & Shine Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME SMOOTH &SH SHAMPOO 85ML.webp",
               "variants": [
                 {
-                  "id": 1154,
+                  "id": 2146,
                   "unit": "85ML",
-                  "price": 57,
+                  "price": 60,
                   "mrp": 65,
                   "image": "images/products/TRESEMME SMOOTH &SH SHAMPOO 85ML.webp",
                   "inStock": true
@@ -1158,16 +1166,16 @@
               ]
             },
             {
-              "id": 1155,
+              "id": 2150,
               "name": "TRESemme Smooth SHINE+ Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME SMOOTH SHINE+ 180ML SHAMPOO.webp",
               "variants": [
                 {
-                  "id": 1155,
+                  "id": 2150,
                   "unit": "180ML",
-                  "price": 151,
+                  "price": 157,
                   "mrp": 172,
                   "image": "images/products/TRESEMME SMOOTH SHINE+ 180ML SHAMPOO.webp",
                   "inStock": true
@@ -1175,24 +1183,24 @@
               ]
             },
             {
-              "id": 1157,
+              "id": 2153,
               "name": "TRESemme Thick & Full Shampoo",
               "featured": false,
               "deal": false,
               "image": "images/products/TRESEMME THICK&FULL SHAMPOO 80ML.webp",
               "variants": [
                 {
-                  "id": 1157,
+                  "id": 2153,
                   "unit": "80ML",
-                  "price": 66,
+                  "price": 69,
                   "mrp": 75,
                   "image": "images/products/TRESEMME THICK&FULL SHAMPOO 80ML.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1156,
+                  "id": 2154,
                   "unit": "180ML",
-                  "price": 167,
+                  "price": 173,
                   "mrp": 190,
                   "image": "images/products/TRESEMME THICK&FULL SHAMPOO 180ML.webp",
                   "inStock": true
@@ -1214,16 +1222,16 @@
           "name": "Bath & Body Care",
           "dishes": [
             {
-              "id": 1158,
+              "id": 2030,
               "name": "Dove Gentle Exfoliating Body Wash",
               "featured": true,
               "deal": false,
               "image": "images/products/DOVE GENTLE EXFOLIATING BW 250ML.webp",
               "variants": [
                 {
-                  "id": 1158,
+                  "id": 2030,
                   "unit": "250ML",
-                  "price": 189,
+                  "price": 196,
                   "mrp": 215,
                   "image": "images/products/DOVE GENTLE EXFOLIATING BW 250ML.webp",
                   "inStock": true
@@ -1231,16 +1239,16 @@
               ]
             },
             {
-              "id": 1159,
+              "id": 2028,
               "name": "Dove Pink Serum Beauty Bar",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE PINK SERUM BEAUTY BAR 100G.webp",
               "variants": [
                 {
-                  "id": 1159,
+                  "id": 2028,
                   "unit": "100G",
-                  "price": 59,
+                  "price": 63,
                   "mrp": 67,
                   "image": "images/products/DOVE PINK SERUM BEAUTY BAR 100G.webp",
                   "inStock": true
@@ -1248,16 +1256,16 @@
               ]
             },
             {
-              "id": 1160,
+              "id": 2029,
               "name": "Dove Refreshing Body Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE REFRESHING BW 250ML.webp",
               "variants": [
                 {
-                  "id": 1160,
+                  "id": 2029,
                   "unit": "250ML",
-                  "price": 189,
+                  "price": 196,
                   "mrp": 215,
                   "image": "images/products/DOVE REFRESHING BW 250ML.webp",
                   "inStock": true
@@ -1265,16 +1273,16 @@
               ]
             },
             {
-              "id": 1161,
+              "id": 2027,
               "name": "Dove Serum Bar",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE SERUM BAR 100G.webp",
               "variants": [
                 {
-                  "id": 1161,
+                  "id": 2027,
                   "unit": "100G",
-                  "price": 55,
+                  "price": 58,
                   "mrp": 62,
                   "image": "images/products/DOVE SERUM BAR 100G.webp",
                   "inStock": true
@@ -1282,16 +1290,16 @@
               ]
             },
             {
-              "id": 1162,
+              "id": 2026,
               "name": "Dove Serum Beauty Bar",
               "featured": false,
               "deal": false,
               "image": "images/products/DOVE SERUM BEAUTY BAR 75G.webp",
               "variants": [
                 {
-                  "id": 1162,
+                  "id": 2026,
                   "unit": "75G",
-                  "price": 35,
+                  "price": 38,
                   "mrp": 40,
                   "image": "images/products/DOVE SERUM BEAUTY BAR 75G.webp",
                   "inStock": true
@@ -1299,16 +1307,16 @@
               ]
             },
             {
-              "id": 1163,
+              "id": 2003,
               "name": "Lifebuoy Lemon Aloe Fresh",
               "featured": true,
               "deal": false,
               "image": "images/products/Lifebuy lemon alovera.webp",
               "variants": [
                 {
-                  "id": 1163,
+                  "id": 2003,
                   "unit": "100G",
-                  "price": 114,
+                  "price": 121,
                   "mrp": 130,
                   "image": "images/products/Lifebuy lemon alovera.webp",
                   "inStock": true
@@ -1316,16 +1324,16 @@
               ]
             },
             {
-              "id": 1164,
+              "id": 2004,
               "name": "Lifebuoy Ice Bath Soap",
               "featured": false,
               "deal": false,
               "image": "images/products/LIFEBUOY ICE BATH SOAP 100G B4G1.webp",
               "variants": [
                 {
-                  "id": 1164,
+                  "id": 2004,
                   "unit": "100G",
-                  "price": 106,
+                  "price": 112,
                   "mrp": 120,
                   "image": "images/products/LIFEBUOY ICE BATH SOAP 100G B4G1.webp",
                   "inStock": true
@@ -1333,16 +1341,16 @@
               ]
             },
             {
-              "id": 1165,
+              "id": 2083,
               "name": "Liril Lime Bathing Bar 125GX4 G",
               "featured": true,
               "deal": false,
               "image": "images/products/LIRIL LIME BATHING BAR 125GX4 - G.webp",
               "variants": [
                 {
-                  "id": 1165,
+                  "id": 2083,
                   "unit": "500G",
-                  "price": 189,
+                  "price": 200,
                   "mrp": 215,
                   "image": "images/products/LIRIL LIME BATHING BAR 125GX4 - G.webp",
                   "inStock": true
@@ -1350,16 +1358,16 @@
               ]
             },
             {
-              "id": 1166,
+              "id": 2090,
               "name": "Lux Advanced Clear Glow (Pack of 4)",
               "featured": true,
               "deal": false,
               "image": "images/products/LUX ADVANCED CLEAR GLOW 4X100G.webp",
               "variants": [
                 {
-                  "id": 1166,
+                  "id": 2090,
                   "unit": "400G",
-                  "price": 110,
+                  "price": 116,
                   "mrp": 125,
                   "image": "images/products/LUX ADVANCED CLEAR GLOW 4X100G.webp",
                   "inStock": true
@@ -1367,16 +1375,16 @@
               ]
             },
             {
-              "id": 1167,
+              "id": 2088,
               "name": "Lux Advanced Radiant Glow",
               "featured": false,
               "deal": false,
               "image": "images/products/LUX ADVANCED RADIANT GLOW 100G B3G1.webp",
               "variants": [
                 {
-                  "id": 1167,
+                  "id": 2088,
                   "unit": "400G",
-                  "price": 88,
+                  "price": 93,
                   "mrp": 100,
                   "image": "images/products/LUX ADVANCED RADIANT GLOW 100G B3G1.webp",
                   "inStock": true
@@ -1384,16 +1392,16 @@
               ]
             },
             {
-              "id": 1168,
+              "id": 2094,
               "name": "Lux Advanced Ultimate Glow",
               "featured": false,
               "deal": false,
               "image": "images/products/LUX ADVANCED ULTIMATE GLOW + 100G B3G1.webp",
               "variants": [
                 {
-                  "id": 1168,
+                  "id": 2094,
                   "unit": "400G",
-                  "price": 92,
+                  "price": 97,
                   "mrp": 104,
                   "image": "images/products/LUX ADVANCED ULTIMATE GLOW + 100G B3G1.webp",
                   "inStock": true
@@ -1401,16 +1409,16 @@
               ]
             },
             {
-              "id": 1169,
+              "id": 2089,
               "name": "Lux Orchid Obsession Body Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/LUX ORCHID OBSESSION BW 245ML.webp",
               "variants": [
                 {
-                  "id": 1169,
+                  "id": 2089,
                   "unit": "245ML",
-                  "price": 87,
+                  "price": 92,
                   "mrp": 99,
                   "image": "images/products/LUX ORCHID OBSESSION BW 245ML.webp",
                   "inStock": true
@@ -1418,16 +1426,16 @@
               ]
             },
             {
-              "id": 1170,
+              "id": 2031,
               "name": "Dove Nourishing Body Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/NEW DOVE NOURISHING BODYWASH 300 ML.webp",
               "variants": [
                 {
-                  "id": 1170,
+                  "id": 2031,
                   "unit": "300ML",
-                  "price": 150,
+                  "price": 155,
                   "mrp": 170,
                   "image": "images/products/NEW DOVE NOURISHING BODYWASH 300 ML.webp",
                   "inStock": true
@@ -1435,16 +1443,16 @@
               ]
             },
             {
-              "id": 1171,
+              "id": 2113,
               "name": "Pears Glycerin Body Wash Pure & Gentle",
               "featured": true,
               "deal": false,
               "image": "images/products/PEARS GLYCERIN BW PURE & GENTLE 250ML.webp",
               "variants": [
                 {
-                  "id": 1171,
+                  "id": 2113,
                   "unit": "250ML",
-                  "price": 123,
+                  "price": 128,
                   "mrp": 140,
                   "image": "images/products/PEARS GLYCERIN BW PURE & GENTLE 250ML.webp",
                   "inStock": true
@@ -1466,16 +1474,16 @@
           "name": "Skin Care & Cosmetics",
           "dishes": [
             {
-              "id": 1172,
+              "id": 2044,
               "name": "Glow & Lovely Ayurveda",
               "featured": true,
               "deal": false,
               "image": "images/products/GAL AYUR 50G.webp",
               "variants": [
                 {
-                  "id": 1172,
+                  "id": 2044,
                   "unit": "50G",
-                  "price": 156,
+                  "price": 161,
                   "mrp": 177,
                   "image": "images/products/GAL AYUR 50G.webp",
                   "inStock": true
@@ -1483,16 +1491,16 @@
               ]
             },
             {
-              "id": 1173,
+              "id": 2039,
               "name": "Glow & Lovely BB Cream",
               "featured": false,
               "deal": false,
               "image": "images/products/GAL BB CREAM 9G.webp",
               "variants": [
                 {
-                  "id": 1173,
+                  "id": 2039,
                   "unit": "9G",
-                  "price": 56,
+                  "price": 59,
                   "mrp": 64,
                   "image": "images/products/GAL BB CREAM 9G.webp",
                   "inStock": true
@@ -1500,16 +1508,16 @@
               ]
             },
             {
-              "id": 1174,
+              "id": 2048,
               "name": "Glow & Lovely Light Bright",
               "featured": false,
               "deal": false,
               "image": "images/products/GAL LIGHT BRIGHT 23G.webp",
               "variants": [
                 {
-                  "id": 1174,
+                  "id": 2048,
                   "unit": "23G",
-                  "price": 66,
+                  "price": 69,
                   "mrp": 75,
                   "image": "images/products/GAL LIGHT BRIGHT 23G.webp",
                   "inStock": true
@@ -1517,16 +1525,16 @@
               ]
             },
             {
-              "id": 1175,
+              "id": 2046,
               "name": "Glow & Lovely Multi Vitamin",
               "featured": false,
               "deal": false,
               "image": "images/products/GAL MV 80G.webp",
               "variants": [
                 {
-                  "id": 1175,
+                  "id": 2046,
                   "unit": "80G",
-                  "price": 186,
+                  "price": 192,
                   "mrp": 211,
                   "image": "images/products/GAL MV 80G.webp",
                   "inStock": true
@@ -1534,16 +1542,16 @@
               ]
             },
             {
-              "id": 1176,
+              "id": 2041,
               "name": "Glow & Lovely Multi Vitamin Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/GAL MV FW 50G.webp",
               "variants": [
                 {
-                  "id": 1176,
+                  "id": 2041,
                   "unit": "50G",
-                  "price": 85,
+                  "price": 89,
                   "mrp": 97,
                   "image": "images/products/GAL MV FW 50G.webp",
                   "inStock": true
@@ -1551,16 +1559,16 @@
               ]
             },
             {
-              "id": 1177,
+              "id": 2047,
               "name": "Glow & Lovely SPF Bright Cream",
               "featured": false,
               "deal": false,
               "image": "images/products/GAL SPF BRIGHT CREAM 15G.webp",
               "variants": [
                 {
-                  "id": 1177,
+                  "id": 2047,
                   "unit": "15G",
-                  "price": 52,
+                  "price": 54,
                   "mrp": 59,
                   "image": "images/products/GAL SPF BRIGHT CREAM 15G.webp",
                   "inStock": true
@@ -1568,16 +1576,16 @@
               ]
             },
             {
-              "id": 1178,
+              "id": 2040,
               "name": "Glow & Handsome Face Cream for Men",
               "featured": true,
               "deal": false,
               "image": "images/products/GLOW & HANDSOME 50G FACE CREAM FOR MEN.webp",
               "variants": [
                 {
-                  "id": 1178,
+                  "id": 2040,
                   "unit": "50G",
-                  "price": 167,
+                  "price": 173,
                   "mrp": 190,
                   "image": "images/products/GLOW & HANDSOME 50G FACE CREAM FOR MEN.webp",
                   "inStock": true
@@ -1585,16 +1593,16 @@
               ]
             },
             {
-              "id": 1179,
+              "id": 2045,
               "name": "Glow & Handsome Face Wash for Men",
               "featured": false,
               "deal": false,
               "image": "images/products/GLOW & HANDSOME 50G FACE WASH FOR MEN.webp",
               "variants": [
                 {
-                  "id": 1179,
+                  "id": 2045,
                   "unit": "50G",
-                  "price": 92,
+                  "price": 96,
                   "mrp": 105,
                   "image": "images/products/GLOW & HANDSOME 50G FACE WASH FOR MEN.webp",
                   "inStock": true
@@ -1602,24 +1610,24 @@
               ]
             },
             {
-              "id": 1181,
+              "id": 2042,
               "name": "Glow & Lovely Vitamin Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/GLOW & LOVELY VIT C FW 50 G.webp",
               "variants": [
                 {
-                  "id": 1181,
+                  "id": 2042,
                   "unit": "50G",
-                  "price": 75,
+                  "price": 78,
                   "mrp": 85,
                   "image": "images/products/GLOW & LOVELY VIT C FW 50 G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1180,
+                  "id": 2043,
                   "unit": "100G",
-                  "price": 154,
+                  "price": 160,
                   "mrp": 175,
                   "image": "images/products/GLOW & LOVELY VIT C FW 100 G.webp",
                   "inStock": true
@@ -1627,14 +1635,14 @@
               ]
             },
             {
-              "id": 1182,
+              "id": 2069,
               "name": "Lakme Bag Strawberry Gel Face Wash",
               "featured": true,
               "deal": false,
               "image": "images/products/LAK BAG SB GEL FW 100G.webp",
               "variants": [
                 {
-                  "id": 1182,
+                  "id": 2069,
                   "unit": "100G",
                   "price": 228,
                   "mrp": 259,
@@ -1644,14 +1652,14 @@
               ]
             },
             {
-              "id": 1184,
+              "id": 2076,
               "name": "Lakme Ph Milk Soft Cream",
               "featured": false,
               "deal": false,
               "image": "images/products/LAK PH MK SOFT CRM 50G.webp",
               "variants": [
                 {
-                  "id": 1184,
+                  "id": 2076,
                   "unit": "50G",
                   "price": 106,
                   "mrp": 120,
@@ -1659,7 +1667,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1183,
+                  "id": 2075,
                   "unit": "100G",
                   "price": 185,
                   "mrp": 210,
@@ -1669,14 +1677,14 @@
               ]
             },
             {
-              "id": 1185,
+              "id": 2064,
               "name": "Lakme Blush & Glow Blueberry Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME BLUSH AND GLOW BLUEBERRY FW 50GM.webp",
               "variants": [
                 {
-                  "id": 1185,
+                  "id": 2064,
                   "unit": "50G",
                   "price": 119,
                   "mrp": 135,
@@ -1686,14 +1694,14 @@
               ]
             },
             {
-              "id": 1186,
+              "id": 2091,
               "name": "Lakme Blush & Glow Strawberry Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME BLUSH&GLOW STRAWBERRYFACEWASH50G.webp",
               "variants": [
                 {
-                  "id": 1186,
+                  "id": 2091,
                   "unit": "50G",
                   "price": 119,
                   "mrp": 135,
@@ -1703,14 +1711,14 @@
               ]
             },
             {
-              "id": 1187,
+              "id": 2062,
               "name": "Lakme Complexion Care Cream Beige",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME COMPLEXION CARE CREAM BEIGE 9G.webp",
               "variants": [
                 {
-                  "id": 1187,
+                  "id": 2062,
                   "unit": "9G",
                   "price": 101,
                   "mrp": 115,
@@ -1720,14 +1728,14 @@
               ]
             },
             {
-              "id": 1188,
+              "id": 2061,
               "name": "Lakme Complexion Care Cream Bronze",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME COMPLEXION CARE CREAM BRONZE 9G.webp",
               "variants": [
                 {
-                  "id": 1188,
+                  "id": 2061,
                   "unit": "9G",
                   "price": 101,
                   "mrp": 115,
@@ -1737,14 +1745,14 @@
               ]
             },
             {
-              "id": 1190,
+              "id": 2074,
               "name": "Lakme Peach Milk Lotion",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME PCH MILK LT 60M.webp",
               "variants": [
                 {
-                  "id": 1190,
+                  "id": 2074,
                   "unit": "60ML",
                   "price": 110,
                   "mrp": 125,
@@ -1752,7 +1760,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1189,
+                  "id": 2077,
                   "unit": "120ML",
                   "price": 241,
                   "mrp": 274,
@@ -1762,14 +1770,14 @@
               ]
             },
             {
-              "id": 1192,
+              "id": 2071,
               "name": "Lakme Peach Milk SPF",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME PCH MILK SPF24 60ML.webp",
               "variants": [
                 {
-                  "id": 1192,
+                  "id": 2071,
                   "unit": "60ML",
                   "price": 123,
                   "mrp": 140,
@@ -1777,7 +1785,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1191,
+                  "id": 2073,
                   "unit": "120ML",
                   "price": 246,
                   "mrp": 280,
@@ -1787,14 +1795,14 @@
               ]
             },
             {
-              "id": 1194,
+              "id": 2092,
               "name": "Lakme Peach Milk Intense",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME PEACH MILK INTENSE 60ML.webp",
               "variants": [
                 {
-                  "id": 1194,
+                  "id": 2092,
                   "unit": "60ML",
                   "price": 87,
                   "mrp": 99,
@@ -1802,7 +1810,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1193,
+                  "id": 2093,
                   "unit": "120ML",
                   "price": 175,
                   "mrp": 199,
@@ -1812,14 +1820,14 @@
               ]
             },
             {
-              "id": 1195,
+              "id": 2070,
               "name": "Lakme Peach Milk Moisturizer",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME PEACH MILK MOISTURIZER 120ML.webp",
               "variants": [
                 {
-                  "id": 1195,
+                  "id": 2070,
                   "unit": "120ML",
                   "price": 175,
                   "mrp": 199,
@@ -1829,14 +1837,14 @@
               ]
             },
             {
-              "id": 1196,
+              "id": 2079,
               "name": "Lakme Peach Ultra Gel",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME PEACH ULTRA GEL- 25G.webp",
               "variants": [
                 {
-                  "id": 1196,
+                  "id": 2079,
                   "unit": "25G",
                   "price": 61,
                   "mrp": 69,
@@ -1846,14 +1854,14 @@
               ]
             },
             {
-              "id": 1197,
+              "id": 2082,
               "name": "Lakme Perfect Radiance Skin Bright Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME PERFECT RAD SKIN BRIGHT FW 50G.webp",
               "variants": [
                 {
-                  "id": 1197,
+                  "id": 2082,
                   "unit": "50G",
                   "price": 154,
                   "mrp": 175,
@@ -1863,16 +1871,16 @@
               ]
             },
             {
-              "id": 1198,
+              "id": 2072,
               "name": "Lakme Peach Milk Maximum Moisturizer",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME PH MK MXM MO 200ML.webp",
               "variants": [
                 {
-                  "id": 1198,
+                  "id": 2072,
                   "unit": "200ML",
-                  "price": 351,
+                  "price": 350,
                   "mrp": 399,
                   "image": "images/products/LAKME PH MK MXM MO 200ML.webp",
                   "inStock": true
@@ -1880,16 +1888,16 @@
               ]
             },
             {
-              "id": 1199,
+              "id": 2063,
               "name": "Lakme Strawberry Cream Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME STRAWBERRY CREAM FW 50G.webp",
               "variants": [
                 {
-                  "id": 1199,
+                  "id": 2063,
                   "unit": "50G",
-                  "price": 114,
+                  "price": 115,
                   "mrp": 130,
                   "image": "images/products/LAKME STRAWBERRY CREAM FW 50G.webp",
                   "inStock": true
@@ -1897,14 +1905,14 @@
               ]
             },
             {
-              "id": 1200,
+              "id": 2087,
               "name": "Lakme Sun Expert Gel SPF",
               "featured": false,
               "deal": false,
               "image": "images/products/LAKME SUN EXPERT GEL SPF50 50G.webp",
               "variants": [
                 {
-                  "id": 1200,
+                  "id": 2087,
                   "unit": "50G",
                   "price": 299,
                   "mrp": 340,
@@ -1914,14 +1922,14 @@
               ]
             },
             {
-              "id": 1201,
+              "id": 2095,
               "name": "Lakme Sun Expert Fairness Sunscreen Lotion SPF24PA++",
               "featured": false,
               "deal": false,
               "image": "images/products/LK SUN EPT FAIRN SNSCN LOT SPF24PA++60ML.webp",
               "variants": [
                 {
-                  "id": 1201,
+                  "id": 2095,
                   "unit": "60ML",
                   "price": 198,
                   "mrp": 225,
@@ -1931,16 +1939,16 @@
               ]
             },
             {
-              "id": 1202,
+              "id": 2086,
               "name": "Lakme 9TO5 Sun Expert Gel Light Sunscreen SPF",
               "featured": false,
               "deal": false,
               "image": "images/products/LK9-5 SUNEX GELLIGHTSUNSCREEN SPF50 50GM.webp",
               "variants": [
                 {
-                  "id": 1202,
+                  "id": 2086,
                   "unit": "50G",
-                  "price": 348,
+                  "price": 347,
                   "mrp": 395,
                   "image": "images/products/LK9-5 SUNEX GELLIGHTSUNSCREEN SPF50 50GM.webp",
                   "inStock": true
@@ -1948,14 +1956,14 @@
               ]
             },
             {
-              "id": 1203,
+              "id": 2085,
               "name": "Lakme 9TO5 Sun Expert Supermatte Sunscreen SPF",
               "featured": false,
               "deal": false,
               "image": "images/products/LK9-5 SUNEXSUPERMATTE SNSRN SPF50 18GM.webp",
               "variants": [
                 {
-                  "id": 1203,
+                  "id": 2085,
                   "unit": "18G",
                   "price": 87,
                   "mrp": 99,
@@ -1963,9 +1971,9 @@
                   "inStock": true
                 },
                 {
-                  "id": 1204,
+                  "id": 2084,
                   "unit": "50G",
-                  "price": 348,
+                  "price": 347,
                   "mrp": 395,
                   "image": "images/products/LK9-5 SUNEXSUPERMATTE SNSRN SPF50 50GM.webp",
                   "inStock": true
@@ -1973,14 +1981,14 @@
               ]
             },
             {
-              "id": 1205,
+              "id": 2106,
               "name": "Pond's Sunscreen Cream SPF",
               "featured": true,
               "deal": false,
               "image": "images/products/PDS SNSCN CRM SF35 15G.webp",
               "variants": [
                 {
-                  "id": 1205,
+                  "id": 2106,
                   "unit": "15G",
                   "price": 66,
                   "mrp": 75,
@@ -1988,7 +1996,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1206,
+                  "id": 2107,
                   "unit": "50G",
                   "price": 175,
                   "mrp": 199,
@@ -1998,14 +2006,14 @@
               ]
             },
             {
-              "id": 1207,
+              "id": 2120,
               "name": "Pond's Beauty Ultimate Clarity",
               "featured": false,
               "deal": false,
               "image": "images/products/PNDS BTY ULT CLARITY 50 G.webp",
               "variants": [
                 {
-                  "id": 1207,
+                  "id": 2120,
                   "unit": "50G",
                   "price": 96,
                   "mrp": 109,
@@ -2015,14 +2023,14 @@
               ]
             },
             {
-              "id": 1208,
+              "id": 2114,
               "name": "Pond's Hydra Miracle Super Lotion Gel",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS HYDRA MIRACLE SUPER LOTION GEL.webp",
               "variants": [
                 {
-                  "id": 1208,
+                  "id": 2114,
                   "unit": "25ML",
                   "price": 66,
                   "mrp": 75,
@@ -2030,26 +2038,26 @@
                   "inStock": true
                 },
                 {
-                  "id": 1209,
+                  "id": 2119,
                   "unit": "50ML",
-                  "price": 171,
-                  "mrp": 194,
+                  "price": 115,
+                  "mrp": 130,
                   "image": "images/products/PNDS HY MR SUP LT GL 50ML.webp",
                   "inStock": true
                 }
               ]
             },
             {
-              "id": 1210,
+              "id": 2112,
               "name": "Pond's Hydra Miracle Cold Cream",
               "featured": false,
               "deal": false,
               "image": "images/products/PNDS HYMR CLD CRM 55ML.webp",
               "variants": [
                 {
-                  "id": 1210,
+                  "id": 2112,
                   "unit": "55ML",
-                  "price": 110,
+                  "price": 114,
                   "mrp": 125,
                   "image": "images/products/PNDS HYMR CLD CRM 55ML.webp",
                   "inStock": true
@@ -2057,14 +2065,14 @@
               ]
             },
             {
-              "id": 1211,
+              "id": 2111,
               "name": "Pond's Bright Beauty Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS BRIGHT BEAUTY FW 100G.webp",
               "variants": [
                 {
-                  "id": 1211,
+                  "id": 2111,
                   "unit": "100G",
                   "price": 202,
                   "mrp": 230,
@@ -2074,14 +2082,14 @@
               ]
             },
             {
-              "id": 1212,
+              "id": 2105,
               "name": "Pond's Age Miracle Wrinkle Cream Day Cream SPF PA++",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS AG MR WR CR DY CR SPF15 PA++ 20GM.webp",
               "variants": [
                 {
-                  "id": 1212,
+                  "id": 2105,
                   "unit": "20G",
                   "price": 263,
                   "mrp": 299,
@@ -2091,16 +2099,16 @@
               ]
             },
             {
-              "id": 1213,
+              "id": 2024,
               "name": "Pond's Aloe Cooling Powder",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS ALOE COOLING POWDER 80G.webp",
               "variants": [
                 {
-                  "id": 1213,
+                  "id": 2024,
                   "unit": "80G",
-                  "price": 59,
+                  "price": 61,
                   "mrp": 67,
                   "image": "images/products/PONDS ALOE COOLING POWDER 80G.webp",
                   "inStock": true
@@ -2108,16 +2116,16 @@
               ]
             },
             {
-              "id": 1214,
+              "id": 2025,
               "name": "Pond's Aloe Cooling Talc",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS ALOE COOLING TALC 100G.webp",
               "variants": [
                 {
-                  "id": 1214,
+                  "id": 2025,
                   "unit": "100G",
-                  "price": 97,
+                  "price": 100,
                   "mrp": 110,
                   "image": "images/products/PONDS ALOE COOLING TALC 100G.webp",
                   "inStock": true
@@ -2125,32 +2133,32 @@
               ]
             },
             {
-              "id": 1217,
+              "id": 2019,
               "name": "Pond's Dreamflower Powder",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS DF POWDER 80G.webp",
               "variants": [
                 {
-                  "id": 1217,
+                  "id": 2019,
                   "unit": "80G",
-                  "price": 90,
+                  "price": 93,
                   "mrp": 102,
                   "image": "images/products/PONDS DF POWDER 80G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1215,
+                  "id": 2020,
                   "unit": "200G",
-                  "price": 223,
+                  "price": 230,
                   "mrp": 253,
                   "image": "images/products/PONDS DF POWDER 200G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1216,
+                  "id": 2021,
                   "unit": "300G",
-                  "price": 294,
+                  "price": 304,
                   "mrp": 334,
                   "image": "images/products/PONDS DF POWDER 300G.webp",
                   "inStock": true
@@ -2158,14 +2166,14 @@
               ]
             },
             {
-              "id": 1219,
+              "id": 2104,
               "name": "Pond's Light Moist",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS LGT MOIST 25ML.webp",
               "variants": [
                 {
-                  "id": 1219,
+                  "id": 2104,
                   "unit": "25ML",
                   "price": 53,
                   "mrp": 60,
@@ -2173,7 +2181,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1220,
+                  "id": 2102,
                   "unit": "50ML",
                   "price": 132,
                   "mrp": 150,
@@ -2181,7 +2189,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1221,
+                  "id": 2101,
                   "unit": "75ML",
                   "price": 110,
                   "mrp": 125,
@@ -2189,7 +2197,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1218,
+                  "id": 2103,
                   "unit": "100ML",
                   "price": 158,
                   "mrp": 180,
@@ -2199,24 +2207,24 @@
               ]
             },
             {
-              "id": 1222,
+              "id": 2016,
               "name": "Pond's Magic Powder",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS MAGIC POWDER 80G.webp",
               "variants": [
                 {
-                  "id": 1222,
+                  "id": 2016,
                   "unit": "80G",
-                  "price": 113,
+                  "price": 117,
                   "mrp": 128,
                   "image": "images/products/PONDS MAGIC POWDER 80G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1223,
+                  "id": 2017,
                   "unit": "300G",
-                  "price": 370,
+                  "price": 382,
                   "mrp": 420,
                   "image": "images/products/PONDS MAGIC POWDR 300G.webp",
                   "inStock": true
@@ -2224,16 +2232,16 @@
               ]
             },
             {
-              "id": 1224,
+              "id": 2018,
               "name": "Pond's Magic Talc",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS MGK TAL 400G.webp",
               "variants": [
                 {
-                  "id": 1224,
+                  "id": 2018,
                   "unit": "400G",
-                  "price": 359,
+                  "price": 371,
                   "mrp": 408,
                   "image": "images/products/PONDS MGK TAL 400G.webp",
                   "inStock": true
@@ -2241,24 +2249,24 @@
               ]
             },
             {
-              "id": 1225,
+              "id": 2099,
               "name": "Pond's Moisturising Cold Cream",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS MOISTURISING COLD CRM RL 30ML POFF.webp",
               "variants": [
                 {
-                  "id": 1225,
+                  "id": 2099,
                   "unit": "30ML",
-                  "price": 43,
+                  "price": 45,
                   "mrp": 49,
                   "image": "images/products/PONDS MOISTURISING COLD CRM RL 30ML POFF.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1226,
+                  "id": 2100,
                   "unit": "55ML",
-                  "price": 83,
+                  "price": 86,
                   "mrp": 94,
                   "image": "images/products/PONDS MOISTURISING COLD CRM RL 55ML POFF.webp",
                   "inStock": true
@@ -2266,16 +2274,16 @@
               ]
             },
             {
-              "id": 1227,
+              "id": 2015,
               "name": "Pond's Pink Glow",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS PINK GLOW 30G.webp",
               "variants": [
                 {
-                  "id": 1227,
+                  "id": 2015,
                   "unit": "30G",
-                  "price": 106,
+                  "price": 110,
                   "mrp": 120,
                   "image": "images/products/PONDS PINK GLOW 30G.webp",
                   "inStock": true
@@ -2283,14 +2291,14 @@
               ]
             },
             {
-              "id": 1229,
+              "id": 2109,
               "name": "Pond's Pure Detox Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS PURE DETOX FW 50G.webp",
               "variants": [
                 {
-                  "id": 1229,
+                  "id": 2109,
                   "unit": "50G",
                   "price": 97,
                   "mrp": 110,
@@ -2298,9 +2306,9 @@
                   "inStock": true
                 },
                 {
-                  "id": 1228,
+                  "id": 2110,
                   "unit": "100G",
-                  "price": 194,
+                  "price": 193,
                   "mrp": 220,
                   "image": "images/products/PONDS PURE DETOX FW 50G.webp",
                   "inStock": true
@@ -2308,16 +2316,16 @@
               ]
             },
             {
-              "id": 1230,
+              "id": 2108,
               "name": "Pond's Rose Body Lotion",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS ROSE BODY LOTION 100 ML.webp",
               "variants": [
                 {
-                  "id": 1230,
+                  "id": 2108,
                   "unit": "100ML",
-                  "price": 87,
+                  "price": 90,
                   "mrp": 99,
                   "image": "images/products/PONDS ROSE BODY LOTION 100 ML.webp",
                   "inStock": true
@@ -2325,32 +2333,32 @@
               ]
             },
             {
-              "id": 1232,
+              "id": 2116,
               "name": "Pond's Sandal Powder",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS SANDAL POWDER 40G.webp",
               "variants": [
                 {
-                  "id": 1232,
+                  "id": 2116,
                   "unit": "40G",
-                  "price": 61,
+                  "price": 63,
                   "mrp": 69,
                   "image": "images/products/PONDS SANDAL POWDER 40G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1233,
+                  "id": 2117,
                   "unit": "80G",
-                  "price": 113,
+                  "price": 117,
                   "mrp": 128,
                   "image": "images/products/PONDS SANDAL POWDER 80G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1231,
+                  "id": 2118,
                   "unit": "300G",
-                  "price": 387,
+                  "price": 400,
                   "mrp": 440,
                   "image": "images/products/PONDS SANDAL POWDER 300G.webp",
                   "inStock": true
@@ -2358,24 +2366,24 @@
               ]
             },
             {
-              "id": 1235,
+              "id": 2022,
               "name": "Pond's Starlight Powder",
               "featured": false,
               "deal": false,
               "image": "images/products/PONDS STARLT POWDER 40G.webp",
               "variants": [
                 {
-                  "id": 1235,
+                  "id": 2022,
                   "unit": "40G",
-                  "price": 56,
+                  "price": 59,
                   "mrp": 64,
                   "image": "images/products/PONDS STARLT POWDER 40G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1234,
+                  "id": 2023,
                   "unit": "80G",
-                  "price": 103,
+                  "price": 107,
                   "mrp": 117,
                   "image": "images/products/PONDS SATRLT POWDER 80G.webp",
                   "inStock": true
@@ -2383,16 +2391,16 @@
               ]
             },
             {
-              "id": 1236,
+              "id": 2125,
               "name": "Rab Sapphire Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/RAB SAPPHIRE FW 250G.webp",
               "variants": [
                 {
-                  "id": 1236,
+                  "id": 2125,
                   "unit": "250G",
-                  "price": 22,
+                  "price": 24,
                   "mrp": 25,
                   "image": "images/products/RAB SAPPHIRE FW 250G.webp",
                   "inStock": true
@@ -2400,24 +2408,24 @@
               ]
             },
             {
-              "id": 1238,
+              "id": 2162,
               "name": "Vaseline Deep Moisture Lotion",
               "featured": true,
               "deal": false,
               "image": "images/products/VAS DEEP MOISTURE LOTION S 40ML.webp",
               "variants": [
                 {
-                  "id": 1238,
+                  "id": 2162,
                   "unit": "40ML",
-                  "price": 43,
+                  "price": 45,
                   "mrp": 49,
                   "image": "images/products/VAS DEEP MOISTURE LOTION S 40ML.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1237,
+                  "id": 2163,
                   "unit": "85ML",
-                  "price": 79,
+                  "price": 82,
                   "mrp": 90,
                   "image": "images/products/VAS DEEP MOISTURE LOTION N 85ML.webp",
                   "inStock": true
@@ -2425,16 +2433,16 @@
               ]
             },
             {
-              "id": 1239,
+              "id": 2166,
               "name": "Vaseline Face Moisturizer",
               "featured": false,
               "deal": false,
               "image": "images/products/VAS FACE MOSIT 25ML.webp",
               "variants": [
                 {
-                  "id": 1239,
+                  "id": 2166,
                   "unit": "25ML",
-                  "price": 48,
+                  "price": 50,
                   "mrp": 55,
                   "image": "images/products/VAS FACE MOSIT 25ML.webp",
                   "inStock": true
@@ -2442,16 +2450,16 @@
               ]
             },
             {
-              "id": 1240,
+              "id": 2179,
               "name": "Vaseline Lip Balm Red Label",
               "featured": false,
               "deal": false,
               "image": "images/products/VASELINE LIP CR RL 10G.webp",
               "variants": [
                 {
-                  "id": 1240,
+                  "id": 2179,
                   "unit": "10G",
-                  "price": 57,
+                  "price": 60,
                   "mrp": 65,
                   "image": "images/products/VASELINE LIP CR RL 10G.webp",
                   "inStock": true
@@ -2459,16 +2467,16 @@
               ]
             },
             {
-              "id": 1241,
+              "id": 2178,
               "name": "Vaseline Lip Balm",
               "featured": false,
               "deal": false,
               "image": "images/products/VASELINE LIP CR TM 10G.webp",
               "variants": [
                 {
-                  "id": 1241,
+                  "id": 2178,
                   "unit": "10G",
-                  "price": 43,
+                  "price": 45,
                   "mrp": 49,
                   "image": "images/products/VASELINE LIP CR TM 10G.webp",
                   "inStock": true
@@ -2476,16 +2484,16 @@
               ]
             },
             {
-              "id": 1242,
+              "id": 2211,
               "name": "Vaseline Deep Moisture Lotion (with Free)",
               "featured": false,
               "deal": false,
               "image": "images/products/VDM LOTION 400ML WITH PSLG 50ML.webp",
               "variants": [
                 {
-                  "id": 1242,
+                  "id": 2211,
                   "unit": "400ML",
-                  "price": 383,
+                  "price": 396,
                   "mrp": 435,
                   "image": "images/products/VDM LOTION 400ML WITH PSLG 50ML.webp",
                   "inStock": true
@@ -2493,32 +2501,32 @@
               ]
             },
             {
-              "id": 1243,
+              "id": 2209,
               "name": "Vaseline Petroleum Jelly",
               "featured": false,
               "deal": false,
               "image": "images/products/VPJ 20G.webp",
               "variants": [
                 {
-                  "id": 1243,
+                  "id": 2209,
                   "unit": "20G",
-                  "price": 50,
+                  "price": 52,
                   "mrp": 57,
                   "image": "images/products/VPJ 20G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1244,
+                  "id": 2210,
                   "unit": "40G",
-                  "price": 84,
+                  "price": 87,
                   "mrp": 95,
                   "image": "images/products/VPJ 20G.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1245,
+                  "id": 2208,
                   "unit": "85G",
-                  "price": 140,
+                  "price": 145,
                   "mrp": 159,
                   "image": "images/products/VPJ 85G.webp",
                   "inStock": true
@@ -2526,24 +2534,24 @@
               ]
             },
             {
-              "id": 1247,
+              "id": 2165,
               "name": "Vaseline Cocoa Glow Lotion",
               "featured": false,
               "deal": false,
               "image": "images/products/VSL COCOA GLOW LT 90ML.webp",
               "variants": [
                 {
-                  "id": 1247,
+                  "id": 2165,
                   "unit": "90ML",
-                  "price": 92,
+                  "price": 96,
                   "mrp": 105,
                   "image": "images/products/VSL COCOA GLOW LT 90ML.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1246,
+                  "id": 2164,
                   "unit": "400ML",
-                  "price": 383,
+                  "price": 396,
                   "mrp": 435,
                   "image": "images/products/VSL COCOA GLOW LT 400ML.webp",
                   "inStock": true
@@ -2565,16 +2573,16 @@
           "name": "Household & Cleaning",
           "dishes": [
             {
-              "id": 1248,
+              "id": 2177,
               "name": "Vim Anti Bacterial Bar",
               "featured": true,
               "deal": false,
               "image": "images/products/VIM ANTI BAC BAR MPK 5X190G NEW AW.webp",
               "variants": [
                 {
-                  "id": 1248,
+                  "id": 2177,
                   "unit": "90G",
-                  "price": 114,
+                  "price": 121,
                   "mrp": 130,
                   "image": "images/products/VIM ANTI BAC BAR MPK 5X190G NEW AW.webp",
                   "inStock": true
@@ -2582,16 +2590,16 @@
               ]
             },
             {
-              "id": 1249,
+              "id": 2176,
               "name": "Vim Anti Smell Bar",
               "featured": false,
               "deal": false,
               "image": "images/products/VIM ANTI SMELL BAR MPK 5X190G NEW AW.webp",
               "variants": [
                 {
-                  "id": 1249,
+                  "id": 2176,
                   "unit": "90G",
-                  "price": 114,
+                  "price": 121,
                   "mrp": 130,
                   "image": "images/products/VIM ANTI SMELL BAR MPK 5X190G NEW AW.webp",
                   "inStock": true
@@ -2599,16 +2607,16 @@
               ]
             },
             {
-              "id": 1250,
+              "id": 2167,
               "name": "Vim Bar Face Wash",
               "featured": false,
               "deal": false,
               "image": "images/products/VIM BAR FW 300G.webp",
               "variants": [
                 {
-                  "id": 1250,
+                  "id": 2167,
                   "unit": "300G",
-                  "price": 26,
+                  "price": 28,
                   "mrp": 30,
                   "image": "images/products/VIM BAR FW 300G.webp",
                   "inStock": true
@@ -2616,16 +2624,16 @@
               ]
             },
             {
-              "id": 1251,
+              "id": 2175,
               "name": "Vim Bar Tub with Naked Scrub",
               "featured": true,
               "deal": false,
               "image": "images/products/VIM BAR TUB 480G WITH NKED SCRUB PD.webp",
               "variants": [
                 {
-                  "id": 1251,
+                  "id": 2175,
                   "unit": "480G",
-                  "price": 48,
+                  "price": 49,
                   "mrp": 55,
                   "image": "images/products/VIM BAR TUB 480G WITH NKED SCRUB PD.webp",
                   "inStock": true
@@ -2633,16 +2641,16 @@
               ]
             },
             {
-              "id": 1252,
+              "id": 2168,
               "name": "Vim Bar Tub",
               "featured": false,
               "deal": false,
               "image": "images/products/VIM BAR TUB AS 500G.webp",
               "variants": [
                 {
-                  "id": 1252,
+                  "id": 2168,
                   "unit": "500G",
-                  "price": 57,
+                  "price": 58,
                   "mrp": 65,
                   "image": "images/products/VIM BAR TUB AS 500G.webp",
                   "inStock": true
@@ -2650,16 +2658,16 @@
               ]
             },
             {
-              "id": 1253,
+              "id": 2170,
               "name": "Vim Drop Dishwash Pouch",
               "featured": false,
               "deal": false,
               "image": "images/products/VIM DROP DISH WASH POUCH 500 ML.webp",
               "variants": [
                 {
-                  "id": 1253,
+                  "id": 2170,
                   "unit": "500ML",
-                  "price": 96,
+                  "price": 100,
                   "mrp": 109,
                   "image": "images/products/VIM DROP DISH WASH POUCH 500 ML.webp",
                   "inStock": true
@@ -2667,16 +2675,16 @@
               ]
             },
             {
-              "id": 1254,
+              "id": 2173,
               "name": "Vim Gel Shudhham",
               "featured": false,
               "deal": false,
               "image": "images/products/VIM GEL SHUDHHAM 100ML.webp",
               "variants": [
                 {
-                  "id": 1254,
+                  "id": 2173,
                   "unit": "100ML",
-                  "price": 53,
+                  "price": 56,
                   "mrp": 60,
                   "image": "images/products/VIM GEL SHUDHHAM 100ML.webp",
                   "inStock": true
@@ -2684,24 +2692,24 @@
               ]
             },
             {
-              "id": 1257,
+              "id": 2172,
               "name": "Vim Liquid Pouch Spouted",
               "featured": true,
               "deal": false,
               "image": "images/products/VIM LQD POUCH 900MLSPOUTED.webp",
               "variants": [
                 {
-                  "id": 1257,
+                  "id": 2172,
                   "unit": "900ML",
-                  "price": 180,
+                  "price": 189,
                   "mrp": 205,
                   "image": "images/products/VIM LQD POUCH 900MLSPOUTED.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1255,
+                  "id": 2174,
                   "unit": "2L",
-                  "price": 392,
+                  "price": 409,
                   "mrp": 445,
                   "image": "images/products/VIM LIQ POUCH 2LTR SPOUTED.webp",
                   "inStock": true
@@ -2709,16 +2717,16 @@
               ]
             },
             {
-              "id": 1256,
+              "id": 2169,
               "name": "Vim Liquid Bottle",
               "featured": false,
               "deal": false,
               "image": "images/products/VIM LIQUID BOTTLE 1.8LTR.webp",
               "variants": [
                 {
-                  "id": 1256,
+                  "id": 2169,
                   "unit": "1.8L",
-                  "price": 365,
+                  "price": 381,
                   "mrp": 415,
                   "image": "images/products/VIM LIQUID BOTTLE 1.8LTR.webp",
                   "inStock": true
@@ -2726,16 +2734,16 @@
               ]
             },
             {
-              "id": 1258,
+              "id": 2171,
               "name": "Vim Spouted Pouch",
               "featured": false,
               "deal": false,
               "image": "images/products/VIM SPOUTED POUCH 480 ML TJ.webp",
               "variants": [
                 {
-                  "id": 1258,
+                  "id": 2171,
                   "unit": "480ML",
-                  "price": 87,
+                  "price": 91,
                   "mrp": 99,
                   "image": "images/products/VIM SPOUTED POUCH 480 ML TJ.webp",
                   "inStock": true
@@ -2757,16 +2765,16 @@
           "name": "Laundry Care",
           "dishes": [
             {
-              "id": 1259,
+              "id": 2009,
               "name": "Comfort Fabric Conditioner Green",
               "featured": true,
               "deal": false,
               "image": "images/products/COMFORT FAB CON GREEN 860ML NEW.webp",
               "variants": [
                 {
-                  "id": 1259,
+                  "id": 2009,
                   "unit": "860ML",
-                  "price": 216,
+                  "price": 227,
                   "mrp": 245,
                   "image": "images/products/COMFORT FAB CON GREEN 860ML NEW.webp",
                   "inStock": true
@@ -2774,16 +2782,16 @@
               ]
             },
             {
-              "id": 1260,
+              "id": 2008,
               "name": "Comfort Fabric Conditioner Pink",
               "featured": false,
               "deal": false,
               "image": "images/products/COMFORT FAB CON PINK 860ML NEW.webp",
               "variants": [
                 {
-                  "id": 1260,
+                  "id": 2008,
                   "unit": "860ML",
-                  "price": 216,
+                  "price": 227,
                   "mrp": 245,
                   "image": "images/products/COMFORT FAB CON PINK 860ML NEW.webp",
                   "inStock": true
@@ -2791,16 +2799,16 @@
               ]
             },
             {
-              "id": 1261,
+              "id": 2007,
               "name": "Comfort Fabric Conditioner Blue",
               "featured": false,
               "deal": false,
               "image": "images/products/COMFORT FAB COND BLUE 860ML NEW.webp",
               "variants": [
                 {
-                  "id": 1261,
+                  "id": 2007,
                   "unit": "860ML",
-                  "price": 216,
+                  "price": 227,
                   "mrp": 245,
                   "image": "images/products/COMFORT FAB COND BLUE 860ML NEW.webp",
                   "inStock": true
@@ -2808,16 +2816,16 @@
               ]
             },
             {
-              "id": 1262,
+              "id": 2005,
               "name": "Comfort Pink Pouch",
               "featured": false,
               "deal": false,
               "image": "images/products/COMFORT PINK POUCH 2 LTR NEW.webp",
               "variants": [
                 {
-                  "id": 1262,
+                  "id": 2005,
                   "unit": "2L",
-                  "price": 396,
+                  "price": 417,
                   "mrp": 450,
                   "image": "images/products/COMFORT PINK POUCH 2 LTR NEW.webp",
                   "inStock": true
@@ -2825,16 +2833,16 @@
               ]
             },
             {
-              "id": 1263,
+              "id": 2001,
               "name": "Rin Fabric Whitener Ala Bolt",
               "featured": true,
               "deal": false,
               "image": "images/products/RIN FAB WHTNR ALA BOLT 500ML.webp",
               "variants": [
                 {
-                  "id": 1263,
+                  "id": 2001,
                   "unit": "500ML",
-                  "price": 79,
+                  "price": 84,
                   "mrp": 90,
                   "image": "images/products/RIN FAB WHTNR ALA BOLT 500ML.webp",
                   "inStock": true
@@ -2842,16 +2850,16 @@
               ]
             },
             {
-              "id": 1264,
+              "id": 2096,
               "name": "Surf Excel Bar",
               "featured": false,
               "deal": false,
               "image": "images/products/SURF EXCEL BAR MPK 4X200G.webp",
               "variants": [
                 {
-                  "id": 1264,
+                  "id": 2096,
                   "unit": "800G",
-                  "price": 113,
+                  "price": 119,
                   "mrp": 128,
                   "image": "images/products/SURF EXCEL BAR MPK 4X200G.webp",
                   "inStock": true
@@ -2859,24 +2867,24 @@
               ]
             },
             {
-              "id": 1265,
+              "id": 2129,
               "name": "Surf Excel EasyWash Detergent Liquid",
               "featured": true,
               "deal": false,
               "image": "images/products/SURF EXCEL E.WASH DETERGENT LIQUID 500ML.webp",
               "variants": [
                 {
-                  "id": 1265,
+                  "id": 2129,
                   "unit": "500ML",
-                  "price": 92,
+                  "price": 98,
                   "mrp": 105,
                   "image": "images/products/SURF EXCEL E.WASH DETERGENT LIQUID 500ML.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1266,
+                  "id": 2128,
                   "unit": "1L",
-                  "price": 180,
+                  "price": 190,
                   "mrp": 205,
                   "image": "images/products/SURF EXCEL EASYWASH DETERGNT LIQUID 1LTR.webp",
                   "inStock": true
@@ -2884,16 +2892,16 @@
               ]
             },
             {
-              "id": 1267,
+              "id": 2127,
               "name": "Surf Excel Matic Liquid Pouch",
               "featured": false,
               "deal": false,
               "image": "images/products/SURF EXCEL MATIC LQD BVI POUCH TL 1.8KG.webp",
               "variants": [
                 {
-                  "id": 1267,
+                  "id": 2127,
                   "unit": "1.8KG",
-                  "price": 240,
+                  "price": 253,
                   "mrp": 273,
                   "image": "images/products/SURF EXCEL MATIC LQD BVI POUCH TL 1.8KG.webp",
                   "inStock": true
@@ -2901,16 +2909,16 @@
               ]
             },
             {
-              "id": 1268,
+              "id": 2130,
               "name": "Surf Excel Matic Liquid",
               "featured": false,
               "deal": false,
               "image": "images/products/SURF XL MTC LIQ TL 1KG POUCH NS.webp",
               "variants": [
                 {
-                  "id": 1268,
+                  "id": 2130,
                   "unit": "1KG",
-                  "price": 131,
+                  "price": 138,
                   "mrp": 149,
                   "image": "images/products/SURF XL MTC LIQ TL 1KG POUCH NS.webp",
                   "inStock": true
@@ -2918,16 +2926,16 @@
               ]
             },
             {
-              "id": 1269,
+              "id": 2038,
               "name": "Surf Excel Matic Powder",
               "featured": false,
               "deal": false,
               "image": "images/products/SURF XL MTK PWD POLY TL 1KG OFFER S.webp",
               "variants": [
                 {
-                  "id": 1269,
+                  "id": 2038,
                   "unit": "1KG",
-                  "price": 238,
+                  "price": 250,
                   "mrp": 270,
                   "image": "images/products/SURF XL MTK PWD POLY TL 1KG OFFER S.webp",
                   "inStock": true
@@ -2935,17 +2943,17 @@
               ]
             },
             {
-              "id": 1270,
+              "id": 2207,
               "name": "Wheel Active Lemon & Orange Powder",
               "featured": true,
               "deal": false,
               "image": "images/products/WHEEL L&O PWDR A+ 2KG NILE.webp",
               "variants": [
                 {
-                  "id": 1270,
+                  "id": 2207,
                   "unit": "2KG",
-                  "price": 130,
-                  "mrp": 148,
+                  "price": 145,
+                  "mrp": 156,
                   "image": "images/products/WHEEL L&O PWDR A+ 2KG NILE.webp",
                   "inStock": true
                 }
@@ -2966,16 +2974,16 @@
           "name": "Health Drinks & Nutrition",
           "dishes": [
             {
-              "id": 1276,
+              "id": 2196,
               "name": "Horlicks Chocolate",
               "featured": true,
               "deal": false,
               "image": "images/products/CHOCOLATE HLX 500G BIB UMOD.webp",
               "variants": [
                 {
-                  "id": 1276,
+                  "id": 2196,
                   "unit": "500G",
-                  "price": 232,
+                  "price": 245,
                   "mrp": 264,
                   "image": "images/products/CHOCOLATE HLX 500G BIB UMOD.webp",
                   "inStock": true
@@ -2983,16 +2991,16 @@
               ]
             },
             {
-              "id": 1277,
+              "id": 2186,
               "name": "Horlicks Badam Lite Pouch",
               "featured": false,
               "deal": false,
               "image": "images/products/HLX BADAM LITE 450G CS POUCH.webp",
               "variants": [
                 {
-                  "id": 1277,
+                  "id": 2186,
                   "unit": "450G",
-                  "price": 263,
+                  "price": 277,
                   "mrp": 299,
                   "image": "images/products/HLX BADAM LITE 450G CS POUCH.webp",
                   "inStock": true
@@ -3000,16 +3008,16 @@
               ]
             },
             {
-              "id": 1278,
+              "id": 2068,
               "name": "Horlicks Lite Jar",
               "featured": false,
               "deal": false,
               "image": "images/products/HORLICKS LITE 450G JAR.webp",
               "variants": [
                 {
-                  "id": 1278,
+                  "id": 2068,
                   "unit": "450G",
-                  "price": 286,
+                  "price": 301,
                   "mrp": 325,
                   "image": "images/products/HORLICKS LITE 450G JAR.webp",
                   "inStock": true
@@ -3017,16 +3025,16 @@
               ]
             },
             {
-              "id": 1279,
+              "id": 2183,
               "name": "Horlicks Lite Badam",
               "featured": false,
               "deal": false,
               "image": "images/products/HORLICKS LITE BADAM 450G BIB.webp",
               "variants": [
                 {
-                  "id": 1279,
+                  "id": 2183,
                   "unit": "450G",
-                  "price": 286,
+                  "price": 301,
                   "mrp": 325,
                   "image": "images/products/HORLICKS LITE BADAM 450G BIB.webp",
                   "inStock": true
@@ -3034,32 +3042,32 @@
               ]
             },
             {
-              "id": 1280,
+              "id": 2199,
               "name": "Junior Horlicks Vanilla",
               "featured": true,
               "deal": false,
               "image": "images/products/JR HLX VANILLA 450GM CS POUCH.webp",
               "variants": [
                 {
-                  "id": 1280,
+                  "id": 2199,
                   "unit": "450G",
-                  "price": 207,
+                  "price": 218,
                   "mrp": 235,
                   "image": "images/products/JR HLX VANILLA 450GM CS POUCH.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1281,
+                  "id": 2181,
                   "unit": "500G",
-                  "price": 290,
+                  "price": 306,
                   "mrp": 330,
                   "image": "images/products/JR. HLX VAN 500GM BIB.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1283,
+                  "id": 2191,
                   "unit": "500G",
-                  "price": 290,
+                  "price": 305,
                   "mrp": 329,
                   "image": "images/products/JUNIOR HLX VANILLA 500G ICON JAR.webp",
                   "inStock": true
@@ -3067,16 +3075,16 @@
               ]
             },
             {
-              "id": 1282,
+              "id": 2192,
               "name": "Junior Horlicks Chocolate",
               "featured": false,
               "deal": false,
               "image": "images/products/JUNIOR HLX CHOCOLATE 500G ICON JAR.webp",
               "variants": [
                 {
-                  "id": 1282,
+                  "id": 2192,
                   "unit": "500G",
-                  "price": 304,
+                  "price": 320,
                   "mrp": 345,
                   "image": "images/products/JUNIOR HLX CHOCOLATE 500G ICON JAR.webp",
                   "inStock": true
@@ -3084,16 +3092,16 @@
               ]
             },
             {
-              "id": 1284,
+              "id": 2195,
               "name": "Mother's Horlicks Kesar",
               "featured": true,
               "deal": false,
               "image": "images/products/MOTHERS HLX KESAR 400G BIB.webp",
               "variants": [
                 {
-                  "id": 1284,
+                  "id": 2195,
                   "unit": "400G",
-                  "price": 524,
+                  "price": 551,
                   "mrp": 595,
                   "image": "images/products/MOTHERS HLX KESAR 400G BIB.webp",
                   "inStock": true
@@ -3101,40 +3109,40 @@
               ]
             },
             {
-              "id": 1286,
+              "id": 2201,
               "name": "Horlicks",
               "featured": false,
               "deal": false,
               "image": "images/products/STD HORLICKS 500G CS POUCH LEO.webp",
               "variants": [
                 {
-                  "id": 1286,
+                  "id": 2201,
                   "unit": "500G",
-                  "price": 207,
+                  "price": 218,
                   "mrp": 235,
                   "image": "images/products/STD HORLICKS 500G CS POUCH LEO.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1288,
+                  "id": 2193,
                   "unit": "500G",
-                  "price": 232,
+                  "price": 245,
                   "mrp": 264,
                   "image": "images/products/STD. HORLICKS ICON JAR 500G EAST.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1285,
+                  "id": 2198,
                   "unit": "1KG",
-                  "price": 378,
+                  "price": 399,
                   "mrp": 430,
                   "image": "images/products/HORLICS 1KG.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1287,
+                  "id": 2194,
                   "unit": "1KG",
-                  "price": 387,
+                  "price": 408,
                   "mrp": 440,
                   "image": "images/products/HORLICS 1KG.webp",
                   "inStock": true
@@ -3142,24 +3150,24 @@
               ]
             },
             {
-              "id": 1289,
+              "id": 2184,
               "name": "Women's Horlicks Caramel",
               "featured": true,
               "deal": false,
               "image": "images/products/WOMEN HORLICKS 400G BIB CARAMEL.webp",
               "variants": [
                 {
-                  "id": 1289,
+                  "id": 2184,
                   "unit": "400G",
-                  "price": 282,
+                  "price": 297,
                   "mrp": 320,
                   "image": "images/products/WOMEN HORLICKS 400G BIB CARAMEL.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1291,
+                  "id": 2189,
                   "unit": "400G",
-                  "price": 312,
+                  "price": 329,
                   "mrp": 355,
                   "image": "images/products/WOMEN HORLICKS 400G ICON JAR CARAMEL.webp",
                   "inStock": true
@@ -3167,32 +3175,32 @@
               ]
             },
             {
-              "id": 1290,
+              "id": 2185,
               "name": "Women's Horlicks Chocolate",
               "featured": false,
               "deal": false,
               "image": "images/products/WOMEN HORLICKS 400G BIB CHOCLATE.webp",
               "variants": [
                 {
-                  "id": 1290,
+                  "id": 2185,
                   "unit": "400G",
-                  "price": 290,
+                  "price": 306,
                   "mrp": 330,
                   "image": "images/products/WOMEN HORLICKS 400G BIB CHOCLATE.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1292,
+                  "id": 2190,
                   "unit": "400G",
-                  "price": 321,
+                  "price": 338,
                   "mrp": 365,
                   "image": "images/products/WOMEN HORLICKS 400G ICON JAR CHOCLATE.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1293,
+                  "id": 2188,
                   "unit": "400G",
-                  "price": 259,
+                  "price": 273,
                   "mrp": 294,
                   "image": "images/products/WOMEN HORLICKS 400GBIB CHOCOLATE.webp",
                   "inStock": true
@@ -3214,14 +3222,14 @@
           "name": "Baby Food & Nutrition",
           "dishes": [
             {
-              "id": 1294,
+              "id": 1001,
               "name": "Cerelac Stage 1 Wheat Apple",
               "featured": true,
               "deal": false,
               "image": "images/products/CERELAC STG1 Whe App 24x360g ZS N1 IN.webp",
               "variants": [
                 {
-                  "id": 1294,
+                  "id": 1001,
                   "unit": "360G",
                   "price": 280,
                   "mrp": 280,
@@ -3229,7 +3237,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1295,
+                  "id": 1002,
                   "unit": "360G",
                   "price": 280,
                   "mrp": 280,
@@ -3239,14 +3247,14 @@
               ]
             },
             {
-              "id": 1296,
+              "id": 1003,
               "name": "Cerelac Stage 2 Wheat Apple Cherry",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STG2 Whe App Chry 24x360gWS N1IN.webp",
               "variants": [
                 {
-                  "id": 1296,
+                  "id": 1003,
                   "unit": "360G",
                   "price": 299,
                   "mrp": 299,
@@ -3254,7 +3262,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1298,
+                  "id": 1005,
                   "unit": "360G",
                   "price": 299,
                   "mrp": 299,
@@ -3264,14 +3272,14 @@
               ]
             },
             {
-              "id": 1297,
+              "id": 1004,
               "name": "Cerelac Stage 2 Wheat Orange",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STG2 Wheat Orange 24x300g WS IN.webp",
               "variants": [
                 {
-                  "id": 1297,
+                  "id": 1004,
                   "unit": "300G",
                   "price": 299,
                   "mrp": 299,
@@ -3281,14 +3289,14 @@
               ]
             },
             {
-              "id": 1299,
+              "id": 1006,
               "name": "Cerelac Stage 3 Wheat Rice Mixed Fruit",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STG3 WheRi Mix Frt 24x300g ZS IN.webp",
               "variants": [
                 {
-                  "id": 1299,
+                  "id": 1006,
                   "unit": "300G",
                   "price": 290,
                   "mrp": 290,
@@ -3296,7 +3304,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1300,
+                  "id": 1007,
                   "unit": "300G",
                   "price": 290,
                   "mrp": 290,
@@ -3306,14 +3314,14 @@
               ]
             },
             {
-              "id": 1301,
+              "id": 1008,
               "name": "Cerelac Stage 3 Wheat Rice Mixed Vegetable",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STA3 Whe Ri MixVeg 24x300g ZS IN.webp",
               "variants": [
                 {
-                  "id": 1301,
+                  "id": 1008,
                   "unit": "300G",
                   "price": 290,
                   "mrp": 290,
@@ -3323,14 +3331,14 @@
               ]
             },
             {
-              "id": 1302,
+              "id": 1009,
               "name": "Cerelac Stage 4 Multi-grain Dal Vegetable",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STG 4 MU Dal Veg 24x300g ZS IN.webp",
               "variants": [
                 {
-                  "id": 1302,
+                  "id": 1009,
                   "unit": "300G",
                   "price": 295,
                   "mrp": 295,
@@ -3340,14 +3348,14 @@
               ]
             },
             {
-              "id": 1303,
+              "id": 1010,
               "name": "Cerelac Stage 4 Multi-grain Fruit",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STG 4 MU Fruit 24x300g WS N1 IN.webp",
               "variants": [
                 {
-                  "id": 1303,
+                  "id": 1010,
                   "unit": "300G",
                   "price": 295,
                   "mrp": 295,
@@ -3357,14 +3365,14 @@
               ]
             },
             {
-              "id": 1304,
+              "id": 1011,
               "name": "Cerelac Stage 5 5-Grain Fruit",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STG5 5 Grain Fruit 24x300g ZS IN.webp",
               "variants": [
                 {
-                  "id": 1304,
+                  "id": 1011,
                   "unit": "300G",
                   "price": 299,
                   "mrp": 299,
@@ -3372,7 +3380,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1306,
+                  "id": 1013,
                   "unit": "300G",
                   "price": 299,
                   "mrp": 299,
@@ -3382,14 +3390,14 @@
               ]
             },
             {
-              "id": 1305,
+              "id": 1012,
               "name": "Cerelac Stage 5 5-Grain Vegetable",
               "featured": false,
               "deal": false,
               "image": "images/products/CERELAC STG5 5 Grain Veg 24x300g ZS IN.webp",
               "variants": [
                 {
-                  "id": 1305,
+                  "id": 1012,
                   "unit": "300G",
                   "price": 299,
                   "mrp": 299,
@@ -3399,14 +3407,14 @@
               ]
             },
             {
-              "id": 1307,
+              "id": 1014,
               "name": "Lactogen Pro 1",
               "featured": true,
               "deal": false,
               "image": "images/products/LACTOGEN PRO1 BIB 24x400g INNWPB176 IN.webp",
               "variants": [
                 {
-                  "id": 1307,
+                  "id": 1014,
                   "unit": "400G",
                   "price": 460,
                   "mrp": 460,
@@ -3416,14 +3424,14 @@
               ]
             },
             {
-              "id": 1308,
+              "id": 1015,
               "name": "Lactogen Pro 2",
               "featured": false,
               "deal": false,
               "image": "images/products/LACTOGEN PRO2 BIB 24x400g INLEB086 N1 IN.webp",
               "variants": [
                 {
-                  "id": 1308,
+                  "id": 1015,
                   "unit": "400G",
                   "price": 460,
                   "mrp": 460,
@@ -3433,14 +3441,14 @@
               ]
             },
             {
-              "id": 1309,
+              "id": 1016,
               "name": "Lactogen Pro 3",
               "featured": false,
               "deal": false,
               "image": "images/products/LACTOGEN PRO 3 BIB 24x400g INJE087-2 IN.webp",
               "variants": [
                 {
-                  "id": 1309,
+                  "id": 1016,
                   "unit": "400G",
                   "price": 450,
                   "mrp": 450,
@@ -3450,14 +3458,14 @@
               ]
             },
             {
-              "id": 1310,
+              "id": 1017,
               "name": "Lactogen Pro 4",
               "featured": false,
               "deal": false,
               "image": "images/products/LACTOGEN PRO 4 BIB 24x400g INJE091-1 IN.webp",
               "variants": [
                 {
-                  "id": 1310,
+                  "id": 1017,
                   "unit": "400G",
                   "price": 450,
                   "mrp": 450,
@@ -3467,14 +3475,14 @@
               ]
             },
             {
-              "id": 1311,
+              "id": 1018,
               "name": "NAN Pro 1 Infant Formula",
               "featured": true,
               "deal": false,
               "image": "images/products/NAN PRO 1 IF BIB 24x400g INNWB174 NV IN.webp",
               "variants": [
                 {
-                  "id": 1311,
+                  "id": 1018,
                   "unit": "400G",
                   "price": 775,
                   "mrp": 775,
@@ -3484,14 +3492,14 @@
               ]
             },
             {
-              "id": 1312,
+              "id": 1019,
               "name": "NAN Pro 2",
               "featured": false,
               "deal": false,
               "image": "images/products/NAN PRO2 BIB 24x400g INLW070 LS IN.webp",
               "variants": [
                 {
-                  "id": 1312,
+                  "id": 1019,
                   "unit": "400G",
                   "price": 775,
                   "mrp": 775,
@@ -3501,14 +3509,14 @@
               ]
             },
             {
-              "id": 1313,
+              "id": 1020,
               "name": "NAN Pro 3",
               "featured": false,
               "deal": false,
               "image": "images/products/NAN PRO 3 BIB 24x400g INJE096-1 LS IN.webp",
               "variants": [
                 {
-                  "id": 1313,
+                  "id": 1020,
                   "unit": "400G",
                   "price": 775,
                   "mrp": 775,
@@ -3518,14 +3526,14 @@
               ]
             },
             {
-              "id": 1314,
+              "id": 1021,
               "name": "NAN Pro 4",
               "featured": false,
               "deal": false,
               "image": "images/products/NAN PRO 4 BIB 24x400g INJE097-1 LS IN.webp",
               "variants": [
                 {
-                  "id": 1314,
+                  "id": 1021,
                   "unit": "400G",
                   "price": 775,
                   "mrp": 775,
@@ -3535,14 +3543,14 @@
               ]
             },
             {
-              "id": 1315,
+              "id": 1022,
               "name": "NAN GROW",
               "featured": false,
               "deal": false,
               "image": "images/products/NANGROW 24x400g JEFB001-2 N1 IN.webp",
               "variants": [
                 {
-                  "id": 1315,
+                  "id": 1022,
                   "unit": "400G",
                   "price": 595,
                   "mrp": 595,
@@ -3552,14 +3560,14 @@
               ]
             },
             {
-              "id": 1316,
+              "id": 1023,
               "name": "Nestum Stage 1 Rice",
               "featured": true,
               "deal": false,
               "image": "images/products/NESTUM STAGE 1 Rice BIB 24x325g IN.webp",
               "variants": [
                 {
-                  "id": 1316,
+                  "id": 1023,
                   "unit": "325G",
                   "price": 190,
                   "mrp": 190,
@@ -3569,14 +3577,14 @@
               ]
             },
             {
-              "id": 1317,
+              "id": 1024,
               "name": "Nestum Stage 2 Rice & Vegetables",
               "featured": false,
               "deal": false,
               "image": "images/products/NESTUM STA2 Rice Vegetables BIB24x325gIN.webp",
               "variants": [
                 {
-                  "id": 1317,
+                  "id": 1024,
                   "unit": "325G",
                   "price": 210,
                   "mrp": 210,
@@ -3586,14 +3594,14 @@
               ]
             },
             {
-              "id": 1318,
+              "id": 1025,
               "name": "Nestum Stage 3 Rice & Fruit",
               "featured": false,
               "deal": false,
               "image": "images/products/NESTUM STAGE 3 Rice Frt BIB 24x325g IN.webp",
               "variants": [
                 {
-                  "id": 1318,
+                  "id": 1025,
                   "unit": "325G",
                   "price": 230,
                   "mrp": 230,
@@ -3603,14 +3611,14 @@
               ]
             },
             {
-              "id": 1319,
+              "id": 1026,
               "name": "Nestle Ceregrow",
               "featured": true,
               "deal": false,
               "image": "images/products/NESTLE CEREGROW BIB 24x300g WS N8 IN.webp",
               "variants": [
                 {
-                  "id": 1319,
+                  "id": 1026,
                   "unit": "300G",
                   "price": 299,
                   "mrp": 299,
@@ -3620,14 +3628,14 @@
               ]
             },
             {
-              "id": 1320,
+              "id": 1027,
               "name": "NAN LoLac Infant Formula",
               "featured": true,
               "deal": false,
               "image": "images/products/NAN LO-LAC IF BIB 24x200g INNE003 IN.webp",
               "variants": [
                 {
-                  "id": 1320,
+                  "id": 1027,
                   "unit": "200G",
                   "price": 345,
                   "mrp": 345,
@@ -3651,16 +3659,16 @@
           "name": "Chocolates & Confectionery",
           "dishes": [
             {
-              "id": 1321,
+              "id": 1028,
               "name": "KitKat 2-Finger Mini",
               "featured": true,
               "deal": false,
               "image": "images/products/KIT KAT 2F MINI 24(42x12.1g) IN.webp",
               "variants": [
                 {
-                  "id": 1321,
+                  "id": 1028,
                   "unit": "12.1G",
-                  "price": 9,
+                  "price": 10,
                   "mrp": 10,
                   "image": "images/products/KIT KAT 2F MINI 24(42x12.1g) IN.webp",
                   "inStock": true
@@ -3668,16 +3676,16 @@
               ]
             },
             {
-              "id": 1322,
+              "id": 1029,
               "name": "KitKat 2-Finger",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT 2F 24(30x18.5g)N1 IN.webp",
               "variants": [
                 {
-                  "id": 1322,
+                  "id": 1029,
                   "unit": "18.5G",
-                  "price": 18,
+                  "price": 19,
                   "mrp": 20,
                   "image": "images/products/KIT KAT 2F 24(30x18.5g)N1 IN.webp",
                   "inStock": true
@@ -3685,16 +3693,16 @@
               ]
             },
             {
-              "id": 1323,
+              "id": 1030,
               "name": "KitKat 3-Finger",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT 3F 18(28x28.5g) IN.webp",
               "variants": [
                 {
-                  "id": 1323,
+                  "id": 1030,
                   "unit": "28.5G",
-                  "price": 22,
+                  "price": 23,
                   "mrp": 25,
                   "image": "images/products/KIT KAT 3F 18(28x28.5g) IN.webp",
                   "inStock": true
@@ -3702,16 +3710,16 @@
               ]
             },
             {
-              "id": 1324,
+              "id": 1031,
               "name": "KitKat 3-Finger Duo",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT 3F Duo 18(28x28.5g) IN.webp",
               "variants": [
                 {
-                  "id": 1324,
+                  "id": 1031,
                   "unit": "28.5G",
-                  "price": 22,
+                  "price": 23,
                   "mrp": 25,
                   "image": "images/products/KIT KAT 3F Duo 18(28x28.5g) IN.webp",
                   "inStock": true
@@ -3719,16 +3727,16 @@
               ]
             },
             {
-              "id": 1325,
+              "id": 1032,
               "name": "KitKat 4-Finger",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT 4 Finger 18(21x38.5g)N1 IN.webp",
               "variants": [
                 {
-                  "id": 1325,
+                  "id": 1032,
                   "unit": "38.5G",
-                  "price": 26,
+                  "price": 28,
                   "mrp": 30,
                   "image": "images/products/KIT KAT 4 Finger 18(21x38.5g)N1 IN.webp",
                   "inStock": true
@@ -3736,16 +3744,16 @@
               ]
             },
             {
-              "id": 1326,
+              "id": 1033,
               "name": "KitKat 2 × 3-Finger Pack",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT 2x3F 18(14x(2x28.5g))N1 IN.webp",
               "variants": [
                 {
-                  "id": 1326,
+                  "id": 1033,
                   "unit": "57G",
-                  "price": 44,
+                  "price": 46,
                   "mrp": 50,
                   "image": "images/products/KIT KAT 2x3F 18(14x(2x28.5g))N1 IN.webp",
                   "inStock": true
@@ -3753,16 +3761,16 @@
               ]
             },
             {
-              "id": 1327,
+              "id": 1034,
               "name": "KitKat Gooey Salted Caramel",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT Gooey Salted Crml 10(6x112g) IN.webp",
               "variants": [
                 {
-                  "id": 1327,
+                  "id": 1034,
                   "unit": "112G",
-                  "price": 163,
+                  "price": 169,
                   "mrp": 185,
                   "image": "images/products/KIT KAT Gooey Salted Crml 10(6x112g) IN.webp",
                   "inStock": true
@@ -3770,16 +3778,16 @@
               ]
             },
             {
-              "id": 1328,
+              "id": 1035,
               "name": "KitKat Tablet Dark",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT Tablet Dark 12(12x50g)N3 IN.webp",
               "variants": [
                 {
-                  "id": 1328,
+                  "id": 1035,
                   "unit": "50G",
-                  "price": 84,
+                  "price": 87,
                   "mrp": 95,
                   "image": "images/products/KIT KAT Tablet Dark 12(12x50g)N3 IN.webp",
                   "inStock": true
@@ -3787,24 +3795,24 @@
               ]
             },
             {
-              "id": 1329,
+              "id": 1037,
               "name": "KitKat Tablet Rich Chocolate",
               "featured": false,
               "deal": false,
               "image": "images/products/KIT KAT Tablet Rich Choc 12(12x50g)N5 IN.webp",
               "variants": [
                 {
-                  "id": 1329,
+                  "id": 1037,
                   "unit": "50G",
-                  "price": 79,
+                  "price": 82,
                   "mrp": 90,
                   "image": "images/products/KIT KAT Tablet Rich Choc 12(12x50g)N5 IN.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1330,
+                  "id": 1038,
                   "unit": "150G",
-                  "price": 185,
+                  "price": 191,
                   "mrp": 210,
                   "image": "images/products/KIT KAT Tablet Rich Choc 10(6x150g)N5 IN.webp",
                   "inStock": true
@@ -3812,16 +3820,16 @@
               ]
             },
             {
-              "id": 1331,
+              "id": 1039,
               "name": "Munch Maha",
               "featured": true,
               "deal": false,
               "image": "images/products/MUNCH Maha 27(32x10.4g) NR IN.webp",
               "variants": [
                 {
-                  "id": 1331,
+                  "id": 1039,
                   "unit": "10.4G",
-                  "price": 4,
+                  "price": 5,
                   "mrp": 5,
                   "image": "images/products/MUNCH Maha 27(32x10.4g) NR IN.webp",
                   "inStock": true
@@ -3829,16 +3837,16 @@
               ]
             },
             {
-              "id": 1332,
+              "id": 1040,
               "name": "Munch Choco Loops",
               "featured": false,
               "deal": false,
               "image": "images/products/MUNCH Choco Loops 192x17g IN.webp",
               "variants": [
                 {
-                  "id": 1332,
+                  "id": 1040,
                   "unit": "17G",
-                  "price": 9,
+                  "price": 10,
                   "mrp": 10,
                   "image": "images/products/MUNCH Choco Loops 192x17g IN.webp",
                   "inStock": true
@@ -3846,16 +3854,16 @@
               ]
             },
             {
-              "id": 1333,
+              "id": 1041,
               "name": "Munch King Size",
               "featured": false,
               "deal": false,
               "image": "images/products/MUNCH King Size 24(24x17.4g) NR 3 IN.webp",
               "variants": [
                 {
-                  "id": 1333,
+                  "id": 1041,
                   "unit": "17.4G",
-                  "price": 9,
+                  "price": 10,
                   "mrp": 10,
                   "image": "images/products/MUNCH King Size 24(24x17.4g) NR 3 IN.webp",
                   "inStock": true
@@ -3863,16 +3871,16 @@
               ]
             },
             {
-              "id": 1334,
+              "id": 1042,
               "name": "Munch Max",
               "featured": false,
               "deal": false,
               "image": "images/products/MUNCH Maxx 12(24x38.5g) N1 IN.webp",
               "variants": [
                 {
-                  "id": 1334,
+                  "id": 1042,
                   "unit": "38.5G",
-                  "price": 18,
+                  "price": 19,
                   "mrp": 20,
                   "image": "images/products/MUNCH Maxx 12(24x38.5g) N1 IN.webp",
                   "inStock": true
@@ -3880,16 +3888,16 @@
               ]
             },
             {
-              "id": 1335,
+              "id": 1043,
               "name": "Milkybar Mould",
               "featured": true,
               "deal": false,
               "image": "images/products/MILKYBAR Mould 24(30x12.5g) N1 IN.webp",
               "variants": [
                 {
-                  "id": 1335,
+                  "id": 1043,
                   "unit": "12.5G",
-                  "price": 9,
+                  "price": 10,
                   "mrp": 10,
                   "image": "images/products/MILKYBAR Mould 24(30x12.5g) N1 IN.webp",
                   "inStock": true
@@ -3897,16 +3905,16 @@
               ]
             },
             {
-              "id": 1336,
+              "id": 1044,
               "name": "Nestle Classic",
               "featured": true,
               "deal": false,
               "image": "images/products/NESTLE CLASSIC 24(28x15g) IN.webp",
               "variants": [
                 {
-                  "id": 1336,
+                  "id": 1044,
                   "unit": "15G",
-                  "price": 9,
+                  "price": 10,
                   "mrp": 10,
                   "image": "images/products/NESTLE CLASSIC 24(28x15g) IN.webp",
                   "inStock": true
@@ -3928,24 +3936,24 @@
           "name": "Instant Foods & Noodles",
           "dishes": [
             {
-              "id": 1340,
+              "id": 1048,
               "name": "Maggi 2-Minute Noodles Masala Chain",
               "featured": true,
               "deal": false,
               "image": "images/products/MAGGI 2-MINN Mas Chain 160x32g IN.webp",
               "variants": [
                 {
-                  "id": 1340,
+                  "id": 1048,
                   "unit": "32G",
-                  "price": 6,
+                  "price": 7,
                   "mrp": 7,
                   "image": "images/products/MAGGI 2-MINN Mas Chain 160x32g IN.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1337,
+                  "id": 1045,
                   "unit": "48G",
-                  "price": 9,
+                  "price": 10,
                   "mrp": 10,
                   "image": "images/products/MAGGI 2-MIN NDLS Masala Chain 120x48g IN.webp",
                   "inStock": true
@@ -3953,24 +3961,24 @@
               ]
             },
             {
-              "id": 1339,
+              "id": 1047,
               "name": "Maggi 2-Minute Noodles Masala",
               "featured": false,
               "deal": false,
               "image": "images/products/MAGGI 2-MINN Mas 24x280g PR Rs2 Off IN.webp",
               "variants": [
                 {
-                  "id": 1339,
+                  "id": 1047,
                   "unit": "280G",
-                  "price": 53,
+                  "price": 56,
                   "mrp": 60,
                   "image": "images/products/MAGGI 2-MINN Mas 24x280g PR Rs2 Off IN.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1338,
+                  "id": 1046,
                   "unit": "420G",
-                  "price": 79,
+                  "price": 83,
                   "mrp": 90,
                   "image": "images/products/MAGGI 2-MINN Mas 16x420g PR Rs7 Off IN.webp",
                   "inStock": true
@@ -3978,16 +3986,16 @@
               ]
             },
             {
-              "id": 1341,
+              "id": 1049,
               "name": "Maggi Masala-ae-Magic",
               "featured": false,
               "deal": false,
               "image": "images/products/MAGGI Masala-ae-Magic 16(2(60x6g) N2 IN.webp",
               "variants": [
                 {
-                  "id": 1341,
+                  "id": 1049,
                   "unit": "6G",
-                  "price": 4,
+                  "price": 5,
                   "mrp": 5,
                   "image": "images/products/MAGGI Masala-ae-Magic 16(2(60x6g) N2 IN.webp",
                   "inStock": true
@@ -3995,16 +4003,16 @@
               ]
             },
             {
-              "id": 1342,
+              "id": 1050,
               "name": "Maggi Tomato Ketchup + Noodles Combo",
               "featured": false,
               "deal": false,
               "image": "images/products/MAGGI Tom Ket 12x960g PR Ndls 280g IN.webp",
               "variants": [
                 {
-                  "id": 1342,
+                  "id": 1050,
                   "unit": "960G",
-                  "price": 150,
+                  "price": 156,
                   "mrp": 170,
                   "image": "images/products/MAGGI Tom Ket 12x960g PR Ndls 280g IN.webp",
                   "inStock": true
@@ -4012,16 +4020,16 @@
               ]
             },
             {
-              "id": 1343,
+              "id": 1051,
               "name": "Maggi Nutrilicious Atta Noodles",
               "featured": false,
               "deal": false,
               "image": "images/products/MAGGI Ntr-lcs Atta 96x55g Rurban RC3 IN.webp",
               "variants": [
                 {
-                  "id": 1343,
+                  "id": 1051,
                   "unit": "55G",
-                  "price": 18,
+                  "price": 19,
                   "mrp": 20,
                   "image": "images/products/MAGGI Ntr-lcs Atta 96x55g Rurban RC3 IN.webp",
                   "inStock": true
@@ -4029,14 +4037,14 @@
               ]
             },
             {
-              "id": 1384,
+              "id": 3033,
               "name": "Ching's Instant Sweet Corn Soup",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Instant SweetCorn Soup 240X13 gm.webp",
               "variants": [
                 {
-                  "id": 1384,
+                  "id": 3033,
                   "unit": "13G",
                   "price": 9,
                   "mrp": 10,
@@ -4044,7 +4052,7 @@
                   "inStock": true
                 },
                 {
-                  "id": 1390,
+                  "id": 3040,
                   "unit": "15G",
                   "price": 9,
                   "mrp": 10,
@@ -4054,16 +4062,16 @@
               ]
             },
             {
-              "id": 1385,
+              "id": 3034,
               "name": "Ching's Manchurian Noodles",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Manchurian Noodles 36 x 240 gm.webp",
               "variants": [
                 {
-                  "id": 1385,
+                  "id": 3034,
                   "unit": "240G",
-                  "price": 70,
+                  "price": 73,
                   "mrp": 80,
                   "image": "images/products/Ching's Manchurian Noodles 36 x 240 gm.webp",
                   "inStock": true
@@ -4071,14 +4079,14 @@
               ]
             },
             {
-              "id": 1388,
+              "id": 3038,
               "name": "Ching's Instant Mixed Vegetable Soup",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Instant Mix Veg Soup 240X14 gm.webp",
               "variants": [
                 {
-                  "id": 1388,
+                  "id": 3038,
                   "unit": "14G",
                   "price": 9,
                   "mrp": 10,
@@ -4088,14 +4096,14 @@
               ]
             },
             {
-              "id": 1389,
+              "id": 3039,
               "name": "Ching's Instant Manchow Soup",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Instant Manchow Soup 240X14 gm.webp",
               "variants": [
                 {
-                  "id": 1389,
+                  "id": 3039,
                   "unit": "14G",
                   "price": 9,
                   "mrp": 10,
@@ -4105,14 +4113,14 @@
               ]
             },
             {
-              "id": 1391,
+              "id": 3041,
               "name": "Ching's Instant Hot & Sour Soup",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Instant Hot&Sour Soup 240X14 gm.webp",
               "variants": [
                 {
-                  "id": 1391,
+                  "id": 3041,
                   "unit": "14G",
                   "price": 9,
                   "mrp": 10,
@@ -4122,14 +4130,14 @@
               ]
             },
             {
-              "id": 1392,
+              "id": 3042,
               "name": "Ching's Instant Tomato Soup with Crouton",
               "featured": false,
               "deal": false,
               "image": "images/products/Ching's Ins.Tomato Soup Crouton 240X16gm.webp",
               "variants": [
                 {
-                  "id": 1392,
+                  "id": 3042,
                   "unit": "16G",
                   "price": 9,
                   "mrp": 10,
@@ -4153,14 +4161,14 @@
           "name": "Coffee & Beverages",
           "dishes": [
             {
-              "id": 1347,
+              "id": 1056,
               "name": "Nescafe Sunrise Sachet Stick",
               "featured": false,
               "deal": false,
               "image": "images/products/NESC Sunrise Sac Stk 30(156x1g)NWNR4 IN.webp",
               "variants": [
                 {
-                  "id": 1347,
+                  "id": 1056,
                   "unit": "1G",
                   "price": 2,
                   "mrp": 2,
@@ -4170,14 +4178,14 @@
               ]
             },
             {
-              "id": 1348,
+              "id": 1057,
               "name": "Nescafe Classic Stick",
               "featured": true,
               "deal": false,
               "image": "images/products/NESCAFE Classic Stick 96(144x1g) IN.webp",
               "variants": [
                 {
-                  "id": 1348,
+                  "id": 1057,
                   "unit": "1G",
                   "price": 2,
                   "mrp": 2,
@@ -4187,16 +4195,16 @@
               ]
             },
             {
-              "id": 1349,
+              "id": 1058,
               "name": "Nescafe Iced Cappuccino Can",
               "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE Iced Cappuccino 60x170ml IN.webp",
               "variants": [
                 {
-                  "id": 1349,
+                  "id": 1058,
                   "unit": "170ML",
-                  "price": 44,
+                  "price": 45,
                   "mrp": 50,
                   "image": "images/products/NESCAFE Iced Cappuccino 60x170ml IN.webp",
                   "inStock": true
@@ -4204,16 +4212,16 @@
               ]
             },
             {
-              "id": 1350,
+              "id": 1059,
               "name": "Nescafe Iced Frappe Can",
               "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE Iced Frappe Cnd 60x170ml IN.webp",
               "variants": [
                 {
-                  "id": 1350,
+                  "id": 1059,
                   "unit": "170ML",
-                  "price": 44,
+                  "price": 45,
                   "mrp": 50,
                   "image": "images/products/NESCAFE Iced Frappe Cnd 60x170ml IN.webp",
                   "inStock": true
@@ -4221,16 +4229,16 @@
               ]
             },
             {
-              "id": 1351,
+              "id": 1060,
               "name": "Nescafe Iced Latte Can",
               "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE Iced Latte Cnd 60x170ml IN.webp",
               "variants": [
                 {
-                  "id": 1351,
+                  "id": 1060,
                   "unit": "170ML",
-                  "price": 44,
+                  "price": 45,
                   "mrp": 50,
                   "image": "images/products/NESCAFE Iced Latte Cnd 60x170ml IN.webp",
                   "inStock": true
@@ -4238,16 +4246,16 @@
               ]
             },
             {
-              "id": 1352,
+              "id": 1061,
               "name": "Nescafe Vietnamese Coffee Can",
               "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE Vietnamese Coffee 30x200ml NR IN.webp",
               "variants": [
                 {
-                  "id": 1352,
+                  "id": 1061,
                   "unit": "200ML",
-                  "price": 66,
+                  "price": 67,
                   "mrp": 75,
                   "image": "images/products/NESCAFE Vietnamese Coffee 30x200ml NR IN.webp",
                   "inStock": true
@@ -4255,16 +4263,16 @@
               ]
             },
             {
-              "id": 1353,
+              "id": 1062,
               "name": "Nescafe Classic Latte Can",
               "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE Classic Latte Cnd 30x200ml IN.webp",
               "variants": [
                 {
-                  "id": 1353,
+                  "id": 1062,
                   "unit": "200ML",
-                  "price": 66,
+                  "price": 67,
                   "mrp": 75,
                   "image": "images/products/NESCAFE Classic Latte Cnd 30x200ml IN.webp",
                   "inStock": true
@@ -4272,16 +4280,16 @@
               ]
             },
             {
-              "id": 1354,
+              "id": 1063,
               "name": "Nescafe Chocolate Latte Can",
               "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE Choco Latte Cnd 30x200ml IN.webp",
               "variants": [
                 {
-                  "id": 1354,
+                  "id": 1063,
                   "unit": "200ML",
-                  "price": 66,
+                  "price": 67,
                   "mrp": 75,
                   "image": "images/products/NESCAFE Choco Latte Cnd 30x200ml IN.webp",
                   "inStock": true
@@ -4289,16 +4297,16 @@
               ]
             },
             {
-              "id": 1355,
+              "id": 1064,
               "name": "Nescafe Classic Jar",
               "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE CLASSIC Jar 36x24g NR IN.webp",
               "variants": [
                 {
-                  "id": 1355,
+                  "id": 1064,
                   "unit": "24G",
-                  "price": 109,
+                  "price": 116,
                   "mrp": 124,
                   "image": "images/products/NESCAFE CLASSIC Jar 36x24g NR IN.webp",
                   "inStock": true
@@ -4306,16 +4314,16 @@
               ]
             },
             {
-              "id": 1379,
+              "id": 3027,
               "name": "Tata Coffee All-in-1 Premix",
               "featured": true,
               "deal": false,
               "image": "images/products/Tata Coffee All in 1 Premix 16g Sachet.webp",
               "variants": [
                 {
-                  "id": 1379,
+                  "id": 3027,
                   "unit": "16G",
-                  "price": 9,
+                  "price": 10,
                   "mrp": 10,
                   "image": "images/products/Tata Coffee All in 1 Premix 16g Sachet.webp",
                   "inStock": true
@@ -4337,24 +4345,24 @@
           "name": "Staples, Salt, Sugar & Pulses",
           "dishes": [
             {
-              "id": 1356,
+              "id": 3001,
               "name": "Tata Salt Packed",
               "featured": true,
               "deal": false,
               "image": "images/products/TATA SALT PACKED 25 X 1 KG (MRP32).webp",
               "variants": [
                 {
-                  "id": 1356,
+                  "id": 3001,
                   "unit": "1KG",
-                  "price": 28,
+                  "price": 29,
                   "mrp": 32,
                   "image": "images/products/TATA SALT PACKED 25 X 1 KG (MRP32).webp",
                   "inStock": true
                 },
                 {
-                  "id": 1365,
+                  "id": 3010,
                   "unit": "1KG",
-                  "price": 28,
+                  "price": 29,
                   "mrp": 32,
                   "image": "images/products/TATA SALT PACKED 50 X 1 KG (MRP32).webp",
                   "inStock": true
@@ -4362,16 +4370,16 @@
               ]
             },
             {
-              "id": 1357,
+              "id": 3002,
               "name": "Tata Salt Sendha+",
               "featured": false,
               "deal": false,
               "image": "images/products/TATA SALT Sendha+ 12X1 KG.webp",
               "variants": [
                 {
-                  "id": 1357,
+                  "id": 3002,
                   "unit": "1KG",
-                  "price": 57,
+                  "price": 60,
                   "mrp": 65,
                   "image": "images/products/TATA SALT Sendha+ 12X1 KG.webp",
                   "inStock": true
@@ -4379,16 +4387,16 @@
               ]
             },
             {
-              "id": 1359,
+              "id": 3004,
               "name": "Chana Dal",
               "featured": true,
               "deal": false,
               "image": "images/products/CHANA DAL 25 x 1Kg.webp",
               "variants": [
                 {
-                  "id": 1359,
+                  "id": 3004,
                   "unit": "1KG",
-                  "price": 129,
+                  "price": 130,
                   "mrp": 147,
                   "image": "images/products/CHANA DAL 25 x 1Kg.webp",
                   "inStock": true
@@ -4396,24 +4404,24 @@
               ]
             },
             {
-              "id": 1361,
+              "id": 3006,
               "name": "OI Jaggery Powder",
               "featured": true,
               "deal": false,
               "image": "images/products/OI Jaggery Powder 500g.webp",
               "variants": [
                 {
-                  "id": 1361,
+                  "id": 3006,
                   "unit": "500G",
-                  "price": 97,
+                  "price": 75,
                   "mrp": 110,
                   "image": "images/products/OI Jaggery Powder 500g.webp",
                   "inStock": true
                 },
                 {
-                  "id": 1360,
+                  "id": 3005,
                   "unit": "1KG",
-                  "price": 194,
+                  "price": 150,
                   "mrp": 220,
                   "image": "images/products/OI Jaggery Powder 1Kg.webp",
                   "inStock": true
@@ -4421,16 +4429,16 @@
               ]
             },
             {
-              "id": 1369,
+              "id": 3014,
               "name": "Tata Gold Leaf Cathedral Pack",
               "featured": false,
               "deal": false,
               "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
               "variants": [
                 {
-                  "id": 1369,
+                  "id": 3014,
                   "unit": "250G",
-                  "price": 119,
+                  "price": 123,
                   "mrp": 135,
                   "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
                   "inStock": true
@@ -4438,16 +4446,16 @@
               ]
             },
             {
-              "id": 1372,
+              "id": 3017,
               "name": "OI Desi Khandsari Sugar",
               "featured": false,
               "deal": false,
               "image": "images/products/OI Desi Khandsari Sugar 500G.webp",
               "variants": [
                 {
-                  "id": 1372,
+                  "id": 3017,
                   "unit": "500G",
-                  "price": 106,
+                  "price": 90,
                   "mrp": 120,
                   "image": "images/products/OI Desi Khandsari Sugar 500G.webp",
                   "inStock": true
@@ -4455,16 +4463,16 @@
               ]
             },
             {
-              "id": 1375,
+              "id": 3022,
               "name": "OI Pink Rock Salt",
               "featured": true,
               "deal": false,
               "image": "images/products/OI PINK ROCK SALT 1KG.webp",
               "variants": [
                 {
-                  "id": 1375,
+                  "id": 3022,
                   "unit": "1KG",
-                  "price": 132,
+                  "price": 110,
                   "mrp": 150,
                   "image": "images/products/OI PINK ROCK SALT 1KG.webp",
                   "inStock": true
@@ -4472,16 +4480,16 @@
               ]
             },
             {
-              "id": 1376,
+              "id": 3023,
               "name": "Toor Dal",
               "featured": true,
               "deal": false,
               "image": "images/products/Toor Dal 25 x 1Kg.webp",
               "variants": [
                 {
-                  "id": 1376,
+                  "id": 3023,
                   "unit": "1KG",
-                  "price": 197,
+                  "price": 200,
                   "mrp": 224,
                   "image": "images/products/Toor Dal 25 x 1Kg.webp",
                   "inStock": true
@@ -4489,16 +4497,16 @@
               ]
             },
             {
-              "id": 1380,
+              "id": 3028,
               "name": "Besan Gargara",
               "featured": false,
               "deal": false,
               "image": "images/products/BESAN GARGARA 20 x 500G (7 MONTHS).webp",
               "variants": [
                 {
-                  "id": 1380,
+                  "id": 3028,
                   "unit": "500G",
-                  "price": 66,
+                  "price": 65,
                   "mrp": 75,
                   "image": "images/products/BESAN GARGARA 20 x 500G (7 MONTHS).webp",
                   "inStock": true
@@ -4506,16 +4514,16 @@
               ]
             },
             {
-              "id": 1381,
+              "id": 3029,
               "name": "Moong Dal",
               "featured": true,
               "deal": false,
               "image": "images/products/MOONG DAL 25 x 1Kg.webp",
               "variants": [
                 {
-                  "id": 1381,
+                  "id": 3029,
                   "unit": "1KG",
-                  "price": 196,
+                  "price": 190,
                   "mrp": 223,
                   "image": "images/products/MOONG DAL 25 x 1Kg.webp",
                   "inStock": true
@@ -4523,16 +4531,16 @@
               ]
             },
             {
-              "id": 1383,
+              "id": 3031,
               "name": "Tata Sampann Poha (Thick)",
               "featured": true,
               "deal": false,
               "image": "images/products/Tata Sampann POHA (Thick) ROI-40 X 500g.webp",
               "variants": [
                 {
-                  "id": 1383,
+                  "id": 3031,
                   "unit": "500G",
-                  "price": 51,
+                  "price": 50,
                   "mrp": 58,
                   "image": "images/products/Tata Sampann POHA (Thick) ROI-40 X 500g.webp",
                   "inStock": true
@@ -4540,16 +4548,16 @@
               ]
             },
             {
-              "id": 1386,
+              "id": 3035,
               "name": "Tata Himalayan Rock Salt",
               "featured": true,
               "deal": false,
               "image": "images/products/TATA HIMALAYAN ROCK SALT 18x1KG Bag.webp",
               "variants": [
                 {
-                  "id": 1386,
+                  "id": 3035,
                   "unit": "1KG",
-                  "price": 106,
+                  "price": 100,
                   "mrp": 120,
                   "image": "images/products/TATA HIMALAYAN ROCK SALT 18x1KG Bag.webp",
                   "inStock": true
@@ -4557,16 +4565,16 @@
               ]
             },
             {
-              "id": 1387,
+              "id": 3036,
               "name": "Tata Lite Salt Packed",
               "featured": true,
               "deal": false,
               "image": "images/products/TATA LITE SALT PACKED 25 X 1 KG (NEW).webp",
               "variants": [
                 {
-                  "id": 1387,
+                  "id": 3036,
                   "unit": "1KG",
-                  "price": 44,
+                  "price": 45,
                   "mrp": 50,
                   "image": "images/products/TATA LITE SALT PACKED 25 X 1 KG (NEW).webp",
                   "inStock": true
@@ -4588,16 +4596,16 @@
           "name": "Dairy Products",
           "dishes": [
             {
-              "id": 1344,
+              "id": 1052,
               "name": "Milkmaid Doypack",
               "featured": false,
               "deal": false,
               "image": "images/products/MILKMAID Doy Pack 64x190g IN.webp",
               "variants": [
                 {
-                  "id": 1344,
+                  "id": 1052,
                   "unit": "190G",
-                  "price": 67,
+                  "price": 78,
                   "mrp": 84,
                   "image": "images/products/MILKMAID Doy Pack 64x190g IN.webp",
                   "inStock": true
@@ -4605,16 +4613,16 @@
               ]
             },
             {
-              "id": 1345,
+              "id": 1053,
               "name": "Milkmaid Tin",
               "featured": false,
               "deal": false,
               "image": "images/products/MILKMAID SCM EOE Tin 48x380g N2 IN.webp",
               "variants": [
                 {
-                  "id": 1345,
+                  "id": 1053,
                   "unit": "380G",
-                  "price": 119,
+                  "price": 137,
                   "mrp": 149,
                   "image": "images/products/MILKMAID SCM EOE Tin 48x380g N2 IN.webp",
                   "inStock": true
