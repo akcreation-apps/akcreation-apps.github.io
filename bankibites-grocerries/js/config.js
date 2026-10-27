@@ -65,13 +65,11 @@ window.BB_CONFIG = {
     'Dangipita',
     'Gopalapur',
     'Harirajpur',
-    'Karabara',
     'Khamaranga',
     'Patapur',
     'Ragadi',
     'Ranapur',
     'Sahadapada',
-    'Similipur',
     'Sisua',
   ],
 
