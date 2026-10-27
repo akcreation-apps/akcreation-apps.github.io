@@ -244,7 +244,7 @@ function renderBill(order) {
 
       <div class="bill-totals">
         <div class="row"><span>Gross Total</span><span>₹${moneyPlain(grossTotal)}</span></div>
-        ${deliveryFee > 0 ? `<div class="row"><span>Delivery</span><span>₹${moneyPlain(deliveryFee)}</span></div>` : `<div class="row"><span>Delivery</span><span>FREE</span></div>`}
+        ${deliveryFee > 0 ? `<div class="row"><span>Delivery</span><span>₹${moneyPlain(deliveryFee)}</span></div>` : ''}
         ${savings > 0 ? `<div class="row savings"><span>Total Saving</span><span>− ₹${moneyPlain(savings)}</span></div>` : ''}
       </div>
       <p id="billTotal">TOTAL &nbsp;₹${moneyPlain(grand)}</p>
