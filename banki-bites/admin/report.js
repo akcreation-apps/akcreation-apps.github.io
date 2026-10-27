@@ -708,7 +708,7 @@ function exportExcel(data) {
 }
 
 async function generateGroceryReport(db, out, printBtn, excelBtn) {
-  window.bbBusy?.('Building grocery pick-list…');
+  window.bbBusy?.('Building grocery shopping list…');
   try {
     // Narrow the Firestore scan to the last 3 days (today + 2 prior). Pending orders
     // (`order_confirmed`/`assigned`) that pre-date this window are stale and shouldn't
@@ -784,7 +784,7 @@ async function generateGroceryReport(db, out, printBtn, excelBtn) {
         return { ...r, vendorPrice: vp, totalVendorPrice: vp * r.qty };
       })
       .sort((a, b) =>
-        a.name.localeCompare(b.name) || String(a.id).localeCompare(String(b.id))
+        b.qty - a.qty || a.name.localeCompare(b.name) || String(a.id).localeCompare(String(b.id))
       );
     const totalPrice       = rows.reduce((s, r) => s + r.price, 0);
     const totalQty         = rows.reduce((s, r) => s + r.qty, 0);
@@ -857,7 +857,7 @@ async function generateGroceryReport(db, out, printBtn, excelBtn) {
           <span class="rest-name">
             <span class="rest-avatar" aria-hidden="true"><i class="fas fa-basket-shopping"></i></span>
             <span class="rest-label">
-              <b>Grocery pick-list</b>
+              <b>Grocery shopping list</b>
               <span class="rest-meta"><i class="fas fa-receipt"></i> ${pending.length} pending order${pending.length === 1 ? '' : 's'}</span>
             </span>
           </span>
@@ -898,7 +898,7 @@ function exportGroceryExcel(data) {
   const money = n => (Number(n) || 0).toFixed(2);
   const rows = [];
 
-  rows.push(`<tr><th colspan="8" style="font-size:14pt;background:#4f46e5;color:#fff;">BankiBites — Grocery Pending Pick-list</th></tr>`);
+  rows.push(`<tr><th colspan="8" style="font-size:14pt;background:#4f46e5;color:#fff;">BankiBites — Grocery Shopping List</th></tr>`);
   rows.push(`<tr><td><b>Generated</b></td><td colspan="7">${esc(data.iso)}</td></tr>`);
   rows.push(`<tr><td><b>Pending orders</b></td><td colspan="7">${data.orderCount}</td></tr>`);
   rows.push(`<tr><td><b>Order confirmed</b></td><td colspan="7">${data.confirmedCount}</td></tr>`);
