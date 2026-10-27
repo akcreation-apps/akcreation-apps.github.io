@@ -195,10 +195,24 @@ function renderBill(order) {
   const address = CFG.fullAddress || CFG.city || '';
   const supportPhone = CFG.supportPhone || '';
 
+  const grossTotal = items.reduce((s, it) => {
+    const unit = Math.max(Number(it.mrp) || 0, Number(it.price) || 0);
+    return s + unit * (Number(it.qty) || 0);
+  }, 0);
+  const savings = Math.max(0, grossTotal - subtotal);
+
   const itemRows = items.map(it => {
     const label = `${it.qty} × ${esc(it.name)}`;
-    const unit = it.unit ? `<div class="bill-item-sub">${esc(it.unit)} · @ ₹${moneyPlain(it.price)}</div>` : '';
-    const line = moneyPlain((it.price || 0) * (it.qty || 0));
+    const mrp = Number(it.mrp) || 0;
+    const price = Number(it.price) || 0;
+    const priceStr = mrp > price
+      ? `@ <s style="color:#94a3b8;text-decoration:line-through">₹${moneyPlain(mrp)}</s> <span style="color:#15803d;font-weight:600">₹${moneyPlain(price)}</span>`
+      : `@ ₹${moneyPlain(price)}`;
+    const subBits = [];
+    if (it.unit) subBits.push(esc(it.unit));
+    subBits.push(priceStr);
+    const unit = `<div class="bill-item-sub">${subBits.join(' · ')}</div>`;
+    const line = moneyPlain(price * (it.qty || 0));
     return `
       <li class="bill-item">
         <span class="qtyname">${label}${unit}</span>
@@ -229,8 +243,9 @@ function renderBill(order) {
       <hr class="separator">
 
       <div class="bill-totals">
-        <div class="row"><span>Subtotal</span><span>₹${moneyPlain(subtotal)}</span></div>
-        <div class="row"><span>Delivery</span><span>${deliveryFee === 0 ? 'FREE' : '₹' + moneyPlain(deliveryFee)}</span></div>
+        <div class="row"><span>Gross Total</span><span>₹${moneyPlain(grossTotal)}</span></div>
+        ${deliveryFee > 0 ? `<div class="row"><span>Delivery</span><span>₹${moneyPlain(deliveryFee)}</span></div>` : `<div class="row"><span>Delivery</span><span>FREE</span></div>`}
+        ${savings > 0 ? `<div class="row savings"><span>Total Saving</span><span>− ₹${moneyPlain(savings)}</span></div>` : ''}
       </div>
       <p id="billTotal">TOTAL &nbsp;₹${moneyPlain(grand)}</p>
 

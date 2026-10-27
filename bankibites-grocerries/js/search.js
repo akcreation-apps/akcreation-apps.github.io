@@ -258,6 +258,7 @@
           data-add-btn="${attr(p.id)}"
           data-name="${attr(p.name)}"
           data-price="${p.price}"
+          data-mrp="${p.mrp}"
           data-unit="${attr(p.unit)}"
           data-image="${attr(encPath(p.image))}">
           <i class="fa-solid fa-plus"></i>

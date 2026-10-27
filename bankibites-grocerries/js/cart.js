@@ -125,10 +125,14 @@
 
   const findItem = (id) => cart.find((it) => String(it.id) === String(id));
 
-  function addItem({ id, name, price, unit, image }) {
+  function addItem({ id, name, price, mrp, unit, image }) {
     const existing = findItem(id);
-    if (existing) existing.qty += 1;
-    else cart.push({ id, name, price: Number(price), unit, image, qty: 1 });
+    if (existing) {
+      existing.qty += 1;
+      if (mrp != null && !existing.mrp) existing.mrp = Number(mrp) || null;
+    } else {
+      cart.push({ id, name, price: Number(price), mrp: Number(mrp) || null, unit, image, qty: 1 });
+    }
     save();
   }
   function inc(id) {
@@ -585,6 +589,7 @@
     const payload = {
       items: cart.map(it => ({
         id: it.id, name: it.name, price: Number(it.price) || 0,
+        mrp: Number(it.mrp) || null,
         unit: it.unit || '', image: it.image || '', qty: Number(it.qty) || 0,
       })),
       subtotal: sub2,
@@ -752,6 +757,7 @@
           id: variant.id,
           name: product.name,
           price: Number(variant.price),
+          mrp: Number(variant.mrp) || null,
           unit: variant.unit,
           image: variant.image || product.image,
         });
@@ -763,10 +769,12 @@
     if (addBtn) {
       e.preventDefault();
       const card = addBtn.closest('[data-product]') || addBtn;
+      const mrpRaw = addBtn.dataset.mrp || card.dataset.mrp;
       const payload = {
         id: addBtn.dataset.addBtn || card.dataset.id,
         name: addBtn.dataset.name || card.dataset.name,
         price: parseFloat(addBtn.dataset.price || card.dataset.price),
+        mrp: mrpRaw ? Number(mrpRaw) || null : null,
         unit: addBtn.dataset.unit || card.dataset.unit,
         image: addBtn.dataset.image || card.dataset.image,
       };
