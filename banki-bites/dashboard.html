@@ -735,6 +735,72 @@
     </div>
   </nav>
 
+  <!-- Food | Grocery segmented pill — mirrors the Android app's
+       FoodGrocerySticky composable. Hidden by default; the script below
+       reads `bankibites_meta/bankimart_maintenance` from Firestore REST
+       (same source the Android app polls) and reveals the pill only when
+       maintenance is OFF. Food is pre-selected because this screen IS the
+       restaurant list; tapping Grocery navigates to /bankibites-grocerries/. -->
+  <div class="fg-pill-wrap" id="fgPillWrap" hidden>
+    <div class="fg-pill" role="tablist" aria-label="Choose a storefront">
+      <button type="button" class="fg-seg" role="tab" aria-selected="true" aria-controls="cardGrid"
+              data-umami-event="bankibites-listing-food-pill">
+        <i class="fas fa-utensils" aria-hidden="true"></i>
+        <span>Food</span>
+      </button>
+      <a class="fg-seg" role="tab" aria-selected="false"
+         href="../bankibites-grocerries/index.html"
+         data-umami-event="bankibites-listing-grocery-pill"
+         aria-label="Shop groceries — opens BankiBites Groceries">
+        <i class="fas fa-store" aria-hidden="true"></i>
+        <span>Grocery</span>
+        <span class="fg-new" aria-hidden="true">NEW</span>
+      </a>
+    </div>
+  </div>
+  <script>
+    // Mirrors Android's fetchGroceryEnabled(): GET the Firestore REST doc
+    // and reveal the pill only when maintenance.enabled is false/missing.
+    // Keeps the web and the app in lockstep without needing the Firestore
+    // JS SDK on this page.
+    (function wireGroceryPill() {
+      var wrap = document.getElementById('fgPillWrap');
+      if (!wrap) return;
+      var MAINTENANCE_URL = 'https://firestore.googleapis.com/v1/projects/akcreation-31707/databases/(default)/documents/bankibites_meta/bankimart_maintenance';
+      var CACHE_KEY = 'bb_grocery_maintenance_v1';
+
+      // Sync paint from cache so repeat visits don't flash.
+      try {
+        var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (cached && cached.enabled === false) wrap.hidden = false;
+      } catch (e) {}
+
+      fetch(MAINTENANCE_URL, { cache: 'no-store' })
+        .then(function (resp) {
+          if (resp.status === 404) return { enabled: false };
+          if (!resp.ok) throw new Error('status ' + resp.status);
+          return resp.json().then(function (body) {
+            var f = body && body.fields || {};
+            return {
+              enabled: !!(f.enabled && f.enabled.booleanValue === true),
+              title: (f.title && f.title.stringValue) || '',
+              message: (f.message && f.message.stringValue) || '',
+              eta: (f.eta && f.eta.stringValue) || '',
+            };
+          });
+        })
+        .then(function (state) {
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (e) {}
+          wrap.hidden = state.enabled === true;
+        })
+        .catch(function (err) {
+          console.warn('[fg-pill] maintenance check failed:', err.message);
+          // Fail-open: show the pill so the storefront stays reachable.
+          wrap.hidden = false;
+        });
+    })();
+  </script>
+
   <!-- Party & Bulk promo strip — kept identical to the Android app's
        BulkOrderStrip: cake icon tile · 2-line title/subtitle · "Explore" pill.
        Text and layout are constant across all screen sizes (no responsive
@@ -765,6 +831,72 @@
     .bulk-strip .bs-cta {
       flex-shrink: 0; background: #fff; color: #E64A19; font-weight: 700;
       font-size: 0.78rem; padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+    }
+
+    /* ── Food | Grocery segmented pill ─────────────────────────────────
+       Mirrors the Android app's `FoodGrocerySticky` composable: a two-
+       segment pill where Food is the selected state (we're on the
+       restaurant list) and Grocery is unselected with a "NEW" badge.
+       Rendered only when the shared Firestore maintenance flag
+       `bankibites_meta/bankimart_maintenance.enabled` is false/absent. */
+    .fg-pill-wrap {
+      padding: 10px 16px 4px;
+      width: 100%;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .fg-pill {
+      display: flex; gap: 3px;
+      width: 100%;
+      background: #E8EBEF;
+      border-radius: 999px;
+      padding: 3px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .fg-seg {
+      flex: 1 1 0; min-width: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px;
+      border: none; background: transparent; cursor: pointer;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.2px;
+      color: #5C6380;
+      text-decoration: none;
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    }
+    .fg-seg i { font-size: 0.9rem; }
+    .fg-seg[aria-selected="true"] {
+      background: #F4A825;
+      color: #161005;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.14);
+    }
+    .fg-seg:focus-visible {
+      outline: 2px solid var(--primary); outline-offset: 2px;
+    }
+    .fg-new {
+      display: inline-block;
+      background: #F4A825; color: #161005;
+      font-size: 0.58rem; font-weight: 800; letter-spacing: 0.6px;
+      border-radius: 999px;
+      padding: 2px 7px;
+      margin-left: 5px;
+    }
+    .fg-seg[aria-selected="true"] .fg-new {
+      background: #161005; color: #F4A825;
+    }
+    @media (prefers-color-scheme: dark) {
+      .fg-pill {
+        background: #1E2535;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      }
+      .fg-seg { color: #9099B7; }
+      .fg-seg[aria-selected="true"] {
+        background: #F4A825; color: #161005;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fg-seg { transition: none; }
     }
   </style>
   <!-- Monthly winners / gamified banners -->

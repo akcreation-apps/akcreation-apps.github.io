@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <title>BankiBites — Banki Bites Food Delivery in Banki, Cuttack, Odisha</title>
-  <meta name="description" content="BankiBites — Banki's first food delivery platform. Order from local Banki restaurants with fast delivery in Banki, Cuttack, Odisha 754008. Available on our Android app or any browser.">
-  <meta name="keywords" content="BankiBites, Banki Bites, food delivery Banki, Banki Bites food delivery, order food Banki, Banki restaurant delivery, food delivery Cuttack Banki, online food order Banki Odisha, Banki food app, Banki Bites app, restaurant near me Banki, food delivery 754008, home delivery Banki, swiggy Banki, zomato Banki, best restaurant Banki Cuttack, food delivery near me Banki, Banki Cuttack food order online, restaurant delivery 754008, order food Banki Cuttack Odisha, delivery charge Banki, food order online Banki, Banki food home delivery, restaurant in Banki online order, online food ordering Banki Odisha, Banki local food delivery">
+  <meta name="description" content="BankiBites — Banki's first food & grocery delivery platform. Order from local Banki restaurants and shop daily groceries with fast delivery in Banki, Cuttack, Odisha 754008. Available on our Android app or any browser.">
+  <meta name="keywords" content="BankiBites, Banki Bites, food delivery Banki, Banki Bites food delivery, order food Banki, Banki restaurant delivery, food delivery Cuttack Banki, online food order Banki Odisha, Banki food app, Banki Bites app, restaurant near me Banki, food delivery 754008, home delivery Banki, swiggy Banki, zomato Banki, best restaurant Banki Cuttack, food delivery near me Banki, Banki Cuttack food order online, restaurant delivery 754008, order food Banki Cuttack Odisha, delivery charge Banki, food order online Banki, Banki food home delivery, restaurant in Banki online order, online food ordering Banki Odisha, Banki local food delivery, grocery delivery Banki, online grocery Banki Cuttack, BankiBites Groceries, buy groceries online Banki 754008, next day grocery delivery Banki">
   <meta name="author" content="AkCreation">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://akcreation-apps.com/banki-bites/">
@@ -21,7 +21,7 @@
   <meta property="og:site_name"       content="BankiBites">
   <meta property="og:locale"          content="en_IN">
   <meta property="og:title"           content="BankiBites — Food Delivery in Banki, Cuttack, Odisha (App & Browser)">
-  <meta property="og:description"     content="Banki's first food delivery platform. Order in 2 taps from local Banki restaurants. ~45 min doorstep delivery across 11+ Banki areas. Use the Android app or any browser.">
+  <meta property="og:description"     content="Banki's first food & grocery delivery platform. Order from local Banki restaurants and shop daily essentials. ~45 min doorstep food delivery across 11+ Banki areas. Use the Android app or any browser.">
   <meta property="og:image"           content="https://akcreation-apps.com/banki-bites/banner.jpg">
   <meta property="og:image:secure_url" content="https://akcreation-apps.com/banki-bites/banner.jpg">
   <meta property="og:image:type"      content="image/jpeg">
@@ -366,6 +366,33 @@
     .btn-cta:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,107,53,0.5); }
     .btn-cta:active { transform: translateY(0); }
     .btn-cta.loading { opacity: 0.75; pointer-events: none; }
+    .btn-cta--grocery {
+      background: linear-gradient(135deg,#16A34A 0%,#15803D 100%);
+      box-shadow: 0 4px 20px rgba(22,163,74,0.38);
+    }
+    .btn-cta--grocery:hover {
+      background: linear-gradient(135deg,#15803D 0%,#166534 100%);
+      box-shadow: 0 6px 24px rgba(22,163,74,0.5);
+    }
+    .hero-ctas {
+      display: flex; flex-wrap: nowrap; gap: 10px; align-items: stretch;
+    }
+    .hero-ctas .btn-cta {
+      flex: 1 1 0; min-width: 0;
+      justify-content: center;
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    @media (max-width: 360px) {
+      .hero-ctas .btn-cta { font-size: 0.8rem; padding: 11px 10px; gap: 6px; }
+      .hero-ctas .btn-cta i { font-size: 0.85rem; }
+    }
+    @media (min-width: 720px) {
+      .hero-ctas { flex-wrap: wrap; }
+      .hero-ctas .btn-cta { flex: 0 1 auto; padding: 14px 24px; font-size: 0.95rem; }
+    }
     .hero-areas {
       margin-top: 18px; font-size: 0.7rem; color: rgba(255,255,255,0.35);
       display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
@@ -427,7 +454,11 @@
     .hero-hours-note {
       font-size: 0.75rem; color: rgba(255,255,255,0.6);
       line-height: 1.5;
+      display: flex; align-items: center; gap: 7px;
+      margin-top: 6px; padding-top: 8px;
+      border-top: 1px dashed rgba(255,255,255,0.08);
     }
+    .hero-hours-note i { color: #22C55E; font-size: 0.75rem; }
     .hero-hours-note strong { color: #fff; font-weight: 700; }
     @media (min-width: 720px) {
       .hero-hours { align-self: flex-start; max-width: 420px; }
@@ -1157,7 +1188,7 @@
         <div class="brand-logo"><img src="banki-bites-logo.png" alt="BankiBites food delivery logo — Banki, Cuttack, Odisha"></div>
         <span class="brand-name">Banki<span>Bites</span></span>
       </a>
-      <a class="topbar-link" href="dashboard.html" title="All restaurants delivering in Banki, Cuttack, Odisha">All Restaurants</a>
+      <a class="topbar-link" href="dashboard.html" title="Order from all restaurants delivering in Banki, Cuttack, Odisha">Order Now</a>
     </nav>
   </header>
 
@@ -1169,25 +1200,31 @@
 
       <div class="hero-copy">
         <div class="hero-eyebrow"><i class="fas fa-bolt" aria-hidden="true"></i> Banki's First Food Delivery</div>
-        <h1>Hungry in <em>Banki?</em> Order in 2 taps.</h1>
+        <h1>Hungry in <em>Banki?</em> Restaurant meals at your doorstep.</h1>
 
-        <div class="hero-hours" role="group" aria-label="BankiBites operating hours">
+        <div class="hero-hours" role="group" aria-label="BankiBites food ordering hours">
           <div class="hero-hours-top">
             <span class="hero-hours-badge" id="hoursBadge">
               <span class="live-dot" aria-hidden="true"></span>
               <span id="hoursStatus">Open Now</span>
             </span>
-            <span class="hero-hours-label">Order Hours</span>
+            <span class="hero-hours-label">Food Order Hours</span>
           </div>
           <div class="hero-hours-time">
             <i class="fas fa-clock" aria-hidden="true"></i>
             <span>11:00 AM &ndash; 10:00 PM &middot; Every Day</span>
           </div>
+          <div class="hero-hours-note">
+            <i class="fas fa-basket-shopping" aria-hidden="true"></i>
+            <span>Groceries can be ordered anytime &middot; delivered next day</span>
+          </div>
         </div>
 
-        <button class="btn-cta" id="orderBtn" aria-label="Find restaurants and order food">
-          <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Food Now
-        </button>
+        <div class="hero-ctas">
+          <button class="btn-cta" id="orderBtn" aria-label="Browse restaurants and order now">
+            <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Now
+          </button>
+        </div>
       </div>
 
       <aside class="hero-why" aria-label="Why order via BankiBites">
@@ -1215,16 +1252,35 @@
     <a class="grow-card grow-card--party" href="bulk-order.html"
        aria-label="Order for a party or bulk event — minimum 10 per item"
        data-umami-event="bankibites-open-bulk"
-       style="display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#FF6B35 0%,#F97316 100%);border:1px solid rgba(255,107,53,0.4);border-radius:18px;padding:16px 18px;text-decoration:none;color:#fff;box-shadow:0 8px 22px rgba(255,107,53,0.28);transition:transform .2s, box-shadow .2s;position:relative;overflow:hidden;">
-      <div style="width:48px;height:48px;flex-shrink:0;border-radius:12px;background:rgba(255,255,255,0.20);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:1.35rem;">
+       style="display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#FF6B35 0%,#F97316 100%);border:1px solid rgba(255,107,53,0.4);border-radius:14px;padding:10px 14px;text-decoration:none;color:#fff;box-shadow:0 6px 18px rgba(255,107,53,0.24);transition:transform .2s, box-shadow .2s;position:relative;overflow:hidden;">
+      <div style="width:38px;height:38px;flex-shrink:0;border-radius:10px;background:rgba(255,255,255,0.20);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;">
         <i class="fas fa-cake-candles" aria-hidden="true"></i>
       </div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:0.9;margin-bottom:2px;">New · Party &amp; Bulk</div>
-        <h3 style="margin:0 0 3px;font-size:1.02rem;color:#fff;font-weight:800;line-height:1.2;">Planning a party or event?</h3>
-        <p style="margin:0;color:rgba(255,255,255,0.92);font-size:0.85rem;line-height:1.35;">Order in bulk from Banki's kitchens — min 10 per item, scheduled delivery.</p>
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:0.9;">New · Party &amp; Bulk</div>
+        <h3 style="margin:1px 0 1px;font-size:0.95rem;color:#fff;font-weight:800;line-height:1.2;">Planning a party or event?</h3>
+        <p style="margin:0;color:rgba(255,255,255,0.92);font-size:0.78rem;line-height:1.3;">Order in bulk from Banki's kitchens — min 10 per item.</p>
       </div>
-      <i class="fas fa-arrow-right" aria-hidden="true" style="font-size:1rem;color:#fff;flex-shrink:0;padding-left:4px;"></i>
+      <i class="fas fa-arrow-right" aria-hidden="true" style="font-size:0.95rem;color:#fff;flex-shrink:0;padding-left:4px;"></i>
+    </a>
+  </div>
+
+  <!-- Groceries entry — promote the BankiBites Groceries storefront
+       at the same visual weight as the party/bulk card. -->
+  <div class="section" style="margin-top:12px;">
+    <a class="grow-card grow-card--grocery" href="dashboard.html"
+       aria-label="Shop daily groceries — tea, sauces, personal care, laundry and more. Opens the restaurant list where you can switch to Groceries."
+       data-umami-event="bankibites-open-groceries"
+       style="display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#16A34A 0%,#15803D 100%);border:1px solid rgba(22,163,74,0.4);border-radius:14px;padding:10px 14px;text-decoration:none;color:#fff;box-shadow:0 6px 18px rgba(22,163,74,0.24);transition:transform .2s, box-shadow .2s;position:relative;overflow:hidden;">
+      <div style="width:38px;height:38px;flex-shrink:0;border-radius:10px;background:rgba(255,255,255,0.20);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;">
+        <i class="fas fa-basket-shopping" aria-hidden="true"></i>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:0.9;">New · Groceries</div>
+        <h3 style="margin:1px 0 1px;font-size:0.95rem;color:#fff;font-weight:800;line-height:1.2;">Daily groceries, delivered next-day</h3>
+        <p style="margin:0;color:rgba(255,255,255,0.92);font-size:0.78rem;line-height:1.3;">Trusted brands — tea, sauces, personal care, laundry &amp; more.</p>
+      </div>
+      <i class="fas fa-arrow-right" aria-hidden="true" style="font-size:0.95rem;color:#fff;flex-shrink:0;padding-left:4px;"></i>
     </a>
   </div>
 
@@ -1388,8 +1444,8 @@
   <!-- Bottom CTA -->
   <div class="bottom-cta">
     <p>Your next meal is one tap away &mdash; from a real Banki restaurant.</p>
-    <button class="btn-cta" id="orderBtn2" aria-label="Find restaurants delivering in Banki, Cuttack, Odisha">
-      <i class="fas fa-utensils" aria-hidden="true"></i> Order Food Now
+    <button class="btn-cta" id="orderBtn2" aria-label="Browse restaurants delivering in Banki, Cuttack, Odisha and order now">
+      <i class="fas fa-utensils" aria-hidden="true"></i> Order Now
     </button>
   </div>
 
