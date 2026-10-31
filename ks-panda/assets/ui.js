@@ -199,11 +199,19 @@ export function openModal({
     backdrop.querySelector(".ks-modal-body").innerHTML = bodyHtml;
 
     const cancelBtn = backdrop.querySelector("[data-cancel]");
-    cancelBtn.textContent = cancelLabel;
+    if (cancelLabel) {
+      cancelBtn.textContent = cancelLabel;
+    } else {
+      cancelBtn.remove();
+    }
 
     const confirmBtn = backdrop.querySelector("[data-confirm]");
-    confirmBtn.className = confirmClass;
-    confirmBtn.textContent = confirmLabel;
+    if (confirmLabel) {
+      confirmBtn.className = confirmClass;
+      confirmBtn.textContent = confirmLabel;
+    } else {
+      confirmBtn.remove();
+    }
 
     const close = (result) => {
       backdrop.remove();
@@ -214,10 +222,10 @@ export function openModal({
     document.addEventListener("keydown", onKey);
 
     backdrop.querySelector(".ks-modal-close").onclick = () => close(null);
-    cancelBtn.onclick = () => close(null);
+    if (cancelLabel) cancelBtn.onclick = () => close(null);
     backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close(null); });
 
-    confirmBtn.onclick = async () => {
+    if (confirmLabel) confirmBtn.onclick = async () => {
       const modalEl = backdrop.querySelector(".ks-modal");
       confirmBtn.disabled = true;
       const original = confirmBtn.innerHTML;
@@ -258,4 +266,23 @@ export function initials(name = "") {
 export function setYear(id = "footer-year") {
   const el = document.getElementById(id);
   if (el) el.textContent = new Date().getFullYear();
+}
+
+// Project-wide date/time formatters. Everything user-facing goes through these
+// so DD/MM/YYYY stays consistent across pages regardless of browser locale.
+export function fmtDate(d) {
+  if (!d) return "";
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+export function fmtTime(d) {
+  if (!d) return "";
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mi}`;
+}
+export function fmtDateTime(d) {
+  if (!d) return "";
+  return `${fmtDate(d)} ${fmtTime(d)}`;
 }

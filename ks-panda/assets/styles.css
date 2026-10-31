@@ -308,7 +308,18 @@ code { color: var(--brand); background: var(--brand-soft); padding: 2px 6px; bor
   flex-wrap: wrap;
   gap: 12px;
   margin: 4px 0 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border-left: 4px solid var(--brand);
+  background: color-mix(in srgb, var(--brand) 7%, transparent);
 }
+/* Semantic accents — each major scroll section gets its own hue so admins
+   can see at a glance which part of the dashboard they're reading. */
+.ks-section-head--info     { border-left-color: var(--info);     background: color-mix(in srgb, var(--info) 7%, transparent); }
+.ks-section-head--warn     { border-left-color: var(--warn, #f59e0b); background: color-mix(in srgb, var(--warn, #f59e0b) 9%, transparent); }
+.ks-section-head--success  { border-left-color: var(--success);  background: color-mix(in srgb, var(--success) 7%, transparent); }
+.ks-section-head--danger   { border-left-color: var(--danger);   background: color-mix(in srgb, var(--danger) 7%, transparent); }
+.ks-section-head--tertiary { border-left-color: var(--brand);    background: color-mix(in srgb, var(--brand) 9%, transparent); }
 .ks-section-head h1, .ks-section-head h2 {
   margin: 0;
   font-weight: 800;
@@ -405,6 +416,36 @@ code { color: var(--brand); background: var(--brand-soft); padding: 2px 6px; bor
 .ks-approval-body { flex: 1 1 200px; min-width: 0; }
 .ks-approval-name { font-weight: 700; color: var(--text); }
 .ks-approval-contact { color: var(--muted); font-size: 0.88rem; word-break: break-word; }
+.ks-emp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+  transition: background .15s ease, border-color .15s ease;
+}
+.ks-emp-row:hover { background: var(--brand-soft); border-color: var(--brand); }
+.ks-emp-row .ks-avatar { width: 36px; height: 36px; font-size: .85rem; }
+.ks-emp-row .ks-emp-meta { min-width: 0; flex: 1; }
+.ks-emp-row .ks-emp-name { font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ks-emp-row .ks-emp-email { color: var(--muted); font-size: .8125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ks-emp-row--warn { border-left: 3px solid var(--warn, #f59e0b); background: rgba(245, 158, 11, 0.08); }
+.ks-emp-row--warn:hover { background: rgba(245, 158, 11, 0.16); }
+.ks-emp-row__chip {
+  margin-left: auto;
+  font-size: .72rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  white-space: nowrap;
+  font-weight: 600;
+  flex-shrink: 0;
+}
 .ks-approval-section {
   margin-top: 12px;
   padding-top: 12px;
@@ -460,45 +501,173 @@ code { color: var(--brand); background: var(--brand-soft); padding: 2px 6px; bor
 .ks-approval-actions {
   display: flex;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 12px;
   flex-wrap: wrap;
-}
-.ks-approval-actions > * { flex: 1 1 120px; }
-@media (min-width: 576px) {
-  .ks-approval-actions > * { flex: 0 0 auto; }
+  justify-content: flex-end;
 }
 
-/* KPI mini-stat grid — for admin dashboard "today at a glance" */
+/* Compact approval/edit-request cards on the admin dashboard.
+   Scoped to the two list containers so other panels using the same markup
+   keep their regular spacing. */
+#pending-list .ks-panel,
+#edit-requests-list .ks-panel {
+  padding: 10px 12px;
+}
+#pending-list .ks-panel:hover,
+#edit-requests-list .ks-panel:hover {
+  box-shadow: var(--shadow-sm);
+  transform: none;
+}
+#pending-list .ks-panel + .ks-panel,
+#edit-requests-list .ks-panel + .ks-panel { margin-top: 8px; }
+#pending-list .ks-approval-meta,
+#edit-requests-list .ks-approval-meta {
+  margin-bottom: 6px;
+  align-items: center;
+  gap: 10px;
+}
+#pending-list .ks-approval-meta .ks-avatar,
+#edit-requests-list .ks-approval-meta .ks-avatar {
+  width: 34px; height: 34px; font-size: .8rem;
+}
+#pending-list .ks-approval-name,
+#edit-requests-list .ks-approval-name { font-size: .92rem; line-height: 1.25; }
+#pending-list .ks-approval-contact,
+#edit-requests-list .ks-approval-contact { font-size: .78rem; line-height: 1.25; }
+#pending-list .ks-approval-section,
+#edit-requests-list .ks-approval-section {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+#pending-list .ks-approval-label,
+#edit-requests-list .ks-approval-label {
+  margin-bottom: 4px;
+  font-size: .68rem;
+  letter-spacing: 0.05em;
+}
+#pending-list .ks-chip,
+#edit-requests-list .ks-chip {
+  padding: 3px 8px;
+  min-height: 26px;
+  font-size: .76rem;
+  gap: 4px;
+}
+#pending-list .ks-chip.checked::before,
+#edit-requests-list .ks-chip.checked::before,
+#pending-list .ks-chip:has(input:checked)::before,
+#edit-requests-list .ks-chip:has(input:checked)::before { font-size: .62rem; }
+#pending-list .ks-approval-actions,
+#edit-requests-list .ks-approval-actions {
+  margin-top: 8px;
+  gap: 6px;
+}
+#pending-list .ks-icon-btn,
+#edit-requests-list .ks-icon-btn {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  font-size: .8rem;
+}
+#pending-list .form-control,
+#edit-requests-list .form-control {
+  height: 32px;
+  padding: 4px 8px;
+  font-size: .85rem;
+  min-height: 32px;
+}
+#pending-list .badge,
+#edit-requests-list .badge {
+  padding: 3px 8px;
+  font-size: .68rem;
+}
+
+/* Collapsible details/summary — used to hide the site-chip grid behind a
+   chevron on pending-approval cards. */
+.ks-collapsible { padding-bottom: 0; }
+.ks-collapsible > summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  user-select: none;
+}
+.ks-collapsible > summary::-webkit-details-marker { display: none; }
+.ks-collapsible > summary::marker { content: ""; }
+.ks-collapsible > summary:hover { color: var(--brand); }
+.ks-collapsible-chev {
+  transition: transform .15s ease;
+  font-size: .72rem;
+}
+.ks-collapsible[open] > summary .ks-collapsible-chev {
+  transform: rotate(90deg);
+}
+.ks-site-count { font-weight: 500; text-transform: none; letter-spacing: 0; }
+.ks-approval-actions > * { flex: 0 0 auto; }
+
+/* Compact icon-only action button — replaces big "Approve/Reject" buttons on
+   cards so they feel like quick marking chips instead of full-width CTAs. */
+.ks-icon-btn {
+  --ks-icon-color: var(--muted);
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ks-icon-color);
+  cursor: pointer;
+  font-size: .95rem;
+  padding: 0;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .1s ease;
+}
+.ks-icon-btn:hover {
+  border-color: var(--ks-icon-color);
+  background: color-mix(in srgb, var(--ks-icon-color) 12%, var(--surface));
+}
+.ks-icon-btn:active { transform: scale(0.96); }
+.ks-icon-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ks-icon-btn--approve { --ks-icon-color: var(--success, #16a34a); }
+.ks-icon-btn--reject  { --ks-icon-color: var(--danger); }
+.ks-icon-btn--primary  { --ks-icon-color: var(--brand); }
+
+/* KPI mini-stat grid — for admin dashboard "today at a glance".
+   Uses auto-fit so adding or removing KPI cards reflows cleanly without
+   needing to update breakpoints. */
 .ks-kpi-grid {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 20px;
 }
-@media (min-width: 576px) { .ks-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 992px) { .ks-kpi-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (min-width: 480px) { .ks-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } }
+@media (min-width: 768px) { .ks-kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } }
 .ks-kpi {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px;
+  padding: 12px;
   box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
+@media (min-width: 768px) { .ks-kpi { padding: 14px; gap: 12px; } }
 .ks-kpi-icon {
-  width: 42px; height: 42px;
-  border-radius: 10px;
+  width: 36px; height: 36px;
+  border-radius: 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: var(--brand-soft);
   color: var(--brand);
-  font-size: 1.05rem;
+  font-size: .95rem;
   flex-shrink: 0;
 }
+@media (min-width: 768px) { .ks-kpi-icon { width: 42px; height: 42px; border-radius: 10px; font-size: 1.05rem; } }
 .ks-kpi--present .ks-kpi-icon { background: var(--success-soft); color: var(--success); }
 .ks-kpi--in .ks-kpi-icon      { background: var(--info-soft);    color: var(--info); }
 .ks-kpi--absent .ks-kpi-icon  { background: var(--danger-soft);  color: var(--danger); }

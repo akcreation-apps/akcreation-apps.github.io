@@ -45,7 +45,7 @@
   <script type="module">
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
-    import { mountTopbar, setYear } from "../assets/ui.js";
+    import { mountTopbar, setYear, fmtDate, fmtTime } from "../assets/ui.js";
     import { collection, query, orderBy, limit, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -68,6 +68,10 @@
       deactivateUser: { label: "Deactivated user", cls: "badge-pending",  icon: "fa-user-slash" },
       reactivateUser: { label: "Reactivated user", cls: "badge-approved", icon: "fa-user-check" },
       editPunch:      { label: "Edited punch",     cls: "badge-info",     icon: "fa-pen" },
+      addPunch:       { label: "Added punch",      cls: "badge-approved", icon: "fa-plus" },
+      deletePunch:    { label: "Deleted punch",    cls: "badge-rejected", icon: "fa-trash" },
+      editUserInfo:   { label: "Edited user info", cls: "badge-info",     icon: "fa-id-card" },
+      rejectEditRequest: { label: "Rejected correction", cls: "badge-rejected", icon: "fa-xmark" },
     };
     function actionBadge(action) {
       const meta = ACTION_MAP[action] || { label: action, cls: "badge-muted", icon: "fa-circle" };
@@ -104,8 +108,8 @@
         const when = e.at?.toDate?.() ?? null;
         tr.innerHTML = `
           <td>
-            <div>${when ? escapeHtml(when.toLocaleDateString()) : ""}</div>
-            <div class="text-muted small">${when ? escapeHtml(when.toLocaleTimeString()) : ""}</div>
+            <div>${when ? escapeHtml(fmtDate(when)) : ""}</div>
+            <div class="text-muted small">${when ? escapeHtml(fmtTime(when)) : ""}</div>
           </td>
           <td>${escapeHtml(await nameOf(e.actor))}</td>
           <td>${actionBadge(e.action)}</td>

@@ -22,6 +22,41 @@
       </div>
     </div>
 
+    <div class="ks-panel" style="margin-bottom:16px;">
+      <div class="ks-form-grid ks-form-grid-4">
+        <div>
+          <label class="ks-field-label" for="flt-search">Search</label>
+          <input class="form-control" id="flt-search" type="search" placeholder="Name or email…">
+        </div>
+        <div>
+          <label class="ks-field-label" for="flt-role">Role</label>
+          <select class="form-control" id="flt-role">
+            <option value="">All roles</option>
+            <option value="employee">Employee</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div>
+          <label class="ks-field-label" for="flt-status">Status</label>
+          <select class="form-control" id="flt-status">
+            <option value="">All statuses</option>
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+        <div>
+          <label class="ks-field-label" for="flt-site">Site</label>
+          <select class="form-control" id="flt-site">
+            <option value="">All sites</option>
+          </select>
+        </div>
+      </div>
+      <div class="text-muted small" style="margin-top:8px;" id="flt-count">—</div>
+    </div>
+
     <div class="ks-table-wrap">
       <div class="ks-table-scroll">
         <table class="table">
@@ -62,14 +97,28 @@
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
       }[c]));
     }
+    // "anil kr" -> "Anil Kr"; devanagari/odia unaffected (no case).
+    function toTitleCase(s) {
+      return String(s)
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/(^|[\s'’\-])(\p{L})/gu, (_, sep, ch) => sep + ch.toUpperCase());
+    }
 
     const availableSites = [];
+    const siteFilterEl = document.getElementById("flt-site");
     onSnapshot(collection(db, "attn_sites"), (snap) => {
       availableSites.length = 0;
       snap.forEach(d => {
         const s = d.data();
         if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
       });
+      // Repopulate site filter preserving selection
+      const prev = siteFilterEl.value;
+      siteFilterEl.innerHTML = '<option value="">All sites</option>' +
+        availableSites.map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)}</option>`).join("");
+      siteFilterEl.value = prev;
       render();
     });
 
@@ -79,6 +128,33 @@
       latestUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       render();
     });
+
+    // Filter wiring
+    const searchEl = document.getElementById("flt-search");
+    const roleEl = document.getElementById("flt-role");
+    const statusEl = document.getElementById("flt-status");
+    const countEl = document.getElementById("flt-count");
+    [searchEl, roleEl, statusEl, siteFilterEl].forEach(el => {
+      el.addEventListener("input", render);
+      el.addEventListener("change", render);
+    });
+
+    function applyFilters(users) {
+      const term = searchEl.value.trim().toLowerCase();
+      const role = roleEl.value;
+      const status = statusEl.value;
+      const site = siteFilterEl.value;
+      return users.filter(u => {
+        if (role && u.role !== role) return false;
+        if (status && u.status !== status) return false;
+        if (site && !(u.assignedSiteIds ?? []).includes(site)) return false;
+        if (term) {
+          const hay = `${u.name || ""} ${u.email || ""} ${u.contact || ""}`.toLowerCase();
+          if (!hay.includes(term)) return false;
+        }
+        return true;
+      });
+    }
 
     function render() {
       if (latestUsers.length === 0) {
@@ -91,8 +167,20 @@
         </td></tr>`;
         return;
       }
+      const filtered = applyFilters(latestUsers);
+      countEl.textContent = `${filtered.length} of ${latestUsers.length} users`;
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5">
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
+            <p class="ks-empty-title">No matches</p>
+            <p class="ks-empty-text">Try adjusting the filters.</p>
+          </div>
+        </td></tr>`;
+        return;
+      }
       tbody.innerHTML = '';
-      latestUsers.forEach(u => {
+      filtered.forEach(u => {
         const badgeClass = { pending: 'badge-pending', approved: 'badge-approved', rejected: 'badge-rejected', disabled: 'badge-muted' }[u.status] ?? 'badge-muted';
         const assigned = new Set(u.assignedSiteIds ?? []);
         const sitesCells = availableSites.length === 0
@@ -107,13 +195,13 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span class="ks-avatar" style="width:36px;height:36px;font-size:.85rem;">${initials(u.name || u.email || "?")}</span>
+            <a href="employee.html?uid=${encodeURIComponent(u.id)}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;" title="View profile">
+              <span class="ks-avatar" style="width:36px;height:36px;font-size:.85rem;">${initials(toTitleCase(u.name || "") || u.email || "?")}</span>
               <div>
-                <div style="font-weight:600;">${escapeHtml(u.name || "—")}</div>
+                <div style="font-weight:600;">${escapeHtml(toTitleCase(u.name || "") || "—")}</div>
                 <div class="text-muted" style="font-size:.8rem;">${escapeHtml(u.email || "")}</div>
               </div>
-            </div>
+            </a>
           </td>
           <td>
             <select class="form-control" data-role>
@@ -125,13 +213,27 @@
           <td><span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span></td>
           <td>${sitesCells}</td>
           <td class="ks-table-actions">
-            <button class="btn btn-sm btn-primary" data-save><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            <button class="ks-icon-btn ks-icon-btn--primary" data-save style="display:none;" aria-label="Save" title="Save changes"><i class="fa-solid fa-floppy-disk"></i></button>
             ${u.status === "approved"
-              ? '<button class="btn btn-sm btn-outline-danger" data-toggle-status style="margin-left:6px;"><i class="fa-solid fa-user-slash"></i> Deactivate</button>'
+              ? '<button class="ks-icon-btn ks-icon-btn--reject" data-toggle-status style="margin-left:6px;" aria-label="Deactivate" title="Deactivate"><i class="fa-solid fa-user-slash"></i></button>'
               : u.status === "disabled"
-              ? '<button class="btn btn-sm btn-outline-primary" data-toggle-status style="margin-left:6px;"><i class="fa-solid fa-user-check"></i> Reactivate</button>'
+              ? '<button class="ks-icon-btn ks-icon-btn--approve" data-toggle-status style="margin-left:6px;" aria-label="Reactivate" title="Reactivate"><i class="fa-solid fa-user-check"></i></button>'
               : ''}
           </td>`;
+        // Dirty tracking — Save button hidden until role or site assignment changes.
+        const saveBtn = tr.querySelector('[data-save]');
+        const originalRole = u.role ?? "";
+        const originalSitesKey = [...(u.assignedSiteIds ?? [])].sort().join("|");
+        const checkDirty = () => {
+          const currentRole = tr.querySelector('[data-role]').value;
+          const currentSitesKey = Array.from(tr.querySelectorAll('[data-site]:checked'))
+            .map(x => x.value).sort().join("|");
+          const dirty = currentRole !== originalRole || currentSitesKey !== originalSitesKey;
+          saveBtn.style.display = dirty ? "" : "none";
+        };
+        tr.querySelector('[data-role]').addEventListener('change', checkDirty);
+        tr.querySelectorAll('[data-site]').forEach(cb => cb.addEventListener('change', checkDirty));
+
         const toggleBtn = tr.querySelector('[data-toggle-status]');
         if (toggleBtn) {
           toggleBtn.onclick = async () => {
@@ -139,7 +241,7 @@
             const nextStatus = isApproved ? "disabled" : "approved";
             const verb = isApproved ? "Deactivate" : "Reactivate";
             await openModal({
-              title: `${verb} ${u.name || "user"}?`,
+              title: `${verb} ${toTitleCase(u.name || "") || "user"}?`,
               bodyHtml: isApproved
                 ? `<p>They will no longer be able to sign in or punch. You can reactivate later.</p>`
                 : `<p>They will regain sign-in and punch access with their current role and site assignments.</p>`,
@@ -159,7 +261,7 @@
                   details: { previousStatus: u.status, newStatus: nextStatus },
                   at: serverTimestamp(),
                 });
-                showToast(`${verb}d ${u.name || "user"}`, isApproved ? "warn" : "success");
+                showToast(`${verb}d ${toTitleCase(u.name || "") || "user"}`, isApproved ? "warn" : "success");
               },
             });
           };
@@ -173,7 +275,7 @@
           btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
           try {
             await updateDoc(doc(db, "attn_users", u.id), { role, assignedSiteIds });
-            showToast(`Saved ${u.name || "user"}`, "success");
+            showToast(`Saved ${toTitleCase(u.name || "") || "user"}`, "success");
           } catch (e) {
             showToast(e.message, "danger");
           } finally {

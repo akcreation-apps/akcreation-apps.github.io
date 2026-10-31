@@ -78,7 +78,7 @@
   <script type="module">
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
-    import { mountTopbar, showToast, initials, setYear } from "../assets/ui.js";
+    import { mountTopbar, showToast, initials, setYear, fmtDate, fmtTime } from "../assets/ui.js";
     import {
       collection, collectionGroup, onSnapshot, query, where, orderBy, getDocs, Timestamp
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -112,8 +112,8 @@
     function dayKey(d) {
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
     }
-    function timeStr(d) { return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
-    function dateStr(d) { return d.toLocaleDateString(); }
+    const timeStr = fmtTime;
+    const dateStr = fmtDate;
     function dayStr(d)  { return d.toLocaleDateString(undefined, { weekday: "short" }); }
 
     // ============================================================
@@ -359,7 +359,8 @@
     }
 
     function renderEmployeePanel(emp) {
-      const rows = emp.days.map(day => {
+      // UI: recent day on top. CSV loops the original asc order below.
+      const rows = [...emp.days].reverse().map(day => {
         const inParts = day.pairs.map(p => p.in ? timeStr(p.in.ts) : `<span class="ks-missing-badge">missing</span>`).join("<br>");
         const outParts = day.pairs.map(p => p.out ? timeStr(p.out.ts) : `<span class="ks-missing-badge">missing</span>`).join("<br>");
         const hoursCell = day.hasMissing

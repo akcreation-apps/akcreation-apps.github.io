@@ -34,7 +34,7 @@
   <script type="module">
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
-    import { mountTopbar, setYear } from "../assets/ui.js";
+    import { mountTopbar, setYear, fmtDate, fmtTime } from "../assets/ui.js";
     import { collectionGroup, query, where, orderBy, getDocs, doc, getDoc, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -106,8 +106,8 @@
           rowsHtml.push(`
             <tr>
               <td>
-                <div>${dt ? escapeHtml(dt.toLocaleDateString()) : ""}</div>
-                <div class="text-muted small">${dt ? escapeHtml(dt.toLocaleTimeString()) : ""}</div>
+                <div>${dt ? escapeHtml(fmtDate(dt)) : ""}</div>
+                <div class="text-muted small">${dt ? escapeHtml(fmtTime(dt)) : ""}</div>
               </td>
               <td>${escapeHtml(nm)}</td>
               <td>${typeBadge(p.type)}</td>

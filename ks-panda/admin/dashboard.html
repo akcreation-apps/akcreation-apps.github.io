@@ -33,13 +33,32 @@
       <div class="ks-kpi ks-kpi--absent"><div class="ks-kpi-icon"><i class="fa-solid fa-user-slash"></i></div>
         <div class="ks-kpi-body"><div class="ks-kpi-label">Absent</div><div class="ks-kpi-value" id="kpi-absent">—</div>
           <div class="ks-kpi-hint">No punch yet</div></div></div>
+      <div class="ks-kpi"><div class="ks-kpi-icon"><i class="fa-solid fa-stopwatch"></i></div>
+        <div class="ks-kpi-body"><div class="ks-kpi-label">Overtime</div><div class="ks-kpi-value" id="kpi-ot">—</div>
+          <div class="ks-kpi-hint">Still in &gt; 9h</div></div></div>
       <div class="ks-kpi"><div class="ks-kpi-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
         <div class="ks-kpi-body"><div class="ks-kpi-label">Total punches</div><div class="ks-kpi-value" id="kpi-punches">—</div>
           <div class="ks-kpi-hint">In &amp; out combined</div></div></div>
     </div>
 
-    <!-- Missing checkout alert -->
-    <div id="missing-checkout-slot"></div>
+    <!-- Users without an assigned site -->
+    <div id="orphan-users-slot"></div>
+
+    <!-- Short / Long sessions today — each panel is hidden when its list is empty -->
+    <div class="ks-grid ks-grid-2" id="session-grid" style="margin-bottom:16px;display:none;">
+      <div class="ks-panel" id="short-panel" style="display:none;">
+        <div class="ks-panel-header">
+          <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-hourglass-end"></i></span>Short sessions today <span class="text-muted small" style="font-weight:500;">(&lt; 4h, already out)</span></h3>
+        </div>
+        <div id="short-list"></div>
+      </div>
+      <div class="ks-panel" id="long-panel" style="display:none;">
+        <div class="ks-panel-header">
+          <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-stopwatch"></i></span>Long sessions in progress <span class="text-muted small" style="font-weight:500;">(&gt; 10h, still in)</span></h3>
+        </div>
+        <div id="long-list"></div>
+      </div>
+    </div>
 
     <div class="ks-grid ks-grid-2">
       <div>
@@ -50,9 +69,20 @@
           <div id="site-headcount"><div class="ks-skel"></div></div>
         </div>
 
-        <div class="ks-section-head" style="margin-top:24px;">
+        <div class="ks-section-head ks-section-head--warn" style="margin-top:24px;">
           <div>
-            <h2 style="font-size:1.15rem;"><i class="fa-solid fa-user-check text-muted" style="font-size:0.85em;"></i> Pending Approvals</h2>
+            <h2 style="font-size:1.15rem;"><i class="fa-solid fa-pen-to-square" style="font-size:0.85em;color:var(--warn,#f59e0b);"></i> Punch correction requests</h2>
+            <p class="ks-subtle">Employees asking to edit a punch. Tap the call button to verify, then approve or reject.</p>
+          </div>
+        </div>
+
+        <div id="edit-requests-list">
+          <p class="text-muted small">Loading…</p>
+        </div>
+
+        <div class="ks-section-head ks-section-head--success" style="margin-top:24px;">
+          <div>
+            <h2 style="font-size:1.15rem;"><i class="fa-solid fa-user-check" style="font-size:0.85em;color:var(--success);"></i> Pending Approvals</h2>
             <p class="ks-subtle">Review new sign-ups from the Android app.</p>
           </div>
         </div>
@@ -91,10 +121,10 @@
   <script type="module">
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
-    import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
+    import { mountTopbar, showToast, openModal, initials, setYear, fmtDate, fmtTime, fmtDateTime } from "../assets/ui.js";
     import {
-      collection, doc, onSnapshot, writeBatch, addDoc, serverTimestamp,
-      collectionGroup, query, where
+      collection, doc, onSnapshot, writeBatch, addDoc, updateDoc, serverTimestamp,
+      collectionGroup, query, where, Timestamp
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -107,8 +137,7 @@
       onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
     });
 
-    document.getElementById("date-line").textContent =
-      new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    document.getElementById("date-line").textContent = fmtDate(new Date());
 
     function escapeHtml(s = "") {
       return String(s).replace(/[&<>"']/g, c => ({
@@ -157,6 +186,12 @@
     function isIn(type)  { const t = String(type||"").toLowerCase(); return t === "in"  || t === "checkin"  || t === "punchin"; }
     function isOut(type) { const t = String(type||"").toLowerCase(); return t === "out" || t === "checkout" || t === "punchout"; }
 
+    // Thresholds — all client-side, no extra reads.
+    const OVERTIME_HOURS = 9;           // still in beyond this = overtime flag
+    const STALE_PENDING_HOURS = 48;     // pending signup older than this = stale
+    const SHORT_SESSION_HOURS = 4;      // completed session shorter than this
+    const LONG_INPROGRESS_HOURS = 10;   // currently in longer than this
+
     function recomputeKpis() {
       // Employees eligible to punch = approved + role in [employee, manager] + at least 1 site
       const activeUsers = allUsers.filter(u =>
@@ -177,13 +212,32 @@
 
       const presentUids = new Set(byUid.keys());
       let currentlyIn = 0;
-      const missingCheckout = [];
+      let overtimeCount = 0;
+      const shortSessions = [];
+      const longSessions = [];
+      const now = new Date();
 
       for (const [uid, punches] of byUid.entries()) {
         const last = punches[punches.length - 1];
         if (isIn(last.type)) {
           currentlyIn++;
-          missingCheckout.push({ uid, at: last.ts.toDate(), siteId: last.siteId });
+          const hoursIn = (now - last.ts.toDate()) / 36e5;
+          if (hoursIn >= OVERTIME_HOURS) overtimeCount++;
+          if (hoursIn >= LONG_INPROGRESS_HOURS) {
+            longSessions.push({ uid, inAt: last.ts.toDate(), hours: hoursIn, siteId: last.siteId });
+          }
+        } else if (isOut(last.type)) {
+          // Pair the last OUT with the latest preceding IN to compute session duration.
+          let matchedIn = null;
+          for (let i = punches.length - 2; i >= 0; i--) {
+            if (isIn(punches[i].type)) { matchedIn = punches[i]; break; }
+          }
+          if (matchedIn) {
+            const hours = (last.ts.toDate() - matchedIn.ts.toDate()) / 36e5;
+            if (hours < SHORT_SESSION_HOURS && hours >= 0) {
+              shortSessions.push({ uid, inAt: matchedIn.ts.toDate(), outAt: last.ts.toDate(), hours, siteId: last.siteId });
+            }
+          }
         }
       }
 
@@ -193,10 +247,99 @@
       document.getElementById("kpi-active-total").textContent = activeUsers.length;
       document.getElementById("kpi-in").textContent = currentlyIn;
       document.getElementById("kpi-absent").textContent = absent;
+      document.getElementById("kpi-ot").textContent = overtimeCount;
       document.getElementById("kpi-punches").textContent = todayPunches.length;
 
       renderSiteHeadcount(byUid);
-      renderMissingCheckout(missingCheckout);
+      renderOrphanUsers();
+      renderShortSessions(shortSessions);
+      renderLongSessions(longSessions);
+      lastByUid = byUid;   // cached so site drill-down can reuse without recomputing
+    }
+
+    // State the modal needs — populated by recomputeKpis().
+    let lastByUid = new Map();
+
+    // Short completed sessions today (<4h). Hides its panel when empty.
+    function renderShortSessions(items) {
+      const panel = document.getElementById("short-panel");
+      const el = document.getElementById("short-list");
+      if (items.length === 0) { panel.style.display = "none"; el.innerHTML = ""; }
+      else {
+        items.sort((a, b) => a.hours - b.hours);
+        el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">${
+          items.map(x => renderDurationRow(x.uid, x.hours, `${timeHM(x.inAt)} → ${timeHM(x.outAt)}`, "var(--warn, #f59e0b)")).join("")
+        }</div>`;
+        panel.style.display = "";
+      }
+      syncSessionGrid();
+    }
+
+    // Currently-in sessions >10h. Hides its panel when empty.
+    function renderLongSessions(items) {
+      const panel = document.getElementById("long-panel");
+      const el = document.getElementById("long-list");
+      if (items.length === 0) { panel.style.display = "none"; el.innerHTML = ""; }
+      else {
+        items.sort((a, b) => b.hours - a.hours);
+        el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">${
+          items.map(x => renderDurationRow(x.uid, x.hours, `In since ${timeHM(x.inAt)}`, "var(--danger)")).join("")
+        }</div>`;
+        panel.style.display = "";
+      }
+      syncSessionGrid();
+    }
+
+    // Hide the whole grid wrapper when neither panel has content.
+    function syncSessionGrid() {
+      const anyVisible =
+        document.getElementById("short-panel").style.display !== "none" ||
+        document.getElementById("long-panel").style.display !== "none";
+      document.getElementById("session-grid").style.display = anyVisible ? "" : "none";
+    }
+
+    function renderDurationRow(uid, hours, subtitle, accentColor) {
+      const u = allUsers.find(x => x.id === uid);
+      const name = u?.name || u?.email || uid.slice(0, 6);
+      const h = Math.floor(hours);
+      const m = Math.round((hours - h) * 60);
+      const dur = `${h}h ${String(m).padStart(2,"0")}m`;
+      return `
+        <a href="employee.html?uid=${encodeURIComponent(uid)}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:8px 10px;border:1px solid var(--border);border-radius:8px;">
+          <span class="ks-avatar" style="width:32px;height:32px;font-size:.75rem;">${initials(name)}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;">${escapeHtml(name)}</div>
+            <div class="text-muted small">${escapeHtml(subtitle)}</div>
+          </div>
+          <div style="font-weight:700;color:${accentColor};font-family:'JetBrains Mono','Menlo','Consolas',monospace;">${dur}</div>
+        </a>`;
+    }
+
+    // Alias for the shared fmtTime so the existing local calls keep working.
+    const timeHM = fmtTime;
+
+    // Warning panel: approved users whose role is employee/manager but who have
+    // no assigned site — these accounts can't punch at all.
+    function renderOrphanUsers() {
+      const slot = document.getElementById("orphan-users-slot");
+      const orphans = allUsers.filter(u =>
+        u.status === "approved" &&
+        (u.role === "employee" || u.role === "manager") &&
+        (u.assignedSiteIds ?? []).length === 0
+      );
+      if (orphans.length === 0) { slot.innerHTML = ""; return; }
+      const names = orphans.slice(0, 6).map(u =>
+        `<a href="employee.html?uid=${encodeURIComponent(u.id)}" style="color:inherit;"><strong>${escapeHtml(u.name || u.email || u.id.slice(0,6))}</strong></a>`
+      ).join(", ");
+      const more = orphans.length > 6 ? ` <span class="text-muted small">and ${orphans.length - 6} more</span>` : "";
+      slot.innerHTML = `
+        <div class="ks-alert">
+          <div class="ks-alert-icon"><i class="fa-solid fa-location-crosshairs"></i></div>
+          <div class="ks-alert-body">
+            <p class="ks-alert-title">No site assigned — can't punch</p>
+            <div>${names}${more}</div>
+          </div>
+        </div>`;
     }
 
     function renderSiteHeadcount(byUid) {
@@ -206,35 +349,104 @@
         if (!sid) continue;
         perSite.set(sid, (perSite.get(sid) || 0) + 1);
       }
+      // Include every known site, even those with zero punches today —
+      // admin can still drill in to see who's assigned but absent.
+      for (const sid of allSites.keys()) {
+        if (!perSite.has(sid)) perSite.set(sid, 0);
+      }
       const el = document.getElementById("site-headcount");
       if (perSite.size === 0) {
-        el.innerHTML = `<p class="text-muted small mb-0">No punches at any site yet today.</p>`;
+        el.innerHTML = `<p class="text-muted small mb-0">No sites configured yet.</p>`;
         return;
       }
       const chips = [];
       for (const [sid, count] of perSite.entries()) {
         const name = allSites.get(sid)?.name ?? sid;
-        chips.push(`<span class="ks-site-chip"><i class="fa-solid fa-location-dot text-muted"></i> ${escapeHtml(name)} · <strong>${count}</strong></span>`);
+        chips.push(`<button type="button" class="ks-site-chip" data-site-id="${escapeHtml(sid)}" style="border:none;cursor:pointer;" title="Click for details"><i class="fa-solid fa-location-dot text-muted"></i> ${escapeHtml(name)} · <strong>${count}</strong></button>`);
       }
       el.innerHTML = `<div class="ks-site-chips">${chips.join("")}</div>`;
+      el.querySelectorAll("[data-site-id]").forEach(btn => {
+        btn.onclick = () => openSiteDrillDown(btn.getAttribute("data-site-id"));
+      });
     }
 
-    function renderMissingCheckout(list) {
-      const slot = document.getElementById("missing-checkout-slot");
-      if (list.length === 0) { slot.innerHTML = ""; return; }
-      const names = list.slice(0, 6).map(({ uid, at }) => {
-        const nm = allUsers.find(u => u.id === uid)?.name ?? uid.slice(0, 6);
-        return `<strong>${escapeHtml(nm)}</strong> <span class="text-muted small">(in at ${escapeHtml(at.toLocaleTimeString())})</span>`;
-      }).join(", ");
-      const more = list.length > 6 ? ` <span class="text-muted small">and ${list.length - 6} more</span>` : "";
-      slot.innerHTML = `
-        <div class="ks-alert">
-          <div class="ks-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-          <div class="ks-alert-body">
-            <p class="ks-alert-title">Still checked in (no punch-out yet)</p>
-            <div>${names}${more}</div>
+    // Site drill-down modal — all data from already-loaded snapshots.
+    function openSiteDrillDown(siteId) {
+      const site = allSites.get(siteId);
+      const siteName = site?.name || siteId;
+      const assignedUsers = allUsers.filter(u =>
+        u.status === "approved" &&
+        (u.role === "employee" || u.role === "manager") &&
+        (u.assignedSiteIds ?? []).includes(siteId)
+      );
+
+      const assignedPunchedHere = [];
+      const assignedPunchedElsewhere = [];
+      const assignedNoPunch = [];
+      const unassignedPunchedHere = [];   // users who punched at this site without being assigned
+
+      for (const u of assignedUsers) {
+        const punches = lastByUid.get(u.id);
+        if (!punches || punches.length === 0) { assignedNoPunch.push(u); continue; }
+        const siteToday = punches[0].siteId;
+        if (siteToday === siteId) assignedPunchedHere.push(u);
+        else assignedPunchedElsewhere.push({ u, actualSiteId: siteToday });
+      }
+      const assignedIds = new Set(assignedUsers.map(u => u.id));
+      for (const [uid, punches] of lastByUid.entries()) {
+        if (assignedIds.has(uid)) continue;
+        if (punches[0]?.siteId === siteId) {
+          const u = allUsers.find(x => x.id === uid);
+          if (u) unassignedPunchedHere.push(u);
+        }
+      }
+
+      const userRow = (u, { warn = false, chipText = "" } = {}) => `
+        <a href="employee.html?uid=${encodeURIComponent(u.id)}" class="ks-emp-row${warn ? " ks-emp-row--warn" : ""}">
+          <span class="ks-avatar">${initials(u.name || u.email || "?")}</span>
+          <div class="ks-emp-meta">
+            <div class="ks-emp-name">${escapeHtml(u.name || "—")}</div>
+            <div class="ks-emp-email">${escapeHtml(u.email || "")}</div>
           </div>
+          ${chipText ? `<span class="ks-emp-row__chip">${escapeHtml(chipText)}</span>` : ""}
+        </a>`;
+
+      const section = (title, items, emptyMsg, { warn = false, showActualSite = false } = {}) =>
+        `<div style="margin-top:16px;">
+          <div class="ks-field-label" style="margin-bottom:6px;">${title} <span class="text-muted small">(${items.length})</span></div>
+          ${items.length === 0
+            ? `<p class="text-muted small mb-0" style="padding:6px 2px;">${emptyMsg}</p>`
+            : `<div style="display:flex;flex-direction:column;gap:8px;">${items.map(x => {
+                if (showActualSite) {
+                  const chipText = allSites.get(x.actualSiteId)?.name || x.actualSiteId || "";
+                  return userRow(x.u, { warn, chipText });
+                }
+                return userRow(x, { warn });
+              }).join("")}</div>`}
         </div>`;
+
+      openModal({
+        title: `Site — ${siteName}`,
+        bodyHtml: `
+          <div class="text-muted small">Today's view, from the data already loaded on the dashboard.</div>
+          ${section(
+            '<i class="fa-solid fa-user-check text-success"></i> Punched in here today',
+            assignedPunchedHere, "No assigned user punched here yet.")}
+          ${section(
+            '<i class="fa-solid fa-shuffle" style="color:var(--warn,#f59e0b);"></i> Assigned here but punched at a different site',
+            assignedPunchedElsewhere,
+            "None.",
+            { warn: true, showActualSite: true })}
+          ${section(
+            '<i class="fa-solid fa-user-slash text-muted"></i> Assigned here but no punch today',
+            assignedNoPunch, "Everyone assigned has punched.")}
+          ${unassignedPunchedHere.length > 0 ? section(
+            '<i class="fa-solid fa-circle-info text-muted"></i> Punched here but not assigned',
+            unassignedPunchedHere, "") : ""}
+        `,
+        confirmLabel: null,
+        cancelLabel: "Close",
+      });
     }
 
     // ============================================================
@@ -266,6 +478,147 @@
       });
     }
 
+    // =========================================================
+    // Punch correction requests from employees (one new listener)
+    // Scoped to status=="pending" to keep read count minimal.
+    // =========================================================
+    const editReqList = document.getElementById('edit-requests-list');
+    onSnapshot(
+      query(collection(db, "attn_editRequests"), where("status", "==", "pending")),
+      (snap) => renderEditRequests(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+      (err) => { editReqList.innerHTML = `<p class="text-muted small">Could not load — ${escapeHtml(err?.code || "error")}</p>`; }
+    );
+
+    function renderEditRequests(items) {
+      if (items.length === 0) {
+        editReqList.innerHTML = `
+          <div class="ks-panel">
+            <div class="ks-empty">
+              <div class="ks-empty-icon"><i class="fa-solid fa-circle-check"></i></div>
+              <p class="ks-empty-title">No pending correction requests</p>
+            </div>
+          </div>`;
+        return;
+      }
+      // Recent on top — most recently submitted requests appear first.
+      items.sort((a, b) => (b.createdAt?.toDate?.() ?? 0) - (a.createdAt?.toDate?.() ?? 0));
+      editReqList.innerHTML = "";
+      for (const req of items) {
+        const u = allUsers.find(x => x.id === req.uid);
+        const name = u?.name || u?.email || req.uid.slice(0, 6);
+        const contact = u?.contact || "";
+        const requestedTs = req.requestedTs?.toDate?.();
+        const createdAt = req.createdAt?.toDate?.();
+        const telHref = contact ? `tel:${String(contact).replace(/[^0-9+]/g, "")}` : "";
+        const card = document.createElement("div");
+        card.className = "ks-panel";
+        card.innerHTML = `
+          <div class="ks-approval-meta">
+            <a href="employee.html?uid=${encodeURIComponent(req.uid)}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1 1 0;min-width:0;">
+              <span class="ks-avatar">${initials(name)}</span>
+              <div style="min-width:0;">
+                <div class="ks-approval-name">${escapeHtml(name)}</div>
+                <div class="ks-approval-contact">
+                  ${contact ? "Phone on file" : '<span class="text-muted small">No contact on file</span>'}
+                </div>
+              </div>
+            </a>
+            ${contact
+              ? `<a href="${telHref}" class="ks-icon-btn ks-icon-btn--primary" title="Call ${escapeHtml(contact)}" aria-label="Call ${escapeHtml(contact)}"><i class="fa-solid fa-phone"></i></a>`
+              : ""}
+            <span class="badge badge-info">Correction request</span>
+          </div>
+          <div class="ks-approval-section">
+            <div class="text-muted small" style="margin-bottom:4px;">Requested change</div>
+            <div><strong>${escapeHtml(req.requestedType || "")}</strong>${requestedTs ? ` at <strong>${escapeHtml(fmtDateTime(requestedTs))}</strong>` : ""}</div>
+            ${req.reason ? `<div class="text-muted small" style="margin-top:6px;"><em>Reason:</em> ${escapeHtml(req.reason)}</div>` : ""}
+            ${createdAt ? `<div class="text-muted small" style="margin-top:4px;">Submitted ${escapeHtml(fmtDateTime(createdAt))}</div>` : ""}
+          </div>
+          <div class="ks-approval-actions">
+            <button class="ks-icon-btn ks-icon-btn--reject" data-reject aria-label="Reject correction" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+            <button class="ks-icon-btn ks-icon-btn--approve" data-approve aria-label="Approve correction" title="Approve"><i class="fa-solid fa-check"></i></button>
+          </div>`;
+
+        card.querySelector('[data-approve]').onclick = () => approveEditRequest(req, name);
+        card.querySelector('[data-reject]').onclick = () => rejectEditRequest(req, name);
+        editReqList.appendChild(card);
+      }
+    }
+
+    async function approveEditRequest(req, name) {
+      if (!req.punchPath || !req.requestedTs) {
+        showToast("Request is missing punch path or timestamp", "danger");
+        return;
+      }
+      await openModal({
+        title: `Approve correction for ${name}?`,
+        bodyHtml: `
+          <p>This will update the punch to <strong>${escapeHtml(req.requestedType)}</strong> at
+          <strong>${escapeHtml(fmtDateTime(req.requestedTs.toDate()))}</strong>.</p>
+          <label class="ks-field-label" for="approve-note">Note (optional)</label>
+          <textarea id="approve-note" class="form-control" rows="2" placeholder="Verified via phone with employee…"></textarea>
+        `,
+        confirmLabel: "Approve",
+        confirmClass: "btn btn-success",
+        onConfirm: async (modal) => {
+          const note = modal.querySelector("#approve-note").value.trim();
+          const punchRef = doc(db, req.punchPath);
+          const before = { requestedType: req.requestedType, requestedTs: req.requestedTs };
+          const newTs = req.requestedTs;
+          const update = { ts: newTs, edited: true };
+          if (req.requestedType) update.type = req.requestedType;
+          await updateDoc(punchRef, update);
+          await addDoc(collection(punchRef, "edits"), {
+            editedBy: adminUid, editedByRole: "admin",
+            editedAt: serverTimestamp(),
+            reason: `Approved correction request${note ? ": " + note : ""}`,
+            before, after: update,
+          });
+          await updateDoc(doc(db, "attn_editRequests", req.id), {
+            status: "approved",
+            resolvedBy: adminUid,
+            resolvedAt: serverTimestamp(),
+            resolvedNote: note || null,
+          });
+          await addDoc(collection(db, "attn_auditLog"), {
+            actor: adminUid, action: "editPunch",
+            targetUser: req.uid, targetPunchId: req.punchId,
+            details: { source: "editRequest", requestId: req.id, newTs: newTs.toDate().toISOString(), note },
+            at: serverTimestamp(),
+          });
+          showToast("Correction approved", "success");
+        },
+      });
+    }
+
+    async function rejectEditRequest(req, name) {
+      await openModal({
+        title: `Reject correction for ${name}?`,
+        bodyHtml: `
+          <label class="ks-field-label" for="reject-note">Reason (optional)</label>
+          <textarea id="reject-note" class="form-control" rows="3" placeholder="Why is this being rejected?"></textarea>
+        `,
+        confirmLabel: "Reject",
+        confirmClass: "btn btn-outline-danger",
+        onConfirm: async (modal) => {
+          const note = modal.querySelector("#reject-note").value.trim();
+          await updateDoc(doc(db, "attn_editRequests", req.id), {
+            status: "rejected",
+            resolvedBy: adminUid,
+            resolvedAt: serverTimestamp(),
+            resolvedNote: note || null,
+          });
+          await addDoc(collection(db, "attn_auditLog"), {
+            actor: adminUid, action: "rejectEditRequest",
+            targetUser: req.uid, targetPunchId: req.punchId,
+            details: { requestId: req.id, note },
+            at: serverTimestamp(),
+          });
+          showToast("Correction rejected", "warn");
+        },
+      });
+    }
+
     const list = document.getElementById('pending-list');
     onSnapshot(collection(db, "attn_pendingApprovals"), (snap) => {
       if (snap.empty) {
@@ -280,8 +633,12 @@
         return;
       }
       list.innerHTML = '';
-      snap.forEach(d => {
-        const p = d.data();
+      // Recent on top — newest sign-up requests appear first.
+      const pending = snap.docs
+        .map(d => ({ id: d.id, data: d.data() }))
+        .sort((a, b) => (b.data.requestedAt?.toDate?.() ?? 0) - (a.data.requestedAt?.toDate?.() ?? 0));
+      pending.forEach(({ id, data: p }) => {
+        const d = { id, data: () => p };   // shim so the existing closure using `d.id` still works
         const card = document.createElement('div');
         card.className = 'ks-panel';
         const sitesHtml = availableSites.length === 0
@@ -293,6 +650,14 @@
                   <span>${escapeHtml(s.name)}</span>
                 </label>`).join("")}
             </div>`;
+        const requestedAt = p.requestedAt?.toDate?.();
+        const ageHours = requestedAt ? (Date.now() - requestedAt.getTime()) / 36e5 : null;
+        const isStale = ageHours != null && ageHours >= STALE_PENDING_HOURS;
+        const ageLabel = ageHours == null
+          ? ""
+          : ageHours < 1 ? "just now"
+          : ageHours < 24 ? `${Math.floor(ageHours)}h ago`
+          : `${Math.floor(ageHours / 24)}d ago`;
         card.innerHTML = `
           <div class="ks-approval-meta">
             <span class="ks-avatar">${initials(p.name || "?")}</span>
@@ -301,9 +666,10 @@
               <div class="ks-approval-contact">
                 ${p.contact ? `<i class="fa-solid fa-phone" style="font-size:.75em;"></i> ${escapeHtml(p.contact)} · ` : ""}
                 ${p.email ? `<i class="fa-solid fa-envelope" style="font-size:.75em;"></i> ${escapeHtml(p.email)}` : ""}
+                ${ageLabel ? ` · <span class="${isStale ? '' : 'text-muted'} small" style="${isStale ? 'color:var(--danger);font-weight:700;' : ''}" title="Requested ${escapeHtml(fmtDateTime(requestedAt))}"><i class="fa-solid ${isStale ? 'fa-triangle-exclamation' : 'fa-clock'}" style="font-size:.75em;"></i> ${escapeHtml(ageLabel)}</span>` : ""}
               </div>
             </div>
-            <span class="badge badge-pending">Pending</span>
+            <span class="badge ${isStale ? 'badge-rejected' : 'badge-pending'}">${isStale ? 'Stale' : 'Pending'}</span>
           </div>
           <div class="ks-approval-section">
             <label class="ks-approval-label">Role</label>
@@ -313,31 +679,59 @@
               <option value="admin">Admin</option>
             </select>
           </div>
-          <div class="ks-approval-section">
-            <label class="ks-approval-label">Assigned sites</label>
-            ${sitesHtml}
-          </div>
+          <details class="ks-approval-section ks-collapsible">
+            <summary class="ks-approval-label ks-collapsible-summary">
+              <i class="fa-solid fa-chevron-right ks-collapsible-chev"></i>
+              Assigned sites
+              <span class="text-muted small ks-site-count" data-site-count>${availableSites.length === 0 ? "" : "(0 selected)"}</span>
+            </summary>
+            <div style="margin-top:6px;">${sitesHtml}</div>
+          </details>
           <div class="ks-approval-actions">
-            <button class="btn btn-success" data-approve><i class="fa-solid fa-check"></i> Approve</button>
-            <button class="btn btn-outline-danger" data-reject><i class="fa-solid fa-xmark"></i> Reject</button>
+            <button class="ks-icon-btn ks-icon-btn--reject" data-reject aria-label="Reject sign-up" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+            <button class="ks-icon-btn ks-icon-btn--approve" data-approve aria-label="Approve sign-up" title="Approve"><i class="fa-solid fa-check"></i></button>
           </div>`;
+
+        // Live count next to the chevron so admin sees how many sites are picked
+        // without having to expand the section every time.
+        const siteCountEl = card.querySelector('[data-site-count]');
+        const syncCount = () => {
+          if (!siteCountEl) return;
+          const n = card.querySelectorAll('[data-site]:checked').length;
+          siteCountEl.textContent = availableSites.length === 0 ? "" : `(${n} selected)`;
+        };
+        card.querySelectorAll('[data-site]').forEach(cb => cb.addEventListener('change', syncCount));
 
         card.querySelector('[data-approve]').onclick = async () => {
           const role = card.querySelector('[data-role]').value;
           const assignedSiteIds = Array.from(card.querySelectorAll('[data-site]:checked')).map(x => x.value);
-          if (role !== 'admin' && assignedSiteIds.length === 0) {
-            const proceed = await openModal({
-              title: "No sites selected",
-              bodyHtml: `<p>This user won't be able to punch in without an assigned site. Approve anyway?</p>`,
-              confirmLabel: "Approve anyway",
-              confirmClass: "btn btn-success",
-            });
-            if (!proceed) return;
-          }
-          try {
-            await approve(d.id, role, assignedSiteIds);
-            showToast(`Approved ${p.name || "user"}`, "success");
-          } catch (e) { showToast(e.message, "danger"); }
+          const siteNames = assignedSiteIds
+            .map(sid => allSites.get(sid)?.name || sid)
+            .map(escapeHtml);
+          const noSiteWarning = (role !== 'admin' && assignedSiteIds.length === 0)
+            ? `<div class="ks-alert" style="margin-top:10px;">
+                 <div class="ks-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                 <div class="ks-alert-body">
+                   <p class="ks-alert-title">No sites selected</p>
+                   <div>This user won't be able to punch in until a site is assigned.</div>
+                 </div>
+               </div>`
+            : "";
+          await openModal({
+            title: `Approve ${p.name || "user"}?`,
+            bodyHtml: `
+              <p><strong>Role:</strong> ${escapeHtml(role)}</p>
+              <p><strong>Sites:</strong> ${siteNames.length ? siteNames.join(", ") : "<em>None</em>"}</p>
+              ${noSiteWarning}
+              <p class="text-muted small" style="margin-top:10px;margin-bottom:0;">This will give the user access to sign in to the Android app and punch at their assigned sites.</p>
+            `,
+            confirmLabel: "Confirm approve",
+            confirmClass: "btn btn-success",
+            onConfirm: async () => {
+              await approve(d.id, role, assignedSiteIds);
+              showToast(`Approved ${p.name || "user"}`, "success");
+            },
+          });
         };
         card.querySelector('[data-reject]').onclick = async () => {
           await openModal({

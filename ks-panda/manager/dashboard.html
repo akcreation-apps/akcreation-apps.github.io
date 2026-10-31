@@ -35,7 +35,7 @@
   <script type="module">
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
-    import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
+    import { mountTopbar, showToast, openModal, initials, setYear, fmtDate, fmtTime } from "../assets/ui.js";
     import {
       collectionGroup, query, where, orderBy, onSnapshot,
       collection, doc, getDoc, updateDoc, addDoc, serverTimestamp, Timestamp
@@ -51,8 +51,7 @@
       onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
     });
 
-    document.getElementById("date-line").textContent =
-      new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    document.getElementById("date-line").textContent = fmtDate(new Date());
 
     async function editPunch(uid, punchId, newDate, reason, before) {
       const punchRef = doc(db, "attn_attendance", uid, "punches", punchId);
@@ -153,7 +152,7 @@
               </div>
             </td>
             <td>${typeBadge(p.type)}</td>
-            <td><strong>${punchDate ? escapeHtml(punchDate.toLocaleTimeString()) : ""}</strong></td>
+            <td><strong>${punchDate ? escapeHtml(fmtTime(punchDate)) : ""}</strong></td>
             <td class="text-muted">${escapeHtml(p.siteId || "")}</td>
             <td>${p.edited ? '<span class="badge badge-pending"><i class="fa-solid fa-pen" style="font-size:.7em;"></i> Edited</span>' : '<span class="text-muted small">—</span>'}</td>
             <td class="ks-table-actions">
