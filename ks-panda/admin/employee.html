@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c9111a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="apple-touch-icon" href="../logo.png">
+  <title>KS Panda — Employee</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .ks-missing-row td { background: var(--danger-soft); }
+    .ks-missing-row td:first-child { border-left: 3px solid var(--danger); }
+    .ks-missing-badge { color: var(--danger); font-weight: 700; }
+    .ks-hours-total {
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+      color: var(--brand);
+      font-weight: 700;
+    }
+    .ks-profile-head {
+      display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+    }
+    .ks-profile-head .ks-avatar {
+      width: 64px; height: 64px; font-size: 1.4rem;
+    }
+    .ks-quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .ks-quick-stat {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+    }
+    .ks-quick-stat-label { font-size: .75rem; color: var(--muted); }
+    .ks-quick-stat-value { font-size: 1.2rem; font-weight: 700; }
+    .ks-punch-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <main class="ks-main">
+    <div class="ks-section-head">
+      <div>
+        <h1><i class="fa-solid fa-id-badge text-muted" style="font-size:0.85em;"></i> <span id="emp-title">Employee</span></h1>
+        <p class="ks-subtle"><a href="users.html"><i class="fa-solid fa-arrow-left"></i> Back to Users</a></p>
+      </div>
+    </div>
+
+    <!-- Profile card -->
+    <div class="ks-panel" id="profile-panel" style="margin-bottom:16px;">
+      <div class="ks-skel ks-skel-lg"></div>
+    </div>
+
+    <!-- Attendance -->
+    <div class="ks-section-head" style="margin-top:8px;">
+      <div>
+        <h2 style="font-size:1.15rem;"><i class="fa-solid fa-calendar-days text-muted" style="font-size:0.85em;"></i> Attendance (last 30 days)</h2>
+        <p class="ks-subtle">You can edit, add, or delete any punch below.</p>
+      </div>
+      <div class="ks-section-actions">
+        <button class="btn btn-primary btn-sm" id="btn-add-punch"><i class="fa-solid fa-plus"></i> Add punch</button>
+      </div>
+    </div>
+
+    <div id="attendance-out">
+      <div class="ks-panel">
+        <div class="ks-skel"></div>
+        <div class="ks-skel"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha</footer>
+
+  <script type="module">
+    import { requireRole } from "../assets/auth-guard.js";
+    import { db, auth } from "../assets/firebase-init.js";
+    import { mountTopbar, showToast, openModal, initials, setYear, fmtDate, fmtTime } from "../assets/ui.js";
+    import {
+      collection, doc, onSnapshot, updateDoc,
+      addDoc, deleteDoc, serverTimestamp, Timestamp, query, orderBy, where
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    setYear();
+    const { user: adminUser } = await requireRole(["admin"]);
+    const adminUid = adminUser.uid;
+    mountTopbar({
+      role: "admin",
+      onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
+    });
+
+    // ---------- Resolve target uid ----------
+    const params = new URLSearchParams(location.search);
+    const uid = params.get("uid");
+    if (!uid) {
+      document.getElementById("profile-panel").innerHTML = `
+        <div class="ks-empty">
+          <div class="ks-empty-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+          <p class="ks-empty-title">No employee selected</p>
+          <p class="ks-empty-text">URL is missing the <code>?uid=…</code> parameter.</p>
+        </div>`;
+      throw new Error("Missing uid");
+    }
+
+    // ---------- Helpers ----------
+    function escapeHtml(s = "") {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+    // "anil kr" -> "Anil Kr"; collapses extra spaces; handles hyphen/apostrophe splits.
+    function toTitleCase(s) {
+      return String(s)
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/(^|[\s'’\-])(\p{L})/gu, (_, sep, ch) => sep + ch.toUpperCase());
+    }
+    function isIn(type)  { const t = String(type||"").toLowerCase(); return t === "in"  || t === "checkin"  || t === "punchin"; }
+    function isOut(type) { const t = String(type||"").toLowerCase(); return t === "out" || t === "checkout" || t === "punchout"; }
+    function fmtDuration(ms) {
+      if (!Number.isFinite(ms) || ms < 0) return "—";
+      const totalMin = Math.round(ms / 60000);
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return `${h}h ${String(m).padStart(2, "0")}m`;
+    }
+    function dayKey(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    }
+    const timeStr = fmtTime;
+    const dateStr = fmtDate;
+    function dayStr(d)  { return d.toLocaleDateString(undefined, { weekday: "short" }); }
+    function toDatetimeLocal(date) {
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+    function pairInOut(punches) {
+      const pairs = [];
+      let openIn = null;
+      for (const p of punches) {
+        if (isIn(p.type)) {
+          if (openIn) pairs.push({ in: openIn, out: null, missing: true });
+          openIn = p;
+        } else if (isOut(p.type)) {
+          if (openIn) { pairs.push({ in: openIn, out: p }); openIn = null; }
+          else pairs.push({ in: null, out: p, missing: true });
+        }
+      }
+      if (openIn) pairs.push({ in: openIn, out: null, missing: true });
+      return pairs;
+    }
+
+    // ---------- Live caches ----------
+    const sitesById = new Map();
+    const availableSites = [];
+    onSnapshot(collection(db, "attn_sites"), (snap) => {
+      sitesById.clear();
+      availableSites.length = 0;
+      snap.forEach(d => {
+        const s = d.data();
+        sitesById.set(d.id, s);
+        if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
+      });
+      renderProfile();
+    });
+    function siteNameOf(siteId) {
+      if (!siteId) return "—";
+      return sitesById.get(siteId)?.name || siteId;
+    }
+
+    // ---------- Employee doc (live) ----------
+    let empData = null;
+    onSnapshot(doc(db, "attn_users", uid), (snap) => {
+      if (!snap.exists()) {
+        document.getElementById("profile-panel").innerHTML = `
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+            <p class="ks-empty-title">User not found</p>
+            <p class="ks-empty-text">No profile exists for UID <code>${escapeHtml(uid)}</code>.</p>
+          </div>`;
+        return;
+      }
+      empData = { id: snap.id, ...snap.data() };
+      document.getElementById("emp-title").textContent = empData.name || empData.email || "Employee";
+      document.title = `KS Panda — ${empData.name || "Employee"}`;
+      renderProfile();
+    });
+
+    // ---------- Profile render ----------
+    function renderProfile() {
+      if (!empData) return;
+      const panel = document.getElementById("profile-panel");
+      const u = empData;
+      const badgeClass = { pending: 'badge-pending', approved: 'badge-approved', rejected: 'badge-rejected', disabled: 'badge-muted' }[u.status] ?? 'badge-muted';
+      const assigned = new Set(u.assignedSiteIds ?? []);
+      const siteChips = (u.assignedSiteIds ?? []).length === 0
+        ? '<em class="text-muted small">No sites assigned</em>'
+        : (u.assignedSiteIds ?? []).map(sid => {
+            const nm = sitesById.get(sid)?.name ?? sid;
+            return `<span class="ks-site-chip"><i class="fa-solid fa-location-dot text-muted"></i> ${escapeHtml(nm)}</span>`;
+          }).join(" ");
+
+      panel.innerHTML = `
+        <div class="ks-profile-head">
+          <span class="ks-avatar">${initials(u.name || u.email || "?")}</span>
+          <div style="flex:1;min-width:200px;">
+            <div style="font-size:1.25rem;font-weight:700;">${escapeHtml(u.name || "—")}</div>
+            <div class="text-muted">${escapeHtml(u.email || "")}</div>
+            <div class="text-muted small">${escapeHtml(u.contact || "No contact")}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+            <span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span>
+            <span class="badge badge-info">${escapeHtml(u.role ?? "—")}</span>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <div class="ks-field-label">Assigned sites</div>
+          <div class="ks-site-chips" style="margin-top:4px;">${siteChips}</div>
+        </div>
+
+        <div class="ks-quick-stats" id="quick-stats">
+          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Today</div><div class="ks-quick-stat-value" id="qs-today">—</div></div>
+          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Days present (range)</div><div class="ks-quick-stat-value" id="qs-days">—</div></div>
+          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Total hours (range)</div><div class="ks-quick-stat-value" id="qs-hours">—</div></div>
+          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Missing checkouts</div><div class="ks-quick-stat-value" id="qs-missing">—</div></div>
+        </div>
+
+        <div class="ks-form-actions" style="margin-top:14px;">
+          <button class="btn btn-outline-primary btn-sm" id="btn-edit-info"><i class="fa-solid fa-pen"></i> Edit name & contact</button>
+        </div>
+      `;
+
+      panel.querySelector("#btn-edit-info").onclick = openEditInfoModal;
+      updateTodayStat();
+    }
+
+    // Today status (uses current loaded punches if range includes today, otherwise shows "—")
+    let currentRangePunches = [];
+    function updateTodayStat() {
+      const el = document.getElementById("qs-today");
+      if (!el) return;
+      const today = new Date(); today.setHours(0,0,0,0);
+      const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+      const todays = currentRangePunches.filter(p => p.ts >= today && p.ts < tomorrow)
+        .sort((a,b) => a.ts - b.ts);
+      if (todays.length === 0) { el.textContent = "Absent"; el.style.color = "var(--danger)"; return; }
+      const last = todays[todays.length-1];
+      if (isIn(last.type)) {
+        el.innerHTML = `In <span class="text-muted small" style="font-weight:500;">since ${escapeHtml(timeStr(last.ts))}</span>`;
+        el.style.color = "var(--success, #28a745)";
+      } else {
+        el.innerHTML = `Out <span class="text-muted small" style="font-weight:500;">at ${escapeHtml(timeStr(last.ts))}</span>`;
+        el.style.color = "";
+      }
+    }
+
+    // ---------- Edit basic info modal ----------
+    async function openEditInfoModal() {
+      const u = empData;
+      await openModal({
+        title: "Edit basic info",
+        bodyHtml: `
+          <label class="ks-field-label" for="ei-name">Name</label>
+          <input id="ei-name" class="form-control" value="${escapeHtml(u.name || "")}" required>
+          <label class="ks-field-label" for="ei-contact" style="margin-top:10px;">Contact</label>
+          <input id="ei-contact" class="form-control" value="${escapeHtml(u.contact || "")}" placeholder="e.g., +91 98765 43210">
+        `,
+        confirmLabel: "Save",
+        onConfirm: async (modal) => {
+          const rawName = modal.querySelector("#ei-name").value.trim();
+          const contact = modal.querySelector("#ei-contact").value.trim();
+          if (!rawName) { showToast("Name is required", "warn"); return false; }
+          const name = toTitleCase(rawName);
+          const before = { name: u.name ?? "", contact: u.contact ?? "" };
+          const after = { name, contact };
+          await updateDoc(doc(db, "attn_users", uid), after);
+          await addDoc(collection(db, "attn_auditLog"), {
+            actor: adminUid, action: "editUserInfo", targetUser: uid,
+            details: { before, after }, at: serverTimestamp(),
+          });
+          showToast("Updated", "success");
+        },
+      });
+    }
+
+    // ---------- Attendance: one live listener for last 30 days ----------
+    // Writes (edit / add / delete) land back here via the same snapshot —
+    // no extra reads, no manual re-fetch after each action.
+    const attendanceOut = document.getElementById("attendance-out");
+    const rangeFrom = new Date(); rangeFrom.setDate(rangeFrom.getDate() - 30); rangeFrom.setHours(0, 0, 0, 0);
+    const rangeTo = new Date();
+
+    attendanceOut.innerHTML = `<div class="ks-panel"><div class="ks-skel"></div><div class="ks-skel"></div><div class="ks-skel"></div></div>`;
+
+    const punchesQuery = query(
+      collection(db, "attn_attendance", uid, "punches"),
+      where("ts", ">=", Timestamp.fromDate(rangeFrom)),
+      orderBy("ts", "asc")
+    );
+    onSnapshot(
+      punchesQuery,
+      (snap) => {
+        const punches = snap.docs.map(d => ({
+          id: d.id,
+          ts: d.data().ts?.toDate?.(),
+          type: d.data().type,
+          siteId: d.data().siteId,
+          edited: !!d.data().edited,
+          addedByAdmin: !!d.data().addedByAdmin,
+        })).filter(p => p.ts);
+        currentRangePunches = punches;
+        updateTodayStat();
+        renderAttendance(punches, rangeFrom, rangeTo);
+      },
+      (err) => {
+        console.error("[employee] punches subscription failed", err);
+        attendanceOut.innerHTML = `
+          <div class="ks-alert ks-alert--danger">
+            <div class="ks-alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <div class="ks-alert-body">
+              <p class="ks-alert-title">Could not load — ${escapeHtml(err?.code || "error")}</p>
+              <div>${escapeHtml(err?.message || String(err))}</div>
+            </div>
+          </div>`;
+      }
+    );
+
+    function renderAttendance(punches, from, to) {
+      // Group by day
+      const byDay = new Map();
+      for (const p of punches) {
+        const k = dayKey(p.ts);
+        if (!byDay.has(k)) byDay.set(k, []);
+        byDay.get(k).push(p);
+      }
+      const sortedKeys = [...byDay.keys()].sort();
+
+      let totalMs = 0;
+      let missingDays = 0;
+      const dayRows = [];
+      for (const k of sortedKeys) {
+        const dayPunches = byDay.get(k).sort((a, b) => a.ts - b.ts);
+        const pairs = pairInOut(dayPunches);
+        let dayMs = 0;
+        let dayHasMissing = false;
+        for (const pair of pairs) {
+          if (pair.in && pair.out) { pair.ms = pair.out.ts - pair.in.ts; dayMs += pair.ms; }
+          else dayHasMissing = true;
+        }
+        if (dayHasMissing) missingDays++;
+        totalMs += dayMs;
+        dayRows.push({ date: new Date(dayPunches[0].ts), punches: dayPunches, pairs, totalMs: dayMs, hasMissing: dayHasMissing });
+      }
+
+      // Update quick stats
+      const qd = document.getElementById("qs-days"); if (qd) qd.textContent = sortedKeys.length;
+      const qh = document.getElementById("qs-hours"); if (qh) qh.textContent = fmtDuration(totalMs);
+      const qm = document.getElementById("qs-missing"); if (qm) { qm.textContent = missingDays; qm.style.color = missingDays>0 ? "var(--danger)" : ""; }
+
+      if (dayRows.length === 0) {
+        attendanceOut.innerHTML = `
+          <div class="ks-panel">
+            <div class="ks-empty">
+              <div class="ks-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+              <p class="ks-empty-title">No punches in this range</p>
+              <p class="ks-empty-text">${dateStr(from)} → ${dateStr(to)}</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const summary = `
+        <div class="ks-panel" style="margin-bottom:16px;">
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+            <div><strong>${dateStr(from)}</strong> → <strong>${dateStr(to)}</strong></div>
+            <div><span class="text-muted small">Days:</span> <strong>${sortedKeys.length}</strong></div>
+            <div><span class="text-muted small">Total:</span> <span class="ks-hours-total">${fmtDuration(totalMs)}</span></div>
+            ${missingDays > 0 ? `<div class="ks-missing-badge"><i class="fa-solid fa-triangle-exclamation"></i> ${missingDays} day(s) missing checkout</div>` : ""}
+          </div>
+        </div>`;
+
+      // Recent day on top. Internal day-punches stay ascending for IN/OUT pairing.
+      const panels = [...dayRows].reverse().map(day => {
+        const rows = day.punches.map(p => {
+          const typeLower = String(p.type || "").toLowerCase();
+          const typeCls = isIn(p.type) ? "badge-approved" : isOut(p.type) ? "badge-info" : "badge-muted";
+          const typeIcon = isIn(p.type) ? "fa-right-to-bracket" : isOut(p.type) ? "fa-right-from-bracket" : "fa-circle";
+          const flags = [];
+          if (p.edited) flags.push('<span class="badge badge-pending" title="Edited"><i class="fa-solid fa-pen" style="font-size:.65em;"></i> edited</span>');
+          if (p.addedByAdmin) flags.push('<span class="badge badge-info" title="Added by admin"><i class="fa-solid fa-plus" style="font-size:.65em;"></i> added</span>');
+          return `
+            <tr data-pid="${escapeHtml(p.id)}">
+              <td><span class="badge ${typeCls}"><i class="fa-solid ${typeIcon}" style="font-size:.7em;"></i> ${escapeHtml(p.type || "—")}</span></td>
+              <td><strong>${escapeHtml(timeStr(p.ts))}</strong></td>
+              <td class="text-muted">${escapeHtml(siteNameOf(p.siteId))}</td>
+              <td>${flags.join(" ") || '<span class="text-muted small">—</span>'}</td>
+              <td class="ks-table-actions">
+                <div class="ks-punch-actions">
+                  <button class="btn btn-sm btn-outline-primary" data-edit title="Edit time"><i class="fa-solid fa-pen-to-square"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" data-delete title="Delete"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>`;
+        }).join("");
+
+        return `
+          <div class="ks-panel" style="margin-bottom:12px;">
+            <div class="ks-panel-header">
+              <h3 class="ks-panel-title">${escapeHtml(dateStr(day.date))} <span class="text-muted small" style="font-weight:500;">· ${escapeHtml(dayStr(day.date))}</span></h3>
+              <div>
+                ${day.hasMissing ? `<span class="badge badge-rejected"><i class="fa-solid fa-triangle-exclamation" style="font-size:.7em;"></i> Missing</span>` : ""}
+                <span class="ks-hours-total" style="margin-left:8px;">${fmtDuration(day.totalMs)}</span>
+              </div>
+            </div>
+            <div class="ks-table-wrap"><div class="ks-table-scroll">
+              <table class="table">
+                <thead><tr><th>Type</th><th>Time</th><th>Site</th><th>Flags</th><th class="ks-table-actions"></th></tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div></div>
+          </div>`;
+      }).join("");
+
+      attendanceOut.innerHTML = summary + panels;
+
+      // Wire up edit/delete per row
+      for (const p of punches) {
+        const tr = attendanceOut.querySelector(`tr[data-pid="${CSS.escape(p.id)}"]`);
+        if (!tr) continue;
+        tr.querySelector("[data-edit]").onclick = () => openEditPunchModal(p);
+        tr.querySelector("[data-delete]").onclick = () => confirmDeletePunch(p);
+      }
+    }
+
+    // ---------- Edit punch ----------
+    async function openEditPunchModal(p) {
+      await openModal({
+        title: `Edit punch — ${empData?.name || "employee"}`,
+        bodyHtml: `
+          <div class="text-muted small" style="margin-bottom:10px;">
+            <strong>${escapeHtml(p.type || "")}</strong> · ${escapeHtml(siteNameOf(p.siteId))}
+          </div>
+          <label class="ks-field-label" for="ep-time">New time</label>
+          <input type="datetime-local" id="ep-time" class="form-control" value="${escapeHtml(toDatetimeLocal(p.ts))}" required>
+          <label class="ks-field-label" for="ep-reason" style="margin-top:10px;">Reason <span class="text-muted">(required)</span></label>
+          <textarea id="ep-reason" class="form-control" rows="3" placeholder="Why is this being adjusted?" required></textarea>
+        `,
+        confirmLabel: "Save change",
+        onConfirm: async (modal) => {
+          const iso = modal.querySelector("#ep-time").value;
+          const reason = modal.querySelector("#ep-reason").value.trim();
+          if (!iso) { showToast("Pick a time", "warn"); return false; }
+          if (!reason) { showToast("Reason is required", "warn"); return false; }
+          const newDate = new Date(iso);
+          const punchRef = doc(db, "attn_attendance", uid, "punches", p.id);
+          const before = { ts: Timestamp.fromDate(p.ts), siteId: p.siteId, type: p.type };
+          const after = { ts: Timestamp.fromDate(newDate), edited: true };
+          await updateDoc(punchRef, after);
+          await addDoc(collection(punchRef, "edits"), {
+            editedBy: adminUid, editedByRole: "admin",
+            editedAt: serverTimestamp(), reason, before, after,
+          });
+          await addDoc(collection(db, "attn_auditLog"), {
+            actor: adminUid, action: "editPunch",
+            targetUser: uid, targetPunchId: p.id,
+            details: { newTs: newDate.toISOString(), reason }, at: serverTimestamp(),
+          });
+          showToast("Punch updated", "success");
+        },
+      });
+    }
+
+    // ---------- Delete punch ----------
+    async function confirmDeletePunch(p) {
+      await openModal({
+        title: "Delete punch?",
+        bodyHtml: `
+          <p>This punch will be permanently removed:</p>
+          <ul>
+            <li><strong>${escapeHtml(p.type || "")}</strong> · ${escapeHtml(dateStr(p.ts))} ${escapeHtml(timeStr(p.ts))}</li>
+            <li>Site: ${escapeHtml(siteNameOf(p.siteId))}</li>
+          </ul>
+          <label class="ks-field-label" for="dp-reason">Reason (required)</label>
+          <textarea id="dp-reason" class="form-control" rows="2" placeholder="Why is this being deleted?" required></textarea>
+        `,
+        confirmLabel: "Delete",
+        confirmClass: "btn btn-outline-danger",
+        onConfirm: async (modal) => {
+          const reason = modal.querySelector("#dp-reason").value.trim();
+          if (!reason) { showToast("Reason is required", "warn"); return false; }
+          await deleteDoc(doc(db, "attn_attendance", uid, "punches", p.id));
+          await addDoc(collection(db, "attn_auditLog"), {
+            actor: adminUid, action: "deletePunch",
+            targetUser: uid, targetPunchId: p.id,
+            details: { type: p.type, siteId: p.siteId, ts: p.ts.toISOString(), reason },
+            at: serverTimestamp(),
+          });
+          showToast("Punch deleted", "warn");
+        },
+      });
+    }
+
+    // ---------- Add punch ----------
+    document.getElementById("btn-add-punch").onclick = async () => {
+      if (!empData) { showToast("Profile has not loaded yet", "warn"); return; }
+      const assigned = empData.assignedSiteIds ?? [];
+      const siteOptions = (assigned.length ? assigned : availableSites.map(s => s.id))
+        .map((sid, i) => `<option value="${escapeHtml(sid)}" ${i===0?"selected":""}>${escapeHtml(sitesById.get(sid)?.name || sid)}</option>`)
+        .join("");
+      const nowLocal = toDatetimeLocal(new Date());
+      await openModal({
+        title: `Add punch — ${empData.name || "employee"}`,
+        bodyHtml: `
+          <label class="ks-field-label" for="ap-type">Type</label>
+          <select id="ap-type" class="form-control">
+            <option value="in">In</option>
+            <option value="out">Out</option>
+          </select>
+          <label class="ks-field-label" for="ap-time" style="margin-top:10px;">Time</label>
+          <input type="datetime-local" id="ap-time" class="form-control" value="${escapeHtml(nowLocal)}" required>
+          <label class="ks-field-label" for="ap-site" style="margin-top:10px;">Site</label>
+          <select id="ap-site" class="form-control">${siteOptions || '<option value="">(No site)</option>'}</select>
+          <label class="ks-field-label" for="ap-reason" style="margin-top:10px;">Reason (required)</label>
+          <textarea id="ap-reason" class="form-control" rows="2" placeholder="Why are you adding this manually?" required></textarea>
+        `,
+        confirmLabel: "Add",
+        onConfirm: async (modal) => {
+          const type = modal.querySelector("#ap-type").value;
+          const iso = modal.querySelector("#ap-time").value;
+          const siteId = modal.querySelector("#ap-site").value;
+          const reason = modal.querySelector("#ap-reason").value.trim();
+          if (!iso) { showToast("Pick a time", "warn"); return false; }
+          if (!siteId) { showToast("Pick a site", "warn"); return false; }
+          if (!reason) { showToast("Reason is required", "warn"); return false; }
+          const when = new Date(iso);
+          const docRef = await addDoc(collection(db, "attn_attendance", uid, "punches"), {
+            ts: Timestamp.fromDate(when),
+            type, siteId,
+            addedByAdmin: true,
+            addedBy: adminUid,
+            addedReason: reason,
+            addedAt: serverTimestamp(),
+          });
+          await addDoc(collection(db, "attn_auditLog"), {
+            actor: adminUid, action: "addPunch",
+            targetUser: uid, targetPunchId: docRef.id,
+            details: { type, siteId, ts: when.toISOString(), reason },
+            at: serverTimestamp(),
+          });
+          showToast("Punch added", "success");
+        },
+      });
+    };
+
+  </script>
+</body>
+</html>
