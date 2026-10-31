@@ -271,6 +271,12 @@
       --muted:        #55606E;
       --border:       #EDE8E3;
       --nav-h:        60px;
+      /* fatafat-inspired visual tokens — veg accent + warm highlight + soft shadows */
+      --veg:          #2E7D32;
+      --veg-soft:     #E8F5E9;
+      --accent-warm:  #FFBD3C;
+      --shadow-brand: 0 10px 24px -12px rgba(255,107,53,.45);
+      --shadow-card:  0 6px 20px -10px rgba(17,24,39,.18);
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -279,6 +285,11 @@
         --text:  #F0EAE3;
         --muted: #7D7585;
         --border:#2B2638;
+        --veg:          #66BB6A;
+        --veg-soft:     #1B2E1D;
+        --accent-warm:  #FFCA55;
+        --shadow-brand: 0 10px 24px -12px rgba(255,107,53,.65);
+        --shadow-card:  0 6px 20px -10px rgba(0,0,0,.55);
       }
       .area-chip  { background: rgba(255,107,53,0.12); }
       .cuisine-chip { background: var(--card); }
@@ -297,7 +308,12 @@
     /* ── TOPBAR ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
-      height: var(--nav-h); background: var(--navy);
+      height: var(--nav-h);
+      background: rgba(26,26,46,0.88);
+      -webkit-backdrop-filter: saturate(140%) blur(10px);
+              backdrop-filter: saturate(140%) blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 2px 14px -8px rgba(0,0,0,0.4);
       display: flex; align-items: center; padding: 0 16px;
     }
     .topbar-inner {
@@ -328,9 +344,41 @@
     .hero::before {
       content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 70% 50%, rgba(255,107,53,0.12) 0%, transparent 65%);
+      background:
+        radial-gradient(ellipse 420px 320px at 85% 20%, rgba(255,107,53,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 360px 260px at 10% 90%, rgba(255,189,60,0.15) 0%, transparent 65%),
+        radial-gradient(ellipse at 70% 50%, rgba(255,107,53,0.12) 0%, transparent 65%);
       pointer-events: none;
     }
+    /* Floating decorative blobs — fatafat-style accent shapes */
+    .hero-blob {
+      position: absolute; pointer-events: none; z-index: 0;
+      border-radius: 50%; filter: blur(2px);
+      opacity: 0.4;
+    }
+    .hero-blob--1 {
+      width: 130px; height: 130px; top: 24px; left: -40px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,189,60,0.6), rgba(255,189,60,0) 70%);
+      animation: blobDrift 11s ease-in-out infinite alternate;
+    }
+    .hero-blob--2 {
+      width: 180px; height: 180px; bottom: 60px; right: -60px;
+      background: radial-gradient(circle at 60% 40%, rgba(255,107,53,0.55), rgba(255,107,53,0) 72%);
+      animation: blobDrift 13s ease-in-out -4s infinite alternate;
+    }
+    .hero-blob--3 {
+      width: 90px; height: 90px; top: 40%; left: 55%;
+      background: radial-gradient(circle, rgba(102,187,106,0.35), rgba(102,187,106,0) 70%);
+      animation: blobDrift 9s ease-in-out -2s infinite alternate;
+    }
+    @keyframes blobDrift {
+      from { transform: translate3d(0,0,0) scale(1); }
+      to   { transform: translate3d(14px,-10px,0) scale(1.08); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-blob { animation: none; }
+    }
+    .hero-inner, .hero-split { position: relative; z-index: 1; }
     .hero::after {
       content: '';
       position: absolute; bottom: 0; left: 0; right: 0; height: 32px;
@@ -345,10 +393,18 @@
       padding: 5px 12px; border-radius: 20px; margin-bottom: 20px;
     }
     .hero h1 {
-      font-size: clamp(1.6rem, 6vw, 2.6rem);
-      font-weight: 900; color: #fff; line-height: 1.12; margin-bottom: 14px;
+      font-size: clamp(1.85rem, 7.2vw, 3.2rem);
+      font-weight: 900; color: #fff; line-height: 1.08; margin-bottom: 14px;
+      letter-spacing: -0.5px;
     }
     .hero h1 em { color: var(--primary); font-style: normal; }
+    @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+      .hero h1 em {
+        background: linear-gradient(120deg, var(--primary) 0%, var(--accent-warm) 100%);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
     .hero-sub {
       font-size: 0.88rem; color: rgba(255,255,255,0.55);
       line-height: 1.65; margin-bottom: 28px;
@@ -356,11 +412,11 @@
     .btn-cta {
       display: inline-flex; align-items: center; gap: 9px;
       background: var(--primary); color: #fff;
-      border: none; padding: 14px 28px; border-radius: 14px;
+      border: none; padding: 14px 28px; border-radius: 999px;
       font-size: 0.95rem; font-weight: 700; cursor: pointer;
       font-family: 'Poppins', sans-serif;
       transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+      box-shadow: var(--shadow-brand);
       text-decoration: none;
     }
     .btn-cta:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,107,53,0.5); }
@@ -711,18 +767,28 @@
 
     /* ── WHAT WE SERVE ── */
     .serve-block { padding-top: 28px; padding-bottom: 4px; }
-    .cuisine-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; list-style: none; padding: 0; }
-    .cuisine-chip {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--card); border: 1.5px solid var(--border);
-      border-radius: 20px; padding: 7px 14px;
-      font-size: 0.75rem; font-weight: 600; color: var(--text);
+    /* Pill chip row — wraps on all widths, light + dark friendly */
+    .cuisine-chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 0 0 24px; padding: 0;
+      list-style: none;
     }
-    .cuisine-chip i { color: var(--primary); font-size: 0.8rem; }
-    .area-chips { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; }
+    .cuisine-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 999px; padding: 8px 14px;
+      font-size: 0.76rem; font-weight: 600; color: var(--text);
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .cuisine-chip:hover {
+      transform: translateY(-1px); border-color: var(--primary);
+      box-shadow: 0 4px 12px -6px rgba(255,107,53,0.35);
+    }
+    .cuisine-chip i { color: var(--primary); font-size: 0.85rem; }
+    .area-chips { display: flex; flex-wrap: wrap; gap: 7px; list-style: none; padding: 0; }
     .area-chip {
       background: #FFF0E8; border: 1px solid rgba(255,107,53,0.2);
-      border-radius: 8px; padding: 4px 10px;
+      border-radius: 999px; padding: 6px 12px;
       font-size: 0.75rem; font-weight: 600; color: var(--primary);
     }
     .serve-sub { font-size: 0.75rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
@@ -730,16 +796,26 @@
     /* ── HOW IT WORKS ── */
     .how { padding-top: 36px; padding-bottom: 4px; }
     .sec-title {
-      font-size: 1rem; font-weight: 800; color: var(--text);
-      margin-bottom: 18px;
+      font-size: 1.08rem; font-weight: 800; color: var(--text);
+      margin-bottom: 20px;
+      position: relative; padding-bottom: 10px;
+    }
+    .sec-title::after {
+      content: ''; position: absolute; left: 0; bottom: 0;
+      width: 36px; height: 3px; border-radius: 2px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent-warm) 100%);
+      opacity: 0.9;
     }
     .steps {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
     }
     .step {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 18px 12px; text-align: center;
+      border-radius: 16px; padding: 18px 12px; text-align: center;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
+    .step:hover { transform: translateY(-3px); box-shadow: 0 12px 26px -14px rgba(17,24,39,0.28); }
     .step-icon {
       width: 44px; height: 44px; border-radius: 12px;
       background: #FFF0E8; color: var(--primary);
@@ -758,9 +834,12 @@
     .why-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .why-card {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 20px 16px;
+      border-radius: 16px; padding: 22px 18px;
       display: flex; align-items: flex-start; gap: 14px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     }
+    .why-card:hover { transform: translateY(-3px); border-color: rgba(255,107,53,0.3); box-shadow: 0 14px 30px -16px rgba(255,107,53,0.25); }
     .why-icon {
       flex-shrink: 0; width: 42px; height: 42px; border-radius: 11px;
       background: #FFF0E8; color: var(--primary);
@@ -864,10 +943,11 @@
     .grow-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .grow-card {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 18px 16px;
+      border-radius: 18px; padding: 20px 18px;
       display: flex; flex-direction: column; gap: 10px;
       position: relative; overflow: hidden;
       text-decoration: none; color: inherit;
+      box-shadow: var(--shadow-card);
       transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
     }
     .grow-card:hover, .grow-card:focus-visible {
@@ -912,9 +992,13 @@
     /* ── BOTTOM CTA STRIP ── */
     .bottom-cta {
       margin-top: 40px;
-      background: var(--navy);
-      padding: 32px 16px;
+      background:
+        radial-gradient(ellipse 440px 220px at 15% 20%, rgba(255,107,53,0.25) 0%, transparent 65%),
+        radial-gradient(ellipse 360px 200px at 85% 85%, rgba(255,189,60,0.14) 0%, transparent 70%),
+        var(--navy);
+      padding: 40px 16px;
       text-align: center;
+      position: relative; overflow: hidden;
     }
     .bottom-cta p {
       color: rgba(255,255,255,0.55); font-size: 0.8rem;
@@ -1196,6 +1280,9 @@
 
   <!-- Hero -->
   <section class="hero" aria-label="Order food online in Banki, Cuttack">
+    <span class="hero-blob hero-blob--1" aria-hidden="true"></span>
+    <span class="hero-blob hero-blob--2" aria-hidden="true"></span>
+    <span class="hero-blob hero-blob--3" aria-hidden="true"></span>
     <div class="hero-inner hero-split">
 
       <div class="hero-copy">

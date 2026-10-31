@@ -42,7 +42,9 @@
       "WebFetch(domain:faq.whatsapp.com)",
       "WebFetch(domain:techcrunch.com)",
       "WebFetch(domain:sinch.com)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" https://fatafatdelivery.in/ -o /tmp/fatafat.html)",
+      "Read(//tmp/**)"
     ]
   },
   "enableAllProjectMcpServers": true,
