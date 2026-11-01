@@ -3,7 +3,7 @@ import pathlib
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-FOOD_SRC = ROOT / 'banki-bites/banner'
+FOOD_SRC = ROOT / 'food_src'
 
 
 def convert(png_path: pathlib.Path, force: bool = False, dry_run: bool = False) -> None:
