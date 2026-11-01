@@ -1,1 +1,880 @@
-{}
+{
+    "PZAdwySxuNb8fOEuCVGC": {
+        "total_cart_value": 229,
+        "created_at": "2026-10-25T11:20:05.223000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Sisua",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 229,
+                            "image_src": "../food_src/Chicken_Pizza_(small).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "sgwqWZhFNT9PVC0un4cJ": {
+        "total_cart_value": 209,
+        "created_at": "2026-10-22T13:11:09.563000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Classic_Pizza_(small).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Classic Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "3mGVGXchOKQaW5FddbY8": {
+        "total_cart_value": 888,
+        "created_at": "2026-10-21T11:00:52.742000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Makundapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 299,
+                            "image_src": "../food_src/Mushroom_Pizza_(medium).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 108,
+                            "name": "Mushroom Pizza (medium)"
+                        },
+                        {
+                            "price": 589,
+                            "image_src": "../food_src/Chicken_Pizza_(large).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 203,
+                            "name": "Chicken Pizza (large)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "D2o5ahpdB2AYAm6f56FT": {
+        "total_cart_value": 229,
+        "created_at": "2026-10-20T11:06:30.057000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 229,
+                            "image_src": "../food_src/Chicken_Pizza_(small).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "7QpdBj0Evd2sEeD0ZUaE": {
+        "total_cart_value": 229,
+        "created_at": "2026-10-20T10:59:43.543000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 229,
+                            "image_src": "../food_src/Chicken_Pizza_(small).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "bz5tMBAppmBHj43aaIux": {
+        "total_cart_value": 229,
+        "created_at": "2026-10-19T13:30:48.802000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Bankigada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Pizza_(small).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 104,
+                            "name": "Paneer Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "IHhVp6bqO42CJkQjnay8": {
+        "total_cart_value": 237,
+        "created_at": "2026-10-19T12:58:28.674000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Grilled_Paneer_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Grilled Paneer Sandwitch"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/French_Fries_(small).webp",
+                            "quantity": 1,
+                            "id": 601,
+                            "name": "French Fries (small)"
+                        }
+                    ],
+                    "name": "Fries"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "fRS65L5kWV2Irpf8IXW0": {
+        "total_cart_value": 119,
+        "created_at": "2026-10-19T11:04:47.850000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Bedapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "kYuDkn071j8ZIDLq06AT": {
+        "total_cart_value": 229,
+        "created_at": "2026-10-15T12:37:29.826000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Dompada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 229,
+                            "image_src": "../food_src/Chicken_Pizza_(small).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 201,
+                            "name": "Chicken Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "BuqBOEOdPskBiMy0NB2C": {
+        "total_cart_value": 359,
+        "created_at": "2026-10-13T14:35:05.760000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Dhansar",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 359,
+                            "image_src": "../food_src/Chicken_Pizza_(medium).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 202,
+                            "name": "Chicken Pizza (medium)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "1bSD9gXXoZs1TTmWpHQr": {
+        "total_cart_value": 229,
+        "created_at": "2026-10-13T14:10:55.450000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Karabara",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Pizza_(small).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 104,
+                            "name": "Paneer Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "LoX1jAFhfTeRDnsYEQeI": {
+        "total_cart_value": 357,
+        "created_at": "2026-10-12T13:28:29.534000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Sisua",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Crispy_Chicken_Finger_(5pc).webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 701,
+                            "name": "Crispy Chicken Finger (5pc)"
+                        }
+                    ],
+                    "name": "Fries"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 109,
+                            "image_src": "../food_src/Chicken_Cheese_Burger.webp",
+                            "type": "NonVeg",
+                            "quantity": 1,
+                            "id": 402,
+                            "name": "Chicken Cheese Burger"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Classic_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 301,
+                            "name": "Classic Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "nLF2Wj3C339n6fZNfpsu": {
+        "total_cart_value": 248,
+        "created_at": "2026-10-12T11:40:05.873000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Pizza_(small).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 104,
+                            "name": "Paneer Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "W7NH5ie2pgqekjFQuXfj": {
+        "total_cart_value": 248,
+        "created_at": "2026-10-11T14:45:19.788000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Pizza_(small).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 104,
+                            "name": "Paneer Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "RULN6sjgEQS3T7SbuTCJ": {
+        "total_cart_value": 436,
+        "created_at": "2026-10-09T14:09:48.314000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Makundapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Grilled_Paneer_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Grilled Paneer Sandwitch"
+                        },
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Grilled_Mushroom_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 503,
+                            "name": "Grilled Mushroom Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/French_Fries_(large).webp",
+                            "quantity": 2,
+                            "id": 602,
+                            "name": "French Fries (large)"
+                        }
+                    ],
+                    "name": "Fries"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "4Lk6LVfcmXjFgi9VlqnF": {
+        "total_cart_value": 229,
+        "created_at": "2026-10-09T13:26:06.020000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Charigharia",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 179,
+                            "image_src": "../food_src/Paneer_Pizza_(small).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 104,
+                            "name": "Paneer Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "DYfZlOHkZnKHhXMte2Kz": {
+        "total_cart_value": 267,
+        "created_at": "2026-10-09T13:13:40.415000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Grilled_Paneer_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 502,
+                            "name": "Grilled Paneer Sandwitch"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "auvrmCTHzRwHp0WFcpz1": {
+        "total_cart_value": 119,
+        "created_at": "2026-10-09T12:36:47.394000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Dhanaar",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Classic_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 301,
+                            "name": "Classic Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "ma8zVAIq5bghERXH1YO4": {
+        "total_cart_value": 517,
+        "created_at": "2026-10-08T14:47:26.735000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Ragadi",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 109,
+                            "image_src": "../food_src/Butter_Scotch_Milk_Shake.webp",
+                            "quantity": 2,
+                            "id": 802,
+                            "name": "Butter Scotch Milk Shake"
+                        }
+                    ],
+                    "name": "Milk Shake"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 299,
+                            "image_src": "../food_src/Mushroom_Pizza_(medium).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 108,
+                            "name": "Mushroom Pizza (medium)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "DOreNiNIWxLhWi5zhzkR": {
+        "total_cart_value": 237,
+        "created_at": "2026-10-06T15:20:10.831000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Bedapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 302,
+                            "name": "Cheese Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "status": "Rejected"
+    },
+    "gbrQGOKWZ3QMiG7iK9zD": {
+        "total_cart_value": 218,
+        "created_at": "2026-10-06T10:48:37.217000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Banki",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 119,
+                            "image_src": "../food_src/French_Fries_(large).webp",
+                            "quantity": 1,
+                            "id": 602,
+                            "name": "French Fries (large)"
+                        }
+                    ],
+                    "name": "Fries"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Grilled_Paneer_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 502,
+                            "name": "Grilled Paneer Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "SHSEhbazgJ59JJS25SUS": {
+        "total_cart_value": 207,
+        "created_at": "2026-10-05T11:50:28.488000+00:00",
+        "triggered_to": "+917749984274",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Chakapada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 3,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "foUupTwluuznZSqiioai": {
+        "total_cart_value": 149,
+        "created_at": "2026-10-04T15:20:05.058000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": true,
+        "table_no": "COD",
+        "tcd_place": "Charchika Sahi ,sub jail front,behind the charchika hotel",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Grilled_Mushroom_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 503,
+                            "name": "Grilled Mushroom Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Approved"
+    },
+    "xQIz3bHP8U45uvYU82AY": {
+        "total_cart_value": 188,
+        "created_at": "2026-10-04T12:42:56.914000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Bankigada",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Classic_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 2,
+                            "id": 301,
+                            "name": "Classic Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            }
+        ],
+        "delivery_charges": 50,
+        "status": "Rejected"
+    },
+    "AinkWAWfgyvHebxvWeg9": {
+        "total_cart_value": 327,
+        "created_at": "2026-10-02T14:35:25.518000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Sisua",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 99,
+                            "image_src": "../food_src/Cheese_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 302,
+                            "name": "Cheese Burger"
+                        },
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Classic_Burger.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 301,
+                            "name": "Classic Burger"
+                        }
+                    ],
+                    "name": "Burger"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 159,
+                            "image_src": "../food_src/Classic_Pizza_(small).webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 101,
+                            "name": "Classic Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    },
+    "80vfAuZKx6q1zyoAWCfs": {
+        "total_cart_value": 527,
+        "created_at": "2026-10-01T14:59:57.964000+00:00",
+        "triggered_to": "+919114191989",
+        "tcd_place_custom": false,
+        "table_no": "COD",
+        "tcd_place": "Bedapur",
+        "order_details": [
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 69,
+                            "image_src": "../food_src/Grilled_Classic_Sandwitch.webp",
+                            "type": "Veg",
+                            "quantity": 1,
+                            "id": 501,
+                            "name": "Grilled Classic Sandwitch"
+                        }
+                    ],
+                    "name": "Sandwitch"
+                }
+            },
+            {
+                "category": {
+                    "dish_details": [
+                        {
+                            "price": 229,
+                            "image_src": "../food_src/Chicken_Pizza_(small).webp",
+                            "type": "NonVeg",
+                            "quantity": 2,
+                            "id": 201,
+                            "name": "Chicken Pizza (small)"
+                        }
+                    ],
+                    "name": "Pizza"
+                }
+            }
+        ],
+        "status": "Approved"
+    }
+}
