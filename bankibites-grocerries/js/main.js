@@ -230,7 +230,7 @@
           .filter((d) => (d.variants || []).some((v) => v.inStock !== false));
         if (items.length === 0) return '';
         items.sort(sortByFeaturedThenPrice);
-        const previews = items.slice(0, 10).map((p) => productCard({ ...p, categoryImage: c.image })).join('');
+        const previews = items.map((p) => productCard({ ...p, categoryImage: c.image })).join('');
         return `
           <section class="prod-row-section" id="cat-${c.id}">
             <div class="prod-row-head">

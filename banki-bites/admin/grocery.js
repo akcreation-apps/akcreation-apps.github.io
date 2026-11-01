@@ -107,7 +107,7 @@ export async function renderGrocery(root, db) {
         <i class="fas fa-truck-fast"></i> Delivery runs
       </button>
       <button type="button" class="gr-subnav-btn" data-sub="requested" role="tab" aria-selected="false">
-        <i class="fas fa-magnifying-glass"></i> Requested
+        <i class="fas fa-magnifying-glass"></i> Search
       </button>
     </div>
 
