@@ -462,7 +462,7 @@ function renderOrderCard(db, o, root, suggestedName = '') {
   const cust = o.customer || {};
   const effectiveName = cust.name || suggestedName || '';
   const itemsHtml = items.map(i =>
-    `<li>${i.qty} × ${esc(i.name)} <span class="text-muted">— ₹${i.price ?? '?'}</span></li>`
+    `<li>${i.qty} × ${esc(i.name)}${i.id != null && i.id !== '' ? ` <span class="text-muted">(${esc(i.id)})</span>` : ''} <span class="text-muted">— ₹${i.price ?? '?'}</span></li>`
   ).join('');
   // Use the suggested BB N name so the collapsed card doesn't say "Not added"
   // when the admin has an auto-suggestion waiting to be accepted.
@@ -508,7 +508,7 @@ function renderOrderCard(db, o, root, suggestedName = '') {
           <span class="restaurant-name">BankiBites Groceries · #${esc(o.id.slice(-6).toUpperCase())}</span>
           <span class="order-total">${fmtINR(grand)}</span>
         </div>
-        <div class="ec-meta">${created ? created.toLocaleString('en-IN') : ''} · ${nItems} item${nItems === 1 ? '' : 's'}${cust.address ? ' · ' + esc(cust.address) : ''}</div>
+        <div class="ec-meta">${created ? created.toLocaleString('en-IN') : ''} · ${nItems} item${nItems === 1 ? '' : 's'}${(cust.address || o.place) ? ' · ' + esc(cust.address || o.place) : ''}</div>
         <div class="ec-meta"><i class="fas fa-truck-fast"></i> ${esc(o.eta_date || '—')} · ${esc(o.eta_window || '')}</div>
         <div class="ec-meta">${contactSummary}${partnerLabel ? ' · <i class="fas fa-motorcycle"></i> ' + esc(partnerLabel) : ''}</div>
       </div>
@@ -560,7 +560,7 @@ function renderOrderCard(db, o, root, suggestedName = '') {
           <textarea class="form-control form-control-sm" placeholder="Delivery address" data-f="address"
                     name="gr-caddr-${esc(o.id)}" rows="2"
                     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                    data-lpignore="true" data-1p-ignore="true">${esc(cust.address || '')}</textarea>
+                    data-lpignore="true" data-1p-ignore="true">${esc(cust.address || o.place || '')}</textarea>
           <div class="customer-gps" data-el="gpsLine" ${(cust.gps || _customers.get(cust.phone)?.gps) ? '' : 'hidden'}>
             <i class="fas fa-location-dot"></i>
             <a data-el="mapLink" target="_blank" rel="noopener">Open in Google Maps</a>
