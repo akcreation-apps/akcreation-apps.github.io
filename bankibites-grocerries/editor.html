@@ -228,6 +228,89 @@
 </head>
 <body>
 
+  <!-- Lock screen (gates the editor until the correct time-based password is entered) -->
+  <style>
+    html:has(#lockScreen) body { overflow: hidden; }
+    #lockScreen {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, #0F172A 0%, #15803D 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    #lockScreen .lock-card {
+      background: #FFFFFF; border-radius: 14px;
+      padding: 22px 18px;
+      width: 100%; max-width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+      box-sizing: border-box;
+    }
+    #lockScreen .lock-icon {
+      width: 52px; height: 52px;
+      margin: 0 auto 12px; border-radius: 50%;
+      background: #DCFCE7; display: flex; align-items: center; justify-content: center;
+    }
+    #lockScreen .lock-icon i { font-size: 20px; color: #15803D; line-height: 1; }
+    #lockScreen h2 {
+      color: #0F172A; font-size: 1.1rem; font-weight: 800;
+      margin: 0 0 6px; line-height: 1.3;
+    }
+    #lockScreen .lock-sub {
+      color: #64748B; font-size: 0.82rem; margin: 0 0 16px; line-height: 1.4;
+    }
+    #lockScreen #lockInput {
+      width: 100%; padding: 12px 10px;
+      font-size: 16px;
+      text-align: center; letter-spacing: 3px; font-weight: 700;
+      border: 2px solid #E7E5E1; border-radius: 10px; outline: none;
+      color: #0F172A; background: #FAFAF7;
+      min-height: 48px; box-sizing: border-box; display: block;
+    }
+    #lockScreen #lockInput:focus { border-color: #16A34A; }
+    #lockScreen #lockError {
+      color: #E11D48; font-size: 0.75rem; margin-top: 8px; min-height: 1em;
+    }
+    #lockScreen #lockSubmit {
+      margin-top: 12px; width: 100%;
+      padding: 13px; min-height: 48px;
+      background: #16A34A; color: #FFFFFF; font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 10px; cursor: pointer; border: 0;
+      display: block;
+    }
+    #lockScreen #lockSubmit:active { transform: scale(0.98); }
+
+    @media (min-width: 480px) {
+      #lockScreen { padding: 24px; align-items: center; }
+      #lockScreen .lock-card { padding: 32px 28px; max-width: 380px; }
+      #lockScreen .lock-icon { width: 60px; height: 60px; margin-bottom: 16px; }
+      #lockScreen .lock-icon i { font-size: 24px; }
+      #lockScreen h2 { font-size: 1.25rem; }
+      #lockScreen .lock-sub { font-size: 0.88rem; margin-bottom: 20px; }
+      #lockScreen #lockInput { font-size: 1.1rem; letter-spacing: 6px; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #lockScreen .lock-card { background: #1C1B22; }
+      #lockScreen h2 { color: #F5F5F1; }
+      #lockScreen .lock-sub { color: #A1A1AA; }
+      #lockScreen #lockInput { background: #0F0E15; color: #F5F5F1; border-color: #2A2932; }
+    }
+  </style>
+  <div id="lockScreen">
+    <div class="lock-card">
+      <div class="lock-icon"><i class="fa-solid fa-lock"></i></div>
+      <h2>Editor Locked</h2>
+      <p class="lock-sub">Enter the 8-digit access code to continue.</p>
+      <input id="lockInput" type="password" inputmode="numeric" autocomplete="off"
+             maxlength="8" placeholder="••••••••">
+      <div id="lockError"></div>
+    </div>
+  </div>
+
+
   <div class="topbar">
     <h1>🛒 Catalog Editor<span class="accent">.</span></h1>
     <span class="status" id="status">not loaded</span>
@@ -262,6 +345,7 @@
       <h3>Add product</h3>
       <p>Only id &amp; image are locked. Fill the rest and adjust later.</p>
       <div class="field"><label>Name</label><input id="npName" placeholder="e.g. Kissan Fresh Tomato Ketchup"></div>
+      <div class="field"><label>Vendor Price (₹)</label><input id="npVendorPrice" type="number" min="0" step="0.5"></div>
       <div class="field"><label>MRP (₹)</label><input id="npMrp" type="number" min="0" step="0.5"></div>
       <div class="field"><label>Price (₹)</label><input id="npPrice" type="number" min="0" step="0.5"></div>
       <div class="field"><label>Unit (e.g. 500G, 1KG, 180ML)</label><input id="npUnit"></div>
@@ -345,7 +429,7 @@
   function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
 
   // ---------- Dirty detection ----------
-  const DISH_FIELDS = ['name', 'price', 'mrp', 'unit', 'inStock', 'featured', 'deal', 'image'];
+  const DISH_FIELDS = ['name', 'price', 'mrp', 'vendor_price', 'unit', 'inStock', 'featured', 'deal', 'image'];
   function isDishDirty(curr, orig, currCat, origCat) {
     if (!orig) return true;
     if (currCat !== origCat) return true;      // moved between categories
@@ -420,6 +504,7 @@
               name: p.name,
               price: Number(v.price ?? p.price ?? 0),
               mrp: Number(v.mrp ?? p.mrp ?? v.price ?? 0),
+              vendor_price: Number(v.vendor_price ?? p.vendor_price ?? 0),
               unit: v.unit ?? p.unit ?? '',
               image: v.image ?? p.image ?? '',
               inStock: v.inStock !== false,
@@ -459,6 +544,7 @@
               unit: r.unit,
               price: Number(r.price) || 0,
               mrp: Number(r.mrp ?? r.price) || 0,
+              vendor_price: Number(r.vendor_price) || 0,
               image: r.image,
               inStock: r.inStock !== false,
             })),
@@ -707,6 +793,7 @@
             <th>ID</th>
             <th>Img</th>
             <th>Name</th>
+            <th>Vendor ₹</th>
             <th>MRP</th>
             <th>Price</th>
             <th>Unit</th>
@@ -747,6 +834,7 @@
           const n = (window.__bbGroupCounts && window.__bbGroupCounts.get(k)) || 1;
           return n > 1 ? `<span title="Rows sharing this name are merged into one variant group on save" style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--brand-soft);color:var(--brand-dark);font-size:0.65rem;font-weight:700;">×${n} sizes</span>` : '';
         })()}</td>
+        <td class="num"><input class="${fCls('vendor_price')}" type="number" min="0" step="0.5" value="${d.vendor_price ?? ''}" data-field="vendor_price" placeholder="—"></td>
         <td class="num"><input class="${fCls('mrp')}" type="number" min="0" step="0.5" value="${d.mrp ?? ''}" data-field="mrp" placeholder="—"></td>
         <td class="num"><input class="${fCls('price')}" type="number" min="0" step="0.5" value="${d.price}" data-field="price"></td>
         <td class="unit"><input class="${fCls('unit')}" type="text" value="${escapeAttr(d.unit || '')}" data-field="unit"></td>
@@ -907,7 +995,7 @@
   }
 
   function openAddProduct(cat) {
-    ['npName', 'npMrp', 'npPrice', 'npUnit', 'npImage'].forEach(id => ($('#' + id).value = ''));
+    ['npName', 'npMrp', 'npPrice', 'npVendorPrice', 'npUnit', 'npImage'].forEach(id => ($('#' + id).value = ''));
     $('#addProdModal').classList.add('open');
     $('#npName').focus();
     $('#npSave').onclick = () => {
@@ -915,12 +1003,13 @@
       if (!name) { $('#npName').focus(); return; }
       const mrp = Number($('#npMrp').value) || 0;
       const price = Number($('#npPrice').value) || mrp;
+      const vendor_price = Number($('#npVendorPrice').value) || 0;
       const unit = $('#npUnit').value.trim() || '1PC';
       const image = $('#npImage').value.trim() || cat.image;
       const sub = cat.subcategories[0];
       if (!sub) { alert('This category has no sub-container; add one first (via JSON)'); return; }
       sub.dishes.unshift({
-        id: nextId(), name, price, mrp, unit, image,
+        id: nextId(), name, price, mrp, vendor_price, unit, image,
         inStock: true, featured: false, deal: false,
       });
       $('#addProdModal').classList.remove('open');
@@ -1032,8 +1121,42 @@
       .replace(/&/g, '&amp;').replace(/"/g, '&quot;');
   }
 
-  // Init
-  loadData();
+  // ==============================================================
+  // Lock screen — time-based password: HHDDMMYY
+  //   HH = current hour (00-23), DD = day, MM = month, YY = last 2 of year.
+  //   Rotates every hour so a leaked code expires on its own.
+  // ==============================================================
+  function expectedLockCode() {
+    const n = new Date();
+    const pad = (x) => String(x).padStart(2, '0');
+    return pad(n.getHours()) + pad(n.getDate()) + pad(n.getMonth() + 1) + pad(n.getFullYear() % 100);
+  }
+  function unlockEditor() {
+    const lock = document.getElementById('lockScreen');
+    if (lock) lock.remove();
+    loadData();
+  }
+  (function initLock() {
+    const lock = document.getElementById('lockScreen');
+    const input = document.getElementById('lockInput');
+    const err = document.getElementById('lockError');
+    if (!lock || !input) { loadData(); return; }
+    input.addEventListener('input', () => {
+      const v = (input.value || '').replace(/\D/g, '').slice(0, 8);
+      if (v !== input.value) input.value = v;
+      if (err.textContent) err.textContent = '';
+      if (v.length === 8) {
+        if (v === expectedLockCode()) {
+          unlockEditor();
+        } else {
+          err.textContent = 'Incorrect code. Try again.';
+          input.value = '';
+          input.focus();
+        }
+      }
+    });
+    input.focus();
+  })();
   </script>
 </body>
 </html>
