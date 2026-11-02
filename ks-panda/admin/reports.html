@@ -369,12 +369,12 @@
         const cls = day.hasMissing ? 'class="ks-missing-row"' : '';
         return `
           <tr ${cls}>
-            <td>${dateStr(day.date)}</td>
-            <td class="text-muted small">${dayStr(day.date)}</td>
-            <td class="text-muted">${escapeHtml(day.siteNames.join(", ") || "—")}</td>
-            <td>${inParts || "—"}</td>
-            <td>${outParts || "—"}</td>
-            <td>${hoursCell}</td>
+            <td data-label="Date">${dateStr(day.date)}</td>
+            <td data-label="Day" class="text-muted small">${dayStr(day.date)}</td>
+            <td data-label="Site" class="text-muted">${escapeHtml(day.siteNames.join(", ") || "—")}</td>
+            <td data-label="In">${inParts || "—"}</td>
+            <td data-label="Out">${outParts || "—"}</td>
+            <td data-label="Hours">${hoursCell}</td>
           </tr>`;
       }).join("");
 

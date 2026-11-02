@@ -12,22 +12,81 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .ks-sites-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .ks-sites-head > div:first-child { flex: 1 1 240px; min-width: 0; }
+    #btn-show-add { flex: 0 0 auto; min-height: 44px; }
+    @media (max-width: 575.98px) {
+      #btn-show-add { width: 100%; }
+    }
+    #add-site-wrap .ks-form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    #add-site-wrap .ks-form-actions .btn { min-height: 44px; }
+    @media (max-width: 575.98px) {
+      #add-site-wrap .ks-form-actions .btn { flex: 1 1 100%; }
+    }
+    .ks-switch-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      min-height: 44px;
+    }
+    .ks-switch-row .custom-control-label { cursor: pointer; }
+    #map-url-feedback.ok { color: var(--success, #198754); }
+    #map-url-feedback.warn { color: var(--warn, #b26a00); }
+    #map-url-feedback.err { color: var(--danger, #c9111a); }
+    .ks-latlng-link {
+      color: var(--brand, #c9111a);
+      text-decoration: none;
+      border-bottom: 1px dashed currentColor;
+    }
+    .ks-latlng-link:hover,
+    .ks-latlng-link:focus {
+      color: var(--brand-dark, #a30d14);
+      text-decoration: none;
+    }
+    .ks-latlng-link code { color: inherit; background: transparent; padding: 0; }
+
+    /* Site-specific: make the Name cell a prominent header in card mode */
+    @media (max-width: 575.98px) {
+      .ks-sites-table .table tbody td[data-label="Name"] {
+        display: block;
+        font-size: .98rem;
+        padding-bottom: 6px !important;
+        margin-bottom: 4px;
+        border-bottom: 1px dashed var(--border) !important;
+      }
+      .ks-sites-table .table tbody td[data-label="Name"]::before { display: none; }
+      .ks-sites-table .table tbody td[data-label="Name"] > * { text-align: left; }
+    }
+  </style>
 </head>
 <body>
   <main class="ks-main">
-    <div class="ks-section-head">
+    <div class="ks-section-head ks-sites-head">
       <div>
         <h1><i class="fa-solid fa-location-dot text-muted" style="font-size:0.85em;"></i> Sites</h1>
         <p class="ks-subtle">Physical locations where employees can punch in. Each user can be assigned one or more sites.</p>
       </div>
+      <button id="btn-show-add" class="btn btn-primary" type="button"><i class="fa-solid fa-plus"></i> Add site</button>
     </div>
 
-    <div class="ks-panel" style="margin-bottom:20px;">
+    <div class="ks-panel" id="add-site-wrap" style="margin-bottom:20px;" hidden>
       <div class="ks-panel-header">
         <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-plus"></i></span>Add a new site</h3>
       </div>
       <form id="new-site" autocomplete="off">
-        <div class="ks-form-grid ks-form-grid-4">
+        <div class="ks-form-grid ks-form-grid-2">
           <div>
             <label class="ks-field-label" for="site-name">Name</label>
             <input class="form-control" id="site-name" name="name" placeholder="e.g., Cuttack Warehouse" required>
@@ -36,36 +95,58 @@
             <label class="ks-field-label" for="site-address">Address</label>
             <input class="form-control" id="site-address" name="address" placeholder="Street, city">
           </div>
-          <div>
-            <label class="ks-field-label" for="site-lat">Latitude</label>
-            <input class="form-control" id="site-lat" name="lat" type="number" step="any" placeholder="20.4625">
-          </div>
-          <div>
-            <label class="ks-field-label" for="site-lng">Longitude</label>
-            <input class="form-control" id="site-lng" name="lng" type="number" step="any" placeholder="85.8828">
+        </div>
+
+        <div class="ks-switch-row" style="margin-top:14px;">
+          <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="site-geofence-on">
+            <label class="custom-control-label" for="site-geofence-on">Enable geofencing</label>
           </div>
         </div>
-        <div class="ks-form-grid ks-form-grid-2" style="margin-top:12px;">
-          <div>
-            <label class="ks-field-label" for="site-radius">Geofence radius (metres)</label>
-            <input class="form-control" id="site-radius" name="radiusMeters" type="number" min="10" step="10" value="150" placeholder="150">
-            <div class="text-muted small" style="margin-top:4px;">Punches from outside this radius are blocked by the Android app.</div>
+        <p class="text-muted small" style="margin-top:-4px;">When off, the Android app will not restrict punches by location for this site.</p>
+
+        <div id="geofence-fields" hidden>
+          <div class="ks-form-grid">
+            <div>
+              <label class="ks-field-label" for="site-map-url">Google Maps URL <span class="text-muted" style="font-weight:400;">(optional helper)</span></label>
+              <input class="form-control" id="site-map-url" type="text" placeholder="Paste a Google Maps link to auto-fill lat / lng">
+              <div id="map-url-feedback" class="small" style="margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="ks-form-grid ks-form-grid-2" style="margin-top:12px;">
+            <div>
+              <label class="ks-field-label" for="site-lat">Latitude</label>
+              <input class="form-control" id="site-lat" type="number" step="any" min="-90" max="90" placeholder="20.4625">
+            </div>
+            <div>
+              <label class="ks-field-label" for="site-lng">Longitude</label>
+              <input class="form-control" id="site-lng" type="number" step="any" min="-180" max="180" placeholder="85.8828">
+            </div>
+          </div>
+          <div class="ks-form-grid" style="margin-top:12px;">
+            <div>
+              <label class="ks-field-label" for="site-radius">Geofence radius (metres)</label>
+              <input class="form-control" id="site-radius" name="radiusMeters" type="number" min="10" step="10" value="150" placeholder="150">
+              <div class="text-muted small" style="margin-top:4px;">Punches from outside this radius are blocked by the Android app. Typical range 50–500 m.</div>
+            </div>
           </div>
         </div>
-        <div class="ks-form-actions">
+
+        <div class="ks-form-actions" style="margin-top:16px;">
           <button class="btn btn-primary" type="submit"><i class="fa-solid fa-plus"></i> Add site</button>
+          <button class="btn btn-outline-secondary" type="button" id="btn-cancel-add">Cancel</button>
         </div>
       </form>
     </div>
 
-    <div class="ks-table-wrap">
+    <div class="ks-table-wrap ks-sites-table">
       <div class="ks-table-scroll">
         <table class="table">
           <thead><tr>
-            <th>Name</th><th>Address</th><th>Lat, Lng</th><th>Radius</th><th>Status</th><th class="ks-table-actions"></th>
+            <th>Name</th><th>Address</th><th>Lat, Lng</th><th>Radius</th><th>Users</th><th>Status</th><th class="ks-table-actions"></th>
           </tr></thead>
           <tbody id="tbody">
-            <tr><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
+            <tr class="ks-empty-row"><td colspan="7"><div class="ks-skel ks-skel-lg"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -78,7 +159,7 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, setYear } from "../assets/ui.js";
-    import { collection, addDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
     setYear();
@@ -94,66 +175,451 @@
       }[c]));
     }
 
+    function parseLatLng(raw) {
+      if (!raw) return null;
+      let url = String(raw).trim();
+      try { url = decodeURIComponent(url); } catch (_) {}
+      const NUM = "(-?\\d+(?:\\.\\d+)?)";
+      // Order matters: the actual pin coordinates live in !3d!4d (data= payload).
+      // The @lat,lng,zoom segment is the viewport centre and can drift away from
+      // the pin if the user has panned the map, so it's only a fallback.
+      const patterns = [
+        new RegExp(`!3d${NUM}!4d${NUM}`),
+        new RegExp(`[?&](?:q|query|ll|destination|origin|center|viewpoint)=${NUM},${NUM}`),
+        new RegExp(`/maps/(?:dir|search|place)/${NUM},${NUM}`),
+        new RegExp(`@${NUM},${NUM}`),
+      ];
+      for (const re of patterns) {
+        const m = url.match(re);
+        if (m) {
+          const lat = parseFloat(m[1]);
+          const lng = parseFloat(m[2]);
+          if (Number.isFinite(lat) && Number.isFinite(lng) &&
+              lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
+              !(lat === 0 && lng === 0)) {
+            return { lat, lng };
+          }
+        }
+      }
+      // Last-ditch: a bare decimal "lat.d,lng.d" pair anywhere in the string.
+      // Both parts MUST have a decimal point — otherwise addresses like
+      // "Flat 20, 85 Market Rd" false-match as lat=20, lng=85.
+      const DEC = "(-?\\d+\\.\\d+)";
+      const bare = url.match(new RegExp(`${DEC}\\s*,\\s*${DEC}`));
+      if (bare) {
+        const lat = parseFloat(bare[1]);
+        const lng = parseFloat(bare[2]);
+        if (Number.isFinite(lat) && Number.isFinite(lng) &&
+            lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
+            !(lat === 0 && lng === 0)) {
+          return { lat, lng };
+        }
+      }
+      return null;
+    }
+
+    function isShortMapsLink(url) {
+      return /maps\.app\.goo\.gl|goo\.gl\/maps/i.test(url || "");
+    }
+
+    const wrap = document.getElementById('add-site-wrap');
+    const form = document.getElementById('new-site');
+    const btnShow = document.getElementById('btn-show-add');
+    const btnCancel = document.getElementById('btn-cancel-add');
+    const geoSwitch = document.getElementById('site-geofence-on');
+    const geoFields = document.getElementById('geofence-fields');
+    const mapUrlInput = document.getElementById('site-map-url');
+    const mapUrlFeedback = document.getElementById('map-url-feedback');
+    const latInput = document.getElementById('site-lat');
+    const lngInput = document.getElementById('site-lng');
+    const radiusInput = document.getElementById('site-radius');
+
+    function resetFormUI() {
+      form.reset();
+      geoSwitch.checked = false;
+      geoFields.hidden = true;
+      mapUrlFeedback.textContent = '';
+      mapUrlFeedback.className = 'small';
+    }
+
+    btnShow.onclick = () => {
+      wrap.hidden = false;
+      btnShow.hidden = true;
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => document.getElementById('site-name')?.focus(), 300);
+    };
+    btnCancel.onclick = () => {
+      wrap.hidden = true;
+      btnShow.hidden = false;
+      resetFormUI();
+    };
+
+    geoSwitch.addEventListener('change', () => {
+      geoFields.hidden = !geoSwitch.checked;
+      if (!geoSwitch.checked) {
+        mapUrlFeedback.textContent = '';
+        mapUrlFeedback.className = 'small';
+      }
+    });
+
+    mapUrlInput.addEventListener('input', () => {
+      const v = mapUrlInput.value.trim();
+      if (!v) {
+        mapUrlFeedback.textContent = '';
+        mapUrlFeedback.className = 'small';
+        return;
+      }
+      if (isShortMapsLink(v)) {
+        mapUrlFeedback.textContent = "Short link detected — open it in Google Maps first and paste the full URL, or type lat / lng directly below.";
+        mapUrlFeedback.className = 'small warn';
+        return;
+      }
+      const parsed = parseLatLng(v);
+      if (parsed) {
+        latInput.value = parsed.lat;
+        lngInput.value = parsed.lng;
+        mapUrlFeedback.textContent = `Auto-filled: ${parsed.lat.toFixed(6)}, ${parsed.lng.toFixed(6)}`;
+        mapUrlFeedback.className = 'small ok';
+      } else {
+        mapUrlFeedback.textContent = "Couldn't find coordinates in this URL — you can still type lat / lng below.";
+        mapUrlFeedback.className = 'small warn';
+      }
+    });
+
     const tbody = document.getElementById('tbody');
+
+    // Keep latest sites + users snapshots so we can:
+    //  (a) show assigned-user count per site
+    //  (b) warn before disabling geofencing on a site that has users
+    //  (c) enforce site-name uniqueness
+    let latestSites = [];
+    const siteUserCount = new Map();
+    const siteUserNames = new Map();
+
+    onSnapshot(collection(db, "attn_users"), (snap) => {
+      siteUserCount.clear();
+      siteUserNames.clear();
+      snap.forEach(u => {
+        const data = u.data();
+        const ids = Array.isArray(data.assignedSiteIds) ? data.assignedSiteIds : [];
+        const name = data.name || data.email || "(unnamed)";
+        ids.forEach(sid => {
+          siteUserCount.set(sid, (siteUserCount.get(sid) || 0) + 1);
+          if (!siteUserNames.has(sid)) siteUserNames.set(sid, []);
+          siteUserNames.get(sid).push(name);
+        });
+      });
+      renderSites();
+    });
+
     onSnapshot(collection(db, "attn_sites"), (snap) => {
-      if (snap.empty) {
-        tbody.innerHTML = `<tr><td colspan="6">
+      latestSites = [];
+      snap.forEach(d => latestSites.push({ id: d.id, data: d.data() }));
+      renderSites(snap.empty);
+    });
+
+    function siteNameExists(name, exceptId = null) {
+      const needle = name.trim().toLowerCase();
+      return latestSites.some(x => x.id !== exceptId && (x.data.name || "").trim().toLowerCase() === needle);
+    }
+
+    function renderSites() {
+      if (!latestSites.length) {
+        tbody.innerHTML = `<tr class="ks-empty-row"><td colspan="7">
           <div class="ks-empty">
             <div class="ks-empty-icon"><i class="fa-solid fa-map-location-dot"></i></div>
             <p class="ks-empty-title">No sites yet</p>
-            <p class="ks-empty-text">Add your first site above.</p>
+            <p class="ks-empty-text">Click <strong>Add site</strong> above to create your first one.</p>
           </div>
         </td></tr>`;
         return;
       }
       tbody.innerHTML = '';
-      snap.forEach(d => {
-        const s = d.data();
+      latestSites.forEach(({ id: siteId, data: s }) => {
+        const d = { id: siteId };
+        const userCount = siteUserCount.get(siteId) || 0;
         const isActive = s.active !== false;
         const radius = Number.isFinite(s.radiusMeters) ? s.radiusMeters : null;
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${escapeHtml(s.name || "")}</strong></td>
-          <td class="text-muted">${escapeHtml(s.address || "—")}</td>
-          <td class="text-muted"><code>${s.lat ?? "—"}, ${s.lng ?? "—"}</code></td>
-          <td>
+          <td data-label="Name"><strong>${escapeHtml(s.name || "")}</strong></td>
+          <td data-label="Address" class="text-muted">${escapeHtml(s.address || "—")}</td>
+          <td data-label="Lat, Lng" class="text-muted">${
+            (Number.isFinite(s.lat) && Number.isFinite(s.lng))
+              ? `<a href="#" data-open-map class="ks-latlng-link" title="Open in Google Maps"><code>${s.lat}, ${s.lng}</code> <i class="fa-solid fa-up-right-from-square" style="font-size:.7em;opacity:.6;"></i></a>`
+              : `<code>—, —</code>`
+          }</td>
+          <td data-label="Radius">
             ${radius
               ? `<span class="badge badge-info">${radius} m</span>`
               : `<span class="badge badge-pending" title="No geofence radius — Android app cannot restrict location"><i class="fa-solid fa-triangle-exclamation" style="font-size:.7em;"></i> unset</span>`}
-            <button class="btn btn-sm btn-outline-secondary" data-edit-radius style="margin-left:6px;padding:2px 8px;min-height:28px;font-size:.75rem;">Edit</button>
           </td>
-          <td>${isActive
+          <td data-label="Users">
+            ${userCount > 0
+              ? `<a href="users.html?site=${encodeURIComponent(siteId)}" class="badge badge-info" title="View ${userCount} assigned user${userCount === 1 ? "" : "s"}" style="text-decoration:none;"><i class="fa-solid fa-users" style="font-size:.7em;"></i> ${userCount}</a>`
+              : '<span class="badge badge-muted" title="No users assigned"><i class="fa-solid fa-user-slash" style="font-size:.7em;"></i> 0</span>'}
+          </td>
+          <td data-label="Status">${isActive
               ? '<span class="badge badge-approved"><i class="fa-solid fa-circle-check" style="font-size:.7em;"></i> Active</span>'
               : '<span class="badge badge-rejected"><i class="fa-solid fa-circle-xmark" style="font-size:.7em;"></i> Off</span>'}</td>
-          <td class="ks-table-actions">
-            <button class="btn btn-sm btn-outline-secondary" data-toggle>
-              <i class="fa-solid ${isActive ? "fa-toggle-on" : "fa-toggle-off"}"></i>
+          <td class="ks-table-actions ks-card-actions">
+            <button class="btn btn-sm btn-outline-primary" data-edit>
+              <i class="fa-solid fa-pen-to-square"></i> Edit
+            </button>
+            <button class="btn btn-sm ${isActive ? "btn-outline-warning" : "btn-success"}" data-toggle>
+              <i class="fa-solid ${isActive ? "fa-ban" : "fa-circle-check"}"></i>
               ${isActive ? "Disable" : "Enable"}
             </button>
+            <button class="btn btn-sm btn-outline-danger" data-delete title="Permanently delete this site">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
           </td>`;
-        tr.querySelector('[data-edit-radius]').onclick = async () => {
-          await openModal({
-            title: `Geofence radius — ${s.name || "site"}`,
+        tr.querySelector('[data-edit]').onclick = async () => {
+          // Initial switch state: honour the stored flag, but also default to
+          // ON for legacy docs that have valid coords+radius without the
+          // explicit field — otherwise saving would silently clear them.
+          const geoOn = s.geofenceEnabled === true
+            || (s.geofenceEnabled === undefined && Number.isFinite(s.lat) && Number.isFinite(s.lng) && Number.isFinite(s.radiusMeters));
+          const startLat = Number.isFinite(s.lat) ? s.lat : "";
+          const startLng = Number.isFinite(s.lng) ? s.lng : "";
+          const startRadius = Number.isFinite(s.radiusMeters) ? s.radiusMeters : 150;
+          const modalPromise = openModal({
+            title: `Edit site — ${s.name || ""}`,
             bodyHtml: `
-              <p class="text-muted small">Distance from the site's coordinates within which employees can punch. Typical range 50–500 m.</p>
-              <label class="ks-field-label" for="rad-input">Radius (metres)</label>
-              <input id="rad-input" type="number" min="10" step="10" class="form-control" value="${radius ?? 150}">
+              <div class="ks-form-grid">
+                <div>
+                  <label class="ks-field-label" for="edit-name">Name</label>
+                  <input id="edit-name" class="form-control" value="${escapeHtml(s.name || "")}" required>
+                </div>
+              </div>
+              <div class="ks-form-grid" style="margin-top:10px;">
+                <div>
+                  <label class="ks-field-label" for="edit-address">Address</label>
+                  <input id="edit-address" class="form-control" value="${escapeHtml(s.address || "")}">
+                </div>
+              </div>
+              <div class="ks-switch-row" style="margin-top:12px;">
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="edit-geo-on" ${geoOn ? "checked" : ""}>
+                  <label class="custom-control-label" for="edit-geo-on">Enable geofencing</label>
+                </div>
+              </div>
+              <div id="edit-geo-fields" ${geoOn ? "" : "hidden"}>
+                <label class="ks-field-label" for="edit-map-url">Google Maps URL <span class="text-muted" style="font-weight:400;">(optional helper)</span></label>
+                <input id="edit-map-url" type="text" class="form-control" placeholder="Paste a Google Maps link to auto-fill lat / lng" value="">
+                <div id="edit-map-feedback" class="small" style="margin-top:4px;"></div>
+                <div class="ks-form-grid ks-form-grid-2" style="margin-top:10px;">
+                  <div>
+                    <label class="ks-field-label" for="edit-lat">Latitude</label>
+                    <input id="edit-lat" type="number" step="any" min="-90" max="90" class="form-control" value="${startLat}">
+                  </div>
+                  <div>
+                    <label class="ks-field-label" for="edit-lng">Longitude</label>
+                    <input id="edit-lng" type="number" step="any" min="-180" max="180" class="form-control" value="${startLng}">
+                  </div>
+                </div>
+                <label class="ks-field-label" for="edit-radius" style="margin-top:10px;">Geofence radius (metres)</label>
+                <input id="edit-radius" type="number" min="10" step="10" class="form-control" value="${startRadius}">
+              </div>
             `,
             confirmLabel: "Save",
             onConfirm: async (modal) => {
-              const v = parseInt(modal.querySelector("#rad-input").value, 10);
-              if (!Number.isFinite(v) || v < 10) { showToast("Enter a radius ≥ 10 m", "warn"); return false; }
-              await updateDoc(doc(db, "attn_sites", d.id), { radiusMeters: v });
-              showToast(`Radius set to ${v} m`, "success");
+              const name = modal.querySelector("#edit-name").value.trim();
+              const address = modal.querySelector("#edit-address").value.trim();
+              if (!name) { showToast("Site name is required", "warn"); return false; }
+              if (siteNameExists(name, d.id)) {
+                showToast(`Another site is already named "${name}"`, "warn");
+                return false;
+              }
+
+              const geoNowOn = modal.querySelector("#edit-geo-on").checked;
+              const geoWasOn = s.geofenceEnabled === true;
+              const uc = siteUserCount.get(d.id) || 0;
+              if (geoWasOn && !geoNowOn && uc > 0) {
+                const warnOk = await openModal({
+                  title: "Disable geofencing?",
+                  bodyHtml: `
+                    <p><strong>${uc} user${uc === 1 ? " is" : "s are"}</strong> currently assigned to <strong>${escapeHtml(s.name || "this site")}</strong>.</p>
+                    <p>Turning off geofencing means the Android app will <strong>no longer restrict their punches by location</strong> at this site — they'll be able to punch in or out from anywhere.</p>
+                    <p class="text-muted small">You can re-enable geofencing later from the Edit modal.</p>
+                  `,
+                  confirmLabel: "Turn geofencing off",
+                  confirmClass: "btn btn-warning",
+                  onConfirm: () => true,
+                });
+                if (!warnOk) return false;
+              }
+
+              const payload = {
+                name,
+                address,
+                lat: null,
+                lng: null,
+                radiusMeters: null,
+                geofenceEnabled: false,
+              };
+
+              if (geoNowOn) {
+                const lat = parseFloat(modal.querySelector("#edit-lat").value);
+                const lng = parseFloat(modal.querySelector("#edit-lng").value);
+                if (!Number.isFinite(lat) || lat < -90 || lat > 90 ||
+                    !Number.isFinite(lng) || lng < -180 || lng > 180) {
+                  showToast("Enter a valid latitude (-90..90) and longitude (-180..180), or paste a Google Maps link to auto-fill", "warn");
+                  return false;
+                }
+                const r = parseInt(modal.querySelector("#edit-radius").value, 10);
+                if (!Number.isFinite(r) || r < 10) {
+                  showToast("Enter a geofence radius ≥ 10 m", "warn");
+                  return false;
+                }
+                payload.lat = lat;
+                payload.lng = lng;
+                payload.radiusMeters = r;
+                payload.geofenceEnabled = true;
+              }
+
+              await updateDoc(doc(db, "attn_sites", d.id), payload);
+              showToast("Site updated", "success");
             },
           });
+
+          // openModal inserts its DOM synchronously inside Promise's executor,
+          // so the modal nodes are already queryable here even though the
+          // promise above hasn't resolved. Wire listeners now.
+          const modalRoot = document.querySelector(".ks-modal-backdrop.open");
+          if (modalRoot) {
+            const sw = modalRoot.querySelector("#edit-geo-on");
+            const fields = modalRoot.querySelector("#edit-geo-fields");
+            const urlEl = modalRoot.querySelector("#edit-map-url");
+            const fb = modalRoot.querySelector("#edit-map-feedback");
+            sw?.addEventListener("change", () => { fields.hidden = !sw.checked; });
+            const latEl = modalRoot.querySelector("#edit-lat");
+            const lngEl = modalRoot.querySelector("#edit-lng");
+            urlEl?.addEventListener("input", () => {
+              const v = urlEl.value.trim();
+              if (!v) { fb.textContent = ""; fb.className = "small"; return; }
+              if (isShortMapsLink(v)) {
+                fb.textContent = "Short link detected — open it in Google Maps first and paste the full URL, or type lat / lng directly below.";
+                fb.className = "small warn"; return;
+              }
+              const p = parseLatLng(v);
+              if (p) {
+                if (latEl) latEl.value = p.lat;
+                if (lngEl) lngEl.value = p.lng;
+                fb.textContent = `Auto-filled: ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`;
+                fb.className = "small ok";
+              } else {
+                fb.textContent = "Couldn't find coordinates in this URL — you can still type lat / lng below.";
+                fb.className = "small warn";
+              }
+            });
+          }
+          await modalPromise;
         };
+        tr.querySelector('[data-delete]').onclick = async () => {
+          const uc = siteUserCount.get(d.id) || 0;
+          if (uc > 0) {
+            const userList = (siteUserNames.get(d.id) || []).slice(0, 8).map(n => escapeHtml(n)).join(", ");
+            const moreNote = uc > 8 ? ` and ${uc - 8} more` : "";
+            await openModal({
+              title: "Can't delete this site",
+              bodyHtml: `
+                <div class="alert alert-warning" style="padding:10px 12px;">
+                  <strong>${uc} user${uc === 1 ? " is" : "s are"}</strong> still assigned to <strong>${escapeHtml(s.name || "this site")}</strong>.
+                </div>
+                <p>Deleting would leave orphan references in attendance history and break their punch flow in the Android app.</p>
+                <p><strong>Assigned to:</strong> <em>${userList}${moreNote}</em></p>
+                <p class="text-muted small">Open each user from the <a href="users.html?site=${encodeURIComponent(d.id)}">Users page (filtered to this site)</a>, remove this site from their assignment, then try again.</p>
+              `,
+              confirmLabel: "",
+              cancelLabel: "Close",
+            });
+            return;
+          }
+          const expectedName = (s.name || "").trim();
+          const delModalPromise = openModal({
+            title: `Delete "${s.name || "this site"}"?`,
+            bodyHtml: `
+              <p>No users are assigned to this site. It will be <strong>permanently removed</strong> from the database.</p>
+              <p class="text-muted small">To confirm, type <code>${escapeHtml(expectedName)}</code> exactly:</p>
+              <input id="confirm-del-input" class="form-control" placeholder="${escapeHtml(expectedName)}" autocomplete="off">
+            `,
+            confirmLabel: "Delete permanently",
+            confirmClass: "btn btn-danger",
+            onConfirm: async (modal) => {
+              const typedName = modal.querySelector("#confirm-del-input").value.trim();
+              if (typedName !== expectedName) return false;
+              await deleteDoc(doc(db, "attn_sites", d.id));
+              showToast("Site deleted", "success");
+            },
+          });
+          // Swap the confirm button between two clearly distinct states so it's
+          // obvious whether the delete can be clicked. Default-browser-disabled
+          // on a red btn-danger reads as ambiguous — we switch the label, icon
+          // and colour instead of just dimming it.
+          const delModalRoot = document.querySelector(".ks-modal-backdrop.open");
+          if (delModalRoot) {
+            const inp = delModalRoot.querySelector("#confirm-del-input");
+            const confirmBtn = delModalRoot.querySelector("[data-confirm]");
+            if (inp && confirmBtn) {
+              const setArmed = (armed) => {
+                confirmBtn.disabled = !armed;
+                if (armed) {
+                  confirmBtn.className = "btn btn-danger";
+                  confirmBtn.style.cssText = "background:#dc3545;border-color:#dc3545;color:#fff;opacity:1;";
+                  confirmBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Delete permanently';
+                } else {
+                  confirmBtn.className = "btn";
+                  confirmBtn.style.cssText = "background:#e9ecef;border:1px solid #ced4da;color:#6c757d;opacity:1;cursor:not-allowed;";
+                  confirmBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Type the exact name to enable';
+                }
+              };
+              setArmed(false);
+              inp.addEventListener("input", () => setArmed(inp.value.trim() === expectedName));
+              setTimeout(() => inp.focus(), 60);
+            }
+          }
+          await delModalPromise;
+        };
+        const openMapLink = tr.querySelector('[data-open-map]');
+        if (openMapLink) {
+          openMapLink.onclick = async (ev) => {
+            ev.preventDefault();
+            await openModal({
+              title: "Open in Google Maps?",
+              bodyHtml: `
+                <p>Open <strong>${escapeHtml(s.name || "this site")}</strong> at <code>${s.lat}, ${s.lng}</code> in Google Maps?</p>
+                <p class="text-muted small">A new browser tab will open.</p>
+              `,
+              confirmLabel: "Open map",
+              onConfirm: () => {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`, "_blank", "noopener");
+              },
+            });
+          };
+        }
         tr.querySelector('[data-toggle]').onclick = async (ev) => {
           const btn = ev.currentTarget;
+          if (isActive) {
+            const confirmed = await openModal({
+              title: `Disable "${s.name || "this site"}"?`,
+              bodyHtml: `
+                <p>Employees assigned to this site won't be able to punch in or out until it's enabled again.</p>
+                <p class="text-muted small">You can re-enable it anytime from this page.</p>
+              `,
+              confirmLabel: "Disable site",
+              confirmClass: "btn btn-danger",
+              onConfirm: async () => {
+                await updateDoc(doc(db, "attn_sites", d.id), { active: false });
+                showToast("Site disabled", "success");
+              },
+            });
+            return;
+          }
           btn.disabled = true;
           try {
-            await updateDoc(doc(db, "attn_sites", d.id), { active: !isActive });
-            showToast(`Site ${!isActive ? "enabled" : "disabled"}`, "success");
+            await updateDoc(doc(db, "attn_sites", d.id), { active: true });
+            showToast("Site enabled", "success");
           } catch (e) {
             showToast(e.message, "danger");
             btn.disabled = false;
@@ -161,26 +627,57 @@
         };
         tbody.appendChild(tr);
       });
-    });
+    }
 
-    document.getElementById('new-site').onsubmit = async (e) => {
+    form.onsubmit = async (e) => {
       e.preventDefault();
-      const fd = new FormData(e.target);
-      const submit = e.target.querySelector('button[type=submit]');
+      const submit = form.querySelector('button[type=submit]');
+      const name = document.getElementById('site-name').value.trim();
+      const address = document.getElementById('site-address').value.trim();
+
+      if (!name) { showToast("Site name is required", "warn"); return; }
+      if (siteNameExists(name)) {
+        showToast(`A site named "${name}" already exists`, "warn");
+        return;
+      }
+
+      let payload = {
+        name,
+        address,
+        lat: null,
+        lng: null,
+        radiusMeters: null,
+        geofenceEnabled: false,
+        active: true,
+        createdAt: new Date(),
+      };
+
+      if (geoSwitch.checked) {
+        const lat = parseFloat(latInput.value);
+        const lng = parseFloat(lngInput.value);
+        if (!Number.isFinite(lat) || lat < -90 || lat > 90 ||
+            !Number.isFinite(lng) || lng < -180 || lng > 180) {
+          showToast("Enter a valid latitude (-90..90) and longitude (-180..180), or paste a Google Maps link to auto-fill", "warn");
+          return;
+        }
+        const radius = parseInt(radiusInput.value, 10);
+        if (!Number.isFinite(radius) || radius < 10) {
+          showToast("Enter a geofence radius ≥ 10 m", "warn");
+          return;
+        }
+        payload.lat = lat;
+        payload.lng = lng;
+        payload.radiusMeters = radius;
+        payload.geofenceEnabled = true;
+      }
+
       submit.disabled = true;
       try {
-        const radius = parseInt(fd.get('radiusMeters'), 10);
-        await addDoc(collection(db, "attn_sites"), {
-          name: fd.get('name'),
-          address: fd.get('address') || '',
-          lat: parseFloat(fd.get('lat')) || null,
-          lng: parseFloat(fd.get('lng')) || null,
-          radiusMeters: Number.isFinite(radius) && radius >= 10 ? radius : 150,
-          active: true,
-          createdAt: new Date(),
-        });
+        await addDoc(collection(db, "attn_sites"), payload);
         showToast("Site added", "success");
-        e.target.reset();
+        resetFormUI();
+        wrap.hidden = true;
+        btnShow.hidden = false;
       } catch (err) {
         showToast(err.message, "danger");
       } finally {

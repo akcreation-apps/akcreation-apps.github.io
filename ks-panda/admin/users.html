@@ -23,37 +23,43 @@
     </div>
 
     <div class="ks-panel" style="margin-bottom:16px;">
-      <div class="ks-form-grid ks-form-grid-4">
-        <div>
+      <div class="ks-search-row" style="display:flex;gap:8px;align-items:flex-end;">
+        <div style="flex:1 1 auto;min-width:0;">
           <label class="ks-field-label" for="flt-search">Search</label>
           <input class="form-control" id="flt-search" type="search" placeholder="Name or email…">
         </div>
-        <div>
-          <label class="ks-field-label" for="flt-role">Role</label>
-          <select class="form-control" id="flt-role">
-            <option value="">All roles</option>
-            <option value="employee">Employee</option>
-            <option value="manager">Manager</option>
-            <option value="admin">Admin</option>
-          </select>
+        <button type="button" id="btn-toggle-filters" class="btn btn-outline-secondary" aria-expanded="false" aria-controls="flt-advanced" title="Show filters" style="min-height:40px;position:relative;">
+          <i class="fa-solid fa-filter"></i>
+          <span class="d-none d-md-inline" style="margin-left:6px;">Filters</span>
+          <span id="flt-active-dot" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--brand,#c9111a);"></span>
+        </button>
+      </div>
+      <div id="flt-advanced" hidden style="margin-top:12px;">
+        <div class="ks-form-grid ks-form-grid-2">
+          <div>
+            <label class="ks-field-label" for="flt-role">Role</label>
+            <select class="form-control" id="flt-role">
+              <option value="">All roles</option>
+              <option value="employee">Employee</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div>
+            <label class="ks-field-label" for="flt-site">Site</label>
+            <select class="form-control" id="flt-site">
+              <option value="">All sites</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label class="ks-field-label" for="flt-status">Status</label>
-          <select class="form-control" id="flt-status">
-            <option value="">All statuses</option>
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-            <option value="disabled">Disabled</option>
-          </select>
-        </div>
-        <div>
-          <label class="ks-field-label" for="flt-site">Site</label>
-          <select class="form-control" id="flt-site">
-            <option value="">All sites</option>
-          </select>
+        <div style="margin-top:10px;">
+          <button type="button" id="btn-clear-filters" class="btn btn-sm btn-outline-secondary">
+            <i class="fa-solid fa-xmark"></i> Clear filters
+          </button>
         </div>
       </div>
+      <!-- Status is no longer part of the UI but kept in DOM for existing filter JS. -->
+      <select id="flt-status" hidden><option value="" selected></option></select>
       <div class="text-muted small" style="margin-top:8px;" id="flt-count">—</div>
     </div>
 
@@ -68,7 +74,7 @@
             <th class="ks-table-actions"></th>
           </tr></thead>
           <tbody id="tbody">
-            <tr><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
+            <tr class="ks-empty-row"><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -81,7 +87,7 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
-    import { collection, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
     setYear();
@@ -108,18 +114,22 @@
 
     const availableSites = [];
     const siteFilterEl = document.getElementById("flt-site");
+    const initialSiteFilter = new URLSearchParams(location.search).get("site") || "";
     onSnapshot(collection(db, "attn_sites"), (snap) => {
       availableSites.length = 0;
       snap.forEach(d => {
         const s = d.data();
         if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
       });
-      // Repopulate site filter preserving selection
-      const prev = siteFilterEl.value;
+      // Repopulate site filter preserving selection (or honouring ?site= deep-link)
+      const prev = siteFilterEl.value || initialSiteFilter;
       siteFilterEl.innerHTML = '<option value="">All sites</option>' +
         availableSites.map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)}</option>`).join("");
       siteFilterEl.value = prev;
       render();
+      // Deep-link populates the site dropdown asynchronously; refresh the
+      // filter-active indicator once we actually have the value set.
+      if (typeof refreshFilterIndicator === "function") refreshFilterIndicator();
     });
 
     let latestUsers = [];
@@ -134,10 +144,36 @@
     const roleEl = document.getElementById("flt-role");
     const statusEl = document.getElementById("flt-status");
     const countEl = document.getElementById("flt-count");
-    [searchEl, roleEl, statusEl, siteFilterEl].forEach(el => {
-      el.addEventListener("input", render);
-      el.addEventListener("change", render);
+    const advanced = document.getElementById("flt-advanced");
+    const toggleBtn = document.getElementById("btn-toggle-filters");
+    const activeDot = document.getElementById("flt-active-dot");
+    const clearBtn = document.getElementById("btn-clear-filters");
+
+    function refreshFilterIndicator() {
+      const hasActive = !!(roleEl.value || siteFilterEl.value);
+      activeDot.style.display = hasActive ? "" : "none";
+      toggleBtn.classList.toggle("btn-outline-secondary", !hasActive);
+      toggleBtn.classList.toggle("btn-primary", hasActive);
+    }
+    toggleBtn.addEventListener("click", () => {
+      const open = advanced.hidden;
+      advanced.hidden = !open;
+      toggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
     });
+    clearBtn.addEventListener("click", () => {
+      roleEl.value = "";
+      siteFilterEl.value = "";
+      render();
+      refreshFilterIndicator();
+    });
+    // Auto-open the panel if the page was deep-linked with ?site=…
+    if (initialSiteFilter) advanced.hidden = false;
+
+    [searchEl, roleEl, statusEl, siteFilterEl].forEach(el => {
+      el.addEventListener("input", () => { render(); refreshFilterIndicator(); });
+      el.addEventListener("change", () => { render(); refreshFilterIndicator(); });
+    });
+    refreshFilterIndicator();
 
     function applyFilters(users) {
       const term = searchEl.value.trim().toLowerCase();
@@ -158,7 +194,7 @@
 
     function render() {
       if (latestUsers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5">
+        tbody.innerHTML = `<tr class="ks-empty-row"><td colspan="5">
           <div class="ks-empty">
             <div class="ks-empty-icon"><i class="fa-solid fa-user-slash"></i></div>
             <p class="ks-empty-title">No users yet</p>
@@ -170,7 +206,7 @@
       const filtered = applyFilters(latestUsers);
       countEl.textContent = `${filtered.length} of ${latestUsers.length} users`;
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5">
+        tbody.innerHTML = `<tr class="ks-empty-row"><td colspan="5">
           <div class="ks-empty">
             <div class="ks-empty-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
             <p class="ks-empty-title">No matches</p>
@@ -194,7 +230,7 @@
             </div>`;
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>
+          <td data-label="User">
             <a href="employee.html?uid=${encodeURIComponent(u.id)}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;" title="View profile">
               <span class="ks-avatar" style="width:36px;height:36px;font-size:.85rem;">${initials(toTitleCase(u.name || "") || u.email || "?")}</span>
               <div>
@@ -203,22 +239,23 @@
               </div>
             </a>
           </td>
-          <td>
+          <td data-label="Role">
             <select class="form-control" data-role>
               <option value="employee"${u.role === 'employee' ? ' selected' : ''}>Employee</option>
               <option value="manager"${u.role === 'manager' ? ' selected' : ''}>Manager</option>
               <option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>
             </select>
           </td>
-          <td><span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span></td>
-          <td>${sitesCells}</td>
-          <td class="ks-table-actions">
+          <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span></td>
+          <td data-label="Sites">${sitesCells}</td>
+          <td class="ks-table-actions ks-card-actions">
             <button class="ks-icon-btn ks-icon-btn--primary" data-save style="display:none;" aria-label="Save" title="Save changes"><i class="fa-solid fa-floppy-disk"></i></button>
             ${u.status === "approved"
               ? '<button class="ks-icon-btn ks-icon-btn--reject" data-toggle-status style="margin-left:6px;" aria-label="Deactivate" title="Deactivate"><i class="fa-solid fa-user-slash"></i></button>'
               : u.status === "disabled"
               ? '<button class="ks-icon-btn ks-icon-btn--approve" data-toggle-status style="margin-left:6px;" aria-label="Reactivate" title="Reactivate"><i class="fa-solid fa-user-check"></i></button>'
               : ''}
+            <button class="ks-icon-btn ks-icon-btn--reject" data-delete style="margin-left:6px;" aria-label="Delete permanently" title="Delete permanently"><i class="fa-solid fa-trash"></i></button>
           </td>`;
         // Dirty tracking — Save button hidden until role or site assignment changes.
         const saveBtn = tr.querySelector('[data-save]');
@@ -266,14 +303,128 @@
             });
           };
         }
+        tr.querySelector('[data-delete]').onclick = async () => {
+          if (u.id === adminUid) {
+            showToast("You can't delete your own account", "warn");
+            return;
+          }
+          const displayName = toTitleCase(u.name || "") || u.email || "this user";
+          await openModal({
+            title: `Delete ${displayName}?`,
+            bodyHtml: `
+              <div class="alert alert-danger" style="padding:10px 12px;">
+                <strong>This is permanent.</strong> The user document, role, and site assignments will be wiped from the database.
+              </div>
+              <p>Any attendance punches they already made will keep the stored user ID but the profile linking that ID to a name will be gone.</p>
+              <p class="text-muted small">To confirm, type the email <code>${escapeHtml(u.email || "")}</code>:</p>
+              <input id="confirm-del-user" class="form-control" placeholder="${escapeHtml(u.email || "")}" autocomplete="off">
+            `,
+            confirmLabel: "Delete permanently",
+            confirmClass: "btn btn-danger",
+            onConfirm: async (modal) => {
+              const typed = modal.querySelector("#confirm-del-user").value.trim().toLowerCase();
+              if (typed !== (u.email || "").trim().toLowerCase()) {
+                showToast("Typed email doesn't match", "warn");
+                return false;
+              }
+              await deleteDoc(doc(db, "attn_users", u.id));
+              await addDoc(collection(db, "attn_auditLog"), {
+                actor: adminUid,
+                action: "deleteUser",
+                targetUser: u.id,
+                details: { email: u.email || null, name: u.name || null, role: u.role || null },
+                at: serverTimestamp(),
+              });
+              showToast(`${displayName} deleted`, "success");
+            },
+          });
+        };
         tr.querySelector('[data-save]').onclick = async (ev) => {
           const btn = ev.currentTarget;
           const role = tr.querySelector('[data-role]').value;
           const assignedSiteIds = Array.from(tr.querySelectorAll('[data-site]:checked')).map(x => x.value);
+          const removedSiteIds = (u.assignedSiteIds ?? []).filter(id => !assignedSiteIds.includes(id));
+
           btn.disabled = true;
           const original = btn.innerHTML;
           btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
           try {
+            // Safety net: if admin is removing a site at which the user is
+            // currently clocked in (last punch there is "in" with no later
+            // "out"), warn them and offer to force-unassign (which posts a
+            // synthetic punch-out at the current time, attributed to admin).
+            let openPunch = null; // { siteId, punchTs, punchId, siteName }
+            if (removedSiteIds.length) {
+              const punchesCol = collection(db, "attn_attendance", u.id, "punches");
+              const latestSnap = await getDocs(query(punchesCol, orderBy("ts", "desc"), limit(1)));
+              if (!latestSnap.empty) {
+                const latest = latestSnap.docs[0];
+                const data = latest.data();
+                const type = String(data.type || "").toLowerCase();
+                const isIn = type === "in" || type === "checkin" || type === "punchin";
+                if (isIn && removedSiteIds.includes(data.siteId)) {
+                  const siteName = availableSites.find(s => s.id === data.siteId)?.name || data.siteId;
+                  openPunch = {
+                    siteId: data.siteId,
+                    punchTs: data.ts?.toDate?.() ?? null,
+                    punchId: latest.id,
+                    siteName,
+                  };
+                }
+              }
+            }
+
+            if (openPunch) {
+              const sinceStr = openPunch.punchTs
+                ? openPunch.punchTs.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+                : "an earlier time";
+              const displayName = toTitleCase(u.name || "") || u.email || "This user";
+              const confirmed = await openModal({
+                title: `${displayName} is still punched in`,
+                bodyHtml: `
+                  <div class="alert alert-warning" style="padding:10px 12px;">
+                    They punched in at <strong>${escapeHtml(openPunch.siteName)}</strong> on <strong>${escapeHtml(sinceStr)}</strong> and haven't punched out yet.
+                  </div>
+                  <p>If you unassign this site now their shift will be left open. Choose <strong>Force unassign</strong> to also record a punch-out at the current time, attributed to you.</p>
+                  <p class="text-muted small">Picking Cancel keeps the site assigned so they can punch out from the app themselves.</p>
+                `,
+                confirmLabel: "Force unassign (adds punch-out now)",
+                confirmClass: "btn btn-warning",
+                onConfirm: () => true,
+              });
+              if (!confirmed) {
+                btn.disabled = false;
+                btn.innerHTML = original;
+                return;
+              }
+
+              // Post the admin punch-out *before* writing the assignment change
+              // so the attendance log is consistent even if the second write fails.
+              const now = new Date();
+              const outRef = await addDoc(collection(db, "attn_attendance", u.id, "punches"), {
+                ts: Timestamp.fromDate(now),
+                type: "out",
+                siteId: openPunch.siteId,
+                addedByAdmin: true,
+                addedBy: adminUid,
+                addedReason: `Auto punch-out: admin unassigned "${openPunch.siteName}" while user was still clocked in`,
+                addedAt: serverTimestamp(),
+              });
+              await addDoc(collection(db, "attn_auditLog"), {
+                actor: adminUid,
+                action: "forcePunchOutOnUnassign",
+                targetUser: u.id,
+                targetPunchId: outRef.id,
+                details: {
+                  siteId: openPunch.siteId,
+                  siteName: openPunch.siteName,
+                  openPunchId: openPunch.punchId,
+                  openSince: openPunch.punchTs?.toISOString() ?? null,
+                },
+                at: serverTimestamp(),
+              });
+            }
+
             await updateDoc(doc(db, "attn_users", u.id), { role, assignedSiteIds });
             showToast(`Saved ${toTitleCase(u.name || "") || "user"}`, "success");
           } catch (e) {

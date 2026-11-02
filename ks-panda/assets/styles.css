@@ -820,6 +820,97 @@ code { color: var(--brand); background: var(--brand-soft); padding: 2px 6px; bor
 .ks-table-actions { text-align: right; white-space: nowrap; }
 
 /* ============================================================
+   Mobile card layout — any .ks-table-wrap collapses to stacked
+   cards below 576px. Rendered <td> cells should carry a
+   data-label="…" attribute so each value picks up a small label.
+   The action cell should carry the .ks-card-actions class so its
+   buttons stack full-width at the bottom of each card.
+   ============================================================ */
+@media (max-width: 575.98px) {
+  .ks-table-wrap {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .ks-table-wrap .ks-table-scroll { overflow: visible; }
+  .ks-table-wrap .table { min-width: 0 !important; background: transparent; margin-bottom: 0; }
+  .ks-table-wrap table,
+  .ks-table-wrap thead,
+  .ks-table-wrap tbody,
+  .ks-table-wrap tr,
+  .ks-table-wrap td { display: block; width: 100%; }
+  .ks-table-wrap thead { display: none; }
+  .ks-table-wrap .table tbody tr {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.03);
+  }
+  .ks-table-wrap .table tbody tr:hover td { background: transparent; }
+  .ks-table-wrap .table tbody td {
+    border: 0 !important;
+    padding: 3px 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 0;
+    font-size: .88rem;
+    line-height: 1.35;
+  }
+  .ks-table-wrap .table tbody td > * { min-width: 0; }
+  .ks-table-wrap .table tbody td[data-label]::before {
+    content: attr(data-label);
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    font-weight: 600;
+    flex: 0 0 auto;
+  }
+  /* Right-align the value side of each row so label/value read as a tidy pair */
+  .ks-table-wrap .table tbody td { text-align: right; }
+  .ks-table-wrap .table tbody td[data-label]::before { text-align: left; }
+  .ks-table-wrap .table tbody td .badge { font-size: .7rem; padding: .25em .55em; }
+  .ks-table-wrap .table tbody td .form-control {
+    height: auto;
+    padding: 4px 8px;
+    font-size: .82rem;
+    max-width: 180px;
+    width: auto;
+  }
+  .ks-table-wrap .table tbody td .ks-chips { gap: 4px; justify-content: flex-end; }
+  .ks-table-wrap .table tbody td .ks-chip { font-size: .72rem; padding: 2px 8px; }
+  .ks-table-wrap .table tbody td.ks-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 8px !important;
+    margin-top: 6px;
+    border-top: 1px dashed var(--border) !important;
+  }
+  .ks-table-wrap .table tbody td.ks-card-actions::before { display: none; }
+  .ks-table-wrap .table tbody td.ks-card-actions .btn,
+  .ks-table-wrap .table tbody td.ks-card-actions .ks-icon-btn {
+    flex: 1 1 auto;
+    min-height: 36px;
+    font-size: .82rem;
+  }
+  .ks-table-wrap .table tbody td.ks-card-actions .ks-punch-actions {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+  }
+  .ks-table-wrap .table tbody td.ks-card-actions .ks-punch-actions .btn { flex: 1 1 auto; }
+  .ks-table-wrap .table tbody tr.ks-empty-row td { display: block; }
+  .ks-table-wrap .table tbody tr.ks-empty-row td::before { display: none; }
+}
+
+/* ============================================================
    Buttons — normalize Bootstrap + icon buttons
    ============================================================ */
 .btn { font-weight: 600; border-radius: 8px; transition: all .12s ease; }

@@ -33,7 +33,7 @@
             <th style="min-width:260px;">Details</th>
           </tr></thead>
           <tbody id="tbody">
-            <tr><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
+            <tr class="ks-empty-row"><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -92,7 +92,7 @@
     const q = query(collection(db, "attn_auditLog"), orderBy("at", "desc"), limit(200));
     onSnapshot(q, async (snap) => {
       if (snap.empty) {
-        tbody.innerHTML = `<tr><td colspan="5">
+        tbody.innerHTML = `<tr class="ks-empty-row"><td colspan="5">
           <div class="ks-empty">
             <div class="ks-empty-icon"><i class="fa-solid fa-clipboard"></i></div>
             <p class="ks-empty-title">Nothing logged yet</p>
@@ -107,14 +107,14 @@
         const tr = document.createElement('tr');
         const when = e.at?.toDate?.() ?? null;
         tr.innerHTML = `
-          <td>
+          <td data-label="When">
             <div>${when ? escapeHtml(fmtDate(when)) : ""}</div>
             <div class="text-muted small">${when ? escapeHtml(fmtTime(when)) : ""}</div>
           </td>
-          <td>${escapeHtml(await nameOf(e.actor))}</td>
-          <td>${actionBadge(e.action)}</td>
-          <td>${e.targetUser ? escapeHtml(await nameOf(e.targetUser)) : '<span class="text-muted">—</span>'}</td>
-          <td><code>${escapeHtml(JSON.stringify(e.details ?? {}))}</code></td>`;
+          <td data-label="Actor">${escapeHtml(await nameOf(e.actor))}</td>
+          <td data-label="Action">${actionBadge(e.action)}</td>
+          <td data-label="Target">${e.targetUser ? escapeHtml(await nameOf(e.targetUser)) : '<span class="text-muted">—</span>'}</td>
+          <td data-label="Details"><code>${escapeHtml(JSON.stringify(e.details ?? {}))}</code></td>`;
         tbody.appendChild(tr);
       }
     });

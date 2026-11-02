@@ -400,11 +400,11 @@
           if (p.addedByAdmin) flags.push('<span class="badge badge-info" title="Added by admin"><i class="fa-solid fa-plus" style="font-size:.65em;"></i> added</span>');
           return `
             <tr data-pid="${escapeHtml(p.id)}">
-              <td><span class="badge ${typeCls}"><i class="fa-solid ${typeIcon}" style="font-size:.7em;"></i> ${escapeHtml(p.type || "—")}</span></td>
-              <td><strong>${escapeHtml(timeStr(p.ts))}</strong></td>
-              <td class="text-muted">${escapeHtml(siteNameOf(p.siteId))}</td>
-              <td>${flags.join(" ") || '<span class="text-muted small">—</span>'}</td>
-              <td class="ks-table-actions">
+              <td data-label="Type"><span class="badge ${typeCls}"><i class="fa-solid ${typeIcon}" style="font-size:.7em;"></i> ${escapeHtml(p.type || "—")}</span></td>
+              <td data-label="Time"><strong>${escapeHtml(timeStr(p.ts))}</strong></td>
+              <td data-label="Site" class="text-muted">${escapeHtml(siteNameOf(p.siteId))}</td>
+              <td data-label="Flags">${flags.join(" ") || '<span class="text-muted small">—</span>'}</td>
+              <td class="ks-table-actions ks-card-actions">
                 <div class="ks-punch-actions">
                   <button class="btn btn-sm btn-outline-primary" data-edit title="Edit time"><i class="fa-solid fa-pen-to-square"></i></button>
                   <button class="btn btn-sm btn-outline-danger" data-delete title="Delete"><i class="fa-solid fa-trash"></i></button>

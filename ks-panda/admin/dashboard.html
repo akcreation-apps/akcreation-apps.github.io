@@ -343,26 +343,46 @@
     }
 
     function renderSiteHeadcount(byUid) {
-      const perSite = new Map();
+      // Punched-in count per site: only users whose LAST punch today is an
+      // "in" (currently clocked in). byUid arrays are sorted ascending, so
+      // the latest punch is at the end — not punches[0].
+      const punchedBySite = new Map();
       for (const punches of byUid.values()) {
-        const sid = punches[0]?.siteId;
+        if (!punches || punches.length === 0) continue;
+        const last = punches[punches.length - 1];
+        if (!isIn(last.type)) continue;
+        const sid = last.siteId;
         if (!sid) continue;
-        perSite.set(sid, (perSite.get(sid) || 0) + 1);
+        punchedBySite.set(sid, (punchedBySite.get(sid) || 0) + 1);
       }
-      // Include every known site, even those with zero punches today —
-      // admin can still drill in to see who's assigned but absent.
-      for (const sid of allSites.keys()) {
-        if (!perSite.has(sid)) perSite.set(sid, 0);
+      // Total assigned per site — only approved users count towards the
+      // denominator, matching how the KPI tiles above interpret "active".
+      const assignedBySite = new Map();
+      for (const u of allUsers) {
+        if (u.status !== "approved") continue;
+        const ids = Array.isArray(u.assignedSiteIds) ? u.assignedSiteIds : [];
+        ids.forEach(sid => {
+          assignedBySite.set(sid, (assignedBySite.get(sid) || 0) + 1);
+        });
       }
+      // Include every known site, even those with zero of either.
+      const siteIds = new Set([...allSites.keys(), ...punchedBySite.keys(), ...assignedBySite.keys()]);
       const el = document.getElementById("site-headcount");
-      if (perSite.size === 0) {
+      if (siteIds.size === 0) {
         el.innerHTML = `<p class="text-muted small mb-0">No sites configured yet.</p>`;
         return;
       }
       const chips = [];
-      for (const [sid, count] of perSite.entries()) {
+      for (const sid of siteIds) {
         const name = allSites.get(sid)?.name ?? sid;
-        chips.push(`<button type="button" class="ks-site-chip" data-site-id="${escapeHtml(sid)}" style="border:none;cursor:pointer;" title="Click for details"><i class="fa-solid fa-location-dot text-muted"></i> ${escapeHtml(name)} · <strong>${count}</strong></button>`);
+        const punched = punchedBySite.get(sid) || 0;
+        const assigned = assignedBySite.get(sid) || 0;
+        // Colour the ratio to signal coverage at a glance.
+        let ratioClass = "text-muted";
+        if (assigned > 0 && punched === assigned) ratioClass = "text-success";
+        else if (assigned > 0 && punched > 0) ratioClass = "text-warning";
+        else if (assigned > 0 && punched === 0) ratioClass = "text-danger";
+        chips.push(`<button type="button" class="ks-site-chip" data-site-id="${escapeHtml(sid)}" style="border:none;cursor:pointer;" title="${punched} punched in of ${assigned} assigned"><i class="fa-solid fa-location-dot text-muted"></i> ${escapeHtml(name)} · <strong class="${ratioClass}">${punched}/${assigned}</strong></button>`);
       }
       el.innerHTML = `<div class="ks-site-chips">${chips.join("")}</div>`;
       el.querySelectorAll("[data-site-id]").forEach(btn => {
@@ -388,14 +408,16 @@
       for (const u of assignedUsers) {
         const punches = lastByUid.get(u.id);
         if (!punches || punches.length === 0) { assignedNoPunch.push(u); continue; }
-        const siteToday = punches[0].siteId;
+        const latest = punches[punches.length - 1];
+        const siteToday = latest.siteId;
         if (siteToday === siteId) assignedPunchedHere.push(u);
         else assignedPunchedElsewhere.push({ u, actualSiteId: siteToday });
       }
       const assignedIds = new Set(assignedUsers.map(u => u.id));
       for (const [uid, punches] of lastByUid.entries()) {
         if (assignedIds.has(uid)) continue;
-        if (punches[0]?.siteId === siteId) {
+        const latest = punches[punches.length - 1];
+        if (latest?.siteId === siteId) {
           const u = allUsers.find(x => x.id === uid);
           if (u) unassignedPunchedHere.push(u);
         }
