@@ -1535,6 +1535,8 @@ button.fab:hover { background: var(--brand-dark); }
 .payout-chip--ok i { color: var(--chip-dlv-fg); }
 .payout-chip--warn { background: var(--chip-new-bg); color: var(--chip-new-fg); }
 .payout-chip--warn i { color: var(--chip-new-fg); }
+.payout-chip--danger { background: var(--chip-cnl-bg); color: var(--chip-cnl-fg); }
+.payout-chip--danger i { color: var(--chip-cnl-fg); }
 .payout-chip--projection {
   background: linear-gradient(135deg, #FF6B35 0%, #F97316 100%);
   color: #fff;

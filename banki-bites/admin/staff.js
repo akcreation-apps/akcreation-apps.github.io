@@ -318,6 +318,29 @@ function renderCard(db, root, uid, s) {
   const paid    = mine.filter(isPayoutPaid).reduce((sum, o) => sum + feeForOrder(o, _staffFeeRules), 0);
   const pending = earned - paid;
 
+  // On-time % for the current calendar month — mirrors the formula in
+  // /banki-bites/delivery/app.js (renderEarnings). Denominator = deliveries
+  // this month that have both `eta` and `delivered_at` recorded; isOnTime
+  // returns null otherwise, which keeps synthetic grocery-run rows out of
+  // the ratio automatically.
+  const monthStartForOT = startOfCurrentMonth(new Date());
+  let onTimeN = 0, onTimeD = 0;
+  for (const o of mine) {
+    const d = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+    if (!d || d < monthStartForOT) continue;
+    const flag = isOnTime(o);
+    if (flag === null) continue;
+    onTimeD++;
+    if (flag) onTimeN++;
+  }
+  const onTimePct = onTimeD > 0 ? Math.round((onTimeN / onTimeD) * 100) : null;
+  const onTimeChipMod = onTimePct === null
+    ? ''
+    : onTimePct >= 90 ? 'payout-chip--ok'
+    : onTimePct >= 75 ? 'payout-chip--warn'
+    : 'payout-chip--danger';
+  const onTimeChip = `<div class="payout-chip ${onTimeChipMod}" title="${onTimePct === null ? 'No ETA data this month' : `${onTimeN} of ${onTimeD} deliveries on-time this month`}"><i class="fas fa-stopwatch"></i> On-time ${onTimePct === null ? '—' : onTimePct + '%'}${onTimeD > 0 ? ` <span class="payout-chip-sub">(${onTimeN}/${onTimeD})</span>` : ''}</div>`;
+
   // Straight-line projection of month-to-date earnings to a full-month
   // estimate. Uses delivered_at (falls back to created_at) so the run rate
   // reflects when the partner was actually paid for the drop, not when the
@@ -349,6 +372,7 @@ function renderCard(db, root, uid, s) {
       <div class="payout-chip payout-chip--ok"><i class="fas fa-circle-check"></i> Paid ${fmtINR(paid)}</div>
       <div class="payout-chip payout-chip--warn"><i class="fas fa-hourglass-half"></i> Pending ${fmtINR(pending)}</div>
       <div class="payout-chip payout-chip--projection" title="Straight-line projection of this month's earnings at the current run rate"><i class="fas fa-chart-line"></i> Projected ${fmtINR(projectedMonthly)} <span class="payout-chip-sub">/ month</span></div>
+      ${onTimeChip}
     </div>
     <details class="payouts-block">
       <summary><i class="fas fa-list-check"></i> Earnings &amp; Payouts</summary>
