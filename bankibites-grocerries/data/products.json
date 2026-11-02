@@ -159,7 +159,7 @@
                   "mrp": 295,
                   "vendor_price": 261.17,
                   "image": "images/products/CERELAC STG 4 MU Fruit 24x300g WS N1 IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -384,7 +384,7 @@
                   "mrp": 190,
                   "vendor_price": 168.21,
                   "image": "images/products/NESTUM STAGE 1 Rice BIB 24x325g IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -402,7 +402,7 @@
                   "mrp": 210,
                   "vendor_price": 185.92,
                   "image": "images/products/NESTUM STA2 Rice Vegetables BIB24x325gIN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -420,7 +420,7 @@
                   "mrp": 230,
                   "vendor_price": 203.62,
                   "image": "images/products/NESTUM STAGE 3 Rice Frt BIB 24x325g IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -610,8 +610,8 @@
                 {
                   "id": 2195,
                   "unit": "400G",
-                  "price": 551,
-                  "mrp": 595,
+                  "price": 555,
+                  "mrp": 599,
                   "vendor_price": 515.69,
                   "image": "images/products/MOTHERS HLX KESAR 400G BIB.webp",
                   "inStock": true
@@ -646,8 +646,8 @@
                 {
                   "id": 2198,
                   "unit": "1KG",
-                  "price": 399,
-                  "mrp": 430,
+                  "price": 408,
+                  "mrp": 440,
                   "vendor_price": 372.69,
                   "image": "images/products/HORLICS 1KG.webp",
                   "inStock": true
@@ -754,7 +754,7 @@
                   "mrp": 10,
                   "vendor_price": 8.6,
                   "image": "images/products/KIT KAT 2F MINI 24(42x12.1g) IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -790,7 +790,7 @@
                   "mrp": 25,
                   "vendor_price": 21.38,
                   "image": "images/products/KIT KAT 3F 18(28x28.5g) IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -808,7 +808,7 @@
                   "mrp": 25,
                   "vendor_price": 21.27,
                   "image": "images/products/KIT KAT 3F Duo 18(28x28.5g) IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -844,7 +844,7 @@
                   "mrp": 50,
                   "vendor_price": 42.77,
                   "image": "images/products/KIT KAT 2x3F 18(14x(2x28.5g))N1 IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -862,7 +862,7 @@
                   "mrp": 185,
                   "vendor_price": 157.43,
                   "image": "images/products/KIT KAT Gooey Salted Crml 10(6x112g) IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -880,7 +880,7 @@
                   "mrp": 95,
                   "vendor_price": 80.84,
                   "image": "images/products/KIT KAT Tablet Dark 12(12x50g)N3 IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -898,7 +898,7 @@
                   "mrp": 90,
                   "vendor_price": 76.59,
                   "image": "images/products/KIT KAT Tablet Rich Choc 12(12x50g)N5 IN.webp",
-                  "inStock": true
+                  "inStock": false
                 },
                 {
                   "id": 1038,
@@ -907,7 +907,7 @@
                   "mrp": 210,
                   "vendor_price": 178.7,
                   "image": "images/products/KIT KAT Tablet Rich Choc 10(6x150g)N5 IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -1047,7 +1047,7 @@
                   "mrp": 120,
                   "vendor_price": 0,
                   "image": "images/products/KISAN FRESH TOMATO KETHUP 500G.webp",
-                  "inStock": true
+                  "inStock": false
                 },
                 {
                   "id": 2060,
@@ -1056,7 +1056,7 @@
                   "mrp": 170,
                   "vendor_price": 0,
                   "image": "images/products/KISSAN FTK 1KG PRICEDROP-RJP NS.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -1299,7 +1299,7 @@
                   "mrp": 47,
                   "vendor_price": 38.2,
                   "image": "images/products/S&J Ginger Garlic Paste 200g New.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -1317,7 +1317,7 @@
                   "mrp": 190,
                   "vendor_price": 154.75,
                   "image": "images/products/MAGGI HOT & SWEET 12x1Kg N1 IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -1398,7 +1398,7 @@
                   "mrp": 46,
                   "vendor_price": 0,
                   "image": "images/products/HELLMANNS MAYO ROASTED GARLIC 85GM RSL.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -1416,7 +1416,7 @@
                   "mrp": 46,
                   "vendor_price": 0,
                   "image": "images/products/HELLMANNS MAYO SMOKY TANDOORI 85GM RSL.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -1434,7 +1434,7 @@
                   "mrp": 40,
                   "vendor_price": 0,
                   "image": "images/products/HELLMANNS MAYO 85GM RSL.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             }
@@ -1741,7 +1741,7 @@
                   "mrp": 65,
                   "vendor_price": 0,
                   "image": "images/products/LIPTON GRN TULSI NAT 1.3GX10S TBV.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -1755,8 +1755,8 @@
                 {
                   "id": 2122,
                   "unit": "250G",
-                  "price": 100,
-                  "mrp": 110,
+                  "price": 82,
+                  "mrp": 90,
                   "vendor_price": 0,
                   "image": "images/products/RED LABEL DUST ODISHA P 250GM.webp",
                   "inStock": true
@@ -1894,7 +1894,7 @@
                   "mrp": 30,
                   "vendor_price": 0,
                   "image": "images/products/TAAZA MASALACHASKA ELAICHI100GPPD.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -2041,7 +2041,7 @@
             {
               "id": 1056,
               "name": "Nescafe Sunrise Sachet Stick",
-              "featured": false,
+              "featured": true,
               "deal": false,
               "image": "images/products/NESC Sunrise Sac Stk 30(156x1g)NWNR4 IN.webp",
               "variants": [
@@ -2059,7 +2059,7 @@
             {
               "id": 1057,
               "name": "Nescafe Classic Stick",
-              "featured": true,
+              "featured": false,
               "deal": false,
               "image": "images/products/NESCAFE Classic Stick 96(144x1g) IN.webp",
               "variants": [
@@ -2070,7 +2070,7 @@
                   "mrp": 2,
                   "vendor_price": 1.77,
                   "image": "images/products/NESCAFE Classic Stick 96(144x1g) IN.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -2203,7 +2203,7 @@
             {
               "id": 3027,
               "name": "Tata Coffee All-in-1 Premix",
-              "featured": true,
+              "featured": false,
               "deal": false,
               "image": "images/products/Tata Coffee All in 1 Premix 16g Sachet.webp",
               "variants": [
@@ -2214,7 +2214,7 @@
                   "mrp": 10,
                   "vendor_price": 9.55,
                   "image": "images/products/Tata Coffee All in 1 Premix 16g Sachet.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             }
@@ -2305,7 +2305,7 @@
                 {
                   "id": 3006,
                   "unit": "500G",
-                  "price": 75,
+                  "price": 85,
                   "mrp": 110,
                   "vendor_price": 0,
                   "image": "images/products/OI Jaggery Powder 500g.webp",
@@ -2318,7 +2318,7 @@
                   "mrp": 220,
                   "vendor_price": 0,
                   "image": "images/products/OI Jaggery Powder 1Kg.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -2332,8 +2332,8 @@
                 {
                   "id": 3014,
                   "unit": "250G",
-                  "price": 123,
-                  "mrp": 135,
+                  "price": 128,
+                  "mrp": 140,
                   "vendor_price": 117.2,
                   "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
                   "inStock": true
@@ -2354,14 +2354,14 @@
                   "mrp": 120,
                   "vendor_price": 85.95,
                   "image": "images/products/OI Desi Khandsari Sugar 500G.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
             {
               "id": 3022,
               "name": "OI Pink Rock Salt",
-              "featured": true,
+              "featured": false,
               "deal": false,
               "image": "images/products/OI PINK ROCK SALT 1KG.webp",
               "variants": [
@@ -2372,7 +2372,7 @@
                   "mrp": 150,
                   "vendor_price": 105.05,
                   "image": "images/products/OI PINK ROCK SALT 1KG.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -2415,7 +2415,7 @@
             {
               "id": 3029,
               "name": "Moong Dal (Muga Dali)",
-              "featured": true,
+              "featured": false,
               "deal": false,
               "image": "images/products/MOONG DAL 25 x 1Kg.webp",
               "variants": [
@@ -2426,7 +2426,7 @@
                   "mrp": 223,
                   "vendor_price": 181.45,
                   "image": "images/products/MOONG DAL 25 x 1Kg.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -2451,7 +2451,7 @@
             {
               "id": 3035,
               "name": "Tata Himalayan Rock Salt",
-              "featured": true,
+              "featured": false,
               "deal": false,
               "image": "images/products/TATA HIMALAYAN ROCK SALT 18x1KG Bag.webp",
               "variants": [
@@ -2462,7 +2462,7 @@
                   "mrp": 120,
                   "vendor_price": 95.5,
                   "image": "images/products/TATA HIMALAYAN ROCK SALT 18x1KG Bag.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -2639,7 +2639,7 @@
                   "mrp": 55,
                   "vendor_price": 0,
                   "image": "images/products/CAC HAIR OIL 75M.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -2657,7 +2657,7 @@
                   "mrp": 189,
                   "vendor_price": 0,
                   "image": "images/products/DOVE DAILY SHINE MID SHAMPOO 180ML.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -3243,8 +3243,8 @@
                 {
                   "id": 2088,
                   "unit": "400G",
-                  "price": 93,
-                  "mrp": 100,
+                  "price": 97,
+                  "mrp": 104,
                   "vendor_price": 0,
                   "image": "images/products/LUX ADVANCED RADIANT GLOW 100G B3G1.webp",
                   "inStock": true
@@ -3401,8 +3401,8 @@
                 {
                   "id": 2046,
                   "unit": "80G",
-                  "price": 192,
-                  "mrp": 211,
+                  "price": 205,
+                  "mrp": 225,
                   "vendor_price": 0,
                   "image": "images/products/GAL MV 80G.webp",
                   "inStock": true
@@ -4035,7 +4035,7 @@
                   "mrp": 110,
                   "vendor_price": 0,
                   "image": "images/products/PONDS ALOE COOLING TALC 100G.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4049,8 +4049,8 @@
                 {
                   "id": 2019,
                   "unit": "80G",
-                  "price": 93,
-                  "mrp": 102,
+                  "price": 107,
+                  "mrp": 118,
                   "vendor_price": 0,
                   "image": "images/products/PONDS DF POWDER 80G.webp",
                   "inStock": true
@@ -4058,8 +4058,8 @@
                 {
                   "id": 2020,
                   "unit": "200G",
-                  "price": 230,
-                  "mrp": 253,
+                  "price": 253,
+                  "mrp": 278,
                   "vendor_price": 0,
                   "image": "images/products/PONDS DF POWDER 200G.webp",
                   "inStock": true
@@ -4067,8 +4067,8 @@
                 {
                   "id": 2021,
                   "unit": "300G",
-                  "price": 304,
-                  "mrp": 334,
+                  "price": 364,
+                  "mrp": 400,
                   "vendor_price": 0,
                   "image": "images/products/PONDS DF POWDER 300G.webp",
                   "inStock": true
@@ -4130,8 +4130,8 @@
                 {
                   "id": 2016,
                   "unit": "80G",
-                  "price": 117,
-                  "mrp": 128,
+                  "price": 123,
+                  "mrp": 135,
                   "vendor_price": 0,
                   "image": "images/products/PONDS MAGIC POWDER 80G.webp",
                   "inStock": true
@@ -4143,7 +4143,7 @@
                   "mrp": 420,
                   "vendor_price": 0,
                   "image": "images/products/PONDS MAGIC POWDR 300G.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4161,7 +4161,7 @@
                   "mrp": 408,
                   "vendor_price": 0,
                   "image": "images/products/PONDS MGK TAL 400G.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4274,8 +4274,8 @@
                 {
                   "id": 2117,
                   "unit": "80G",
-                  "price": 117,
-                  "mrp": 128,
+                  "price": 123,
+                  "mrp": 135,
                   "vendor_price": 0,
                   "image": "images/products/PONDS SANDAL POWDER 80G.webp",
                   "inStock": true
@@ -4287,7 +4287,7 @@
                   "mrp": 440,
                   "vendor_price": 0,
                   "image": "images/products/PONDS SANDAL POWDER 300G.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4310,8 +4310,8 @@
                 {
                   "id": 2023,
                   "unit": "80G",
-                  "price": 107,
-                  "mrp": 117,
+                  "price": 123,
+                  "mrp": 135,
                   "vendor_price": 0,
                   "image": "images/products/PONDS SATRLT POWDER 80G.webp",
                   "inStock": true
@@ -4332,7 +4332,7 @@
                   "mrp": 25,
                   "vendor_price": 0,
                   "image": "images/products/RAB SAPPHIRE FW 250G.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4391,8 +4391,8 @@
                 {
                   "id": 2179,
                   "unit": "10G",
-                  "price": 60,
-                  "mrp": 65,
+                  "price": 64,
+                  "mrp": 70,
                   "vendor_price": 0,
                   "image": "images/products/VASELINE LIP CR RL 10G.webp",
                   "inStock": true
@@ -4431,7 +4431,7 @@
                   "mrp": 435,
                   "vendor_price": 395.45,
                   "image": "images/products/VDM LOTION 400ML WITH PSLG 50ML.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4445,8 +4445,8 @@
                 {
                   "id": 2209,
                   "unit": "20G",
-                  "price": 52,
-                  "mrp": 57,
+                  "price": 54,
+                  "mrp": 60,
                   "vendor_price": 51.82,
                   "image": "images/products/VPJ 20G.webp",
                   "inStock": true
@@ -4454,8 +4454,8 @@
                 {
                   "id": 2210,
                   "unit": "40G",
-                  "price": 87,
-                  "mrp": 95,
+                  "price": 94,
+                  "mrp": 104,
                   "vendor_price": 86.36,
                   "image": "images/products/VPJ 20G.webp",
                   "inStock": true
@@ -4494,7 +4494,7 @@
                   "mrp": 435,
                   "vendor_price": 0,
                   "image": "images/products/VSL COCOA GLOW LT 400ML.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             }
@@ -4576,8 +4576,8 @@
                 {
                   "id": 2175,
                   "unit": "480G",
-                  "price": 49,
-                  "mrp": 55,
+                  "price": 58,
+                  "mrp": 65,
                   "vendor_price": 0,
                   "image": "images/products/VIM BAR TUB 480G WITH NKED SCRUB PD.webp",
                   "inStock": true
@@ -4598,7 +4598,7 @@
                   "mrp": 65,
                   "vendor_price": 0,
                   "image": "images/products/VIM BAR TUB AS 500G.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4616,7 +4616,7 @@
                   "mrp": 109,
                   "vendor_price": 0,
                   "image": "images/products/VIM DROP DISH WASH POUCH 500 ML.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4641,7 +4641,7 @@
             {
               "id": 2172,
               "name": "Vim Liquid Pouch Spouted",
-              "featured": true,
+              "featured": false,
               "deal": false,
               "image": "images/products/VIM LQD POUCH 900MLSPOUTED.webp",
               "variants": [
@@ -4652,7 +4652,7 @@
                   "mrp": 205,
                   "vendor_price": 0,
                   "image": "images/products/VIM LQD POUCH 900MLSPOUTED.webp",
-                  "inStock": true
+                  "inStock": false
                 },
                 {
                   "id": 2174,
@@ -4661,7 +4661,7 @@
                   "mrp": 445,
                   "vendor_price": 0,
                   "image": "images/products/VIM LIQ POUCH 2LTR SPOUTED.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4679,7 +4679,7 @@
                   "mrp": 415,
                   "vendor_price": 0,
                   "image": "images/products/VIM LIQUID BOTTLE 1.8LTR.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4837,7 +4837,7 @@
                   "mrp": 105,
                   "vendor_price": 0,
                   "image": "images/products/SURF EXCEL E.WASH DETERGENT LIQUID 500ML.webp",
-                  "inStock": true
+                  "inStock": false
                 },
                 {
                   "id": 2128,
@@ -4846,7 +4846,7 @@
                   "mrp": 205,
                   "vendor_price": 0,
                   "image": "images/products/SURF EXCEL EASYWASH DETERGNT LIQUID 1LTR.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4864,7 +4864,7 @@
                   "mrp": 273,
                   "vendor_price": 0,
                   "image": "images/products/SURF EXCEL MATIC LQD BVI POUCH TL 1.8KG.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4878,8 +4878,8 @@
                 {
                   "id": 2130,
                   "unit": "1KG",
-                  "price": 138,
-                  "mrp": 149,
+                  "price": 147,
+                  "mrp": 159,
                   "vendor_price": 0,
                   "image": "images/products/SURF XL MTC LIQ TL 1KG POUCH NS.webp",
                   "inStock": true
@@ -4900,7 +4900,7 @@
                   "mrp": 270,
                   "vendor_price": 0,
                   "image": "images/products/SURF XL MTK PWD POLY TL 1KG OFFER S.webp",
-                  "inStock": true
+                  "inStock": false
                 }
               ]
             },
@@ -4914,8 +4914,8 @@
                 {
                   "id": 2207,
                   "unit": "2KG",
-                  "price": 145,
-                  "mrp": 156,
+                  "price": 153,
+                  "mrp": 170,
                   "vendor_price": 144.44,
                   "image": "images/products/WHEEL L&O PWDR A+ 2KG NILE.webp",
                   "inStock": true
