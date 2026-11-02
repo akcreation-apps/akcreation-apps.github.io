@@ -195,12 +195,14 @@
     /* Modal */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(15,23,42,0.5);
-      display: none; align-items: center; justify-content: center; z-index: 1000;
+      display: none; align-items: flex-start; justify-content: center; z-index: 1000;
+      overflow-y: auto; padding: 24px 16px; -webkit-overflow-scrolling: touch;
     }
     .modal-backdrop.open { display: flex; }
     .modal {
       background: var(--surface); border-radius: 12px; padding: 24px;
       width: min(500px, calc(100% - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      max-height: calc(100vh - 48px); overflow-y: auto; margin: auto;
     }
     .modal h3 { color: var(--ink); font-size: 1.05rem; margin-bottom: 8px; }
     .modal p { color: var(--text); font-size: 0.9rem; margin-bottom: 16px; }
@@ -335,6 +337,7 @@
     <div class="modal">
       <h3>Add product</h3>
       <p>Only id &amp; image are locked. Fill the rest and adjust later.</p>
+      <div class="field"><label>ID (auto-incremented — edit only if you know what you're doing)</label><input id="npId" type="number" min="1" step="1"></div>
       <div class="field"><label>Name</label><input id="npName" placeholder="e.g. Kissan Fresh Tomato Ketchup"></div>
       <div class="field"><label>Vendor Price (₹)</label><input id="npVendorPrice" type="number" min="0" step="0.5"></div>
       <div class="field"><label>MRP (₹)</label><input id="npMrp" type="number" min="0" step="0.5"></div>
@@ -987,11 +990,20 @@
 
   function openAddProduct(cat) {
     ['npName', 'npMrp', 'npPrice', 'npVendorPrice', 'npUnit', 'npImage'].forEach(id => ($('#' + id).value = ''));
+    // Pre-fill the ID field with the next auto-incremented value so the user
+    // sees what will be assigned; they can still override it before saving.
+    $('#npId').value = nextId();
     $('#addProdModal').classList.add('open');
     $('#npName').focus();
     $('#npSave').onclick = () => {
       const name = $('#npName').value.trim();
       if (!name) { $('#npName').focus(); return; }
+      const id = Number($('#npId').value) || nextId();
+      // Reject collisions so we never silently overwrite an existing product.
+      const idTaken = data.categories.some((c) =>
+        c.subcategories.some((s) => s.dishes.some((d) => Number(d.id) === id))
+      );
+      if (idTaken) { alert(`ID ${id} is already in use. Pick a different one.`); $('#npId').focus(); return; }
       const mrp = Number($('#npMrp').value) || 0;
       const price = Number($('#npPrice').value) || mrp;
       const vendor_price = Number($('#npVendorPrice').value) || 0;
@@ -1000,7 +1012,7 @@
       const sub = cat.subcategories[0];
       if (!sub) { alert('This category has no sub-container; add one first (via JSON)'); return; }
       sub.dishes.unshift({
-        id: nextId(), name, price, mrp, vendor_price, unit, image,
+        id, name, price, mrp, vendor_price, unit, image,
         inStock: true, featured: false, deal: false,
       });
       $('#addProdModal').classList.remove('open');
@@ -1090,14 +1102,22 @@
     loadData();
   });
 
-  // Close modals on backdrop click
+  // Close modals on backdrop click — except the Add product modal, which must
+  // only close via its Save or Cancel buttons so a stray outside click can't
+  // discard a half-filled form.
   document.querySelectorAll('.modal-backdrop').forEach((m) => {
+    if (m.id === 'addProdModal') return;
     m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); });
   });
 
-  // Escape closes modals
+  // Escape closes modals — same exclusion for the Add product modal.
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-backdrop.open').forEach((m) => {
+        if (m.id === 'addProdModal') return;
+        m.classList.remove('open');
+      });
+    }
   });
 
   // ==============================================================
