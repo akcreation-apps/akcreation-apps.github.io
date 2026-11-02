@@ -1692,6 +1692,24 @@
           "name": "Tea & Tea Products",
           "dishes": [
             {
+              "id": 3014,
+              "name": "Tata Gold Leaf Cathedral Pack",
+              "featured": false,
+              "deal": false,
+              "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
+              "variants": [
+                {
+                  "id": 3014,
+                  "unit": "250G",
+                  "price": 128,
+                  "mrp": 140,
+                  "vendor_price": 117.2,
+                  "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
+                  "inStock": true
+                }
+              ]
+            },
+            {
               "id": 2066,
               "name": "Lipton Green Honey Lemon Tea Bags",
               "featured": true,
@@ -2319,24 +2337,6 @@
                   "vendor_price": 0,
                   "image": "images/products/OI Jaggery Powder 1Kg.webp",
                   "inStock": false
-                }
-              ]
-            },
-            {
-              "id": 3014,
-              "name": "Tata Gold Leaf Cathedral Pack",
-              "featured": false,
-              "deal": false,
-              "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
-              "variants": [
-                {
-                  "id": 3014,
-                  "unit": "250G",
-                  "price": 128,
-                  "mrp": 140,
-                  "vendor_price": 117.2,
-                  "image": "images/products/Tata Gold Leaf 250gm Cathedral Pack.webp",
-                  "inStock": true
                 }
               ]
             },
