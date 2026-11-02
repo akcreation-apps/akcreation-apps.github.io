@@ -203,6 +203,9 @@
       const units = (d.variants || []).map((v) => v.unit || '').join(' ');
       return matches(d.name + ' ' + catName + ' ' + units);
     };
+    // Hide any product whose every variant is marked out of stock —
+    // matches the homepage behaviour in main.js.
+    const inStock = (d) => (d.variants || []).some((v) => v.inStock !== false);
 
     if (state.mode === 'search' && q) {
       // Global search — across every category
@@ -210,7 +213,7 @@
       state.catalog.categories.forEach((cat) => {
         cat.subcategories.forEach((sub) =>
           sub.dishes.forEach((d) => {
-            if (productMatches(d, cat.name)) {
+            if (inStock(d) && productMatches(d, cat.name)) {
               items.push({ ...d, categoryImage: cat.image, categoryName: cat.name });
             }
           })
@@ -226,7 +229,7 @@
     const items = [];
     cat.subcategories.forEach((sub) =>
       sub.dishes.forEach((d) => {
-        if (productMatches(d, cat.name)) items.push({ ...d, categoryImage: cat.image, categoryName: cat.name });
+        if (inStock(d) && productMatches(d, cat.name)) items.push({ ...d, categoryImage: cat.image, categoryName: cat.name });
       })
     );
     items.sort(sortByFeaturedThenPrice);
