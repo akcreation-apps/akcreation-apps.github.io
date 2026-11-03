@@ -1360,7 +1360,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
           );
         }
         parts.push(`Restaurant ର live Offer ଜାଣିବା ପାଇଁ follow କରନ୍ତୁ: https://www.instagram.com/bankibites`);
-        parts.push(`_Team BankiBites :)_`);
+        parts.push(`_*Team BankiBites :)*_`);
         return parts.join('\n\n');
       }
 

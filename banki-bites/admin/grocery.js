@@ -48,6 +48,63 @@ function normalisePhone(raw) {
 }
 function isValidPhone(raw) { return /^\d{10}$/.test(normalisePhone(raw)); }
 
+// Mirrors the "BB N (real name)" convention admin uses — pull the real name
+// out of the parentheses, otherwise return the raw name unchanged.
+function prettyCustomerName(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  if (!/^bb/i.test(s)) return s;
+  const m = s.match(/\(([^)]+)\)/);
+  return (m && m[1].trim()) ? m[1].trim() : '';
+}
+
+// Sends the Odia order-confirmation message to the customer via WhatsApp.
+// The button click itself is the user gesture, so we go straight to wa.me
+// without a Swal confirm — any intermediate await would cost us the gesture
+// and trip the api.whatsapp.com interstitial on mobile.
+function sendCustomerWA(o, msg) {
+  const phone = normalisePhone(o.customer?.phone || '');
+  if (!phone || !isValidPhone(phone)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'No phone',
+      text: 'This order has no valid customer phone number.',
+      confirmButtonColor: '#FF6B35',
+    });
+    return;
+  }
+  const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
+  try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
+  window.location.href = waUrl;
+}
+
+function buildOdiaGreeting(o) {
+  const nameOnly = prettyCustomerName(o.customer?.name || '');
+  return nameOnly ? `ନମସ୍କାର ${nameOnly} !` : 'ନମସ୍କାର !';
+}
+
+function sendOrderConfirmationWA(o) {
+  const msg = [
+    buildOdiaGreeting(o),
+    'ଆପଣଙ୍କ order successfully confirm ହୋଇଯାଇଛି ।',
+    'ଚିନ୍ତା କରନ୍ତୁ ନାହିଁ, ଆପଣଙ୍କ groceries order ରେ mention କରାଯାଇଥିବା scheduled time ଅନୁସାରେ deliver କରାଯିବ ।',
+    'BankiBites Grocery ଉପରେ ଭରସା ରଖିଥିବାରୁ ଧନ୍ୟବାଦ !',
+    '_*Team BankiBites :)*_',
+  ].join('\n\n');
+  sendCustomerWA(o, msg);
+}
+
+function sendOrderDeliveredWA(o) {
+  const msg = [
+    buildOdiaGreeting(o),
+    'Your order has been successfully delivered.',
+    'ଆପଣଙ୍କ order ର complete bill BankiBites Grocery ରେ available ଅଛି ।\nOrder History ରେ ଯାଇ ଆପଣ ନିଜ bill details check କରିପାରିବେ ।',
+    'BankiBites Grocery ଉପରେ ଭରସା ରଖିଥିବାରୁ ଆପଣଙ୍କୁ ବହୁତ ବହୁତ ଧନ୍ୟବାଦ ।',
+    '_*Team BankiBites :)*_',
+  ].join('\n\n');
+  sendCustomerWA(o, msg);
+}
+
 export async function renderGrocery(root, db) {
   root.innerHTML = `
     <style>
@@ -630,6 +687,14 @@ function renderOrderCard(db, o, root, suggestedName = '') {
     </div>
 
     <div class="ec-actions order-actions">
+      ${status === 'order_confirmed' ? `
+      <button class="btn btn-sm btn-outline-success mr-auto" data-act="notifyConfirmed" title="Send Odia order-confirmation message on WhatsApp">
+        <i class="fab fa-whatsapp mr-1"></i> Order Confirmation
+      </button>` : ''}
+      ${status === 'delivered' ? `
+      <button class="btn btn-sm btn-outline-success mr-auto" data-act="notifyDelivered" title="Send Odia order-delivered message on WhatsApp">
+        <i class="fab fa-whatsapp mr-1"></i> Order Delivered
+      </button>` : ''}
       <button class="btn btn-sm btn-outline-danger" data-act="deleteOrder"><i class="fas fa-trash-alt mr-1"></i> Delete</button>
       <button class="btn btn-sm ${isFake ? 'btn-warning' : 'btn-outline-danger'}" data-act="toggleFake">
         <i class="fas fa-triangle-exclamation mr-1"></i>${isFake ? 'Unmark fake' : 'Flag as fake'}
@@ -642,6 +707,14 @@ function renderOrderCard(db, o, root, suggestedName = '') {
   wireSave(db, card, o);
   card.querySelector('[data-act="deleteOrder"]').addEventListener('click', () => deleteOrder(db, o));
   card.querySelector('[data-act="toggleFake"]').addEventListener('click', () => toggleFake(db, o));
+  const notifyConfirmedBtn = card.querySelector('[data-act="notifyConfirmed"]');
+  if (notifyConfirmedBtn) {
+    notifyConfirmedBtn.addEventListener('click', () => sendOrderConfirmationWA(o));
+  }
+  const notifyDeliveredBtn = card.querySelector('[data-act="notifyDelivered"]');
+  if (notifyDeliveredBtn) {
+    notifyDeliveredBtn.addEventListener('click', () => sendOrderDeliveredWA(o));
+  }
   return card;
 }
 
