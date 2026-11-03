@@ -302,9 +302,15 @@
 
     attendanceOut.innerHTML = `<div class="ks-panel"><div class="ks-skel"></div><div class="ks-skel"></div><div class="ks-skel"></div></div>`;
 
+    // Widen the fetched window by 1 day on the lower side so a night shift
+    // that started before rangeFrom (e.g. Sun 23:00 → Mon 06:00 when the
+    // range begins Monday) still has both halves available for pairing.
+    // We'll trim pairs back to [rangeFrom, rangeTo] by IN-date inside
+    // renderAttendance so the display stays within the user's selected range.
+    const fetchFrom = new Date(rangeFrom.getTime() - 24 * 60 * 60 * 1000);
     const punchesQuery = query(
       collection(db, "attn_attendance", uid, "punches"),
-      where("ts", ">=", Timestamp.fromDate(rangeFrom)),
+      where("ts", ">=", Timestamp.fromDate(fetchFrom)),
       orderBy("ts", "asc")
     );
     onSnapshot(
@@ -344,10 +350,17 @@
       const pairsAll = pairInOut(sortedAll);
       // Index per IN-dayKey so we can credit hours to the shift's start day.
       // Orphan OUT (no preceding IN) buckets on the OUT's own day.
+      // Pairs whose anchor falls outside the user-selected [from, to] window
+      // are discarded — they only exist because we fetched a 1-day pad to
+      // allow cross-midnight pairing at the boundaries.
+      const rangeFromMs = from.getTime();
+      const rangeToMs = to.getTime();
       const pairsByStartDay = new Map();
       for (const pair of pairsAll) {
         const anchor = pair.in?.ts || pair.out?.ts;
         if (!anchor) continue;
+        const anchorMs = anchor.getTime();
+        if (anchorMs < rangeFromMs || anchorMs > rangeToMs) continue;
         const k = dayKey(anchor);
         if (!pairsByStartDay.has(k)) pairsByStartDay.set(k, []);
         pairsByStartDay.get(k).push(pair);
@@ -356,9 +369,12 @@
 
       // Punch list is still grouped by each punch's own calendar day so the
       // raw timeline (and the Edit/Add/Delete controls per punch) stays
-      // intuitive to find.
+      // intuitive to find. The fetched list includes 1 day of padding before
+      // rangeFrom so cross-midnight pairs still resolve; drop those padding
+      // punches from the visible timeline so the UI matches the picked range.
       const byDay = new Map();
       for (const p of punches) {
+        if (p.ts.getTime() < rangeFromMs) continue;
         const k = dayKey(p.ts);
         if (!byDay.has(k)) byDay.set(k, []);
         byDay.get(k).push(p);

@@ -108,7 +108,7 @@
     <div class="ks-section-head">
       <div>
         <h1><i class="fa-solid fa-file-arrow-down text-muted" style="font-size:0.85em;"></i> Attendance Report</h1>
-        <p class="ks-subtle">Pick a date range and see every employee's punches, grouped and totalled. Download the full report as CSV.</p>
+        <p class="ks-subtle">Pick a date range and see every employee's punches, grouped and totalled. Download the full report as Excel.</p>
       </div>
       <div class="ks-section-actions">
         <span class="badge badge-info" title="Daily generation limit per browser">
@@ -446,13 +446,22 @@
       outEl.innerHTML = `<div class="ks-panel"><div class="ks-skel"></div><div class="ks-skel"></div><div class="ks-skel"></div></div>`;
 
       try {
+        // Widen the fetched window by ±24h so night-shift pairs that cross
+        // the user-selected range boundary (e.g. IN at Mon 23:00 + OUT at
+        // Tue 06:00 with range starting Tue 00:00) are still paired. We
+        // trim back to the user range *after* bucketing by IN-date, so only
+        // shifts that STARTED inside the range are reported.
+        const fetchFrom = new Date(from.getTime() - 24 * 60 * 60 * 1000);
+        const fetchTo   = new Date(to.getTime()   + 24 * 60 * 60 * 1000);
         const q = query(
           collectionGroup(db, "punches"),
-          where("ts", ">=", Timestamp.fromDate(from)),
-          where("ts", "<=", Timestamp.fromDate(to)),
+          where("ts", ">=", Timestamp.fromDate(fetchFrom)),
+          where("ts", "<=", Timestamp.fromDate(fetchTo)),
           orderBy("ts", "asc")
         );
         const snap = await getDocs(q);
+        const rangeFromMs = from.getTime();
+        const rangeToMs   = to.getTime();
 
         // Group punches by uid first (NOT by day). Pairing runs across the
         // whole range so a 10 PM IN on Mon pairs with a 6 AM OUT on Tue.
@@ -508,6 +517,12 @@
           for (const pair of pairs) {
             const anchor = dateOf(pair.in) || dateOf(pair.out);
             if (!anchor) continue;
+            // Trim back to the user-selected range by shift-start day. A pair
+            // whose anchor falls into the ±24h padding (but not the real
+            // range) is discarded — otherwise it would double-count across
+            // adjacent report runs.
+            const anchorMs = anchor.getTime();
+            if (anchorMs < rangeFromMs || anchorMs > rangeToMs) continue;
             bucket(anchor, pair);
           }
 
