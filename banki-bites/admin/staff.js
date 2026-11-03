@@ -84,7 +84,10 @@ export async function renderStaff(root, db) {
       </div>
     </details>
 
-    <div class="section-header section-header--compact section-header--end">
+    <div class="section-header section-header--compact section-header--end" style="gap:8px;flex-wrap:wrap">
+      <button id="copyEtaBtn" class="btn btn-sm btn-outline-success" title="Open WhatsApp with the ETA ranking prefilled — pick the recipient from your contacts">
+        <i class="fab fa-whatsapp mr-1"></i> Share ETA ranking
+      </button>
       <button id="addStaffBtn" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i> Add staff</button>
     </div>
     <div class="text-muted mb-2" style="font-size:0.78rem">
@@ -93,6 +96,7 @@ export async function renderStaff(root, db) {
     <div id="staffList" class="card-list"><div class="bb-loader-block">Loading delivery partners…</div></div>
   `;
   document.getElementById('addStaffBtn').addEventListener('click', () => openEditor(db, null, root));
+  document.getElementById('copyEtaBtn').addEventListener('click', () => copyEtaRanking(root));
   try { await whenChartReady(); } catch (e) { console.warn('[staff] Chart.js unavailable:', e.message); }
   wireStatsBlockResize(root.querySelector('.stats-block'));
   _staffFeeRules = await loadFeeRules(db);
@@ -291,6 +295,74 @@ async function loadStaff(db, root, { force = false } = {}) {
   }
   list.innerHTML = '';
   staff.forEach(s => list.appendChild(renderCard(db, root, s.id, s)));
+}
+
+// Build the current-month ETA (on-time %) ranking for every delivery partner
+// rendered on screen, drop anyone with 0% (either no ETA data yet or genuinely
+// zero on-time deliveries — neither belongs in a motivation blast), and copy
+// a Odia-flavoured message to the clipboard so admin can paste it into the
+// partners' group chat.
+function copyEtaRanking(root) {
+  const monthStart = startOfCurrentMonth(new Date());
+  const cards = Array.from(root.querySelectorAll('.staff-card[data-uid]'));
+  const rows = [];
+  for (const card of cards) {
+    const uid = card.dataset.uid;
+    const name = card.querySelector('.ec-title')?.childNodes[0]?.nodeValue?.trim() || uid;
+    const mine = staffOrdersFor(uid);
+    let onTimeN = 0, onTimeD = 0;
+    for (const o of mine) {
+      const d = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+      if (!d || d < monthStart) continue;
+      const flag = isOnTime(o);
+      if (flag === null) continue;
+      onTimeD++;
+      if (flag) onTimeN++;
+    }
+    if (onTimeD === 0) continue;
+    const pct = Math.round((onTimeN / onTimeD) * 100);
+    if (pct <= 0) continue;
+    rows.push({ name, pct, onTimeN, onTimeD });
+  }
+  if (!rows.length) {
+    Swal.fire({
+      icon: 'info',
+      title: 'No ETA data',
+      text: 'No partner has an ETA % above 0% this month yet.',
+      confirmButtonColor: '#FF6B35',
+    });
+    return;
+  }
+  rows.sort((a, b) => b.pct - a.pct);
+
+  // Odia motivation lines — tuned to the ≥70% bonus threshold the admin
+  // mentioned when asking for this feature.
+  const noteFor = (pct) => {
+    if (pct >= 90) return '🏆 ବହୁତ ବଢ଼ିଆ! Bonus pakka — keep flying!';
+    if (pct >= 70) return '🎁 Bonus eligible — ବଢ଼ିଆ କାମ, ଏମିତି ଜାରି ରଖନ୍ତୁ!';
+    if (pct >= 50) return '⏱️ Target 70%+ — ଆଉ ଟିକେ ଚେଷ୍ଟା କଲେ bonus ଆପଣଙ୍କର!';
+    return '🚀 Push harder — ଆପଣ ପାରିବେ, bonus ଅପେକ୍ଷା କରୁଛି!';
+  };
+
+  const header = [
+    '🏍️ BankiBites — Delivery Partner ETA ranking',
+    '\nBonus unlock: ETA ≥ 70% (Minimum 30 orders)🎁\n',
+    '',
+  ].join('\n');
+  const body = rows.map((r, i) => {
+    const medal = i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : `${i + 1}. `;
+    return `${medal}${r.name} — ${r.pct}%\n   ${noteFor(r.pct)}`;
+  }).join('\n\n');
+  const footer = '\n\n_Team BankiBites 💚_';
+  const text = header + body + footer;
+
+  // Open WhatsApp with the message prefilled but no recipient — admin picks
+  // the partner / group / broadcast list from the WhatsApp contact chooser.
+  // The button click itself is the user gesture, so go straight to wa.me
+  // without any Swal / async step in between (needed to keep the gesture
+  // fresh on mobile so WhatsApp opens directly instead of the interstitial).
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.location.href = waUrl;
 }
 
 function staffOrdersFor(uid) {
