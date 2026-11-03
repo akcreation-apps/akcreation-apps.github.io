@@ -18,6 +18,7 @@ function mountPartnerChart(id, config) {
 const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
   opening_hour: '08', closing_hour: '22', break_start_hour: '', break_end_hour: '', address: '', point_of_contact: '',
+  eta_minutes: '',
   is_active: true, is_removed: false, is_veg: false, is_homemade: false, is_separate_price: false,
   sort_order: 0, sync_collection: '', sync_doc_id: '',
 };
@@ -466,6 +467,11 @@ async function openEditor(db, existing, root) {
         <div class="form-group col-6"><label>Break start hour (0-23, optional)</label><input class="form-control" name="break_start_hour" value="${escapeAttr(p.break_start_hour || '')}"></div>
         <div class="form-group col-6"><label>Break end hour (0-23, optional)</label><input class="form-control" name="break_end_hour" value="${escapeAttr(p.break_end_hour || '')}"></div>
       </div>
+      <div class="form-group">
+        <label>ETA (in minutes)</label>
+        <input class="form-control" type="number" name="eta_minutes" min="1" step="1" inputmode="numeric"
+               placeholder="e.g. 45" value="${p.eta_minutes != null && p.eta_minutes !== '' ? escapeAttr(p.eta_minutes) : ''}">
+      </div>
       <small class="text-muted d-block" style="margin-top:-.25rem;margin-bottom:.75rem">Leave both blank for no break. Break must fall inside open/close hours.</small>
       <div class="form-group"><label>Address</label><textarea class="form-control" name="address" rows="2">${escapeHtml(p.address)}</textarea></div>
       <div class="form-group">
@@ -539,6 +545,7 @@ async function openEditor(db, existing, root) {
         break_start_hour: (fd.get('break_start_hour') || '').trim(),
         break_end_hour:   (fd.get('break_end_hour')   || '').trim(),
         address: fd.get('address').trim(),
+        eta_minutes: (fd.get('eta_minutes') || '').toString().trim(),
         point_of_contact: pocRaw ? normalisePhone(pocRaw) : '',
         is_active: f.querySelector('#paIsActive').checked,
         is_removed: f.querySelector('#paIsRemoved').checked,
@@ -590,6 +597,18 @@ async function openEditor(db, existing, root) {
         }
         data.break_start_hour = String(bs).padStart(2, '0');
         data.break_end_hour   = String(be).padStart(2, '0');
+      }
+      // ETA is optional, but when provided must be a positive integer so the
+      // storefront + Notify-ETA dialog can trust it as a minute count.
+      if (data.eta_minutes === '') {
+        data.eta_minutes = null;
+      } else {
+        const etaNum = parseInt(data.eta_minutes, 10);
+        if (!Number.isFinite(etaNum) || etaNum <= 0) {
+          Swal.showValidationMessage('ETA must be a positive whole number of minutes');
+          return false;
+        }
+        data.eta_minutes = etaNum;
       }
       // Point of contact is mandatory for both add and edit — every partner
       // must have a reachable phone before the record can be saved.
