@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../assets/styles.css">
+  <!-- SheetJS: real .xlsx export (two-sheet workbook with Summary + Detail) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     .ks-missing-row td { background: var(--danger-soft); }
     .ks-missing-row td:first-child { border-left: 3px solid var(--danger); }
@@ -22,6 +24,83 @@
       font-weight: 700;
     }
     .ks-emp-panel + .ks-emp-panel { margin-top: 16px; }
+    .ks-qp-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .ks-qp-row .btn { min-height: 36px; }
+    .ks-ms-wrap { position: relative; }
+    .ks-ms-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; min-height: 38px;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; cursor: pointer;
+      font-size: .88rem;
+    }
+    .ks-ms-btn:hover { border-color: var(--brand); }
+    .ks-ms-panel {
+      position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; right: 0;
+      max-height: 260px; overflow-y: auto;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+      padding: 8px;
+    }
+    .ks-ms-panel[hidden] { display: none; }
+    .ks-ms-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 6px; cursor: pointer;
+      font-size: .88rem;
+    }
+    .ks-ms-opt:hover { background: var(--brand-soft); }
+    .ks-ms-opt input { margin: 0; }
+    .ks-ms-count {
+      display: inline-block; min-width: 20px; text-align: center;
+      font-size: .72rem; font-weight: 700;
+      background: var(--brand); color: #fff;
+      border-radius: 10px; padding: 1px 6px;
+      margin-left: 4px;
+    }
+    .ks-summary-row { cursor: pointer; }
+    .ks-summary-row:hover td { background: var(--brand-soft); }
+    .ks-summary-row .ks-chev { transition: transform .15s ease; }
+    .ks-summary-row.expanded .ks-chev { transform: rotate(90deg); }
+    .ks-detail-cell {
+      background: var(--surface-alt);
+      padding: 16px !important;
+    }
+    .ks-detail-cell[hidden] { display: none; }
+    .ks-kpi-strip {
+      display: grid; gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      margin-bottom: 16px;
+    }
+    .ks-kpi-tile {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+    }
+    .ks-kpi-tile .ks-kpi-label {
+      font-size: .72rem; text-transform: uppercase; letter-spacing: .04em;
+      color: var(--muted); font-weight: 600;
+    }
+    .ks-kpi-tile .ks-kpi-value {
+      font-size: 1.4rem; font-weight: 700; color: var(--text);
+      margin-top: 2px; font-family: 'JetBrains Mono', 'Menlo', monospace;
+    }
+    .ks-kpi-tile.warn .ks-kpi-value { color: var(--danger); }
+    .ks-kpi-tile.ok .ks-kpi-value { color: var(--success); }
+
+    /* --- Mobile card-mode overrides for the summary table --- */
+    /* Shared .ks-table-wrap mobile CSS turns every <td> into a flex row with
+       3px padding — which breaks the chevron column and the embedded detail
+       table. Scope-override them here. */
+    @media (max-width: 575.98px) {
+      .ks-summary-table .ks-summary-row td:first-child { display: none !important; }
+      .ks-summary-table .ks-detail-row td.ks-detail-cell {
+        display: block !important;
+        padding: 10px !important;
+        text-align: left !important;
+      }
+      .ks-summary-table .ks-detail-row td.ks-detail-cell::before { display: none !important; }
+      .ks-summary-row.expanded td { background: var(--brand-soft); }
+    }
   </style>
 </head>
 <body>
@@ -40,9 +119,17 @@
 
     <div class="ks-panel" style="margin-bottom:20px;">
       <div class="ks-panel-header">
-        <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-sliders"></i></span>Date range</h3>
+        <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-sliders"></i></span>Filters</h3>
       </div>
       <form id="report-form" autocomplete="off">
+        <div class="ks-qp-row" role="group" aria-label="Quick date pick">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-qp="today">Today</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-qp="yesterday">Yesterday</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-qp="last7">Last 7 days</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-qp="thisMonth">This month</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-qp="lastMonth">Last month</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-qp="last30">Last 30 days</button>
+        </div>
         <div class="ks-form-grid ks-form-grid-4">
           <div>
             <label class="ks-field-label" for="rep-from">From</label>
@@ -52,10 +139,40 @@
             <label class="ks-field-label" for="rep-to">To</label>
             <input class="form-control" type="date" id="rep-to" required>
           </div>
+          <div>
+            <label class="ks-field-label" for="flt-role">Role</label>
+            <select class="form-control" id="flt-role">
+              <option value="">All roles</option>
+              <option value="employee">Employee</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="ks-ms-wrap">
+            <label class="ks-field-label">Sites</label>
+            <button type="button" class="ks-ms-btn" id="ms-site-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ms-site-panel">
+              <span id="ms-site-label">All sites</span>
+              <i class="fa-solid fa-chevron-down text-muted" style="font-size:.8em;"></i>
+            </button>
+            <div class="ks-ms-panel" id="ms-site-panel" hidden role="listbox" aria-label="Sites"></div>
+          </div>
+        </div>
+        <div class="ks-form-grid" style="margin-top:12px;">
+          <div class="ks-ms-wrap">
+            <label class="ks-field-label">Employees</label>
+            <button type="button" class="ks-ms-btn" id="ms-emp-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ms-emp-panel">
+              <span id="ms-emp-label">All employees</span>
+              <i class="fa-solid fa-chevron-down text-muted" style="font-size:.8em;"></i>
+            </button>
+            <div class="ks-ms-panel" id="ms-emp-panel" hidden role="listbox" aria-label="Employees"></div>
+          </div>
         </div>
         <div class="ks-form-actions">
           <button class="btn btn-primary" type="submit"><i class="fa-solid fa-play"></i> Generate report</button>
-          <button class="btn btn-outline-secondary" type="button" id="btn-csv" disabled><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+          <button class="btn btn-success" type="button" id="btn-xlsx" disabled><i class="fa-solid fa-file-excel"></i> Download Excel</button>
+          <button class="btn btn-sm btn-outline-secondary" type="button" id="btn-clear">
+            <i class="fa-solid fa-xmark"></i> Clear filters
+          </button>
         </div>
       </form>
     </div>
@@ -95,10 +212,6 @@
       return String(s).replace(/[&<>"']/g, c => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
       }[c]));
-    }
-    function csvCell(v) {
-      const s = v == null ? "" : String(v);
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     }
     function isIn(type)  { const t = String(type||"").toLowerCase(); return t === "in"  || t === "checkin"  || t === "punchin"; }
     function isOut(type) { const t = String(type||"").toLowerCase(); return t === "out" || t === "checkout" || t === "punchout"; }
@@ -163,24 +276,154 @@
     onSnapshot(collection(db, "attn_users"), (snap) => {
       usersById.clear();
       snap.forEach(d => usersById.set(d.id, d.data()));
+      renderEmpMultiSelect();
     });
     onSnapshot(collection(db, "attn_sites"), (snap) => {
       sitesById.clear();
       snap.forEach(d => sitesById.set(d.id, d.data()));
+      renderSiteMultiSelect();
     });
 
-    // Default date range: last 30 days
-    (() => {
-      const to = new Date();
-      const from = new Date(); from.setDate(from.getDate() - 30);
-      const iso = d => d.toISOString().slice(0, 10);
-      document.getElementById("rep-from").value = iso(from);
-      document.getElementById("rep-to").value = iso(to);
-    })();
+    // ============================================================
+    // Multi-select pickers (sites + employees)
+    // ============================================================
+    const selectedSiteIds = new Set();
+    const selectedEmpIds  = new Set();
+    const initialSiteParam = new URLSearchParams(location.search).get("site") || "";
+    if (initialSiteParam) selectedSiteIds.add(initialSiteParam);
 
-    let lastReport = null; // { rangeFrom, rangeTo, employees: [ { uid, name, role, totalMs, hasMissing, days: [ { date, day, pairs, totalMs, siteNames } ] } ] }
+    function wireMultiSelect(btnId, panelId, labelId, selectedSet, allLabel, onChange) {
+      const btn   = document.getElementById(btnId);
+      const panel = document.getElementById(panelId);
+      const label = document.getElementById(labelId);
+      btn.addEventListener("click", () => {
+        const open = panel.hidden;
+        // Close every open panel AND reset the matching button's aria-expanded,
+        // not just the one being clicked, so the other sibling picker's a11y
+        // state doesn't lie about being open.
+        document.querySelectorAll(".ks-ms-panel").forEach(p => {
+          p.hidden = true;
+          const pBtn = document.querySelector(`[aria-controls="${p.id}"]`);
+          if (pBtn) pBtn.setAttribute("aria-expanded", "false");
+        });
+        panel.hidden = !open;
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      document.addEventListener("click", (e) => {
+        if (panel.hidden) return;
+        if (!panel.contains(e.target) && !btn.contains(e.target)) panel.hidden = true;
+      });
+      panel.addEventListener("change", (e) => {
+        const cb = e.target.closest("input[type=checkbox]");
+        if (!cb) return;
+        const id = cb.value;
+        if (cb.checked) selectedSet.add(id); else selectedSet.delete(id);
+        refreshLabel();
+        onChange?.();
+      });
+      function refreshLabel() {
+        if (selectedSet.size === 0) {
+          label.textContent = allLabel;
+          btn.classList.remove("btn-primary");
+        } else if (selectedSet.size === 1) {
+          const only = [...selectedSet][0];
+          const name = panel.querySelector(`input[value="${CSS.escape(only)}"]`)?.dataset.name;
+          label.textContent = name || "1 selected";
+        } else {
+          label.textContent = `${selectedSet.size} selected`;
+        }
+      }
+      return { refreshLabel };
+    }
+
+    const siteMs = wireMultiSelect("ms-site-btn", "ms-site-panel", "ms-site-label", selectedSiteIds, "All sites");
+    const empMs  = wireMultiSelect("ms-emp-btn",  "ms-emp-panel",  "ms-emp-label",  selectedEmpIds,  "All employees");
+
+    function renderSiteMultiSelect() {
+      const panel = document.getElementById("ms-site-panel");
+      const list = [...sitesById.entries()]
+        .map(([id, s]) => ({ id, name: s.name || "(unnamed)" }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      panel.innerHTML = list.length
+        ? list.map(s => `
+            <label class="ks-ms-opt">
+              <input type="checkbox" value="${escapeHtml(s.id)}" data-name="${escapeHtml(s.name)}" ${selectedSiteIds.has(s.id) ? "checked" : ""}>
+              <span>${escapeHtml(s.name)}</span>
+            </label>`).join("")
+        : `<p class="text-muted small mb-0" style="padding:8px;">No sites yet.</p>`;
+      siteMs.refreshLabel();
+    }
+    function renderEmpMultiSelect() {
+      const panel = document.getElementById("ms-emp-panel");
+      const list = [...usersById.entries()]
+        .map(([id, u]) => ({ id, name: u.name || u.email || "(unnamed)", role: u.role || "" }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      panel.innerHTML = list.length
+        ? list.map(u => `
+            <label class="ks-ms-opt">
+              <input type="checkbox" value="${escapeHtml(u.id)}" data-name="${escapeHtml(u.name)}" ${selectedEmpIds.has(u.id) ? "checked" : ""}>
+              <span>${escapeHtml(u.name)} <span class="text-muted small">· ${escapeHtml(u.role)}</span></span>
+            </label>`).join("")
+        : `<p class="text-muted small mb-0" style="padding:8px;">No users yet.</p>`;
+      empMs.refreshLabel();
+    }
+
+    // ============================================================
+    // Date helpers + quick-pick buttons
+    // ============================================================
+    const isoDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    function setRange(from, to) {
+      document.getElementById("rep-from").value = isoDate(from);
+      document.getElementById("rep-to").value   = isoDate(to);
+    }
+    function applyQuickPick(key) {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      let from, to;
+      switch (key) {
+        case "today":     from = new Date(today); to = new Date(today); break;
+        case "yesterday": from = new Date(today); from.setDate(from.getDate()-1); to = new Date(from); break;
+        case "last7":     to = new Date(today); from = new Date(today); from.setDate(from.getDate()-6); break;
+        case "thisMonth": from = new Date(today.getFullYear(), today.getMonth(), 1); to = new Date(today); break;
+        case "lastMonth":
+          from = new Date(today.getFullYear(), today.getMonth()-1, 1);
+          to   = new Date(today.getFullYear(), today.getMonth(), 0);
+          break;
+        case "last30":    to = new Date(today); from = new Date(today); from.setDate(from.getDate()-29); break;
+        default: return;
+      }
+      setRange(from, to);
+    }
+    document.querySelectorAll("[data-qp]").forEach(btn => {
+      btn.addEventListener("click", () => applyQuickPick(btn.dataset.qp));
+    });
+    // Default: last 30 days
+    applyQuickPick("last30");
+
+    document.getElementById("btn-clear").addEventListener("click", () => {
+      selectedSiteIds.clear();
+      selectedEmpIds.clear();
+      document.getElementById("flt-role").value = "";
+      renderSiteMultiSelect();
+      renderEmpMultiSelect();
+      applyQuickPick("last30");
+      // Reset the output too — otherwise a stale report sits under a
+      // "cleared" filter row, which admins read as "these are the results
+      // for the cleared filters" and misinterpret.
+      lastReport = null;
+      xlsxBtn.disabled = true;
+      outEl.innerHTML = `
+        <div class="ks-panel">
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-chart-column"></i></div>
+            <p class="ks-empty-title">No report yet</p>
+            <p class="ks-empty-text">Pick a date range and click Generate.</p>
+          </div>
+        </div>`;
+    });
+
+    let lastReport = null; // { rangeFrom, rangeTo, employees: [...], filters: {...}, kpis: {...} }
     const outEl = document.getElementById("report-out");
-    const csvBtn = document.getElementById("btn-csv");
+    const xlsxBtn = document.getElementById("btn-xlsx");
 
     document.getElementById("report-form").onsubmit = async (e) => {
       e.preventDefault();
@@ -211,67 +454,120 @@
         );
         const snap = await getDocs(q);
 
-        // Group punches by uid → by dayKey
+        // Group punches by uid first (NOT by day). Pairing runs across the
+        // whole range so a 10 PM IN on Mon pairs with a 6 AM OUT on Tue.
+        // Each resulting pair is then attributed to its IN-date (shift-start).
         const byUid = new Map();
         for (const d of snap.docs) {
           const p = d.data();
           const uid = d.ref.parent.parent.id;
           const ts = p.ts?.toDate?.();
           if (!ts) continue;
-          if (!byUid.has(uid)) byUid.set(uid, new Map());
-          const dayMap = byUid.get(uid);
-          const k = dayKey(ts);
-          if (!dayMap.has(k)) dayMap.set(k, []);
-          dayMap.get(k).push({ ts, type: p.type, siteId: p.siteId, edited: !!p.edited });
+          if (!byUid.has(uid)) byUid.set(uid, []);
+          byUid.get(uid).push({ ts, type: p.type, siteId: p.siteId, edited: !!p.edited });
         }
 
         const employees = [];
-        for (const [uid, dayMap] of byUid.entries()) {
+        for (const [uid, punchesRaw] of byUid.entries()) {
           const u = usersById.get(uid);
           const name = u?.name || u?.email || uid;
           const role = u?.role || "";
-          const days = [];
-          let totalMs = 0;
-          let hasMissing = false;
 
-          // Sort day keys chronologically
-          const sortedKeys = [...dayMap.keys()].sort();
-          for (const k of sortedKeys) {
-            const punches = dayMap.get(k).sort((a, b) => a.ts - b.ts);
-            const pairs = pairInOut(punches);
-            let dayMs = 0;
-            const siteNames = new Set();
-            let dayHasMissing = false;
-            for (const pair of pairs) {
-              if (pair.in?.siteId) siteNames.add(siteNameOf(pair.in.siteId));
-              if (pair.out?.siteId) siteNames.add(siteNameOf(pair.out.siteId));
-              if (pair.in && pair.out) {
-                pair.ms = pair.out.ts - pair.in.ts;
-                dayMs += pair.ms;
-              } else {
-                dayHasMissing = true;
-              }
+          const punches = punchesRaw.sort((a, b) => a.ts - b.ts);
+          const pairs = pairInOut(punches);
+
+          // Attribution policy: a shift is attributed to the day its IN
+          // started (the shift-start day). An orphan OUT without a preceding
+          // IN is bucketed on the OUT's own day since we have no better
+          // signal and it still needs to surface somewhere.
+          const dayMap = new Map(); // dayKey -> day bucket
+          const dateOf = (p) => (p?.ts ? new Date(p.ts) : null);
+          const bucket = (date, pair) => {
+            const k = dayKey(date);
+            if (!dayMap.has(k)) {
+              dayMap.set(k, {
+                date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+                key: k,
+                pairs: [],
+                totalMs: 0,
+                siteNames: new Set(),
+                hasMissing: false,
+              });
             }
-            if (dayHasMissing) hasMissing = true;
-            totalMs += dayMs;
-            days.push({
-              date: new Date(punches[0].ts),
-              key: k,
-              pairs,
-              totalMs: dayMs,
-              siteNames: [...siteNames],
-              hasMissing: dayHasMissing,
-            });
+            const b = dayMap.get(k);
+            b.pairs.push(pair);
+            if (pair.in?.siteId) b.siteNames.add(siteNameOf(pair.in.siteId));
+            if (pair.out?.siteId) b.siteNames.add(siteNameOf(pair.out.siteId));
+            if (pair.in && pair.out) {
+              pair.ms = pair.out.ts - pair.in.ts;
+              b.totalMs += pair.ms;
+            } else {
+              b.hasMissing = true;
+            }
+          };
+          for (const pair of pairs) {
+            const anchor = dateOf(pair.in) || dateOf(pair.out);
+            if (!anchor) continue;
+            bucket(anchor, pair);
           }
 
-          employees.push({ uid, name, role, totalMs, hasMissing, days });
-        }
-        // Sort employees by name
-        employees.sort((a, b) => a.name.localeCompare(b.name));
+          const days = [...dayMap.values()]
+            .sort((a, b) => a.key.localeCompare(b.key))
+            .map(d => ({ ...d, siteNames: [...d.siteNames] }));
+          const totalMs = days.reduce((s, d) => s + d.totalMs, 0);
+          const hasMissing = days.some(d => d.hasMissing);
 
-        lastReport = { rangeFrom: from, rangeTo: to, employees };
+          // Per-employee derived stats used by the summary row.
+          const daysPresent = days.length;
+          const missingCount = days.filter(d => d.hasMissing).length;
+          const avgMsPerDay = daysPresent > 0 ? totalMs / daysPresent : 0;
+          const allSiteNames = new Set();
+          days.forEach(d => d.siteNames.forEach(n => allSiteNames.add(n)));
+          const uAssignedSites = (usersById.get(uid)?.assignedSiteIds) || [];
+
+          employees.push({
+            uid, name, role,
+            totalMs, hasMissing, days,
+            daysPresent, missingCount, avgMsPerDay,
+            siteNames: [...allSiteNames],
+            assignedSiteIds: Array.isArray(uAssignedSites) ? uAssignedSites : [],
+          });
+        }
+
+        // --- Apply client-side filters (role, site, employee) ---
+        const roleFilter = document.getElementById("flt-role").value;
+        const siteFilterSet = new Set(selectedSiteIds);
+        const empFilterSet  = new Set(selectedEmpIds);
+        const filtered = employees.filter(e => {
+          if (roleFilter && e.role !== roleFilter) return false;
+          if (empFilterSet.size && !empFilterSet.has(e.uid)) return false;
+          if (siteFilterSet.size) {
+            const anyMatch = e.assignedSiteIds.some(id => siteFilterSet.has(id))
+                          || e.days.some(d => d.pairs.some(p => siteFilterSet.has(p.in?.siteId) || siteFilterSet.has(p.out?.siteId)));
+            if (!anyMatch) return false;
+          }
+          return true;
+        });
+
+        // Default sort: total hours descending (surfaces top contributors)
+        filtered.sort((a, b) => b.totalMs - a.totalMs || a.name.localeCompare(b.name));
+
+        // Report-level KPIs
+        const totalMsAll = filtered.reduce((s, e) => s + e.totalMs, 0);
+        const totalDaysPresent = filtered.reduce((s, e) => s + e.daysPresent, 0);
+        const empWithGaps = filtered.filter(e => e.hasMissing).length;
+        const rangeDays = Math.max(1, Math.round((to - from) / 86400000) + 1);
+        const avgMsPerEmp = filtered.length ? totalMsAll / filtered.length : 0;
+
+        lastReport = {
+          rangeFrom: from, rangeTo: to,
+          employees: filtered,
+          allEmployees: employees,
+          filters: { role: roleFilter, siteIds: [...siteFilterSet], empIds: [...empFilterSet] },
+          kpis: { totalMsAll, totalDaysPresent, empWithGaps, rangeDays, avgMsPerEmp },
+        };
         renderReport(lastReport);
-        csvBtn.disabled = employees.length === 0;
+        xlsxBtn.disabled = filtered.length === 0;
       } catch (err) {
         // Firestore's SDK returns { code, message, ... }. Both "rule denied" and
         // "missing collection-group index" surface as code="permission-denied"
@@ -329,38 +625,114 @@
     }
 
     function renderReport(report) {
-      const { rangeFrom, rangeTo, employees } = report;
+      const { rangeFrom, rangeTo, employees, kpis } = report;
       if (employees.length === 0) {
         outEl.innerHTML = `
           <div class="ks-panel">
             <div class="ks-empty">
               <div class="ks-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
-              <p class="ks-empty-title">No punches in this range</p>
-              <p class="ks-empty-text">${dateStr(rangeFrom)} → ${dateStr(rangeTo)}</p>
+              <p class="ks-empty-title">No matching punches</p>
+              <p class="ks-empty-text">${dateStr(rangeFrom)} → ${dateStr(rangeTo)} · try widening the date range or clearing filters.</p>
             </div>
           </div>`;
         return;
       }
 
-      const missingCount = employees.filter(e => e.hasMissing).length;
-      const summary = `
-        <div class="ks-panel" style="margin-bottom:16px;">
-          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
-            <div><strong>${employees.length}</strong> <span class="text-muted">employees</span></div>
-            <div><strong>${dateStr(rangeFrom)}</strong> → <strong>${dateStr(rangeTo)}</strong></div>
-            ${missingCount > 0
-              ? `<div class="ks-missing-badge"><i class="fa-solid fa-triangle-exclamation"></i> ${missingCount} with missing checkout</div>`
-              : `<div class="text-success"><i class="fa-solid fa-circle-check"></i> All checkouts complete</div>`}
+      // Report-level KPI strip
+      const kpiStrip = `
+        <div class="ks-kpi-strip">
+          <div class="ks-kpi-tile">
+            <div class="ks-kpi-label">Range</div>
+            <div class="ks-kpi-value" style="font-size:1rem;">${dateStr(rangeFrom)}<br>${dateStr(rangeTo)}</div>
+          </div>
+          <div class="ks-kpi-tile">
+            <div class="ks-kpi-label">Employees</div>
+            <div class="ks-kpi-value">${employees.length}</div>
+          </div>
+          <div class="ks-kpi-tile">
+            <div class="ks-kpi-label">Total hours</div>
+            <div class="ks-kpi-value">${fmtDuration(kpis.totalMsAll)}</div>
+          </div>
+          <div class="ks-kpi-tile">
+            <div class="ks-kpi-label">Avg per employee</div>
+            <div class="ks-kpi-value">${fmtDuration(kpis.avgMsPerEmp)}</div>
+          </div>
+          <div class="ks-kpi-tile ${kpis.empWithGaps > 0 ? "warn" : "ok"}">
+            <div class="ks-kpi-label">With missing checkouts</div>
+            <div class="ks-kpi-value">${kpis.empWithGaps}</div>
           </div>
         </div>`;
 
-      const panels = employees.map(emp => renderEmployeePanel(emp)).join("");
-      outEl.innerHTML = summary + panels;
+      // Summary table — one row per employee, click a row to expand.
+      const rows = employees.map((emp, idx) => renderSummaryRow(emp, idx)).join("");
+      outEl.innerHTML = `
+        ${kpiStrip}
+        <div class="ks-table-wrap ks-summary-table">
+          <div class="ks-table-scroll">
+            <table class="table">
+              <thead><tr>
+                <th></th>
+                <th>Employee</th>
+                <th>Role</th>
+                <th>Sites</th>
+                <th>Days present</th>
+                <th>Total hours</th>
+                <th>Avg / day</th>
+                <th>Missing</th>
+              </tr></thead>
+              <tbody id="summary-body">${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+
+      // Row click toggles the detail cell beneath it.
+      document.querySelectorAll(".ks-summary-row").forEach(row => {
+        row.addEventListener("click", (ev) => {
+          if (ev.target.closest("a,button")) return;
+          const idx = row.dataset.idx;
+          const detail = document.querySelector(`.ks-detail-row[data-idx="${idx}"]`);
+          const open = row.classList.toggle("expanded");
+          if (detail) detail.hidden = !open;
+        });
+      });
     }
 
-    function renderEmployeePanel(emp) {
-      // UI: recent day on top. CSV loops the original asc order below.
-      const rows = [...emp.days].reverse().map(day => {
+    function renderSummaryRow(emp, idx) {
+      const sitesLabel = emp.siteNames.length
+        ? escapeHtml(emp.siteNames.slice(0, 3).join(", ")) + (emp.siteNames.length > 3 ? ` <span class="text-muted small">+${emp.siteNames.length - 3}</span>` : "")
+        : '<span class="text-muted small">—</span>';
+      const missingCell = emp.missingCount > 0
+        ? `<span class="ks-missing-badge"><i class="fa-solid fa-triangle-exclamation" style="font-size:.7em;"></i> ${emp.missingCount}</span>`
+        : `<span class="text-muted small">—</span>`;
+      const summary = `
+        <tr class="ks-summary-row" data-idx="${idx}">
+          <td class="ks-chev-cell"><i class="fa-solid fa-chevron-right ks-chev text-muted"></i></td>
+          <td data-label="Employee">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <span class="ks-avatar" style="width:30px;height:30px;font-size:.75rem;flex:0 0 auto;">${initials(emp.name)}</span>
+              <div style="min-width:0;">
+                <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(emp.name)}</div>
+              </div>
+            </div>
+          </td>
+          <td data-label="Role" class="text-muted">${escapeHtml(emp.role || "—")}</td>
+          <td data-label="Sites" class="text-muted">${sitesLabel}</td>
+          <td data-label="Days present">${emp.daysPresent}</td>
+          <td data-label="Total hours"><span class="ks-hours-total">${fmtDuration(emp.totalMs)}</span></td>
+          <td data-label="Avg / day">${fmtDuration(emp.avgMsPerDay)}</td>
+          <td data-label="Missing">${missingCell}</td>
+        </tr>`;
+      const detail = `
+        <tr class="ks-detail-row" data-idx="${idx}" hidden>
+          <td class="ks-detail-cell" colspan="8">
+            ${renderEmployeeDetail(emp)}
+          </td>
+        </tr>`;
+      return summary + detail;
+    }
+
+    function renderEmployeeDetail(emp) {
+      const dayRows = [...emp.days].reverse().map(day => {
         const inParts = day.pairs.map(p => p.in ? timeStr(p.in.ts) : `<span class="ks-missing-badge">missing</span>`).join("<br>");
         const outParts = day.pairs.map(p => p.out ? timeStr(p.out.ts) : `<span class="ks-missing-badge">missing</span>`).join("<br>");
         const hoursCell = day.hasMissing
@@ -377,68 +749,125 @@
             <td data-label="Hours">${hoursCell}</td>
           </tr>`;
       }).join("");
-
       return `
-        <div class="ks-panel ks-emp-panel">
-          <div class="ks-panel-header">
-            <h3 class="ks-panel-title" style="display:flex;align-items:center;gap:10px;">
-              <span class="ks-avatar" style="width:34px;height:34px;font-size:.8rem;">${initials(emp.name)}</span>
-              <span>${escapeHtml(emp.name)} <span class="text-muted small" style="font-weight:500;">· ${escapeHtml(emp.role)}</span></span>
-            </h3>
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-              ${emp.hasMissing ? `<span class="badge badge-rejected"><i class="fa-solid fa-triangle-exclamation" style="font-size:.7em;"></i> Missing checkout</span>` : ""}
-              <div><span class="text-muted small">Total:</span> <span class="ks-hours-total">${fmtDuration(emp.totalMs)}</span></div>
-            </div>
-          </div>
-          <div class="ks-table-wrap"><div class="ks-table-scroll">
-            <table class="table">
-              <thead><tr>
-                <th style="min-width:110px;">Date</th>
-                <th>Day</th>
-                <th>Site</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>Hours</th>
-              </tr></thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div></div>
-        </div>`;
+        <div style="margin-bottom:8px;font-size:.85rem;color:var(--muted);">
+          <i class="fa-solid fa-info-circle"></i> Day-by-day breakdown — most recent first.
+        </div>
+        <div class="ks-table-wrap"><div class="ks-table-scroll">
+          <table class="table">
+            <thead><tr>
+              <th style="min-width:110px;">Date</th>
+              <th>Day</th>
+              <th>Site</th>
+              <th>In</th>
+              <th>Out</th>
+              <th>Hours</th>
+            </tr></thead>
+            <tbody>${dayRows}</tbody>
+          </table>
+        </div></div>`;
     }
 
-    csvBtn.onclick = () => {
+    // ---------- Excel export ----------
+    // Hours are written as numeric values (decimal hours) so pivot/sum works
+    // natively in Excel. A "Hours (hh:mm)" column keeps the human-friendly
+    // string for anyone reading rows directly.
+    function msToHours(ms) {
+      return Number.isFinite(ms) && ms > 0 ? Math.round((ms / 36e5) * 100) / 100 : 0;
+    }
+
+    xlsxBtn.onclick = () => {
       if (!lastReport || lastReport.employees.length === 0) return;
-      const { rangeFrom, rangeTo, employees } = lastReport;
-      const header = ["Employee", "Role", "Date", "Day", "Site", "In", "Out", "Hours", "Notes"];
-      const lines = [header.map(csvCell).join(",")];
+      if (typeof XLSX === "undefined") {
+        showToast("Excel library didn't load — check your connection", "danger");
+        return;
+      }
+      const { rangeFrom, rangeTo, employees, kpis } = lastReport;
+
+      // --- Sheet 1: Summary (one row per employee) ---
+      const summaryAoa = [
+        ["Attendance Summary"],
+        [`Range: ${dateStr(rangeFrom)} → ${dateStr(rangeTo)}`],
+        [`Generated: ${new Date().toLocaleString()}`],
+        [],
+        ["Employee", "Role", "Sites", "Days present", "Total hours", "Avg hours/day", "Missing checkouts"],
+      ];
+      for (const emp of employees) {
+        summaryAoa.push([
+          emp.name,
+          emp.role,
+          emp.siteNames.join(" / "),
+          emp.daysPresent,
+          msToHours(emp.totalMs),
+          msToHours(emp.avgMsPerDay),
+          emp.missingCount,
+        ]);
+      }
+      summaryAoa.push([]);
+      summaryAoa.push([
+        "TOTAL", "", "",
+        kpis.totalDaysPresent,
+        msToHours(kpis.totalMsAll),
+        msToHours(kpis.avgMsPerEmp),
+        kpis.empWithGaps,
+      ]);
+      const summarySheet = XLSX.utils.aoa_to_sheet(summaryAoa);
+      summarySheet["!cols"] = [
+        { wch: 24 }, { wch: 10 }, { wch: 30 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 16 },
+      ];
+      // Merge the title row across all columns for a tidy header.
+      summarySheet["!merges"] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
+      ];
+
+      // --- Sheet 2: Detail (one row per shift pair) ---
+      const detailAoa = [
+        ["Attendance Detail"],
+        [`Range: ${dateStr(rangeFrom)} → ${dateStr(rangeTo)}`],
+        [],
+        ["Employee", "Role", "Date", "Day", "Site", "In", "Out", "Hours", "Notes"],
+      ];
       for (const emp of employees) {
         for (const day of emp.days) {
+          if (day.pairs.length === 0) {
+            detailAoa.push([emp.name, emp.role, dateStr(day.date), dayStr(day.date), "", "", "", 0, "NO_PUNCHES"]);
+            continue;
+          }
           for (const p of day.pairs) {
             const notes = p.missing ? (p.in && !p.out ? "MISSING_CHECKOUT" : "MISSING_CHECKIN") : "";
-            const siteNames = [p.in?.siteId, p.out?.siteId]
-              .filter(Boolean)
-              .map(id => siteNameOf(id));
+            const siteNames = [p.in?.siteId, p.out?.siteId].filter(Boolean).map(id => siteNameOf(id));
             const site = [...new Set(siteNames)].join(" / ");
-            const inStr = p.in ? timeStr(p.in.ts) : "";
+            const inStr  = p.in  ? timeStr(p.in.ts)  : "";
             const outStr = p.out ? timeStr(p.out.ts) : "";
-            const hours = (p.in && p.out) ? fmtDuration(p.out.ts - p.in.ts) : "";
-            lines.push([emp.name, emp.role, dateStr(day.date), dayStr(day.date), site, inStr, outStr, hours, notes].map(csvCell).join(","));
-          }
-          if (day.pairs.length === 0) {
-            lines.push([emp.name, emp.role, dateStr(day.date), dayStr(day.date), "", "", "", "", "NO_PUNCHES"].map(csvCell).join(","));
+            const hours  = (p.in && p.out) ? msToHours(p.out.ts - p.in.ts) : 0;
+            detailAoa.push([emp.name, emp.role, dateStr(day.date), dayStr(day.date), site, inStr, outStr, hours, notes]);
           }
         }
-        // Totals row per employee
-        lines.push([emp.name, emp.role, "", "", "", "", "", fmtDuration(emp.totalMs), "TOTAL"].map(csvCell).join(","));
+        detailAoa.push([emp.name, emp.role, "", "", "", "", "", msToHours(emp.totalMs), "TOTAL"]);
+        detailAoa.push([]);
       }
-      const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const fn = `attendance_all_${rangeFrom.toISOString().slice(0,10)}_${rangeTo.toISOString().slice(0,10)}.csv`;
-      const a = document.createElement("a");
-      a.href = url; a.download = fn;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-      showToast("CSV downloaded", "success");
+      const detailSheet = XLSX.utils.aoa_to_sheet(detailAoa);
+      detailSheet["!cols"] = [
+        { wch: 24 }, { wch: 10 }, { wch: 12 }, { wch: 6 }, { wch: 26 },
+        { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 18 },
+      ];
+      detailSheet["!merges"] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+      ];
+      // Freeze the two sheets' header rows (title + range + headers block).
+      summarySheet["!freeze"] = { xSplit: 0, ySplit: 5 };
+      detailSheet["!freeze"]  = { xSplit: 0, ySplit: 4 };
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, summarySheet, "Summary");
+      XLSX.utils.book_append_sheet(wb, detailSheet, "Detail");
+
+      const filename = `attendance_${isoDate(rangeFrom)}_${isoDate(rangeTo)}.xlsx`;
+      XLSX.writeFile(wb, filename);
+      showToast("Excel file downloaded", "success");
     };
   </script>
 </body>

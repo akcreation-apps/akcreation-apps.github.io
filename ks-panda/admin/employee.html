@@ -336,7 +336,27 @@
     );
 
     function renderAttendance(punches, from, to) {
-      // Group by day
+      // --- Pair across the full range (not per calendar day), then
+      // attribute each shift to its IN-date so cross-midnight night shifts
+      // show up as one coherent shift on the day they started, not as two
+      // half-shifts both marked "missing" on either side of midnight. ---
+      const sortedAll = [...punches].sort((a, b) => a.ts - b.ts);
+      const pairsAll = pairInOut(sortedAll);
+      // Index per IN-dayKey so we can credit hours to the shift's start day.
+      // Orphan OUT (no preceding IN) buckets on the OUT's own day.
+      const pairsByStartDay = new Map();
+      for (const pair of pairsAll) {
+        const anchor = pair.in?.ts || pair.out?.ts;
+        if (!anchor) continue;
+        const k = dayKey(anchor);
+        if (!pairsByStartDay.has(k)) pairsByStartDay.set(k, []);
+        pairsByStartDay.get(k).push(pair);
+        if (pair.in && pair.out) pair.ms = pair.out.ts - pair.in.ts;
+      }
+
+      // Punch list is still grouped by each punch's own calendar day so the
+      // raw timeline (and the Edit/Add/Delete controls per punch) stays
+      // intuitive to find.
       const byDay = new Map();
       for (const p of punches) {
         const k = dayKey(p.ts);
@@ -350,16 +370,26 @@
       const dayRows = [];
       for (const k of sortedKeys) {
         const dayPunches = byDay.get(k).sort((a, b) => a.ts - b.ts);
-        const pairs = pairInOut(dayPunches);
+        // Pairs attributed to THIS day's shift-start (not necessarily the
+        // same as the punches listed above — a day can show an OUT whose
+        // IN was yesterday, in which case the OUT belongs to yesterday's
+        // row and this day's dayMs excludes it).
+        const dayPairs = pairsByStartDay.get(k) || [];
         let dayMs = 0;
         let dayHasMissing = false;
-        for (const pair of pairs) {
-          if (pair.in && pair.out) { pair.ms = pair.out.ts - pair.in.ts; dayMs += pair.ms; }
+        for (const pair of dayPairs) {
+          if (pair.in && pair.out) dayMs += pair.ms;
           else dayHasMissing = true;
         }
         if (dayHasMissing) missingDays++;
         totalMs += dayMs;
-        dayRows.push({ date: new Date(dayPunches[0].ts), punches: dayPunches, pairs, totalMs: dayMs, hasMissing: dayHasMissing });
+        dayRows.push({
+          date: new Date(dayPunches[0].ts),
+          punches: dayPunches,
+          pairs: dayPairs,
+          totalMs: dayMs,
+          hasMissing: dayHasMissing,
+        });
       }
 
       // Update quick stats
