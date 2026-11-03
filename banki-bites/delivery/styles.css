@@ -4,8 +4,36 @@
    =========================================================================== */
 
 /* Delivery has no tabbar, so the section-header (filter dropdown) would
-   otherwise sit flush against the topbar — give it some breathing room. */
-#appShell > .content { padding-top: 14px; }
+   otherwise sit flush against the topbar — give it some breathing room.
+   Also drop the admin 1200px content cap and shrink side padding so the
+   Active / History / Earnings segmented bar and every list underneath it
+   spans edge to edge of the viewport. */
+#appShell > .content {
+  padding-top: 14px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+.segmented { width: 100%; margin-left: 0; margin-right: 0; }
+
+/* The admin stylesheet turns #appShell into a sidebar grid at both the
+   >=900px and >=1024px breakpoints — the delivery page has no .tabbar, so
+   that sidebar column just leaves empty space on the left (and squeezes the
+   Active / History / Earnings bar and the orders list into a narrow strip).
+   Force a plain flex column at every viewport so the content always uses
+   the full screen width. */
+#appShell {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  grid-template-areas: none !important;
+}
+#appShell > .topbar,
+#appShell > .content,
+#appShell > .admin-footer { width: 100% !important; max-width: none !important; }
 .section-header {
   margin-bottom: 10px;
   align-items: center;
@@ -192,10 +220,14 @@
 .delivery-actions-spacer { height: 6px; }
 
 /* ===== Delivery order card (collapsible <details>) ===== */
-#ordersList.card-list {
-  max-width: 560px;
-  margin: 0 auto;
+/* Mobile + small tablet: both lists use the full content width so no space is
+   wasted beside the cards. The narrow driver-focus column only kicks in on
+   true desktop (see the >= 900px block further down). */
+#ordersList.card-list,
+#groceryRuns.card-list {
   width: 100%;
+  margin: 0;
+  max-width: none;
 }
 details.delivery-order {
   padding: 0; gap: 0; overflow: hidden;
@@ -743,10 +775,10 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   .addr-block { font-size: 0.92rem; padding: 10px 12px; }
 }
 
-@media (min-width: 992px) {
-  /* Driver focus is one card at a time — keep delivery list narrow & centred */
-  #ordersList.card-list { max-width: 720px; margin: 0 auto; }
-}
+/* Food orders and grocery runs stay edge-to-edge at every viewport, so the
+   two lists line up with each other and with the Active / History / Earnings
+   bar above them. No desktop recentre — it only re-introduces the mismatched
+   widths the user was seeing before. */
 
 /* ===========================================================================
    Awaiting payout — driver-facing settlement list
