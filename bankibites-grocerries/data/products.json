@@ -41,7 +41,7 @@
               "id": 1003,
               "name": "Cerelac Stage 2 Wheat Apple Cherry",
               "featured": false,
-              "deal": true,
+              "deal": false,
               "image": "images/products/CERELAC STG2 Whe App Chry 24x360gWS N1IN.webp",
               "variants": [
                 {
@@ -68,7 +68,7 @@
               "id": 1004,
               "name": "Cerelac Stage 2 Wheat Orange",
               "featured": false,
-              "deal": false,
+              "deal": true,
               "image": "images/products/CERELAC STG2 Wheat Orange 24x300g WS IN.webp",
               "variants": [
                 {
@@ -2010,7 +2010,7 @@
               "id": 3015,
               "name": "Tata Tea Buff Dust",
               "featured": false,
-              "deal": false,
+              "deal": true,
               "image": "images/products/TATA TEA BUFF DUST 1 KG - OR01-MF.webp",
               "variants": [
                 {
@@ -2028,7 +2028,7 @@
               "id": 3030,
               "name": "Tata Tea Premium Leaf",
               "featured": false,
-              "deal": true,
+              "deal": false,
               "image": "images/products/Tata Tea Pr Lf 250g PP-OR-Spcl pr.webp",
               "variants": [
                 {
@@ -2597,7 +2597,7 @@
               "id": 2180,
               "name": "V Wash",
               "featured": true,
-              "deal": false,
+              "deal": true,
               "image": "images/products/V WASH 20ML.webp",
               "variants": [
                 {
@@ -3291,7 +3291,7 @@
               "id": 2031,
               "name": "Dove Nourishing Body Wash",
               "featured": false,
-              "deal": false,
+              "deal": true,
               "image": "images/products/NEW DOVE NOURISHING BODYWASH 300 ML.webp",
               "variants": [
                 {
@@ -3309,7 +3309,7 @@
               "id": 2113,
               "name": "Pears Glycerin Body Wash Pure & Gentle",
               "featured": true,
-              "deal": true,
+              "deal": false,
               "image": "images/products/PEARS GLYCERIN BW PURE & GENTLE 250ML.webp",
               "variants": [
                 {
@@ -3611,7 +3611,7 @@
               "id": 2061,
               "name": "Lakme Complexion Care Cream Bronze",
               "featured": false,
-              "deal": false,
+              "deal": true,
               "image": "images/products/LAKME COMPLEXION CARE CREAM BRONZE 9G.webp",
               "variants": [
                 {
@@ -4079,7 +4079,7 @@
               "id": 2104,
               "name": "Pond's Light Moist",
               "featured": false,
-              "deal": true,
+              "deal": false,
               "image": "images/products/PONDS LGT MOIST 25ML.webp",
               "variants": [
                 {
