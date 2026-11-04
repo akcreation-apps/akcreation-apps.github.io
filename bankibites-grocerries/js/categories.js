@@ -127,7 +127,15 @@
   function renderSubnav() {
     const wrap = $('#subnavInner');
     if (!wrap) return;
-    wrap.innerHTML = state.catalog.categories
+    const hasDeals = state.catalog.categories.some((cat) =>
+      cat.subcategories.some((sub) =>
+        sub.dishes.some((d) => d.deal === true && (d.variants || []).some((v) => v.inStock !== false))
+      )
+    );
+    const offerChip = hasDeals
+      ? `<a class="subnav-item offer" href="deals.html"><i class="fa-solid fa-fire"></i>Offers</a>`
+      : '';
+    const catChips = state.catalog.categories
       .map(
         (c) => `
       <a class="subnav-item${c.id === state.activeCat ? ' active' : ''}"
@@ -136,6 +144,7 @@
       </a>`
       )
       .join('');
+    wrap.innerHTML = offerChip + catChips;
     wrap.querySelectorAll('[data-cat-chip]').forEach((el) => {
       el.addEventListener('click', (e) => {
         e.preventDefault();

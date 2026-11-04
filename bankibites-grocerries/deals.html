@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="theme-color" content="#16A34A" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A0B0F" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+
+  <title>Deals worth picking up · BankiBites Groceries</title>
+  <meta name="description" content="Every BankiBites grocery deal in one place — branded groceries at the best prices, delivered next-day across Banki.">
+
+  <link rel="icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="BankiBites Groceries">
+        <span class="brand-mark"><img src="images/logo.png" alt="" loading="eager"></span>
+        <span class="brand-name" data-vendor-name>BankiBites<span class="accent">.</span></span>
+      </a>
+
+      <button class="location" data-open-place aria-label="Change delivery location">
+        <i class="fa-solid fa-location-dot pin"></i>
+        <span>
+          <span class="label">Deliver to</span>
+          <span class="value"><span data-location-value>Select area</span> <i class="fa-solid fa-chevron-down caret"></i></span>
+        </span>
+      </button>
+
+      <div class="search search-desktop" role="search">
+        <i class="fa-solid fa-magnifying-glass icon-left"></i>
+        <input type="search" id="dealsSearchDesktop" placeholder="Search brands, groceries, essentials…" aria-label="Search">
+        <span class="icon-right"><i class="fa-solid fa-arrow-right"></i></span>
+      </div>
+
+      <div class="header-icons">
+        <button class="icon-btn search-toggle" id="searchToggle" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="icon-btn hide-sm" aria-label="Wishlist"><i class="fa-regular fa-heart"></i></button>
+        <button class="icon-btn hide-sm" aria-label="Account"><i class="fa-regular fa-user"></i></button>
+        <button class="icon-btn" data-open-cart aria-label="Cart">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="count" data-cart-count style="display:none">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-mobile" id="searchMobile">
+      <div class="search" role="search">
+        <i class="fa-solid fa-magnifying-glass icon-left"></i>
+        <input type="search" id="dealsSearchMobile" placeholder="Search brands, essentials…" aria-label="Search">
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile-only delivery strip -->
+  <button type="button" class="mobile-loc-strip" data-open-place aria-label="Change delivery location">
+    <i class="fa-solid fa-location-dot"></i>
+    <span class="ms-text">Delivering to <strong data-location-value>Select area</strong></span>
+    <span class="ms-change">Change <i class="fa-solid fa-chevron-right"></i></span>
+  </button>
+
+  <!-- Category chips row -->
+  <nav class="subnav" aria-label="Categories">
+    <div class="subnav-inner" id="subnavInner"></div>
+  </nav>
+
+  <!-- Page header -->
+  <section class="page-header">
+    <div class="container">
+      <p class="crumbs"><a href="index.html">Home</a> <i class="fa-solid fa-chevron-right"></i> <span>All Deals</span></p>
+      <h1><i class="fa-solid fa-fire" style="color:#ef4444;"></i> Deals worth picking up</h1>
+      <p class="lede">Every grocery essential currently on offer — branded, genuine, and delivered next-day.</p>
+    </div>
+  </section>
+
+  <!-- Deals grid -->
+  <main class="section" style="padding-top: 20px;">
+    <div class="container">
+      <div class="cat-toolbar">
+        <div class="cat-toolbar-info">
+          <strong id="dealsCountText">Loading…</strong>
+          <span id="dealsMetaText"></span>
+        </div>
+        <div class="cat-toolbar-actions">
+          <span class="chip"><i class="fa-solid fa-truck-fast"></i> <span data-eta-short></span></span>
+          <span class="chip" data-eta-cutoff></span>
+          <span class="chip chip-brand"><i class="fa-solid fa-shield-halved"></i> 100% genuine</span>
+        </div>
+      </div>
+
+      <div id="dealsContent"><p class="loading-text">Loading deals…</p></div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html">
+            <span class="brand-mark"><img src="images/logo.png" alt="" loading="eager"></span>
+            <span class="brand-name" data-vendor-name>BankiBites<span class="accent">.</span></span>
+          </a>
+          <p>Trusted grocery essentials for your home. From <span data-city>Banki, Cuttack, Odisha</span>.</p>
+          <div class="footer-social">
+            <a data-wa-link href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            <a data-ig-link href="https://www.instagram.com/bankibites/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; <span id="year"></span> <span data-vendor-full>BankiBites Groceries</span> · A <a data-family-url href="https://akcreation-apps.com/banki-bites/"><span data-family-brand>BankiBites</span></a> family brand · Made in Odisha ❤️ · Part of <a data-parent-url href="https://akcreation-apps.com/services.html"><span data-parent-brand>AK Creation</span></a>.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating cart bar (mobile) -->
+  <div class="view-cart-bar" id="viewCartBar" data-open-cart role="button" tabindex="0">
+    <div class="vcb-info">
+      <i class="fa-solid fa-basket-shopping"></i>
+      <span id="viewCartCount">0 items</span>
+      <span class="vcb-dot"></span>
+      <strong id="viewCartTotal">₹0</strong>
+    </div>
+    <div class="vcb-cta">View Cart <i class="fa-solid fa-arrow-right"></i></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="js/config.js"></script>
+  <script src="js/maintenance.js"></script>
+  <script src="js/variant-picker.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/deals.js"></script>
+  <script src="js/order-history.js"></script>
+  <script type="module">
+    import { writeGroceryOrder, warmWriterConnection } from './js/order-write.js';
+    window.bbWriteGroceryOrder = writeGroceryOrder;
+    warmWriterConnection();
+  </script>
+</body>
+</html>
