@@ -117,8 +117,6 @@
               "name": "Chicken Lollipop Chilli (4Pc)",
               "price": 139,
               "vendor_price": 108,
-              "offer_price": 169,
-              "is_offer": true,
               "available_time": "",
               "not_available_time": 20
             },
@@ -191,6 +189,22 @@
               "is_offer": true,
               "available_time": "",
               "not_available_time": ""
+            },
+            {
+              "id": 305,
+              "name": "Lachha Veg Roll",
+              "price": 79,
+              "vendor_price": 58.5,
+              "available_time": "",
+              "not_available_time": ""
+            },
+            {
+              "id": 306,
+              "name": "Lachha Paneer Roll",
+              "price": 89,
+              "vendor_price": 67.5,
+              "available_time": "",
+              "not_available_time": ""
             }
           ]
         },
@@ -229,6 +243,14 @@
               "vendor_price": 63,
               "available_time": "",
               "not_available_time": ""
+            },
+            {
+              "id": 405,
+              "name": "Laccha Egg Roll",
+              "price": 99,
+              "vendor_price": 72,
+              "available_time": "",
+              "not_available_time": ""
             }
           ]
         }
@@ -247,18 +269,12 @@
               "vendor_price": 9,
               "available_time": "",
               "not_available_time": ""
-            }
-          ]
-        },
-        {
-          "name": "Biryani",
-          "type": "Veg",
-          "dishes": [
+            },
             {
-              "id": 601,
-              "name": "Veg Biryani (Full)",
-              "price": 99,
-              "vendor_price": 72,
+              "id": 502,
+              "name": "Lachha Paratha",
+              "price": 29,
+              "vendor_price": 18,
               "available_time": "",
               "not_available_time": ""
             }
