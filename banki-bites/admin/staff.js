@@ -356,13 +356,27 @@ function copyEtaRanking(root) {
   const footer = '\n\n_Team BankiBites 💚_';
   const text = header + body + footer;
 
-  // Open WhatsApp with the message prefilled but no recipient — admin picks
-  // the partner / group / broadcast list from the WhatsApp contact chooser.
-  // The button click itself is the user gesture, so go straight to wa.me
-  // without any Swal / async step in between (needed to keep the gesture
-  // fresh on mobile so WhatsApp opens directly instead of the interstitial).
-  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
-  window.location.href = waUrl;
+  // Copy to clipboard synchronously via execCommand (modern async clipboard
+  // API loses the race with window.location.href on mobile), then open the
+  // delivery-partners WhatsApp group. chat.whatsapp.com URLs can't carry a
+  // prefilled ?text= payload — so admin pastes once inside the group.
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+  ta.style.width = '1px'; ta.style.height = '1px';
+  ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+  } catch (e) {}
+
+  window.location.href = 'https://chat.whatsapp.com/JVivP6n7w7D5xYkH29J9oL';
 }
 
 function staffOrdersFor(uid) {

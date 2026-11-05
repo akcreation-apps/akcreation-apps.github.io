@@ -799,11 +799,41 @@ function renderKpis(el, orders, ordersAll, partners, staff, rules) {
   `;
 }
 
-// Opens WhatsApp with a short Odia/English daily summary — approved vs
-// cancelled vs fake orders, new customers, and today's revenue (delivered
-// only). Uses the cached orders/customers from the latest refresh() so no
-// extra Firestore reads happen on click (keeping the user gesture fresh so
-// mobile WhatsApp opens directly instead of the interstitial).
+// WhatsApp group that receives the daily dashboard summary. Clicking the
+// Share button copies the formatted message to the clipboard and opens this
+// group directly — paste once inside to send.
+const DASHBOARD_WA_GROUP_URL = 'https://chat.whatsapp.com/F329gpCzLre2FLm90gCxJq';
+
+// Synchronous clipboard copy via execCommand — the modern async
+// navigator.clipboard.writeText loses the race with window.location.href on
+// mobile, so we fall back to the deprecated-but-synchronous API that still
+// works inside a direct click handler.
+function syncCopyToClipboard(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+  ta.style.width = '1px'; ta.style.height = '1px';
+  ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+  } catch (e) {}
+  return ok;
+}
+
+// Copies a short Odia/English daily summary to the clipboard and opens the
+// BankiBites dashboard WhatsApp group. Admin pastes inside the group to
+// send. chat.whatsapp.com URLs cannot carry a prefilled ?text= payload —
+// that's a WhatsApp platform limitation, so copy + open + paste is the
+// cleanest end-to-end flow. Uses the cached orders/customers from the latest
+// refresh() so no extra Firestore reads happen on click.
 function shareDailySummary() {
   const now = new Date();
   const dayStart = startOfDay(now);
@@ -847,10 +877,8 @@ function shareDailySummary() {
   ];
   const text = lines.join('\n');
 
-  // Fresh user gesture — go straight to wa.me so WhatsApp opens the
-  // contact picker instead of the mobile interstitial.
-  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
-  window.location.href = waUrl;
+  syncCopyToClipboard(text);
+  window.location.href = DASHBOARD_WA_GROUP_URL;
 }
 
 function renderOrdersPerDay(orders, p) {
