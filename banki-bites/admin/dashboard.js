@@ -11,6 +11,11 @@ import { refreshStaffData } from './staff.js';
 
 const charts = new Map(); // canvas-id -> Chart instance (so we destroy on re-render)
 
+// Cached snapshots from the latest refresh() so the "Share summary" button
+// can build today's numbers without hitting Firestore again.
+let _lastOrdersAll = [];
+let _lastCustomers = [];
+
 // Hard cap on how far back we ever fetch from Firestore. Keeps memory bounded
 // and prevents runaway queries on custom ranges the admin might type.
 // Declared above `state` because normalizeRange() reads it at module init.
@@ -166,6 +171,11 @@ export async function renderDashboard(root, db) {
     <div class="section-header section-header--compact">
       <h3 class="m-0"><i class="fas fa-chart-line text-primary mr-1"></i> Dashboard</h3>
       <div class="d-flex" style="gap:6px;flex-wrap:wrap">
+        <button id="dashShareSummary" class="btn btn-sm btn-outline-success" aria-label="Share today's summary on WhatsApp"
+                title="Share today's summary on WhatsApp">
+          <i class="fab fa-whatsapp" aria-hidden="true"></i>
+          <span class="d-none d-sm-inline ml-1" aria-hidden="true">Share summary</span>
+        </button>
         <button id="dashFeeRules" class="btn btn-sm btn-outline-secondary" aria-label="Edit fee rules">
           <i class="fas fa-sliders" aria-hidden="true"></i>
           <span class="d-none d-sm-inline ml-1" aria-hidden="true">Fee rules</span>
@@ -335,6 +345,7 @@ export async function renderDashboard(root, db) {
     }
   });
   document.getElementById('dashFeeRules').addEventListener('click', () => openFeeRulesEditor(db, root));
+  document.getElementById('dashShareSummary').addEventListener('click', () => shareDailySummary());
 }
 
 async function openFeeRulesEditor(db, root) {
@@ -566,6 +577,11 @@ async function refresh(root, db) {
   const customers = [];
   customersSnap.forEach(d => customers.push({ phone: d.id, ...d.data() }));
 
+  // Cached so the "Share summary" button can rebuild today's numbers without
+  // a second Firestore read. Covers whichever source (food/grocery) is live.
+  _lastOrdersAll = ordersAll;
+  _lastCustomers = customers;
+
   // Filter to the selected range for every chart/KPI that respects the picker.
   // MoM KPI + MoM chart use the always-loaded last-month window instead.
   const range = state.range;
@@ -781,6 +797,60 @@ function renderKpis(el, orders, ordersAll, partners, staff, rules) {
       </div>
     </div>
   `;
+}
+
+// Opens WhatsApp with a short Odia/English daily summary — approved vs
+// cancelled vs fake orders, new customers, and today's revenue (delivered
+// only). Uses the cached orders/customers from the latest refresh() so no
+// extra Firestore reads happen on click (keeping the user gesture fresh so
+// mobile WhatsApp opens directly instead of the interstitial).
+function shareDailySummary() {
+  const now = new Date();
+  const dayStart = startOfDay(now);
+  const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+  const inToday = (ts) => {
+    const d = toDateSafe(ts);
+    return d && d >= dayStart && d < dayEnd;
+  };
+
+  const orders = (_lastOrdersAll || []).filter(o => inToday(o.created_at));
+  const isFake = (o) => o.status === 'fake' || o.is_fake === true;
+  const cancelled = orders.filter(o => o.status === 'cancelled' && !isFake(o));
+  const fake = orders.filter(isFake);
+  // "Approved" = every live order that's neither cancelled nor fake —
+  // everything admin accepted, whether it's still being processed or already
+  // delivered. Matches how admin reads the day end-of-day.
+  const approved = orders.filter(o => !isFake(o) && o.status !== 'cancelled');
+  const delivered = orders.filter(o => o.status === 'delivered' && !isFake(o));
+  const revenue = delivered.reduce((s, o) => s + netRevenue(o), 0);
+
+  const newCustomers = (_lastCustomers || []).filter(c => inToday(c.created_at));
+
+  const sourceLabel = state.source === 'grocery' ? 'Grocery' : 'Food';
+  const dateLabel = now.toLocaleDateString('en-IN', {
+    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+  });
+
+  const lines = [
+    `📊 *BankiBites — ${sourceLabel} daily summary*`,
+    `🗓️ ${dateLabel}`,
+    '',
+    `✅ Approved orders: *${approved.length}*  (delivered: ${delivered.length})`,
+    `❌ Cancelled: *${cancelled.length}*`,
+    `🚫 Fake: *${fake.length}*`,
+    '',
+    `🧑‍🤝‍🧑 New customers today: *${newCustomers.length}*`,
+    `💰 Revenue (delivered): *${fmtINR(revenue)}*`,
+    '',
+    'ଆଜିର ବିବରଣୀ — Team ପାଇଁ ।',
+    '_Team BankiBites 💚_',
+  ];
+  const text = lines.join('\n');
+
+  // Fresh user gesture — go straight to wa.me so WhatsApp opens the
+  // contact picker instead of the mobile interstitial.
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.location.href = waUrl;
 }
 
 function renderOrdersPerDay(orders, p) {
