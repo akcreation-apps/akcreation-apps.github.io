@@ -171,8 +171,8 @@ export async function renderDashboard(root, db) {
     <div class="section-header section-header--compact">
       <h3 class="m-0"><i class="fas fa-chart-line text-primary mr-1"></i> Dashboard</h3>
       <div class="d-flex" style="gap:6px;flex-wrap:wrap">
-        <button id="dashShareSummary" class="btn btn-sm btn-outline-success" aria-label="Share today's summary on WhatsApp"
-                title="Share today's summary on WhatsApp">
+        <button id="dashShareSummary" class="btn btn-sm btn-outline-success" aria-label="Share today's summary in the BankiBites WhatsApp group"
+                title="Copy today's summary and open the BankiBites WhatsApp group — paste inside to send">
           <i class="fab fa-whatsapp" aria-hidden="true"></i>
           <span class="d-none d-sm-inline ml-1" aria-hidden="true">Share summary</span>
         </button>

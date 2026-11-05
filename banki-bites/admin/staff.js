@@ -85,7 +85,7 @@ export async function renderStaff(root, db) {
     </details>
 
     <div class="section-header section-header--compact section-header--end" style="gap:8px;flex-wrap:wrap">
-      <button id="copyEtaBtn" class="btn btn-sm btn-outline-success" title="Open WhatsApp with the ETA ranking prefilled — pick the recipient from your contacts">
+      <button id="copyEtaBtn" class="btn btn-sm btn-outline-success" title="Copy the ETA ranking and open the delivery partners WhatsApp group — paste inside to send">
         <i class="fab fa-whatsapp mr-1"></i> Share ETA ranking
       </button>
       <button id="addStaffBtn" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i> Add staff</button>
