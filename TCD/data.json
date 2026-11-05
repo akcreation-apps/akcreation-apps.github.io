@@ -325,7 +325,7 @@
               "vendor_price": 99,
               "offer_price": 139,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -335,7 +335,7 @@
               "vendor_price": 99,
               "offer_price": 139,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -345,7 +345,7 @@
               "vendor_price": 99,
               "offer_price": 139,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -361,7 +361,7 @@
               "vendor_price": 99,
               "offer_price": 169,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -371,7 +371,7 @@
               "vendor_price": 99,
               "offer_price": 169,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -381,7 +381,7 @@
               "vendor_price": 99,
               "offer_price": 169,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -457,7 +457,6 @@
               "available_time": "",
               "not_available_time": ""
             },
-
             {
               "id": 104,
               "name": "Paneer Manchurian",
@@ -577,7 +576,7 @@
               "vendor_price": 119,
               "offer_price": 139,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -587,7 +586,7 @@
               "vendor_price": 119,
               "offer_price": 159,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -597,7 +596,7 @@
               "vendor_price": 119,
               "offer_price": 169,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -607,7 +606,7 @@
               "vendor_price": 119,
               "offer_price": 159,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -623,7 +622,7 @@
               "vendor_price": 119,
               "offer_price": 159,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -633,7 +632,7 @@
               "vendor_price": 119,
               "offer_price": 159,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             },
             {
@@ -643,7 +642,7 @@
               "vendor_price": 119,
               "offer_price": 159,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
@@ -664,7 +663,7 @@
               "vendor_price": 99,
               "offer_price": 139,
               "is_offer": true,
-              "available_time": "",
+              "available_time": 12,
               "not_available_time": ""
             }
           ]
