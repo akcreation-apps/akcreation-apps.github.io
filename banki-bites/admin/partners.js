@@ -19,6 +19,7 @@ const EMPTY = {
   name: '', logo: '', url: '', services: [], rating: 4.5,
   opening_hour: '08', closing_hour: '22', break_start_hour: '', break_end_hour: '', address: '', point_of_contact: '',
   eta_minutes: '',
+  whatsapp_group_url: '',
   is_active: true, is_removed: false, is_veg: false, is_homemade: false, is_separate_price: false,
   sort_order: 0, sync_collection: '', sync_doc_id: '',
 };
@@ -472,6 +473,12 @@ async function openEditor(db, existing, root) {
         <input class="form-control" type="number" name="eta_minutes" min="1" step="1" inputmode="numeric"
                placeholder="e.g. 45" value="${p.eta_minutes != null && p.eta_minutes !== '' ? escapeAttr(p.eta_minutes) : ''}">
       </div>
+      <div class="form-group">
+        <label>WhatsApp group invite URL <small class="text-muted">(paste full https://chat.whatsapp.com/… link)</small></label>
+        <input class="form-control" type="url" name="whatsapp_group_url" inputmode="url"
+               placeholder="https://chat.whatsapp.com/XXXXXXXXXXXXXXXX"
+               value="${escapeAttr(p.whatsapp_group_url || '')}">
+      </div>
       <small class="text-muted d-block" style="margin-top:-.25rem;margin-bottom:.75rem">Leave both blank for no break. Break must fall inside open/close hours.</small>
       <div class="form-group"><label>Address</label><textarea class="form-control" name="address" rows="2">${escapeHtml(p.address)}</textarea></div>
       <div class="form-group">
@@ -546,6 +553,7 @@ async function openEditor(db, existing, root) {
         break_end_hour:   (fd.get('break_end_hour')   || '').trim(),
         address: fd.get('address').trim(),
         eta_minutes: (fd.get('eta_minutes') || '').toString().trim(),
+        whatsapp_group_url: (fd.get('whatsapp_group_url') || '').toString().trim(),
         point_of_contact: pocRaw ? normalisePhone(pocRaw) : '',
         is_active: f.querySelector('#paIsActive').checked,
         is_removed: f.querySelector('#paIsRemoved').checked,
@@ -609,6 +617,15 @@ async function openEditor(db, existing, root) {
           return false;
         }
         data.eta_minutes = etaNum;
+      }
+      // WhatsApp group URL is optional, but when provided must be a
+      // chat.whatsapp.com invite link so the orders page can open it directly.
+      if (data.whatsapp_group_url) {
+        const url = data.whatsapp_group_url;
+        if (!/^https?:\/\/chat\.whatsapp\.com\//i.test(url)) {
+          Swal.showValidationMessage('WhatsApp group URL must start with https://chat.whatsapp.com/');
+          return false;
+        }
       }
       // Point of contact is mandatory for both add and edit — every partner
       // must have a reachable phone before the record can be saved.

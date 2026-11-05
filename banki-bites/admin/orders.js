@@ -13,6 +13,52 @@ import {
 // on the orders collection across tab switches.
 let _ordersUnsub = null;
 
+// Cached partner → WhatsApp-group-URL map. Pre-loaded once in renderOrders()
+// so the per-card "Send to restaurant" button can read the URL without a
+// Firestore round-trip on every click. The partner doc id is a name-slug
+// (e.g. "the-cafe-darbar") but orders carry a short restaurant_id ("TCD")
+// — so we index each partner under every key we might later match against:
+// the doc id, the lowercased name, the trailing path segment of the public
+// URL (that's usually the restaurant_id's folder, e.g. "TCD"), and both
+// casings of each.
+let _partnerGroupUrlByKey = new Map();
+function addPartnerIndex(key, url) {
+  if (!key || !url) return;
+  const k = String(key).trim();
+  if (!k) return;
+  _partnerGroupUrlByKey.set(k, url);
+  _partnerGroupUrlByKey.set(k.toLowerCase(), url);
+  _partnerGroupUrlByKey.set(k.toUpperCase(), url);
+}
+function indexPartner(id, data) {
+  const url = data?.whatsapp_group_url;
+  if (!url) return;
+  addPartnerIndex(id, url);
+  addPartnerIndex(data.name, url);
+  // Trailing folder segment of the public URL — e.g. ".../TCD/" -> "TCD".
+  const u = String(data.url || '').replace(/[?#].*$/, '').replace(/\/+$/, '');
+  const seg = u.split('/').pop();
+  addPartnerIndex(seg, url);
+}
+function partnerGroupUrlFor(o) {
+  if (!o) return '';
+  const candidates = [
+    o.restaurant_id,
+    o.restaurant_name,
+    // The storefront sometimes stores the folder name on the order itself
+    // (see onboarding-tool templates); harmless to try.
+    o.restaurant_folder,
+  ];
+  for (const c of candidates) {
+    if (!c) continue;
+    const url = _partnerGroupUrlByKey.get(c)
+      || _partnerGroupUrlByKey.get(String(c).toLowerCase())
+      || _partnerGroupUrlByKey.get(String(c).toUpperCase());
+    if (url) return url;
+  }
+  return '';
+}
+
 // ── Per-restaurant ETA loader ──────────────────────────────────────────────
 // Reads etaMinutes straight from each restaurant's own /<folder>/restaurant.js
 // so the Notify-ETA dialog defaults match the value the restaurant configured
@@ -319,6 +365,12 @@ export async function renderOrders(root, db) {
   const staffSnap = await getDocs(collection(db, COL.STAFF));
   const staff = [];
   staffSnap.forEach(d => staff.push({ uid: d.id, ...d.data() }));
+
+  // Pre-load partners once so each order card can look up its restaurant's
+  // WhatsApp group invite URL without a per-click Firestore read.
+  const partnersSnap = await getDocs(collection(db, COL.PARTNERS));
+  _partnerGroupUrlByKey = new Map();
+  partnersSnap.forEach(d => indexPartner(d.id, d.data() || {}));
 
   // Pre-load customers for the picker. Held in a Map<phone, customer> and
   // mutated in-place when the admin creates/edits a customer from a card.
@@ -670,8 +722,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     <div class="order-section">
       <div class="order-section-head order-section-head--row">
         <span><i class="fas fa-list"></i> Items</span>
-        <button type="button" class="btn btn-sm btn-outline-secondary btn-copy-items" data-act="copyItems" title="Copy items to send to the restaurant">
-          <i class="fas fa-copy"></i> Copy
+        <button type="button" class="btn btn-sm btn-outline-success btn-copy-items" data-act="copyItems"
+                title="Copy items and open this restaurant's WhatsApp group">
+          <i class="fab fa-whatsapp"></i> Send
         </button>
       </div>
       <ul class="order-items">${itemsHtml}</ul>
@@ -1178,11 +1231,11 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   //   Items:
   //   • Chicken Biryani  →  *×2*
   //   • Paneer Butter Masala  →  *×1*
-  card.querySelector('[data-act="copyItems"]').addEventListener('click', async (ev) => {
+  card.querySelector('[data-act="copyItems"]').addEventListener('click', (ev) => {
     const btn = ev.currentTarget;
     const items = o.items || [];
     if (!items.length) {
-      Swal.fire({ icon: 'info', title: 'No items', text: 'This order has no items to copy.', confirmButtonColor: '#FF6B35' });
+      Swal.fire({ icon: 'info', title: 'No items', text: 'This order has no items to send.', confirmButtonColor: '#FF6B35' });
       return;
     }
     const lines = [];
@@ -1199,24 +1252,54 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       lines.push(`• ${i.name}  →  *×${qty}*`);
     });
     const text = lines.join('\n');
+
+    // Copy synchronously via execCommand BEFORE navigating — the modern
+    // navigator.clipboard.writeText is async and loses the race with
+    // window.location.href on most mobile browsers, which is why the
+    // group was opening with an empty clipboard. execCommand is deprecated
+    // but every WhatsApp-capable browser still honours it when invoked
+    // inside a direct click handler.
+    const copySync = (t) => {
+      const ta = document.createElement('textarea');
+      ta.value = t;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+      ta.style.width = '1px'; ta.style.height = '1px';
+      ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      return ok;
+    };
+    const copied = copySync(text);
+    // Also fire the modern API as a secondary — harmless if it races, but
+    // on desktop Chrome the clipboard permission model prefers it.
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
+        navigator.clipboard.writeText(text).catch(() => {});
       }
+    } catch (e) {}
+
+    const groupUrl = partnerGroupUrlFor(o);
+    if (!groupUrl) {
+      // No group configured for this restaurant — fall back to copy-only with
+      // a clear note so admin knows to set the URL in the partner form.
       const original = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-check"></i> Copied';
       btn.disabled = true;
       setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1500);
-    } catch (err) {
-      console.error('[orders] copy items failed:', err);
-      Swal.fire({ icon: 'error', title: 'Copy failed', text: 'Could not copy to clipboard. Please copy manually.', confirmButtonColor: '#FF6B35' });
+      Swal.fire({
+        icon: 'info',
+        title: 'No WhatsApp group linked',
+        html: 'Items copied — but this restaurant has no WhatsApp group URL in the Partners form. Add it there so one tap opens the group next time.',
+        confirmButtonColor: '#FF6B35',
+      });
+      return;
     }
+    if (!copied) console.warn('[orders] clipboard copy failed — group will open but admin may need to retry.');
+    window.location.href = groupUrl;
   });
 
   // Notify ETA — WhatsApp greeting with the customer's name and an estimated
