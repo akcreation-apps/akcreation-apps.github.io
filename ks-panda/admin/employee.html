@@ -83,6 +83,7 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, initials, setYear, fmtDate, fmtTime } from "../assets/ui.js";
+    import { isVerificationUser } from "../assets/config.js";
     import {
       collection, doc, onSnapshot, updateDoc,
       addDoc, deleteDoc, serverTimestamp, Timestamp, query, orderBy, where
@@ -227,6 +228,10 @@
       empData = data;
       document.getElementById("emp-title").textContent = empData.name || empData.email || "Employee";
       document.title = `KS Panda — ${empData.name || "Employee"}`;
+      // Verification accounts can't be mutated — hide the Add-punch button
+      // entirely so it doesn't tease the admin into clicking it.
+      const addBtn = document.getElementById("btn-add-punch");
+      if (addBtn) addBtn.style.display = isVerificationUser(empData) ? "none" : "";
       renderProfile();
     });
 
@@ -277,14 +282,20 @@
         </div>
 
         <div class="ks-form-actions" style="margin-top:14px;">
-          ${isAdmin ? `<button class="btn btn-outline-primary btn-sm" id="btn-edit-info"><i class="fa-solid fa-pen"></i> Edit name & contact</button>` : ""}
+          ${(isAdmin && !isVerificationUser(u))
+            ? `<button class="btn btn-outline-primary btn-sm" id="btn-edit-info"><i class="fa-solid fa-pen"></i> Edit name & contact</button>`
+            : ""}
+          ${isVerificationUser(u)
+            ? `<span class="badge badge-info"><i class="fa-solid fa-lock" style="font-size:.7em;"></i> Verification account — read only</span>`
+            : ""}
         </div>
       `;
 
-      // Edit name & contact is admin-only. For managers the button isn't
-      // rendered at all, so we guard the wiring to avoid a null deref.
+      // Edit name & contact is admin-only AND hidden for the verification
+      // user. The button isn't rendered in either suppressed case, so
+      // guard the wiring to avoid a null deref.
       const editInfoBtn = panel.querySelector("#btn-edit-info");
-      if (isAdmin && editInfoBtn) editInfoBtn.onclick = openEditInfoModal;
+      if (editInfoBtn) editInfoBtn.onclick = openEditInfoModal;
       updateTodayStat();
     }
 
@@ -623,6 +634,11 @@
     if (btnAddPunch) btnAddPunch.onclick = async () => {
       if (accessBlocked) return;
       if (!empData) { showToast("Profile has not loaded yet", "warn"); return; }
+      // Verification account is read-only — no punches can be added.
+      if (isVerificationUser(empData)) {
+        showToast("Verification account is read-only", "warn");
+        return;
+      }
       // Site dropdown must only list sites BOTH the employee and the viewer
       // can access. For admins that reduces to the employee's own sites;
       // for managers it's the intersection with their assigned scope.

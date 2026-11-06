@@ -159,6 +159,7 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, setYear } from "../assets/ui.js";
+    import { isVerificationSite, VERIFICATION_SITE_NAME } from "../assets/config.js";
     import { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -373,9 +374,13 @@
         const userCount = siteUserCount.get(siteId) || 0;
         const isActive = s.active !== false;
         const radius = Number.isFinite(s.radiusMeters) ? s.radiusMeters : null;
+        // Verification site is frozen — no Edit / Disable / Delete buttons
+        // are rendered and the row is marked with a padlock badge so admin
+        // knows it's maintained via `assets/config.js`, not the UI.
+        const isVerifSite = isVerificationSite(s);
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td data-label="Name"><strong>${escapeHtml(s.name || "")}</strong></td>
+          <td data-label="Name"><strong>${escapeHtml(s.name || "")}</strong>${isVerifSite ? ` <span class="badge badge-info" style="margin-left:6px;" title="Verification site — managed via config.js"><i class="fa-solid fa-lock" style="font-size:.7em;"></i> Verification</span>` : ""}</td>
           <td data-label="Address" class="text-muted">${escapeHtml(s.address || "—")}</td>
           <td data-label="Lat, Lng" class="text-muted">${
             (Number.isFinite(s.lat) && Number.isFinite(s.lng))
@@ -396,18 +401,21 @@
               ? '<span class="badge badge-approved"><i class="fa-solid fa-circle-check" style="font-size:.7em;"></i> Active</span>'
               : '<span class="badge badge-rejected"><i class="fa-solid fa-circle-xmark" style="font-size:.7em;"></i> Off</span>'}</td>
           <td class="ks-table-actions ks-card-actions">
-            <button class="btn btn-sm btn-outline-primary" data-edit>
-              <i class="fa-solid fa-pen-to-square"></i> Edit
-            </button>
-            <button class="btn btn-sm ${isActive ? "btn-outline-warning" : "btn-success"}" data-toggle>
-              <i class="fa-solid ${isActive ? "fa-ban" : "fa-circle-check"}"></i>
-              ${isActive ? "Disable" : "Enable"}
-            </button>
-            <button class="btn btn-sm btn-outline-danger" data-delete title="Permanently delete this site">
-              <i class="fa-solid fa-trash"></i> Delete
-            </button>
+            ${isVerifSite
+              ? `<span class="text-muted small" title="Verification site is read-only; change it from assets/config.js"><i class="fa-solid fa-lock"></i> Read-only</span>`
+              : `
+                <button class="btn btn-sm btn-outline-primary" data-edit>
+                  <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <button class="btn btn-sm ${isActive ? "btn-outline-warning" : "btn-success"}" data-toggle>
+                  <i class="fa-solid ${isActive ? "fa-ban" : "fa-circle-check"}"></i>
+                  ${isActive ? "Disable" : "Enable"}
+                </button>
+                <button class="btn btn-sm btn-outline-danger" data-delete title="Permanently delete this site">
+                  <i class="fa-solid fa-trash"></i> Delete
+                </button>`}
           </td>`;
-        tr.querySelector('[data-edit]').onclick = async () => {
+        tr.querySelector('[data-edit]')?.addEventListener('click', async () => {
           // Initial switch state: honour the stored flag, but also default to
           // ON for legacy docs that have valid coords+radius without the
           // explicit field — otherwise saving would silently clear them.
@@ -558,8 +566,8 @@
             });
           }
           await modalPromise;
-        };
-        tr.querySelector('[data-delete]').onclick = async () => {
+        });
+        tr.querySelector('[data-delete]')?.addEventListener('click', async () => {
           const uc = siteUserCount.get(d.id) || 0;
           if (uc > 0) {
             const userList = (siteUserNames.get(d.id) || []).slice(0, 8).map(n => escapeHtml(n)).join(", ");
@@ -632,7 +640,7 @@
             }
           }
           await delModalPromise;
-        };
+        });
         const openMapLink = tr.querySelector('[data-open-map]');
         if (openMapLink) {
           openMapLink.onclick = async (ev) => {
@@ -650,7 +658,7 @@
             });
           };
         }
-        tr.querySelector('[data-toggle]').onclick = async (ev) => {
+        tr.querySelector('[data-toggle]')?.addEventListener('click', async (ev) => {
           const btn = ev.currentTarget;
           if (isActive) {
             const confirmed = await openModal({
@@ -678,7 +686,7 @@
             showToast(e.message, "danger");
             btn.disabled = false;
           }
-        };
+        });
         tbody.appendChild(tr);
       });
     }

@@ -139,6 +139,7 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
+    import { isVerificationUser } from "../assets/config.js";
     import { collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -305,12 +306,15 @@
       filtered.forEach(u => {
         const badgeClass = { pending: 'badge-pending', approved: 'badge-approved', rejected: 'badge-rejected', disabled: 'badge-muted' }[u.status] ?? 'badge-muted';
         const assigned = new Set(u.assignedSiteIds ?? []);
+        // Verification user is frozen — no site-assignment edits, no role
+        // changes, no actions. Managed from `assets/config.js`.
+        const isVerif = isVerificationUser(u);
         const sitesCells = availableSites.length === 0
           ? '<em class="text-muted small">No sites</em>'
           : `<div class="ks-chips">
               ${availableSites.map(s => `
                 <label class="ks-chip">
-                  <input type="checkbox" value="${escapeHtml(s.id)}" ${assigned.has(s.id) ? 'checked' : ''} data-site${isAdmin ? "" : " disabled"}>
+                  <input type="checkbox" value="${escapeHtml(s.id)}" ${assigned.has(s.id) ? 'checked' : ''} data-site${(isAdmin && !isVerif) ? "" : " disabled"}>
                   <span>${escapeHtml(s.name)}</span>
                 </label>`).join("")}
             </div>`;
@@ -320,29 +324,40 @@
             <a href="employee.html?uid=${encodeURIComponent(u.id)}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;" title="View profile">
               <span class="ks-avatar" style="width:36px;height:36px;font-size:.85rem;">${initials(toTitleCase(u.name || "") || u.email || "?")}</span>
               <div>
-                <div style="font-weight:600;">${escapeHtml(toTitleCase(u.name || "") || "—")}</div>
+                <div style="font-weight:600;">${escapeHtml(toTitleCase(u.name || "") || "—")}${isVerif ? ` <span class="badge badge-info" style="font-size:.65rem;margin-left:4px;" title="Verification account — managed via config.js"><i class="fa-solid fa-lock" style="font-size:.7em;"></i> Verification</span>` : ""}</div>
                 <div class="text-muted" style="font-size:.8rem;">${escapeHtml(u.email || "")}</div>
               </div>
             </a>
           </td>
-          <td data-label="Role" data-col="role">
-            <select class="form-control" data-role${isAdmin ? "" : " disabled"}>
-              <option value="employee"${u.role === 'employee' ? ' selected' : ''}>Employee</option>
-              <option value="manager"${u.role === 'manager' ? ' selected' : ''}>Manager</option>
-              ${isAdmin ? `<option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>` : (u.role === 'admin' ? `<option value="admin" selected disabled>Admin</option>` : "")}
-            </select>
-          </td>
-          <td data-label="Status" data-col="status"><span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span></td>
-          <td data-label="Sites" data-col="sites">${sitesCells}</td>
+          <td data-label="Role" data-col="role">${
+            isVerif
+              ? '<span class="text-muted small">—</span>'
+              : `<select class="form-control" data-role${isAdmin ? "" : " disabled"}>
+                  <option value="employee"${u.role === 'employee' ? ' selected' : ''}>Employee</option>
+                  <option value="manager"${u.role === 'manager' ? ' selected' : ''}>Manager</option>
+                  ${isAdmin ? `<option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>` : (u.role === 'admin' ? `<option value="admin" selected disabled>Admin</option>` : "")}
+                </select>`
+          }</td>
+          <td data-label="Status" data-col="status">${
+            isVerif
+              ? '<span class="text-muted small">—</span>'
+              : `<span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span>`
+          }</td>
+          <td data-label="Sites" data-col="sites">${
+            isVerif ? '<span class="text-muted small">—</span>' : sitesCells
+          }</td>
           <td class="ks-table-actions ks-card-actions" data-col="actions">
-            ${isAdmin ? `<button class="ks-icon-btn ks-icon-btn--primary" data-save style="display:none;" aria-label="Save" title="Save changes"><i class="fa-solid fa-floppy-disk"></i></button>` : ""}
-            ${isAdmin && u.status === "approved"
-              ? '<button class="ks-icon-btn ks-icon-btn--reject" data-toggle-status style="margin-left:6px;" aria-label="Deactivate" title="Deactivate"><i class="fa-solid fa-user-slash"></i></button>'
-              : isAdmin && u.status === "disabled"
-              ? '<button class="ks-icon-btn ks-icon-btn--approve" data-toggle-status style="margin-left:6px;" aria-label="Reactivate" title="Reactivate"><i class="fa-solid fa-user-check"></i></button>'
-              : ''}
-            ${isAdmin ? `<button class="ks-icon-btn ks-icon-btn--reject" data-delete style="margin-left:6px;" aria-label="Delete permanently" title="Delete permanently"><i class="fa-solid fa-trash"></i></button>` : ""}
-            ${isAdmin ? "" : `<span class="text-muted small" title="View-only for managers"><i class="fa-solid fa-eye"></i> View only</span>`}
+            ${isVerif
+              ? `<span class="text-muted small" title="Verification account is read-only; change it from assets/config.js"><i class="fa-solid fa-lock"></i> Read-only</span>`
+              : `
+                ${isAdmin ? `<button class="ks-icon-btn ks-icon-btn--primary" data-save style="display:none;" aria-label="Save" title="Save changes"><i class="fa-solid fa-floppy-disk"></i></button>` : ""}
+                ${isAdmin && u.status === "approved"
+                  ? '<button class="ks-icon-btn ks-icon-btn--reject" data-toggle-status style="margin-left:6px;" aria-label="Deactivate" title="Deactivate"><i class="fa-solid fa-user-slash"></i></button>'
+                  : isAdmin && u.status === "disabled"
+                  ? '<button class="ks-icon-btn ks-icon-btn--approve" data-toggle-status style="margin-left:6px;" aria-label="Reactivate" title="Reactivate"><i class="fa-solid fa-user-check"></i></button>'
+                  : ''}
+                ${isAdmin ? `<button class="ks-icon-btn ks-icon-btn--reject" data-delete style="margin-left:6px;" aria-label="Delete permanently" title="Delete permanently"><i class="fa-solid fa-trash"></i></button>` : ""}
+                ${isAdmin ? "" : `<span class="text-muted small" title="View-only for managers"><i class="fa-solid fa-eye"></i> View only</span>`}`}
           </td>`;
         // Dirty tracking — Save button only exists for admins, so skip the
         // whole wiring for managers (the inputs are also `disabled`).

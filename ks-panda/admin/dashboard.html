@@ -124,6 +124,7 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, initials, setYear, fmtDate, fmtTime, fmtDateTime } from "../assets/ui.js";
+    import { isVerificationSite, isVerificationUser } from "../assets/config.js";
     import {
       collection, doc, onSnapshot, writeBatch, addDoc, updateDoc, serverTimestamp,
       collectionGroup, query, where, Timestamp, getDoc
@@ -184,15 +185,24 @@
     // Live users (one subscription, reused everywhere). Also re-runs the
     // correction-requests render so any request filtered out as "unknown
     // user" when users hadn't arrived yet gets re-evaluated now.
+    //
+    // Verification user is suppressed everywhere — it's not a real
+    // employee so it shouldn't contribute to Present / Active / Overtime
+    // counts, shouldn't surface in correction requests, and shouldn't
+    // appear in session cards.
     onSnapshot(collection(db, "attn_users"), (snap) => {
-      allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      allUsers = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(u => !isVerificationUser(u));
       recomputeKpis();
       if (lastEditRequestsRaw) renderEditRequests(lastEditRequestsRaw).catch(err => console.warn("[dashboard] edit-requests re-render failed", err));
     });
 
     // Live sites. For managers, only their assigned sites make it into the
     // lookup — everything downstream (per-site headcount, drill-downs,
-    // approval site chips) is filtered by this alone.
+    // approval site chips) is filtered by this alone. The verification
+    // site is also suppressed everywhere on the dashboard because it's
+    // not a real work location.
     const availableSites = [];
     onSnapshot(collection(db, "attn_sites"), (snap) => {
       availableSites.length = 0;
@@ -200,6 +210,7 @@
       snap.forEach(d => {
         if (isScoped && !viewerAllowedSiteIds.has(d.id)) return;
         const s = d.data();
+        if (isVerificationSite(s)) return;
         allSites.set(d.id, s);
         if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
       });
