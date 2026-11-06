@@ -12,6 +12,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    /* Pulse dot used on the "Currently working" chip inside the site
+       drill-down modal. Kept here (not in the shared stylesheet) because
+       it's only referenced on this page. */
+    @keyframes ks-pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: .35; }
+    }
+  </style>
 </head>
 <body>
   <main class="ks-main">
@@ -474,13 +483,22 @@
       const assignedNoPunch = [];
       const unassignedPunchedHere = [];   // users who punched at this site without being assigned
 
+      // Each punched-here entry carries the latest-punch metadata so the
+      // row renderer can show a "Currently working" chip for users whose
+      // last punch today is still an IN (no matching OUT yet) vs a muted
+      // "Checked out" chip once they've closed the shift.
       for (const u of assignedUsers) {
         const punches = lastByUid.get(u.id);
         if (!punches || punches.length === 0) { assignedNoPunch.push(u); continue; }
         const latest = punches[punches.length - 1];
         const siteToday = latest.siteId;
-        if (siteToday === siteId) assignedPunchedHere.push(u);
-        else assignedPunchedElsewhere.push({ u, actualSiteId: siteToday });
+        if (siteToday === siteId) {
+          assignedPunchedHere.push({
+            u,
+            isCurrentlyIn: isIn(latest.type),
+            latestAt: latest.ts?.toDate?.() ?? null,
+          });
+        } else assignedPunchedElsewhere.push({ u, actualSiteId: siteToday });
       }
       const assignedIds = new Set(assignedUsers.map(u => u.id));
       for (const [uid, punches] of lastByUid.entries()) {
@@ -488,21 +506,52 @@
         const latest = punches[punches.length - 1];
         if (latest?.siteId === siteId) {
           const u = allUsers.find(x => x.id === uid);
-          if (u) unassignedPunchedHere.push(u);
+          if (u) unassignedPunchedHere.push({
+            u,
+            isCurrentlyIn: isIn(latest.type),
+            latestAt: latest.ts?.toDate?.() ?? null,
+          });
         }
       }
 
-      const userRow = (u, { warn = false, chipText = "" } = {}) => `
+      // Sort "punched here" lists so currently-in users float to the top.
+      const sortHereFirst = (a, b) => (b.isCurrentlyIn - a.isCurrentlyIn);
+      assignedPunchedHere.sort(sortHereFirst);
+      unassignedPunchedHere.sort(sortHereFirst);
+
+      // Short duration string — "3h 42m", "0h 09m", etc. Uses the same
+      // h-m formatting as the Android app and the Reports page so admins
+      // read one consistent unit everywhere.
+      function fmtDur(ms) {
+        if (!Number.isFinite(ms) || ms < 0) return "—";
+        const totalMin = Math.floor(ms / 60000);
+        const h = Math.floor(totalMin / 60);
+        const m = totalMin % 60;
+        return `${h}h ${String(m).padStart(2, "0")}m`;
+      }
+      function statusChip(entry) {
+        if (entry?.isCurrentlyIn && entry.latestAt) {
+          const elapsed = Date.now() - entry.latestAt.getTime();
+          return `<span class="ks-emp-row__chip" style="background:var(--success,#28a745);color:#fff;" title="Clocked in at ${escapeHtml(fmtTime(entry.latestAt))}"><i class="fa-solid fa-circle" style="font-size:.55em;animation:ks-pulse 1.6s ease-in-out infinite;"></i> ${fmtDur(elapsed)}</span>`;
+        }
+        if (entry && entry.isCurrentlyIn === false) {
+          const at = entry.latestAt ? ` at ${escapeHtml(fmtTime(entry.latestAt))}` : "";
+          return `<span class="ks-emp-row__chip" style="background:var(--surface-alt,#f1f3f5);color:var(--muted,#6c757d);" title="Checked out${at}"><i class="fa-solid fa-circle-check" style="font-size:.7em;"></i> Checked out</span>`;
+        }
+        return "";
+      }
+
+      const userRow = (u, { warn = false, chipText = "", entry = null } = {}) => `
         <a href="employee.html?uid=${encodeURIComponent(u.id)}" class="ks-emp-row${warn ? " ks-emp-row--warn" : ""}">
           <span class="ks-avatar">${initials(u.name || u.email || "?")}</span>
           <div class="ks-emp-meta">
             <div class="ks-emp-name">${escapeHtml(u.name || "—")}</div>
             <div class="ks-emp-email">${escapeHtml(u.email || "")}</div>
           </div>
-          ${chipText ? `<span class="ks-emp-row__chip">${escapeHtml(chipText)}</span>` : ""}
+          ${entry ? statusChip(entry) : (chipText ? `<span class="ks-emp-row__chip">${escapeHtml(chipText)}</span>` : "")}
         </a>`;
 
-      const section = (title, items, emptyMsg, { warn = false, showActualSite = false } = {}) =>
+      const section = (title, items, emptyMsg, { warn = false, showActualSite = false, showHereStatus = false } = {}) =>
         `<div style="margin-top:16px;">
           <div class="ks-field-label" style="margin-bottom:6px;">${title} <span class="text-muted small">(${items.length})</span></div>
           ${items.length === 0
@@ -511,6 +560,11 @@
                 if (showActualSite) {
                   const chipText = allSites.get(x.actualSiteId)?.name || x.actualSiteId || "";
                   return userRow(x.u, { warn, chipText });
+                }
+                if (showHereStatus) {
+                  // x is { u, isCurrentlyIn, latestAt } — pass the whole
+                  // entry so the row renderer can draw the live chip.
+                  return userRow(x.u, { warn, entry: x });
                 }
                 return userRow(x, { warn });
               }).join("")}</div>`}
@@ -522,7 +576,8 @@
           <div class="text-muted small">Today's view, from the data already loaded on the dashboard.</div>
           ${section(
             '<i class="fa-solid fa-user-check text-success"></i> Punched in here today',
-            assignedPunchedHere, "No assigned user punched here yet.")}
+            assignedPunchedHere, "No assigned user punched here yet.",
+            { showHereStatus: true })}
           ${section(
             '<i class="fa-solid fa-shuffle" style="color:var(--warn,#f59e0b);"></i> Assigned here but punched at a different site',
             assignedPunchedElsewhere,
@@ -533,7 +588,8 @@
             assignedNoPunch, "Everyone assigned has punched.")}
           ${unassignedPunchedHere.length > 0 ? section(
             '<i class="fa-solid fa-circle-info text-muted"></i> Punched here but not assigned',
-            unassignedPunchedHere, "") : ""}
+            unassignedPunchedHere, "",
+            { showHereStatus: true }) : ""}
         `,
         confirmLabel: null,
         cancelLabel: "Close",
