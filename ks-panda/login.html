@@ -59,8 +59,10 @@
       const snap = await getDoc(doc(db, "attn_users", u.uid));
       const d = snap.data();
       if (!d || d.status !== "approved") return showErr("Account not approved for portal access.");
-      if (d.role === "admin") location.href = "admin/dashboard.html";
-      else if (d.role === "manager") location.href = "manager/dashboard.html";
+      // Admin and manager share the same /admin/ UI — Pending Approvals
+      // and the Sites/Reports/Audit Log nav are hidden for managers inside
+      // admin/dashboard.html + ui.js.
+      if (d.role === "admin" || d.role === "manager") location.href = "admin/dashboard.html";
       else showErr("Employees must use the Android app.");
     });
   </script>

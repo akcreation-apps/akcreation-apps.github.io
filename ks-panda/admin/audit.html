@@ -18,7 +18,7 @@
     <div class="ks-section-head">
       <div>
         <h1><i class="fa-solid fa-clipboard-list text-muted" style="font-size:0.85em;"></i> Audit Log</h1>
-        <p class="ks-subtle">Every admin action and manager punch-edit, newest first. Showing the last 200 events.</p>
+        <p class="ks-subtle">Every admin and manager action, newest first. Showing the last 100 events.</p>
       </div>
     </div>
 
@@ -62,20 +62,81 @@
       }[c]));
     }
 
+    // Live lookup from site id → readable name, so the Details column renders
+    // site names instead of raw Firestore ids. The subscription keeps the map
+    // in sync; rows that already rendered are re-rendered when sites arrive.
+    const siteNameById = new Map();
+    const siteIdFields = new Set(["siteId", "assignedSiteIds"]);
+    function resolveSiteId(id) {
+      if (id == null) return id;
+      return siteNameById.get(id) || id;
+    }
+    // Recursively walk the details payload and swap any known site-id field
+    // (string or array) with its resolved human name. Unknown values pass
+    // through untouched so other details (reason, timestamps, etc.) render
+    // exactly as stored.
+    function humaniseDetails(value) {
+      // `null` is `typeof === "object"` but has no entries — must be checked
+      // explicitly before the object branch or `Object.entries(null)` throws.
+      // Audit entries from the site editor write `{ before: { address: null, lat: null, … } }`,
+      // so this code path is exercised every time the admin edits a site.
+      if (value === null) return value;
+      if (Array.isArray(value)) return value.map(humaniseDetails);
+      if (typeof value === "object") {
+        const out = {};
+        for (const [k, v] of Object.entries(value)) {
+          if (k === "assignedSiteIds" && Array.isArray(v)) {
+            out[k] = v.map(resolveSiteId);
+          } else if (k === "siteId" && typeof v === "string") {
+            out[k] = resolveSiteId(v);
+          } else {
+            out[k] = humaniseDetails(v);
+          }
+        }
+        return out;
+      }
+      return value;
+    }
+
     const ACTION_MAP = {
-      approveUser:    { label: "Approved user",    cls: "badge-approved", icon: "fa-user-check" },
-      rejectUser:     { label: "Rejected user",    cls: "badge-rejected", icon: "fa-user-xmark" },
-      deactivateUser: { label: "Deactivated user", cls: "badge-pending",  icon: "fa-user-slash" },
-      reactivateUser: { label: "Reactivated user", cls: "badge-approved", icon: "fa-user-check" },
-      editPunch:      { label: "Edited punch",     cls: "badge-info",     icon: "fa-pen" },
-      addPunch:       { label: "Added punch",      cls: "badge-approved", icon: "fa-plus" },
-      deletePunch:    { label: "Deleted punch",    cls: "badge-rejected", icon: "fa-trash" },
-      editUserInfo:   { label: "Edited user info", cls: "badge-info",     icon: "fa-id-card" },
-      rejectEditRequest: { label: "Rejected correction", cls: "badge-rejected", icon: "fa-xmark" },
+      // User lifecycle
+      approveUser:             { label: "Approved user",         cls: "badge-approved", icon: "fa-user-check" },
+      rejectUser:              { label: "Rejected user",         cls: "badge-rejected", icon: "fa-user-xmark" },
+      deactivateUser:          { label: "Deactivated user",      cls: "badge-pending",  icon: "fa-user-slash" },
+      reactivateUser:          { label: "Reactivated user",      cls: "badge-approved", icon: "fa-user-check" },
+      deleteUser:              { label: "Deleted user",          cls: "badge-rejected", icon: "fa-user-minus" },
+      editUserInfo:            { label: "Edited user info",      cls: "badge-info",     icon: "fa-id-card" },
+      // Punch mutations
+      addPunch:                { label: "Added punch",           cls: "badge-approved", icon: "fa-plus" },
+      editPunch:               { label: "Edited punch",          cls: "badge-info",     icon: "fa-pen" },
+      deletePunch:             { label: "Deleted punch",         cls: "badge-rejected", icon: "fa-trash" },
+      // Correction request resolution
+      rejectEditRequest:       { label: "Rejected correction",   cls: "badge-rejected", icon: "fa-xmark" },
+      // Automatic / admin-driven punch-outs
+      forcePunchOutOnUnassign: { label: "Force punch-out (unassign)", cls: "badge-pending", icon: "fa-right-from-bracket" },
+      // Site lifecycle
+      addSite:                 { label: "Added site",            cls: "badge-approved", icon: "fa-location-dot" },
+      editSite:                { label: "Edited site",           cls: "badge-info",     icon: "fa-pen-to-square" },
+      deleteSite:              { label: "Deleted site",          cls: "badge-rejected", icon: "fa-trash-can" },
+      enableSite:              { label: "Enabled site",          cls: "badge-approved", icon: "fa-circle-check" },
+      disableSite:             { label: "Disabled site",         cls: "badge-pending",  icon: "fa-ban" },
     };
+    // Site-action events carry `targetSite` instead of `targetUser`. Pulling
+    // the readable name from the `details.name` field (snapshot captured at
+    // write time) means the audit row still reads sensibly even after the
+    // site has been deleted.
+    const SITE_ACTIONS = new Set(["addSite", "editSite", "deleteSite", "enableSite", "disableSite"]);
     function actionBadge(action) {
       const meta = ACTION_MAP[action] || { label: action, cls: "badge-muted", icon: "fa-circle" };
       return `<span class="badge ${meta.cls}"><i class="fa-solid ${meta.icon}" style="font-size:.7em;"></i> ${escapeHtml(meta.label)}</span>`;
+    }
+    // Small coloured chip next to the actor name so admin vs manager actions
+    // are distinguishable at a glance. Falls back to a muted chip when the
+    // legacy log entry has no actorRole field.
+    function actorRoleBadge(role) {
+      if (role === "admin")  return ' <span class="badge badge-info" style="font-size:.65rem;">admin</span>';
+      if (role === "manager") return ' <span class="badge badge-pending" style="font-size:.65rem;">manager</span>';
+      return "";
     }
 
     const nameCache = new Map();
@@ -89,8 +150,25 @@
     }
 
     const tbody = document.getElementById('tbody');
-    const q = query(collection(db, "attn_auditLog"), orderBy("at", "desc"), limit(200));
+    // Cache the latest audit snapshot so we can re-render when the sites
+    // map arrives (sites snapshot may fire after the first audit snapshot).
+    let latestAuditSnap = null;
+    onSnapshot(collection(db, "attn_sites"), (snap) => {
+      siteNameById.clear();
+      snap.forEach(s => siteNameById.set(s.id, s.data()?.name ?? s.id));
+      // Re-render the cached audit snap with the fresh name map. Catch so a
+      // throw here doesn't surface as an unhandled promise rejection with
+      // no UI fallback (the primary onSnapshot keeps the page alive).
+      if (latestAuditSnap) render(latestAuditSnap).catch(err => console.error("[audit] re-render failed", err));
+    });
+
+    const q = query(collection(db, "attn_auditLog"), orderBy("at", "desc"), limit(100));
     onSnapshot(q, async (snap) => {
+      latestAuditSnap = snap;
+      await render(snap);
+    });
+
+    async function render(snap) {
       if (snap.empty) {
         tbody.innerHTML = `<tr class="ks-empty-row"><td colspan="5">
           <div class="ks-empty">
@@ -111,13 +189,19 @@
             <div>${when ? escapeHtml(fmtDate(when)) : ""}</div>
             <div class="text-muted small">${when ? escapeHtml(fmtTime(when)) : ""}</div>
           </td>
-          <td data-label="Actor">${escapeHtml(await nameOf(e.actor))}</td>
+          <td data-label="Actor">${escapeHtml(await nameOf(e.actor))}${actorRoleBadge(e.actorRole)}</td>
           <td data-label="Action">${actionBadge(e.action)}</td>
-          <td data-label="Target">${e.targetUser ? escapeHtml(await nameOf(e.targetUser)) : '<span class="text-muted">—</span>'}</td>
-          <td data-label="Details"><code>${escapeHtml(JSON.stringify(e.details ?? {}))}</code></td>`;
+          <td data-label="Target">${
+            SITE_ACTIONS.has(e.action)
+              ? (e.details?.name
+                  ? `<i class="fa-solid fa-location-dot text-muted" style="font-size:.75em;"></i> ${escapeHtml(e.details.name)}`
+                  : (e.targetSite ? `<code class="text-muted small">${escapeHtml(e.targetSite)}</code>` : '<span class="text-muted">—</span>'))
+              : (e.targetUser ? escapeHtml(await nameOf(e.targetUser)) : '<span class="text-muted">—</span>')
+          }</td>
+          <td data-label="Details"><code>${escapeHtml(JSON.stringify(humaniseDetails(e.details ?? {})))}</code></td>`;
         tbody.appendChild(tr);
       }
-    });
+    }
   </script>
 </body>
 </html>

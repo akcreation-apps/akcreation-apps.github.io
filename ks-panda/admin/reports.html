@@ -132,7 +132,7 @@
         </div>
         <div class="ks-form-grid ks-form-grid-4">
           <div>
-            <label class="ks-field-label" for="rep-from">From</label>
+            <label class="ks-field-label" for="rep-from">From <span class="text-muted" style="font-weight:400;">(up to 60 days back)</span></label>
             <input class="form-control" type="date" id="rep-from" required>
           </div>
           <div>
@@ -372,6 +372,27 @@
     // Date helpers + quick-pick buttons
     // ============================================================
     const isoDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    // Reports are capped to a 60-day lookback window — older data lives in
+    // archive exports, not this live view. `min` on the From picker and
+    // `max` on the To picker pin the range at the browser level; the submit
+    // handler re-checks because typed-in values can bypass the picker.
+    const REPORT_LOOKBACK_DAYS = 60;
+    function refreshDateBounds() {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const minFrom = new Date(today); minFrom.setDate(minFrom.getDate() - REPORT_LOOKBACK_DAYS);
+      document.getElementById("rep-from").min = isoDate(minFrom);
+      document.getElementById("rep-from").max = isoDate(today);
+      document.getElementById("rep-to").min   = isoDate(minFrom);
+      document.getElementById("rep-to").max   = isoDate(today);
+    }
+    refreshDateBounds();
+    // Keep the picker bounds in sync if the page sits open across midnight.
+    // Submit-time validation already uses `new Date()` fresh, so it was safe
+    // either way — this just keeps the picker UI honest.
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refreshDateBounds();
+    });
+    window.addEventListener("focus", refreshDateBounds);
     function setRange(from, to) {
       document.getElementById("rep-from").value = isoDate(from);
       document.getElementById("rep-to").value   = isoDate(to);
@@ -433,6 +454,20 @@
       const from = new Date(fromStr); from.setHours(0, 0, 0, 0);
       const to = new Date(toStr); to.setHours(23, 59, 59, 999);
       if (from > to) { showToast("‘From’ must be before ‘To’", "warn"); return; }
+
+      // Enforce the 60-day lookback window. Browsers honour min/max on
+      // <input type="date"> pickers, but admins can still paste or type an
+      // older value directly, so re-check at submit.
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const minFromDate = new Date(today); minFromDate.setDate(minFromDate.getDate() - REPORT_LOOKBACK_DAYS);
+      if (from < minFromDate) {
+        showToast(`Reports can only go back ${REPORT_LOOKBACK_DAYS} days — ‘From’ must be on or after ${isoDate(minFromDate)}`, "warn");
+        return;
+      }
+      if (to > new Date(today.getTime() + 24*60*60*1000 - 1)) {
+        showToast("‘To’ can't be in the future", "warn");
+        return;
+      }
 
       if (!tryConsumeQuota()) {
         showToast(`Daily limit of ${RATE_LIMIT} reports reached`, "danger");

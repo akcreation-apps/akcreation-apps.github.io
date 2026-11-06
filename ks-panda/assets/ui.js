@@ -1,6 +1,9 @@
 // KS Panda UI helpers — shared across every admin/manager page.
 // Vanilla ES module, no dependencies. Bootstrap JS is not required.
 
+// Managers use the SAME admin UI, so the paths below are relative within
+// /admin/. Sites / Reports / Audit Log are admin-only and never appear in
+// the manager nav.
 const NAV_ITEMS = {
   admin: [
     { href: "dashboard.html", label: "Dashboard", icon: "fa-gauge-high" },
@@ -10,8 +13,8 @@ const NAV_ITEMS = {
     { href: "audit.html",     label: "Audit Log", icon: "fa-clipboard-list" },
   ],
   manager: [
-    { href: "dashboard.html", label: "Today",   icon: "fa-clock" },
-    { href: "history.html",   label: "History", icon: "fa-calendar-days" },
+    { href: "dashboard.html", label: "Dashboard", icon: "fa-gauge-high" },
+    { href: "users.html",     label: "Users",     icon: "fa-users" },
   ],
 };
 

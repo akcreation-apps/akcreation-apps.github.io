@@ -159,20 +159,53 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, setYear } from "../assets/ui.js";
-    import { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
     setYear();
-    await requireRole(["admin"]);
+    const { user: adminUser } = await requireRole(["admin"]);
+    const adminUid = adminUser.uid;
     mountTopbar({
       role: "admin",
       onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
     });
 
+    // Small helper so each site-mutating path can drop a single-line log
+    // entry without repeating the field skeleton everywhere.
+    async function logSiteAction(action, siteId, details) {
+      try {
+        await addDoc(collection(db, "attn_auditLog"), {
+          actor: adminUid,
+          actorRole: "admin",
+          action,
+          targetSite: siteId,
+          details: details || {},
+          at: serverTimestamp(),
+        });
+      } catch (err) {
+        // Never block the primary write on a failed audit — log console only.
+        console.warn("[sites] audit log failed", action, err);
+      }
+    }
+
     function escapeHtml(s = "") {
       return String(s).replace(/[&<>"']/g, c => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
       }[c]));
+    }
+
+    // Shared delete-confirmation code: today's Access Code (same formula as
+    // the Android app and the dashboard's Today's Access Code tile). The
+    // 8-digit code is CC + DD + MM + YY — the first two year digits, day,
+    // month, last two year digits. Admins already know it from the
+    // dashboard, and it rotates every midnight so yesterday's muscle memory
+    // can't delete today.
+    function todayDeleteCode() {
+      const d = new Date();
+      const yyyy = String(d.getFullYear()).padStart(4, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      return yyyy.slice(0, 2) + dd + mm + yyyy.slice(2, 4);
     }
 
     function parseLatLng(raw) {
@@ -479,6 +512,16 @@
               }
 
               await updateDoc(doc(db, "attn_sites", d.id), payload);
+              await logSiteAction("editSite", d.id, {
+                before: {
+                  name: s.name ?? null,
+                  address: s.address ?? null,
+                  lat: s.lat ?? null, lng: s.lng ?? null,
+                  radiusMeters: s.radiusMeters ?? null,
+                  geofenceEnabled: s.geofenceEnabled ?? null,
+                },
+                after: payload,
+              });
               showToast("Site updated", "success");
             },
           });
@@ -536,27 +579,36 @@
             });
             return;
           }
-          const expectedName = (s.name || "").trim();
+          // Delete confirmation password = today's date as DDMMYYYY.
+          // Same rule across every destructive admin action so admins only
+          // need to remember one format. The expected code is computed LIVE
+          // on every keystroke and at submit (never captured at modal open),
+          // so a modal left sitting across midnight correctly rejects
+          // yesterday's code.
           const delModalPromise = openModal({
             title: `Delete "${s.name || "this site"}"?`,
             bodyHtml: `
               <p>No users are assigned to this site. It will be <strong>permanently removed</strong> from the database.</p>
-              <p class="text-muted small">To confirm, type <code>${escapeHtml(expectedName)}</code> exactly:</p>
-              <input id="confirm-del-input" class="form-control" placeholder="${escapeHtml(expectedName)}" autocomplete="off">
+              <p class="text-muted small">To confirm, enter the Access Code.</p>
+              <input id="confirm-del-input" class="form-control" inputmode="numeric" maxlength="8" autocomplete="off">
             `,
             confirmLabel: "Delete permanently",
             confirmClass: "btn btn-danger",
             onConfirm: async (modal) => {
-              const typedName = modal.querySelector("#confirm-del-input").value.trim();
-              if (typedName !== expectedName) return false;
+              const typed = modal.querySelector("#confirm-del-input").value.trim();
+              if (typed !== todayDeleteCode()) return false;
               await deleteDoc(doc(db, "attn_sites", d.id));
+              await logSiteAction("deleteSite", d.id, {
+                name: s.name ?? null,
+                address: s.address ?? null,
+                lat: s.lat ?? null, lng: s.lng ?? null,
+                radiusMeters: s.radiusMeters ?? null,
+              });
               showToast("Site deleted", "success");
             },
           });
           // Swap the confirm button between two clearly distinct states so it's
-          // obvious whether the delete can be clicked. Default-browser-disabled
-          // on a red btn-danger reads as ambiguous — we switch the label, icon
-          // and colour instead of just dimming it.
+          // obvious whether the delete can be clicked.
           const delModalRoot = document.querySelector(".ks-modal-backdrop.open");
           if (delModalRoot) {
             const inp = delModalRoot.querySelector("#confirm-del-input");
@@ -571,11 +623,11 @@
                 } else {
                   confirmBtn.className = "btn";
                   confirmBtn.style.cssText = "background:#e9ecef;border:1px solid #ced4da;color:#6c757d;opacity:1;cursor:not-allowed;";
-                  confirmBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Type the exact name to enable';
+                  confirmBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Enter Access Code';
                 }
               };
               setArmed(false);
-              inp.addEventListener("input", () => setArmed(inp.value.trim() === expectedName));
+              inp.addEventListener("input", () => setArmed(inp.value.trim() === todayDeleteCode()));
               setTimeout(() => inp.focus(), 60);
             }
           }
@@ -611,6 +663,7 @@
               confirmClass: "btn btn-danger",
               onConfirm: async () => {
                 await updateDoc(doc(db, "attn_sites", d.id), { active: false });
+                await logSiteAction("disableSite", d.id, { name: s.name ?? null });
                 showToast("Site disabled", "success");
               },
             });
@@ -619,6 +672,7 @@
           btn.disabled = true;
           try {
             await updateDoc(doc(db, "attn_sites", d.id), { active: true });
+            await logSiteAction("enableSite", d.id, { name: s.name ?? null });
             showToast("Site enabled", "success");
           } catch (e) {
             showToast(e.message, "danger");
@@ -673,7 +727,14 @@
 
       submit.disabled = true;
       try {
-        await addDoc(collection(db, "attn_sites"), payload);
+        const siteRef = await addDoc(collection(db, "attn_sites"), payload);
+        await logSiteAction("addSite", siteRef.id, {
+          name: payload.name,
+          address: payload.address,
+          lat: payload.lat, lng: payload.lng,
+          radiusMeters: payload.radiusMeters,
+          geofenceEnabled: payload.geofenceEnabled,
+        });
         showToast("Site added", "success");
         resetFormUI();
         wrap.hidden = true;

@@ -80,19 +80,21 @@
           <p class="text-muted small">Loading…</p>
         </div>
 
-        <div class="ks-section-head ks-section-head--success" style="margin-top:24px;">
-          <div>
-            <h2 style="font-size:1.15rem;"><i class="fa-solid fa-user-check" style="font-size:0.85em;color:var(--success);"></i> Pending Approvals</h2>
-            <p class="ks-subtle">Review new sign-ups from the Android app.</p>
+        <div id="pending-approvals-block">
+          <div class="ks-section-head ks-section-head--success" style="margin-top:24px;">
+            <div>
+              <h2 style="font-size:1.15rem;"><i class="fa-solid fa-user-check" style="font-size:0.85em;color:var(--success);"></i> Pending Approvals</h2>
+              <p class="ks-subtle">Review new sign-ups from the Android app.</p>
+            </div>
           </div>
-        </div>
 
-        <div id="pending-list">
-          <div class="ks-skel ks-skel-panel"></div>
+          <div id="pending-list">
+            <div class="ks-skel ks-skel-panel"></div>
+          </div>
         </div>
       </div>
 
-      <aside>
+      <aside id="admin-aside">
         <div class="ks-stat">
           <div class="ks-stat-icon"><i class="fa-solid fa-key"></i></div>
           <div class="ks-stat-body">
@@ -124,16 +126,43 @@
     import { mountTopbar, showToast, openModal, initials, setYear, fmtDate, fmtTime, fmtDateTime } from "../assets/ui.js";
     import {
       collection, doc, onSnapshot, writeBatch, addDoc, updateDoc, serverTimestamp,
-      collectionGroup, query, where, Timestamp
+      collectionGroup, query, where, Timestamp, getDoc
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
     setYear();
-    const { user } = await requireRole(["admin"]);
+    const { user, profile } = await requireRole(["admin", "manager"]);
     const adminUid = user.uid;
 
+    // Managers and admins share this dashboard. Admin-only sections and
+    // the aside (Access Code + Quick Help) are removed from the DOM for
+    // managers so they can't see or interact with them. The Sites /
+    // Reports / Audit Log nav items are similarly dropped for managers via
+    // NAV_ITEMS["manager"] in ui.js.
+    const isAdmin = profile?.role === "admin";
+    const callerRole = isAdmin ? "admin" : "manager";
+    if (!isAdmin) {
+      document.getElementById("pending-approvals-block")?.remove();
+      document.getElementById("admin-aside")?.remove();
+    }
+
+    // Strict site scope for managers. Every downstream data filter funnels
+    // through `viewerAllowedSiteIds`. For admins, `isScoped` is false and
+    // nothing is filtered — they still see everything.
+    const viewerAssignedSiteIds = Array.isArray(profile?.assignedSiteIds) ? profile.assignedSiteIds : [];
+    const viewerAllowedSiteIds = new Set(viewerAssignedSiteIds);
+    const isScoped = !isAdmin;
+    function inScope(siteId) {
+      return !isScoped || viewerAllowedSiteIds.has(siteId);
+    }
+    function userInScope(u) {
+      if (!isScoped) return true;
+      const ids = Array.isArray(u?.assignedSiteIds) ? u.assignedSiteIds : [];
+      return ids.some(sid => viewerAllowedSiteIds.has(sid));
+    }
+
     mountTopbar({
-      role: "admin",
+      role: isAdmin ? "admin" : (profile?.role || "manager"),
       onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
     });
 
@@ -152,18 +181,24 @@
     let allSites = new Map(); // id -> site
     let todayPunches = [];  // today's punches across sites
 
-    // Live users (one subscription, reused everywhere)
+    // Live users (one subscription, reused everywhere). Also re-runs the
+    // correction-requests render so any request filtered out as "unknown
+    // user" when users hadn't arrived yet gets re-evaluated now.
     onSnapshot(collection(db, "attn_users"), (snap) => {
       allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       recomputeKpis();
+      if (lastEditRequestsRaw) renderEditRequests(lastEditRequestsRaw).catch(err => console.warn("[dashboard] edit-requests re-render failed", err));
     });
 
-    // Live sites (also feeds pending-approval site chips)
+    // Live sites. For managers, only their assigned sites make it into the
+    // lookup — everything downstream (per-site headcount, drill-downs,
+    // approval site chips) is filtered by this alone.
     const availableSites = [];
     onSnapshot(collection(db, "attn_sites"), (snap) => {
       availableSites.length = 0;
       allSites.clear();
       snap.forEach(d => {
+        if (isScoped && !viewerAllowedSiteIds.has(d.id)) return;
         const s = d.data();
         allSites.set(d.id, s);
         if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
@@ -171,17 +206,27 @@
       recomputeKpis();
     });
 
-    // Today's punches — bounded by startOfDay so read cost stays flat
+    // Today's punches — bounded by startOfDay. For managers, Firestore-level
+    // scope via `where("siteId", "in", ...)` keeps read cost + exposure
+    // proportional to their assignment. A client-side re-filter removes any
+    // stray doc the server returned outside scope (defense-in-depth).
     const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
-    const todayQ = query(collectionGroup(db, "punches"), where("ts", ">=", startOfDay));
-    onSnapshot(todayQ, (snap) => {
-      todayPunches = snap.docs.map(d => ({
-        id: d.id,
-        uid: d.ref.parent.parent.id,
-        ...d.data()
-      }));
-      recomputeKpis();
-    });
+    const SITE_IN_CAP = 30;
+    const queriedSiteIds = viewerAssignedSiteIds.slice(0, SITE_IN_CAP);
+    // A manager with zero assigned sites would produce an invalid `in` clause —
+    // skip the subscription entirely and show empty state.
+    const canQueryPunches = !isScoped || queriedSiteIds.length > 0;
+    if (canQueryPunches) {
+      const todayQ = isScoped
+        ? query(collectionGroup(db, "punches"), where("siteId", "in", queriedSiteIds), where("ts", ">=", startOfDay))
+        : query(collectionGroup(db, "punches"), where("ts", ">=", startOfDay));
+      onSnapshot(todayQ, (snap) => {
+        todayPunches = snap.docs
+          .map(d => ({ id: d.id, uid: d.ref.parent.parent.id, ...d.data() }))
+          .filter(p => inScope(p.siteId));
+        recomputeKpis();
+      });
+    }
 
     function isIn(type)  { const t = String(type||"").toLowerCase(); return t === "in"  || t === "checkin"  || t === "punchin"; }
     function isOut(type) { const t = String(type||"").toLowerCase(); return t === "out" || t === "checkout" || t === "punchout"; }
@@ -193,11 +238,14 @@
     const LONG_INPROGRESS_HOURS = 10;   // currently in longer than this
 
     function recomputeKpis() {
-      // Employees eligible to punch = approved + role in [employee, manager] + at least 1 site
+      // Employees eligible to punch = approved + role in [employee, manager] + at least 1 site.
+      // For managers, we additionally restrict to users whose assignment
+      // overlaps the manager's own scope — anyone else isn't theirs to see.
       const activeUsers = allUsers.filter(u =>
         u.status === "approved" &&
         (u.role === "employee" || u.role === "manager") &&
-        (u.assignedSiteIds ?? []).length > 0
+        (u.assignedSiteIds ?? []).length > 0 &&
+        userInScope(u)
       );
       const activeUidSet = new Set(activeUsers.map(u => u.id));
 
@@ -319,9 +367,12 @@
     const timeHM = fmtTime;
 
     // Warning panel: approved users whose role is employee/manager but who have
-    // no assigned site — these accounts can't punch at all.
+    // no assigned site — these accounts can't punch at all. Orphan users
+    // belong globally to the admin's concern, not to a specific manager's
+    // scope, so this panel is admin-only; we hide it for managers.
     function renderOrphanUsers() {
       const slot = document.getElementById("orphan-users-slot");
+      if (!isAdmin) { slot.innerHTML = ""; return; }
       const orphans = allUsers.filter(u =>
         u.status === "approved" &&
         (u.role === "employee" || u.role === "manager") &&
@@ -352,20 +403,23 @@
         const last = punches[punches.length - 1];
         if (!isIn(last.type)) continue;
         const sid = last.siteId;
-        if (!sid) continue;
+        if (!sid || !inScope(sid)) continue;
         punchedBySite.set(sid, (punchedBySite.get(sid) || 0) + 1);
       }
       // Total assigned per site — only approved users count towards the
       // denominator, matching how the KPI tiles above interpret "active".
+      // For managers, only sites inside their scope contribute.
       const assignedBySite = new Map();
       for (const u of allUsers) {
         if (u.status !== "approved") continue;
         const ids = Array.isArray(u.assignedSiteIds) ? u.assignedSiteIds : [];
         ids.forEach(sid => {
+          if (!inScope(sid)) return;
           assignedBySite.set(sid, (assignedBySite.get(sid) || 0) + 1);
         });
       }
-      // Include every known site, even those with zero of either.
+      // Include every site the viewer is allowed to see. `allSites` was
+      // already scope-filtered for managers so this works for both roles.
       const siteIds = new Set([...allSites.keys(), ...punchedBySite.keys(), ...assignedBySite.keys()]);
       const el = document.getElementById("site-headcount");
       if (siteIds.size === 0) {
@@ -392,6 +446,10 @@
 
     // Site drill-down modal — all data from already-loaded snapshots.
     function openSiteDrillDown(siteId) {
+      // Defensive: a manager can only drill into their own sites. Chips for
+      // out-of-scope sites are never rendered, but a direct JS call would
+      // otherwise still work.
+      if (!inScope(siteId)) return;
       const site = allSites.get(siteId);
       const siteName = site?.name || siteId;
       const assignedUsers = allUsers.filter(u =>
@@ -483,7 +541,7 @@
       batch.delete(doc(db, "attn_pendingApprovals", targetUid));
       await batch.commit();
       await addDoc(collection(db, "attn_auditLog"), {
-        actor: adminUid, action: "approveUser", targetUser: targetUid,
+        actor: adminUid, actorRole: callerRole, action: "approveUser", targetUser: targetUid,
         details: { role, assignedSiteIds }, at: serverTimestamp()
       });
     }
@@ -495,7 +553,7 @@
       batch.delete(doc(db, "attn_pendingApprovals", targetUid));
       await batch.commit();
       await addDoc(collection(db, "attn_auditLog"), {
-        actor: adminUid, action: "rejectUser", targetUser: targetUid,
+        actor: adminUid, actorRole: callerRole, action: "rejectUser", targetUser: targetUid,
         details: { reason }, at: serverTimestamp()
       });
     }
@@ -504,14 +562,68 @@
     // Punch correction requests from employees (one new listener)
     // Scoped to status=="pending" to keep read count minimal.
     // =========================================================
+    // Correction requests are scoped to the viewer via `userInScope` below
+    // (defined earlier at the top of the script). Admins see everything;
+    // managers see only requests whose target user overlaps their sites.
     const editReqList = document.getElementById('edit-requests-list');
+    // Cache the latest raw snapshot so when allUsers finally lands we can
+    // re-filter (user-scope depends on allUsers being populated).
+    let lastEditRequestsRaw = null;
     onSnapshot(
       query(collection(db, "attn_editRequests"), where("status", "==", "pending")),
-      (snap) => renderEditRequests(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+      (snap) => {
+        lastEditRequestsRaw = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderEditRequests(lastEditRequestsRaw).catch(err => console.warn("[dashboard] edit-requests render failed", err));
+      },
       (err) => { editReqList.innerHTML = `<p class="text-muted small">Could not load — ${escapeHtml(err?.code || "error")}</p>`; }
     );
 
-    function renderEditRequests(items) {
+    // Resolve each pending edit-request's target-punch siteId. The request
+    // doc stored by the Android app does NOT carry the punch's siteId, so
+    // we read the referenced punch document once and cache the result. This
+    // lets managers be scoped by the SITE OF THE PUNCH being corrected,
+    // not just the requesting user's overall assignment overlap — a user
+    // assigned to two sites could otherwise surface a request about a
+    // punch at a site the manager doesn't own.
+    const punchSiteCache = new Map();
+    async function siteIdForRequest(req) {
+      if (!req?.punchPath) return null;
+      if (punchSiteCache.has(req.punchPath)) return punchSiteCache.get(req.punchPath);
+      try {
+        const snap = await getDoc(doc(db, req.punchPath));
+        const sid = snap.exists() ? snap.data()?.siteId ?? null : null;
+        punchSiteCache.set(req.punchPath, sid);
+        return sid;
+      } catch (err) {
+        console.warn("[dashboard] edit-request punch lookup failed", err);
+        // Treat an unreachable punch as out-of-scope for managers (fail
+        // closed). Admins aren't gated by scope so they still see it.
+        punchSiteCache.set(req.punchPath, null);
+        return null;
+      }
+    }
+
+    async function renderEditRequests(items) {
+      // Manager scope filter: drop any request whose requesting user isn't
+      // in the viewer's scope. `userInScope` (declared at module top) is a
+      // no-op for admins, so this is safe for both roles.
+      items = items.filter(req => {
+        const u = allUsers.find(x => x.id === req.uid);
+        // Admins see requests from any uid, including unknown ones (the
+        // profile-missing fallback renders the uid as the name).
+        if (isAdmin) return true;
+        // Managers need both the user record AND scope overlap to consider it.
+        return u ? userInScope(u) : false;
+      });
+      // Second gate for managers: the punch being corrected must itself be
+      // at one of the manager's sites. Resolve in parallel then filter.
+      if (!isAdmin && items.length > 0) {
+        const siteIds = await Promise.all(items.map(req => siteIdForRequest(req)));
+        items = items.filter((_, i) => {
+          const sid = siteIds[i];
+          return sid != null && viewerAllowedSiteIds.has(sid);
+        });
+      }
       if (items.length === 0) {
         editReqList.innerHTML = `
           <div class="ks-panel">
@@ -572,6 +684,16 @@
         showToast("Request is missing punch path or timestamp", "danger");
         return;
       }
+      // Defensive scope gate for managers — the UI only surfaces in-scope
+      // requests, but a user who tampered with the DOM shouldn't be able
+      // to approve a correction for a punch at a site they don't manage.
+      if (!isAdmin) {
+        const sid = await siteIdForRequest(req);
+        if (!sid || !viewerAllowedSiteIds.has(sid)) {
+          showToast("This punch is outside your site scope", "warn");
+          return;
+        }
+      }
       await openModal({
         title: `Approve correction for ${name}?`,
         bodyHtml: `
@@ -591,7 +713,7 @@
           if (req.requestedType) update.type = req.requestedType;
           await updateDoc(punchRef, update);
           await addDoc(collection(punchRef, "edits"), {
-            editedBy: adminUid, editedByRole: "admin",
+            editedBy: adminUid, editedByRole: isAdmin ? "admin" : "manager",
             editedAt: serverTimestamp(),
             reason: `Approved correction request${note ? ": " + note : ""}`,
             before, after: update,
@@ -603,7 +725,7 @@
             resolvedNote: note || null,
           });
           await addDoc(collection(db, "attn_auditLog"), {
-            actor: adminUid, action: "editPunch",
+            actor: adminUid, actorRole: callerRole, action: "editPunch",
             targetUser: req.uid, targetPunchId: req.punchId,
             details: { source: "editRequest", requestId: req.id, newTs: newTs.toDate().toISOString(), note },
             at: serverTimestamp(),
@@ -614,6 +736,15 @@
     }
 
     async function rejectEditRequest(req, name) {
+      // Same scope gate as approve — a manager can't resolve a request
+      // whose punch lives outside their site scope.
+      if (!isAdmin) {
+        const sid = await siteIdForRequest(req);
+        if (!sid || !viewerAllowedSiteIds.has(sid)) {
+          showToast("This punch is outside your site scope", "warn");
+          return;
+        }
+      }
       await openModal({
         title: `Reject correction for ${name}?`,
         bodyHtml: `
@@ -631,7 +762,7 @@
             resolvedNote: note || null,
           });
           await addDoc(collection(db, "attn_auditLog"), {
-            actor: adminUid, action: "rejectEditRequest",
+            actor: adminUid, actorRole: callerRole, action: "rejectEditRequest",
             targetUser: req.uid, targetPunchId: req.punchId,
             details: { requestId: req.id, note },
             at: serverTimestamp(),
@@ -642,7 +773,10 @@
     }
 
     const list = document.getElementById('pending-list');
-    onSnapshot(collection(db, "attn_pendingApprovals"), (snap) => {
+    // Only subscribe to the pending-approvals collection for admins —
+    // managers aren't allowed to read it (Firestore rules would reject
+    // the listener) and the DOM anchor doesn't exist for them anyway.
+    if (isAdmin && list) onSnapshot(collection(db, "attn_pendingApprovals"), (snap) => {
       if (snap.empty) {
         list.innerHTML = `
           <div class="ks-panel">
@@ -775,15 +909,19 @@
     });
 
     // ============================================================
-    // Daily access code — same formula as the Android app
+    // Daily access code — same formula as the Android app. Only rendered
+    // inside the admin aside, which is removed from the DOM for managers,
+    // so we no-op if the target element isn't there.
     // ============================================================
     (() => {
+      const codeEl = document.getElementById('today-code');
+      if (!codeEl) return;
       const d = new Date();
       const yyyy = String(d.getFullYear()).padStart(4, '0');
       const dd = String(d.getDate()).padStart(2, '0');
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const code = yyyy.slice(0, 2) + dd + mm + yyyy.slice(2, 4);
-      document.getElementById('today-code').textContent =
+      codeEl.textContent =
         code.slice(0, 2) + " " + code.slice(2, 4) + " " + code.slice(4, 6) + " " + code.slice(6, 8);
     })();
   </script>

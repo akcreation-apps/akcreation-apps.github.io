@@ -12,6 +12,58 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    /* Manager view: only Employee name + Sites. Role / Status / Actions
+       columns are stripped from both the header and every rendered row via
+       the matching `data-col` attribute. */
+    body.is-manager [data-col="role"],
+    body.is-manager [data-col="status"],
+    body.is-manager [data-col="actions"] { display: none !important; }
+    /* Hide the filters we no longer need for managers (they can't change
+       roles, and only see their own scoped users anyway). The hidden Status
+       select stays in DOM since existing filter JS references it. */
+    body.is-manager #flt-role,
+    body.is-manager label[for="flt-role"] { display: none !important; }
+
+    /* Mobile card tidy-up: when the shared .ks-table-wrap CSS collapses
+       each row into a card, the User cell makes a better card header than
+       a label/value pair, and the Sites chips look better stacked below
+       with their label on its own line. */
+    @media (max-width: 575.98px) {
+      .ks-table-wrap .table tbody td[data-label="User"] {
+        display: block !important;
+        padding: 2px 0 10px !important;
+        margin-bottom: 8px;
+        border-bottom: 1px dashed var(--border) !important;
+        text-align: left !important;
+      }
+      .ks-table-wrap .table tbody td[data-label="User"]::before { display: none !important; }
+      .ks-table-wrap .table tbody td[data-label="Sites"] {
+        display: block !important;
+        padding: 6px 0 !important;
+        text-align: left !important;
+      }
+      .ks-table-wrap .table tbody td[data-label="Sites"]::before {
+        display: block !important;
+        margin-bottom: 6px;
+      }
+      .ks-table-wrap .table tbody td[data-label="Sites"] .ks-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .ks-table-wrap .table tbody td[data-label="Sites"] .ks-chip {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      /* On manager view the card has only User + Sites, no actions divider.
+         Give the card a bit more breathing room. */
+      body.is-manager .ks-table-wrap .table tbody tr {
+        padding: 12px 14px;
+      }
+    }
+  </style>
 </head>
 <body>
   <main class="ks-main">
@@ -68,10 +120,10 @@
         <table class="table">
           <thead><tr>
             <th>User</th>
-            <th style="min-width:150px;">Role</th>
-            <th>Status</th>
-            <th style="min-width:220px;">Sites</th>
-            <th class="ks-table-actions"></th>
+            <th style="min-width:150px;" data-col="role">Role</th>
+            <th data-col="status">Status</th>
+            <th style="min-width:220px;" data-col="sites">Sites</th>
+            <th class="ks-table-actions" data-col="actions"></th>
           </tr></thead>
           <tbody id="tbody">
             <tr class="ks-empty-row"><td colspan="5"><div class="ks-skel ks-skel-lg"></div></td></tr>
@@ -91,10 +143,24 @@
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
     setYear();
-    const { user: adminUser } = await requireRole(["admin"]);
+    const { user: adminUser, profile } = await requireRole(["admin", "manager"]);
     const adminUid = adminUser.uid;
+    const callerRole = profile?.role === "admin" ? "admin" : "manager";
+    const isAdmin = callerRole === "admin";
+    // Strict scope for managers: only users whose assignedSiteIds overlap
+    // the manager's own set are visible in the Users list.
+    const viewerAssignedSiteIds = Array.isArray(profile?.assignedSiteIds) ? profile.assignedSiteIds : [];
+    const viewerAllowedSiteIds = new Set(viewerAssignedSiteIds);
+    function userInScope(u) {
+      if (isAdmin) return true;
+      // Managers see themselves regardless (so they can see their own row).
+      if (u.id === adminUid) return true;
+      const ids = Array.isArray(u?.assignedSiteIds) ? u.assignedSiteIds : [];
+      return ids.some(sid => viewerAllowedSiteIds.has(sid));
+    }
+    if (!isAdmin) document.body.classList.add("is-manager");
     mountTopbar({
-      role: "admin",
+      role: callerRole,
       onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
     });
 
@@ -102,6 +168,19 @@
       return String(s).replace(/[&<>"']/g, c => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
       }[c]));
+    }
+
+    // Shared delete-confirmation code: today's Access Code (same formula as
+    // the Android app and the dashboard's Today's Access Code tile). The
+    // 8-digit code is CC + DD + MM + YY — the first two year digits, day,
+    // month, last two year digits. Admins already know it from the
+    // dashboard, and it rotates every midnight.
+    function todayDeleteCode() {
+      const d = new Date();
+      const yyyy = String(d.getFullYear()).padStart(4, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      return yyyy.slice(0, 2) + dd + mm + yyyy.slice(2, 4);
     }
     // "anil kr" -> "Anil Kr"; devanagari/odia unaffected (no case).
     function toTitleCase(s) {
@@ -118,6 +197,10 @@
     onSnapshot(collection(db, "attn_sites"), (snap) => {
       availableSites.length = 0;
       snap.forEach(d => {
+        // Managers only see their own sites in the Sites dropdown, in the
+        // per-user site chip picker, and anywhere else `availableSites` is
+        // read. Admins see everything.
+        if (!isAdmin && !viewerAllowedSiteIds.has(d.id)) return;
         const s = d.data();
         if (s.active !== false) availableSites.push({ id: d.id, name: s.name });
       });
@@ -181,6 +264,9 @@
       const status = statusEl.value;
       const site = siteFilterEl.value;
       return users.filter(u => {
+        // Manager scope gate runs first — a user outside scope is never
+        // listed regardless of what the picker filters say.
+        if (!userInScope(u)) return false;
         if (role && u.role !== role) return false;
         if (status && u.status !== status) return false;
         if (site && !(u.assignedSiteIds ?? []).includes(site)) return false;
@@ -224,7 +310,7 @@
           : `<div class="ks-chips">
               ${availableSites.map(s => `
                 <label class="ks-chip">
-                  <input type="checkbox" value="${escapeHtml(s.id)}" ${assigned.has(s.id) ? 'checked' : ''} data-site>
+                  <input type="checkbox" value="${escapeHtml(s.id)}" ${assigned.has(s.id) ? 'checked' : ''} data-site${isAdmin ? "" : " disabled"}>
                   <span>${escapeHtml(s.name)}</span>
                 </label>`).join("")}
             </div>`;
@@ -239,37 +325,41 @@
               </div>
             </a>
           </td>
-          <td data-label="Role">
-            <select class="form-control" data-role>
+          <td data-label="Role" data-col="role">
+            <select class="form-control" data-role${isAdmin ? "" : " disabled"}>
               <option value="employee"${u.role === 'employee' ? ' selected' : ''}>Employee</option>
               <option value="manager"${u.role === 'manager' ? ' selected' : ''}>Manager</option>
-              <option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>
+              ${isAdmin ? `<option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>` : (u.role === 'admin' ? `<option value="admin" selected disabled>Admin</option>` : "")}
             </select>
           </td>
-          <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span></td>
-          <td data-label="Sites">${sitesCells}</td>
-          <td class="ks-table-actions ks-card-actions">
-            <button class="ks-icon-btn ks-icon-btn--primary" data-save style="display:none;" aria-label="Save" title="Save changes"><i class="fa-solid fa-floppy-disk"></i></button>
-            ${u.status === "approved"
+          <td data-label="Status" data-col="status"><span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span></td>
+          <td data-label="Sites" data-col="sites">${sitesCells}</td>
+          <td class="ks-table-actions ks-card-actions" data-col="actions">
+            ${isAdmin ? `<button class="ks-icon-btn ks-icon-btn--primary" data-save style="display:none;" aria-label="Save" title="Save changes"><i class="fa-solid fa-floppy-disk"></i></button>` : ""}
+            ${isAdmin && u.status === "approved"
               ? '<button class="ks-icon-btn ks-icon-btn--reject" data-toggle-status style="margin-left:6px;" aria-label="Deactivate" title="Deactivate"><i class="fa-solid fa-user-slash"></i></button>'
-              : u.status === "disabled"
+              : isAdmin && u.status === "disabled"
               ? '<button class="ks-icon-btn ks-icon-btn--approve" data-toggle-status style="margin-left:6px;" aria-label="Reactivate" title="Reactivate"><i class="fa-solid fa-user-check"></i></button>'
               : ''}
-            <button class="ks-icon-btn ks-icon-btn--reject" data-delete style="margin-left:6px;" aria-label="Delete permanently" title="Delete permanently"><i class="fa-solid fa-trash"></i></button>
+            ${isAdmin ? `<button class="ks-icon-btn ks-icon-btn--reject" data-delete style="margin-left:6px;" aria-label="Delete permanently" title="Delete permanently"><i class="fa-solid fa-trash"></i></button>` : ""}
+            ${isAdmin ? "" : `<span class="text-muted small" title="View-only for managers"><i class="fa-solid fa-eye"></i> View only</span>`}
           </td>`;
-        // Dirty tracking — Save button hidden until role or site assignment changes.
+        // Dirty tracking — Save button only exists for admins, so skip the
+        // whole wiring for managers (the inputs are also `disabled`).
         const saveBtn = tr.querySelector('[data-save]');
-        const originalRole = u.role ?? "";
-        const originalSitesKey = [...(u.assignedSiteIds ?? [])].sort().join("|");
-        const checkDirty = () => {
-          const currentRole = tr.querySelector('[data-role]').value;
-          const currentSitesKey = Array.from(tr.querySelectorAll('[data-site]:checked'))
-            .map(x => x.value).sort().join("|");
-          const dirty = currentRole !== originalRole || currentSitesKey !== originalSitesKey;
-          saveBtn.style.display = dirty ? "" : "none";
-        };
-        tr.querySelector('[data-role]').addEventListener('change', checkDirty);
-        tr.querySelectorAll('[data-site]').forEach(cb => cb.addEventListener('change', checkDirty));
+        if (isAdmin && saveBtn) {
+          const originalRole = u.role ?? "";
+          const originalSitesKey = [...(u.assignedSiteIds ?? [])].sort().join("|");
+          const checkDirty = () => {
+            const currentRole = tr.querySelector('[data-role]').value;
+            const currentSitesKey = Array.from(tr.querySelectorAll('[data-site]:checked'))
+              .map(x => x.value).sort().join("|");
+            const dirty = currentRole !== originalRole || currentSitesKey !== originalSitesKey;
+            saveBtn.style.display = dirty ? "" : "none";
+          };
+          tr.querySelector('[data-role]').addEventListener('change', checkDirty);
+          tr.querySelectorAll('[data-site]').forEach(cb => cb.addEventListener('change', checkDirty));
+        }
 
         const toggleBtn = tr.querySelector('[data-toggle-status]');
         if (toggleBtn) {
@@ -293,6 +383,7 @@
                 });
                 await addDoc(collection(db, "attn_auditLog"), {
                   actor: adminUid,
+                  actorRole: callerRole,
                   action: isApproved ? "deactivateUser" : "reactivateUser",
                   targetUser: u.id,
                   details: { previousStatus: u.status, newStatus: nextStatus },
@@ -303,33 +394,37 @@
             });
           };
         }
-        tr.querySelector('[data-delete]').onclick = async () => {
+        const deleteBtn = tr.querySelector('[data-delete]');
+        if (deleteBtn) deleteBtn.onclick = async () => {
           if (u.id === adminUid) {
             showToast("You can't delete your own account", "warn");
             return;
           }
           const displayName = toTitleCase(u.name || "") || u.email || "this user";
-          await openModal({
+          // Delete confirmation password = today's date as DDMMYYYY — same
+          // rule used on the Sites delete flow so admins only need to
+          // remember one code format. Computed LIVE on each keystroke and at
+          // submit so a modal left open across midnight correctly rejects
+          // yesterday's code.
+          const delModalPromise = openModal({
             title: `Delete ${displayName}?`,
             bodyHtml: `
               <div class="alert alert-danger" style="padding:10px 12px;">
                 <strong>This is permanent.</strong> The user document, role, and site assignments will be wiped from the database.
               </div>
               <p>Any attendance punches they already made will keep the stored user ID but the profile linking that ID to a name will be gone.</p>
-              <p class="text-muted small">To confirm, type the email <code>${escapeHtml(u.email || "")}</code>:</p>
-              <input id="confirm-del-user" class="form-control" placeholder="${escapeHtml(u.email || "")}" autocomplete="off">
+              <p class="text-muted small">To confirm, enter the Access Code.</p>
+              <input id="confirm-del-user" class="form-control" inputmode="numeric" maxlength="8" autocomplete="off">
             `,
             confirmLabel: "Delete permanently",
             confirmClass: "btn btn-danger",
             onConfirm: async (modal) => {
-              const typed = modal.querySelector("#confirm-del-user").value.trim().toLowerCase();
-              if (typed !== (u.email || "").trim().toLowerCase()) {
-                showToast("Typed email doesn't match", "warn");
-                return false;
-              }
+              const typed = modal.querySelector("#confirm-del-user").value.trim();
+              if (typed !== todayDeleteCode()) return false;
               await deleteDoc(doc(db, "attn_users", u.id));
               await addDoc(collection(db, "attn_auditLog"), {
                 actor: adminUid,
+                actorRole: callerRole,
                 action: "deleteUser",
                 targetUser: u.id,
                 details: { email: u.email || null, name: u.name || null, role: u.role || null },
@@ -338,8 +433,33 @@
               showToast(`${displayName} deleted`, "success");
             },
           });
+          // Keep the confirm button visually locked until the admin types
+          // the correct code — matches the Sites delete UX.
+          const delModalRoot = document.querySelector(".ks-modal-backdrop.open");
+          if (delModalRoot) {
+            const inp = delModalRoot.querySelector("#confirm-del-user");
+            const confirmBtn = delModalRoot.querySelector("[data-confirm]");
+            if (inp && confirmBtn) {
+              const setArmed = (armed) => {
+                confirmBtn.disabled = !armed;
+                if (armed) {
+                  confirmBtn.className = "btn btn-danger";
+                  confirmBtn.style.cssText = "background:#dc3545;border-color:#dc3545;color:#fff;opacity:1;";
+                  confirmBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Delete permanently';
+                } else {
+                  confirmBtn.className = "btn";
+                  confirmBtn.style.cssText = "background:#e9ecef;border:1px solid #ced4da;color:#6c757d;opacity:1;cursor:not-allowed;";
+                  confirmBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Enter Access Code';
+                }
+              };
+              setArmed(false);
+              inp.addEventListener("input", () => setArmed(inp.value.trim() === todayDeleteCode()));
+              setTimeout(() => inp.focus(), 60);
+            }
+          }
+          await delModalPromise;
         };
-        tr.querySelector('[data-save]').onclick = async (ev) => {
+        if (isAdmin && saveBtn) saveBtn.onclick = async (ev) => {
           const btn = ev.currentTarget;
           const role = tr.querySelector('[data-role]').value;
           const assignedSiteIds = Array.from(tr.querySelectorAll('[data-site]:checked')).map(x => x.value);
@@ -412,6 +532,7 @@
               });
               await addDoc(collection(db, "attn_auditLog"), {
                 actor: adminUid,
+                actorRole: callerRole,
                 action: "forcePunchOutOnUnassign",
                 targetUser: u.id,
                 targetPunchId: outRef.id,

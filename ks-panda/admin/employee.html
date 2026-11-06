@@ -90,10 +90,22 @@
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
     setYear();
-    const { user: adminUser } = await requireRole(["admin"]);
+    const { user: adminUser, profile } = await requireRole(["admin", "manager"]);
     const adminUid = adminUser.uid;
+    const callerRole = profile?.role === "admin" ? "admin" : "manager";
+    const isAdmin = callerRole === "admin";
+    // Strict scope for managers: target user must have at least one site
+    // in common with this manager, otherwise the profile isn't theirs to
+    // view. Admins always pass.
+    const viewerAssignedSiteIds = Array.isArray(profile?.assignedSiteIds) ? profile.assignedSiteIds : [];
+    const viewerAllowedSiteIds = new Set(viewerAssignedSiteIds);
+    function viewerAllowsUser(targetUserData) {
+      if (isAdmin) return true;
+      const ids = Array.isArray(targetUserData?.assignedSiteIds) ? targetUserData.assignedSiteIds : [];
+      return ids.some(sid => viewerAllowedSiteIds.has(sid));
+    }
     mountTopbar({
-      role: "admin",
+      role: callerRole,
       onSignOut: () => signOut(auth).then(() => location.href = "../login.html"),
     });
 
@@ -179,6 +191,9 @@
 
     // ---------- Employee doc (live) ----------
     let empData = null;
+    // Flipped true when a manager navigates to a UID outside their site
+    // scope. All downstream renders bail early so no data is ever drawn.
+    let accessBlocked = false;
     onSnapshot(doc(db, "attn_users", uid), (snap) => {
       if (!snap.exists()) {
         document.getElementById("profile-panel").innerHTML = `
@@ -189,7 +204,27 @@
           </div>`;
         return;
       }
-      empData = { id: snap.id, ...snap.data() };
+      const data = { id: snap.id, ...snap.data() };
+      // Manager scope gate — a manager can only open an employee profile
+      // whose assignedSiteIds overlap their own. Anyone else gets an
+      // access-denied page with no data and no edit UI.
+      if (!viewerAllowsUser(data)) {
+        accessBlocked = true;
+        empData = null;
+        document.getElementById("emp-title").textContent = "Access denied";
+        document.title = "KS Panda — Access denied";
+        document.getElementById("profile-panel").innerHTML = `
+          <div class="ks-empty">
+            <div class="ks-empty-icon"><i class="fa-solid fa-lock"></i></div>
+            <p class="ks-empty-title">This employee isn't in your scope</p>
+            <p class="ks-empty-text">You can only view employees assigned to one of your sites. Return to the <a href="dashboard.html">dashboard</a>.</p>
+          </div>`;
+        const atn = document.getElementById("attendance-out");
+        if (atn) atn.innerHTML = "";
+        return;
+      }
+      accessBlocked = false;
+      empData = data;
       document.getElementById("emp-title").textContent = empData.name || empData.email || "Employee";
       document.title = `KS Panda — ${empData.name || "Employee"}`;
       renderProfile();
@@ -202,9 +237,15 @@
       const u = empData;
       const badgeClass = { pending: 'badge-pending', approved: 'badge-approved', rejected: 'badge-rejected', disabled: 'badge-muted' }[u.status] ?? 'badge-muted';
       const assigned = new Set(u.assignedSiteIds ?? []);
-      const siteChips = (u.assignedSiteIds ?? []).length === 0
+      // Managers only see the overlap between the employee's sites and
+      // their own assigned sites — the employee may be at other sites the
+      // manager isn't responsible for, but those aren't theirs to view.
+      const visibleSiteIds = (u.assignedSiteIds ?? []).filter(sid =>
+        isAdmin || viewerAllowedSiteIds.has(sid)
+      );
+      const siteChips = visibleSiteIds.length === 0
         ? '<em class="text-muted small">No sites assigned</em>'
-        : (u.assignedSiteIds ?? []).map(sid => {
+        : visibleSiteIds.map(sid => {
             const nm = sitesById.get(sid)?.name ?? sid;
             return `<span class="ks-site-chip"><i class="fa-solid fa-location-dot text-muted"></i> ${escapeHtml(nm)}</span>`;
           }).join(" ");
@@ -217,10 +258,10 @@
             <div class="text-muted">${escapeHtml(u.email || "")}</div>
             <div class="text-muted small">${escapeHtml(u.contact || "No contact")}</div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+          ${isAdmin ? `<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
             <span class="badge ${badgeClass}">${escapeHtml(u.status ?? "—")}</span>
             <span class="badge badge-info">${escapeHtml(u.role ?? "—")}</span>
-          </div>
+          </div>` : ""}
         </div>
 
         <div style="margin-top:14px;">
@@ -236,11 +277,14 @@
         </div>
 
         <div class="ks-form-actions" style="margin-top:14px;">
-          <button class="btn btn-outline-primary btn-sm" id="btn-edit-info"><i class="fa-solid fa-pen"></i> Edit name & contact</button>
+          ${isAdmin ? `<button class="btn btn-outline-primary btn-sm" id="btn-edit-info"><i class="fa-solid fa-pen"></i> Edit name & contact</button>` : ""}
         </div>
       `;
 
-      panel.querySelector("#btn-edit-info").onclick = openEditInfoModal;
+      // Edit name & contact is admin-only. For managers the button isn't
+      // rendered at all, so we guard the wiring to avoid a null deref.
+      const editInfoBtn = panel.querySelector("#btn-edit-info");
+      if (isAdmin && editInfoBtn) editInfoBtn.onclick = openEditInfoModal;
       updateTodayStat();
     }
 
@@ -285,7 +329,7 @@
           const after = { name, contact };
           await updateDoc(doc(db, "attn_users", uid), after);
           await addDoc(collection(db, "attn_auditLog"), {
-            actor: adminUid, action: "editUserInfo", targetUser: uid,
+            actor: adminUid, actorRole: callerRole, action: "editUserInfo", targetUser: uid,
             details: { before, after }, at: serverTimestamp(),
           });
           showToast("Updated", "success");
@@ -323,7 +367,13 @@
           siteId: d.data().siteId,
           edited: !!d.data().edited,
           addedByAdmin: !!d.data().addedByAdmin,
-        })).filter(p => p.ts);
+        }))
+          .filter(p => p.ts)
+          // Manager scoping: punches at sites outside the viewer's scope are
+          // dropped before they reach rendering, so the attendance table,
+          // the "Total hours" quick stat, and Today status all reflect only
+          // punches at the manager's own sites. Admins see everything.
+          .filter(p => isAdmin || viewerAllowedSiteIds.has(p.siteId));
         currentRangePunches = punches;
         updateTodayStat();
         renderAttendance(punches, rangeFrom, rangeTo);
@@ -342,6 +392,10 @@
     );
 
     function renderAttendance(punches, from, to) {
+      // Access-blocked managers never render punches — the subscription may
+      // still fire (it was opened before the user-profile snapshot resolved
+      // the scope decision), so we short-circuit here too.
+      if (accessBlocked) return;
       // --- Pair across the full range (not per calendar day), then
       // attribute each shift to its IN-date so cross-midnight night shifts
       // show up as one coherent shift on the day they started, not as two
@@ -451,10 +505,10 @@
               <td data-label="Site" class="text-muted">${escapeHtml(siteNameOf(p.siteId))}</td>
               <td data-label="Flags">${flags.join(" ") || '<span class="text-muted small">—</span>'}</td>
               <td class="ks-table-actions ks-card-actions">
-                <div class="ks-punch-actions">
+                ${isAdmin ? `<div class="ks-punch-actions">
                   <button class="btn btn-sm btn-outline-primary" data-edit title="Edit time"><i class="fa-solid fa-pen-to-square"></i></button>
                   <button class="btn btn-sm btn-outline-danger" data-delete title="Delete"><i class="fa-solid fa-trash"></i></button>
-                </div>
+                </div>` : `<span class="text-muted small"><i class="fa-solid fa-eye"></i> View only</span>`}
               </td>
             </tr>`;
         }).join("");
@@ -479,12 +533,15 @@
 
       attendanceOut.innerHTML = summary + panels;
 
-      // Wire up edit/delete per row
-      for (const p of punches) {
-        const tr = attendanceOut.querySelector(`tr[data-pid="${CSS.escape(p.id)}"]`);
-        if (!tr) continue;
-        tr.querySelector("[data-edit]").onclick = () => openEditPunchModal(p);
-        tr.querySelector("[data-delete]").onclick = () => confirmDeletePunch(p);
+      // Wire up edit/delete per row — admins only. Managers see the rows
+      // as read-only (buttons are not rendered).
+      if (isAdmin) {
+        for (const p of punches) {
+          const tr = attendanceOut.querySelector(`tr[data-pid="${CSS.escape(p.id)}"]`);
+          if (!tr) continue;
+          tr.querySelector("[data-edit]")?.addEventListener("click", () => openEditPunchModal(p));
+          tr.querySelector("[data-delete]")?.addEventListener("click", () => confirmDeletePunch(p));
+        }
       }
     }
 
@@ -513,11 +570,11 @@
           const after = { ts: Timestamp.fromDate(newDate), edited: true };
           await updateDoc(punchRef, after);
           await addDoc(collection(punchRef, "edits"), {
-            editedBy: adminUid, editedByRole: "admin",
+            editedBy: adminUid, editedByRole: callerRole,
             editedAt: serverTimestamp(), reason, before, after,
           });
           await addDoc(collection(db, "attn_auditLog"), {
-            actor: adminUid, action: "editPunch",
+            actor: adminUid, actorRole: callerRole, action: "editPunch",
             targetUser: uid, targetPunchId: p.id,
             details: { newTs: newDate.toISOString(), reason }, at: serverTimestamp(),
           });
@@ -546,7 +603,7 @@
           if (!reason) { showToast("Reason is required", "warn"); return false; }
           await deleteDoc(doc(db, "attn_attendance", uid, "punches", p.id));
           await addDoc(collection(db, "attn_auditLog"), {
-            actor: adminUid, action: "deletePunch",
+            actor: adminUid, actorRole: callerRole, action: "deletePunch",
             targetUser: uid, targetPunchId: p.id,
             details: { type: p.type, siteId: p.siteId, ts: p.ts.toISOString(), reason },
             at: serverTimestamp(),
@@ -556,11 +613,31 @@
       });
     }
 
-    // ---------- Add punch ----------
-    document.getElementById("btn-add-punch").onclick = async () => {
+    // ---------- Add punch (admin AND manager) ----------
+    // Both roles can add a punch — managers often need this to record a
+    // missed in/out for employees at their sites. Edit and Delete remain
+    // admin-only (see renderAttendance where those buttons are gated).
+    // The audit entry records `addedByRole` so the trail still shows who
+    // created it; the Firestore rules remain the authority.
+    const btnAddPunch = document.getElementById("btn-add-punch");
+    if (btnAddPunch) btnAddPunch.onclick = async () => {
+      if (accessBlocked) return;
       if (!empData) { showToast("Profile has not loaded yet", "warn"); return; }
-      const assigned = empData.assignedSiteIds ?? [];
-      const siteOptions = (assigned.length ? assigned : availableSites.map(s => s.id))
+      // Site dropdown must only list sites BOTH the employee and the viewer
+      // can access. For admins that reduces to the employee's own sites;
+      // for managers it's the intersection with their assigned scope.
+      const empSites = empData.assignedSiteIds ?? [];
+      const intersectIds = empSites.filter(sid => isAdmin || viewerAllowedSiteIds.has(sid));
+      if (intersectIds.length === 0) {
+        showToast(
+          isAdmin
+            ? "This employee has no sites assigned — assign one first from the Users page."
+            : "You don't share any sites with this employee.",
+          "warn"
+        );
+        return;
+      }
+      const siteOptions = intersectIds
         .map((sid, i) => `<option value="${escapeHtml(sid)}" ${i===0?"selected":""}>${escapeHtml(sitesById.get(sid)?.name || sid)}</option>`)
         .join("");
       const nowLocal = toDatetimeLocal(new Date());
@@ -575,7 +652,7 @@
           <label class="ks-field-label" for="ap-time" style="margin-top:10px;">Time</label>
           <input type="datetime-local" id="ap-time" class="form-control" value="${escapeHtml(nowLocal)}" required>
           <label class="ks-field-label" for="ap-site" style="margin-top:10px;">Site</label>
-          <select id="ap-site" class="form-control">${siteOptions || '<option value="">(No site)</option>'}</select>
+          <select id="ap-site" class="form-control">${siteOptions}</select>
           <label class="ks-field-label" for="ap-reason" style="margin-top:10px;">Reason (required)</label>
           <textarea id="ap-reason" class="form-control" rows="2" placeholder="Why are you adding this manually?" required></textarea>
         `,
@@ -586,19 +663,27 @@
           const siteId = modal.querySelector("#ap-site").value;
           const reason = modal.querySelector("#ap-reason").value.trim();
           if (!iso) { showToast("Pick a time", "warn"); return false; }
+          // Defensive: reject if the final site choice fell outside the
+          // viewer's scope (shouldn't happen given the filter above, but
+          // belt-and-braces against DOM tampering).
+          if (!isAdmin && !viewerAllowedSiteIds.has(siteId)) {
+            showToast("Site is outside your scope", "warn");
+            return false;
+          }
           if (!siteId) { showToast("Pick a site", "warn"); return false; }
           if (!reason) { showToast("Reason is required", "warn"); return false; }
           const when = new Date(iso);
           const docRef = await addDoc(collection(db, "attn_attendance", uid, "punches"), {
             ts: Timestamp.fromDate(when),
             type, siteId,
-            addedByAdmin: true,
+            addedByAdmin: true,              // legacy flag, kept for Android app compat
+            addedByRole: callerRole,         // "admin" or "manager" — the real attribution
             addedBy: adminUid,
             addedReason: reason,
             addedAt: serverTimestamp(),
           });
           await addDoc(collection(db, "attn_auditLog"), {
-            actor: adminUid, action: "addPunch",
+            actor: adminUid, actorRole: callerRole, action: "addPunch",
             targetUser: uid, targetPunchId: docRef.id,
             details: { type, siteId, ts: when.toISOString(), reason },
             at: serverTimestamp(),
