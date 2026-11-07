@@ -673,7 +673,7 @@ export async function renderBroadcast(root, db) {
     const hasVariable = /\{\s*(discount|expiry)\s*\}/i.test(body);
     const warnings = [];
     if (!isUtility && recipients.length > remainingToday) {
-      warnings.push(`Only <strong>${remainingToday}</strong> of these ${recipients.length} will be queued today (daily safety cap is ${capLimit}).`);
+      warnings.push(`Up to <strong>${remainingToday}</strong> sends will go through today — the broadcast stops automatically when the ${capLimit}/day send cap is hit. Skipping is free and doesn't count.`);
     }
     if (isUtility && (sentToday + recipients.length) > capLimit) {
       warnings.push(`You've already sent <strong>${sentToday}</strong> reminders today and this run adds <strong>${recipients.length}</strong> more — over the soft cap of ${capLimit}/day. Consider splitting into two sessions a few hours apart.`);
@@ -681,10 +681,14 @@ export async function renderBroadcast(root, db) {
     if (!personalised && !hasVariable) {
       warnings.push(`Your message is byte-identical for every recipient. WhatsApp's spam filter looks for this — insert <code>{name}</code> to personalise.`);
     }
-    const queuedCount = isUtility ? recipients.length : Math.min(recipients.length, remainingToday);
+    // Don't truncate the queue up-front — skips should never eat into the
+    // 25/day cap. Let every selected recipient surface in the batch; the
+    // per-iteration guard in runNextInQueue() stops the run the moment
+    // actual sends (bumpSentToday) hit the cap.
+    const queuedCount = recipients.length;
     const cooldownNote = isUtility
       ? `one at a time with a ${cooldownMs/1000}s cooldown between sends (soft cap ${capLimit}/day for reminders).`
-      : `one at a time with a ${cooldownMs/1000}s cooldown between sends.`;
+      : `one at a time with a ${cooldownMs/1000}s cooldown between sends. The ${capLimit}/day cap counts sends only — skips are free.`;
     const confirm = await Swal.fire({
       title: 'Start broadcast?',
       html: `You're about to send this message to <strong>${queuedCount}</strong> recipient(s), ${cooldownNote}
@@ -694,7 +698,8 @@ export async function renderBroadcast(root, db) {
       confirmButtonText: 'Start',
     });
     if (!confirm.isConfirmed) return;
-    if (!isUtility && recipients.length > remainingToday) recipients.length = remainingToday;
+    // No pre-truncation — the per-iteration cap check in runNextInQueue
+    // stops cleanly once actual sends reach the daily cap.
     saveQueue({ body, imageUrl, recipients, index: 0, segment: activeSeg });
     runNextInQueue();
   });
@@ -762,6 +767,9 @@ async function runNextInQueue() {
   }
   const r = q.recipients[q.index];
   const remaining = q.recipients.length - q.index;
+  // Live cap tracker so the admin can see how many real sends they've done
+  // today vs the daily cap — skips do NOT advance this counter.
+  const sentNow = readSentToday(capKey);
   // Cooldown gate: if we sent one less than cooldownMs ago, hold the Swal
   // open with a countdown before enabling "Send". Prevents the rapid-fire
   // sequential wa.me pattern that trips WhatsApp velocity checks.
@@ -781,7 +789,7 @@ async function runNextInQueue() {
           <strong>${escapeHtml(r.name || headerName)}</strong>
           <code>${escapeHtml(r.phone)}</code>
         </div>
-        <div class="bb-bc__swal-count">${remaining} of ${q.recipients.length} remaining</div>
+        <div class="bb-bc__swal-count">${remaining} of ${q.recipients.length} in queue · ${sentNow}/${capLimit} sent today</div>
         <pre class="bb-bc__swal-msg">${escapeHtml(finalMessage)}</pre>
       </div>
     `,
