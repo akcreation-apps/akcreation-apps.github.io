@@ -61,7 +61,7 @@
     <!-- Attendance -->
     <div class="ks-section-head" style="margin-top:8px;">
       <div>
-        <h2 style="font-size:1.15rem;"><i class="fa-solid fa-calendar-days text-muted" style="font-size:0.85em;"></i> Attendance (last 30 days)</h2>
+        <h2 style="font-size:1.15rem;"><i class="fa-solid fa-calendar-days text-muted" style="font-size:0.85em;"></i> Attendance (latest 50 punches)</h2>
         <p class="ks-subtle">You can edit, add, or delete any punch below.</p>
       </div>
       <div class="ks-section-actions">
@@ -86,7 +86,7 @@
     import { isVerificationUser } from "../assets/config.js";
     import {
       collection, doc, onSnapshot, updateDoc,
-      addDoc, deleteDoc, serverTimestamp, Timestamp, query, orderBy, where
+      addDoc, deleteDoc, serverTimestamp, Timestamp, query, orderBy, where, limit
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -276,8 +276,8 @@
 
         <div class="ks-quick-stats" id="quick-stats">
           <div class="ks-quick-stat"><div class="ks-quick-stat-label">Today</div><div class="ks-quick-stat-value" id="qs-today">—</div></div>
-          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Days present (range)</div><div class="ks-quick-stat-value" id="qs-days">—</div></div>
-          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Total hours (range)</div><div class="ks-quick-stat-value" id="qs-hours">—</div></div>
+          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Days present (in view)</div><div class="ks-quick-stat-value" id="qs-days">—</div></div>
+          <div class="ks-quick-stat"><div class="ks-quick-stat-label">Total hours (in view)</div><div class="ks-quick-stat-value" id="qs-hours">—</div></div>
           <div class="ks-quick-stat"><div class="ks-quick-stat-label">Missing checkouts</div><div class="ks-quick-stat-value" id="qs-missing">—</div></div>
         </div>
 
@@ -352,21 +352,25 @@
     // Writes (edit / add / delete) land back here via the same snapshot —
     // no extra reads, no manual re-fetch after each action.
     const attendanceOut = document.getElementById("attendance-out");
-    const rangeFrom = new Date(); rangeFrom.setDate(rangeFrom.getDate() - 30); rangeFrom.setHours(0, 0, 0, 0);
+    // The attendance view is now bounded by the last 50 punches (see
+    // PUNCH_LIMIT below). rangeFrom is set wide enough that the IN-date
+    // trim inside renderAttendance never clips a legitimate row — the 50
+    // punches themselves are the limit.
+    const rangeFrom = new Date(0); // epoch — don't trim by date, only by count
     const rangeTo = new Date();
 
     attendanceOut.innerHTML = `<div class="ks-panel"><div class="ks-skel"></div><div class="ks-skel"></div><div class="ks-skel"></div></div>`;
 
-    // Widen the fetched window by 1 day on the lower side so a night shift
-    // that started before rangeFrom (e.g. Sun 23:00 → Mon 06:00 when the
-    // range begins Monday) still has both halves available for pairing.
-    // We'll trim pairs back to [rangeFrom, rangeTo] by IN-date inside
-    // renderAttendance so the display stays within the user's selected range.
-    const fetchFrom = new Date(rangeFrom.getTime() - 24 * 60 * 60 * 1000);
+    // Fetch the most recent 50 punches by ts (descending from the server,
+    // which keeps the query cheap and bounded). The pair-inOut logic needs
+    // ascending order, so we re-sort client-side inside renderAttendance.
+    // 50 is enough to cover the last ~25 complete shifts — anything older
+    // belongs in Reports, not this quick-scan view.
+    const PUNCH_LIMIT = 50;
     const punchesQuery = query(
       collection(db, "attn_attendance", uid, "punches"),
-      where("ts", ">=", Timestamp.fromDate(fetchFrom)),
-      orderBy("ts", "asc")
+      orderBy("ts", "desc"),
+      limit(PUNCH_LIMIT)
     );
     onSnapshot(
       punchesQuery,
@@ -384,7 +388,12 @@
           // dropped before they reach rendering, so the attendance table,
           // the "Total hours" quick stat, and Today status all reflect only
           // punches at the manager's own sites. Admins see everything.
-          .filter(p => isAdmin || viewerAllowedSiteIds.has(p.siteId));
+          .filter(p => isAdmin || viewerAllowedSiteIds.has(p.siteId))
+          // Server returns ts desc (latest first) because of the orderBy +
+          // limit. pairInOut walks forward in time, so re-sort ascending
+          // for the pairing step. The per-day renderer reverses rows back
+          // to latest-first for display.
+          .sort((a, b) => a.ts - b.ts);
         currentRangePunches = punches;
         updateTodayStat();
         renderAttendance(punches, rangeFrom, rangeTo);
@@ -483,26 +492,33 @@
           <div class="ks-panel">
             <div class="ks-empty">
               <div class="ks-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
-              <p class="ks-empty-title">No punches in this range</p>
-              <p class="ks-empty-text">${dateStr(from)} → ${dateStr(to)}</p>
+              <p class="ks-empty-title">No punches yet</p>
+              <p class="ks-empty-text">This employee has no recorded punches in their last 50 attempts.</p>
             </div>
           </div>`;
         return;
       }
 
+      // Use the actual span of the loaded punches instead of the wide
+      // epoch-to-now window the query carries internally.
+      const spanFrom = dayRows[0].date;
+      const spanTo = dayRows[dayRows.length - 1].date;
       const summary = `
         <div class="ks-panel" style="margin-bottom:16px;">
           <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
-            <div><strong>${dateStr(from)}</strong> → <strong>${dateStr(to)}</strong></div>
+            <div><strong>${dateStr(spanFrom)}</strong> → <strong>${dateStr(spanTo)}</strong></div>
             <div><span class="text-muted small">Days:</span> <strong>${sortedKeys.length}</strong></div>
             <div><span class="text-muted small">Total:</span> <span class="ks-hours-total">${fmtDuration(totalMs)}</span></div>
             ${missingDays > 0 ? `<div class="ks-missing-badge"><i class="fa-solid fa-triangle-exclamation"></i> ${missingDays} day(s) missing checkout</div>` : ""}
           </div>
         </div>`;
 
-      // Recent day on top. Internal day-punches stay ascending for IN/OUT pairing.
+      // Recent day on top AND recent punch on top within each day. The
+      // pair-inOut logic already consumed the ascending order; for display
+      // we reverse per day so the latest event (usually the OUT) is the
+      // first row the admin sees.
       const panels = [...dayRows].reverse().map(day => {
-        const rows = day.punches.map(p => {
+        const rows = [...day.punches].reverse().map(p => {
           const typeLower = String(p.type || "").toLowerCase();
           const typeCls = isIn(p.type) ? "badge-approved" : isOut(p.type) ? "badge-info" : "badge-muted";
           const typeIcon = isIn(p.type) ? "fa-right-to-bracket" : isOut(p.type) ? "fa-right-from-bracket" : "fa-circle";
@@ -689,6 +705,50 @@
           if (!siteId) { showToast("Pick a site", "warn"); return false; }
           if (!reason) { showToast("Reason is required", "warn"); return false; }
           const when = new Date(iso);
+          // Guards: keep the IN→OUT timeline well-formed. Pairing is timestamp
+          // ordered, so a bad admin pick corrupts an otherwise valid session.
+          //  - OUT guard: reject if the OUT lands at/before an open IN that
+          //    should be closing. Without this the OUT becomes an orphan and
+          //    the IN stays "MISSING OUT" on the employee's calendar.
+          //  - IN guard: reject if `when` falls while a shift is already open
+          //    (either inside an existing IN→OUT window, or after an unpaired
+          //    IN). Those produce consecutive-IN sessions that render as
+          //    "MISSING OUT" for the first shift.
+          {
+            const sorted = [...currentRangePunches].sort((a, b) => a.ts - b.ts);
+
+            // State at `when`: the IN that is "open" at that moment. Replay
+            // everything strictly before `when`.
+            let openAtWhen = null;
+            for (const p of sorted) {
+              if (p.ts >= when) break;
+              if (isIn(p.type)) openAtWhen = p;
+              else if (isOut(p.type)) openAtWhen = null;
+            }
+
+            // Latest open IN across the full timeline (for the OUT guard —
+            // we need to catch an IN that sits AFTER `when` too).
+            let openIn = null;
+            for (const p of sorted) {
+              if (isIn(p.type)) openIn = p;
+              else if (isOut(p.type)) openIn = null;
+            }
+
+            if (isOut(type) && openIn && when <= openIn.ts) {
+              showToast(
+                `OUT must be after the open IN at ${dateStr(openIn.ts)} ${timeStr(openIn.ts)}`,
+                "warn"
+              );
+              return false;
+            }
+            if (isIn(type) && openAtWhen) {
+              showToast(
+                `IN overlaps an open shift from ${dateStr(openAtWhen.ts)} ${timeStr(openAtWhen.ts)}. Add an OUT first or pick another time.`,
+                "warn"
+              );
+              return false;
+            }
+          }
           const docRef = await addDoc(collection(db, "attn_attendance", uid, "punches"), {
             ts: Timestamp.fromDate(when),
             type, siteId,
