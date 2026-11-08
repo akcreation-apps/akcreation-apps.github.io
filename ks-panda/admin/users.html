@@ -139,7 +139,7 @@
     import { requireRole } from "../assets/auth-guard.js";
     import { db, auth } from "../assets/firebase-init.js";
     import { mountTopbar, showToast, openModal, initials, setYear } from "../assets/ui.js";
-    import { isVerificationUser } from "../assets/config.js";
+    import { isVerificationUser, isVerificationSite } from "../assets/config.js";
     import { collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -309,10 +309,13 @@
         // Verification user is frozen — no site-assignment edits, no role
         // changes, no actions. Managed from `assets/config.js`.
         const isVerif = isVerificationUser(u);
-        const sitesCells = availableSites.length === 0
+        const sitesForRow = isVerif
+          ? availableSites
+          : availableSites.filter(s => !isVerificationSite(s));
+        const sitesCells = sitesForRow.length === 0
           ? '<em class="text-muted small">No sites</em>'
           : `<div class="ks-chips">
-              ${availableSites.map(s => `
+              ${sitesForRow.map(s => `
                 <label class="ks-chip">
                   <input type="checkbox" value="${escapeHtml(s.id)}" ${assigned.has(s.id) ? 'checked' : ''} data-site${(isAdmin && !isVerif) ? "" : " disabled"}>
                   <span>${escapeHtml(s.name)}</span>
