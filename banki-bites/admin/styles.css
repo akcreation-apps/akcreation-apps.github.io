@@ -3313,3 +3313,40 @@ button.fab:hover { background: var(--brand-dark); }
   }
   .install-fab-logo { background: #0b0d12; }
 }
+
+
+/* ---- Settings tab ---- */
+.settings-wrap { max-width: 720px; margin: 0 auto; padding: 8px 4px 24px; }
+.settings-head { margin-bottom: 18px; }
+.settings-head h2 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.25rem; margin: 0 0 4px; }
+.settings-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.settings-card + .settings-card { margin-top: 16px; }
+.settings-card-head h3 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; margin: 0 0 4px; }
+.settings-card-head p { font-size: 0.85rem; margin: 0 0 16px; }
+.settings-card .form-group label { font-size: 0.85rem; }
+.settings-card code {
+  background: var(--brand-soft, #fff1e6);
+  color: var(--brand-dark, #d8552a);
+  padding: 2px 6px; border-radius: 4px;
+  font-size: 0.85em;
+}
+.settings-meta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.78rem; color: var(--text-muted, #6b7280);
+  background: var(--surface-2, #f8f9fa);
+  border-radius: 8px; padding: 6px 10px;
+  margin-top: 4px;
+}
+.settings-actions { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
+
+@media (prefers-color-scheme: dark) {
+  .settings-card { background: var(--surface, #18141d); border-color: #2a2634; }
+  .settings-card code { background: #3a1f14; color: #ff7a47; }
+  .settings-meta { background: #1f1822; }
+}

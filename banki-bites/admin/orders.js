@@ -1,4 +1,5 @@
 import { COL, invalidateCache } from '../firebase-config.js';
+import { encodePayToken } from '../pay-token.js';
 import { invalidateCustomersCache } from './customers-tab.js';
 import { loadCustomers, searchCustomers, openCustomerModal, setActiveOffer, clearActiveOffer } from './customers.js';
 import {
@@ -933,6 +934,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       <button class="btn btn-sm btn-outline-primary mr-auto" data-act="notifyEta" title="Send ETA greeting on WhatsApp">
         <i class="fab fa-whatsapp mr-1"></i> Notify ETA
       </button>` : ''}
+      ${!paymentCollected && !isFake && status !== 'cancelled' ? `
+      <button class="btn btn-sm btn-outline-info" data-act="generatePayLink" title="Generate a 5-min UPI payment link and send on WhatsApp">
+        <i class="fas fa-link mr-1"></i> Pay link
+      </button>` : ''}
       ${status === 'delivered' && cust.phone ? `
       <button class="btn btn-sm btn-outline-success mr-auto" data-act="thankYou" title="Send thank-you coupon on WhatsApp">
         <i class="fab fa-whatsapp mr-1"></i> Thank You
@@ -1411,6 +1416,116 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       }
       const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
       try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
+      try { window.location.href = waUrl; return; } catch (e) {}
+      try { window.location.assign(waUrl); return; } catch (e) {}
+      try { window.open(waUrl, '_self'); return; } catch (e) {}
+      try { window.open(waUrl, '_blank'); return; } catch (e) {}
+    });
+  }
+
+  const payLinkBtnEl = card.querySelector('[data-act="generatePayLink"]');
+  if (payLinkBtnEl) {
+    payLinkBtnEl.addEventListener('click', async () => {
+      // Discount: live input beats saved value; used both for the URL coupon
+      // and (when present) as the source of "base amount = cart total" so the
+      // pay page can show the pre-discount amount with the offer as opt-in.
+      const liveDiscount = parseFloat(card.querySelector('[data-f="discount"]')?.value);
+      const savedDiscount = Number.isFinite(+o.discount) ? +o.discount : 0;
+      let discount = Math.max(0, Number.isFinite(liveDiscount) && liveDiscount >= 0 ? liveDiscount : savedDiscount);
+
+      // Admin-configured minimum cart value for surfacing a discount. Read from
+      // bankibites_meta/discount_config. If the order's raw total is below this
+      // threshold, strip the discount so no offer is shown to the customer.
+      let minOrderValue = 0;
+      try {
+        const cfgSnap = await getDoc(doc(db, COL.META, 'discount_config'));
+        if (cfgSnap.exists()) {
+          const mv = +cfgSnap.data()?.min_order_value;
+          if (Number.isFinite(mv) && mv > 0) minOrderValue = mv;
+        }
+      } catch (e) {
+        console.warn('[orders] discount_config fetch failed:', e.message);
+      }
+      const cartTotal = Number.isFinite(+o.total) ? +o.total : 0;
+      if (discount > 0 && minOrderValue > 0 && cartTotal < minOrderValue) {
+        discount = 0;
+      }
+
+      // Amount: when a discount is on the order, surface the cart total so the
+      // customer sees the discount applied as an opt-in offer. Otherwise fall
+      // back to the live "To collect" field → saved collect_amount → o.total.
+      const fallbackTotal = Number.isFinite(+o.total) ? +o.total : NaN;
+      let amount;
+      if (discount > 0 && Number.isFinite(fallbackTotal) && fallbackTotal > 0) {
+        amount = fallbackTotal;
+      } else {
+        const liveCollect = parseFloat(card.querySelector('[data-f="collectAmount"]')?.value);
+        const savedCollect = Number.isFinite(+o.collect_amount) ? +o.collect_amount : NaN;
+        amount = Number.isFinite(liveCollect) && liveCollect > 0
+          ? liveCollect
+          : (Number.isFinite(savedCollect) && savedCollect > 0 ? savedCollect : fallbackTotal);
+      }
+
+      if (!(Number.isFinite(amount) && amount > 0)) {
+        Swal.fire({ icon: 'warning', title: 'No amount', text: 'This order has no payable amount set.', confirmButtonColor: '#FF6B35' });
+        return;
+      }
+
+      // Phone: prefer the phone input currently on the card (admin may have typed
+      // it without saving yet), fall back to the stored customer phone. Only
+      // prompt when neither yields a valid 10-digit number.
+      const livePhone = normalisePhone(card.querySelector('[data-f="phone"]')?.value || '');
+      const savedPhone = normalisePhone(o.customer?.phone || '');
+      let phone = /^\d{10}$/.test(livePhone) ? livePhone : savedPhone;
+      if (!/^\d{10}$/.test(phone)) {
+        const res = await Swal.fire({
+          title: '<i class="fab fa-whatsapp mr-1" style="color:#25d366"></i> Customer WhatsApp number',
+          input: 'tel',
+          inputLabel: 'No phone on this order yet',
+          inputPlaceholder: '10-digit mobile number',
+          inputAttributes: { inputmode: 'tel', maxlength: 15, autocomplete: 'off' },
+          confirmButtonText: 'Continue',
+          confirmButtonColor: '#25d366',
+          showCancelButton: true,
+          inputValidator: (v) => {
+            const n = normalisePhone(v);
+            if (!/^\d{10}$/.test(n)) return 'Enter a valid 10-digit Indian mobile';
+            return null;
+          },
+        });
+        if (!res.isConfirmed) return;
+        phone = normalisePhone(res.value);
+      }
+
+      const PAY_LINK_EXPIRY_SECONDS = 300;
+      const exp = Math.floor(Date.now() / 1000) + PAY_LINK_EXPIRY_SECONDS;
+      const tokenPayload = {
+        o: o.id,
+        a: +amount.toFixed(2),
+        e: exp,
+      };
+      if (discount > 0 && discount < amount) {
+        tokenPayload.d = +discount.toFixed(2);
+      }
+      const payUrl = `${location.origin}/banki-bites/pay.html?t=${encodePayToken(tokenPayload)}`;
+
+      const amountLabel = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+      const discountLine = discount > 0 && discount < amount
+        ? `🎁 *Offer:* Tap the link to apply ₹${Number.isInteger(discount) ? discount : discount.toFixed(2)} discount before paying.`
+        : null;
+      const msg = [
+        'ନମସ୍କାର !',
+        `ଆପଣଙ୍କ order ପାଇଁ secure payment link (valid for 5 minutes) —`,
+        payUrl,
+        `*Amount:* ₹${amountLabel}`,
+        discountLine,
+        `UPI app ରେ tap କରି pay କରିଦିଅନ୍ତୁ ।`,
+        `📸 Payment ହେଲା ପରେ screenshot ଏହି WhatsApp number ରେ share କରିଦିଅନ୍ତୁ, ଆମେ confirm କରିଦେବୁ ।`,
+        `_Team BankiBites :)_`,
+      ].filter(Boolean).join('\n\n');
+
+      const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
+      try { navigator.clipboard && navigator.clipboard.writeText(payUrl).catch(() => {}); } catch (e) {}
       try { window.location.href = waUrl; return; } catch (e) {}
       try { window.location.assign(waUrl); return; } catch (e) {}
       try { window.open(waUrl, '_self'); return; } catch (e) {}

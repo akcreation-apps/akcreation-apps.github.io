@@ -16,6 +16,7 @@ import { renderBroadcast } from './broadcast.js';
 import { renderCustomers } from './customers-tab.js';
 import { renderReport }    from './report.js';
 import { renderGrocery }   from './grocery.js';
+import { renderSettings }  from './settings.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -264,4 +265,5 @@ async function activateTab(name) {
   if (name === 'broadcast') await renderBroadcast(panel, db, APP_NAME);
   if (name === 'report')    await renderReport(panel, db, APP_NAME);
   if (name === 'grocery')   await renderGrocery(panel, db, APP_NAME);
+  if (name === 'settings')  await renderSettings(panel, db, APP_NAME);
 }

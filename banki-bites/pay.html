@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>BankiBites – Pay via UPI</title>
+  <meta name="description" content="Secure UPI payment page for BankiBites orders. Pay by tapping the button on Android or scan the QR from any device.">
+
+  <meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F0E15" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" href="/favicon.ico">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 4 -->
+  <link rel="stylesheet" href="https://akcreation-apps.com/assets/bootstrap/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- QR generator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Crypto-JS needed by firebase-config.js to decrypt credentials -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+  <!-- Analytics -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+
+  <style>
+    :root {
+      --brand: #FF6B35;
+      --brand-dark: #E85826;
+      --brand-soft: #FFE8DC;
+      --bg: #FFF8F3;
+      --surface: #FFFFFF;
+      --text: #1F1B16;
+      --muted: #6B6259;
+      --border: #EADFD5;
+      --success: #1FA971;
+      --warn: #E0A800;
+      --danger: #D94C3D;
+      --shadow: 0 10px 30px rgba(31, 27, 22, 0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --brand: #FF7A47;
+        --brand-dark: #FF6B35;
+        --brand-soft: #3A1F14;
+        --bg: #0F0E15;
+        --surface: #191824;
+        --text: #F5F1EC;
+        --muted: #9E958B;
+        --border: #2A2634;
+        --danger: #FF6E60;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .topbar .logo {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--brand); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 18px;
+    }
+    .topbar .brand-name {
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; line-height: 1;
+    }
+    .topbar .brand-sub {
+      font-size: 11px; color: var(--muted); margin-top: 2px;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px 16px 40px;
+      display: flex; justify-content: center;
+    }
+
+    .card-pay {
+      width: 100%; max-width: 480px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+    }
+
+    .merchant {
+      display: flex; align-items: center; gap: 12px;
+      padding-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+    .merchant .m-logo {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--brand-soft); color: var(--brand);
+      display: grid; place-items: center; font-size: 22px;
+    }
+    .merchant .m-name {
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 16px;
+    }
+    .merchant .m-vpa {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--muted); margin-top: 2px;
+    }
+    .vpa-copy {
+      background: none; border: none; color: var(--brand);
+      cursor: pointer; padding: 4px 6px; border-radius: 6px;
+      min-width: 44px; min-height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .vpa-copy:hover { background: var(--brand-soft); }
+
+    .amount-block {
+      text-align: center;
+      padding: 22px 8px 8px;
+    }
+    .amount-label {
+      font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
+    }
+    .amount-value {
+      font-family: 'Poppins', sans-serif; font-weight: 800;
+      font-size: 44px; line-height: 1.1; color: var(--text);
+      margin-top: 4px;
+    }
+    .amount-value .rupee { color: var(--brand); margin-right: 2px; }
+    .chip {
+      display: inline-block; margin-top: 10px;
+      background: var(--brand-soft); color: var(--brand-dark);
+      font-size: 12px; font-weight: 600;
+      padding: 6px 12px; border-radius: 999px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .chip { color: var(--brand); }
+    }
+    .countdown {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 10px; margin-left: 6px;
+      background: rgba(224, 168, 0, .12); color: var(--warn);
+      font-size: 12px; font-weight: 600;
+      padding: 6px 12px; border-radius: 999px;
+      font-variant-numeric: tabular-nums;
+    }
+    .countdown i { font-size: 11px; }
+    .txn-ref {
+      font-size: 11px; color: var(--muted); margin-top: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .btn-pay {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; min-height: 52px;
+      background: var(--brand); color: #fff;
+      border: none; border-radius: 14px;
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 16px;
+      cursor: pointer;
+      transition: background .15s ease, transform .05s ease;
+    }
+    .btn-pay:hover:not(:disabled) { background: var(--brand-dark); }
+    .btn-pay:active:not(:disabled) { transform: scale(.99); }
+    .btn-pay:disabled { opacity: .5; cursor: not-allowed; }
+
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 22px 0 14px; color: var(--muted); font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .qr-wrap {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .qr-frame {
+      background: #FFFFFF;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      display: inline-block;
+      line-height: 0;
+    }
+    .qr-frame img, .qr-frame canvas {
+      display: block; width: 200px; height: 200px;
+    }
+    .qr-help {
+      font-size: 12px; color: var(--muted); margin-top: 10px; text-align: center;
+    }
+    .qr-help strong { color: var(--text); }
+
+    .scan-lead {
+      text-align: center;
+      font-size: 14px; font-weight: 600;
+      color: var(--text);
+      margin: 8px 0 16px;
+    }
+    .scan-lead i { color: var(--brand); margin-right: 6px; }
+
+    .btn-save {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 16px;
+      min-height: 44px; padding: 0 18px;
+      background: var(--surface); color: var(--brand);
+      border: 1.5px solid var(--brand); border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+    .btn-save:hover { background: var(--brand-soft); }
+    .btn-save:active { transform: scale(.99); }
+
+    /* Prominent "Copy UPI ID" action, offered next to Save-QR so the customer
+       can choose: scan, download the QR, or copy the id into their UPI app. */
+    .alt-actions {
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+      margin-top: 16px;
+    }
+    .alt-actions .btn-save { margin-top: 0; }
+    .btn-copy-upi {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 44px; padding: 0 18px;
+      background: var(--brand); color: #fff;
+      border: none; border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px;
+      cursor: pointer;
+      transition: background .15s ease, transform .05s ease;
+    }
+    .btn-copy-upi:hover { background: var(--brand-dark); }
+    .btn-copy-upi:active { transform: scale(.99); }
+    .manual-amount-hint {
+      width: 100%;
+      margin-top: 10px;
+      font-size: 12px; color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+    .manual-amount-hint strong {
+      color: var(--text); font-weight: 700;
+    }
+
+    /* Offers collapse — follows the industry-standard "Apply coupon" row
+       seen in UPI apps and food-delivery checkouts. Full-width tappable row
+       with a dashed border, a muted ticket icon, and a chevron. Not brand-
+       coloured, so it doesn't compete with the Pay button, but clearly
+       recognisable as an interactive coupon slot for customers who look. */
+    .offers {
+      margin: 14px 4px 8px;
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .offers summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 8px 12px;
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12px;
+      line-height: 1;
+      letter-spacing: .01em;
+      color: var(--text);
+    }
+    .offers summary::-webkit-details-marker { display: none; }
+    .offers summary .tag {
+      color: var(--brand); font-size: 12px;
+      flex-shrink: 0;
+    }
+    .offers summary .lead { flex: 1; }
+    .offers summary .chev {
+      color: var(--muted); font-size: 10px;
+      transition: transform .15s ease;
+      flex-shrink: 0;
+    }
+    .offers[open] summary .chev { transform: rotate(180deg); }
+    .offers-body {
+      padding: 8px 12px;
+      border-top: 1px dashed var(--border);
+    }
+    .offer-row {
+      display: flex; align-items: center; gap: 10px;
+      justify-content: space-between;
+    }
+    .offer-row .amt {
+      font-family: 'Poppins', sans-serif; font-weight: 600;
+      font-size: 12px; color: var(--success);
+    }
+    .btn-apply {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 26px; padding: 0 10px;
+      background: var(--brand); color: #fff;
+      border: none; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-weight: 600; font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-apply:hover { background: var(--brand-dark); }
+    .btn-apply:active { transform: scale(.98); }
+
+    .amount-value .strike {
+      color: var(--muted); font-size: 22px; text-decoration: line-through;
+      font-weight: 600; margin-right: 10px;
+    }
+    .applied-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(31,169,113,.14); color: var(--success);
+      font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 999px;
+      margin-top: 8px;
+    }
+
+    .qr-ios-hint {
+      margin-top: 10px;
+      font-size: 11px; color: var(--muted);
+      text-align: center; max-width: 280px;
+      line-height: 1.5;
+    }
+    .qr-ios-hint strong { color: var(--text); }
+
+    .empty-qr {
+      width: 200px; height: 200px;
+      display: grid; place-items: center;
+      color: var(--muted); font-size: 12px; text-align: center; padding: 12px;
+      background: repeating-linear-gradient(45deg, var(--brand-soft), var(--brand-soft) 8px, transparent 8px, transparent 16px);
+      border-radius: 8px;
+    }
+
+    .expired-card {
+      text-align: center;
+      padding: 32px 18px;
+    }
+    .expired-card .ic {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(217, 76, 61, .12); color: var(--danger);
+      display: grid; place-items: center;
+      margin: 0 auto 14px; font-size: 28px;
+    }
+    .expired-card h3 {
+      font-family: 'Poppins', sans-serif; font-weight: 700;
+      font-size: 18px; margin: 0 0 6px;
+    }
+    .expired-card p {
+      font-size: 14px; color: var(--muted); margin: 0;
+      line-height: 1.5;
+    }
+
+    .toast-pop {
+      position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px);
+      background: var(--text); color: var(--surface);
+      padding: 10px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 500;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 1000;
+    }
+    .toast-pop.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    footer {
+      text-align: center;
+      padding: 18px 12px;
+      font-size: 12px; color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    footer a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (min-width: 768px) {
+      main { padding-top: 40px; }
+      .card-pay { padding: 28px 26px; border-radius: 24px; }
+      .amount-value { font-size: 52px; }
+      .qr-frame img, .qr-frame canvas { width: 220px; height: 220px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">B</div>
+  <div>
+    <div class="brand-name">BankiBites</div>
+    <div class="brand-sub"><i class="fas fa-lock"></i> Secure UPI Payment</div>
+  </div>
+</header>
+
+<main>
+  <section class="card-pay" aria-label="UPI payment card">
+
+    <!-- EXPIRED STATE -->
+    <div id="expiredView" hidden>
+      <div class="expired-card">
+        <div class="ic"><i class="fas fa-hourglass-end"></i></div>
+        <h3>This payment link has expired</h3>
+        <p>For your security, BankiBites payment links are valid for 5 minutes. Please contact BankiBites to get a fresh link.</p>
+      </div>
+    </div>
+
+    <!-- ACTIVE STATE -->
+    <div id="activeView">
+      <div class="merchant">
+        <div class="m-logo"><i class="fas fa-utensils"></i></div>
+        <div style="flex:1;">
+          <div class="m-name">BankiBites</div>
+          <div class="m-vpa">
+            <span id="vpa-text">8270171898m@pnb</span>
+            <button class="vpa-copy" id="copyVpa" aria-label="Copy UPI ID">
+              <i class="far fa-copy" id="copyIcon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="amount-block">
+        <div class="amount-label">Amount payable</div>
+        <div class="amount-value">
+          <span id="amountStrike" class="strike" hidden></span>
+          <span class="rupee">₹</span><span id="amount">—</span>
+        </div>
+        <div id="appliedChipWrap" hidden>
+          <span class="applied-chip"><i class="fas fa-check-circle"></i> <span id="appliedChipText">Offer applied</span></span>
+        </div>
+        <div>
+          <span class="chip" id="orderChip">Order: —</span>
+          <span class="countdown" id="countdown" hidden>
+            <i class="fas fa-clock"></i> <span id="countdownText">5:00</span>
+          </span>
+        </div>
+        <div class="txn-ref" id="txnRef">Ref: —</div>
+      </div>
+
+      <details class="offers" id="offersBox" hidden>
+        <summary>
+          <i class="fas fa-ticket tag"></i>
+          <span class="lead">Redeem offer</span>
+          <i class="fas fa-chevron-down chev"></i>
+        </summary>
+        <div class="offers-body">
+          <div class="offer-row">
+            <div class="amt" id="offerAmt">−₹0 off</div>
+            <button type="button" class="btn-apply" id="applyOfferBtn">Apply</button>
+          </div>
+        </div>
+      </details>
+
+      <div id="androidPay" hidden>
+        <button class="btn-pay" id="pay">
+          <i class="fas fa-mobile-alt"></i>
+          <span>Pay with UPI App</span>
+        </button>
+        <div class="divider">Or scan to pay</div>
+      </div>
+
+      <div id="scanPay" hidden>
+        <div class="scan-lead">
+          <i class="fas fa-qrcode"></i> Scan this QR from your phone's UPI app to pay
+        </div>
+      </div>
+
+      <div class="qr-wrap">
+        <div class="qr-frame" id="qrFrame">
+          <div class="empty-qr">Preparing QR…</div>
+        </div>
+        <div class="qr-help">
+          Scan with <strong>GPay</strong> · <strong>PhonePe</strong> · <strong>Paytm</strong> · <strong>BHIM</strong>
+        </div>
+        <div class="alt-actions">
+          <button class="btn-copy-upi" id="copyUpiBig" type="button">
+            <i class="fas fa-copy"></i>
+            <span>Copy UPI ID</span>
+          </button>
+          <button class="btn-save" id="saveQr" hidden>
+            <i class="fas fa-download"></i>
+            <span>Save QR</span>
+          </button>
+          <div class="manual-amount-hint" id="manualAmountHint" hidden>
+            After copying, enter <strong>₹<span id="manualAmountValue">—</span></strong> manually in your UPI app.
+          </div>
+        </div>
+        <div class="qr-ios-hint" id="iosHint" hidden>
+          On iPhone: tap Save, then long-press the image that opens and choose <strong>Save to Photos</strong>.
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<div class="toast-pop" id="toast" role="status" aria-live="polite"></div>
+
+<footer>
+  <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+</footer>
+
+<script type="module">
+  import { getDb, COL } from './firebase-config.js';
+  import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
+  import { encodePayToken, decodePayToken } from './pay-token.js';
+
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  const params = new URLSearchParams(location.search);
+  const token = (params.get('t') || '').trim();
+  const payload = decodePayToken(token) || {};
+
+  const order = String(payload.o || '').trim();
+  const parsedAmount = Number(payload.a);
+  const amountNum = Number.isFinite(parsedAmount) && parsedAmount > 0 ? parsedAmount : NaN;
+  const expSec = Number(payload.e);
+  const expValid = Number.isFinite(expSec) && expSec > 0;
+  const parsedDiscount = Number(payload.d);
+  const discountNum = Number.isFinite(parsedDiscount) && parsedDiscount > 0 ? parsedDiscount : 0;
+  const parsedApplied = Number(payload.f);
+  const appliedFromToken = Number.isFinite(parsedApplied) && parsedApplied > 0 ? parsedApplied : 0;
+
+  const expiredView = document.getElementById('expiredView');
+  const activeView = document.getElementById('activeView');
+
+  function showExpired() {
+    expiredView.hidden = false;
+    activeView.hidden = true;
+  }
+
+  // Hard-stop up front: no amount, no exp param, or already past expiry.
+  if (!Number.isFinite(amountNum) || !expValid || Date.now() / 1000 > expSec) {
+    showExpired();
+  } else {
+    bootActive();
+  }
+
+  // Default VPA / payee — overridden by admin-controlled Firestore config
+  // (bankibites_meta/upi_config) when reachable. Kept as fallback so a
+  // Firestore outage doesn't block payment.
+  const FALLBACK_VPA = '8270171898m@pnb';
+  const FALLBACK_PAYEE = 'BankiBites';
+
+  async function loadMerchantConfig() {
+    try {
+      const db = await getDb();
+      const snap = await getDoc(doc(db, COL.META, 'upi_config'));
+      if (snap.exists()) {
+        const d = snap.data() || {};
+        return {
+          vpa: (d.merchant_vpa || FALLBACK_VPA).trim(),
+          payee: (d.merchant_name || FALLBACK_PAYEE).trim(),
+        };
+      }
+    } catch (e) {
+      console.warn('[pay] UPI config fetch failed, using fallback:', e.message);
+    }
+    return { vpa: FALLBACK_VPA, payee: FALLBACK_PAYEE };
+  }
+
+  async function bootActive() {
+    const { vpa: VPA, payee: PAYEE } = await loadMerchantConfig();
+
+    const amountEl = document.getElementById('amount');
+    const orderChip = document.getElementById('orderChip');
+    const txnRefEl = document.getElementById('txnRef');
+    const payBtn = document.getElementById('pay');
+    const qrFrame = document.getElementById('qrFrame');
+    const androidPay = document.getElementById('androidPay');
+    const scanPay = document.getElementById('scanPay');
+    const saveQrBtn = document.getElementById('saveQr');
+    const iosHint = document.getElementById('iosHint');
+    const countdownWrap = document.getElementById('countdown');
+    const countdownText = document.getElementById('countdownText');
+
+    const ua = navigator.userAgent;
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    if (isAndroid) {
+      androidPay.hidden = false;
+    } else {
+      scanPay.hidden = false;
+      saveQrBtn.hidden = false;
+      if (isIOS) iosHint.hidden = false;
+    }
+
+    const txnRef = 'BB' + (order || 'ORDER').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 20);
+
+    // Reflect the live VPA on the merchant row (the only place the VPA is
+    // shown — the big Copy button intentionally hides it to keep the row
+    // uncluttered; customers can read it from the merchant row above).
+    const vpaTextEl = document.getElementById('vpa-text');
+    if (vpaTextEl) vpaTextEl.textContent = VPA;
+
+    amountEl.textContent = amountNum.toFixed(2).replace(/\.00$/, '');
+
+    // Manual-amount reminder — shown next to Copy UPI ID so the customer
+    // remembers to type the amount in their UPI app after pasting the VPA
+    // (the copied VPA alone doesn't carry the amount).
+    const manualHint = document.getElementById('manualAmountHint');
+    const manualAmountValue = document.getElementById('manualAmountValue');
+    if (manualHint && manualAmountValue) {
+      manualAmountValue.textContent = amountNum.toFixed(2).replace(/\.00$/, '');
+      manualHint.hidden = false;
+    }
+    orderChip.textContent = 'Order: ' + (order ? order.slice(0, 10) : '—');
+    txnRefEl.textContent = 'Ref: ' + txnRef;
+
+    // Offers — a discount (passed in via ?discount=<rupees>) is presented as a
+    // collapsed coupon the customer can opt into. Applying reloads the page
+    // with amount = amount − discount and no discount param, so the UPI intent
+    // and QR reflect the lower total.
+    if (discountNum > 0 && discountNum < amountNum) {
+      const offersBox = document.getElementById('offersBox');
+      const offerAmt  = document.getElementById('offerAmt');
+      const applyBtn  = document.getElementById('applyOfferBtn');
+      offersBox.hidden = false;
+      const discountLabel = Number.isInteger(discountNum) ? String(discountNum) : discountNum.toFixed(2);
+      offerAmt.textContent = '−₹' + discountLabel + ' off';
+      applyBtn.addEventListener('click', () => {
+        const newAmount = +(amountNum - discountNum).toFixed(2);
+        // Re-encode the token so the URL stays opaque after Apply — new amount,
+        // discount dropped, `f` carries the applied value so we can show the
+        // strike-through chip once the page reloads.
+        const newToken = encodePayToken({
+          o: order,
+          a: newAmount,
+          e: expSec,
+          f: discountNum,
+        });
+        location.replace(location.pathname + '?t=' + newToken);
+      });
+    }
+
+    // After an offer is applied we land back here with the token's `f` field
+    // populated. Show the original (pre-discount) amount as a strike-through
+    // alongside the new amount so the customer sees the saving confirmed.
+    const appliedNum = appliedFromToken;
+    if (appliedNum > 0) {
+      const strikeEl = document.getElementById('amountStrike');
+      const chipWrap = document.getElementById('appliedChipWrap');
+      const chipText = document.getElementById('appliedChipText');
+      const originalAmount = amountNum + appliedNum;
+      const origLabel = Number.isInteger(originalAmount) ? String(originalAmount) : originalAmount.toFixed(2);
+      const savedLabel = Number.isInteger(appliedNum) ? String(appliedNum) : appliedNum.toFixed(2);
+      strikeEl.textContent = '₹' + origLabel;
+      strikeEl.hidden = false;
+      chipText.textContent = `Offer applied · You saved ₹${savedLabel}`;
+      chipWrap.hidden = false;
+    }
+
+    const upiSafe = (s) => encodeURIComponent(s)
+      .replace(/%40/g, '@')
+      .replace(/%20/g, '+');
+
+    const upiUrl = 'upi://pay' +
+      '?pa=' + upiSafe(VPA) +
+      '&pn=' + upiSafe(PAYEE) +
+      '&am=' + amountNum.toFixed(2) +
+      '&cu=INR' +
+      '&tr=' + upiSafe(txnRef) +
+      '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
+
+    qrFrame.innerHTML = '';
+    new QRCode(qrFrame, {
+      text: upiUrl,
+      width: 220,
+      height: 220,
+      colorDark: '#1F1B16',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+
+    // Countdown — updates every second, swaps to expired state at 0 without reload.
+    countdownWrap.hidden = false;
+    function tick() {
+      const left = Math.floor(expSec - Date.now() / 1000);
+      if (left <= 0) {
+        countdownText.textContent = '0:00';
+        showExpired();
+        clearInterval(timerId);
+        return;
+      }
+      const m = Math.floor(left / 60);
+      const s = left % 60;
+      countdownText.textContent = m + ':' + (s < 10 ? '0' + s : s);
+    }
+    tick();
+    const timerId = setInterval(tick, 1000);
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    async function copyVpaToClipboard() {
+      try {
+        await navigator.clipboard.writeText(VPA);
+        showToast('UPI ID copied — paste in your UPI app');
+        return true;
+      } catch (e) {
+        showToast('Copy failed — long-press the ID');
+        return false;
+      }
+    }
+
+    document.getElementById('copyVpa').addEventListener('click', async () => {
+      const ok = await copyVpaToClipboard();
+      if (!ok) return;
+      const icon = document.getElementById('copyIcon');
+      icon.classList.remove('fa-copy', 'far');
+      icon.classList.add('fa-check', 'fas');
+      setTimeout(() => {
+        icon.classList.remove('fa-check', 'fas');
+        icon.classList.add('fa-copy', 'far');
+      }, 1500);
+    });
+
+    document.getElementById('copyUpiBig').addEventListener('click', copyVpaToClipboard);
+
+    if (payBtn) {
+      payBtn.addEventListener('click', () => {
+        window.location.href = upiUrl;
+      });
+    }
+
+    saveQrBtn.addEventListener('click', () => {
+      const canvas = qrFrame.querySelector('canvas');
+      const img = qrFrame.querySelector('img');
+      const src = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+      if (!src) { showToast('QR not ready yet'); return; }
+
+      const filename = 'bankibites-upi-' + txnRef + '.png';
+      const a = document.createElement('a');
+      a.href = src;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      if (isIOS) {
+        const w = window.open();
+        if (w) w.document.write('<title>' + filename + '</title><img src="' + src + '" style="width:100%">');
+        showToast('Long-press the image to save');
+      } else {
+        showToast('QR saved to your device');
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
