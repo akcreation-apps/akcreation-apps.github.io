@@ -417,6 +417,34 @@
     footer a { color: var(--brand); text-decoration: none; font-weight: 600; }
     footer a:hover { text-decoration: underline; }
 
+    /* "Other ways to pay" collapse — shown on Android to hide the QR and
+       Copy-UPI by default so the big Pay button is the obvious primary action.
+       On iOS / desktop the summary is hidden via JS and the details element
+       stays open, so the QR flow renders inline exactly like before. */
+    .other-methods {
+      margin-top: 18px;
+    }
+    .other-methods-summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 10px;
+      border-top: 1px solid var(--border);
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 13px;
+      color: var(--muted);
+    }
+    .other-methods-summary:hover { color: var(--text); }
+    .other-methods-summary::-webkit-details-marker { display: none; }
+    .other-methods-summary .chev {
+      font-size: 10px;
+      transition: transform .15s ease;
+    }
+    .other-methods[open] .other-methods-summary .chev { transform: rotate(180deg); }
+    /* No padding on the body when the summary is hidden (iOS / desktop flow)
+       so the QR sits flush below the scan-lead; when the summary is visible
+       (Android accordion), the summary itself provides the breathing room. */
+    .other-methods-body { padding-top: 0; }
+
     @media (min-width: 768px) {
       main { padding-top: 40px; }
       .card-pay { padding: 28px 26px; border-radius: 24px; }
@@ -500,7 +528,6 @@
           <i class="fas fa-mobile-alt"></i>
           <span>Pay with UPI App</span>
         </button>
-        <div class="divider">Or scan to pay</div>
       </div>
 
       <div id="scanPay" hidden>
@@ -509,30 +536,38 @@
         </div>
       </div>
 
-      <div class="qr-wrap">
-        <div class="qr-frame" id="qrFrame">
-          <div class="empty-qr">Preparing QR…</div>
-        </div>
-        <div class="qr-help">
-          Scan with <strong>GPay</strong> · <strong>PhonePe</strong> · <strong>Paytm</strong> · <strong>BHIM</strong>
-        </div>
-        <div class="alt-actions">
-          <button class="btn-copy-upi" id="copyUpiBig" type="button">
-            <i class="fas fa-copy"></i>
-            <span>Copy UPI ID</span>
-          </button>
-          <button class="btn-save" id="saveQr" hidden>
-            <i class="fas fa-download"></i>
-            <span>Save QR</span>
-          </button>
-          <div class="manual-amount-hint" id="manualAmountHint" hidden>
-            After copying, enter <strong>₹<span id="manualAmountValue">—</span></strong> manually in your UPI app.
+      <details id="otherMethods" class="other-methods">
+        <summary class="other-methods-summary" id="otherMethodsSummary" hidden>
+          <span>Other ways to pay — QR or copy UPI ID</span>
+          <i class="fas fa-chevron-down chev"></i>
+        </summary>
+        <div class="other-methods-body">
+          <div class="qr-wrap">
+            <div class="qr-frame" id="qrFrame">
+              <div class="empty-qr">Preparing QR…</div>
+            </div>
+            <div class="qr-help">
+              Scan with <strong>GPay</strong> · <strong>PhonePe</strong> · <strong>Paytm</strong> · <strong>BHIM</strong>
+            </div>
+            <div class="alt-actions">
+              <button class="btn-copy-upi" id="copyUpiBig" type="button">
+                <i class="fas fa-copy"></i>
+                <span>Copy UPI ID</span>
+              </button>
+              <button class="btn-save" id="saveQr" hidden>
+                <i class="fas fa-download"></i>
+                <span>Save QR</span>
+              </button>
+              <div class="manual-amount-hint" id="manualAmountHint" hidden>
+                After copying, enter <strong>₹<span id="manualAmountValue">—</span></strong> manually in your UPI app.
+              </div>
+            </div>
+            <div class="qr-ios-hint" id="iosHint" hidden>
+              On iPhone: tap Save, then long-press the image that opens and choose <strong>Save to Photos</strong>.
+            </div>
           </div>
         </div>
-        <div class="qr-ios-hint" id="iosHint" hidden>
-          On iPhone: tap Save, then long-press the image that opens and choose <strong>Save to Photos</strong>.
-        </div>
-      </div>
+      </details>
     </div>
 
   </section>
@@ -623,12 +658,21 @@
     const isIOS = /iPhone|iPad|iPod/i.test(ua) ||
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+    // Android — primary CTA is the Pay button; QR + Copy live inside a
+    // collapsed "Other ways to pay" accordion so they don't compete for
+    // attention. iOS / desktop keep the inline flow (no accordion summary).
+    const otherMethods = document.getElementById('otherMethods');
+    const otherMethodsSummary = document.getElementById('otherMethodsSummary');
     if (isAndroid) {
       androidPay.hidden = false;
+      otherMethods.removeAttribute('open');
+      otherMethodsSummary.hidden = false;
     } else {
       scanPay.hidden = false;
       saveQrBtn.hidden = false;
       if (isIOS) iosHint.hidden = false;
+      otherMethods.setAttribute('open', '');
+      otherMethodsSummary.hidden = true;
     }
 
     const txnRef = 'BB' + (order || 'ORDER').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 20);
