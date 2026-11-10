@@ -434,6 +434,58 @@
     footer a { color: var(--brand); text-decoration: none; font-weight: 600; }
     footer a:hover { text-decoration: underline; }
 
+    /* iOS UPI app quick-launchers — a 4-tile grid of brand-coloured chips that
+       deep-link into each UPI app with the payment pre-filled. Shown only on
+       iOS where there's no reliable system-wide `upi://` intent handler. */
+    .ios-apps {
+      margin-top: 16px;
+      padding: 14px;
+      background: var(--brand-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .ios-apps-title {
+      font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .ios-apps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .ios-app-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 10px 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none !important;
+      color: var(--text);
+      font-family: 'Inter', sans-serif; font-weight: 600; font-size: 11px;
+      transition: transform .1s ease, border-color .15s ease, background .15s ease;
+      min-height: 44px;
+    }
+    .ios-app-btn:hover { border-color: var(--brand); color: var(--text); }
+    .ios-app-btn:active { transform: scale(.96); }
+    .ios-app-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--brand); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 16px;
+    }
+    .ios-app-icon--gpay    { background: #4285F4; }
+    .ios-app-icon--phonepe { background: #5F259F; }
+    .ios-app-icon--paytm   { background: #00BAF2; }
+    .ios-app-icon--bhim    { background: #FF8800; }
+    .ios-apps-note {
+      margin-top: 10px;
+      font-size: 11px; color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
     /* "Other ways to pay" collapse — shown on Android to hide the QR and
        Copy-UPI by default so the big Pay button is the obvious primary action.
        On iOS / desktop the summary is hidden via JS and the details element
@@ -547,8 +599,34 @@
         </button>
       </div>
 
+      <!-- iOS-only quick launchers — tap-to-open UPI apps with amount pre-filled.
+           Safari silently does nothing if the app isn't installed, so the QR
+           and Copy-UPI fallbacks below still cover that case. -->
+      <div id="iosApps" class="ios-apps" hidden>
+        <div class="ios-apps-title">Tap your UPI app to pay</div>
+        <div class="ios-apps-grid">
+          <a href="#" data-upi-app="gpay" class="ios-app-btn" aria-label="Pay with GPay">
+            <span class="ios-app-icon ios-app-icon--gpay">G</span>
+            <span>GPay</span>
+          </a>
+          <a href="#" data-upi-app="phonepe" class="ios-app-btn" aria-label="Pay with PhonePe">
+            <span class="ios-app-icon ios-app-icon--phonepe">P</span>
+            <span>PhonePe</span>
+          </a>
+          <a href="#" data-upi-app="paytm" class="ios-app-btn" aria-label="Pay with Paytm">
+            <span class="ios-app-icon ios-app-icon--paytm">P</span>
+            <span>Paytm</span>
+          </a>
+          <a href="#" data-upi-app="bhim" class="ios-app-btn" aria-label="Pay with BHIM">
+            <span class="ios-app-icon ios-app-icon--bhim">B</span>
+            <span>BHIM</span>
+          </a>
+        </div>
+        <div class="ios-apps-note">Nothing happened? The app isn't installed — scan the QR below instead.</div>
+      </div>
+
       <div id="scanPay" hidden>
-        <div class="scan-lead">
+        <div class="scan-lead" id="scanLead">
           <i class="fas fa-qrcode"></i> Scan this QR from your phone's UPI app to pay
         </div>
       </div>
@@ -688,11 +766,14 @@
       otherMethodsSummary.hidden = false;
     } else {
       scanPay.hidden = false;
-      saveQrBtn.hidden = false;
       if (isIOS) iosHint.hidden = false;
       otherMethods.setAttribute('open', '');
       otherMethodsSummary.hidden = true;
     }
+    // Save/Share QR is useful on every non-Pay-button platform, including
+    // Android when the user has expanded "Other ways to pay" — so expose it
+    // universally rather than only on iOS / desktop.
+    saveQrBtn.hidden = false;
 
     const txnRef = 'BB' + (order || 'ORDER').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 20);
 
@@ -780,6 +861,41 @@
       colorLight: '#FFFFFF',
       correctLevel: QRCode.CorrectLevel.M
     });
+
+    // iOS quick-launchers — build an app-specific deep link per UPI app, so
+    // tapping a tile opens that app directly with the payment pre-filled.
+    // iOS has no system-wide `upi://` handler, so these per-app schemes are
+    // the only reliable way to short-circuit the "save QR → scan from gallery"
+    // dance. If an app isn't installed, Safari silently does nothing — users
+    // fall back to the QR + Copy UPI ID options below.
+    if (isIOS) {
+      const iosApps = document.getElementById('iosApps');
+      if (iosApps) {
+        const query = '?pa=' + upiSafe(VPA) +
+                      '&pn=' + upiSafe(PAYEE) +
+                      '&am=' + amountNum.toFixed(2) +
+                      '&cu=INR' +
+                      '&tr=' + upiSafe(txnRef) +
+                      '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
+        const schemes = {
+          gpay:    'tez://upi/pay' + query,
+          phonepe: 'phonepe://pay' + query,
+          paytm:   'paytmmp://pay' + query,
+          bhim:    'bhim://upi/pay' + query,
+        };
+        iosApps.querySelectorAll('[data-upi-app]').forEach(btn => {
+          const app = btn.dataset.upiApp;
+          if (schemes[app]) btn.href = schemes[app];
+        });
+        iosApps.hidden = false;
+        // Downgrade the QR lead to a secondary "Or scan this QR" since the
+        // apps row is now the primary action on iOS.
+        const scanLead = document.getElementById('scanLead');
+        if (scanLead) {
+          scanLead.innerHTML = '<i class="fas fa-qrcode"></i> Or scan this QR instead';
+        }
+      }
+    }
 
     // Countdown — updates every second, swaps to expired state at 0 without reload.
     countdownWrap.hidden = false;

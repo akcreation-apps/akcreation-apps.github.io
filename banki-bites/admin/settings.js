@@ -356,6 +356,41 @@ export async function renderSettings(root, db) {
       }
       const payUrl = `${location.origin}/banki-bites/pay.html?t=${encodePayToken(tokenPayload)}`;
 
+      // Final confirmation — show the admin exactly what's about to be encoded
+      // into the link (amount, discount, note) and which number it's being sent
+      // to, so a wrong value is caught before WhatsApp opens.
+      const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2);
+      const rows = [
+        `<tr><td style="padding-top:6px;font-weight:700">Amount in link</td><td style="padding-top:6px;text-align:right;font-weight:700;color:#FF6B35">₹${fmt(amount)}</td></tr>`,
+      ];
+      if (tokenPayload.d) {
+        rows.push(`<tr><td style="color:#1fa971">Offer (opt-in)</td><td style="text-align:right;color:#1fa971">− ₹${fmt(tokenPayload.d)}</td></tr>`);
+        rows.push(`<tr><td style="color:#6b7280;font-size:0.82rem">If customer applies offer</td><td style="text-align:right;color:#6b7280;font-size:0.82rem">₹${fmt(amount - tokenPayload.d)}</td></tr>`);
+      }
+      if (note) {
+        rows.push(`<tr><td style="color:#6b7280">Note</td><td style="text-align:right;font-style:italic">${note.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</td></tr>`);
+      }
+      const confirmRes = await Swal.fire({
+        title: '<i class="fas fa-paper-plane mr-1" style="color:#25d366"></i> Send payment link?',
+        html: `
+          <div class="text-left" style="font-size:0.9rem">
+            <div style="margin-bottom:12px">
+              <div style="color:#6b7280;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em">To WhatsApp</div>
+              <div style="font-weight:600">+91 ${phone}</div>
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+              ${rows.join('')}
+            </table>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Send',
+        confirmButtonColor: '#25d366',
+        cancelButtonText: 'Cancel',
+        focusCancel: true,
+      });
+      if (!confirmRes.isConfirmed) return;
+
       const noteLine = note ? `*For:* ${note}` : null;
       const msg = [
         'ନମସ୍କାର !',

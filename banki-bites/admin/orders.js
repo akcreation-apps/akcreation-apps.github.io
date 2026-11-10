@@ -1569,6 +1569,45 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       }
       const payUrl = `${location.origin}/banki-bites/pay.html?t=${encodePayToken(tokenPayload)}`;
 
+      // Final confirmation — show the admin exactly what's about to be encoded
+      // into the link (amount, breakdown, discount) and which number it's being
+      // sent to, so a wrong value is caught before WhatsApp opens.
+      const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2);
+      const effectiveCart = (discount > 0 && Number.isFinite(+o.total) && +o.total > 0) ? +o.total : null;
+      const rows = [];
+      if (effectiveCart !== null) {
+        rows.push(`<tr><td style="color:#6b7280">Cart total</td><td style="text-align:right">₹${fmt(effectiveCart)}</td></tr>`);
+        if (extraCharges > 0) rows.push(`<tr><td style="color:#6b7280">Extra charges</td><td style="text-align:right">+ ₹${fmt(extraCharges)}</td></tr>`);
+      } else if (extraCharges > 0) {
+        rows.push(`<tr><td style="color:#6b7280">Base</td><td style="text-align:right">₹${fmt(amount - extraCharges)}</td></tr>`);
+        rows.push(`<tr><td style="color:#6b7280">Extra charges</td><td style="text-align:right">+ ₹${fmt(extraCharges)}</td></tr>`);
+      }
+      rows.push(`<tr style="border-top:1px solid #e5e7eb"><td style="padding-top:6px;font-weight:700">Amount in link</td><td style="padding-top:6px;text-align:right;font-weight:700;color:#FF6B35">₹${fmt(amount)}</td></tr>`);
+      if (tokenPayload.d) {
+        rows.push(`<tr><td style="color:#1fa971">Offer (opt-in)</td><td style="text-align:right;color:#1fa971">− ₹${fmt(tokenPayload.d)}</td></tr>`);
+        rows.push(`<tr><td style="color:#6b7280;font-size:0.82rem">If customer applies offer</td><td style="text-align:right;color:#6b7280;font-size:0.82rem">₹${fmt(amount - tokenPayload.d)}</td></tr>`);
+      }
+      const confirmRes = await Swal.fire({
+        title: '<i class="fas fa-paper-plane mr-1" style="color:#25d366"></i> Send payment link?',
+        html: `
+          <div class="text-left" style="font-size:0.9rem">
+            <div style="margin-bottom:12px">
+              <div style="color:#6b7280;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em">To WhatsApp</div>
+              <div style="font-weight:600">+91 ${phone}</div>
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+              ${rows.join('')}
+            </table>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Send',
+        confirmButtonColor: '#25d366',
+        cancelButtonText: 'Cancel',
+        focusCancel: true,
+      });
+      if (!confirmRes.isConfirmed) return;
+
       const msg = [
         'ନମସ୍କାର !',
         'ଆପଣଙ୍କ order ପାଇଁ secure payment link (valid for 5 minutes) —',
