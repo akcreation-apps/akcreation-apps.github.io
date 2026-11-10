@@ -3319,16 +3319,57 @@ button.fab:hover { background: var(--brand-dark); }
 .settings-wrap { max-width: 720px; margin: 0 auto; padding: 8px 4px 24px; }
 .settings-head { margin-bottom: 18px; }
 .settings-head h2 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.25rem; margin: 0 0 4px; }
+/* Settings cards render as collapsible <details> accordions so the Settings
+   tab stays short — only the card the admin is editing is expanded. */
 .settings-card {
   background: var(--surface, #fff);
   border: 1px solid var(--border, #e5e7eb);
   border-radius: 14px;
-  padding: 20px 22px;
   box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  overflow: hidden;
 }
-.settings-card + .settings-card { margin-top: 16px; }
-.settings-card-head h3 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; margin: 0 0 4px; }
-.settings-card-head p { font-size: 0.85rem; margin: 0 0 16px; }
+.settings-card + .settings-card { margin-top: 10px; }
+.settings-card-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  user-select: none;
+}
+.settings-card-summary::-webkit-details-marker { display: none; }
+.settings-card-summary:hover { background: rgba(0,0,0,0.02); }
+.scs-icon {
+  flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--brand-soft, #fff1e6); color: var(--brand, #FF6B35);
+  display: grid; place-items: center; font-size: 15px;
+}
+.scs-text { flex: 1; min-width: 0; }
+.scs-text strong {
+  display: block;
+  font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.95rem;
+  color: var(--text, #1f1b16);
+  line-height: 1.2;
+}
+.scs-text small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+.scs-chev {
+  flex-shrink: 0;
+  color: var(--text-muted, #6b7280); font-size: 12px;
+  transition: transform .15s ease;
+}
+.settings-card[open] .scs-chev { transform: rotate(180deg); }
+.settings-card-body {
+  padding: 4px 20px 18px;
+  border-top: 1px solid var(--border, #e5e7eb);
+  padding-top: 16px;
+}
+.settings-card-body p { font-size: 0.85rem; margin: 0 0 14px; }
 .settings-card .form-group label { font-size: 0.85rem; }
 .settings-card code {
   background: var(--brand-soft, #fff1e6);
@@ -3344,9 +3385,13 @@ button.fab:hover { background: var(--brand-dark); }
   margin-top: 4px;
 }
 .settings-actions { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
+.settings-actions--leading { margin-top: 0; justify-content: flex-start; }
 
 @media (prefers-color-scheme: dark) {
   .settings-card { background: var(--surface, #18141d); border-color: #2a2634; }
+  .settings-card-summary:hover { background: rgba(255,255,255,0.04); }
+  .settings-card-body { border-top-color: #2a2634; }
+  .scs-icon { background: #3a1f14; color: #ff7a47; }
   .settings-card code { background: #3a1f14; color: #ff7a47; }
   .settings-meta { background: #1f1822; }
 }
