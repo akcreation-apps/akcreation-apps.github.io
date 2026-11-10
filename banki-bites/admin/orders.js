@@ -1075,6 +1075,35 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   // ── Customer picker wiring ────────────────────────────────────────────
   const nameInput = card.querySelector('[data-f="name"]');
   const addrInput = card.querySelector('[data-f="address"]');
+
+  // Auto-populate "Extra charges" from the customer-name suffix. Convention:
+  // the admin appends `+ <amount>` after the closing parenthesis in the name
+  // to encode a per-order extra (packing, delivery, courier top-up, etc.),
+  // e.g. `BB 45 (Miralin) + 20`. Whenever the name changes we re-parse and
+  // keep the extra-charges field in sync. If the suffix is absent we leave
+  // the extra field alone so the admin can still edit it manually.
+  const extraChargesInput = card.querySelector('[data-f="extraCharges"]');
+  function parseExtraFromName(name) {
+    if (!name) return null;
+    const m = String(name).match(/\)\s*\+\s*(\d+(?:\.\d+)?)\s*$/);
+    if (!m) return null;
+    const n = parseFloat(m[1]);
+    return Number.isFinite(n) && n >= 0 ? n : null;
+  }
+  function syncExtraFromName() {
+    if (!extraChargesInput) return;
+    const extra = parseExtraFromName(nameInput.value);
+    if (extra === null) return; // no suffix → don't touch what the admin may have typed
+    const current = parseFloat(extraChargesInput.value);
+    if (current === extra) return;
+    extraChargesInput.value = extra;
+    extraChargesInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  nameInput.addEventListener('input', syncExtraFromName);
+  nameInput.addEventListener('change', syncExtraFromName);
+  // Initial pass — pick up a pre-existing suffix on saved orders without
+  // waiting for the admin to edit the field.
+  syncExtraFromName();
   const searchInput = card.querySelector('[data-f="custSearch"]');
   const resultsEl = card.querySelector('[data-el="results"]');
   const chipEl = card.querySelector('[data-el="chip"]');
@@ -1147,6 +1176,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
 
   function applyCustomer(c) {
     nameInput.value = c.name || '';
+    // Dispatch 'input' so listeners that track the name field (e.g. the
+    // extra-charges auto-parse) pick up programmatic sets too.
+    nameInput.dispatchEvent(new Event('input', { bubbles: true }));
     phoneInput.value = c.phone || '';
     // Dispatch 'input' so listeners that track the phone field (e.g. the
     // Pay-link button's live visibility toggle) pick up programmatic sets too.
