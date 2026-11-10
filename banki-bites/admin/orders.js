@@ -669,6 +669,18 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         ? '<span class="status-pill status-paid">PAID</span>'
         : '<span class="status-pill status-unpaid">UNPAID</span>');
 
+  // Courier payout at-a-glance chip so admins don't need to expand each
+  // order just to see what the rider earns on it.
+  const payoutChip = (() => {
+    if (!payoutApplicable) return '';
+    const amt = Number.isFinite(+o.payout_amount) ? +o.payout_amount : feeForOrder(o, feeRules);
+    const paidCls = o.payout_paid === true ? ' status-payout-paid' : '';
+    const paidIcon = o.payout_paid === true ? ' <i class="fas fa-check"></i>' : '';
+    const partner = staff.find(s => s.uid === o.delivery_staff_id);
+    const partnerLabel = partner ? ` · ${escapeHtml(partner.name)}` : '';
+    return `<span class="status-pill status-payout${paidCls}" title="Courier payout${partner ? ' · ' + partner.name : ''}"><i class="fas fa-motorcycle"></i> ₹${amt}${partnerLabel}${paidIcon}</span>`;
+  })();
+
   // Friendlier status labels — "out for delivery" overflows the pill on
   // narrow screens, so abbreviate it for the summary chip. Status dropdown
   // (below) keeps the longer, more descriptive form.
@@ -715,6 +727,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         ${isFake ? '<span class="status-pill status-fake">FAKE</span>' : ''}
         <span class="status-pill status-${status}">${STATUS_LABEL[status] || status.replace('_', ' ')}</span>
         ${paymentBadge}
+        ${payoutChip}
         <i class="fas fa-chevron-down order-chevron" aria-hidden="true"></i>
       </div>
     </summary>
