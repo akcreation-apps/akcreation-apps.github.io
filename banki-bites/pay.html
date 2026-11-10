@@ -368,6 +368,23 @@
       line-height: 1.5;
     }
     .qr-ios-hint strong { color: var(--text); }
+    /* iPhone 3-step guide — replaces the single-line long-press hint now that
+       Save QR uses the iOS share sheet to drop the image straight into Photos. */
+    .ios-guide {
+      list-style: decimal;
+      margin: 14px 0 0;
+      padding: 12px 14px 12px 32px;
+      background: var(--brand-soft);
+      border-radius: 10px;
+      max-width: 320px;
+      font-size: 12px; color: var(--text);
+      line-height: 1.55;
+    }
+    .ios-guide li + li { margin-top: 6px; }
+    .ios-guide strong { color: var(--brand-dark); font-weight: 700; }
+    @media (prefers-color-scheme: dark) {
+      .ios-guide strong { color: var(--brand); }
+    }
 
     .empty-qr {
       width: 200px; height: 200px;
@@ -555,16 +572,18 @@
                 <span>Copy UPI ID</span>
               </button>
               <button class="btn-save" id="saveQr" hidden>
-                <i class="fas fa-download"></i>
-                <span>Save QR</span>
+                <i class="fas fa-share-square" id="saveQrIcon"></i>
+                <span id="saveQrLabel">Save QR</span>
               </button>
               <div class="manual-amount-hint" id="manualAmountHint" hidden>
                 After copying, enter <strong>₹<span id="manualAmountValue">—</span></strong> manually in your UPI app.
               </div>
             </div>
-            <div class="qr-ios-hint" id="iosHint" hidden>
-              On iPhone: tap Save, then long-press the image that opens and choose <strong>Save to Photos</strong>.
-            </div>
+            <ol class="ios-guide" id="iosHint" hidden>
+              <li>Tap <strong>Share QR</strong> → <strong>Save Image</strong> to add the QR to your Photos.</li>
+              <li>Open <strong>GPay, PhonePe, Paytm</strong> or <strong>BHIM</strong>.</li>
+              <li>Tap the <strong>Scan</strong> icon → <strong>Scan from Gallery</strong> → pick the QR.</li>
+            </ol>
           </div>
         </div>
       </details>
@@ -818,24 +837,74 @@
       });
     }
 
-    saveQrBtn.addEventListener('click', () => {
+    // Label/icon the Save-QR button according to its real behaviour: on iOS it
+    // opens the native share sheet (one tap → "Save Image" → QR lands in
+    // Photos); on desktop it triggers a plain download.
+    const saveQrLabel = document.getElementById('saveQrLabel');
+    const saveQrIcon = document.getElementById('saveQrIcon');
+    if (saveQrLabel) saveQrLabel.textContent = isIOS ? 'Share QR' : 'Save QR';
+    if (saveQrIcon) {
+      saveQrIcon.className = isIOS ? 'fas fa-share-square' : 'fas fa-download';
+    }
+
+    // Convert the rendered QR (canvas or <img>) into a File so iOS's Web Share
+    // sheet can save it straight to Photos / forward it to a UPI app in one tap.
+    async function qrAsFile() {
       const canvas = qrFrame.querySelector('canvas');
       const img = qrFrame.querySelector('img');
-      const src = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
-      if (!src) { showToast('QR not ready yet'); return; }
-
       const filename = 'bankibites-upi-' + txnRef + '.png';
+      const toFile = (blob) => new File([blob], filename, { type: 'image/png' });
+
+      if (canvas) {
+        return await new Promise((resolve) => {
+          canvas.toBlob((blob) => resolve(blob ? toFile(blob) : null), 'image/png');
+        });
+      }
+      if (img && img.src) {
+        try {
+          const r = await fetch(img.src);
+          const blob = await r.blob();
+          return toFile(blob);
+        } catch (e) { return null; }
+      }
+      return null;
+    }
+
+    saveQrBtn.addEventListener('click', async () => {
+      const file = await qrAsFile();
+      if (!file) { showToast('QR not ready yet'); return; }
+
+      // iOS 15+ / modern Safari — use the native share sheet so the user can
+      // tap "Save Image" once, bypassing the long-press-image fallback.
+      if (isIOS && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'BankiBites UPI QR',
+            text: 'Scan from your UPI app to pay',
+          });
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return; // user cancelled — don't fall through
+          // Any other failure falls through to the download/window.open path.
+        }
+      }
+
+      // Everywhere else — regular download. On iOS without file-share support,
+      // also open the image in a new tab as a last-resort long-press target.
+      const url = URL.createObjectURL(file);
       const a = document.createElement('a');
-      a.href = src;
-      a.download = filename;
+      a.href = url;
+      a.download = file.name;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       if (isIOS) {
         const w = window.open();
-        if (w) w.document.write('<title>' + filename + '</title><img src="' + src + '" style="width:100%">');
-        showToast('Long-press the image to save');
+        if (w) w.document.write('<title>' + file.name + '</title><img src="' + url + '" style="width:100%">');
+        showToast('Long-press the image → Save to Photos');
       } else {
         showToast('QR saved to your device');
       }

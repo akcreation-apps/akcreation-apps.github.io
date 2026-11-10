@@ -519,7 +519,7 @@ export async function renderOrders(root, db) {
               <input id="cplPhone" class="form-control" type="tel" inputmode="tel" maxlength="15" placeholder="10-digit mobile">
             </div>
             <div class="form-group mb-0">
-              <label style="font-size:0.82rem;font-weight:600">Note <span style="color:#6b7280;font-weight:400">— optional, shown in UPI app</span></label>
+              <label style="font-size:0.82rem;font-weight:600">Note <span style="color:#6b7280;font-weight:400">— optional, added to WhatsApp message</span></label>
               <input id="cplNote" class="form-control" type="text" maxlength="40" placeholder="e.g. Table 3 · Walk-in">
             </div>
           </div>
@@ -1185,6 +1185,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     e.preventDefault();
     const raw = (e.clipboardData || window.clipboardData).getData('text/plain');
     phoneInput.value = normalisePhone(raw);
+    phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
     refreshOfferHint(phoneInput.value);
   });
 
@@ -1264,6 +1265,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   function applyCustomer(c) {
     nameInput.value = c.name || '';
     phoneInput.value = c.phone || '';
+    // Dispatch 'input' so listeners that track the phone field (e.g. the
+    // Pay-link button's live visibility toggle) pick up programmatic sets too.
+    phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
     addrInput.value = c.address || '';
     chipTextEl.textContent = chipLabel(c.name, c.phone);
     chipEl.hidden = false;
@@ -1351,6 +1355,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   card.querySelector('[data-act="clearCustomer"]').addEventListener('click', () => {
     nameInput.value = '';
     phoneInput.value = '';
+    phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
     addrInput.value = '';
     clearChip();
     searchInput.focus();
@@ -1921,6 +1926,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     const phone = normalisePhone(rawPhone);
     // Reflect the normalised value back into the input for the user.
     phoneInput.value = phone;
+    phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
 
     const patch = {
       customer: { name, phone, address },
