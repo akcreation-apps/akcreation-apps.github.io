@@ -360,27 +360,32 @@ export async function renderSettings(root, db) {
       // into the link (amount, discount, note) and which number it's being sent
       // to, so a wrong value is caught before WhatsApp opens.
       const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2);
-      const rows = [
-        `<tr><td style="padding-top:6px;font-weight:700">Amount in link</td><td style="padding-top:6px;text-align:right;font-weight:700;color:#FF6B35">₹${fmt(amount)}</td></tr>`,
-      ];
+      const escapeHtml = (s) => String(s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+      const row = (label, value, opts = {}) => {
+        const s = opts.strong ? 'font-weight:700;color:' + (opts.color || '#1f1b16') : 'color:' + (opts.color || '#6b7280');
+        const valStyle = opts.wrap ? 'word-break:break-word' : 'white-space:nowrap';
+        return `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:3px 0">
+          <span style="${s};flex-shrink:0">${label}</span>
+          <span style="${s};${valStyle};text-align:right;min-width:0">${value}</span>
+        </div>`;
+      };
+      const rows = [row('Amount in link', `₹${fmt(amount)}`, { strong: true, color: '#FF6B35' })];
       if (tokenPayload.d) {
-        rows.push(`<tr><td style="color:#1fa971">Offer (opt-in)</td><td style="text-align:right;color:#1fa971">− ₹${fmt(tokenPayload.d)}</td></tr>`);
-        rows.push(`<tr><td style="color:#6b7280;font-size:0.82rem">If customer applies offer</td><td style="text-align:right;color:#6b7280;font-size:0.82rem">₹${fmt(amount - tokenPayload.d)}</td></tr>`);
+        rows.push(row('Offer (opt-in)', `− ₹${fmt(tokenPayload.d)}`, { color: '#1fa971' }));
+        rows.push(row('If customer applies', `₹${fmt(amount - tokenPayload.d)}`, { color: '#6b7280' }));
       }
       if (note) {
-        rows.push(`<tr><td style="color:#6b7280">Note</td><td style="text-align:right;font-style:italic">${note.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</td></tr>`);
+        rows.push(row('Note', `<em>${escapeHtml(note)}</em>`, { wrap: true }));
       }
       const confirmRes = await Swal.fire({
-        title: '<i class="fas fa-paper-plane mr-1" style="color:#25d366"></i> Send payment link?',
+        title: 'Send payment link?',
         html: `
-          <div class="text-left" style="font-size:0.9rem">
-            <div style="margin-bottom:12px">
-              <div style="color:#6b7280;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em">To WhatsApp</div>
-              <div style="font-weight:600">+91 ${phone}</div>
+          <div style="text-align:left;font-size:0.9rem">
+            <div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e5e7eb">
+              <div style="color:#6b7280;font-size:0.72rem;text-transform:uppercase;letter-spacing:.05em">To WhatsApp</div>
+              <div style="font-weight:600;word-break:break-all">+91 ${phone}</div>
             </div>
-            <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
-              ${rows.join('')}
-            </table>
+            ${rows.join('')}
           </div>
         `,
         showCancelButton: true,
@@ -388,6 +393,7 @@ export async function renderSettings(root, db) {
         confirmButtonColor: '#25d366',
         cancelButtonText: 'Cancel',
         focusCancel: true,
+        width: 'min(420px, 92vw)',
       });
       if (!confirmRes.isConfirmed) return;
 

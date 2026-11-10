@@ -1574,30 +1574,36 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       // sent to, so a wrong value is caught before WhatsApp opens.
       const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2);
       const effectiveCart = (discount > 0 && Number.isFinite(+o.total) && +o.total > 0) ? +o.total : null;
+      const row = (label, value, opts = {}) => {
+        const s = opts.strong ? 'font-weight:700;color:' + (opts.color || '#1f1b16') : 'color:' + (opts.color || '#6b7280');
+        const top = opts.top ? 'border-top:1px solid #e5e7eb;padding-top:8px;margin-top:4px;' : '';
+        return `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:3px 0;${top}">
+          <span style="${s};flex:1;min-width:0">${label}</span>
+          <span style="${s};white-space:nowrap">${value}</span>
+        </div>`;
+      };
       const rows = [];
       if (effectiveCart !== null) {
-        rows.push(`<tr><td style="color:#6b7280">Cart total</td><td style="text-align:right">₹${fmt(effectiveCart)}</td></tr>`);
-        if (extraCharges > 0) rows.push(`<tr><td style="color:#6b7280">Extra charges</td><td style="text-align:right">+ ₹${fmt(extraCharges)}</td></tr>`);
+        rows.push(row('Cart total', `₹${fmt(effectiveCart)}`));
+        if (extraCharges > 0) rows.push(row('Extra charges', `+ ₹${fmt(extraCharges)}`));
       } else if (extraCharges > 0) {
-        rows.push(`<tr><td style="color:#6b7280">Base</td><td style="text-align:right">₹${fmt(amount - extraCharges)}</td></tr>`);
-        rows.push(`<tr><td style="color:#6b7280">Extra charges</td><td style="text-align:right">+ ₹${fmt(extraCharges)}</td></tr>`);
+        rows.push(row('Base', `₹${fmt(amount - extraCharges)}`));
+        rows.push(row('Extra charges', `+ ₹${fmt(extraCharges)}`));
       }
-      rows.push(`<tr style="border-top:1px solid #e5e7eb"><td style="padding-top:6px;font-weight:700">Amount in link</td><td style="padding-top:6px;text-align:right;font-weight:700;color:#FF6B35">₹${fmt(amount)}</td></tr>`);
+      rows.push(row('Amount in link', `₹${fmt(amount)}`, { strong: true, color: '#FF6B35', top: rows.length > 0 }));
       if (tokenPayload.d) {
-        rows.push(`<tr><td style="color:#1fa971">Offer (opt-in)</td><td style="text-align:right;color:#1fa971">− ₹${fmt(tokenPayload.d)}</td></tr>`);
-        rows.push(`<tr><td style="color:#6b7280;font-size:0.82rem">If customer applies offer</td><td style="text-align:right;color:#6b7280;font-size:0.82rem">₹${fmt(amount - tokenPayload.d)}</td></tr>`);
+        rows.push(row('Offer (opt-in)', `− ₹${fmt(tokenPayload.d)}`, { color: '#1fa971' }));
+        rows.push(row('If customer applies', `₹${fmt(amount - tokenPayload.d)}`, { color: '#6b7280' }));
       }
       const confirmRes = await Swal.fire({
-        title: '<i class="fas fa-paper-plane mr-1" style="color:#25d366"></i> Send payment link?',
+        title: 'Send payment link?',
         html: `
-          <div class="text-left" style="font-size:0.9rem">
-            <div style="margin-bottom:12px">
-              <div style="color:#6b7280;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em">To WhatsApp</div>
-              <div style="font-weight:600">+91 ${phone}</div>
+          <div style="text-align:left;font-size:0.9rem">
+            <div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e5e7eb">
+              <div style="color:#6b7280;font-size:0.72rem;text-transform:uppercase;letter-spacing:.05em">To WhatsApp</div>
+              <div style="font-weight:600;word-break:break-all">+91 ${phone}</div>
             </div>
-            <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
-              ${rows.join('')}
-            </table>
+            ${rows.join('')}
           </div>
         `,
         showCancelButton: true,
@@ -1605,6 +1611,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         confirmButtonColor: '#25d366',
         cancelButtonText: 'Cancel',
         focusCancel: true,
+        width: 'min(420px, 92vw)',
       });
       if (!confirmRes.isConfirmed) return;
 
