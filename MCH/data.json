@@ -128,10 +128,8 @@
             {
               "id": 502,
               "name": "Veg Biryani (Half)",
-              "price": 99,
-              "vendor_price": 80,
-              "offer_price": 119,
-              "is_offer": true,
+              "price": 119,
+              "vendor_price": 90,
               "available_time": "",
               "not_available_time": ""
             }
@@ -155,6 +153,7 @@
               "price": 159,
               "vendor_price": 117,
               "offer_price": 199,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": ""
             },
@@ -224,6 +223,7 @@
               "price": 109,
               "vendor_price": 81,
               "offer_price": 149,
+              "is_offer": true,
               "available_time": "",
               "not_available_time": 16
             },
@@ -417,6 +417,7 @@
               "price": 49,
               "vendor_price": 36,
               "offer_price": 69,
+              "is_offer": true,
               "available_time": 19,
               "not_available_time": ""
             },

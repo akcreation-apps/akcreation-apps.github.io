@@ -39,7 +39,7 @@
             {
               "id": 104,
               "name": "Paneer Pizza (small)",
-              "price": 179,
+              "price": 189,
               "vendor_price": 139.5,
               "available_time": "",
               "not_available_time": ""
@@ -63,7 +63,7 @@
             {
               "id": 107,
               "name": "Mushroom Pizza (small)",
-              "price": 179,
+              "price": 189,
               "vendor_price": 139.5,
               "available_time": "",
               "not_available_time": ""
