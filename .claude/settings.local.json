@@ -44,7 +44,8 @@
       "WebFetch(domain:sinch.com)",
       "Bash(pip install *)",
       "Bash(curl -sL -A \"Mozilla/5.0\" https://fatafatdelivery.in/ -o /tmp/fatafat.html)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(awk '{print $5, $9}')"
     ]
   },
   "enableAllProjectMcpServers": true,
