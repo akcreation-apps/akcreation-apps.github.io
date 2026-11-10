@@ -354,6 +354,9 @@ export async function renderOrders(root, db) {
       <button type="button" id="clearFilters" class="orders-filter-clear" aria-label="Clear all filters" hidden>
         <i class="fas fa-xmark" aria-hidden="true"></i> Clear
       </button>
+      <button type="button" id="customPayLinkBtn" class="btn btn-sm btn-outline-primary ml-auto" title="Create a one-off UPI payment link without an order">
+        <i class="fas fa-link mr-1"></i> Custom pay link
+      </button>
     </div>
     <div id="ordersList" class="card-list grid-2"><div class="bb-loader-block">Listening for orders…</div></div>
   `;
@@ -489,6 +492,120 @@ export async function renderOrders(root, db) {
     onChange();
   });
   updateActiveState();
+
+  // ── "Custom pay link" top-bar action ──────────────────────────────────
+  // Lets the admin mint a one-off payment link for ad-hoc collections (walk-in,
+  // outstanding dues, etc.) without needing a saved order. Amount + phone are
+  // required; discount and a human-readable note are optional. A short random
+  // reference stands in for the order id so the pay page / UPI txn note still
+  // carries something recognisable.
+  const customPayLinkBtn = document.getElementById('customPayLinkBtn');
+  if (customPayLinkBtn) {
+    customPayLinkBtn.addEventListener('click', async () => {
+      const res = await Swal.fire({
+        title: '<i class="fas fa-link mr-1" style="color:#25d366"></i> Custom pay link',
+        html: `
+          <div class="text-left" style="font-size:0.88rem">
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:600">Amount (₹) <span style="color:#d94c3d">*</span></label>
+              <input id="cplAmount" class="form-control" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 250">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:600">Discount (₹) <span style="color:#6b7280;font-weight:400">— optional</span></label>
+              <input id="cplDiscount" class="form-control" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 20">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:600">Customer WhatsApp <span style="color:#d94c3d">*</span></label>
+              <input id="cplPhone" class="form-control" type="tel" inputmode="tel" maxlength="15" placeholder="10-digit mobile">
+            </div>
+            <div class="form-group mb-0">
+              <label style="font-size:0.82rem;font-weight:600">Note <span style="color:#6b7280;font-weight:400">— optional, shown in UPI app</span></label>
+              <input id="cplNote" class="form-control" type="text" maxlength="40" placeholder="e.g. Table 3 · Walk-in">
+            </div>
+          </div>
+        `,
+        confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Send on WhatsApp',
+        confirmButtonColor: '#25d366',
+        showCancelButton: true,
+        width: 460,
+        focusConfirm: false,
+        didOpen: () => {
+          // Mirror the main order form's phone-field behaviour: as soon as the
+          // admin pastes/types anything, strip +91 / 91 / leading 0 / spaces /
+          // dashes so the field always shows the clean 10-digit number.
+          const phoneEl = document.getElementById('cplPhone');
+          const trim = () => {
+            const normalised = normalisePhone(phoneEl.value);
+            if (normalised !== phoneEl.value) phoneEl.value = normalised;
+          };
+          phoneEl.addEventListener('input', trim);
+          phoneEl.addEventListener('change', trim);
+          phoneEl.addEventListener('blur', trim);
+        },
+        preConfirm: () => {
+          const amount = parseFloat(document.getElementById('cplAmount').value);
+          const discountRaw = document.getElementById('cplDiscount').value.trim();
+          const discount = discountRaw ? parseFloat(discountRaw) : 0;
+          const phone = normalisePhone(document.getElementById('cplPhone').value);
+          const note = document.getElementById('cplNote').value.trim();
+          if (!(Number.isFinite(amount) && amount > 0)) {
+            Swal.showValidationMessage('Enter a valid amount greater than 0.');
+            return false;
+          }
+          if (!Number.isFinite(discount) || discount < 0) {
+            Swal.showValidationMessage('Discount must be 0 or greater.');
+            return false;
+          }
+          if (discount >= amount) {
+            Swal.showValidationMessage('Discount must be smaller than the amount.');
+            return false;
+          }
+          if (!/^\d{10}$/.test(phone)) {
+            Swal.showValidationMessage('Enter a valid 10-digit WhatsApp number.');
+            return false;
+          }
+          return { amount, discount, phone, note };
+        },
+      });
+
+      if (!res.isConfirmed) return;
+      const { amount, discount, phone, note } = res.value;
+
+      // Random short reference that doubles as the UPI `tr` (transaction id).
+      // Prefix `CP` (custom-pay) + base36 timestamp + 3 random base36 chars.
+      const ref = 'CP' + Date.now().toString(36).toUpperCase()
+        + Math.random().toString(36).slice(2, 5).toUpperCase();
+
+      const PAY_LINK_EXPIRY_SECONDS = 300;
+      const exp = Math.floor(Date.now() / 1000) + PAY_LINK_EXPIRY_SECONDS;
+      const tokenPayload = {
+        o: ref,
+        a: +amount.toFixed(2),
+        e: exp,
+      };
+      if (discount > 0 && discount < amount) {
+        tokenPayload.d = +discount.toFixed(2);
+      }
+      const payUrl = `${location.origin}/banki-bites/pay.html?t=${encodePayToken(tokenPayload)}`;
+
+      const noteLine = note ? `*For:* ${note}` : null;
+      const msg = [
+        'ନମସ୍କାର !',
+        'ଆପଣଙ୍କ ପାଇଁ secure payment link (valid for 5 minutes) —',
+        payUrl,
+        noteLine,
+        'Payment ହେଲା ପରେ screenshot ଏହି WhatsApp number ରେ share କରିଦିଅନ୍ତୁ, ଆମେ confirm କରିଦେବୁ ।',
+        '_Team BankiBites_',
+      ].filter(Boolean).join('\n\n');
+
+      const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
+      try { navigator.clipboard && navigator.clipboard.writeText(payUrl).catch(() => {}); } catch (e) {}
+      try { window.location.href = waUrl; return; } catch (e) {}
+      try { window.location.assign(waUrl); return; } catch (e) {}
+      try { window.open(waUrl, '_self'); return; } catch (e) {}
+      try { window.open(waUrl, '_blank'); return; } catch (e) {}
+    });
+  }
 
   // Only fetch orders from the first day of the previous calendar month onward
   // so admin never pulls years of history into memory. Single-field range query
@@ -935,7 +1052,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         <i class="fab fa-whatsapp mr-1"></i> Notify ETA
       </button>` : ''}
       ${!paymentCollected && !isFake && status !== 'cancelled' ? `
-      <button class="btn btn-sm btn-outline-info" data-act="generatePayLink" title="Generate a 5-min UPI payment link and send on WhatsApp">
+      <button class="btn btn-sm btn-outline-primary" data-act="generatePayLink" title="Generate a 5-min UPI payment link and send on WhatsApp" ${isValidPhone(cust.phone) ? '' : 'hidden'}>
         <i class="fas fa-link mr-1"></i> Pay link
       </button>` : ''}
       ${status === 'delivered' && cust.phone ? `
@@ -1425,6 +1542,19 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
 
   const payLinkBtnEl = card.querySelector('[data-act="generatePayLink"]');
   if (payLinkBtnEl) {
+    // Reveal the Pay link button the moment a valid 10-digit phone is in the
+    // form (saved or just typed), and hide it again if the admin clears/edits
+    // the number back to something invalid.
+    const phoneInputEl = card.querySelector('[data-f="phone"]');
+    if (phoneInputEl) {
+      const syncPayBtnVisibility = () => {
+        payLinkBtnEl.hidden = !isValidPhone(phoneInputEl.value);
+      };
+      phoneInputEl.addEventListener('input', syncPayBtnVisibility);
+      phoneInputEl.addEventListener('change', syncPayBtnVisibility);
+    }
+
+
     payLinkBtnEl.addEventListener('click', async () => {
       // Discount: live input beats saved value; used both for the URL coupon
       // and (when present) as the source of "base amount = cart total" so the
@@ -1509,20 +1639,13 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       }
       const payUrl = `${location.origin}/banki-bites/pay.html?t=${encodePayToken(tokenPayload)}`;
 
-      const amountLabel = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
-      const discountLine = discount > 0 && discount < amount
-        ? `🎁 *Offer:* Tap the link to apply ₹${Number.isInteger(discount) ? discount : discount.toFixed(2)} discount before paying.`
-        : null;
       const msg = [
         'ନମସ୍କାର !',
-        `ଆପଣଙ୍କ order ପାଇଁ secure payment link (valid for 5 minutes) —`,
+        'ଆପଣଙ୍କ order ପାଇଁ secure payment link (valid for 5 minutes) —',
         payUrl,
-        `*Amount:* ₹${amountLabel}`,
-        discountLine,
-        `UPI app ରେ tap କରି pay କରିଦିଅନ୍ତୁ ।`,
-        `📸 Payment ହେଲା ପରେ screenshot ଏହି WhatsApp number ରେ share କରିଦିଅନ୍ତୁ, ଆମେ confirm କରିଦେବୁ ।`,
-        `_Team BankiBites :)_`,
-      ].filter(Boolean).join('\n\n');
+        'Payment ହେଲା ପରେ screenshot ଏହି WhatsApp number ରେ share କରିଦିଅନ୍ତୁ, ଆମେ confirm କରିଦେବୁ ।',
+        '_Team BankiBites_',
+      ].join('\n\n');
 
       const waUrl = 'https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg);
       try { navigator.clipboard && navigator.clipboard.writeText(payUrl).catch(() => {}); } catch (e) {}
