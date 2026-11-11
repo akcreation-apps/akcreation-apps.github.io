@@ -159,17 +159,34 @@ function playNewOrderChime() {
     });
   } catch {}
 }
+// Prefer the service-worker registration so clicks reach `notificationclick`
+// in sw.js — required for installed PWAs, where page-context Notifications
+// are orphaned once the window is backgrounded/closed.
+async function showAdminNotification(title, options) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.ready;
+      if (reg && reg.showNotification) {
+        await reg.showNotification(title, options);
+        return;
+      }
+    }
+  } catch {}
+  try { new Notification(title, options); } catch {}
+}
 function showNewOrderBrowserNotification(order) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   const name = order.customer?.name || order.customer_name || 'Customer';
   const total = order.total ?? order.total_amount;
-  try {
-    new Notification('New BankiBites order', {
-      body: `${name}${total != null ? ' — ₹' + total : ''}`,
-      icon: '/banki-bites/banki-bites-logo.png',
-      tag: order.id,
-    });
-  } catch {}
+  showAdminNotification('New BankiBites order', {
+    body: `${name}${total != null ? ' — ₹' + total : ''}`,
+    icon: '/banki-bites/banki-bites-logo.png',
+    badge: '/banki-bites/banki-bites-logo.png',
+    tag: order.id,
+    renotify: true,
+    data: { url: `/banki-bites/admin/?orderId=${encodeURIComponent(order.id)}` },
+  });
 }
 function shortOrderRef(order) {
   const id = order.id || '';
@@ -188,13 +205,14 @@ function showStatusBrowserNotification(kind, order) {
     title = `Order ${ref} delivered ✓`;
     body = `${name}${total != null ? ' — ₹' + total + ' collected' : ''}`;
   }
-  try {
-    new Notification(title, {
-      body,
-      icon: '/banki-bites/banki-bites-logo.png',
-      tag: `${order.id}:${kind}`,
-    });
-  } catch {}
+  showAdminNotification(title, {
+    body,
+    icon: '/banki-bites/banki-bites-logo.png',
+    badge: '/banki-bites/banki-bites-logo.png',
+    tag: `${order.id}:${kind}`,
+    renotify: true,
+    data: { url: `/banki-bites/admin/?orderId=${encodeURIComponent(order.id)}` },
+  });
 }
 function bumpOrdersBadge() {
   const s = _newOrderState;
