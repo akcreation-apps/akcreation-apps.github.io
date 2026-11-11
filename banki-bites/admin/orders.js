@@ -1157,8 +1157,22 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     const n = parseFloat(m[1]);
     return Number.isFinite(n) && n >= 0 ? n : null;
   }
+  // Honour a manual override: once the admin types into the extra-charges
+  // field themselves, stop auto-syncing from the name suffix. The sync below
+  // dispatches a synthetic 'input' event (isTrusted === false) — those don't
+  // count as manual edits.
+  // Also treat any already-saved extra_charges value (even 0) as a prior
+  // manual decision — so reopening/expanding a saved order never silently
+  // overwrites what the admin committed with the name-suffix value.
+  let extraManuallyEdited = Number.isFinite(+o.extra_charges);
+  if (extraChargesInput) {
+    extraChargesInput.addEventListener('input', (e) => {
+      if (e.isTrusted) extraManuallyEdited = true;
+    });
+  }
   function syncExtraFromName() {
     if (!extraChargesInput) return;
+    if (extraManuallyEdited) return; // respect admin's manual value
     const extra = parseExtraFromName(nameInput.value);
     if (extra === null) return; // no suffix → don't touch what the admin may have typed
     const current = parseFloat(extraChargesInput.value);
