@@ -213,12 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if ('Notification' in window && Notification.permission === 'default') {
         try { Notification.requestPermission(); } catch {}
       }
-      // Deep-link: a notification-click launch carries ?orderId=… — jump
-      // straight to the Orders tab so the admin lands on the relevant order.
-      const deepLinkOrderId = new URLSearchParams(location.search).get('orderId');
       // Land on Orders when there are active deliveries to triage; otherwise
       // open the Dashboard for a high-level read of the business.
-      const landing = deepLinkOrderId ? 'orders' : await pickLandingTab(await getDb());
+      const landing = await pickLandingTab(await getDb());
       activateTab(landing);
     });
 
