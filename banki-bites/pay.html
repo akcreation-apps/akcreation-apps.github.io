@@ -534,7 +534,7 @@
     }
     .ios-apps-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
     }
     .ios-app-btn {
@@ -571,8 +571,6 @@
     /* Letter-only fallbacks tinted to each brand's primary colour so they
        still read as recognisably distinct even without the official mark. */
     .ios-app-logo--bhim       { background: #FF9933; color: #fff; border-color: #FF9933; }
-    .ios-app-logo--fampay     { background: #0D1B33; color: #FFD84D; border-color: #0D1B33; }
-    .ios-app-logo--supermoney { background: #FFCB05; color: #0D1B33; border-color: #FFCB05; }
     @media (prefers-color-scheme: dark) {
       /* Give the white logo chips a subtle border in dark mode so they don't
          merge into the surrounding brand-soft background. */
@@ -727,14 +725,6 @@
           <a href="#" data-upi-app="bhim" class="ios-app-btn" aria-label="Pay with BHIM">
             <span class="ios-app-logo ios-app-logo--bhim">B</span>
             <span>BHIM</span>
-          </a>
-          <a href="#" data-upi-app="fampay" class="ios-app-btn" aria-label="Pay with FamPay">
-            <span class="ios-app-logo ios-app-logo--fampay">F</span>
-            <span>FamPay</span>
-          </a>
-          <a href="#" data-upi-app="supermoney" class="ios-app-btn" aria-label="Pay with super.money">
-            <span class="ios-app-logo ios-app-logo--supermoney">s</span>
-            <span>super.money</span>
           </a>
         </div>
         <div class="ios-apps-note">Please choose an app you have installed. If nothing happens, that app isn't on your phone — try another or scan the QR below.</div>
@@ -1021,12 +1011,10 @@
                       '&tr=' + upiSafe(txnRef) +
                       '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
         const schemes = {
-          gpay:       'tez://upi/pay' + query,
-          phonepe:    'phonepe://pay' + query,
-          paytm:      'paytmmp://pay' + query,
-          bhim:       'bhim://upi/pay' + query,
-          fampay:     'fampay://upi/pay' + query,
-          supermoney: 'supermoney://upi/pay' + query,
+          gpay:    'tez://upi/pay' + query,
+          phonepe: 'phonepe://pay' + query,
+          paytm:   'paytmmp://pay' + query,
+          bhim:    'bhim://upi/pay' + query,
         };
         iosApps.querySelectorAll('[data-upi-app]').forEach(btn => {
           const app = btn.dataset.upiApp;
