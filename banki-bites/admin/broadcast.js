@@ -1,6 +1,6 @@
-import { COL, cachedGetDocs } from '../firebase-config.js';
+import { COL } from '../firebase-config.js';
 import {
-  doc, setDoc, collection, query, where, getDocs, Timestamp,
+  doc, setDoc, collection, query, where, orderBy, limit, startAfter, getDocs, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { loadCustomers } from './customers.js';
 
@@ -45,10 +45,10 @@ function bumpSentToday(key = CAP_KEY) {
   } catch (e) { return 0; }
 }
 
-// Look back this many days when computing "last order" — anyone whose most
-// recent order is older than this is treated as "never" for the win-back
-// segments. 180 days covers every meaningful lifecycle cohort cheaply.
-const ORDER_LOOKBACK_DAYS = 180;
+// Look back this many days when computing "last order". Trimmed from 180→60
+// to cap daily Firestore reads — customers with no delivered order in the
+// last 60 days land in the "Lost 60d+" segment either way.
+const ORDER_LOOKBACK_DAYS = 60;
 
 // Win-back lifecycle segments, by days since last delivered order. Customers
 // with no order in the look-back window are folded into "Lost 60d+".
@@ -165,26 +165,45 @@ function clearQueue() { sessionStorage.removeItem(QUEUE_KEY); }
 // recent delivered order in the last ORDER_LOOKBACK_DAYS. Customers without
 // any delivered order in the window are simply absent from the map and end
 // up in the "Never ordered" segment in the UI.
+// 5-min cache so repeated tab opens during campaign composition don't re-fetch.
+const BC_CACHE_TTL_MS = 5 * 60 * 1000;
+let _lastOrderCache = null; // { t, map }
+
 async function loadLastOrderByPhone(db) {
+  if (_lastOrderCache && (Date.now() - _lastOrderCache.t) < BC_CACHE_TTL_MS) {
+    return _lastOrderCache.map;
+  }
   const cutoffMs = Date.now() - ORDER_LOOKBACK_DAYS * 86400000;
   const sinceTs = Timestamp.fromMillis(cutoffMs);
-  // Shared cache: the Broadcast tab is often opened, closed, and reopened
-  // while composing a campaign. 5-min TTL is plenty for lifecycle segments.
-  const orders = await cachedGetDocs(
-    'orders:last180d',
-    () => query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs)),
-    { ttlMs: 5 * 60_000 },
-  );
+  // Page through the window in 200-doc chunks. Hard cap at 20 pages (4000
+  // orders) as a safety net against a spike in orders.
+  const PAGE_SIZE = 200;
+  const MAX_PAGES = 20;
   const out = new Map();
-  for (const o of orders) {
-    if (o.status === 'cancelled' || o.status === 'fake') continue;
-    const phone = (o.customer && o.customer.phone) || '';
-    if (!phone) continue;
-    const ms = o.created_at?.toMillis?.();
-    if (!ms) continue;
-    const prev = out.get(phone);
-    if (!prev || ms > prev) out.set(phone, ms);
+  let cursor = null;
+  for (let i = 0; i < MAX_PAGES; i++) {
+    const constraints = [
+      where('created_at', '>=', sinceTs),
+      orderBy('created_at', 'desc'),
+    ];
+    if (cursor) constraints.push(startAfter(cursor));
+    constraints.push(limit(PAGE_SIZE));
+    const snap = await getDocs(query(collection(db, COL.ORDERS), ...constraints));
+    if (snap.empty) break;
+    snap.forEach(d => {
+      const o = d.data();
+      if (o.status === 'cancelled' || o.status === 'fake') return;
+      const phone = (o.customer && o.customer.phone) || '';
+      if (!phone) return;
+      const ms = o.created_at?.toMillis?.();
+      if (!ms) return;
+      const prev = out.get(phone);
+      if (!prev || ms > prev) out.set(phone, ms);
+    });
+    if (snap.size < PAGE_SIZE) break;
+    cursor = snap.docs[snap.docs.length - 1];
   }
+  _lastOrderCache = { t: Date.now(), map: out };
   return out;
 }
 

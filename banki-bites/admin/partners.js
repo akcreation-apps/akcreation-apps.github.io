@@ -1,8 +1,8 @@
 import { COL } from '../firebase-config.js';
 import {
-  collection, getDocs, doc, setDoc, deleteDoc, orderBy, query, where, writeBatch, Timestamp, onSnapshot,
+  collection, getDocs, doc, setDoc, deleteDoc, orderBy, limit, startAfter, query, where, writeBatch, Timestamp, onSnapshot,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, startOfLastMonth, isDelivered, truncateName } from '../analytics.js';
+import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, isDelivered, truncateName } from '../analytics.js';
 
 const partnerCharts = new Map();
 function mountPartnerChart(id, config) {
@@ -219,16 +219,40 @@ function wireStorefrontToggle(root, db) {
   });
 }
 
+// Paged orders fetch (200/page, 20-page hard cap) so partner analytics stay
+// correct across the whole window without ever asking Firestore for a huge
+// single getDocs().
+const PARTNERS_PAGE_SIZE = 200;
+const PARTNERS_MAX_PAGES = 20;
+async function fetchPartnerOrdersPaged(db, sinceTs) {
+  const out = [];
+  let cursor = null;
+  for (let i = 0; i < PARTNERS_MAX_PAGES; i++) {
+    const constraints = [
+      where('created_at', '>=', sinceTs),
+      orderBy('created_at', 'desc'),
+    ];
+    if (cursor) constraints.push(startAfter(cursor));
+    constraints.push(limit(PARTNERS_PAGE_SIZE));
+    const snap = await getDocs(query(collection(db, COL.ORDERS), ...constraints));
+    if (snap.empty) break;
+    snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+    if (snap.size < PARTNERS_PAGE_SIZE) break;
+    cursor = snap.docs[snap.docs.length - 1];
+  }
+  return out;
+}
+
 async function renderPartnerCharts(db) {
   const p = chartPalette();
-  // Same window as the rest of the admin panel: from the 1st of last month.
-  const sinceTs = Timestamp.fromDate(startOfLastMonth());
-  const [partnersSnap, ordersSnap] = await Promise.all([
+  // Last 60 days — aligns the partner analytics with the dashboard window
+  // and bounds daily read cost.
+  const sinceTs = Timestamp.fromMillis(Date.now() - 60 * 86400000);
+  const [partnersSnap, orders] = await Promise.all([
     getDocs(query(collection(db, COL.PARTNERS), orderBy('sort_order'))),
-    getDocs(query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs))),
+    fetchPartnerOrdersPaged(db, sinceTs),
   ]);
   const partners = []; partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
-  const orders = []; ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
 
   const g = groupBy(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown');
   const top = topN(g, 8);

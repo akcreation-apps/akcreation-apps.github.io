@@ -11,15 +11,32 @@
 import { COL, invalidateCache } from '../firebase-config.js';
 import {
   collection, query, where, onSnapshot, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
-  Timestamp, writeBatch, orderBy,
+  Timestamp, writeBatch, orderBy, limit, startAfter, documentId,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { startOfLastMonth, fmtINR } from '../analytics.js';
+import { fmtINR } from '../analytics.js';
 import { loadCustomers, searchCustomers, openCustomerModal, upsertCustomer } from './customers.js';
 
 let _ordersUnsub = null;
 let _runsUnsub = null;
 let _staffCache = [];
 let _customers = new Map();
+
+// Batch-fetch grocery orders by id using documentId()+'in' (10-id chunks).
+// Replaces N parallel getDoc() calls when rendering a run's stops — a run of
+// 20 stops drops from 20 reads to 2.
+async function fetchGroceryOrdersByIds(db, ids) {
+  const uniq = Array.from(new Set((ids || []).filter(Boolean)));
+  if (!uniq.length) return [];
+  const out = [];
+  for (let i = 0; i < uniq.length; i += 10) {
+    const chunk = uniq.slice(i, i + 10);
+    const snap = await getDocs(query(collection(db, COL.GROCERY_ORDERS), where(documentId(), 'in', chunk)));
+    snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+  }
+  // Preserve the caller's id order so the stop sequence stays stable.
+  const byId = new Map(out.map(o => [o.id, o]));
+  return uniq.map(id => byId.get(id)).filter(Boolean);
+}
 
 const STATUSES = ['new', 'order_confirmed', 'assigned', 'out_for_delivery', 'delivered', 'cancelled', 'fake'];
 const STATUS_LABEL = {
@@ -197,6 +214,11 @@ export async function renderGrocery(root, db) {
         </button>
       </div>
       <div id="grOrdersList" class="card-list grid-2"><div class="bb-loader-block">Listening for grocery orders…</div></div>
+      <div id="grOrdersLoadMore" class="text-center my-3" hidden>
+        <button type="button" id="grOrdersLoadMoreBtn" class="btn btn-sm btn-outline-secondary">
+          <i class="fas fa-angles-down"></i> Load older 200
+        </button>
+      </div>
     </div>
 
     <div id="groceryRequestedPane" class="grocery-pane" hidden>
@@ -240,6 +262,11 @@ export async function renderGrocery(root, db) {
         </button>
       </div>
       <div id="grRunsList" class="card-list"><div class="bb-loader-block">Loading runs…</div></div>
+      <div id="grRunsLoadMore" class="text-center my-3" hidden>
+        <button type="button" id="grRunsLoadMoreBtn" class="btn btn-sm btn-outline-secondary">
+          <i class="fas fa-angles-down"></i> Load older 200
+        </button>
+      </div>
     </div>
   `;
 
@@ -275,7 +302,20 @@ function mountOrders(root, db) {
   const statusFilter = root.querySelector('#grStatusFilter');
   const etaFilter = root.querySelector('#grEtaFilter');
   const clearBtn = root.querySelector('#grClearFilters');
-  let all = [];
+  // `live` = newest 200 orders from the onSnapshot listener (60d window).
+  // `older` = one-shot "Load older" pages beyond that window.
+  let live = [];
+  let older = [];
+  let olderExhausted = false;
+  function mergedAll() {
+    if (!older.length) return live;
+    const seen = new Set();
+    const out = [];
+    for (const o of live) { if (!seen.has(o.id)) { seen.add(o.id); out.push(o); } }
+    for (const o of older) { if (!seen.has(o.id)) { seen.add(o.id); out.push(o); } }
+    out.sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0));
+    return out;
+  }
 
   // Highlight the active filter wrappers and reveal the Clear button only
   // when the current selection differs from the defaults. Mirrors the food
@@ -295,7 +335,7 @@ function mountOrders(root, db) {
 
   function refreshEtaOptions() {
     const set = new Set();
-    for (const o of all) { if (o.eta_date) set.add(o.eta_date); }
+    for (const o of mergedAll()) { if (o.eta_date) set.add(o.eta_date); }
     const dates = [...set].sort();
     const prev = etaFilter.value || 'all';
     etaFilter.innerHTML = '<option value="all">All dates</option>' +
@@ -306,13 +346,16 @@ function mountOrders(root, db) {
   function paint() {
     const st = statusFilter.value;
     const ed = etaFilter.value;
-    const filtered = all.filter(o => {
+    const filtered = mergedAll().filter(o => {
       if (ed !== 'all' && o.eta_date !== ed) return false;
       if (st === 'fake') return o.status === 'fake' || o.is_fake === true;
       if (st === 'all') return true;
       if (st === 'active') return !['delivered', 'cancelled', 'fake'].includes(o.status) && o.is_fake !== true;
       return (o.status || 'new') === st;
     });
+    const loadMoreWrap = root.querySelector('#grOrdersLoadMore');
+    // Hide when exhausted OR the on-screen list is empty.
+    if (loadMoreWrap) loadMoreWrap.hidden = olderExhausted || filtered.length === 0;
     if (!filtered.length) {
       listEl.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No grocery orders match.</p></div>';
       return;
@@ -349,18 +392,55 @@ function mountOrders(root, db) {
   }
   updateFilterActiveState();
 
-  const sinceTs = Timestamp.fromDate(startOfLastMonth());
-  const q = query(collection(db, COL.GROCERY_ORDERS), where('created_at', '>=', sinceTs));
+  // Live-window = last 60 days; pages beyond via the "Load older 200" button.
+  const LIVE_WINDOW_DAYS = 60;
+  const PAGE_SIZE = 200;
+  const sinceTs = Timestamp.fromMillis(Date.now() - LIVE_WINDOW_DAYS * 86400000);
+  const q = query(
+    collection(db, COL.GROCERY_ORDERS),
+    where('created_at', '>=', sinceTs),
+    orderBy('created_at', 'desc'),
+    limit(PAGE_SIZE),
+  );
   if (_ordersUnsub) { try { _ordersUnsub(); } catch {} _ordersUnsub = null; }
   _ordersUnsub = onSnapshot(q, snap => {
     invalidateCache('grocery_orders');
-    all = [];
-    snap.forEach(d => all.push({ id: d.id, ...d.data() }));
-    all.sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0));
+    live = [];
+    snap.forEach(d => live.push({ id: d.id, ...d.data() }));
+    live.sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0));
     refreshEtaOptions();
     paint();
   }, err => {
     listEl.innerHTML = `<div class="empty-state"><i class="fas fa-triangle-exclamation"></i><p>${esc(err.message)}</p></div>`;
+  });
+
+  const loadMoreBtn = root.querySelector('#grOrdersLoadMoreBtn');
+  loadMoreBtn?.addEventListener('click', async () => {
+    const existing = mergedAll();
+    const cursorTs = existing[existing.length - 1]?.created_at;
+    if (!cursorTs) return;
+    loadMoreBtn.disabled = true;
+    const origLabel = loadMoreBtn.innerHTML;
+    loadMoreBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading…';
+    try {
+      const page = await getDocs(query(
+        collection(db, COL.GROCERY_ORDERS),
+        where('created_at', '<', cursorTs),
+        orderBy('created_at', 'desc'),
+        limit(PAGE_SIZE),
+      ));
+      const added = [];
+      page.forEach(d => added.push({ id: d.id, ...d.data() }));
+      older = older.concat(added);
+      if (added.length < PAGE_SIZE) olderExhausted = true;
+      refreshEtaOptions();
+      paint();
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Load failed', text: err.message });
+    } finally {
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.innerHTML = origLabel;
+    }
   });
 }
 
@@ -1117,7 +1197,23 @@ function mountRuns(root, db) {
   const listEl = root.querySelector('#grRunsList');
   const filterEl = root.querySelector('#grRunsFilter');
   const clearBtn = root.querySelector('#grRunsClearFilter');
-  let allRuns = [];
+  // `liveRuns` = newest 200 runs streamed by the listener.
+  // `olderRuns` = one-shot "Load older" pages beyond the live window.
+  let liveRuns = [];
+  let olderRuns = [];
+  let olderRunsExhausted = false;
+  const RUNS_PAGE_SIZE = 200;
+
+  function mergedRuns() {
+    if (!olderRuns.length) return liveRuns;
+    const seen = new Set();
+    const out = [];
+    for (const r of liveRuns) { if (!seen.has(r.id)) { seen.add(r.id); out.push(r); } }
+    for (const r of olderRuns) { if (!seen.has(r.id)) { seen.add(r.id); out.push(r); } }
+    // run_date is a YYYY-MM-DD string → lexical sort desc is correct.
+    out.sort((a, b) => String(b.run_date || '').localeCompare(String(a.run_date || '')));
+    return out;
+  }
 
   function updateRunsFilterState() {
     const isActive = filterEl.value !== 'active';
@@ -1128,12 +1224,16 @@ function mountRuns(root, db) {
 
   function paintRuns() {
     const f = filterEl.value;
-    const filtered = allRuns.filter(r => {
+    const base = mergedRuns();
+    const filtered = base.filter(r => {
       if (f === 'all') return true;
       if (f === 'completed') return r.status === 'completed';
       // 'active' = anything that still needs work (planned or dispatched).
       return r.status !== 'completed';
     });
+    const loadMoreWrap = root.querySelector('#grRunsLoadMore');
+    // Hide when exhausted OR the on-screen list is empty.
+    if (loadMoreWrap) loadMoreWrap.hidden = olderRunsExhausted || filtered.length === 0;
     if (!filtered.length) {
       const msg = f === 'active' ? 'No active runs.' : (f === 'completed' ? 'No completed runs yet.' : 'No delivery runs planned yet.');
       listEl.innerHTML = `<div class="empty-state"><i class="fas fa-truck-fast"></i><p>${msg}</p></div>`;
@@ -1152,14 +1252,45 @@ function mountRuns(root, db) {
   }
   updateRunsFilterState();
 
-  const q = query(collection(db, COL.DELIVERY_RUNS), orderBy('run_date', 'desc'));
+  // Live listener on newest 200 by run_date. Older pages come from the
+  // "Load older 200" button below, which uses startAfter(run_date) — no
+  // extra listener accumulates.
+  const q = query(collection(db, COL.DELIVERY_RUNS), orderBy('run_date', 'desc'), limit(RUNS_PAGE_SIZE));
   if (_runsUnsub) { try { _runsUnsub(); } catch {} _runsUnsub = null; }
   _runsUnsub = onSnapshot(q, snap => {
-    allRuns = [];
-    snap.forEach(d => allRuns.push({ id: d.id, ...d.data() }));
+    liveRuns = [];
+    snap.forEach(d => liveRuns.push({ id: d.id, ...d.data() }));
     paintRuns();
   }, err => {
     listEl.innerHTML = `<div class="empty-state"><i class="fas fa-triangle-exclamation"></i><p>${esc(err.message)}</p></div>`;
+  });
+
+  const loadMoreBtn = root.querySelector('#grRunsLoadMoreBtn');
+  loadMoreBtn?.addEventListener('click', async () => {
+    const existing = mergedRuns();
+    const cursorRunDate = existing[existing.length - 1]?.run_date;
+    if (!cursorRunDate) return;
+    loadMoreBtn.disabled = true;
+    const origLabel = loadMoreBtn.innerHTML;
+    loadMoreBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading…';
+    try {
+      const page = await getDocs(query(
+        collection(db, COL.DELIVERY_RUNS),
+        orderBy('run_date', 'desc'),
+        startAfter(cursorRunDate),
+        limit(RUNS_PAGE_SIZE),
+      ));
+      const added = [];
+      page.forEach(d => added.push({ id: d.id, ...d.data() }));
+      olderRuns = olderRuns.concat(added);
+      if (added.length < RUNS_PAGE_SIZE) olderRunsExhausted = true;
+      paintRuns();
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Load failed', text: err.message });
+    } finally {
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.innerHTML = origLabel;
+    }
   });
 }
 
@@ -1214,14 +1345,8 @@ function renderRunCard(db, r) {
       loaded = true;
       const stopsEl = el.querySelector('[data-el="stops"]');
       try {
-        const stops = await Promise.all(
-          (r.order_ids || []).map(id =>
-            getDoc(doc(db, COL.GROCERY_ORDERS, id))
-              .then(s => s.exists() ? { id, ...s.data() } : null)
-              .catch(() => null)
-          )
-        );
-        const rows = stops.filter(Boolean).map((o, i) => {
+        const stops = await fetchGroceryOrdersByIds(db, r.order_ids || []);
+        const rows = stops.map((o, i) => {
           const fee = Number(o.delivery_fee_final ?? o.delivery_fee_estimated ?? 0);
           const extra = Number(o.extra_charges) || 0;
           const total = (Number(o.subtotal) || 0) + fee + extra;
@@ -1286,14 +1411,7 @@ async function editRun(db, r) {
   window.bbBusy('Loading stops…');
   let stops = [];
   try {
-    const results = await Promise.all(
-      (r.order_ids || []).map(id =>
-        getDoc(doc(db, COL.GROCERY_ORDERS, id))
-          .then(s => s.exists() ? { id, ...s.data() } : null)
-          .catch(() => null)
-      )
-    );
-    stops = results.filter(Boolean);
+    stops = await fetchGroceryOrdersByIds(db, r.order_ids || []);
   } finally {
     window.bbDone();
   }

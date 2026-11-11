@@ -1,6 +1,6 @@
 import { COL, cachedGetDocs, invalidateCache } from '../firebase-config.js';
 import {
-  collection, getDocs, doc, setDoc, deleteDoc, updateDoc, writeBatch, query, where,
+  collection, getDocs, doc, setDoc, deleteDoc, updateDoc, writeBatch, query, where, orderBy, limit, startAfter,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { Timestamp } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
@@ -105,25 +105,70 @@ export async function renderStaff(root, db) {
   renderStaffCharts();
 }
 
+// Window + page size match the rest of the admin panel: last 60 days, 200 docs
+// per request, 20-page hard cap. 2-min TTL cache keyed by query so repeated
+// tab opens don't re-page the whole window. The `force` flag (passed by
+// Dashboard's Refresh / own Refresh paths) bypasses the cache.
+const STAFF_WINDOW_DAYS = 60;
+const STAFF_PAGE_SIZE = 200;
+const STAFF_MAX_PAGES = 20;
+const STAFF_CACHE_TTL_MS = 2 * 60 * 1000;
+const _staffPagedCache = new Map(); // key -> { t, data }
+
+// Public hook so the orders live-listener can drop stale staff caches the
+// moment any order changes — otherwise staff payout numbers lag by up to the
+// cache TTL after another admin updates an order.
+export function invalidateStaffPagedCache() {
+  _staffPagedCache.delete('orders:last60d');
+  _staffPagedCache.delete('delivery_runs:completed:last60d');
+}
+
+async function fetchPaged(db, cacheKey, colName, extraConstraints, { force } = {}) {
+  const hit = _staffPagedCache.get(cacheKey);
+  if (!force && hit && (Date.now() - hit.t) < STAFF_CACHE_TTL_MS) return hit.data;
+  const out = [];
+  let cursor = null;
+  for (let i = 0; i < STAFF_MAX_PAGES; i++) {
+    const constraints = [...extraConstraints, orderBy('created_at', 'desc')];
+    if (cursor) constraints.push(startAfter(cursor));
+    constraints.push(limit(STAFF_PAGE_SIZE));
+    const snap = await getDocs(query(collection(db, colName), ...constraints));
+    if (snap.empty) break;
+    snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+    if (snap.size < STAFF_PAGE_SIZE) break;
+    cursor = snap.docs[snap.docs.length - 1];
+  }
+  _staffPagedCache.set(cacheKey, { t: Date.now(), data: out });
+  return out;
+}
+
 async function refreshStaffOrders(db, { force = false } = {}) {
-  const sinceTs = Timestamp.fromDate(startOfLastMonth());
-  _staffOrdersCache = await cachedGetDocs(
-    'orders:sinceLastMonth',
-    () => query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs)),
-    { ttlMs: 2 * 60_000, force },
+  const sinceTs = Timestamp.fromMillis(Date.now() - STAFF_WINDOW_DAYS * 86400000);
+  _staffOrdersCache = await fetchPaged(
+    db,
+    'orders:last60d',
+    COL.ORDERS,
+    [where('created_at', '>=', sinceTs)],
+    { force },
   );
-  // Also pull completed grocery runs since the same cutoff. Turned into
-  // synthetic order-shaped rows so the existing payout UI treats them
-  // exactly like a restaurant delivery — one row per run, one payout per run.
-  _staffRunsCache = await cachedGetDocs(
-    'delivery_runs:completed:sinceLastMonth',
-    () => query(
+  // Also pull completed grocery runs across the same window. Single-page
+  // fetch (no orderBy) — completed runs in 60d is a small set, and skipping
+  // orderBy avoids forcing a composite index on (status, created_at).
+  const runsKey = 'delivery_runs:completed:last60d';
+  const runsHit = _staffPagedCache.get(runsKey);
+  if (!force && runsHit && (Date.now() - runsHit.t) < STAFF_CACHE_TTL_MS) {
+    _staffRunsCache = runsHit.data;
+  } else {
+    const snap = await getDocs(query(
       collection(db, COL.DELIVERY_RUNS),
       where('status', '==', 'completed'),
       where('created_at', '>=', sinceTs),
-    ),
-    { ttlMs: 2 * 60_000, force },
-  );
+      limit(STAFF_PAGE_SIZE),
+    ));
+    _staffRunsCache = [];
+    snap.forEach(d => _staffRunsCache.push({ id: d.id, ...d.data() }));
+    _staffPagedCache.set(runsKey, { t: Date.now(), data: _staffRunsCache });
+  }
 }
 
 // Convert a completed run doc into a synthetic order the payout UI can
@@ -656,8 +701,10 @@ function renderCard(db, root, uid, s) {
       for (const r of (_staffRunsCache || [])) {
         if (runIds.includes(r.id)) { r.payout_paid = true; r.payout_paid_at = now; }
       }
-      invalidateCache('orders:sinceLastMonth');
-      invalidateCache('delivery_runs:completed:sinceLastMonth');
+      // In-memory caches already patched above; also drop the paged caches so
+      // the next refreshStaffOrders() call re-reads the authoritative state.
+      _staffPagedCache.delete('orders:last60d');
+      _staffPagedCache.delete('delivery_runs:completed:last60d');
       Swal.fire({ icon: 'success', title: 'Saved', timer: 1100, showConfirmButton: false });
       loadStaff(db, root);
       renderStaffCharts();

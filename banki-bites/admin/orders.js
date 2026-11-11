@@ -1,13 +1,14 @@
 import { COL, invalidateCache } from '../firebase-config.js';
 import { encodePayToken } from '../pay-token.js';
 import { invalidateCustomersCache } from './customers-tab.js';
+import { invalidateStaffPagedCache } from './staff.js';
 import { loadCustomers, searchCustomers, openCustomerModal, setActiveOffer, clearActiveOffer } from './customers.js';
 import {
-  collection, query, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, where, Timestamp,
+  collection, query, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, where, Timestamp, orderBy, limit, startAfter,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
-  wireStatsBlockResize, startOfLastMonth, netRevenue, truncateName,
+  wireStatsBlockResize, netRevenue, truncateName,
 } from '../analytics.js';
 
 // Detached whenever renderOrders re-mounts, so we never accumulate live listeners
@@ -356,6 +357,11 @@ export async function renderOrders(root, db) {
       </button>
     </div>
     <div id="ordersList" class="card-list grid-2"><div class="bb-loader-block">Listening for orders…</div></div>
+    <div id="ordersLoadMore" class="text-center my-3" hidden>
+      <button type="button" id="ordersLoadMoreBtn" class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-angles-down"></i> Load older 200
+      </button>
+    </div>
   `;
 
   try { await whenChartReady(); } catch (e) { console.warn('[orders] Chart.js unavailable:', e.message); }
@@ -406,7 +412,7 @@ export async function renderOrders(root, db) {
   // restaurants in practice.
   function refreshRestaurantOptions() {
     const names = new Set();
-    for (const o of allOrders) {
+    for (const o of mergedOrders()) {
       const label = (o.restaurant_name || o.restaurant_id || '').trim();
       if (label) names.add(label);
     }
@@ -422,11 +428,27 @@ export async function renderOrders(root, db) {
   }
 
   let allOrders = [];
+  // One-shot "Load older" pages — orders older than the live-listener window.
+  // Kept separate so the listener can keep replacing allOrders without wiping
+  // the manually-loaded history.
+  let olderOrders = [];
+  let olderOrdersExhausted = false;
+  // Deduped merge of live window + manually-loaded older pages, newest first.
+  function mergedOrders() {
+    if (!olderOrders.length) return allOrders;
+    const seen = new Set();
+    const out = [];
+    for (const o of allOrders) { if (!seen.has(o.id)) { seen.add(o.id); out.push(o); } }
+    for (const o of olderOrders) { if (!seen.has(o.id)) { seen.add(o.id); out.push(o); } }
+    out.sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0));
+    return out;
+  }
   function render() {
     const f = filter.value;
     const r = restaurantFilter.value;
     const dp = partnerFilter.value;
-    const filtered = allOrders.filter(o => {
+    const base = mergedOrders();
+    const filtered = base.filter(o => {
       if (r !== 'all') {
         const label = (o.restaurant_name || o.restaurant_id || '').trim();
         if (label !== r) return false;
@@ -461,7 +483,13 @@ export async function renderOrders(root, db) {
         listEl.appendChild(renderOrderCard(db, o, staff, customers, feeRules, suggestedName));
       });
     }
-    renderOrdersStats(allOrders, filtered);
+    renderOrdersStats(base, filtered);
+    // Button visible whenever there's a reasonable chance of older orders —
+    // hidden once a Load-older page returns fewer than PAGE_SIZE docs.
+    const loadMoreWrap = document.getElementById('ordersLoadMore');
+    // Hide when exhausted OR the on-screen list is empty (no point offering
+    // "older" when the empty-state is what the admin is looking at).
+    if (loadMoreWrap) loadMoreWrap.hidden = olderOrdersExhausted || filtered.length === 0;
   }
   const clearBtn = document.getElementById('clearFilters');
   function updateActiveState() {
@@ -490,11 +518,48 @@ export async function renderOrders(root, db) {
   });
   updateActiveState();
 
-  // Only fetch orders from the first day of the previous calendar month onward
-  // so admin never pulls years of history into memory. Single-field range query
-  // → no composite index needed.
-  const sinceTs = Timestamp.fromDate(startOfLastMonth());
-  const q = query(collection(db, COL.ORDERS), where('created_at', '>=', sinceTs));
+  const loadMoreBtn = document.getElementById('ordersLoadMoreBtn');
+  loadMoreBtn?.addEventListener('click', async () => {
+    const existing = mergedOrders();
+    const oldest = existing[existing.length - 1];
+    const cursorTs = oldest?.created_at;
+    if (!cursorTs) return;
+    loadMoreBtn.disabled = true;
+    const origLabel = loadMoreBtn.innerHTML;
+    loadMoreBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading…';
+    try {
+      const page = await getDocs(query(
+        collection(db, COL.ORDERS),
+        where('created_at', '<', cursorTs),
+        orderBy('created_at', 'desc'),
+        limit(PAGE_SIZE),
+      ));
+      const added = [];
+      page.forEach(d => added.push({ id: d.id, ...d.data() }));
+      olderOrders = olderOrders.concat(added);
+      if (added.length < PAGE_SIZE) olderOrdersExhausted = true;
+      render();
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Load failed', text: err.message });
+    } finally {
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.innerHTML = origLabel;
+    }
+  });
+
+  // Live-window = last 60 days. Keeps the listener bounded (the free-tier
+  // reads quota was being chewed through by unlimited listeners). Older
+  // orders are reachable via the "Load older 200" button below the list,
+  // which does one-shot getDocs pages — no extra listener accumulates.
+  const LIVE_WINDOW_DAYS = 60;
+  const PAGE_SIZE = 200;
+  const sinceTs = Timestamp.fromMillis(Date.now() - LIVE_WINDOW_DAYS * 86400000);
+  const q = query(
+    collection(db, COL.ORDERS),
+    where('created_at', '>=', sinceTs),
+    orderBy('created_at', 'desc'),
+    limit(PAGE_SIZE),
+  );
   if (_ordersUnsub) { try { _ordersUnsub(); } catch {} _ordersUnsub = null; }
   const alertState = initNewOrderAlerts();
   _ordersUnsub = onSnapshot(q, snap => {
@@ -504,6 +569,7 @@ export async function renderOrders(root, db) {
     // of waiting out their TTL.
     invalidateCache('orders');
     invalidateCustomersCache();
+    invalidateStaffPagedCache();
     allOrders = [];
     snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
     // Alert on newly-inserted "new"-status orders. The very first snapshot is

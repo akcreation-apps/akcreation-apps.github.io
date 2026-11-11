@@ -1,6 +1,6 @@
 import { COL } from '../firebase-config.js';
 import {
-  collection, getDocs, query, where, Timestamp, doc, setDoc, onSnapshot,
+  collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp, doc, setDoc, onSnapshot,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, isFarPlace, isDelivered, isCancelled, isPayoutPaid, isPayoutPending,
@@ -10,6 +10,30 @@ import {
 import { refreshStaffData } from './staff.js';
 
 const charts = new Map(); // canvas-id -> Chart instance (so we destroy on re-render)
+
+// Paged orders fetch — 200 docs per request, up to 20 pages (4000 docs hard
+// cap). Aggregates are correct across the whole window without ever asking
+// Firestore for more than 200 docs at a time.
+const DASH_PAGE_SIZE = 200;
+const DASH_MAX_PAGES = 20;
+async function fetchOrdersPaged(db, colName, sinceTs) {
+  const out = [];
+  let cursor = null;
+  for (let i = 0; i < DASH_MAX_PAGES; i++) {
+    const constraints = [
+      where('created_at', '>=', sinceTs),
+      orderBy('created_at', 'desc'),
+    ];
+    if (cursor) constraints.push(startAfter(cursor));
+    constraints.push(limit(DASH_PAGE_SIZE));
+    const snap = await getDocs(query(collection(db, colName), ...constraints));
+    if (snap.empty) break;
+    snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+    if (snap.size < DASH_PAGE_SIZE) break;
+    cursor = snap.docs[snap.docs.length - 1];
+  }
+  return out;
+}
 
 // Cached snapshots from the latest refresh() so the "Share summary" button
 // can build today's numbers without hitting Firestore again.
@@ -557,19 +581,17 @@ async function refresh(root, db) {
   // Swap the collection based on the Food/Grocery toggle. Everything else
   // (partners, staff, customers, fee rules) is shared across both flows.
   const sourceCol = state.source === 'grocery' ? COL.GROCERY_ORDERS : COL.ORDERS;
-  const [ordersSnap, partnersSnap, staffSnap, customersSnap, rules] = await Promise.all([
-    getDocs(query(collection(db, sourceCol), where('created_at', '>=', sinceTs))),
+  const [ordersRaw, partnersSnap, staffSnap, customersSnap, rules] = await Promise.all([
+    fetchOrdersPaged(db, sourceCol, sinceTs),
     getDocs(collection(db, COL.PARTNERS)),
     getDocs(collection(db, COL.STAFF)),
     getDocs(collection(db, COL.CUSTOMERS)),
     loadFeeRules(db, { autoSeed: true }),
   ]);
 
-  const ordersAll = [];
-  ordersSnap.forEach(d => {
-    const raw = { id: d.id, ...d.data() };
-    ordersAll.push(state.source === 'grocery' ? normaliseGroceryOrder(raw) : raw);
-  });
+  const ordersAll = ordersRaw.map(raw =>
+    state.source === 'grocery' ? normaliseGroceryOrder(raw) : raw
+  );
   const partners = [];
   partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
   const staff = [];

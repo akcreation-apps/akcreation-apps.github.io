@@ -1,6 +1,6 @@
 import { COL, cachedGetDocs } from '../firebase-config.js';
 import {
-  collection, getDocs,
+  collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   toDateSafe, fmtINR, chartPalette, whenChartReady, netRevenue, isDelivered,
@@ -50,7 +50,14 @@ export async function renderCustomers(root, db) {
           <i class="fas fa-arrows-rotate" aria-hidden="true"></i>
           <span class="d-none d-sm-inline ml-1">Refresh</span>
         </button>
+        <button id="custFullHistory" class="btn btn-sm btn-outline-secondary" aria-label="Load full order history">
+          <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
+          <span class="d-none d-sm-inline ml-1">Full history</span>
+        </button>
       </div>
+    </div>
+    <div id="custWindowNotice" class="small text-muted mt-1" style="margin-bottom:.5rem">
+      <i class="fas fa-circle-info"></i> Showing aggregates from the <strong>last 60 days</strong> of orders. Use <strong>Full history</strong> for lifetime numbers.
     </div>
 
     <div id="custKpis" class="kpi-grid"></div>
@@ -127,6 +134,42 @@ export async function renderCustomers(root, db) {
   document.getElementById('custSearch').addEventListener('input', (e) => {
     renderTable(root, state, e.target.value);
   });
+  document.getElementById('custFullHistory').addEventListener('click', async () => {
+    const btn = document.getElementById('custFullHistory');
+    const notice = document.getElementById('custWindowNotice');
+    if (state.fullHistory) {
+      // Toggle back to 60-day window — one confirm, one-shot.
+      state = await loadAll(db, { force: true, fullHistory: false });
+      paint(root, state);
+      btn.innerHTML = '<i class="fas fa-clock-rotate-left"></i><span class="d-none d-sm-inline ml-1">Full history</span>';
+      if (notice) notice.innerHTML = '<i class="fas fa-circle-info"></i> Showing aggregates from the <strong>last 60 days</strong> of orders. Use <strong>Full history</strong> for lifetime numbers.';
+      return;
+    }
+    const ok = await Swal.fire({
+      icon: 'warning',
+      title: 'Load full order history?',
+      html: 'This fetches <strong>every order ever placed</strong> in 200-doc pages.<br><br>'
+          + 'On a busy store this can read <strong>several thousand documents</strong> and quickly eat into your Firestore daily quota.<br><br>'
+          + 'Only do this when you actually need lifetime numbers.',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, load everything',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626',
+      reverseButtons: true,
+    });
+    if (!ok.isConfirmed) return;
+    btn.disabled = true; btn.classList.add('is-loading');
+    try {
+      state = await loadAll(db, { force: true, fullHistory: true });
+      paint(root, state);
+      btn.innerHTML = '<i class="fas fa-rotate-left"></i><span class="d-none d-sm-inline ml-1">Back to 60d</span>';
+      if (notice) notice.innerHTML = '<i class="fas fa-circle-check" style="color:var(--success,#16a34a)"></i> Showing <strong>lifetime</strong> aggregates across the full order history.';
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Load failed', text: err.message });
+    } finally {
+      btn.disabled = false; btn.classList.remove('is-loading');
+    }
+  });
   // Delegate edit clicks on table rows.
   root.addEventListener('click', async (e) => {
     const editBtn = e.target.closest('[data-edit-phone]');
@@ -145,19 +188,23 @@ export async function renderCustomers(root, db) {
   });
 }
 
-async function loadAll(db, { force = false } = {}) {
-  if (!force && _loadAllCache && (Date.now() - _loadAllCache.t) < LOAD_ALL_TTL_MS) {
+async function loadAll(db, { force = false, fullHistory = false } = {}) {
+  if (!force && _loadAllCache && _loadAllCache.fullHistory === fullHistory
+      && (Date.now() - _loadAllCache.t) < LOAD_ALL_TTL_MS) {
     return _loadAllCache.state;
   }
-  window.bbBusy('Loading customers…');
+  window.bbBusy(fullHistory ? 'Loading full history…' : 'Loading customers…');
   try {
-    const [customersMap, ordersSnap, staffList] = await Promise.all([
+    // Default window: last 60 days — enough for the lifecycle KPIs the tab
+    // shows without reading years of history. Admin can opt into the full
+    // history via the "Load full history" button (with a read-cost warning).
+    const ORDERS_WINDOW_DAYS = 60;
+    const PAGE_SIZE = 200;
+    const [customersMap, orders, staffList] = await Promise.all([
       loadCustomers(db),
-      getDocs(collection(db, COL.ORDERS)),
+      fullHistory ? fetchAllOrdersPaged(db, PAGE_SIZE) : fetchRecentOrdersPaged(db, ORDERS_WINDOW_DAYS, PAGE_SIZE),
       cachedGetDocs('staff:all', () => collection(db, COL.STAFF), { ttlMs: 10 * 60_000 }),
     ]);
-    const orders = [];
-    ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
     const staffById = new Map(staffList.map(s => [s.id, s]));
 
     // Aggregate per-customer (by phone). Spend only counts delivered orders.
@@ -218,12 +265,45 @@ async function loadAll(db, { force = false } = {}) {
     }
 
     rows.sort((x, y) => (y.lastOrder?.getTime() || 0) - (x.lastOrder?.getTime() || 0));
-    const state = { customers: customersMap, orders, rows, staffById };
-    _loadAllCache = { state, t: Date.now() };
+    const state = { customers: customersMap, orders, rows, staffById, fullHistory };
+    _loadAllCache = { state, t: Date.now(), fullHistory };
     return state;
   } finally {
     window.bbDone();
   }
+}
+
+// Paged fetch of orders in the last N days (200 at a time). Keeps per-request
+// reads small even when the window has thousands of docs. Hard safety cap on
+// total pages so a runaway spike can't quietly chew the whole day's quota.
+async function fetchRecentOrdersPaged(db, windowDays, pageSize) {
+  const sinceTs = Timestamp.fromMillis(Date.now() - windowDays * 86400000);
+  return fetchOrdersPagedCore(db, pageSize, {
+    baseConstraints: [where('created_at', '>=', sinceTs)],
+    hardCap: 20,
+  });
+}
+
+// Full-history paged fetch — no date floor. Only called from the explicit
+// "Load full history" button (which shows a read-cost warning first).
+async function fetchAllOrdersPaged(db, pageSize) {
+  return fetchOrdersPagedCore(db, pageSize, { baseConstraints: [], hardCap: 200 });
+}
+
+async function fetchOrdersPagedCore(db, pageSize, { baseConstraints, hardCap }) {
+  const out = [];
+  let cursor = null;
+  for (let i = 0; i < hardCap; i++) {
+    const constraints = [...baseConstraints, orderBy('created_at', 'desc')];
+    if (cursor) constraints.push(startAfter(cursor));
+    constraints.push(limit(pageSize));
+    const snap = await getDocs(query(collection(db, COL.ORDERS), ...constraints));
+    if (snap.empty) break;
+    snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+    if (snap.size < pageSize) break;
+    cursor = snap.docs[snap.docs.length - 1];
+  }
+  return out;
 }
 
 function pickTopPlace(map) {
