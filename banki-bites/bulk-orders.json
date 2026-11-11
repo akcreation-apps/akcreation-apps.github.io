@@ -9,7 +9,7 @@
       "folder": "TCD",
       "prefix": "tcd",
       "encKey": "TCD-FOOD-CAFE",
-      "whatsapp": "7749984274",
+      "whatsapp": "9114191989",
       "is_active": true,
       "min_qty_per_item": 10,
       "lead_time_hours": 12,
@@ -26,7 +26,7 @@
       "folder": "MCH",
       "prefix": "mch",
       "encKey": "MAA-CHARCHIKA-HOTEL",
-      "whatsapp": "7749984274",
+      "whatsapp": "9114191989",
       "is_active": true,
       "min_qty_per_item": 10,
       "lead_time_hours": 12,
@@ -34,9 +34,9 @@
       "items": [
         { "id": "veg-biryani",    "name": "Veg Biryani",    "price": 100, "unit": "plate", "available": true },
         { "id": "chicken-biryani","name": "Chicken Biryani","price": 120, "unit": "plate", "available": true },
-        { "id": "chicken-65-biryani","name": "Chicken 65 Biryani","price": 130, "unit": "plate", "available": true },
-        { "id": "fry-pc-chicken-biryani","name": "Fry pcs Chicken Biryani","price": 150, "unit": "plate", "available": true },
-        { "id": "special-chicken-biryani","name": "Special Chicken Biryani","price": 180, "unit": "plate", "available": true }
+        { "id": "chicken-65-biryani","name": "Chicken 65 Biryani","price": 130, "unit": "plate", "available": false },
+        { "id": "fry-pc-chicken-biryani","name": "Fry pcs Chicken Biryani","price": 150, "unit": "plate", "available": false },
+        { "id": "special-chicken-biryani","name": "Special Chicken Biryani","price": 180, "unit": "plate", "available": false }
       ]
     },
     "uniquefastfood": {
@@ -46,7 +46,7 @@
       "folder": "Unique",
       "prefix": "unique",
       "encKey": "Unique-Fast-Food",
-      "whatsapp": "7749984274",
+      "whatsapp": "9114191989",
       "is_active": true,
       "min_qty_per_item": 10,
       "lead_time_hours": 12,
