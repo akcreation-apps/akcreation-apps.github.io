@@ -53,17 +53,17 @@
     <!-- Users without an assigned site -->
     <div id="orphan-users-slot"></div>
 
-    <!-- Short / Long sessions today — each panel is hidden when its list is empty -->
+    <!-- Half day / Over time sessions today — each panel is hidden when its list is empty -->
     <div class="ks-grid ks-grid-2" id="session-grid" style="margin-bottom:16px;display:none;">
       <div class="ks-panel" id="short-panel" style="display:none;">
         <div class="ks-panel-header">
-          <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-hourglass-end"></i></span>Short sessions today <span class="text-muted small" style="font-weight:500;">(&lt; 4h, already out)</span></h3>
+          <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-hourglass-end"></i></span>Half day today <span class="text-muted small" style="font-weight:500;">(&lt; 5h, already out)</span></h3>
         </div>
         <div id="short-list"></div>
       </div>
       <div class="ks-panel" id="long-panel" style="display:none;">
         <div class="ks-panel-header">
-          <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-stopwatch"></i></span>Long sessions in progress <span class="text-muted small" style="font-weight:500;">(&gt; 10h, still in)</span></h3>
+          <h3 class="ks-panel-title"><span class="ks-panel-icon"><i class="fa-solid fa-stopwatch"></i></span>Over time in progress <span class="text-muted small" style="font-weight:500;">(&gt; 10h, still in)</span></h3>
         </div>
         <div id="long-list"></div>
       </div>
@@ -190,6 +190,7 @@
     let allUsers = [];      // full user list (approved + others)
     let allSites = new Map(); // id -> site
     let todayPunches = [];  // today's punches across sites
+    let verificationUids = new Set(); // uids of the Google verification account(s) — suppressed from all panels
 
     // Live users (one subscription, reused everywhere). Also re-runs the
     // correction-requests render so any request filtered out as "unknown
@@ -200,9 +201,9 @@
     // counts, shouldn't surface in correction requests, and shouldn't
     // appear in session cards.
     onSnapshot(collection(db, "attn_users"), (snap) => {
-      allUsers = snap.docs
-        .map(d => ({ id: d.id, ...d.data() }))
-        .filter(u => !isVerificationUser(u));
+      const rawUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      verificationUids = new Set(rawUsers.filter(isVerificationUser).map(u => u.id));
+      allUsers = rawUsers.filter(u => !isVerificationUser(u));
       recomputeKpis();
       if (lastEditRequestsRaw) renderEditRequests(lastEditRequestsRaw).catch(err => console.warn("[dashboard] edit-requests re-render failed", err));
     });
@@ -254,7 +255,7 @@
     // Thresholds — all client-side, no extra reads.
     const OVERTIME_HOURS = 9;           // still in beyond this = overtime flag
     const STALE_PENDING_HOURS = 48;     // pending signup older than this = stale
-    const SHORT_SESSION_HOURS = 4;      // completed session shorter than this
+    const SHORT_SESSION_HOURS = 5;      // completed session shorter than this (Half day)
     const LONG_INPROGRESS_HOURS = 10;   // currently in longer than this
 
     function recomputeKpis() {
@@ -269,10 +270,13 @@
       );
       const activeUidSet = new Set(activeUsers.map(u => u.id));
 
-      // Group today's punches by uid, sorted by time
+      // Group today's punches by uid, sorted by time.
+      // Verification user's punches are dropped here so they don't contribute to
+      // Present / In / Overtime counts or the Half day / Over time session panels.
       const byUid = new Map();
       for (const p of todayPunches) {
         if (!p.ts?.toDate) continue;
+        if (verificationUids.has(p.uid)) continue;
         if (!byUid.has(p.uid)) byUid.set(p.uid, []);
         byUid.get(p.uid).push(p);
       }
@@ -316,7 +320,7 @@
       document.getElementById("kpi-in").textContent = currentlyIn;
       document.getElementById("kpi-absent").textContent = absent;
       document.getElementById("kpi-ot").textContent = overtimeCount;
-      document.getElementById("kpi-punches").textContent = todayPunches.length;
+      document.getElementById("kpi-punches").textContent = todayPunches.filter(p => !verificationUids.has(p.uid)).length;
 
       renderSiteHeadcount(byUid);
       renderOrphanUsers();
@@ -328,7 +332,7 @@
     // State the modal needs — populated by recomputeKpis().
     let lastByUid = new Map();
 
-    // Short completed sessions today (<4h). Hides its panel when empty.
+    // Half day completed sessions today (<5h). Hides its panel when empty.
     function renderShortSessions(items) {
       const panel = document.getElementById("short-panel");
       const el = document.getElementById("short-list");
@@ -343,7 +347,7 @@
       syncSessionGrid();
     }
 
-    // Currently-in sessions >10h. Hides its panel when empty.
+    // Over time currently-in sessions (>10h). Hides its panel when empty.
     function renderLongSessions(items) {
       const panel = document.getElementById("long-panel");
       const el = document.getElementById("long-list");
