@@ -63,6 +63,17 @@
       "address": "Banki, Odisha 754008",
       "eta_minutes": 45,
       "is_active": true
+    },
+    {
+      "name": "Biswal Bakery",
+      "logo": "https://akcreation-apps.com/Biswal/biswal-bakery-logo.png",
+      "url": "https://akcreation-apps.com/Biswal/index.html?table=COD",
+      "services": ["Cakes", "Party Accessories"],
+      "opening_hour": "11",
+      "closing_hour": "21",
+      "address": "Banki Rd, Banki, Odisha 754008",
+      "eta_minutes": 120,
+      "is_active": true
     }
   ]
 }
