@@ -1,7 +1,7 @@
-// bankibites-admin SW v2 — adds notificationclick handling
+// bankibites-admin SW v3 — adds notificationclick, drops no-op fetch handler
+// (Chrome warns no-op fetch handlers add navigation overhead.)
 self.addEventListener('install', (e) => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-self.addEventListener('fetch', () => { /* network only */ });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
