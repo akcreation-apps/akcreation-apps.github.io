@@ -552,14 +552,19 @@ export async function renderOrders(root, db) {
   // reads quota was being chewed through by unlimited listeners). Older
   // orders are reachable via the "Load older 200" button below the list,
   // which does one-shot getDocs pages — no extra listener accumulates.
+  // LIVE_PAGE_SIZE is the on-subscribe backfill cost; sized to the admin's
+  // real working set (BankiBites: ≤10 concurrent active + a handful of
+  // recently-delivered for context). The "Load older" pager stays at
+  // PAGE_SIZE so an explicit click still fetches a useful batch.
   const LIVE_WINDOW_DAYS = 60;
+  const LIVE_PAGE_SIZE = 20;
   const PAGE_SIZE = 200;
   const sinceTs = Timestamp.fromMillis(Date.now() - LIVE_WINDOW_DAYS * 86400000);
   const q = query(
     collection(db, COL.ORDERS),
     where('created_at', '>=', sinceTs),
     orderBy('created_at', 'desc'),
-    limit(PAGE_SIZE),
+    limit(LIVE_PAGE_SIZE),
   );
   if (_ordersUnsub) { try { _ordersUnsub(); } catch {} _ordersUnsub = null; }
   const alertState = initNewOrderAlerts();

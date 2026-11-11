@@ -2,7 +2,7 @@ import { COL, cachedGetDocs } from '../firebase-config.js';
 import {
   collection, query, where, Timestamp,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
-import { isDelivered, fmtINR } from '../analytics.js';
+import { fmtINR } from '../analytics.js';
 
 function todayLocalISO() {
   const d = new Date();
@@ -464,16 +464,21 @@ async function generate(db, iso, out, printBtn, excelBtn) {
     // safely cache for much longer since they're closed books.
     const isToday = iso === todayLocalISO();
     const ttlMs = isToday ? 2 * 60_000 : 60 * 60_000;
-    const orders = await cachedGetDocs(
+    // Push the delivered filter to Firestore so we only pay reads for the
+    // docs we actually render — cancelled/pending orders no longer count
+    // against the daily quota. Requires a composite index on
+    // (status ASC, created_at ASC); Firestore will prompt in the console on
+    // the first run if missing.
+    const delivered = await cachedGetDocs(
       `report:${iso}`,
       () => query(
         collection(db, COL.ORDERS),
+        where('status', '==', 'delivered'),
         where('created_at', '>=', Timestamp.fromDate(start)),
         where('created_at', '<',  Timestamp.fromDate(end)),
       ),
       { ttlMs },
     );
-    const delivered = orders.filter(isDelivered);
 
     if (delivered.length === 0) {
       out.innerHTML = `
