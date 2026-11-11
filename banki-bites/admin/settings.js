@@ -128,6 +128,14 @@ export async function renderSettings(root, db) {
             <small class="form-text text-muted">Shown inside the customer's UPI app (GPay / PhonePe / Paytm) during the payment prompt.</small>
           </div>
 
+          <div class="form-group">
+            <label for="upiSupport"><strong>Support WhatsApp number</strong></label>
+            <input class="form-control" type="tel" id="upiSupport"
+                   placeholder="10-digit mobile" inputmode="tel" maxlength="15"
+                   autocapitalize="off" autocorrect="off" spellcheck="false">
+            <small class="form-text text-muted">Shown as a floating WhatsApp button on the customer-facing payment page. Leave blank to hide the button.</small>
+          </div>
+
           <div class="settings-meta" id="upiMeta" hidden>
             <i class="fas fa-clock-rotate-left"></i>
             <span>Last updated <span id="upiUpdatedAt">—</span></span>
@@ -159,9 +167,23 @@ export async function renderSettings(root, db) {
 
   const vpaInput = root.querySelector('#upiVpa');
   const nameInput = root.querySelector('#upiName');
+  const supportInput = root.querySelector('#upiSupport');
   const metaBox = root.querySelector('#upiMeta');
   const updatedAtEl = root.querySelector('#upiUpdatedAt');
   const form = root.querySelector('#upiForm');
+
+  // Live phone normalisation on the support-number field — same behaviour as
+  // the custom-pay-link form, so pasting +91 / 91 / 0-prefix / spaces / dashes
+  // collapses to a clean 10-digit number in the input.
+  if (supportInput) {
+    const trim = () => {
+      const n = normalisePhone(supportInput.value);
+      if (n !== supportInput.value) supportInput.value = n;
+    };
+    supportInput.addEventListener('input', trim);
+    supportInput.addEventListener('change', trim);
+    supportInput.addEventListener('blur', trim);
+  }
 
   // Prefill from Firestore — fall back to the historical defaults so the form
   // never renders empty on a first-time install.
@@ -172,6 +194,7 @@ export async function renderSettings(root, db) {
       const d = snap.data() || {};
       vpaInput.value = d.merchant_vpa || DEFAULT_VPA;
       nameInput.value = d.merchant_name || DEFAULT_NAME;
+      if (supportInput) supportInput.value = normalisePhone(d.support_whatsapp || '');
       if (d.updated_at?.toDate) {
         updatedAtEl.textContent = d.updated_at.toDate().toLocaleString('en-IN');
         metaBox.hidden = false;
@@ -192,6 +215,7 @@ export async function renderSettings(root, db) {
     e.preventDefault();
     const vpa = vpaInput.value.trim();
     const name = (nameInput.value || '').trim() || DEFAULT_NAME;
+    const support = supportInput ? normalisePhone(supportInput.value) : '';
 
     if (!isValidVpa(vpa)) {
       Swal.fire({
@@ -203,13 +227,24 @@ export async function renderSettings(root, db) {
       vpaInput.focus();
       return;
     }
+    if (support && !/^\d{10}$/.test(support)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid support number',
+        text: 'Enter a 10-digit Indian mobile number, or leave blank to hide the support button.',
+        confirmButtonColor: '#FF6B35',
+      });
+      supportInput.focus();
+      return;
+    }
 
     const confirm = await Swal.fire({
       icon: 'question',
       title: 'Save UPI settings?',
       html: `This will change the VPA shown to every customer immediately.<br><br>
              <strong>UPI ID:</strong> <code>${vpa}</code><br>
-             <strong>Payee:</strong> ${name}`,
+             <strong>Payee:</strong> ${name}<br>
+             <strong>Support WhatsApp:</strong> ${support ? '+91 ' + support : '<em>not set</em>'}`,
       showCancelButton: true,
       confirmButtonText: 'Save',
       confirmButtonColor: '#FF6B35',
@@ -221,6 +256,7 @@ export async function renderSettings(root, db) {
       await setDoc(doc(db, COL.META, 'upi_config'), {
         merchant_vpa: vpa,
         merchant_name: name,
+        support_whatsapp: support || null,
         updated_at: serverTimestamp(),
       }, { merge: true });
       window.bbDone && window.bbDone();

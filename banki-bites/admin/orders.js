@@ -487,9 +487,10 @@ export async function renderOrders(root, db) {
     // Button visible whenever there's a reasonable chance of older orders —
     // hidden once a Load-older page returns fewer than PAGE_SIZE docs.
     const loadMoreWrap = document.getElementById('ordersLoadMore');
-    // Hide when exhausted OR the on-screen list is empty (no point offering
-    // "older" when the empty-state is what the admin is looking at).
-    if (loadMoreWrap) loadMoreWrap.hidden = olderOrdersExhausted || filtered.length === 0;
+    // Hide when: exhausted, list is empty, OR the filter is "active" (older
+    // orders are by definition delivered/cancelled/fake so "Load older" has
+    // nothing useful to surface under this filter).
+    if (loadMoreWrap) loadMoreWrap.hidden = olderOrdersExhausted || filtered.length === 0 || f === 'active';
   }
   const clearBtn = document.getElementById('clearFilters');
   function updateActiveState() {

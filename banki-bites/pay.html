@@ -22,8 +22,8 @@
   <meta property="og:title" content="Pay BankiBites Securely via UPI — Tap to Open Your UPI App">
   <meta property="og:description" content="Tap to pay your BankiBites order securely via UPI in seconds. Works with GPay, PhonePe, Paytm &amp; BHIM. Link valid for 5 minutes.">
   <meta property="og:url" content="https://akcreation-apps.com/banki-bites/pay.html">
-  <meta property="og:image" content="https://akcreation-apps.com/banki-bites/pay-og.jpg?v=2">
-  <meta property="og:image:secure_url" content="https://akcreation-apps.com/banki-bites/pay-og.jpg?v=2">
+  <meta property="og:image" content="https://akcreation-apps.com/banki-bites/pay-og.jpg?v=3">
+  <meta property="og:image:secure_url" content="https://akcreation-apps.com/banki-bites/pay-og.jpg?v=3">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -32,7 +32,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Pay BankiBites Securely via UPI — Tap to Open Your UPI App">
   <meta name="twitter:description" content="Tap to pay your BankiBites order securely via UPI. Works with GPay, PhonePe, Paytm &amp; BHIM.">
-  <meta name="twitter:image" content="https://akcreation-apps.com/banki-bites/pay-og.jpg?v=2">
+  <meta name="twitter:image" content="https://akcreation-apps.com/banki-bites/pay-og.jpg?v=3">
   <meta name="twitter:image:alt" content="Pay BankiBites securely via UPI">
 
   <!-- Favicons -->
@@ -111,7 +111,41 @@
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       padding: 14px 18px;
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .topbar-brand { flex: 1; min-width: 0; }
+    /* Sticky countdown pill — pinned to the header so the customer always sees
+       how much time they have left on the link, no matter where they scroll. */
+    .countdown-top {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      background: rgba(224, 168, 0, 0.14);
+      color: var(--warn);
+      border: 1px solid rgba(224, 168, 0, 0.45);
+      border-radius: 999px;
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      letter-spacing: .02em;
+    }
+    .countdown-top i { font-size: 12px; }
+    /* Last 60 s — flip to danger colour + gentle pulse to prompt action. */
+    .countdown-top.is-urgent {
+      background: rgba(217, 76, 61, 0.14);
+      color: var(--danger);
+      border-color: rgba(217, 76, 61, 0.5);
+      animation: countdown-pulse 1s ease-in-out infinite;
+    }
+    @keyframes countdown-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 76, 61, 0.35); }
+      50%      { transform: scale(1.04); box-shadow: 0 0 0 6px rgba(217, 76, 61, 0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .countdown-top.is-urgent { animation: none; }
+    }
+    @media (max-width: 380px) {
+      .countdown-top { padding: 7px 10px; font-size: 13px; }
     }
     .topbar .logo {
       width: 36px; height: 36px; border-radius: 10px;
@@ -187,15 +221,6 @@
     @media (prefers-color-scheme: dark) {
       .chip { color: var(--brand); }
     }
-    .countdown {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 10px; margin-left: 6px;
-      background: rgba(224, 168, 0, .12); color: var(--warn);
-      font-size: 12px; font-weight: 600;
-      padding: 6px 12px; border-radius: 999px;
-      font-variant-numeric: tabular-nums;
-    }
-    .countdown i { font-size: 11px; }
     .txn-ref {
       font-size: 11px; color: var(--muted); margin-top: 8px;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -413,6 +438,61 @@
       line-height: 1.5;
     }
 
+    /* Floating WhatsApp support FAB — always visible on live pay pages so
+       customers can reach support instantly. Prominent on both desktop and
+       mobile, with safe-area padding for iPhone home indicators and an
+       aggressive z-index to stay above the footer and any accordion panels. */
+    .support-fab {
+      position: fixed;
+      right: 20px;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      z-index: 9999;
+      display: inline-flex; align-items: center; gap: 10px;
+      min-height: 56px;
+      padding: 0 22px 0 18px;
+      background: #25d366;
+      color: #fff;
+      border: none; border-radius: 999px;
+      font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px;
+      text-decoration: none !important;
+      box-shadow: 0 10px 28px rgba(37, 211, 102, 0.45), 0 2px 6px rgba(0, 0, 0, 0.18);
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .support-fab:hover { background: #1fbd5c; color: #fff; }
+    .support-fab:active { transform: scale(.96); }
+    .support-fab i { font-size: 24px; }
+    /* Soft pulsing halo so the button catches the eye without being noisy.
+       Pure CSS, no JS, no reflow — animates a box-shadow ring behind the pill. */
+    .support-fab::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+      animation: support-pulse 2.2s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes support-pulse {
+      0%   { box-shadow: 0 0 0 0   rgba(37, 211, 102, 0.55); }
+      70%  { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0);   }
+      100% { box-shadow: 0 0 0 0   rgba(37, 211, 102, 0);   }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .support-fab::before { animation: none; }
+    }
+    /* Mobile — keep the label visible so the button is obviously tappable and
+       doesn't get mistaken for a decorative icon. */
+    @media (max-width: 480px) {
+      .support-fab {
+        right: 14px;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        min-height: 54px;
+        padding: 0 18px 0 14px;
+        font-size: 14px;
+      }
+      .support-fab i { font-size: 22px; }
+    }
+
     .toast-pop {
       position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px);
       background: var(--text); color: var(--surface);
@@ -430,6 +510,8 @@
       font-size: 12px; color: var(--muted);
       border-top: 1px solid var(--border);
       background: var(--surface);
+      position: relative;
+      z-index: 1;
     }
     footer a { color: var(--brand); text-decoration: none; font-weight: 600; }
     footer a:hover { text-decoration: underline; }
@@ -452,12 +534,12 @@
     }
     .ios-apps-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
     .ios-app-btn {
       display: flex; flex-direction: column; align-items: center; gap: 6px;
-      padding: 10px 4px;
+      padding: 12px 6px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -465,20 +547,37 @@
       color: var(--text);
       font-family: 'Inter', sans-serif; font-weight: 600; font-size: 11px;
       transition: transform .1s ease, border-color .15s ease, background .15s ease;
-      min-height: 44px;
+      min-height: 68px;
+      text-align: center;
+      line-height: 1.25;
     }
     .ios-app-btn:hover { border-color: var(--brand); color: var(--text); }
     .ios-app-btn:active { transform: scale(.96); }
-    .ios-app-icon {
-      width: 34px; height: 34px; border-radius: 8px;
-      background: var(--brand); color: #fff;
+    /* Shared chip for the logo mark — holds either an <img> (brand SVG) or
+       a single letter fallback when a brand icon isn't available on the
+       simple-icons CDN. */
+    .ios-app-logo {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: #fff;
+      border: 1px solid var(--border);
       display: grid; place-items: center;
-      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 16px;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 17px;
+      color: var(--text);
     }
-    .ios-app-icon--gpay    { background: #4285F4; }
-    .ios-app-icon--phonepe { background: #5F259F; }
-    .ios-app-icon--paytm   { background: #00BAF2; }
-    .ios-app-icon--bhim    { background: #FF8800; }
+    .ios-app-logo img {
+      width: 22px; height: 22px; object-fit: contain; display: block;
+    }
+    /* Letter-only fallbacks tinted to each brand's primary colour so they
+       still read as recognisably distinct even without the official mark. */
+    .ios-app-logo--bhim       { background: #FF9933; color: #fff; border-color: #FF9933; }
+    .ios-app-logo--fampay     { background: #0D1B33; color: #FFD84D; border-color: #0D1B33; }
+    .ios-app-logo--supermoney { background: #FFCB05; color: #0D1B33; border-color: #FFCB05; }
+    @media (prefers-color-scheme: dark) {
+      /* Give the white logo chips a subtle border in dark mode so they don't
+         merge into the surrounding brand-soft background. */
+      .ios-app-logo { border-color: rgba(0, 0, 0, 0.12); }
+    }
     .ios-apps-note {
       margin-top: 10px;
       font-size: 11px; color: var(--muted);
@@ -527,9 +626,13 @@
 
 <header class="topbar">
   <div class="logo">B</div>
-  <div>
+  <div class="topbar-brand">
     <div class="brand-name">BankiBites</div>
     <div class="brand-sub"><i class="fas fa-lock"></i> Secure UPI Payment</div>
+  </div>
+  <div class="countdown-top" id="countdown" hidden aria-live="polite" aria-label="Payment link expiry countdown">
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <span id="countdownText">5:00</span>
   </div>
 </header>
 
@@ -571,9 +674,6 @@
         </div>
         <div>
           <span class="chip" id="orderChip">Order: —</span>
-          <span class="countdown" id="countdown" hidden>
-            <i class="fas fa-clock"></i> <span id="countdownText">5:00</span>
-          </span>
         </div>
         <div class="txn-ref" id="txnRef">Ref: —</div>
       </div>
@@ -600,29 +700,44 @@
       </div>
 
       <!-- iOS-only quick launchers — tap-to-open UPI apps with amount pre-filled.
-           Safari silently does nothing if the app isn't installed, so the QR
-           and Copy-UPI fallbacks below still cover that case. -->
+           Safari silently does nothing if the app isn't installed, so we also
+           listen for visibility change after tap to detect that case and prompt
+           the customer to pick a different app. -->
       <div id="iosApps" class="ios-apps" hidden>
         <div class="ios-apps-title">Tap your UPI app to pay</div>
         <div class="ios-apps-grid">
           <a href="#" data-upi-app="gpay" class="ios-app-btn" aria-label="Pay with GPay">
-            <span class="ios-app-icon ios-app-icon--gpay">G</span>
+            <span class="ios-app-logo">
+              <img src="https://cdn.simpleicons.org/googlepay/4285F4" alt="" loading="lazy" onerror="this.remove()">
+            </span>
             <span>GPay</span>
           </a>
           <a href="#" data-upi-app="phonepe" class="ios-app-btn" aria-label="Pay with PhonePe">
-            <span class="ios-app-icon ios-app-icon--phonepe">P</span>
+            <span class="ios-app-logo">
+              <img src="https://cdn.simpleicons.org/phonepe/5F259F" alt="" loading="lazy" onerror="this.remove()">
+            </span>
             <span>PhonePe</span>
           </a>
           <a href="#" data-upi-app="paytm" class="ios-app-btn" aria-label="Pay with Paytm">
-            <span class="ios-app-icon ios-app-icon--paytm">P</span>
+            <span class="ios-app-logo">
+              <img src="https://cdn.simpleicons.org/paytm/00BAF2" alt="" loading="lazy" onerror="this.remove()">
+            </span>
             <span>Paytm</span>
           </a>
           <a href="#" data-upi-app="bhim" class="ios-app-btn" aria-label="Pay with BHIM">
-            <span class="ios-app-icon ios-app-icon--bhim">B</span>
+            <span class="ios-app-logo ios-app-logo--bhim">B</span>
             <span>BHIM</span>
           </a>
+          <a href="#" data-upi-app="fampay" class="ios-app-btn" aria-label="Pay with FamPay">
+            <span class="ios-app-logo ios-app-logo--fampay">F</span>
+            <span>FamPay</span>
+          </a>
+          <a href="#" data-upi-app="supermoney" class="ios-app-btn" aria-label="Pay with super.money">
+            <span class="ios-app-logo ios-app-logo--supermoney">s</span>
+            <span>super.money</span>
+          </a>
         </div>
-        <div class="ios-apps-note">Nothing happened? The app isn't installed — scan the QR below instead.</div>
+        <div class="ios-apps-note">Please choose an app you have installed. If nothing happens, that app isn't on your phone — try another or scan the QR below.</div>
       </div>
 
       <div id="scanPay" hidden>
@@ -672,6 +787,13 @@
 
 <div class="toast-pop" id="toast" role="status" aria-live="polite"></div>
 
+<a href="#" id="supportFab" class="support-fab" hidden
+   aria-label="Chat with BankiBites support on WhatsApp"
+   target="_blank" rel="noopener">
+  <i class="fab fa-whatsapp" aria-hidden="true"></i>
+  <span class="support-fab-label">Need help?</span>
+</a>
+
 <footer>
   <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
 </footer>
@@ -712,11 +834,13 @@
     bootActive();
   }
 
-  // Default VPA / payee — overridden by admin-controlled Firestore config
-  // (bankibites_meta/upi_config) when reachable. Kept as fallback so a
-  // Firestore outage doesn't block payment.
+  // Default VPA / payee / support number — overridden by admin-controlled
+  // Firestore config (bankibites_meta/upi_config) when reachable. Kept as
+  // fallback so a Firestore outage, missing field, or first-time install
+  // doesn't block payment or hide the support button.
   const FALLBACK_VPA = '8270171898m@pnb';
   const FALLBACK_PAYEE = 'BankiBites';
+  const FALLBACK_SUPPORT = '7749984274'; // canonical BankiBites WhatsApp
 
   async function loadMerchantConfig() {
     try {
@@ -724,19 +848,38 @@
       const snap = await getDoc(doc(db, COL.META, 'upi_config'));
       if (snap.exists()) {
         const d = snap.data() || {};
+        const supportRaw = String(d.support_whatsapp || '').replace(/\D/g, '');
+        const support = /^\d{10}$/.test(supportRaw) ? supportRaw : FALLBACK_SUPPORT;
         return {
           vpa: (d.merchant_vpa || FALLBACK_VPA).trim(),
           payee: (d.merchant_name || FALLBACK_PAYEE).trim(),
+          support,
         };
       }
     } catch (e) {
       console.warn('[pay] UPI config fetch failed, using fallback:', e.message);
     }
-    return { vpa: FALLBACK_VPA, payee: FALLBACK_PAYEE };
+    return { vpa: FALLBACK_VPA, payee: FALLBACK_PAYEE, support: FALLBACK_SUPPORT };
   }
 
   async function bootActive() {
-    const { vpa: VPA, payee: PAYEE } = await loadMerchantConfig();
+    const { vpa: VPA, payee: PAYEE, support: SUPPORT_PHONE } = await loadMerchantConfig();
+
+    // Floating WhatsApp support button — rendered only when the admin has
+    // saved a support number in Settings. Pre-fills a message with the order
+    // id and amount so the manager has context the moment they open the chat.
+    if (SUPPORT_PHONE) {
+      const supportFab = document.getElementById('supportFab');
+      if (supportFab) {
+        const supportText = [
+          'ନମସ୍କାର BankiBites team,',
+          'ମୋ payment regarding help ଦରକାର ।',
+          order ? `Order: ${order}` : null,
+        ].filter(Boolean).join('\n');
+        supportFab.href = 'https://wa.me/91' + SUPPORT_PHONE + '?text=' + encodeURIComponent(supportText);
+        supportFab.hidden = false;
+      }
+    }
 
     const amountEl = document.getElementById('amount');
     const orderChip = document.getElementById('orderChip');
@@ -878,14 +1021,33 @@
                       '&tr=' + upiSafe(txnRef) +
                       '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
         const schemes = {
-          gpay:    'tez://upi/pay' + query,
-          phonepe: 'phonepe://pay' + query,
-          paytm:   'paytmmp://pay' + query,
-          bhim:    'bhim://upi/pay' + query,
+          gpay:       'tez://upi/pay' + query,
+          phonepe:    'phonepe://pay' + query,
+          paytm:      'paytmmp://pay' + query,
+          bhim:       'bhim://upi/pay' + query,
+          fampay:     'fampay://upi/pay' + query,
+          supermoney: 'supermoney://upi/pay' + query,
         };
         iosApps.querySelectorAll('[data-upi-app]').forEach(btn => {
           const app = btn.dataset.upiApp;
-          if (schemes[app]) btn.href = schemes[app];
+          const href = schemes[app];
+          if (!href) return;
+          btn.href = href;
+          // "App not installed" detection — if the app opens, iOS backgrounds
+          // the tab (visibilitychange → hidden). If we're still visible 1.5 s
+          // after the tap, assume the scheme wasn't handled and nudge the
+          // customer to try another app.
+          btn.addEventListener('click', () => {
+            let opened = false;
+            const onVis = () => { if (document.hidden) opened = true; };
+            document.addEventListener('visibilitychange', onVis);
+            setTimeout(() => {
+              document.removeEventListener('visibilitychange', onVis);
+              if (!opened && !document.hidden) {
+                showToast('App not installed — please pick an installed UPI app.');
+              }
+            }, 1500);
+          });
         });
         iosApps.hidden = false;
         // Downgrade the QR lead to a secondary "Or scan this QR" since the
@@ -897,12 +1059,14 @@
       }
     }
 
-    // Countdown — updates every second, swaps to expired state at 0 without reload.
+    // Countdown — updates every second, swaps to expired state at 0 without
+    // reload. Flips to the urgent state under 60 s so the pill pulses red.
     countdownWrap.hidden = false;
     function tick() {
       const left = Math.floor(expSec - Date.now() / 1000);
       if (left <= 0) {
         countdownText.textContent = '0:00';
+        countdownWrap.classList.remove('is-urgent');
         showExpired();
         clearInterval(timerId);
         return;
@@ -910,6 +1074,7 @@
       const m = Math.floor(left / 60);
       const s = left % 60;
       countdownText.textContent = m + ':' + (s < 10 ? '0' + s : s);
+      countdownWrap.classList.toggle('is-urgent', left <= 60);
     }
     tick();
     const timerId = setInterval(tick, 1000);

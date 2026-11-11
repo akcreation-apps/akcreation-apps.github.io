@@ -354,8 +354,9 @@ function mountOrders(root, db) {
       return (o.status || 'new') === st;
     });
     const loadMoreWrap = root.querySelector('#grOrdersLoadMore');
-    // Hide when exhausted OR the on-screen list is empty.
-    if (loadMoreWrap) loadMoreWrap.hidden = olderExhausted || filtered.length === 0;
+    // Hide when exhausted, list is empty, OR the status filter is "active"
+    // (older grocery orders are by definition delivered/cancelled/fake).
+    if (loadMoreWrap) loadMoreWrap.hidden = olderExhausted || filtered.length === 0 || st === 'active';
     if (!filtered.length) {
       listEl.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No grocery orders match.</p></div>';
       return;
@@ -1232,8 +1233,9 @@ function mountRuns(root, db) {
       return r.status !== 'completed';
     });
     const loadMoreWrap = root.querySelector('#grRunsLoadMore');
-    // Hide when exhausted OR the on-screen list is empty.
-    if (loadMoreWrap) loadMoreWrap.hidden = olderRunsExhausted || filtered.length === 0;
+    // Hide when exhausted, list is empty, OR the filter is "active" (older
+    // runs are by definition completed).
+    if (loadMoreWrap) loadMoreWrap.hidden = olderRunsExhausted || filtered.length === 0 || f === 'active';
     if (!filtered.length) {
       const msg = f === 'active' ? 'No active runs.' : (f === 'completed' ? 'No completed runs yet.' : 'No delivery runs planned yet.');
       listEl.innerHTML = `<div class="empty-state"><i class="fas fa-truck-fast"></i><p>${msg}</p></div>`;
