@@ -1109,6 +1109,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     if (autoFilledDiscount != null && discountInput.value !== String(autoFilledDiscount)) {
       autoFilledDiscount = null;
     }
+    // Mark the field as admin-touched so refreshOfferHint() never
+    // auto-refills it for this customer — including the case where the
+    // admin clears the value to empty/0 to waive the offer on this order.
+    discountDirty = true;
     recomputeCollect();
   });
   prepaidInput .addEventListener('input', recomputeCollect);
@@ -1223,6 +1227,10 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   const offerHintEl = card.querySelector('[data-el="offerHint"]');
   const offerHintTextEl = card.querySelector('[data-el="offerHintText"]');
   let autoFilledDiscount = null;
+  // Sticky flag: once the admin types/clears the discount for the current
+  // customer, we stop auto-refilling from active_offer_amount. Reset when
+  // the customer is switched or cleared.
+  let discountDirty = false;
   function refreshOfferHint(rawPhone) {
     const phone = normalisePhone(rawPhone || '');
     const c = phone ? customers.get(phone) : null;
@@ -1251,9 +1259,11 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     offerHintTextEl.textContent = ` Eligible: ₹${amt} (expires ${expiryLabel})`;
     offerHintEl.hidden = false;
     // Auto-fill the discount input only when it's empty or still showing
-    // a previous auto-fill — never overwrite an admin-typed value.
+    // a previous auto-fill — never overwrite an admin-typed value, and
+    // never re-fill after the admin has deliberately cleared it.
     const cur = discountInput.value;
-    if (cur === '' || cur === '0' || (autoFilledDiscount != null && cur === String(autoFilledDiscount))) {
+    const autoFillable = !discountDirty && (cur === '' || cur === '0' || (autoFilledDiscount != null && cur === String(autoFilledDiscount)));
+    if (autoFillable) {
       discountInput.value = String(amt);
       autoFilledDiscount = amt;
       recomputeCollect();
@@ -1261,6 +1271,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   }
 
   function applyCustomer(c) {
+    // Picking a different customer resets the discount-touched flag so the
+    // new customer's active_offer_amount can auto-fill cleanly.
+    discountDirty = false;
     nameInput.value = c.name || '';
     // Dispatch 'input' so listeners that track the name field (e.g. the
     // extra-charges auto-parse) pick up programmatic sets too.
@@ -1354,6 +1367,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   });
 
   card.querySelector('[data-act="clearCustomer"]').addEventListener('click', () => {
+    discountDirty = false;
     nameInput.value = '';
     phoneInput.value = '';
     phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
