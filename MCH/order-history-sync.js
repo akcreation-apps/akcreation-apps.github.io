@@ -38,6 +38,9 @@ export async function syncOrderHistoryStatuses() {
     );
     if (pending.length === 0) return false;
 
+    const INITIATED_EXPIRY_MS = 24 * 60 * 60 * 1000;
+    const nowMs = Date.now();
+
     const app = await _initApp();
     const db = getFirestore(app);
     let changed = false;
@@ -52,6 +55,12 @@ export async function syncOrderHistoryStatuses() {
                 else if (data.status === 'Rejected') next = 'Rejected';
             } else {
                 next = 'Deleted';
+            }
+            if (!next) {
+                const createdSec = order.order_details && order.order_details.created_at && order.order_details.created_at.seconds;
+                if (createdSec && (nowMs - createdSec * 1000) > INITIATED_EXPIRY_MS) {
+                    next = 'Expired';
+                }
             }
             if (next) {
                 const current = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];

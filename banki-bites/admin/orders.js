@@ -557,7 +557,7 @@ export async function renderOrders(root, db) {
   // recently-delivered for context). The "Load older" pager stays at
   // PAGE_SIZE so an explicit click still fetches a useful batch.
   const LIVE_WINDOW_DAYS = 60;
-  const LIVE_PAGE_SIZE = 20;
+  const LIVE_PAGE_SIZE = 40;
   const PAGE_SIZE = 200;
   const sinceTs = Timestamp.fromMillis(Date.now() - LIVE_WINDOW_DAYS * 86400000);
   const q = query(

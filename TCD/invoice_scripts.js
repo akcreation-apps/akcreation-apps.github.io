@@ -73,6 +73,8 @@ async function fetchOrders() {
     showLoader(); // Show loader while fetching data
     if(orders && orders.length > 0){
         let data_available = false;
+        const INITIATED_EXPIRY_MS = 24 * 60 * 60 * 1000;
+        const nowMs = Date.now();
         for (const order of orders) {
             if(!order.api_call || order.api_call === "Initiated"){
                 const allOrders = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
@@ -81,6 +83,14 @@ async function fetchOrders() {
                     const orderElement = createOrderElement(order, order.order_id);
                     orderList.appendChild(orderElement);
                     data_available = true
+                } else {
+                    const createdSec = order.order_details && order.order_details.created_at && order.order_details.created_at.seconds;
+                    if (createdSec && (nowMs - createdSec * 1000) > INITIATED_EXPIRY_MS) {
+                        const latest = JSON.parse(localStorage.getItem(lsKey('order_history'))) || [];
+                        const upd = latest.map(o => (o.order_id === order.order_id && (!o.api_call || o.api_call === "Initiated"))
+                            ? { ...o, api_call: "Expired" } : o);
+                        localStorage.setItem(lsKey('order_history'), JSON.stringify(upd));
+                    }
                 }
             } else if (order.admin_id === admin_id && order.api_call === "Approved"){
                 const orderElement = createOrderElement(order, order.order_id);
