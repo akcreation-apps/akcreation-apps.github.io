@@ -246,6 +246,9 @@ export async function renderSettings(root, db) {
             .ao-chip.err{background:rgba(215,38,61,.1);color:#b91c1c;border-color:rgba(215,38,61,.3);}
             .ao-row-err{margin-top:6px;padding:6px 8px;background:rgba(215,38,61,.08);color:#b91c1c;border-radius:6px;font-size:11px;}
             .ao-edit{margin-left:8px;font-size:12px;cursor:pointer;color:#FF6B35;text-decoration:underline;background:none;border:none;padding:0;}
+            .ao-del{margin-left:6px;width:26px;height:26px;border-radius:5px;background:transparent;border:1px solid rgba(215,38,61,.2);color:#D7263D;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;transition:background .12s;}
+            .ao-del:hover{background:rgba(215,38,61,.1);}
+            .ao-del i{font-size:12px;}
             @media (prefers-color-scheme: dark){
               .active-orders-status{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:#d1d5db;}
               .active-orders-status.ok{background:rgba(45,179,106,.15);border-color:rgba(45,179,106,.35);color:#86efac;}
@@ -256,25 +259,28 @@ export async function renderSettings(root, db) {
             }
           </style>
 
-          <details class="mt-2">
-            <summary class="text-muted" style="cursor:pointer;">
-              <i class="fas fa-database mr-1"></i> Live tracking file (<code id="notifyTrackingPath">—</code>)
-            </summary>
-            <p class="text-muted mt-2 mb-2">
-              Current state of orders the server is tracking (notified / pending). Rarely needs editing — use only if an entry gets stuck and you want to force a re-notification.
-            </p>
-            <textarea id="notifyTrackingBox" class="form-control"
-                      style="font-family:monospace;font-size:12px;min-height:200px;"
-                      spellcheck="false"></textarea>
-            <div class="settings-actions mt-2">
-              <button type="button" class="btn btn-outline-secondary btn-sm" id="notifyTrackingReloadBtn">
-                <i class="fas fa-rotate mr-1"></i> Reload
-              </button>
-              <button type="button" class="btn btn-outline-danger btn-sm" id="notifyTrackingSaveBtn">
-                <i class="fas fa-save mr-1"></i> Overwrite
-              </button>
-            </div>
-          </details>
+          <!-- Live tracking JSON editor hidden by default — admins get the
+               human-readable active-orders panel above. Toggle via
+               ?debug=tracking in the URL if you ever need the raw JSON. -->
+          <div id="notifyTrackingDebug" hidden>
+            <details class="mt-2">
+              <summary class="text-muted" style="cursor:pointer;">
+                <i class="fas fa-database mr-1"></i> Live tracking file (<code id="notifyTrackingPath">—</code>)
+              </summary>
+              <p class="text-muted mt-2 mb-2">Raw tracking file — rarely needs editing.</p>
+              <textarea id="notifyTrackingBox" class="form-control"
+                        style="font-family:monospace;font-size:12px;min-height:200px;"
+                        spellcheck="false"></textarea>
+              <div class="settings-actions mt-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="notifyTrackingReloadBtn">
+                  <i class="fas fa-rotate mr-1"></i> Reload
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="notifyTrackingSaveBtn">
+                  <i class="fas fa-save mr-1"></i> Overwrite
+                </button>
+              </div>
+            </details>
+          </div>
         </div>
       </details>
     </div>
@@ -860,6 +866,18 @@ export async function renderSettings(root, db) {
         }
         const errBlock = o.last_error
           ? `<div class="ao-row-err">🚨 ${escapeHtmlLite(o.last_error)}</div>` : '';
+
+        // Creation time: prefer order creation (customer placed it), fall
+        // back to first-seen by server. Both strings already arrive in
+        // 'YYYY-MM-DD HH:MM:SS IST' from the server — strip the date when
+        // it's today for a tighter display.
+        const rawCreated = o.created_at_ist || o.first_seen_at_ist || '';
+        const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+        const createdDisplay = rawCreated.startsWith(today)
+          ? rawCreated.slice(11)                  // just "HH:MM:SS IST"
+          : rawCreated;
+        const createdLabel = o.created_at_ist ? 'placed' : 'first seen';
+
         return `<div class="ao-row">
           <div class="ao-row-head">
             <div>
@@ -870,16 +888,25 @@ export async function renderSettings(root, db) {
             <div class="ao-eta ${etaClass(o.minutes_left)}">
               ⏱ ${escapeHtmlLite(o.eta_ist || '—')} <small>(${etaText(o.minutes_left)})</small>
               <button class="ao-edit" data-oid="${escapeHtmlLite(o.order_id)}" data-eta="${escapeHtmlLite(o.eta_iso || '')}">edit</button>
+              <button class="ao-del" data-oid="${escapeHtmlLite(o.order_id)}" data-num="${escapeHtmlLite(o.order_number)}" title="Remove from tracking file">
+                <i class="fas fa-trash-can"></i>
+              </button>
             </div>
           </div>
-          <div class="text-muted small">status=${escapeHtmlLite(o.status)}</div>
+          <div class="text-muted small">
+            status=${escapeHtmlLite(o.status)}
+            ${rawCreated ? ` · ${createdLabel} <strong>${escapeHtmlLite(createdDisplay)}</strong>` : ''}
+          </div>
           <div class="ao-chips">${chips.join('')}</div>
           ${errBlock}
         </div>`;
       }).join('');
-      // Wire edit buttons
+      // Wire edit + delete buttons
       activeListEl.querySelectorAll('.ao-edit').forEach(btn => {
         btn.addEventListener('click', () => openEtaEditor(btn.dataset.oid, btn.dataset.eta));
+      });
+      activeListEl.querySelectorAll('.ao-del').forEach(btn => {
+        btn.addEventListener('click', () => confirmDeleteEntry(btn.dataset.oid, btn.dataset.num));
       });
     } catch (err) {
       // Server unreachable → big red actionable banner.
@@ -893,6 +920,50 @@ export async function renderSettings(root, db) {
           Fix: start the local_machine Flask server on your laptop, confirm ngrok is live, then click <b>retry</b>.
         </small>`;
       activeListEl.innerHTML = '';
+    }
+  }
+
+  async function confirmDeleteEntry(oid, orderNumber) {
+    const server = cleanBaseUrl(notifyServerInput.value);
+    const token  = notifyTokenInput.value.trim();
+    if (!server || !token) {
+      Swal.fire({ icon: 'info', title: 'Save server URL + token first', confirmButtonColor: '#FF6B35' });
+      return;
+    }
+    const confirm = await Swal.fire({
+      icon: 'warning',
+      title: `Remove #${orderNumber || oid.slice(-6).toUpperCase()}?`,
+      html: `
+        <div class="text-left">
+          <p>This removes the entry from the <strong>tracking file only</strong> on the notification server.</p>
+          <ul>
+            <li>The scanner stops queuing this order.</li>
+            <li>No email / WhatsApp is fired.</li>
+            <li><strong>The Firestore order is NOT deleted</strong> — use the Orders tab for that.</li>
+          </ul>
+        </div>`,
+      showCancelButton: true,
+      confirmButtonText: 'Remove from tracking',
+      confirmButtonColor: '#D7263D',
+      cancelButtonText: 'Cancel',
+    });
+    if (!confirm.isConfirmed) return;
+    try {
+      const res = await fetch(`${server}/bankibites/order-delete`, {
+        method: 'POST', mode: 'cors',
+        headers: { 'Content-Type': 'application/json', 'X-Notify-Token': token },
+        body: JSON.stringify({ order_id: oid, actor: 'admin' }),
+      });
+      const body = await res.json();
+      if (!res.ok || body.success === false) throw new Error(body.message || `HTTP ${res.status}`);
+      Swal.fire({
+        icon: body.removed ? 'success' : 'info',
+        title: body.removed ? 'Removed from tracking' : 'Was already gone',
+        timer: 1200, showConfirmButton: false,
+      });
+      reloadActiveOrders();
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Delete failed', text: err.message, confirmButtonColor: '#D7263D' });
     }
   }
 

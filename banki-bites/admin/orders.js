@@ -638,6 +638,29 @@ export async function renderOrders(root, db) {
         } else if (ch.type === 'modified') {
           const prev = alertState.prevStatus.get(id);
           alertState.prevStatus.set(id, status);
+          // Propagate ANY modification to the notification server so its
+          // tracking file stays in sync with Firestore. The server's
+          // evaluate_sync is idempotent — it only fires new notifications
+          // when state actually changes (status flipped to terminal → drops
+          // entry; eta changed → resets breach flag; partner changed → DMs
+          // the new one). This catches edge paths that bypass the main save
+          // flow: toggleFake button, the "Notify ETA" auto-ETA shortcut,
+          // and any concurrent admin/partner edit from another device.
+          try {
+            const orderForSync = { id, ...data };
+            const restPhone = partnerPhoneFor(orderForSync);
+            if (restPhone) orderForSync.restaurant_phone = restPhone;
+            // Look up partner info if an assignment exists.
+            const assignedStaff = data.delivery_staff_id
+              ? staff.find(s => s.uid === data.delivery_staff_id)
+              : null;
+            const partner = assignedStaff
+              ? { name: assignedStaff.name || '', phone: assignedStaff.phone || '' }
+              : null;
+            syncOrder(orderForSync, partner, 'admin');
+          } catch (err) {
+            console.warn('[orders] modified-sync failed:', err.message);
+          }
           if (prev === status) return;
           if (status === 'out_for_delivery' || status === 'delivered') {
             playStatusChime(status);
@@ -2243,6 +2266,25 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
     try {
       window.bbBusy('Updating…');
       await updateDoc(doc(db, COL.ORDERS, o.id), { is_fake: nowFake, status: nowFake ? 'fake' : 'new' });
+      // Tell the notification server. Marking fake is a terminal status on
+      // the server → it drops the tracking entry. Unmarking fake sets status
+      // back to 'new' → the entry re-enters as a fresh "first sight" if the
+      // server had already purged it.
+      {
+        const mergedOrder = {
+          ...o,
+          is_fake: nowFake,
+          status: nowFake ? 'fake' : 'new',
+          id: o.id,
+        };
+        const restPhone = partnerPhoneFor(mergedOrder);
+        if (restPhone) mergedOrder.restaurant_phone = restPhone;
+        const assignedStaff = staff.find(s => s.uid === o.delivery_staff_id);
+        const partner = assignedStaff
+          ? { name: assignedStaff.name || '', phone: assignedStaff.phone || '' }
+          : null;
+        syncOrder(mergedOrder, partner, 'admin');
+      }
       // Cascade source restaurant doc both ways:
       //   mark fake   → source becomes 'Rejected'
       //   unmark fake → source restored to 'In Progress' (best-effort; we don't
