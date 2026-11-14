@@ -1,4 +1,5 @@
 import { getDb as getDbBase, getAuthInstance as getAuthBase, COL } from '../firebase-config.js';
+import { initNotifySync, syncOrder } from '../notify-sync.js';
 
 const APP_NAME = 'bankibites-delivery';
 const getDb = () => getDbBase(APP_NAME);
@@ -214,6 +215,7 @@ let currentUser = null;
 async function listenOrders(user) {
   if (unsub) unsub();
   const db = await getDb();
+  initNotifySync(db);
   const filter = $('#filter').value;
   const listEl = $('#ordersList');
   listEl.innerHTML = '<div class="bb-loader-block">Loading deliveries…</div>';
@@ -628,6 +630,7 @@ function renderCard(db, o) {
     try {
       window.bbBusy('Reverting status…');
       await updateDoc(doc(db, COL.ORDERS, o.id), { status: 'assigned' });
+      syncOrder({ ...o, status: 'assigned', id: o.id }, null, 'partner');
       window.bbDone();
     } catch (e) {
       window.bbDone();
@@ -683,6 +686,9 @@ function renderCard(db, o) {
     try {
       window.bbBusy('Updating status…');
       await updateDoc(doc(db, COL.ORDERS, o.id), patch);
+      // Tell the notification server. On terminal statuses it just drops the
+      // tracking entry — no further notifications fire.
+      syncOrder({ ...o, ...patch, id: o.id }, null, 'partner');
       // Cascade terminal status back to the source restaurant order so the
       // individual TCD/A1 admin sees the same Approved outcome.
       if (next === 'delivered' && o.source_doc_path) {

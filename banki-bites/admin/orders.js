@@ -1,4 +1,5 @@
 import { COL, invalidateCache } from '../firebase-config.js';
+import { initNotifySync, syncOrder, syncOrderDelete } from '../notify-sync.js';
 import { encodePayToken } from '../pay-token.js';
 import { invalidateCustomersCache } from './customers-tab.js';
 import { invalidateStaffPagedCache } from './staff.js';
@@ -306,6 +307,7 @@ function isValidPhone(raw) {
 }
 
 export async function renderOrders(root, db) {
+  initNotifySync(db);
   root.innerHTML = `
     <details class="stats-block">
       <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Today snapshot</summary>
@@ -596,7 +598,12 @@ export async function renderOrders(root, db) {
           if (alertState.seenIds.has(id)) return;
           alertState.seenIds.add(id);
           alertState.prevStatus.set(id, status);
-          if (status === 'new') alertNewOrder({ id, ...data });
+          if (status === 'new') {
+            alertNewOrder({ id, ...data });
+            // Fire-and-forget email + WA to admin via the local notification server.
+            // Partner is null here — assignments happen later from the save flow.
+            syncOrder({ id, ...data }, null, 'admin');
+          }
         } else if (ch.type === 'modified') {
           const prev = alertState.prevStatus.get(id);
           alertState.prevStatus.set(id, status);
@@ -2101,6 +2108,17 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       if (selectedGps) patch.customer.gps = selectedGps;
 
       await updateDoc(doc(db, COL.ORDERS, o.id), patch);
+      // Fire the notification server. Server owns the "what to fire" decision
+      // based on its tracking file — this just hands over the merged order +
+      // resolved partner on every save.
+      {
+        const mergedOrder = { ...o, ...patch, id: o.id };
+        const assignedStaff = staff.find(s => s.uid === staffId);
+        const partner = assignedStaff
+          ? { name: assignedStaff.name || '', phone: assignedStaff.phone || '' }
+          : null;
+        syncOrder(mergedOrder, partner, 'admin');
+      }
       if (phone) {
         const custRef = doc(db, COL.CUSTOMERS, phone);
         const custData = { name, phone, address, last_seen: Timestamp.now() };
@@ -2260,6 +2278,9 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         }
       }
       await deleteDoc(doc(db, COL.ORDERS, o.id));
+      // Tell the notification server to drop its tracking entry so the
+      // scheduled ETA scanner stops queuing a deleted order.
+      syncOrderDelete(o.id, 'admin');
       window.bbDone();
       if (sourceWarn) {
         Swal.fire({

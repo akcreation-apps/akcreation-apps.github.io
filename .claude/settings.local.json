@@ -45,7 +45,8 @@
       "Bash(pip install *)",
       "Bash(curl -sL -A \"Mozilla/5.0\" https://fatafatdelivery.in/ -o /tmp/fatafat.html)",
       "Read(//tmp/**)",
-      "Bash(awk '{print $5, $9}')"
+      "Bash(awk '{print $5, $9}')",
+      "Bash(xargs cat *)"
     ]
   },
   "enableAllProjectMcpServers": true,
