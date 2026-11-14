@@ -1,39 +1,87 @@
 // Thin client for the local notification server (local_machine/app.py).
 //
-// One job: POST /bankibites/order-sync with the current order + partner
-// sidecar on every save. The server owns the "what to actually fire"
-// decision (new-order, partner-assign, eta-urgency) and the dedup state.
+// Jobs:
+//   1. POST /bankibites/order-sync on every order save/delete (admin + partner)
+//   2. Cache the notification server URL + token for other consumers
+//      (top-bar indicator, settings panel polling)
 //
-// Config lives in Firestore at `bankibites_meta/notification_config`
-// (server_url + notify_token). This module caches the config in-memory and
-// also reloads lazily if Firestore updates it mid-session.
+// Config lives in Firestore at `bankibites_meta/notification_config`.
+// We cache it in **localStorage** so subsequent page loads read 0 Firebase
+// reads for the config — Firestore is only consulted once per session for
+// the onSnapshot subscription, which then also pushes any admin-side edits
+// made on OTHER devices into our cache in near-real-time.
+//
+// Firebase read cost per admin login:
+//   • First-ever login on this browser:  1 read (onSnapshot initial)
+//   • Subsequent reloads on this browser: 1 read (onSnapshot initial — the
+//     page starts with localStorage cache, so notifications are usable
+//     before that read returns)
+//   • Cross-device config edit while this tab is open: 1 read per change
 
-import { doc, getDoc, onSnapshot }
+import { doc, onSnapshot }
   from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { COL } from './firebase-config.js';
 
-let _db = null;
-let _cfg = { server_url: '', notify_token: '' };
-let _unsub = null;
+const LS_KEY = 'bb_notification_config_v1';
 
-/** Called once by each page that wants to sync. Idempotent. */
+let _db   = null;
+let _cfg  = _loadCache();   // hydrate synchronously from localStorage
+let _unsub = null;
+_publishCfg();              // make cached values available immediately
+
+function _loadCache() {
+  try {
+    if (typeof localStorage === 'undefined') return { server_url: '', notify_token: '' };
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return { server_url: '', notify_token: '' };
+    const parsed = JSON.parse(raw);
+    return sanitiseCfg(parsed || {});
+  } catch {
+    return { server_url: '', notify_token: '' };
+  }
+}
+
+function _saveCache(cfg) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(LS_KEY, JSON.stringify(cfg));
+  } catch { /* quota, private mode — ignore */ }
+}
+
+/** Called once per page that wants notifications. Idempotent across callers. */
 export function initNotifySync(db) {
   if (_db) return;
   _db = db;
-  // Prime once, then keep in sync with any admin saving new values.
-  getDoc(doc(db, COL.META, 'notification_config')).then(snap => {
-    if (snap.exists()) _cfg = sanitiseCfg(snap.data());
-  }).catch(() => {});
+  // Single onSnapshot subscription. The first invocation returns the current
+  // doc (1 Firebase read) and every subsequent edit re-fires. We don't call
+  // getDoc separately because that would double the read cost for no gain —
+  // onSnapshot's initial firing is the same data.
   _unsub = onSnapshot(doc(db, COL.META, 'notification_config'), snap => {
-    if (snap.exists()) _cfg = sanitiseCfg(snap.data());
-  }, () => {});
+    if (!snap.exists()) return;
+    const next = sanitiseCfg(snap.data());
+    // Skip the no-op update when the cache matches the server (common case
+    // on the first fire if localStorage was warm).
+    if (next.server_url === _cfg.server_url && next.notify_token === _cfg.notify_token) {
+      return;
+    }
+    _cfg = next;
+    _saveCache(_cfg);
+    _publishCfg();
+  }, () => { /* permission / network error — keep whatever we have cached */ });
 }
 
 function sanitiseCfg(d) {
   return {
-    server_url:   String(d.server_url   || '').trim().replace(/\/+$/, ''),
-    notify_token: String(d.notify_token || '').trim(),
+    server_url:   String(d?.server_url   || '').trim().replace(/\/+$/, ''),
+    notify_token: String(d?.notify_token || '').trim(),
   };
+}
+
+function _publishCfg() {
+  // Expose the live config on `window` so the top-bar server-status indicator
+  // (and any other read-only consumer) can ping without importing this module
+  // and duplicating the Firestore subscription.
+  if (typeof window !== 'undefined') window.__bbNotifyCfg = { ..._cfg };
 }
 
 /**

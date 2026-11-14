@@ -17,6 +17,8 @@ import { renderCustomers } from './customers-tab.js';
 import { renderReport }    from './report.js';
 import { renderGrocery }   from './grocery.js';
 import { renderSettings }  from './settings.js';
+import { initNotifySync } from '../notify-sync.js';
+import { initNotifyServerIndicator } from './notify-server-indicator.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -201,8 +203,45 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       currentUser = user;
+      // Keep the full email in the hidden span for a11y + anything that reads
+      // it programmatically; show just the first letter in the avatar + full
+      // email on hover and in the account popup.
       $('#userEmail').textContent = user.email;
+      const letter = (user.displayName || user.email || '?').trim()[0] || '?';
+      const avatarBtn    = $('#userAvatar');
+      const avatarLetter = $('#userAvatarLetter');
+      if (avatarLetter) avatarLetter.textContent = letter.toUpperCase();
+      if (avatarBtn) {
+        avatarBtn.title = user.email;
+        avatarBtn.setAttribute('aria-label', `Signed in as ${user.email}`);
+        avatarBtn.onclick = () => {
+          if (typeof Swal === 'undefined') { alert(`Signed in as ${user.email}`); return; }
+          Swal.fire({
+            icon: 'info',
+            title: 'Signed in',
+            html: `<div style="text-align:center;">
+                     <div style="margin:6px 0 10px 0;">
+                       <span style="display:inline-flex;align-items:center;justify-content:center;
+                                    width:56px;height:56px;border-radius:50%;
+                                    background:linear-gradient(135deg,#FF6B35 0%,#E07A1F 100%);
+                                    color:#fff;font-weight:800;font-size:22px;">
+                         ${letter.toUpperCase()}
+                       </span>
+                     </div>
+                     <div style="font-size:13px;word-break:break-all;">${user.email}</div>
+                   </div>`,
+            confirmButtonText: 'Close',
+            confirmButtonColor: '#FF6B35',
+          });
+        };
+      }
       showShell();
+      // Start pulling the notification-server config from Firestore so the
+      // top-bar status indicator has credentials to ping with. The orders.js
+      // tab also calls initNotifySync when it mounts, but we start it here
+      // so the indicator works even before Orders is opened.
+      try { initNotifySync(await getDb()); } catch {}
+      initNotifyServerIndicator();
       // Live-hide the Grocery tab whenever the storefront is in maintenance.
       // Admin toggles the flag from Partners → BankiMart card; this listener
       // mirrors any change (from this tab or another) instantly.

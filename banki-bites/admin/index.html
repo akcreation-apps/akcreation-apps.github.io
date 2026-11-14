@@ -67,12 +67,59 @@
         <span>Admin</span>
       </div>
       <div class="topbar-user">
-        <span id="userEmail" class="user-email"></span>
+        <button id="notifyServerIndicator" type="button"
+                class="notify-server-indicator notify-server--unknown"
+                title="Notification server status — checking…" aria-live="polite">
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span class="notify-server-dot" aria-hidden="true"></span>
+          <span class="sr-only" id="notifyServerLabel">Notification server status unknown</span>
+        </button>
+        <button id="userAvatar" type="button" class="user-avatar"
+                aria-label="Signed in as (click to view account)" title="">
+          <span id="userAvatarLetter" aria-hidden="true">?</span>
+        </button>
+        <span id="userEmail" class="sr-only"></span>
         <button id="signOutBtn" class="btn btn-sm btn-outline-light" title="Sign out">
           <i class="fas fa-sign-out-alt"></i>
         </button>
       </div>
     </header>
+
+    <style>
+      .notify-server-indicator{
+        position:relative;display:inline-flex;align-items:center;justify-content:center;
+        width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.15);
+        background:transparent;color:#fff;cursor:pointer;padding:0;margin-right:6px;
+        transition:background .15s, box-shadow .15s;
+      }
+      .notify-server-indicator:hover{background:rgba(255,255,255,.08);}
+      .notify-server-indicator i{font-size:14px;line-height:1;}
+      .notify-server-dot{
+        position:absolute;bottom:3px;right:3px;width:9px;height:9px;border-radius:50%;
+        border:2px solid var(--topbar-bg,#111);
+      }
+      .notify-server--unknown .notify-server-dot{background:#9b9ba7;}
+      .notify-server--online  .notify-server-dot{background:#2DB36A;box-shadow:0 0 0 2px rgba(45,179,106,.3);}
+      .notify-server--offline .notify-server-dot{background:#D7263D;box-shadow:0 0 0 2px rgba(215,38,61,.35);animation:nsi-pulse 1.1s ease-in-out infinite;}
+      .notify-server--offline{background:rgba(215,38,61,.1);border-color:rgba(215,38,61,.45);}
+      .notify-server--offline i{color:#ff9aa5;}
+      @keyframes nsi-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.25);}}
+      @media (prefers-color-scheme: dark){
+        .notify-server-dot{border-color:var(--topbar-bg,#0F0E15);}
+      }
+      .user-avatar{
+        display:inline-flex;align-items:center;justify-content:center;
+        width:32px;height:32px;border-radius:50%;
+        background:linear-gradient(135deg,#FF6B35 0%,#E07A1F 100%);
+        color:#fff;font-weight:700;font-size:13px;
+        border:1px solid rgba(255,255,255,.15);padding:0;cursor:pointer;
+        margin-right:6px;transition:transform .12s, box-shadow .12s;
+        text-transform:uppercase;line-height:1;letter-spacing:0;
+      }
+      .user-avatar:hover{transform:scale(1.07);box-shadow:0 0 0 3px rgba(255,107,53,.25);}
+      .user-avatar:focus-visible{outline:2px solid #FF6B35;outline-offset:2px;}
+      .user-avatar span{display:inline-block;transform:translateY(-.5px);}
+    </style>
 
     <nav class="tabbar" role="tablist" aria-label="Admin sections">
       <div class="sidebar-brand" aria-hidden="true">
