@@ -25,6 +25,7 @@ let _ordersUnsub = null;
 // URL (that's usually the restaurant_id's folder, e.g. "TCD"), and both
 // casings of each.
 let _partnerGroupUrlByKey = new Map();
+let _partnerPhoneByKey    = new Map();
 function addPartnerIndex(key, url) {
   if (!key || !url) return;
   const k = String(key).trim();
@@ -33,15 +34,30 @@ function addPartnerIndex(key, url) {
   _partnerGroupUrlByKey.set(k.toLowerCase(), url);
   _partnerGroupUrlByKey.set(k.toUpperCase(), url);
 }
+function addPartnerPhoneIndex(key, phone) {
+  if (!key || !phone) return;
+  const k = String(key).trim();
+  if (!k) return;
+  _partnerPhoneByKey.set(k, phone);
+  _partnerPhoneByKey.set(k.toLowerCase(), phone);
+  _partnerPhoneByKey.set(k.toUpperCase(), phone);
+}
 function indexPartner(id, data) {
-  const url = data?.whatsapp_group_url;
-  if (!url) return;
-  addPartnerIndex(id, url);
-  addPartnerIndex(data.name, url);
+  const url   = data?.whatsapp_group_url;
+  const phone = String(data?.point_of_contact || '').replace(/\D/g, '');
+  if (url) {
+    addPartnerIndex(id, url);
+    addPartnerIndex(data.name, url);
+  }
+  if (phone) {
+    addPartnerPhoneIndex(id, phone);
+    addPartnerPhoneIndex(data.name, phone);
+  }
   // Trailing folder segment of the public URL — e.g. ".../TCD/" -> "TCD".
   const u = String(data.url || '').replace(/[?#].*$/, '').replace(/\/+$/, '');
   const seg = u.split('/').pop();
-  addPartnerIndex(seg, url);
+  if (url)   addPartnerIndex(seg, url);
+  if (phone) addPartnerPhoneIndex(seg, phone);
 }
 function partnerGroupUrlFor(o) {
   if (!o) return '';
@@ -58,6 +74,18 @@ function partnerGroupUrlFor(o) {
       || _partnerGroupUrlByKey.get(String(c).toLowerCase())
       || _partnerGroupUrlByKey.get(String(c).toUpperCase());
     if (url) return url;
+  }
+  return '';
+}
+function partnerPhoneFor(o) {
+  if (!o) return '';
+  const candidates = [o.restaurant_id, o.restaurant_name, o.restaurant_folder];
+  for (const c of candidates) {
+    if (!c) continue;
+    const phone = _partnerPhoneByKey.get(c)
+      || _partnerPhoneByKey.get(String(c).toLowerCase())
+      || _partnerPhoneByKey.get(String(c).toUpperCase());
+    if (phone) return phone;
   }
   return '';
 }
@@ -602,7 +630,10 @@ export async function renderOrders(root, db) {
             alertNewOrder({ id, ...data });
             // Fire-and-forget email + WA to admin via the local notification server.
             // Partner is null here — assignments happen later from the save flow.
-            syncOrder({ id, ...data }, null, 'admin');
+            const orderForSync = { id, ...data };
+            const restPhone = partnerPhoneFor(orderForSync);
+            if (restPhone) orderForSync.restaurant_phone = restPhone;
+            syncOrder(orderForSync, null, 'admin');
           }
         } else if (ch.type === 'modified') {
           const prev = alertState.prevStatus.get(id);
@@ -2113,6 +2144,8 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       // resolved partner on every save.
       {
         const mergedOrder = { ...o, ...patch, id: o.id };
+        const restPhone = partnerPhoneFor(mergedOrder);
+        if (restPhone) mergedOrder.restaurant_phone = restPhone;
         const assignedStaff = staff.find(s => s.uid === staffId);
         const partner = assignedStaff
           ? { name: assignedStaff.name || '', phone: assignedStaff.phone || '' }
