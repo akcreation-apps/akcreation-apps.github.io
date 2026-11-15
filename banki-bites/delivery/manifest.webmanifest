@@ -14,19 +14,13 @@
   "icons": [
     {
       "src": "/banki-bites/banki-bites-logo.png",
-      "sizes": "192x192",
+      "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/banki-bites/banki-bites-logo.png",
+      "src": "/banki-bites/delivery/notif-icon.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/banki-bites/banki-bites-logo.png",
-      "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     }

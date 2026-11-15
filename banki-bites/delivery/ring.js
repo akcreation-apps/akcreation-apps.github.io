@@ -190,8 +190,13 @@ async function _fireNotification(order, count) {
     renotify: true,                                      // play system sound + vibrate on EACH re-fire
     requireInteraction: true,                            // stays until tapped (desktop + Android)
     vibrate: VIBRATE_PATTERN,
-    icon: '/banki-bites/banki-bites-logo.png',
-    badge: '/banki-bites/banki-bites-logo.png',
+    // Large icon — purpose-built 512×512 with ~12% safe-area padding so
+    // Android's circular lock-screen mask doesn't crop the logo edges.
+    icon: '/banki-bites/delivery/notif-icon.png',
+    // Status-bar small icon — must be a white silhouette on transparent;
+    // Android renders every non-transparent pixel as white. Using the
+    // colourful logo here just produces a white blob.
+    badge: '/banki-bites/delivery/notif-badge.png',
   };
   try {
     // Prefer the service-worker notification path on Android/PWA — those
