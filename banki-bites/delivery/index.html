@@ -75,6 +75,17 @@
         <span>Delivery</span>
       </div>
       <div class="topbar-user">
+        <!-- Availability toggle: partners mark themselves online (available
+             for new assignments) or offline. Turning off asks for confirmation.
+             Hidden until Firestore has loaded the staff doc. -->
+        <label id="availToggle" class="toggle availability-toggle" hidden title="Toggle availability">
+          <input type="checkbox" id="availToggleInput">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-text">
+            <span class="toggle-on"><i class="fas fa-circle"></i> Online</span>
+            <span class="toggle-off"><i class="fas fa-circle"></i> Offline</span>
+          </span>
+        </label>
         <span id="userEmail" class="user-email"></span>
         <button id="signOutBtn" class="btn btn-sm btn-outline-light" title="Sign out">
           <i class="fas fa-sign-out-alt"></i>
@@ -112,6 +123,6 @@
         .catch(err => console.warn('[delivery] SW register failed:', err));
     }
   </script>
-  <script type="module" src="app.js?v=20261115-maskable-fix"></script>
+  <script type="module" src="app.js?v=20261115-availability"></script>
 </body>
 </html>

@@ -785,9 +785,17 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
   const paymentCollected = isNewUnprocessed ? false : (o.payment_collected === false ? false : true);
   const payoutApplicable = o.payout_applicable !== false;
 
+  // Only online + active partners appear in the assignment dropdown. If the
+  // order is already assigned to someone who's now offline, keep them in the
+  // list (as "— offline") so the admin can see the current assignee and
+  // re-assign if needed instead of being confused by a missing name.
   const staffOptions = staff
-    .filter(s => s.is_active !== false)
-    .map(s => `<option value="${s.uid}" ${o.delivery_staff_id === s.uid ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('');
+    .filter(s => s.is_active !== false && (s.is_online !== false || o.delivery_staff_id === s.uid))
+    .map(s => {
+      const offline = s.is_online === false;
+      const label = offline ? `${escapeHtml(s.name)} — offline` : escapeHtml(s.name);
+      return `<option value="${s.uid}" ${o.delivery_staff_id === s.uid ? 'selected' : ''}${offline ? ' disabled' : ''}>${label}</option>`;
+    }).join('');
 
   // Contact summary line when collapsed
   const contactSummary = effectiveName || cust.phone

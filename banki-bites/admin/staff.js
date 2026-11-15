@@ -486,12 +486,28 @@ function renderCard(db, root, uid, s) {
   }, 0);
   const projectedMonthly = Math.round(mtdEarned * (daysInMonth / daysElapsed));
 
+  // Availability: a partner is "online" (available to receive new orders)
+  // when is_online !== false. Missing field = treated as online so legacy
+  // staff docs don't suddenly disappear from the assignment dropdown.
+  const isOnline = s.is_online !== false;
+  const availBadge = s.is_active === false
+    ? '<span class="status-pill status-cancelled">Inactive</span>'
+    : `<span class="status-pill ${isOnline ? 'status-delivered' : 'status-cancelled'}" title="${isOnline ? 'Available for new deliveries' : 'Not accepting new deliveries'}"><i class="fas fa-circle" style="font-size:0.55rem;vertical-align:middle"></i> ${isOnline ? 'Online' : 'Offline'}</span>`;
+
   el.innerHTML = `
     <div class="ec-row">
       <div style="min-width:0;flex:1">
-        <div class="ec-title">${escapeHtml(s.name)} ${s.is_active === false ? '<span class="status-pill status-cancelled">Inactive</span>' : ''}</div>
+        <div class="ec-title">${escapeHtml(s.name)} ${availBadge}</div>
         <div class="ec-meta"><i class="fas fa-envelope"></i> ${escapeHtml(s.email||'')}</div>
         <div class="ec-meta"><i class="fas fa-phone"></i> ${escapeHtml(s.phone||'—')}</div>
+        <label class="toggle staff-availability-toggle" title="Admin override: toggle this partner's availability">
+          <input type="checkbox" data-act="toggleOnline" ${isOnline ? 'checked' : ''} ${s.is_active === false ? 'disabled' : ''}>
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-text">
+            <span class="toggle-on">Available</span>
+            <span class="toggle-off">Unavailable</span>
+          </span>
+        </label>
       </div>
       <button class="icon-btn icon-btn--secondary" data-act="edit" title="Edit ${escapeAttr(s.name)}" aria-label="Edit ${escapeAttr(s.name)}">
         <i class="fas fa-pen"></i>
@@ -531,6 +547,37 @@ function renderCard(db, root, uid, s) {
     </div>
   `;
   el.querySelector('[data-act="edit"]').addEventListener('click', () => openEditor(db, { uid, ...s }, root));
+  // Admin override for partner availability. Writing from admin is identical
+  // to the partner writing it from the delivery app — same field, same doc.
+  const availInput = el.querySelector('[data-act="toggleOnline"]');
+  if (availInput) {
+    availInput.addEventListener('change', async () => {
+      const goingOffline = !availInput.checked;
+      if (goingOffline) {
+        const ok = await Swal.fire({
+          title: `Take ${s.name} offline?`,
+          text: 'They will stop receiving new delivery assignments until marked available again.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, take offline',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#dc3545',
+        });
+        if (!ok.isConfirmed) { availInput.checked = true; return; }
+      }
+      try {
+        window.bbBusy(goingOffline ? 'Taking offline…' : 'Marking online…');
+        await updateDoc(doc(db, COL.STAFF, uid), { is_online: !goingOffline });
+        invalidateCache('staff:all');
+      } catch (err) {
+        availInput.checked = !goingOffline;
+        Swal.fire({ icon: 'error', title: 'Could not update', text: err.message });
+      } finally {
+        window.bbDone();
+      }
+      loadStaff(db, root, { force: true });
+    });
+  }
   el.querySelector('[data-act="del"]').addEventListener('click', async () => {
     const ok = await Swal.fire({ title: `Remove ${s.name}?`, text: 'This only removes the directory entry; delete the Auth user separately in Firebase Console.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Remove', confirmButtonColor: '#dc3545' });
     if (!ok.isConfirmed) return;

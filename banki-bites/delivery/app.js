@@ -110,6 +110,55 @@ function lookupPartnerPhone(o) {
   }
   return '';
 }
+/**
+ * Availability toggle shown in the topbar. The partner flips themselves
+ * online/offline — offline partners are filtered out of the admin's order-
+ * assignment dropdown so they stop receiving new orders. Admin can also
+ * override this from the staff card (same field).
+ *
+ * Confirmation is required before going offline so a mis-tap doesn't
+ * silently stop the pipeline of new deliveries.
+ */
+function mountAvailabilityToggle(db, user, initialData) {
+  const wrap = $('#availToggle');
+  const input = $('#availToggleInput');
+  if (!wrap || !input) return;
+  // Default to online when the field is missing (legacy staff docs).
+  input.checked = initialData.is_online !== false;
+  wrap.hidden = false;
+  let writing = false;
+  input.addEventListener('change', async () => {
+    if (writing) return;
+    const goingOffline = !input.checked;
+    if (goingOffline && window.Swal) {
+      const ok = await Swal.fire({
+        title: 'Go offline?',
+        text: 'You will stop receiving new delivery assignments until you turn yourself back on.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, go offline',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc3545',
+      });
+      if (!ok.isConfirmed) {
+        input.checked = true;              // revert
+        return;
+      }
+    }
+    writing = true;
+    try {
+      window.bbBusy(goingOffline ? 'Going offline…' : 'Going online…');
+      await updateDoc(doc(db, COL.STAFF, user.uid), { is_online: !goingOffline });
+    } catch (err) {
+      input.checked = !goingOffline;       // revert on failure
+      if (window.Swal) Swal.fire({ icon: 'error', title: 'Could not update status', text: err.message });
+    } finally {
+      writing = false;
+      window.bbDone();
+    }
+  });
+}
+
 const _earnCharts = new Map();
 function mountEarnChart(id, config) {
   const old = _earnCharts.get(id);
@@ -226,6 +275,7 @@ let currentUser = null;
     currentUser = user;
     $('#userEmail').textContent = staffDoc.data().name || user.email;
     showShell();
+    mountAvailabilityToggle(db, user, staffDoc.data());
     // Prime the new-order alert engine: unlock Web Audio on the next tap
     // (browsers block autoplay until a user gesture) and ask for OS
     // notification permission so the partner is reached with the tab in

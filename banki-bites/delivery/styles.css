@@ -1398,6 +1398,28 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
   0%, 100% { background: #dc2626; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45); }
   50%      { background: #ef4444; box-shadow: 0 6px 22px rgba(239, 68, 68, 0.75); }
 }
+
+/* ===========================================================================
+   Availability toggle in the topbar — reuses .toggle from admin/styles.css
+   but tightens spacing so it fits beside the user email + sign-out button.
+   =========================================================================== */
+.availability-toggle {
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.availability-toggle .toggle-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.availability-toggle .toggle-on  i { color: #22c55e; margin-right: 4px; font-size: 0.55rem; }
+.availability-toggle .toggle-off i { color: #ef4444; margin-right: 4px; font-size: 0.55rem; }
+@media (max-width: 480px) {
+  .availability-toggle .toggle-text { display: none; }   /* icon-only on phones to save room */
+}
 @media (prefers-color-scheme: dark) {
   .bb-ring-banner {
     background: #b91c1c;

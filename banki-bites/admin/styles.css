@@ -3354,3 +3354,13 @@ button.fab:hover { background: var(--brand-dark); }
   .settings-card code { background: #3a1f14; color: #ff7a47; }
   .settings-meta { background: #1f1822; }
 }
+
+/* Availability toggle placed inside each staff card — uses the shared .toggle
+   styles but sits as its own row under the contact lines with a muted label. */
+.staff-availability-toggle {
+  margin-top: 6px;
+  font-size: 0.82rem;
+}
+.staff-availability-toggle .toggle-text {
+  font-weight: 600;
+}
