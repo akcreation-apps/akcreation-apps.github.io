@@ -1014,8 +1014,9 @@ function wireSave(db, card, o) {
     // means: fully-paid toggle on, or any partial received, or to-collect
     // reduced below the order total (i.e., admin acknowledged some money).
     const isRecordingPayment = paidToggleOn || prepaid > 0 || collect < orderTotal;
-    const isAdvancingStatus = status !== 'new';
-    if (isRecordingPayment || isAdvancingStatus) {
+    const isTerminalIdle = status === 'new' || status === 'cancelled';
+    const isAdvancingStatus = !isTerminalIdle;
+    if (!isTerminalIdle && (isRecordingPayment || isAdvancingStatus)) {
       const missing = [];
       if (!name) missing.push('name');
       if (!isValidPhone(phoneRaw)) missing.push('valid 10-digit phone');
