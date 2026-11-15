@@ -1,5 +1,6 @@
 import { getDb as getDbBase, getAuthInstance as getAuthBase, COL } from '../firebase-config.js';
 import { initNotifySync, syncOrder } from '../notify-sync.js';
+import { armAudioOnFirstGesture, primeAudioNow, requestAlertPermission, startRinging, stopRinging } from './ring.js';
 
 const APP_NAME = 'bankibites-delivery';
 const getDb = () => getDbBase(APP_NAME);
@@ -52,6 +53,22 @@ window.bbDone = function () {
 let _feeRules = null;
 let _allOrders = [];
 let _currentView = 'active';
+// IDs of orders we've already rung for this browser session — guards against
+// re-ringing on snapshot replays (reconnect, tab refocus). Persisted in
+// sessionStorage so a soft page refresh keeps the "already acknowledged" state.
+const _SEEN_ASSIGNED_KEY = 'bb_delivery_seen_assigned_v1';
+const _seenAssigned = new Set((() => {
+  try { return JSON.parse(sessionStorage.getItem(_SEEN_ASSIGNED_KEY) || '[]'); }
+  catch { return []; }
+})());
+function _rememberSeen(id) {
+  _seenAssigned.add(id);
+  try { sessionStorage.setItem(_SEEN_ASSIGNED_KEY, JSON.stringify([..._seenAssigned])); } catch {}
+}
+function _forgetSeen(id) {
+  if (!_seenAssigned.delete(id)) return;
+  try { sessionStorage.setItem(_SEEN_ASSIGNED_KEY, JSON.stringify([..._seenAssigned])); } catch {}
+}
 // Map<lookupKey, 10-digit phone> — populated once on sign-in so the delivery
 // card can render a "Call restaurant" banner on assigned orders. Each partner
 // is registered under every stable identifier we might see on an order:
@@ -112,6 +129,10 @@ let currentUser = null;
 
   $('#signInForm').addEventListener('submit', async e => {
     e.preventDefault();
+    // Unlock the AudioContext synchronously inside this gesture handler, BEFORE
+    // any await — browsers only honour audio resume() when it's traced back to
+    // a user gesture. This guarantees the very first new-order siren is audible.
+    primeAudioNow();
     $('#authError').hidden = true;
     try {
       await signInWithEmailAndPassword(auth, $('#emailInput').value.trim(), $('#passwordInput').value);
@@ -205,6 +226,12 @@ let currentUser = null;
     currentUser = user;
     $('#userEmail').textContent = staffDoc.data().name || user.email;
     showShell();
+    // Prime the new-order alert engine: unlock Web Audio on the next tap
+    // (browsers block autoplay until a user gesture) and ask for OS
+    // notification permission so the partner is reached with the tab in
+    // the background.
+    armAudioOnFirstGesture();
+    requestAlertPermission();
     try { _feeRules = await loadFeeRules(db, { force: true }); } catch {}
     await loadPartnerContacts(db);
     listenOrders(user);
@@ -212,12 +239,22 @@ let currentUser = null;
   });
 })();
 
+let _listenerPrimed = false;
+let _ordersListTapBound = false;
 async function listenOrders(user) {
   if (unsub) unsub();
+  _listenerPrimed = false;
   const db = await getDb();
   initNotifySync(db);
   const filter = $('#filter').value;
   const listEl = $('#ordersList');
+  // Tapping anywhere inside the orders list counts as the partner having seen
+  // the new assignment — kill the ring. Bind once per session (listenOrders
+  // can re-run on filter changes).
+  if (!_ordersListTapBound) {
+    listEl.addEventListener('click', () => stopRinging(), true);
+    _ordersListTapBound = true;
+  }
   listEl.innerHTML = '<div class="bb-loader-block">Loading deliveries…</div>';
 
   // Filter server-side by assignee; sort/filter the rest client-side so we
@@ -227,6 +264,29 @@ async function listenOrders(user) {
     where('delivery_staff_id', '==', user.uid),
   );
   unsub = onSnapshot(q, snap => {
+    // Detect freshly-assigned orders so we can fire the loud alert. The very
+    // first snapshot after subscribing floods us with every already-assigned
+    // doc as `added`; we silently mark those as seen so only *new* assignments
+    // (added after the listener is live) trigger the ring.
+    const newAssignments = [];
+    const firstSnapshot = !_listenerPrimed;
+    snap.docChanges().forEach(ch => {
+      // 'removed' = the order left this partner's query — either reassigned
+      // elsewhere or unassigned. Drop it from _seenAssigned so a future
+      // reassign to this partner rings again.
+      if (ch.type === 'removed') { _forgetSeen(ch.doc.id); return; }
+      if (ch.type !== 'added') return;
+      const o = { id: ch.doc.id, ...ch.doc.data() };
+      if (o.status === 'delivered' || o.status === 'cancelled') return;
+      if (_seenAssigned.has(o.id)) return;
+      _rememberSeen(o.id);
+      if (!firstSnapshot) newAssignments.push(o);
+    });
+    _listenerPrimed = true;
+    // One startRinging() call per new order so the banner counter ("N new
+    // deliveries") reflects the actual count when several arrive together.
+    newAssignments.forEach(o => startRinging(o));
+
     const allOrders = [];
     snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
     // Cap everything client-side at the start of the previous month — that's the

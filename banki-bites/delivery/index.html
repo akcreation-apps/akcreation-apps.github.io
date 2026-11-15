@@ -61,6 +61,13 @@
 
   <div id="appShell" hidden>
     <h1 class="sr-only">BankiBites Delivery</h1>
+    <!-- Louder/longer ring banner — shown by ring.js when a new order is assigned.
+         Tapping anywhere on the banner (or the Stop button) acknowledges and
+         silences the siren + vibration + OS notification. -->
+    <div id="ringBanner" class="bb-ring-banner" hidden role="alert" aria-live="assertive">
+      <span class="bb-ring-label" data-ring-label>🔔 New delivery assigned — tap to stop ringing</span>
+      <button type="button" id="ringStopBtn" class="btn btn-light btn-sm bb-ring-stop">Stop</button>
+    </div>
     <header class="topbar">
       <div class="topbar-brand">
         <img src="/banki-bites/banki-bites-logo.png" alt="" class="topbar-logo">
@@ -95,6 +102,6 @@
   </div>
 
   <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
-  <script type="module" src="app.js?v=20260606-emoji-fix-2"></script>
+  <script type="module" src="app.js?v=20261115-chime-4"></script>
 </body>
 </html>

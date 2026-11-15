@@ -1349,3 +1349,76 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
     color: #fed7aa;
   }
 }
+
+/* ===========================================================================
+   New-order ring banner — shown by ring.js while the siren is looping.
+   Sticky under the topbar, high-contrast red, pulses so it's impossible to
+   miss. Tap target meets the 44 px mobile rule.
+   =========================================================================== */
+.bb-ring-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 16px;
+  background: #dc2626;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
+  cursor: pointer;
+  animation: bb-ring-pulse 1s ease-in-out infinite;
+}
+.bb-ring-banner .bb-ring-label {
+  flex: 1 1 auto;
+  line-height: 1.3;
+}
+.bb-ring-banner .bb-ring-stop {
+  flex: 0 0 auto;
+  min-width: 72px;
+  min-height: 44px;
+  padding: 8px 18px;
+  font-weight: 700;
+  color: #b91c1c;
+  background: #fff;
+  border: none;
+}
+.bb-ring-banner .bb-ring-stop:hover,
+.bb-ring-banner .bb-ring-stop:focus {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+@keyframes bb-ring-pulse {
+  0%, 100% { background: #dc2626; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45); }
+  50%      { background: #ef4444; box-shadow: 0 6px 22px rgba(239, 68, 68, 0.75); }
+}
+@media (prefers-color-scheme: dark) {
+  .bb-ring-banner {
+    background: #b91c1c;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(185, 28, 28, 0.6);
+  }
+  .bb-ring-banner .bb-ring-stop {
+    color: #fff;
+    background: #0b0d12;
+    border: 1px solid #fecaca;
+  }
+  .bb-ring-banner .bb-ring-stop:hover,
+  .bb-ring-banner .bb-ring-stop:focus {
+    background: #1f2937;
+    color: #fff;
+  }
+  @keyframes bb-ring-pulse {
+    0%, 100% { background: #b91c1c; box-shadow: 0 4px 14px rgba(185, 28, 28, 0.6); }
+    50%      { background: #dc2626; box-shadow: 0 6px 22px rgba(220, 38, 38, 0.85); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bb-ring-banner { animation: none; }
+}
