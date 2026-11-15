@@ -402,6 +402,51 @@ export async function renderOrders(root, db) {
   const staff = [];
   staffSnap.forEach(d => staff.push({ uid: d.id, ...d.data() }));
 
+  // Keep the staff list live so when a partner flips themselves offline (or
+  // admin overrides from the staff card) the admin's order-assignment
+  // dropdowns + sidebar partner filter reflect it without a page refresh.
+  // Mutates `staff` in-place so every closure that already holds a ref
+  // (refreshPartnerOptions, order-save handlers) sees the fresh data.
+  const _staffUnsub = onSnapshot(collection(db, COL.STAFF), snap => {
+    const next = [];
+    snap.forEach(d => next.push({ uid: d.id, ...d.data() }));
+    staff.length = 0;
+    staff.push(...next);
+    try { refreshPartnerOptions(); } catch {}
+    try { applyStaffAvailabilityToDropdowns(); } catch {}
+  });
+  // Stop the listener when this orders view is torn down.
+  if (typeof root !== 'undefined' && root) {
+    const prev = root._staffUnsub;
+    if (typeof prev === 'function') try { prev(); } catch {}
+    root._staffUnsub = _staffUnsub;
+  }
+
+  /**
+   * Walk every rendered order card's partner <select data-f="staff"> and
+   * reconcile its <option>s with the current `staff` array — so a partner
+   * going offline mid-session disappears from fresh selects (except the one
+   * who's currently assigned to a given order, which stays visible as
+   * "— offline" and disabled, matching the server-render in renderOrderCard).
+   */
+  function applyStaffAvailabilityToDropdowns() {
+    document.querySelectorAll('select[data-f="staff"]').forEach(sel => {
+      const assignedUid = sel.value;
+      const html = staff
+        .filter(s => s.is_active !== false && (s.is_online !== false || assignedUid === s.uid))
+        .map(s => {
+          const offline = s.is_online === false;
+          const label = offline ? `${escapeHtml(s.name)} — offline` : escapeHtml(s.name);
+          return `<option value="${s.uid}" ${assignedUid === s.uid ? 'selected' : ''}${offline ? ' disabled' : ''}>${label}</option>`;
+        }).join('');
+      // Preserve the leading "Unassigned" option (first <option>) so the
+      // admin can still clear an assignment.
+      const first = sel.querySelector('option[value=""]');
+      sel.innerHTML = (first ? first.outerHTML : '') + html;
+      if (assignedUid) sel.value = assignedUid;
+    });
+  }
+
   // Pre-load partners once so each order card can look up its restaurant's
   // WhatsApp group invite URL without a per-click Firestore read.
   const partnersSnap = await getDocs(collection(db, COL.PARTNERS));
