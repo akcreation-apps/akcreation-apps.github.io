@@ -29,12 +29,21 @@ const CYCLE_MS = (NOTE_MS + INTER_NOTE_GAP_MS) * 2 + INTER_CYCLE_GAP_MS;
 const VIBRATE_PATTERN = [250, 150, 250, 800];            // matches the chime cadence
 const VIBRATE_LOOP_MS = VIBRATE_PATTERN.reduce((a, b) => a + b, 0);
 
+// Re-fire the OS notification this often while ringing. Each re-fire plays
+// the Android system notification sound and re-triggers the vibrate pattern,
+// which gives the "keeps ringing until acknowledged" behaviour even when the
+// PWA is backgrounded or the screen is locked.
+const NOTIFY_REFIRE_MS = 3000;
+
 let _ctx = null;
 let _osc = null;
 let _gain = null;
 let _toggleTimer = null;
 let _vibrateTimer = null;
+let _notifyRefireTimer = null;
 let _activeNotification = null;
+let _lastOrder = null;
+let _wakeLock = null;
 let _ringing = false;
 let _alertCount = 0;                                     // for multi-assignment display
 let _bannerEl = null;
@@ -168,29 +177,62 @@ function _stopVibrateLoop() {
   }
 }
 
-function _fireNotification(order, count) {
+async function _fireNotification(order, count) {
   if (!('Notification' in window)) return;
   if (Notification.permission !== 'granted') return;
+  const title = count > 1 ? `${count} new deliveries` : 'New delivery assigned';
+  const body = order?.customer_name
+    ? `${order.customer_name} — ${order.restaurant_name || 'Order'} #${String(order.id || '').slice(0, 6)}`
+    : 'Open BankiBites Delivery to view the order.';
+  const options = {
+    body,
+    tag: 'bb-new-delivery',                              // coalesce multiple notifications
+    renotify: true,                                      // play system sound + vibrate on EACH re-fire
+    requireInteraction: true,                            // stays until tapped (desktop + Android)
+    vibrate: VIBRATE_PATTERN,
+    icon: '/banki-bites/banki-bites-logo.png',
+    badge: '/banki-bites/banki-bites-logo.png',
+  };
   try {
+    // Prefer the service-worker notification path on Android/PWA — those
+    // survive the tab being backgrounded and are what triggers the system's
+    // own ring sound each time renotify fires. Fall back to the window
+    // Notification constructor on desktop where SW isn't registered yet.
+    const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration('/banki-bites/delivery/');
+    if (reg) {
+      await reg.showNotification(title, options);
+      return;
+    }
     if (_activeNotification) { try { _activeNotification.close(); } catch {} }
-    const title = count > 1 ? `${count} new deliveries` : 'New delivery assigned';
-    const body = order?.customer_name
-      ? `${order.customer_name} — ${order.restaurant_name || 'Order'} #${String(order.id || '').slice(0, 6)}`
-      : 'Open BankiBites Delivery to view the order.';
-    _activeNotification = new Notification(title, {
-      body,
-      tag: 'bb-new-delivery',                            // coalesce multiple notifications
-      renotify: true,
-      requireInteraction: true,
-      vibrate: VIBRATE_PATTERN,
-      icon: '/banki-bites/banki-bites-logo.png',
-      badge: '/banki-bites/banki-bites-logo.png',
-    });
+    _activeNotification = new Notification(title, options);
     _activeNotification.onclick = () => {
       try { window.focus(); } catch {}
       stopRinging();
     };
   } catch {}
+}
+
+/**
+ * Hold a Screen Wake Lock while ringing so the Android screen doesn't sleep
+ * mid-alert and kill our Web Audio loop. Re-acquired automatically when the
+ * page becomes visible again (browsers drop the lock on tab blur).
+ */
+async function _acquireWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    _wakeLock = await navigator.wakeLock.request('screen');
+    _wakeLock.addEventListener('release', () => { _wakeLock = null; });
+  } catch {}
+}
+function _releaseWakeLock() {
+  if (!_wakeLock) return;
+  try { _wakeLock.release(); } catch {}
+  _wakeLock = null;
+}
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && _ringing && !_wakeLock) _acquireWakeLock();
+  });
 }
 
 function _showBanner(count) {
@@ -211,29 +253,58 @@ function _hideBanner() {
 /** Begin ringing (idempotent). Call once per new assignment detected. */
 export function startRinging(order) {
   _alertCount += 1;
+  _lastOrder = order || _lastOrder;
   _showBanner(_alertCount);
-  _fireNotification(order, _alertCount);
+  _fireNotification(_lastOrder, _alertCount);
   if (_ringing) return;                                  // audio/vibrate already looping
   _ringing = true;
   _startAudioLoop();
   _startVibrateLoop();
+  _acquireWakeLock();
+  // Re-fire the OS notification every NOTIFY_REFIRE_MS so Android plays its
+  // system ring sound + vibration on every tick — this is what gives the
+  // "keeps ringing until tapped" behaviour even when the PWA is backgrounded
+  // or the phone screen is locked.
+  if (_notifyRefireTimer) clearInterval(_notifyRefireTimer);
+  _notifyRefireTimer = setInterval(() => {
+    if (!_ringing) return;
+    _fireNotification(_lastOrder, _alertCount);
+  }, NOTIFY_REFIRE_MS);
 }
 
 /** Stop everything — audio, vibration, notification, banner. */
-export function stopRinging() {
+export async function stopRinging() {
   if (!_ringing && _alertCount === 0) {
     _hideBanner();
     return;
   }
   _ringing = false;
   _alertCount = 0;
+  _lastOrder = null;
   _stopAudioLoop();
   _stopVibrateLoop();
+  _releaseWakeLock();
+  if (_notifyRefireTimer) { clearInterval(_notifyRefireTimer); _notifyRefireTimer = null; }
   if (_activeNotification) {
     try { _activeNotification.close(); } catch {}
     _activeNotification = null;
   }
+  // Close any SW-shown notifications with our tag too.
+  try {
+    const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration('/banki-bites/delivery/');
+    if (reg) {
+      const notes = await reg.getNotifications({ tag: 'bb-new-delivery' });
+      notes.forEach(n => { try { n.close(); } catch {} });
+    }
+  } catch {}
   _hideBanner();
+}
+
+// Service worker tells us the partner tapped the OS notification — stop the ring.
+if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+  navigator.serviceWorker.addEventListener('message', ev => {
+    if (ev.data && ev.data.type === 'stop-ring') stopRinging();
+  });
 }
 
 export function isRinging() { return _ringing; }

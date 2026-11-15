@@ -13,6 +13,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/banki-bites/banki-bites-logo.png">
   <link rel="icon" type="image/png" href="/banki-bites/banki-bites-logo.png">
   <link rel="shortcut icon" href="/banki-bites/banki-bites-logo.png">
+  <link rel="manifest" href="/banki-bites/delivery/manifest.webmanifest">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,6 +103,15 @@
   </div>
 
   <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
-  <script type="module" src="app.js?v=20261115-chime-4"></script>
+  <script>
+    // Register the delivery PWA service worker so partners can install it to
+    // the home screen on Android and so the OS notification click can focus
+    // the running app (which stops the ring).
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/banki-bites/delivery/sw.js', { scope: '/banki-bites/delivery/' })
+        .catch(err => console.warn('[delivery] SW register failed:', err));
+    }
+  </script>
+  <script type="module" src="app.js?v=20261115-pwa-robust-ring"></script>
 </body>
 </html>
