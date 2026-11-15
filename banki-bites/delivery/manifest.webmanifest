@@ -19,7 +19,7 @@
       "purpose": "any"
     },
     {
-      "src": "/banki-bites/delivery/notif-icon.png",
+      "src": "/banki-bites/delivery/notif-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
