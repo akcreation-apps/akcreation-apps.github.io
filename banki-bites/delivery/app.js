@@ -757,19 +757,11 @@ function renderCard(db, o) {
   // prevents them from scrolling past the prompt to peek at the address.
   const summaryMainHtml = needsDecision
     ? `<div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}</div>
-       ${(hasAddress || etaSummaryChip) ? `
-         <div class="needs-decision-meta">
-           ${hasAddress ? `
-             <span class="needs-decision-addr" title="${escapeAttr(c.address)}">
-               <i class="fas fa-location-dot" aria-hidden="true"></i>
-               <span class="needs-decision-addr-text">${escapeHtml(c.address)}</span>
-             </span>` : ''}
-           ${etaSummaryChip ? `<span class="needs-decision-eta">${etaSummaryChip}</span>` : ''}
-         </div>` : ''}
-       <div class="decision-prompt" role="status">
-         <i class="fas fa-hand-pointer" aria-hidden="true"></i>
-         <span>Tap to approve or reject</span>
-       </div>`
+       ${hasAddress ? `
+         <div class="decision-addr" title="${escapeAttr(c.address)}">
+           <i class="fas fa-location-dot" aria-hidden="true"></i>
+           <span class="decision-addr-text">${escapeHtml(c.address)}</span>
+         </div>` : ''}`
     : `<div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</div>
        ${(hasName || hasAddress) ? `
          <div class="delivery-summary-addr">
@@ -785,14 +777,22 @@ function renderCard(db, o) {
        ${wasRejected ? `<div class="delivery-summary-sub"><span class="status-pill status-ack-rejected"><i class="fas fa-xmark"></i> You rejected this</span></div>` : ''}`;
 
   card.innerHTML = `
-    <summary class="delivery-summary">
+    <summary class="delivery-summary${needsDecision ? ' delivery-summary--undecided' : ''}">
       <div class="ec-row">
         <div class="delivery-summary-main">
           ${summaryMainHtml}
         </div>
-        <span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>
+        ${needsDecision
+          ? (etaSummaryChip ? `<span class="decision-eta">${etaSummaryChip}</span>` : '')
+          : `<span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>`}
         <i class="fas fa-chevron-down delivery-chevron" aria-hidden="true"></i>
       </div>
+      ${needsDecision ? `
+        <div class="decision-footer" role="status">
+          <i class="fas fa-hand-pointer decision-footer-pulse" aria-hidden="true"></i>
+          <span>Tap to approve or reject</span>
+          <i class="fas fa-arrow-right decision-footer-arrow" aria-hidden="true"></i>
+        </div>` : ''}
     </summary>
 
     <div class="delivery-body">
