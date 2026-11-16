@@ -10,11 +10,11 @@
       "url": "https://akcreation-apps.com/TCD/?table=COD",
       "services": ["Chinese", "Continental", "Drinks", "Indian"],
       "rating": 4.6,
-      "opening_hour": "10",
-      "closing_hour": "22",
+      "opening_hour": "11",
+      "closing_hour": "21",
       "address": "BJP Party Office Side, Banki College Road, Banki 754008",
       "eta_minutes": 60,
-      "is_active": true
+      "is_active": false
     },
     {
       "name": "A1 Amul Fast Food",
@@ -35,7 +35,7 @@
       "url": "https://akcreation-apps.com/MCH/?table=COD",
       "services": ["Chinese", "Indian"],
       "rating": 4,
-      "opening_hour": "10",
+      "opening_hour": "12",
       "closing_hour": "22",
       "address": "Jail Road, Banki, Odisha 754008",
       "eta_minutes": 45,
@@ -48,7 +48,7 @@
       "services": ["Chinese", "Indian"],
       "rating": 5,
       "opening_hour": "16",
-      "closing_hour": "23",
+      "closing_hour": "22",
       "address": "Banki Khordha Road, Banki, Odisha 754008",
       "eta_minutes": 45,
       "is_active": true
