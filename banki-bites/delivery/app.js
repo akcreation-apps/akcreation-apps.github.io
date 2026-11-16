@@ -757,16 +757,18 @@ function renderCard(db, o) {
   // prevents them from scrolling past the prompt to peek at the address.
   const summaryMainHtml = needsDecision
     ? `<div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}</div>
-       ${hasAddress ? `
-         <div class="delivery-summary-addr">
-           <i class="fas fa-location-dot" aria-hidden="true"></i>
-           <span>${escapeHtml(c.address)}</span>
+       ${(hasAddress || etaSummaryChip) ? `
+         <div class="needs-decision-meta">
+           ${hasAddress ? `
+             <span class="needs-decision-addr" title="${escapeAttr(c.address)}">
+               <i class="fas fa-location-dot" aria-hidden="true"></i>
+               <span class="needs-decision-addr-text">${escapeHtml(c.address)}</span>
+             </span>` : ''}
+           ${etaSummaryChip ? `<span class="needs-decision-eta">${etaSummaryChip}</span>` : ''}
          </div>` : ''}
-       ${etaSummaryChip ? `
-         <div class="delivery-summary-sub">${etaSummaryChip}</div>` : ''}
        <div class="decision-prompt" role="status">
          <i class="fas fa-hand-pointer" aria-hidden="true"></i>
-         <span>Tap to approve or reject this delivery</span>
+         <span>Tap to approve or reject</span>
        </div>`
     : `<div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</div>
        ${(hasName || hasAddress) ? `
