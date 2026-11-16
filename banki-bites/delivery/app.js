@@ -1,6 +1,7 @@
-import { getDb as getDbBase, getAuthInstance as getAuthBase, COL } from '../firebase-config.js';
+import { getDb as getDbBase, getAuthInstance as getAuthBase, getBankiBitesApp, COL } from '../firebase-config.js';
 import { initNotifySync, syncOrder } from '../notify-sync.js';
 import { armAudioOnFirstGesture, primeAudioNow, requestAlertPermission, startRinging, stopRinging } from './ring.js';
+import { enablePush } from './push-config.js';
 
 const APP_NAME = 'bankibites-delivery';
 const getDb = () => getDbBase(APP_NAME);
@@ -281,7 +282,29 @@ let currentUser = null;
     // notification permission so the partner is reached with the tab in
     // the background.
     armAudioOnFirstGesture();
-    requestAlertPermission();
+    // Request notification permission THEN register for FCM push — order
+    // matters because FCM getToken() needs Notification.permission === 'granted'.
+    requestAlertPermission().then(async perm => {
+      if (perm !== 'granted') return;
+      try {
+        const firebaseApp = await getBankiBitesApp(APP_NAME);
+        await enablePush({
+          firebaseApp,
+          db,
+          uid: user.uid,
+          // Foreground FCM pushes route through the same ring UX as live
+          // Firestore events — partner hears the chime whether the message
+          // arrived via onSnapshot or via FCM.
+          onForegroundMessage: data => startRinging({
+            id: data.orderId,
+            customer_name: data.customer_name,
+            restaurant_name: data.restaurant_name,
+          }),
+        });
+      } catch (err) {
+        console.warn('[delivery] push enable failed:', err);
+      }
+    });
     try { _feeRules = await loadFeeRules(db, { force: true }); } catch {}
     await loadPartnerContacts(db);
     listenOrders(user);
