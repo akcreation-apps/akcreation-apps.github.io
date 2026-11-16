@@ -977,20 +977,21 @@
       .replace(/%40/g, '@')
       .replace(/%20/g, '+');
 
-    // NOTE: `tr` (merchant txn ref) and `pn` (payee name) are intentionally
-    // omitted. Including `tr` makes UPI apps treat the intent as a merchant-
-    // collect call and run a signed merchant handshake (mc/mode/sign) that
-    // fails for dynamic merchant VPAs like `-iservuqrsbrp@cbin`. Including `pn`
-    // makes some apps cross-check the name against the NPCI-registered merchant
-    // name; a mismatch surfaces as "This receiver is not accepting payments on
-    // this UPI ID". Dropping both mirrors the manual "Pay to UPI ID" flow,
-    // which is the one that actually works for this VPA — the UPI app fetches
-    // the real registered name from NPCI itself.
+    // IMPORTANT — the VPA (`merchant_vpa` in Firestore `bankibites_meta/upi_config`)
+    // must be a standard personal / P2PM handle (e.g. `@pnb`, `@okicici`, `@ybl`,
+    // `@paytm`). Bank-issued dynamic merchant QR sub-VPAs — notably Central Bank
+    // of India's iServe pattern `<digits>-iservuqr...@cbin` — are flagged by
+    // NPCI as scan-only and reject externally-dispatched `upi://pay` intents
+    // with "This receiver is not accepting payments on this UPI ID", even
+    // though manual entry and QR scanning of the same URL work. If a merchant
+    // QR VPA is ever set here, customers will have to scan the on-page QR.
     const upiUrl = 'upi://pay' +
       '?pa=' + upiSafe(VPA) +
+      '&pn=' + upiSafe(PAYEE) +
       '&am=' + amountNum.toFixed(2) +
       '&cu=INR' +
-      '&tn=' + upiSafe('Order ' + (order || txnRef));
+      '&tr=' + upiSafe(txnRef) +
+      '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
 
     qrFrame.innerHTML = '';
     new QRCode(qrFrame, {
@@ -1012,9 +1013,11 @@
       const iosApps = document.getElementById('iosApps');
       if (iosApps) {
         const query = '?pa=' + upiSafe(VPA) +
+                      '&pn=' + upiSafe(PAYEE) +
                       '&am=' + amountNum.toFixed(2) +
                       '&cu=INR' +
-                      '&tn=' + upiSafe('Order ' + (order || txnRef));
+                      '&tr=' + upiSafe(txnRef) +
+                      '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
         const schemes = {
           gpay:    'tez://upi/pay' + query,
           phonepe: 'phonepe://pay' + query,
