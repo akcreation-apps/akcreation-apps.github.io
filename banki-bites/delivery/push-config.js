@@ -102,11 +102,23 @@ export async function enablePush({ firebaseApp, db, uid, onForegroundMessage }) 
   // Persist the token on the partner's staff doc so the server can target
   // this device when assigning them an order. Firestore rule allows the
   // partner to self-write this field (see rule snippet below).
+  //
+  // Only write when the token actually changed vs the last one we saved
+  // locally — avoids writing on every PWA launch, which otherwise triggers
+  // every admin's live staff listener and burns read quota needlessly.
+  const LS_KEY = 'bb_delivery_fcm_token_v1';
+  const prev = (() => { try { return localStorage.getItem(LS_KEY); } catch { return null; } })();
+  if (prev === token) {
+    _enabled = true;
+    console.info('[push] FCM token unchanged — skipping Firestore write');
+    return;
+  }
   try {
     await updateDoc(doc(db, COL.STAFF, uid), {
       fcm_token: token,
       fcm_token_updated_at: serverTimestamp(),
     });
+    try { localStorage.setItem(LS_KEY, token); } catch {}
     _enabled = true;
     console.info('[push] FCM token registered');
   } catch (err) {

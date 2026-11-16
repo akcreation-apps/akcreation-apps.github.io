@@ -210,6 +210,11 @@ export async function renderDashboard(root, db) {
         </button>
       </div>
     </div>
+    <!-- Last-fetched stamp so admin always knows how old the cached analytics
+         are. Painted by refresh() from the cache's fetchedAt field. -->
+    <div id="dashLastFetched" class="text-muted small" style="margin:-4px 0 10px 2px; font-size:0.78rem;">
+      <i class="fas fa-clock" aria-hidden="true"></i> <span data-el="text">Checking…</span>
+    </div>
 
     <div class="dash-source" role="tablist" aria-label="Data source">
       <button type="button" class="dash-source-btn is-active" data-source="food" role="tab" aria-selected="true">
@@ -351,25 +356,57 @@ export async function renderDashboard(root, db) {
         b.classList.toggle('is-active', active);
         b.setAttribute('aria-selected', active ? 'true' : 'false');
       });
-      await refresh(root, db);
+      // Source toggle (Food ↔ Grocery) — use cache for the newly-selected
+      // source if present. Hitting Refresh is the explicit path to a fresh
+      // pull.
+      await refresh(root, db, { force: false });
     });
   });
-  await refresh(root, db);
+  // Mount: use cache if present so opening the Dashboard tab is free.
+  await refresh(root, db, { force: false });
   document.getElementById('dashRefresh').addEventListener('click', async () => {
+    // Confirm before burning Firestore reads — the dashboard refresh pulls
+    // orders + partners + staff + customers + fee rules, which can run into
+    // hundreds of reads on a busy business. Everything the admin sees until
+    // they click Refresh comes from the local cache.
+    const ok = await Swal.fire({
+      icon: 'warning',
+      title: 'Refresh from Firestore?',
+      html: 'This re-reads orders, partners, staff, customers and fee rules — can cost <strong>several hundred Firestore reads</strong>. The current view is served from cache; refresh only when you need the latest numbers.',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, refresh now',
+      cancelButtonText: 'Keep cached',
+      confirmButtonColor: '#FF6B35',
+    });
+    if (!ok.isConfirmed) return;
     const btn = document.getElementById('dashRefresh');
     btn.disabled = true;
     btn.classList.add('is-loading');
     try {
-      // Refresh both this Dashboard's data AND the Staff/Earnings cache so the
-      // admin doesn't have to re-open the Delivery tab to see updated payouts.
-      await Promise.all([refresh(root, db), refreshStaffData(db).catch(e => console.warn('[dashboard] staff refresh skipped:', e.message))]);
+      // Explicit refresh → force Firestore fetch AND re-fetch the shared
+      // Staff/Earnings cache so admin doesn't need to re-open Delivery tab.
+      await Promise.all([refresh(root, db, { force: true }), refreshStaffData(db).catch(e => console.warn('[dashboard] staff refresh skipped:', e.message))]);
     } finally {
       btn.disabled = false;
       btn.classList.remove('is-loading');
     }
   });
   document.getElementById('dashFeeRules').addEventListener('click', () => openFeeRulesEditor(db, root));
-  document.getElementById('dashShareSummary').addEventListener('click', () => shareDailySummary());
+  document.getElementById('dashShareSummary').addEventListener('click', async () => {
+    const btn = document.getElementById('dashShareSummary');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    try {
+      // Share-summary ALWAYS wants fresh numbers — the message goes into the
+      // team WhatsApp group so stale data would be embarrassing. Force-refresh
+      // the dashboard, then let shareDailySummary() read the now-current cache.
+      await refresh(root, db, { force: true });
+      shareDailySummary();
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+    }
+  });
 }
 
 async function openFeeRulesEditor(db, root) {
@@ -519,7 +556,8 @@ async function subscribeMaintenanceToggle(root, db) {
         b.classList.toggle('is-active', active);
         b.setAttribute('aria-selected', active ? 'true' : 'false');
       });
-      await refresh(root, db);
+      // Switching source — use cache if we have one for Food; don't auto-fetch.
+      await refresh(root, db, { force: false });
     }
   };
   // Detach any previous listener from an earlier render.
@@ -564,7 +602,83 @@ function wireRangeControls(root, db) {
   });
 }
 
-async function refresh(root, db) {
+// --------------------------------------------------------------------------
+// Dashboard localStorage cache. Policy:
+//   • Only the "Refresh" button (and other explicit force-fetch actions like
+//     "Share summary") hit Firestore. Everything else (initial mount, range
+//     changes, source toggle, maintenance-flag live update) reads from cache.
+//   • Cache lives per source (food / grocery) so switching source doesn't
+//     invalidate the other one. A 24-hour staleness fence prevents truly old
+//     data from being served if the admin never clicks Refresh.
+// --------------------------------------------------------------------------
+const DASH_CACHE_KEY = 'bb_dashboard_cache_v1';
+const DASH_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+// Firestore Timestamp instances have a .toDate() method that's lost after
+// JSON.stringify — we'd get {seconds, nanoseconds} back and every downstream
+// toDateSafe() call would fail. Normalise timestamps + Date objects to ISO
+// strings on write; toDateSafe() handles ISO via its `new Date(v)` fallback.
+function _normalizeForCache(v) {
+  if (v == null) return v;
+  if (typeof v !== 'object') return v;
+  if (typeof v.toDate === 'function') { try { return v.toDate().toISOString(); } catch { return null; } }
+  if (v instanceof Date) return v.toISOString();
+  if (Array.isArray(v)) return v.map(_normalizeForCache);
+  const out = {};
+  for (const k in v) if (Object.prototype.hasOwnProperty.call(v, k)) out[k] = _normalizeForCache(v[k]);
+  return out;
+}
+function _loadDashCache() {
+  try {
+    const raw = localStorage.getItem(DASH_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === 'object') ? parsed : {};
+  } catch { return {}; }
+}
+function _saveDashCache(next) {
+  try { localStorage.setItem(DASH_CACHE_KEY, JSON.stringify(next)); } catch {}
+}
+function _getCachedBySource(source) {
+  const all = _loadDashCache();
+  const slot = all[source];
+  if (!slot) return null;
+  if (!slot.fetchedAt || (Date.now() - slot.fetchedAt) > DASH_CACHE_TTL_MS) return null;
+  return slot;
+}
+function _putCachedBySource(source, data) {
+  const all = _loadDashCache();
+  all[source] = { fetchedAt: Date.now(), ..._normalizeForCache(data) };
+  _saveDashCache(all);
+}
+
+/**
+ * Human-readable "last fetched" label — informational only, no stale warning.
+ * Share Summary on the daily routine refreshes the cache automatically.
+ */
+function _paintLastFetched(root, fetchedAt) {
+  const el = root.querySelector('#dashLastFetched');
+  if (!el) return;
+  const textEl = el.querySelector('[data-el="text"]') || el;
+  if (!fetchedAt) {
+    textEl.textContent = 'No cached data yet — click Refresh or Share summary to load analytics';
+    return;
+  }
+  const now = Date.now();
+  const diffMs = now - fetchedAt;
+  const d = new Date(fetchedAt);
+  const sameDay = new Date().toDateString() === d.toDateString();
+  const yesterday = new Date(now - 86400000).toDateString() === d.toDateString();
+  const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const dayStr = sameDay ? 'Today' : yesterday ? 'Yesterday' : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  let relative = '';
+  if (diffMs < 60_000) relative = 'just now';
+  else if (diffMs < 3_600_000) relative = `${Math.floor(diffMs / 60_000)} min ago`;
+  else if (diffMs < 86_400_000) relative = `${Math.floor(diffMs / 3_600_000)} h ago`;
+  else relative = `${Math.floor(diffMs / 86_400_000)} d ago`;
+  textEl.innerHTML = `Analytics last fetched <strong>${dayStr} · ${timeStr}</strong> (${relative})`;
+}
+
+async function refresh(root, db, { force = false } = {}) {
   const kpisEl = root.querySelector('#dashKpis');
   kpisEl.classList.add('is-loading');
   // Mark all chart cards as loading so the spinner overlay appears on each
@@ -572,32 +686,56 @@ async function refresh(root, db) {
   const chartBodies = root.querySelectorAll('.chart-card-body');
   chartBodies.forEach(el => el.classList.add('is-loading'));
 
-  // Fetch window: driven by the range picker. Query the widest of {selected
-  // range, last-month-to-now} so KPIs like "MoM revenue" still work when the
-  // user picks a short range like Last 7d.
-  const mom = { from: startOfLastMonth(), to: new Date() };
-  const fetchFrom = state.range.from < mom.from ? state.range.from : mom.from;
-  const sinceTs = Timestamp.fromDate(fetchFrom);
+  // Fetch window: always pull the full MAX_FETCH_DAYS so the cache is a
+  // superset of any range the admin might later pick. Changing the range
+  // picker then becomes a pure client-side filter — zero Firestore reads.
+  const fetchFromCutoff = new Date(Date.now() - MAX_FETCH_DAYS * 86400000);
+  const sinceTs = Timestamp.fromDate(fetchFromCutoff);
   // Swap the collection based on the Food/Grocery toggle. Everything else
   // (partners, staff, customers, fee rules) is shared across both flows.
   const sourceCol = state.source === 'grocery' ? COL.GROCERY_ORDERS : COL.ORDERS;
-  const [ordersRaw, partnersSnap, staffSnap, customersSnap, rules] = await Promise.all([
-    fetchOrdersPaged(db, sourceCol, sinceTs),
-    getDocs(collection(db, COL.PARTNERS)),
-    getDocs(collection(db, COL.STAFF)),
-    getDocs(collection(db, COL.CUSTOMERS)),
-    loadFeeRules(db, { autoSeed: true }),
-  ]);
 
-  const ordersAll = ordersRaw.map(raw =>
-    state.source === 'grocery' ? normaliseGroceryOrder(raw) : raw
-  );
-  const partners = [];
-  partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
-  const staff = [];
-  staffSnap.forEach(d => staff.push({ uid: d.id, ...d.data() }));
-  const customers = [];
-  customersSnap.forEach(d => customers.push({ phone: d.id, ...d.data() }));
+  // Cache path: if not forcing a refresh and we have a usable cached payload
+  // for this source, skip Firestore entirely. The admin only pays read cost
+  // when they explicitly click Refresh or Share Summary.
+  let ordersAll, partners, staff, customers, rules;
+  const cached = !force ? _getCachedBySource(state.source) : null;
+  if (cached) {
+    ordersAll = cached.ordersAll || [];
+    partners  = cached.partners  || [];
+    staff     = cached.staff     || [];
+    customers = cached.customers || [];
+    rules     = cached.rules     || null;
+    // Fee rules are tiny but can still be served from cache; fall back to a
+    // local-only read if the cache didn't have them yet.
+    if (!rules) {
+      try { rules = await loadFeeRules(db, { autoSeed: true }); } catch {}
+    }
+    _paintLastFetched(root, cached.fetchedAt);
+  } else {
+    // Either the admin hit Refresh (force) OR there's no cache yet (first
+    // visit on this browser) — in both cases we do a full Firestore fetch so
+    // the dashboard always has data to render.
+    const [ordersRaw, partnersSnap, staffSnap, customersSnap, feeRules] = await Promise.all([
+      fetchOrdersPaged(db, sourceCol, sinceTs),
+      getDocs(collection(db, COL.PARTNERS)),
+      getDocs(collection(db, COL.STAFF)),
+      getDocs(collection(db, COL.CUSTOMERS)),
+      loadFeeRules(db, { autoSeed: true }),
+    ]);
+    ordersAll = ordersRaw.map(raw =>
+      state.source === 'grocery' ? normaliseGroceryOrder(raw) : raw
+    );
+    partners = [];
+    partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
+    staff = [];
+    staffSnap.forEach(d => staff.push({ uid: d.id, ...d.data() }));
+    customers = [];
+    customersSnap.forEach(d => customers.push({ phone: d.id, ...d.data() }));
+    rules = feeRules;
+    _putCachedBySource(state.source, { ordersAll, partners, staff, customers, rules });
+    _paintLastFetched(root, Date.now());
+  }
 
   // Cached so the "Share summary" button can rebuild today's numbers without
   // a second Firestore read. Covers whichever source (food/grocery) is live.

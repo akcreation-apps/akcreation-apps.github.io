@@ -96,7 +96,24 @@ export async function renderStaff(root, db) {
     <div id="staffList" class="card-list"><div class="bb-loader-block">Loading delivery partners…</div></div>
   `;
   document.getElementById('addStaffBtn').addEventListener('click', () => openEditor(db, null, root));
-  document.getElementById('copyEtaBtn').addEventListener('click', () => copyEtaRanking(root));
+  document.getElementById('copyEtaBtn').addEventListener('click', async () => {
+    // Share ETA ranking ALWAYS wants fresh numbers — the message goes into the
+    // partner WhatsApp group so a stale ranking would be embarrassing. Force
+    // a fresh pull of orders + staff + runs, re-render the cards, then copy.
+    // This is the only action in the Delivery tab that intentionally bypasses
+    // the cache (all other reads reuse _staffPagedCache's 2-min TTL).
+    const btn = document.getElementById('copyEtaBtn');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    try {
+      await refreshStaffOrders(db, { force: true });
+      await loadStaff(db, root, { force: true });
+      copyEtaRanking(root);
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+    }
+  });
   try { await whenChartReady(); } catch (e) { console.warn('[staff] Chart.js unavailable:', e.message); }
   wireStatsBlockResize(root.querySelector('.stats-block'));
   _staffFeeRules = await loadFeeRules(db);
