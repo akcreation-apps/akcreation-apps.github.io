@@ -24,7 +24,7 @@
 // Safe to commit — VAPID public keys are not secrets.
 export const VAPID_PUBLIC_KEY = 'BFYKsQXpOrZUTm6ASGQVHZMavmQxk4axAHfxeSIBJ0K2wFGY-5L-Jnw6VLfkoN9EXYrQPPX0MNa7t84PGd-fyOo';
 
-import { doc, updateDoc, serverTimestamp }
+import { doc, updateDoc, deleteField, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { getMessaging, getToken, onMessage, isSupported }
   from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-messaging.js';
@@ -103,26 +103,57 @@ export async function enablePush({ firebaseApp, db, uid, onForegroundMessage }) 
   // this device when assigning them an order. Firestore rule allows the
   // partner to self-write this field (see rule snippet below).
   //
-  // Only write when the token actually changed vs the last one we saved
-  // locally — avoids writing on every PWA launch, which otherwise triggers
-  // every admin's live staff listener and burns read quota needlessly.
-  const LS_KEY = 'bb_delivery_fcm_token_v1';
-  const prev = (() => { try { return localStorage.getItem(LS_KEY); } catch { return null; } })();
+  // Tokens live as entries inside `fcm_tokens` — a map keyed by token string
+  // — so a partner signed in on multiple devices receives pushes on all of
+  // them. Only write when the token actually changed vs the last one we
+  // saved locally, otherwise every PWA launch triggers every admin's live
+  // staff listener and burns read quota needlessly.
+  const prev = (() => { try { return localStorage.getItem(LAST_TOKEN_LS_KEY); } catch { return null; } })();
   if (prev === token) {
     _enabled = true;
+    _activeToken = token;
     console.info('[push] FCM token unchanged — skipping Firestore write');
     return;
   }
   try {
+    const ua = (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent.slice(0, 200) : '';
+    // Dotted-key update adds (or overwrites) just this one entry inside the
+    // `fcm_tokens` map. Other devices' entries are untouched.
     await updateDoc(doc(db, COL.STAFF, uid), {
-      fcm_token: token,
-      fcm_token_updated_at: serverTimestamp(),
+      [`fcm_tokens.${token}`]: { addedAt: serverTimestamp(), ua },
     });
-    try { localStorage.setItem(LS_KEY, token); } catch {}
+    try { localStorage.setItem(LAST_TOKEN_LS_KEY, token); } catch {}
     _enabled = true;
+    _activeToken = token;
     console.info('[push] FCM token registered');
   } catch (err) {
     console.warn('[push] failed to save FCM token:', err);
+  }
+}
+
+// Module-level: the token minted for THIS device in the current session.
+// disablePushForThisDevice() needs it to know which map entry to delete.
+let _activeToken = null;
+const LAST_TOKEN_LS_KEY = 'bb_delivery_fcm_token_v1';
+
+/**
+ * Called on sign-out. Removes THIS device's FCM token from the partner's
+ * staff doc (other devices stay registered and keep receiving pushes) and
+ * clears the local cache so a subsequent sign-in re-registers.
+ */
+export async function disablePushForThisDevice({ db, uid }) {
+  const token = _activeToken || (() => { try { return localStorage.getItem(LAST_TOKEN_LS_KEY); } catch { return null; } })();
+  try { localStorage.removeItem(LAST_TOKEN_LS_KEY); } catch {}
+  _activeToken = null;
+  _enabled = false;
+  if (!token || !db || !uid) return;
+  try {
+    await updateDoc(doc(db, COL.STAFF, uid), {
+      [`fcm_tokens.${token}`]: deleteField(),
+    });
+    console.info('[push] FCM token removed for this device');
+  } catch (err) {
+    console.warn('[push] failed to remove FCM token:', err);
   }
 }
 
@@ -140,7 +171,7 @@ match /bankibites_delivery_staff/{uid} {
       request.auth != null
       && request.auth.uid == uid
       && request.resource.data.diff(resource.data).affectedKeys()
-           .hasOnly(['is_online', 'fcm_token', 'fcm_token_updated_at'])
+           .hasOnly(['is_online', 'fcm_token', 'fcm_token_updated_at', 'fcm_tokens'])
     );
 }
 

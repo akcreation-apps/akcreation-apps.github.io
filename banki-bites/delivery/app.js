@@ -1,7 +1,7 @@
 import { getDb as getDbBase, getAuthInstance as getAuthBase, getBankiBitesApp, COL } from '../firebase-config.js';
 import { initNotifySync, syncOrder } from '../notify-sync.js';
 import { armAudioOnFirstGesture, primeAudioNow, requestAlertPermission, startRinging, stopRinging } from './ring.js';
-import { enablePush } from './push-config.js';
+import { enablePush, disablePushForThisDevice } from './push-config.js';
 
 const APP_NAME = 'bankibites-delivery';
 const getDb = () => getDbBase(APP_NAME);
@@ -194,6 +194,16 @@ let currentUser = null;
 
   $('#signOutBtn').addEventListener('click', async () => {
     if (unsub) unsub();
+    // Remove THIS device's FCM token from the partner's staff doc so pushes
+    // stop reaching this phone after sign-out. Other devices (if the partner
+    // is also signed in elsewhere) keep their own tokens and keep receiving.
+    // Must run BEFORE signOut while auth is still valid for the Firestore write.
+    try {
+      if (currentUser) {
+        const db = await getDb();
+        await disablePushForThisDevice({ db, uid: currentUser.uid });
+      }
+    } catch (err) { console.warn('[delivery] push token cleanup failed:', err); }
     await signOut(auth);
     location.reload();
   });
