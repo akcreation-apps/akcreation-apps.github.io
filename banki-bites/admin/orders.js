@@ -5,7 +5,7 @@ import { invalidateCustomersCache } from './customers-tab.js';
 import { invalidateStaffPagedCache } from './staff.js';
 import { loadCustomers, searchCustomers, openCustomerModal, setActiveOffer, clearActiveOffer } from './customers.js';
 import {
-  collection, query, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, where, Timestamp, orderBy, limit, startAfter,
+  collection, query, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc, getDocs, where, Timestamp, orderBy, limit, startAfter, deleteField,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import {
   loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
@@ -316,6 +316,20 @@ function formatEta(ts) {
   if (!ts?.toDate) return '';
   const d = ts.toDate();
   return d.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+// Short relative time for ack chips: "4s ago", "2m ago", "1h ago", "3d ago".
+function relTimeShort(ts) {
+  const ms = ts?.toMillis?.() ?? (ts instanceof Date ? ts.getTime() : null);
+  if (!ms) return '';
+  const diff = Math.max(0, Date.now() - ms);
+  const s = Math.floor(diff / 1000);
+  if (s < 60)  return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60)  return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24)  return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
 }
 
 // Normalises a user-typed phone number: strips +91/91 prefix, spaces, dashes,
@@ -855,6 +869,23 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         ? '<span class="status-pill status-paid">PAID</span>'
         : '<span class="status-pill status-unpaid">UNPAID</span>');
 
+  // Partner Approve/Reject chip: single at-a-glance signal that proves a human
+  // tapped a button on the partner's app — no FCM dependency.
+  //   • Accepted  — partner tapped Approve (green)
+  //   • Rejected  — partner tapped Reject (red); admin needs to reassign
+  //   • Waiting   — assigned but neither button tapped yet (gray)
+  const ackChips = (() => {
+    if (!o.delivery_staff_id) return '';
+    if (o.status === 'delivered' || o.status === 'cancelled' || o.status === 'fake') return '';
+    if (o.partner_approved_at) {
+      return `<span class="status-pill status-ack-approved" title="Partner approved — order is actively on their plate"><i class="fas fa-check"></i> Accepted ${relTimeShort(o.partner_approved_at)}</span>`;
+    }
+    if (o.partner_rejected_at) {
+      return `<span class="status-pill status-ack-rejected" title="Partner rejected — reassign to someone else"><i class="fas fa-xmark"></i> Rejected ${relTimeShort(o.partner_rejected_at)}</span>`;
+    }
+    return `<span class="status-pill status-ack-waiting" title="Assigned but partner hasn't tapped Approve or Reject yet"><i class="fas fa-hourglass-half"></i> Waiting</span>`;
+  })();
+
   // Courier payout at-a-glance chip so admins don't need to expand each
   // order just to see what the rider earns on it.
   const payoutChip = (() => {
@@ -914,6 +945,7 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
         <span class="status-pill status-${status}">${STATUS_LABEL[status] || status.replace('_', ' ')}</span>
         ${paymentBadge}
         ${payoutChip}
+        ${ackChips}
         <i class="fas fa-chevron-down order-chevron" aria-hidden="true"></i>
       </div>
     </summary>
@@ -2165,6 +2197,14 @@ function renderOrderCard(db, o, staff, customers, feeRules, suggestedName = '') 
       patch.collect_amount = null;
     }
     if (staffId && !o.assigned_at) patch.assigned_at = Timestamp.now();
+    // Reassignment (or un-assignment) resets the Approve/Reject state — the
+    // new partner hasn't decided yet, and leaving stale chips on screen would
+    // mislead the admin into thinking they had.
+    if (staffId !== o.delivery_staff_id) {
+      if (staffId && o.delivery_staff_id) patch.assigned_at = Timestamp.now(); // bump clock for the new partner
+      if (o.partner_approved_at) patch.partner_approved_at = deleteField();
+      if (o.partner_rejected_at) patch.partner_rejected_at = deleteField();
+    }
 
     // ETA is admin-controlled: whatever is in the datetime-local input at Save
     // time gets written, and only then. There is no auto-set on assignment or

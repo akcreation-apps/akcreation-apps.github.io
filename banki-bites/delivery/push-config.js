@@ -175,6 +175,19 @@ match /bankibites_delivery_staff/{uid} {
     );
 }
 
+// Delivery-partner Approve/Reject on assigned orders: allow the assigned
+// partner to stamp partner_approved_at / partner_rejected_at on THEIR own
+// order only — nothing else. Admin keeps full write access.
+match /bankibites_orders/{orderId} {
+  allow update: if isAdmin()
+    || (
+      request.auth != null
+      && resource.data.delivery_staff_id == request.auth.uid
+      && request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['partner_approved_at', 'partner_rejected_at'])
+    );
+}
+
 
 =============================================================================
    Server-side send (Python — drop into your Flask notification server next

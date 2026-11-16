@@ -443,11 +443,18 @@ details.entity-card[open] > .order-summary .order-chevron {
 .status-unpaid { background: #fee2e2; color: #991b1b; }
 .status-payout        { background: #fef3c7; color: #92400e; }
 .status-payout-paid   { background: #dcfce7; color: #166534; }
+/* Partner Approve/Reject chips — explicit human-tap signal, no FCM needed. */
+.status-ack-waiting   { background: #e5e7eb; color: #374151; }
+.status-ack-approved  { background: #dcfce7; color: #166534; }
+.status-ack-rejected  { background: #fee2e2; color: #991b1b; }
 @media (prefers-color-scheme: dark) {
   .status-paid   { background: #0f3320; color: #86efac; }
   .status-unpaid { background: #3a1414; color: #fca5a5; }
   .status-payout      { background: #3a2a0d; color: #fcd34d; }
   .status-payout-paid { background: #0f3320; color: #86efac; }
+  .status-ack-waiting  { background: #262b33; color: #cbd5e1; }
+  .status-ack-approved { background: #0f3320; color: #86efac; }
+  .status-ack-rejected { background: #3a1414; color: #fca5a5; }
 }
 
 /* ===== Order sections inside an open card ===== */

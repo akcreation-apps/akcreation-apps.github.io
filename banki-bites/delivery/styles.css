@@ -110,6 +110,61 @@
 .delivery-dual-actions .btn-delivered:focus { background: #15803d; color: #fff; }
 .delivery-dual-actions .btn-delivered:active { background: #166534; }
 
+/* Passive note shown after a partner has rejected an order — nothing to do
+   but wait for the admin to reassign. Visually neutral so it doesn't scream
+   like an error; just explains the state. */
+.rejected-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+.rejected-note i { font-size: 1rem; }
+@media (prefers-color-scheme: dark) {
+  .rejected-note {
+    background: #3a1414;
+    color: #fca5a5;
+    border-color: #7f1d1d;
+  }
+}
+
+/* Attention-grabbing gate prompt shown in the collapsed card summary for any
+   assigned order the partner hasn't approved or rejected yet. Amber + pulsing
+   icon so it reads as "action required" without being alarming like the red
+   rejection note. */
+.decision-prompt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.decision-prompt i { font-size: 1rem; animation: bb-decision-pulse 1.6s ease-in-out infinite; }
+@keyframes bb-decision-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.2); opacity: 0.75; }
+}
+@media (prefers-color-scheme: dark) {
+  .decision-prompt {
+    background: #3a2409;
+    color: #fdba74;
+    border-color: #7c2d12;
+  }
+}
+
 /* Secondary icon-only quick actions (Call, Map). Outlined "ghost" buttons —
    neutral surface, accent-coloured icon and border. Reads as a refined
    secondary action instead of a bright primary one. Hover fills with the

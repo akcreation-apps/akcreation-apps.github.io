@@ -324,6 +324,10 @@ let currentUser = null;
 
 let _listenerPrimed = false;
 let _ordersListTapBound = false;
+// Module-level so a partner with TWO undecided assigned orders can't double-tap
+// and have the second card's modal replace the first (SweetAlert2 only allows
+// one modal at a time). The second tap is ignored until the first resolves.
+let _decisionModalOpen = false;
 async function listenOrders(user) {
   if (unsub) unsub();
   _listenerPrimed = false;
@@ -660,6 +664,39 @@ function renderCard(db, o) {
        </a>`
     : '';
 
+  // Admin-visibility: on a freshly assigned order the partner MUST tap
+  // Approve or Reject before anything else. The modal gate (see toggle
+  // interceptor below) intercepts expansion so the partner can't peek at
+  // customer details before deciding — the decision IS the signal to admin.
+  //   • !approved && !rejected → modal pops on tap, card stays collapsed
+  //   • approved              → card auto-expands, normal Pick up button
+  //   • rejected              → card may be expanded to view the "waiting
+  //                             for reassign" note, but no actions remain
+  const needsDecision = o.status === 'assigned' && !o.partner_approved_at && !o.partner_rejected_at;
+  const wasRejected   = o.status === 'assigned' && !!o.partner_rejected_at;
+
+  const primaryActionHtml = (() => {
+    if (o.status === 'out_for_delivery') {
+      return `<div class="delivery-dual-actions">
+                <button class="btn btn-not-picked" data-act="undo">
+                  <i class="fas fa-times"></i> Not Picked Up
+                </button>
+                <button class="btn btn-delivered" data-act="next">
+                  <i class="fas fa-check"></i> Delivered
+                </button>
+              </div>`;
+    }
+    if (wasRejected) {
+      return `<div class="rejected-note" role="status">
+                <i class="fas fa-circle-info"></i>
+                You rejected this order. The admin will reassign it shortly.
+              </div>`;
+    }
+    return `<button class="btn done-btn" data-act="next">
+              <i class="fas fa-check"></i> ${o.status === 'assigned' ? 'Pick up' : 'Update'}
+            </button>`;
+  })();
+
   // Once delivered, the partner is read-only: no call, no status update.
   // Call button is only rendered when a phone number is actually present.
   const actionsBlock = isClosed
@@ -673,18 +710,7 @@ function renderCard(db, o) {
              ? `<a class="icon-action map-btn" href="${mapsHref}" target="_blank" rel="noopener noreferrer" aria-label="Open customer location in Google Maps" title="Open in Google Maps"><i class="fas fa-map-location-dot" aria-hidden="true"></i></a>`
              : ''}
          </div>
-         ${o.status === 'out_for_delivery' ? `
-           <div class="delivery-dual-actions">
-             <button class="btn btn-not-picked" data-act="undo">
-               <i class="fas fa-times"></i> Not Picked Up
-             </button>
-             <button class="btn btn-delivered" data-act="next">
-               <i class="fas fa-check"></i> Delivered
-             </button>
-           </div>` : `
-           <button class="btn done-btn" data-act="next">
-             <i class="fas fa-check"></i> ${o.status === 'assigned' ? 'Pick up' : 'Update'}
-           </button>`}
+         ${primaryActionHtml}
        </div>`;
 
   const deliveredMeta = o.status === 'delivered' && o.delivered_at?.toDate
@@ -718,25 +744,49 @@ function renderCard(db, o) {
     : '';
 
   // Auto-expand only the actively-out-for-delivery order so the driver sees
-  // the address + actions without an extra tap. Everything else stays collapsed.
+  // the address + actions without an extra tap. Also auto-expand assigned
+  // orders the partner has already approved — their decision is on record,
+  // so showing the full card on next render is a nicer flow than making
+  // them tap twice (once to approve, once to view).
   if (o.status === 'out_for_delivery') card.open = true;
+  if (o.status === 'assigned' && o.partner_approved_at) card.open = true;
+
+  // needsDecision: hide customer PII (name, address, items, payment chips)
+  // until the partner has tapped Approve or Reject. All they see is the
+  // restaurant name and a bright prompt — makes the decision the gate, and
+  // prevents them from scrolling past the prompt to peek at the address.
+  const summaryMainHtml = needsDecision
+    ? `<div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}</div>
+       ${hasAddress ? `
+         <div class="delivery-summary-addr">
+           <i class="fas fa-location-dot" aria-hidden="true"></i>
+           <span>${escapeHtml(c.address)}</span>
+         </div>` : ''}
+       ${etaSummaryChip ? `
+         <div class="delivery-summary-sub">${etaSummaryChip}</div>` : ''}
+       <div class="decision-prompt" role="status">
+         <i class="fas fa-hand-pointer" aria-hidden="true"></i>
+         <span>Tap to approve or reject this delivery</span>
+       </div>`
+    : `<div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</div>
+       ${(hasName || hasAddress) ? `
+         <div class="delivery-summary-addr">
+           <i class="fas fa-location-dot" aria-hidden="true"></i>
+           <span>${hasName ? `<strong>${escapeHtml(displayCustomerName)}</strong>` : ''}${hasName && hasAddress ? ' · ' : ''}${hasAddress ? escapeHtml(c.address) : ''}${hasItems ? ` · ${items.length} item${items.length === 1 ? '' : 's'}` : ''}</span>
+         </div>` : (hasItems ? `<div class="delivery-summary-sub"><span class="ec-meta">${items.length} item${items.length === 1 ? '' : 's'}</span></div>` : '')}
+       ${(!isClosed && (etaSummaryChip || paymentSummaryChip)) ? `
+         <div class="delivery-summary-sub">
+           ${etaSummaryChip}
+           ${paymentSummaryChip}
+         </div>` : ''}
+       ${deliveredMeta}
+       ${wasRejected ? `<div class="delivery-summary-sub"><span class="status-pill status-ack-rejected"><i class="fas fa-xmark"></i> You rejected this</span></div>` : ''}`;
 
   card.innerHTML = `
     <summary class="delivery-summary">
       <div class="ec-row">
         <div class="delivery-summary-main">
-          <div class="ec-title" title="${escapeHtml(restaurantLabel || '—')}">${escapeHtml(truncateName(restaurantLabel || '—'))}${totalLabel}</div>
-          ${(hasName || hasAddress) ? `
-            <div class="delivery-summary-addr">
-              <i class="fas fa-location-dot" aria-hidden="true"></i>
-              <span>${hasName ? `<strong>${escapeHtml(displayCustomerName)}</strong>` : ''}${hasName && hasAddress ? ' · ' : ''}${hasAddress ? escapeHtml(c.address) : ''}${hasItems ? ` · ${items.length} item${items.length === 1 ? '' : 's'}` : ''}</span>
-            </div>` : (hasItems ? `<div class="delivery-summary-sub"><span class="ec-meta">${items.length} item${items.length === 1 ? '' : 's'}</span></div>` : '')}
-          ${(!isClosed && (etaSummaryChip || paymentSummaryChip)) ? `
-            <div class="delivery-summary-sub">
-              ${etaSummaryChip}
-              ${paymentSummaryChip}
-            </div>` : ''}
-          ${deliveredMeta}
+          ${summaryMainHtml}
         </div>
         <span class="status-pill status-${o.status}">${pillLabel(o.status)}</span>
         <i class="fas fa-chevron-down delivery-chevron" aria-hidden="true"></i>
@@ -758,6 +808,121 @@ function renderCard(db, o) {
       ${actionsBlock}
     </div>
   `;
+
+  // Gate: tapping an undecided assigned-order card does NOT expand it. Instead
+  // we close it immediately and open a modal that forces Approve or Reject.
+  // Using the `toggle` event (fires after the browser has already flipped
+  // card.open) lets us catch the open and reverse it in the same tick before
+  // the body paints — snappier than preventing the summary click. The guard
+  // (_decisionModalOpen) is module-level so stacking is prevented ACROSS
+  // cards too (partner has two new orders → second tap waits for first modal).
+  if (needsDecision) {
+    card.addEventListener('toggle', async () => {
+      if (!card.open) return;
+      if (_decisionModalOpen) return;
+      card.open = false;
+      _decisionModalOpen = true;
+      try {
+        // Modal body: restaurant + enough decision context (address + optional
+        // Maps link, ETA) for the partner to accept or reject without seeing
+        // customer PII (name/phone). All text is escaped; all styling is inline
+        // so it renders predictably inside SweetAlert2 regardless of CSS order.
+        const modalParts = [
+          `<div style="font-size:1rem;font-weight:700;color:#111827;margin-bottom:10px;text-align:left;">
+             <i class="fas fa-store" style="color:#6b7280;margin-right:6px;"></i>${escapeHtml(restaurantLabel || 'Restaurant')}
+           </div>`,
+        ];
+        // Unified location card — address + Maps link together so they read as
+        // one block. Link drops to its own line below the address when space
+        // is tight, which avoids awkward mid-address wrapping.
+        if (hasAddress || hasGps) {
+          modalParts.push(
+            `<div style="display:flex;gap:10px;align-items:flex-start;text-align:left;padding:10px 12px;margin-bottom:10px;background:#f3f4f6;border-radius:10px;">
+               <i class="fas fa-location-dot" style="margin-top:2px;color:#2563eb;font-size:1rem;flex-shrink:0;"></i>
+               <div style="flex:1;min-width:0;">
+                 ${hasAddress ? `<div style="color:#1f2937;font-size:0.9rem;line-height:1.4;word-wrap:break-word;">${escapeHtml(c.address)}</div>` : ''}
+                 ${hasGps ? `
+                   <a href="${mapsHref}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;margin-top:${hasAddress ? '6px' : '0'};font-size:0.82rem;font-weight:600;color:#2563eb;text-decoration:none;">
+                     <i class="fas fa-map-location-dot"></i>Open in Google Maps
+                   </a>` : ''}
+               </div>
+             </div>`
+          );
+        }
+        // ETA row — same visual weight as the location card, below it.
+        if (o.eta?.toDate) {
+          const etaDate = o.eta.toDate();
+          const minsLeft = Math.round((etaDate.getTime() - Date.now()) / 60000);
+          const etaText  = etaDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          const isLate   = minsLeft < 0;
+          const isSoon   = !isLate && minsLeft <= 10;
+          const relative = isLate
+            ? `${Math.abs(minsLeft)} min late`
+            : (isSoon ? `${minsLeft} min left` : `in ${minsLeft} min`);
+          const bg = isLate ? '#fee2e2' : (isSoon ? '#fef3c7' : '#dbeafe');
+          const fg = isLate ? '#991b1b' : (isSoon ? '#92400e' : '#1e40af');
+          modalParts.push(
+            `<div style="display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;margin-bottom:12px;background:${bg};color:${fg};border-radius:10px;font-size:0.9rem;">
+               <i class="fas fa-stopwatch" style="font-size:1rem;flex-shrink:0;"></i>
+               <span>Deliver by <strong>${etaText}</strong> · ${relative}</span>
+             </div>`
+          );
+        }
+        modalParts.push(
+          `<div style="text-align:left;font-size:0.82rem;color:#6b7280;line-height:1.4;">
+             Approve to see customer name and begin pick-up. Reject if you can't take it — admin will reassign.
+           </div>`
+        );
+        const res = await Swal.fire({
+          icon: 'question',
+          title: 'New delivery assigned',
+          html: modalParts.join(''),
+          showDenyButton: true,
+          confirmButtonText: '<i class="fas fa-check"></i> Approve',
+          denyButtonText:    '<i class="fas fa-times"></i> Reject',
+          confirmButtonColor: '#16a34a',
+          denyButtonColor:    '#dc2626',
+          reverseButtons: true,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        });
+        if (res.isConfirmed)   await _approveThisOrder();
+        else if (res.isDenied) await _rejectThisOrder();
+      } finally {
+        _decisionModalOpen = false;
+      }
+    });
+  }
+
+  async function _approveThisOrder() {
+    try {
+      window.bbBusy('Approving…');
+      await updateDoc(doc(db, COL.ORDERS, o.id), {
+        partner_approved_at: Timestamp.now(),
+      });
+      stopRinging();
+      window.bbDone();
+    } catch (e) {
+      window.bbDone();
+      // Awaited so the partner actually sees the error before the toggle
+      // handler releases _decisionModalOpen and another modal could stack.
+      await Swal.fire({ icon: 'error', title: 'Could not approve', text: e.message });
+    }
+  }
+
+  async function _rejectThisOrder() {
+    try {
+      window.bbBusy('Rejecting…');
+      await updateDoc(doc(db, COL.ORDERS, o.id), {
+        partner_rejected_at: Timestamp.now(),
+      });
+      stopRinging();
+      window.bbDone();
+    } catch (e) {
+      window.bbDone();
+      await Swal.fire({ icon: 'error', title: 'Could not reject', text: e.message });
+    }
+  }
 
   card.querySelector('[data-act="undo"]')?.addEventListener('click', async () => {
     const ok = await Swal.fire({
