@@ -977,18 +977,20 @@
       .replace(/%40/g, '@')
       .replace(/%20/g, '+');
 
-    // NOTE: `tr` (merchant txn ref) is intentionally omitted. Including it makes
-    // UPI apps treat the intent as a merchant-collect call and ask NPCI to
-    // validate a merchant handshake (mc/mode/sign). For VPAs registered as
-    // dynamic merchant QRs (e.g. `-iservuqrsbrp@cbin`) that handshake fails and
-    // the app surfaces "This receiver is not accepting payments on this UPI ID"
-    // even though the same VPA works via manual "Pay to UPI ID" entry.
+    // NOTE: `tr` (merchant txn ref) and `pn` (payee name) are intentionally
+    // omitted. Including `tr` makes UPI apps treat the intent as a merchant-
+    // collect call and run a signed merchant handshake (mc/mode/sign) that
+    // fails for dynamic merchant VPAs like `-iservuqrsbrp@cbin`. Including `pn`
+    // makes some apps cross-check the name against the NPCI-registered merchant
+    // name; a mismatch surfaces as "This receiver is not accepting payments on
+    // this UPI ID". Dropping both mirrors the manual "Pay to UPI ID" flow,
+    // which is the one that actually works for this VPA — the UPI app fetches
+    // the real registered name from NPCI itself.
     const upiUrl = 'upi://pay' +
       '?pa=' + upiSafe(VPA) +
-      '&pn=' + upiSafe(PAYEE) +
       '&am=' + amountNum.toFixed(2) +
       '&cu=INR' +
-      '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
+      '&tn=' + upiSafe('Order ' + (order || txnRef));
 
     qrFrame.innerHTML = '';
     new QRCode(qrFrame, {
@@ -1010,10 +1012,9 @@
       const iosApps = document.getElementById('iosApps');
       if (iosApps) {
         const query = '?pa=' + upiSafe(VPA) +
-                      '&pn=' + upiSafe(PAYEE) +
                       '&am=' + amountNum.toFixed(2) +
                       '&cu=INR' +
-                      '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
+                      '&tn=' + upiSafe('Order ' + (order || txnRef));
         const schemes = {
           gpay:    'tez://upi/pay' + query,
           phonepe: 'phonepe://pay' + query,
