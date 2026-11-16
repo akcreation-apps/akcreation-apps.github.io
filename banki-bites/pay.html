@@ -977,12 +977,17 @@
       .replace(/%40/g, '@')
       .replace(/%20/g, '+');
 
+    // NOTE: `tr` (merchant txn ref) is intentionally omitted. Including it makes
+    // UPI apps treat the intent as a merchant-collect call and ask NPCI to
+    // validate a merchant handshake (mc/mode/sign). For VPAs registered as
+    // dynamic merchant QRs (e.g. `-iservuqrsbrp@cbin`) that handshake fails and
+    // the app surfaces "This receiver is not accepting payments on this UPI ID"
+    // even though the same VPA works via manual "Pay to UPI ID" entry.
     const upiUrl = 'upi://pay' +
       '?pa=' + upiSafe(VPA) +
       '&pn=' + upiSafe(PAYEE) +
       '&am=' + amountNum.toFixed(2) +
       '&cu=INR' +
-      '&tr=' + upiSafe(txnRef) +
       '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
 
     qrFrame.innerHTML = '';
@@ -1008,7 +1013,6 @@
                       '&pn=' + upiSafe(PAYEE) +
                       '&am=' + amountNum.toFixed(2) +
                       '&cu=INR' +
-                      '&tr=' + upiSafe(txnRef) +
                       '&tn=' + upiSafe(PAYEE + ' Order ' + (order || txnRef));
         const schemes = {
           gpay:    'tez://upi/pay' + query,
