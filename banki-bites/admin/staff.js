@@ -490,27 +490,45 @@ function copyEtaRanking(root) {
   const footer = '\n\n_Team BankiBites 💚_';
   const text = header + body + footer;
 
-  // Copy to clipboard synchronously via execCommand (modern async clipboard
-  // API loses the race with window.location.href on mobile), then open the
-  // delivery-partners WhatsApp group. chat.whatsapp.com URLs can't carry a
-  // prefilled ?text= payload — so admin pastes once inside the group.
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.setAttribute('readonly', '');
-  ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
-  ta.style.width = '1px'; ta.style.height = '1px';
-  ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
-  document.body.appendChild(ta);
-  ta.focus(); ta.select();
-  try { document.execCommand('copy'); } catch (e) {}
-  document.body.removeChild(ta);
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).catch(() => {});
-    }
-  } catch (e) {}
-
-  window.location.href = 'https://chat.whatsapp.com/JVivP6n7w7D5xYkH29J9oL';
+  // IMPORTANT: the outer handler did two `await`s (refreshStaffOrders +
+  // loadStaff) before reaching this function. On mobile, that means the
+  // original button click is no longer treated as a "fresh user gesture",
+  // and assigning window.location.href straight here silently fails. We
+  // wrap the copy + navigate pair behind a Swal confirm — the Share-now
+  // click inside that Swal IS a fresh gesture, so clipboard + redirect
+  // both succeed.
+  Swal.fire({
+    title: 'ETA ranking ready',
+    html: `<div style="text-align:left;max-height:40vh;overflow:auto;white-space:pre-wrap;font-size:0.82rem;background:var(--surface,#f8fafc);padding:10px;border-radius:8px;border:1px solid var(--border,#e2e8f0)">${escapeHtml(text)}</div>
+           <p class="text-muted small mt-2 mb-0" style="text-align:left">Tap <strong>Copy & open WhatsApp</strong> to copy the message and open the delivery-partners group. Paste inside the group to send.</p>`,
+    width: 560,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fab fa-whatsapp"></i> Copy & open WhatsApp',
+    cancelButtonText: 'Close',
+    confirmButtonColor: '#16a34a',
+    reverseButtons: true,
+  }).then(res => {
+    if (!res.isConfirmed) return;
+    // Everything below runs inside the Swal confirm's click handler —
+    // that click is the fresh gesture mobile browsers require for both
+    // clipboard writes and location.href navigation to actually fire.
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+    ta.style.width = '1px'; ta.style.height = '1px';
+    ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+    } catch (e) {}
+    window.location.href = 'https://chat.whatsapp.com/JVivP6n7w7D5xYkH29J9oL';
+  });
 }
 
 function staffOrdersFor(uid) {
