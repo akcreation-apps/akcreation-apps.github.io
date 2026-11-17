@@ -101,21 +101,59 @@ export async function renderStaff(root, db) {
   `;
   document.getElementById('addStaffBtn').addEventListener('click', () => openEditor(db, null, root));
   document.getElementById('copyEtaBtn').addEventListener('click', async () => {
-    // Share ETA ranking ALWAYS wants fresh numbers — the message goes into the
-    // partner WhatsApp group so a stale ranking would be embarrassing. Force
-    // a fresh pull of orders + staff + runs, re-render the cards, then copy.
-    // This is the only action in the Delivery tab that intentionally bypasses
-    // the cache (all other reads reuse _staffPagedCache's 2-min TTL).
+    // Share ETA ranking ALWAYS wants fresh numbers — the message goes into
+    // the partner WhatsApp group so a stale ranking would be embarrassing.
+    // Force a fresh pull of orders + staff + runs, re-render the cards, then
+    // copy. Full-screen loader so the admin can see Firestore is in flight;
+    // the button's own spinner is too subtle to signal a multi-second fetch.
     const btn = document.getElementById('copyEtaBtn');
     btn.disabled = true;
     btn.classList.add('is-loading');
+    try { window.bbBusy('Fetching latest ETA data…'); } catch {}
+    // Share ETA ranking only uses CURRENT-MONTH deliveries — no need to
+    // pull the full 60-day window the Delivery tab normally holds. Scoped
+    // fetch keeps the cost bounded to ~a few hundred reads per share,
+    // instead of the 4000-doc worst case the 60-day refresh would charge.
+    // Staff list is force-refreshed because the ranking must include every
+    // partner currently on file (tiny collection). We temporarily swap the
+    // shared staff caches to the current-month arrays for the duration of
+    // copyEtaRanking, then restore so the Staff tab's regular card chips
+    // (Earned/Paid/Pending over 60 days) stay correct.
+    let monthData = null;
     try {
-      await refreshStaffOrders(db, { force: true });
       await loadStaff(db, root, { force: true });
-      copyEtaRanking(root);
-    } finally {
+      monthData = await fetchCurrentMonthEtaData(db);
+    } catch (err) {
+      try { window.bbDone(); } catch {}
       btn.disabled = false;
       btn.classList.remove('is-loading');
+      Swal.fire({
+        icon: 'error',
+        title: 'Could not fetch ETA data',
+        text: err?.message || 'Please check your connection and try again.',
+        confirmButtonColor: '#FF6B35',
+      });
+      return;
+    }
+    // Close the loader BEFORE copyEtaRanking so the full-screen overlay is
+    // gone by the time copyEtaRanking assigns window.location.href — avoids
+    // any modal ↔ navigation conflict on mobile browsers.
+    try { window.bbDone(); } catch {}
+    btn.disabled = false;
+    btn.classList.remove('is-loading');
+    // Swap caches to current-month data just for the ranking build —
+    // copyEtaRanking reads caches synchronously, so restoring right after
+    // it returns is safe (any async Swal/location.href inside has already
+    // captured the row data it needs).
+    const prevOrders = _staffOrdersCache;
+    const prevRuns = _staffRunsCache;
+    _staffOrdersCache = monthData.orders;
+    _staffRunsCache = monthData.runs;
+    try {
+      copyEtaRanking(root);
+    } finally {
+      _staffOrdersCache = prevOrders;
+      _staffRunsCache = prevRuns;
     }
   });
   try { await whenChartReady(); } catch (e) { console.warn('[staff] Chart.js unavailable:', e.message); }
@@ -145,6 +183,13 @@ const PER_PARTNER_RUNS_LIMIT = 150;
 const PER_PARTNER_CACHE_TTL_MS = 10 * 60 * 1000;
 const _perPartnerPayoutsCache = new Map(); // uid -> { t, mine }
 
+// Share ETA ranking hard caps — bound the current-month fetch so a surprise
+// traffic spike can't quietly chew through quota on a single share click.
+// A month with >1000 orders would be unprecedented for a BankiBites-size
+// store; runs are capped lower because a single partner-day = one run doc.
+const ETA_MONTH_ORDERS_LIMIT = 1000;
+const ETA_MONTH_RUNS_LIMIT = 300;
+
 // Public hook so the orders live-listener can drop the staff tab's paged
 // caches the moment any order changes. Deliberately does NOT touch the
 // shared dashboard cache — that one is admin-controlled and only the
@@ -171,6 +216,37 @@ async function fetchPaged(db, cacheKey, colName, extraConstraints, { force } = {
   }
   _staffPagedCache.set(cacheKey, { t: Date.now(), data: out });
   return out;
+}
+
+// Current-month-only fetch used exclusively by Share ETA ranking.
+// Deliberately NARROWER than refreshStaffOrders (which pulls 60 days) so
+// each share click costs ~a few hundred reads instead of thousands.
+// Returns { orders, runs } — the caller is responsible for swapping them
+// into _staffOrdersCache / _staffRunsCache around copyEtaRanking() and
+// restoring the prior caches after, so the Staff tab's regular card
+// chips (Earned/Paid/Pending over 60 days) aren't narrowed.
+async function fetchCurrentMonthEtaData(db) {
+  const monthStartDate = startOfCurrentMonth(new Date());
+  const sinceTs = Timestamp.fromMillis(monthStartDate.getTime());
+  const [ordersSnap, runsSnap] = await Promise.all([
+    getDocs(query(
+      collection(db, COL.ORDERS),
+      where('created_at', '>=', sinceTs),
+      orderBy('created_at', 'desc'),
+      limit(ETA_MONTH_ORDERS_LIMIT),
+    )),
+    getDocs(query(
+      collection(db, COL.DELIVERY_RUNS),
+      where('status', '==', 'completed'),
+      where('created_at', '>=', sinceTs),
+      limit(ETA_MONTH_RUNS_LIMIT),
+    )),
+  ]);
+  const orders = [];
+  ordersSnap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+  const runs = [];
+  runsSnap.forEach(d => runs.push({ id: d.id, ...d.data() }));
+  return { orders, runs };
 }
 
 async function refreshStaffOrders(db, { force = false } = {}) {
@@ -490,45 +566,27 @@ function copyEtaRanking(root) {
   const footer = '\n\n_Team BankiBites 💚_';
   const text = header + body + footer;
 
-  // IMPORTANT: the outer handler did two `await`s (refreshStaffOrders +
-  // loadStaff) before reaching this function. On mobile, that means the
-  // original button click is no longer treated as a "fresh user gesture",
-  // and assigning window.location.href straight here silently fails. We
-  // wrap the copy + navigate pair behind a Swal confirm — the Share-now
-  // click inside that Swal IS a fresh gesture, so clipboard + redirect
-  // both succeed.
-  Swal.fire({
-    title: 'ETA ranking ready',
-    html: `<div style="text-align:left;max-height:40vh;overflow:auto;white-space:pre-wrap;font-size:0.82rem;background:var(--surface,#f8fafc);padding:10px;border-radius:8px;border:1px solid var(--border,#e2e8f0)">${escapeHtml(text)}</div>
-           <p class="text-muted small mt-2 mb-0" style="text-align:left">Tap <strong>Copy & open WhatsApp</strong> to copy the message and open the delivery-partners group. Paste inside the group to send.</p>`,
-    width: 560,
-    showCancelButton: true,
-    confirmButtonText: '<i class="fab fa-whatsapp"></i> Copy & open WhatsApp',
-    cancelButtonText: 'Close',
-    confirmButtonColor: '#16a34a',
-    reverseButtons: true,
-  }).then(res => {
-    if (!res.isConfirmed) return;
-    // Everything below runs inside the Swal confirm's click handler —
-    // that click is the fresh gesture mobile browsers require for both
-    // clipboard writes and location.href navigation to actually fire.
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.setAttribute('readonly', '');
-    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
-    ta.style.width = '1px'; ta.style.height = '1px';
-    ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
-    document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    try { document.execCommand('copy'); } catch (e) {}
-    document.body.removeChild(ta);
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => {});
-      }
-    } catch (e) {}
-    window.location.href = 'https://chat.whatsapp.com/JVivP6n7w7D5xYkH29J9oL';
-  });
+  // Copy to clipboard synchronously via execCommand (modern async clipboard
+  // API loses the race with window.location.href on mobile), then open the
+  // delivery-partners WhatsApp group. chat.whatsapp.com URLs can't carry a
+  // prefilled ?text= payload — so admin pastes once inside the group.
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+  ta.style.width = '1px'; ta.style.height = '1px';
+  ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+  } catch (e) {}
+
+  window.location.href = 'https://chat.whatsapp.com/JVivP6n7w7D5xYkH29J9oL';
 }
 
 function staffOrdersFor(uid) {

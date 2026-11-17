@@ -393,6 +393,20 @@ export async function renderDashboard(root, db) {
   });
   document.getElementById('dashFeeRules').addEventListener('click', () => openFeeRulesEditor(db, root));
   document.getElementById('dashShareSummary').addEventListener('click', async () => {
+    // Share summary ALWAYS wants fresh numbers (goes into a team WhatsApp
+    // group so stale would be embarrassing), which means a full refresh of
+    // orders + partners + staff + customers + fee rules — several thousand
+    // Firestore reads on a busy business. Warn before spending that.
+    const ok = await Swal.fire({
+      icon: 'warning',
+      title: 'Share summary refreshes everything',
+      html: 'This re-reads <strong>orders, partners, staff, customers and fee rules</strong> to post an accurate snapshot — can cost <strong>several thousand Firestore reads</strong>.<br><br>Continue only when you actually want to share the latest numbers.',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, fetch & share',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#FF6B35',
+    });
+    if (!ok.isConfirmed) return;
     const btn = document.getElementById('dashShareSummary');
     btn.disabled = true;
     btn.classList.add('is-loading');
@@ -401,16 +415,26 @@ export async function renderDashboard(root, db) {
     // slow 60-day fetch over a weak connection would otherwise look frozen.
     try { window.bbBusy('Fetching latest analytics…'); } catch {}
     try {
-      // Share-summary ALWAYS wants fresh numbers — the message goes into the
-      // team WhatsApp group so stale data would be embarrassing. Force-refresh
-      // the dashboard, then let shareDailySummary() read the now-current cache.
       await refresh(root, db, { force: true });
-      shareDailySummary();
-    } finally {
+    } catch (err) {
       try { window.bbDone(); } catch {}
       btn.disabled = false;
       btn.classList.remove('is-loading');
+      Swal.fire({
+        icon: 'error',
+        title: 'Could not fetch analytics',
+        text: err?.message || 'Please check your connection and try again.',
+        confirmButtonColor: '#FF6B35',
+      });
+      return;
     }
+    // Close the loader BEFORE shareDailySummary so the overlay is gone by
+    // the time it assigns window.location.href — avoids any modal ↔
+    // navigation conflict on mobile browsers.
+    try { window.bbDone(); } catch {}
+    btn.disabled = false;
+    btn.classList.remove('is-loading');
+    shareDailySummary();
   });
 }
 
