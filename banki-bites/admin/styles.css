@@ -347,6 +347,15 @@ select.form-control, textarea.form-control {
 .ec-actions--bottom > .icon-btn:first-child { margin-right: auto; }
 .ec-actions--bottom > .icon-btn:last-child  { margin-left:  auto; }
 
+/* Partner card: 4 action buttons — group the safe actions (Close, Call,
+   Menu) together on the left, and keep the destructive Delete isolated on
+   the right. Overrides the generic "space-between" rule above so the three
+   left buttons sit side-by-side with a tight gap instead of being spread
+   edge-to-edge. */
+.partner-card .ec-actions--bottom { gap: 8px; }
+.partner-card .ec-actions--bottom > .icon-btn:first-child { margin-right: 0; }
+.partner-card .ec-actions--bottom > [data-act="del"] { margin-left: auto; }
+
 .partner-pos {
   display: inline-block;
   font-size: 0.7rem;

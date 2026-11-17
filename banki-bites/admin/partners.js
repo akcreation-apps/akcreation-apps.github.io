@@ -347,8 +347,7 @@ function renderCard(db, root, id, p) {
           <span title="${escapeAttr(p.name || '')}">${escapeHtml(truncateName(p.name || ''))}</span>
           ${statusPill}
         </div>
-        <div class="ec-meta">${(p.services || []).join(' · ')} · ★ ${p.rating} · ${p.opening_hour}–${p.closing_hour}</div>
-        <div class="ec-meta">${escapeHtml(p.address || '')}</div>
+        <div class="ec-meta">${(p.services || []).join(' · ')} · ★ ${p.rating} · ${p.opening_hour}–${p.closing_hour}${p.eta_minutes !== '' && p.eta_minutes != null ? ` · <i class="fas fa-clock"></i> ${escapeHtml(String(p.eta_minutes))} min` : ''}</div>
         ${p.point_of_contact ? `<div class="ec-meta"><i class="fas fa-user-tie"></i> ${escapeHtml(p.point_of_contact)}</div>` : ''}
       </div>
       <button class="icon-btn icon-btn--secondary" data-act="edit" title="Edit" aria-label="Edit ${escapeAttr(p.name)}">
