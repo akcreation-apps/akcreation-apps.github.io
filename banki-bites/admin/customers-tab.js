@@ -57,7 +57,7 @@ export async function renderCustomers(root, db) {
       </div>
     </div>
     <div id="custWindowNotice" class="small text-muted mt-1" style="margin-bottom:.5rem">
-      <i class="fas fa-circle-info"></i> Showing aggregates from the <strong>last 60 days</strong> of orders. Use <strong>Full history</strong> for lifetime numbers.
+      <i class="fas fa-circle-info"></i> Nothing loaded yet. Click <strong>Full history</strong> for lifetime numbers, or <strong>Refresh</strong> for the last 60 days — both read Firestore.
     </div>
 
     <div id="custKpis" class="kpi-grid"></div>
@@ -118,10 +118,58 @@ export async function renderCustomers(root, db) {
 
   try { await whenChartReady(); } catch (e) { console.warn('[customers] Chart.js unavailable:', e.message); }
 
-  let state = await loadAll(db);
-  paint(root, state);
+  // Tab mount intentionally does NOT fetch anything — the customer tab's
+  // loadAll() scans the full customers collection + 60d (or lifetime) of
+  // orders, which can easily cost thousands of reads. Admin must opt in by
+  // clicking Refresh (60d window) or Full history (lifetime). If a prior
+  // click already populated the in-memory cache (within TTL), reuse it so
+  // tab switches don't look empty for the admin.
+  let state;
+  if (_loadAllCache && (Date.now() - _loadAllCache.t) < LOAD_ALL_TTL_MS) {
+    state = _loadAllCache.state;
+    paint(root, state);
+    const notice = document.getElementById('custWindowNotice');
+    if (notice) {
+      notice.innerHTML = state.fullHistory
+        ? '<i class="fas fa-circle-check" style="color:var(--success,#16a34a)"></i> Showing <strong>lifetime</strong> aggregates across the full order history.'
+        : '<i class="fas fa-circle-info"></i> Showing aggregates from the <strong>last 60 days</strong> of orders. Use <strong>Full history</strong> for lifetime numbers.';
+    }
+    if (state.fullHistory) {
+      const btn = document.getElementById('custFullHistory');
+      if (btn) btn.innerHTML = '<i class="fas fa-rotate-left"></i><span class="d-none d-sm-inline ml-1">Back to 60d</span>';
+    }
+  } else {
+    state = { customers: new Map(), orders: [], rows: [], staffById: new Map(), fullHistory: false };
+    const tableWrap = document.getElementById('custTableWrap');
+    if (tableWrap) {
+      tableWrap.innerHTML = `
+        <div class="empty-state" style="padding:24px;text-align:center">
+          <i class="fas fa-database" style="font-size:2rem;color:var(--muted,#94a3b8);margin-bottom:8px"></i>
+          <p class="mb-2"><strong>No customer data loaded.</strong></p>
+          <p class="text-muted small mb-0">
+            Click <strong>Refresh</strong> for last-60-days aggregates, or
+            <strong>Full history</strong> for lifetime numbers.
+          </p>
+        </div>
+      `;
+    }
+  }
 
   document.getElementById('custRefresh').addEventListener('click', async () => {
+    // Confirm before burning Firestore reads — Refresh pulls the full
+    // customers collection + 60d of orders in 200-doc pages, which can run
+    // into several thousand reads on a busy store. Same pattern as the
+    // Dashboard Refresh / Full history confirms.
+    const ok = await Swal.fire({
+      icon: 'warning',
+      title: 'Refresh from Firestore?',
+      html: 'This re-reads <strong>all customers</strong> and the <strong>last 60 days of orders</strong> — can cost <strong>several thousand reads</strong>. The current view is served from cache; refresh only when you need the latest numbers.',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, refresh now',
+      cancelButtonText: 'Keep cached',
+      confirmButtonColor: '#FF6B35',
+    });
+    if (!ok.isConfirmed) return;
     const btn = document.getElementById('custRefresh');
     btn.disabled = true; btn.classList.add('is-loading');
     try { state = await loadAll(db, { force: true }); paint(root, state); }
@@ -138,11 +186,28 @@ export async function renderCustomers(root, db) {
     const btn = document.getElementById('custFullHistory');
     const notice = document.getElementById('custWindowNotice');
     if (state.fullHistory) {
-      // Toggle back to 60-day window — one confirm, one-shot.
-      state = await loadAll(db, { force: true, fullHistory: false });
-      paint(root, state);
-      btn.innerHTML = '<i class="fas fa-clock-rotate-left"></i><span class="d-none d-sm-inline ml-1">Full history</span>';
-      if (notice) notice.innerHTML = '<i class="fas fa-circle-info"></i> Showing aggregates from the <strong>last 60 days</strong> of orders. Use <strong>Full history</strong> for lifetime numbers.';
+      // Toggling back to 60-day window still triggers a fresh fetch of all
+      // customers + 60d of orders — confirm so admin doesn't accidentally
+      // repeat reads just to narrow the view.
+      const okBack = await Swal.fire({
+        icon: 'warning',
+        title: 'Switch back to 60-day view?',
+        html: 'This re-reads <strong>all customers</strong> and the <strong>last 60 days of orders</strong> — can cost <strong>several thousand reads</strong>.',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, switch now',
+        cancelButtonText: 'Stay on full history',
+        confirmButtonColor: '#FF6B35',
+      });
+      if (!okBack.isConfirmed) return;
+      btn.disabled = true; btn.classList.add('is-loading');
+      try {
+        state = await loadAll(db, { force: true, fullHistory: false });
+        paint(root, state);
+        btn.innerHTML = '<i class="fas fa-clock-rotate-left"></i><span class="d-none d-sm-inline ml-1">Full history</span>';
+        if (notice) notice.innerHTML = '<i class="fas fa-circle-info"></i> Showing aggregates from the <strong>last 60 days</strong> of orders. Use <strong>Full history</strong> for lifetime numbers.';
+      } finally {
+        btn.disabled = false; btn.classList.remove('is-loading');
+      }
       return;
     }
     const ok = await Swal.fire({

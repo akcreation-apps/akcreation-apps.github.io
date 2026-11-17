@@ -9,7 +9,7 @@ import {
   startOfCurrentMonth, truncateName, isOnTime,
 } from '../analytics.js';
 import {
-  getCachedDashboardData, putDashboardDataIntoCache, invalidateDashboardCacheSlot,
+  getCachedDashboardData, putDashboardDataIntoCache,
   getDashboardSource, DASHBOARD_FETCH_WINDOW_DAYS,
 } from './dashboard.js';
 
@@ -136,16 +136,22 @@ const STAFF_MAX_PAGES = 20;
 const STAFF_CACHE_TTL_MS = 2 * 60 * 1000;
 const _staffPagedCache = new Map(); // key -> { t, data }
 
-// Public hook so the orders live-listener can drop stale staff caches the
-// moment any order changes — otherwise staff payout numbers lag by up to the
-// cache TTL after another admin updates an order. Also clears the matching
-// keys inside the shared dashboard cache so the next read refetches.
+// Per-partner Earnings & Payouts expand — hard caps + 10-min session cache
+// so repeated expansions of the same partner (even across staff-tab
+// remounts) don't re-hit Firestore. Caps bound the worst case even for a
+// prolific partner with months of history.
+const PER_PARTNER_ORDERS_LIMIT = 300;
+const PER_PARTNER_RUNS_LIMIT = 150;
+const PER_PARTNER_CACHE_TTL_MS = 10 * 60 * 1000;
+const _perPartnerPayoutsCache = new Map(); // uid -> { t, mine }
+
+// Public hook so the orders live-listener can drop the staff tab's paged
+// caches the moment any order changes. Deliberately does NOT touch the
+// shared dashboard cache — that one is admin-controlled and only the
+// Refresh / Share Summary buttons should force a Firestore refetch.
 export function invalidateStaffPagedCache() {
   _staffPagedCache.delete('orders:last60d');
   _staffPagedCache.delete('delivery_runs:completed:last60d');
-  try {
-    invalidateDashboardCacheSlot(getDashboardSource(), ['ordersAll', 'deliveryRuns']);
-  } catch {}
 }
 
 async function fetchPaged(db, cacheKey, colName, extraConstraints, { force } = {}) {
@@ -779,14 +785,28 @@ function renderCard(db, root, uid, s) {
   // Per-partner realtime refetch — when the admin expands the Earnings &
   // Payouts details for this partner, pull their fresh orders from
   // Firestore so the payout list reflects any writes made since the
-  // dashboard cache was last filled. Only runs once per card lifetime;
-  // repeated open/close doesn't re-hit Firestore.
+  // dashboard cache was last filled. Guarded three ways against burning
+  // read quota:
+  //   1. `fetchedFresh` — single fetch per card lifetime (open/close
+  //      within same card does nothing after first open).
+  //   2. `_perPartnerPayoutsCache` with a 10-min TTL — repeated expansions
+  //      across staff-tab remounts reuse cached rows, no Firestore read.
+  //   3. Both queries carry an explicit `limit()` — a prolific partner
+  //      with months of history can't accidentally pull thousands of docs.
   const payoutsDetails = el.querySelector('details.payouts-block');
   if (payoutsDetails) {
     let fetchedFresh = false;
     payoutsDetails.addEventListener('toggle', async () => {
       if (!payoutsDetails.open || fetchedFresh) return;
       fetchedFresh = true;
+      // Session cache hit — reuse within TTL, zero Firestore reads.
+      const cached = _perPartnerPayoutsCache.get(uid);
+      if (cached && (Date.now() - cached.t) < PER_PARTNER_CACHE_TTL_MS) {
+        mine = cached.mine;
+        renderPayoutRows();
+        renderPayoutHistory();
+        return;
+      }
       try {
         const sinceTs = Timestamp.fromMillis(Date.now() - (DASHBOARD_FETCH_WINDOW_DAYS || 60) * 86400000);
         const [ordersSnap, runsSnap] = await Promise.all([
@@ -794,12 +814,18 @@ function renderCard(db, root, uid, s) {
             collection(db, COL.ORDERS),
             where('delivery_staff_id', '==', uid),
             where('created_at', '>=', sinceTs),
+            orderBy('created_at', 'desc'),
+            limit(PER_PARTNER_ORDERS_LIMIT),
           )),
+          // No orderBy on delivery_runs — avoids forcing a new composite
+          // index on (partner_uid, status, created_at). The limit just caps
+          // the worst case; row order is reconciled client-side after merge.
           getDocs(query(
             collection(db, COL.DELIVERY_RUNS),
             where('partner_uid', '==', uid),
             where('status', '==', 'completed'),
             where('created_at', '>=', sinceTs),
+            limit(PER_PARTNER_RUNS_LIMIT),
           )),
         ]);
         const freshOrders = [];
@@ -810,9 +836,12 @@ function renderCard(db, root, uid, s) {
         const freshRuns = [];
         runsSnap.forEach(d => freshRuns.push(runToSyntheticOrder({ id: d.id, ...d.data() })));
         mine = [...freshOrders, ...freshRuns];
+        _perPartnerPayoutsCache.set(uid, { t: Date.now(), mine });
         renderPayoutRows();
         renderPayoutHistory();
       } catch (err) {
+        // Fetch failed — allow a retry on the next expansion.
+        fetchedFresh = false;
         console.warn('[staff] realtime payouts refetch failed:', err.message);
       }
     });
@@ -873,13 +902,13 @@ function renderCard(db, root, uid, s) {
       for (const r of (_staffRunsCache || [])) {
         if (runIds.includes(r.id)) { r.payout_paid = true; r.payout_paid_at = now; }
       }
-      // In-memory caches already patched above; also drop the paged caches
-      // AND the shared dashboard cache slots so the next refreshStaffOrders()
-      // (or a page reload) re-reads the authoritative state instead of the
-      // stale payout_paid=false rows we just updated in Firestore.
+      // In-memory caches already patched above; also drop the staff tab's
+      // paged caches so the next refreshStaffOrders() path re-reads fresh
+      // state from the dashboard cache. We intentionally do NOT touch the
+      // shared dashboard cache — the admin's design is that only an
+      // explicit Refresh / Share Summary click refetches analytics.
       _staffPagedCache.delete('orders:last60d');
       _staffPagedCache.delete('delivery_runs:completed:last60d');
-      try { invalidateDashboardCacheSlot(getDashboardSource(), ['ordersAll', 'deliveryRuns']); } catch {}
       Swal.fire({ icon: 'success', title: 'Saved', timer: 1100, showConfirmButton: false });
       loadStaff(db, root);
       renderStaffCharts();
