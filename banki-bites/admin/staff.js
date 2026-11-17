@@ -491,9 +491,18 @@ function copyEtaRanking(root) {
   const monthStart = startOfCurrentMonth(new Date());
   const cards = Array.from(root.querySelectorAll('.staff-card[data-uid]'));
   const rows = [];
-  // Running tally of deliveries made this month across every partner —
-  // feeds the dynamic "minimum orders" threshold for bonus eligibility.
-  let totalDeliveriesThisMonth = 0;
+  // Match the Dashboard "Deliveries · N so far" tile (dashboard.js ~L884)
+  // so the dynamic threshold and the KPI admin reads it against agree.
+  // Any delivered order this month counts — assigned or not, payable or
+  // not — because the threshold is a fair-share target, not a payout
+  // number. Previously this was tallied inside the per-card loop, which
+  // dropped unassigned / payout_applicable=false deliveries and made the
+  // minimum read lower than the dashboard total.
+  const totalDeliveriesThisMonth = (_staffOrdersCache || []).reduce((n, o) => {
+    if (!isDelivered(o)) return n;
+    const d = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
+    return (d && d >= monthStart) ? n + 1 : n;
+  }, 0);
   for (const card of cards) {
     const uid = card.dataset.uid;
     const name = card.querySelector('.ec-title')?.childNodes[0]?.nodeValue?.trim() || uid;
@@ -502,7 +511,6 @@ function copyEtaRanking(root) {
     for (const o of mine) {
       const d = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
       if (!d || d < monthStart) continue;
-      totalDeliveriesThisMonth++;
       monthDeliveries++;
       const flag = isOnTime(o);
       if (flag === null) continue;
