@@ -409,14 +409,19 @@ function copyEtaRanking(root) {
   const monthStart = startOfCurrentMonth(new Date());
   const cards = Array.from(root.querySelectorAll('.staff-card[data-uid]'));
   const rows = [];
+  // Running tally of deliveries made this month across every partner —
+  // feeds the dynamic "minimum orders" threshold for bonus eligibility.
+  let totalDeliveriesThisMonth = 0;
   for (const card of cards) {
     const uid = card.dataset.uid;
     const name = card.querySelector('.ec-title')?.childNodes[0]?.nodeValue?.trim() || uid;
     const mine = staffOrdersFor(uid);
-    let onTimeN = 0, onTimeD = 0;
+    let onTimeN = 0, onTimeD = 0, monthDeliveries = 0;
     for (const o of mine) {
       const d = toDateSafe(o.delivered_at) || toDateSafe(o.created_at);
       if (!d || d < monthStart) continue;
+      totalDeliveriesThisMonth++;
+      monthDeliveries++;
       const flag = isOnTime(o);
       if (flag === null) continue;
       onTimeD++;
@@ -425,8 +430,19 @@ function copyEtaRanking(root) {
     if (onTimeD === 0) continue;
     const pct = Math.round((onTimeN / onTimeD) * 100);
     if (pct <= 0) continue;
-    rows.push({ name, pct, onTimeN, onTimeD });
+    rows.push({ name, pct, onTimeN, onTimeD, monthDeliveries });
   }
+  // Dynamic bonus threshold: average deliveries per partner if the work
+  // were spread across everyone except one (the admin's rule — carve out
+  // one slot so the bar sits a bit above the "fair share"). Rounded up so
+  // the message never understates the target. Falls back to the prior
+  // fixed 30 when we can't compute a sensible average (≤ 1 partner, or
+  // nothing delivered yet this month).
+  const partnerCount = cards.length;
+  const divisor = partnerCount - 1;
+  const minOrders = (divisor > 0 && totalDeliveriesThisMonth > 0)
+    ? Math.ceil(totalDeliveriesThisMonth / divisor)
+    : 30;
   if (!rows.length) {
     Swal.fire({
       icon: 'info',
@@ -439,8 +455,17 @@ function copyEtaRanking(root) {
   rows.sort((a, b) => b.pct - a.pct);
 
   // Odia motivation lines — tuned to the ≥70% bonus threshold the admin
-  // mentioned when asking for this feature.
-  const noteFor = (pct) => {
+  // mentioned when asking for this feature. A partner clears the bar only
+  // when their ETA % AND their month-to-date delivery count both qualify;
+  // high ETA on thin volume gets a separate "pick up more orders" nudge so
+  // the message stays consistent with the "Minimum N orders" header.
+  // Per-partner delivery counts are confidential and must not leak into
+  // the group message — we only use the count to pick the right tone.
+  const noteFor = (pct, monthDeliveries) => {
+    const volumeShort = monthDeliveries < minOrders;
+    if (pct >= 70 && volumeShort) {
+      return '📦 ETA ବଢ଼ିଆ, କିନ୍ତୁ orders ଟିକେ କମ୍ — ଆଉ କିଛି order ନେଲେ bonus pakka!';
+    }
     if (pct >= 90) return '🏆 ବହୁତ ବଢ଼ିଆ! Bonus pakka — keep flying!';
     if (pct >= 70) return '🎁 Bonus eligible — ବଢ଼ିଆ କାମ, ଏମିତି ଜାରି ରଖନ୍ତୁ!';
     if (pct >= 50) return '⏱️ Target 70%+ — ଆଉ ଟିକେ ଚେଷ୍ଟା କଲେ bonus ଆପଣଙ୍କର!';
@@ -449,12 +474,12 @@ function copyEtaRanking(root) {
 
   const header = [
     '🏍️ BankiBites — Delivery Partner ETA ranking',
-    '\nBonus unlock: ETA ≥ 70% (Minimum 30 orders)🎁\n',
+    `\nBonus unlock: ETA ≥ 70% (Minimum ${minOrders} orders)🎁\n`,
     '',
   ].join('\n');
   const body = rows.map((r, i) => {
     const medal = i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : `${i + 1}. `;
-    return `${medal}${r.name} — ${r.pct}%\n   ${noteFor(r.pct)}`;
+    return `${medal}${r.name} — ${r.pct}%\n   ${noteFor(r.pct, r.monthDeliveries)}`;
   }).join('\n\n');
   const footer = '\n\n_Team BankiBites 💚_';
   const text = header + body + footer;
