@@ -33,14 +33,6 @@ async function syncToPartnerAdmin(db, syncCollection, syncDocId, updates) {
   }
 }
 
-function notifyPartnerWhatsApp(phone, type, name) {
-  const msgs = {
-    closed:  `Hi, this is BankiBites. Your restaurant *${name}* has been temporarily closed on our platform as per your request. Customers will not see your listing until you contact us to reactivate it.`,
-    blocked: `Hi, this is BankiBites. Your restaurant *${name}* has been blocked on our platform for *24 hours* because you missed fulfilling a customer order without informing us about food availability. Please contact us immediately to resolve this issue and reactivate your listing.`,
-  };
-  window.location.href = `https://wa.me/91${phone}?text=${encodeURIComponent(msgs[type])}`;
-}
-
 // Normalise a typed Indian phone to 10 digits (strip +91/91/0 prefix, spaces,
 // dashes, parens). Returns the trailing 10 digits if recognisable, else ''.
 function normalisePhone(raw) {
@@ -334,16 +326,17 @@ function renderCard(db, root, id, p) {
        </a>`
     : '';
 
-  const closedBtn = (!p.is_active && pocPhone)
-    ? `<button class="icon-btn icon-btn--warn" data-act="notify-closed" title="Notify: closed per request" aria-label="Notify ${escapeAttr(p.name)}: closed per request">
-         <i class="fas fa-store-slash"></i>
-       </button>`
-    : '';
-
-  const blockBtn = pocPhone
-    ? `<button class="icon-btn icon-btn--danger" data-act="notify-blocked" title="Block: notify restaurant for missing order" aria-label="Block notify ${escapeAttr(p.name)}">
-         <i class="fas fa-ban"></i>
-       </button>`
+  let menuUrl = '';
+  if (p.url) {
+    try {
+      const base = p.url.endsWith('/') ? p.url : `${p.url}/`;
+      menuUrl = new URL('admin/', base).href;
+    } catch {}
+  }
+  const menuBtn = menuUrl
+    ? `<a class="icon-btn icon-btn--secondary" href="${escapeAttr(menuUrl)}" target="_blank" rel="noopener" title="Menu control" aria-label="Open menu control for ${escapeAttr(p.name)}">
+         <i class="fas fa-utensils"></i>
+       </a>`
     : '';
 
   el.innerHTML = `
@@ -367,8 +360,7 @@ function renderCard(db, root, id, p) {
         <i class="fas ${closeIcon}"></i>
       </button>
       ${callBtn}
-      ${closedBtn}
-      ${blockBtn}
+      ${menuBtn}
       <button class="icon-btn icon-btn--danger" data-act="del" title="Delete" aria-label="Delete ${escapeAttr(p.name)}">
         <i class="fas fa-trash"></i>
       </button>
@@ -401,16 +393,6 @@ function renderCard(db, root, id, p) {
       Swal.fire({ icon: 'error', title: 'Update failed', text: err.message });
     }
   });
-  if (!p.is_active && pocPhone) {
-    el.querySelector('[data-act="notify-closed"]').addEventListener('click', () => {
-      notifyPartnerWhatsApp(pocPhone, 'closed', p.name);
-    });
-  }
-  if (pocPhone) {
-    el.querySelector('[data-act="notify-blocked"]').addEventListener('click', () => {
-      notifyPartnerWhatsApp(pocPhone, 'blocked', p.name);
-    });
-  }
   el.querySelector('[data-act="del"]').addEventListener('click', async () => {
     const ok = await Swal.fire({
       title: `Delete ${p.name}?`,
