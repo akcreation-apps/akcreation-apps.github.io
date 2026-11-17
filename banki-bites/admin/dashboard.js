@@ -556,8 +556,8 @@ async function subscribeMaintenanceToggle(root, db) {
         b.classList.toggle('is-active', active);
         b.setAttribute('aria-selected', active ? 'true' : 'false');
       });
-      // Switching source — use cache if we have one for Food; don't auto-fetch.
-      await refresh(root, db, { force: false });
+      // Don't auto-fetch on maintenance-flag flip. The admin's next
+      // explicit Refresh / Share summary click will repopulate.
     }
   };
   // Detach any previous listener from an earlier render.
@@ -608,11 +608,10 @@ function wireRangeControls(root, db) {
 //     "Share summary") hit Firestore. Everything else (initial mount, range
 //     changes, source toggle, maintenance-flag live update) reads from cache.
 //   • Cache lives per source (food / grocery) so switching source doesn't
-//     invalidate the other one. A 24-hour staleness fence prevents truly old
-//     data from being served if the admin never clicks Refresh.
+//     invalidate the other one. Cached data is served indefinitely — no
+//     staleness fence — so the dashboard never silently re-reads Firestore.
 // --------------------------------------------------------------------------
 const DASH_CACHE_KEY = 'bb_dashboard_cache_v1';
-const DASH_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 // Firestore Timestamp instances have a .toDate() method that's lost after
 // JSON.stringify — we'd get {seconds, nanoseconds} back and every downstream
 // toDateSafe() call would fail. Normalise timestamps + Date objects to ISO
@@ -641,8 +640,7 @@ function _saveDashCache(next) {
 function _getCachedBySource(source) {
   const all = _loadDashCache();
   const slot = all[source];
-  if (!slot) return null;
-  if (!slot.fetchedAt || (Date.now() - slot.fetchedAt) > DASH_CACHE_TTL_MS) return null;
+  if (!slot || !slot.fetchedAt) return null;
   return slot;
 }
 function _putCachedBySource(source, data) {
