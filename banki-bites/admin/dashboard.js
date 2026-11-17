@@ -396,6 +396,10 @@ export async function renderDashboard(root, db) {
     const btn = document.getElementById('dashShareSummary');
     btn.disabled = true;
     btn.classList.add('is-loading');
+    // Full-screen loader so admin has clear feedback that fresh analytics
+    // are being pulled — the button's own spinner is too subtle, and a
+    // slow 60-day fetch over a weak connection would otherwise look frozen.
+    try { window.bbBusy('Fetching latest analytics…'); } catch {}
     try {
       // Share-summary ALWAYS wants fresh numbers — the message goes into the
       // team WhatsApp group so stale data would be embarrassing. Force-refresh
@@ -403,6 +407,7 @@ export async function renderDashboard(root, db) {
       await refresh(root, db, { force: true });
       shareDailySummary();
     } finally {
+      try { window.bbDone(); } catch {}
       btn.disabled = false;
       btn.classList.remove('is-loading');
     }
