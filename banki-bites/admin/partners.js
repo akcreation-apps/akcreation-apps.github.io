@@ -3,6 +3,7 @@ import {
   collection, getDocs, doc, setDoc, deleteDoc, orderBy, limit, startAfter, query, where, writeBatch, Timestamp, onSnapshot,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, isDelivered, truncateName } from '../analytics.js';
+import { getCachedDashboardData, putDashboardDataIntoCache, getDashboardSource, DASHBOARD_FETCH_WINDOW_DAYS } from './dashboard.js';
 
 const partnerCharts = new Map();
 function mountPartnerChart(id, config) {
@@ -237,14 +238,27 @@ async function fetchPartnerOrdersPaged(db, sinceTs) {
 
 async function renderPartnerCharts(db) {
   const p = chartPalette();
-  // Last 60 days — aligns the partner analytics with the dashboard window
-  // and bounds daily read cost.
-  const sinceTs = Timestamp.fromMillis(Date.now() - 60 * 86400000);
-  const [partnersSnap, orders] = await Promise.all([
-    getDocs(query(collection(db, COL.PARTNERS), orderBy('sort_order'))),
-    fetchPartnerOrdersPaged(db, sinceTs),
-  ]);
-  const partners = []; partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
+  // Reuse the dashboard's cached payload whenever possible — orders + partners
+  // list are already loaded there. Only fall back to Firestore on cache miss
+  // (e.g. first visit, admin opened Partners tab before Dashboard). The miss
+  // path backfills the shared cache so the next tab open is free.
+  const source = getDashboardSource();
+  const cached = getCachedDashboardData(source);
+  let partners, orders;
+  if (cached && cached.ordersAll && cached.partners) {
+    partners = cached.partners;
+    orders = cached.ordersAll;
+  } else {
+    const windowDays = DASHBOARD_FETCH_WINDOW_DAYS || 60;
+    const sinceTs = Timestamp.fromMillis(Date.now() - windowDays * 86400000);
+    const [partnersSnap, fetchedOrders] = await Promise.all([
+      getDocs(query(collection(db, COL.PARTNERS), orderBy('sort_order'))),
+      fetchPartnerOrdersPaged(db, sinceTs),
+    ]);
+    partners = []; partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
+    orders = fetchedOrders;
+    putDashboardDataIntoCache(source, { partners, ordersAll: orders });
+  }
 
   const g = groupBy(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown');
   const top = topN(g, 8);
@@ -296,17 +310,31 @@ async function renderPartnerCharts(db) {
   });
 }
 
-async function loadPartners(db, root) {
+async function loadPartners(db, root, { force = false } = {}) {
   const list = root.querySelector('#partnersList');
   list.innerHTML = '<div class="bb-loader-block">Loading restaurants…</div>';
-  const q = query(collection(db, COL.PARTNERS), orderBy('sort_order'));
-  const snap = await getDocs(q);
-  if (snap.empty) {
+  // Reuse the dashboard's cached partners list when it's already been
+  // fetched. Cache miss or force → one Firestore read, then backfill so
+  // sibling tabs don't repeat it. `force` is passed by mutation paths
+  // (toggle active, delete) so the UI reflects the write immediately.
+  const source = getDashboardSource();
+  const cached = !force ? getCachedDashboardData(source) : null;
+  let partners;
+  if (cached && Array.isArray(cached.partners) && cached.partners.length) {
+    partners = [...cached.partners].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  } else {
+    const q = query(collection(db, COL.PARTNERS), orderBy('sort_order'));
+    const snap = await getDocs(q);
+    partners = [];
+    snap.forEach(d => partners.push({ id: d.id, ...d.data() }));
+    if (partners.length) putDashboardDataIntoCache(source, { partners });
+  }
+  if (!partners.length) {
     list.innerHTML = `<div class="empty-state"><i class="fas fa-store"></i><p>No partners yet.</p></div>`;
     return;
   }
   list.innerHTML = '';
-  snap.forEach(d => list.appendChild(renderCard(db, root, d.id, d.data())));
+  partners.forEach(p => list.appendChild(renderCard(db, root, p.id, p)));
 }
 
 function renderCard(db, root, id, p) {
@@ -386,7 +414,7 @@ function renderCard(db, root, id, p) {
       const nextShopStatus = (!p.is_active && !p.is_removed) ? 'open' : 'closed';
       await syncToPartnerAdmin(db, p.sync_collection, p.sync_doc_id, { shop_status: nextShopStatus });
       window.bbDone();
-      loadPartners(db, root);
+      loadPartners(db, root, { force: true });
     } catch (err) {
       window.bbDone();
       Swal.fire({ icon: 'error', title: 'Update failed', text: err.message });
@@ -407,7 +435,7 @@ function renderCard(db, root, id, p) {
       await deleteDoc(doc(db, COL.PARTNERS, id));
       await resequencePartners(db);
       window.bbDone();
-      loadPartners(db, root);
+      loadPartners(db, root, { force: true });
     } catch (err) {
       window.bbDone();
       Swal.fire({ icon: 'error', title: 'Delete failed', text: err.message });
@@ -690,7 +718,7 @@ async function openEditor(db, existing, root) {
     Swal.fire({ icon: 'error', title: 'Save failed', text: err.message });
     return;
   }
-  loadPartners(db, root);
+  loadPartners(db, root, { force: true });
 }
 
 function escapeHtml(s) {

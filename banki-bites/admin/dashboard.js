@@ -640,12 +640,68 @@ function _saveDashCache(next) {
 function _getCachedBySource(source) {
   const all = _loadDashCache();
   const slot = all[source];
-  if (!slot || !slot.fetchedAt) return null;
+  if (!slot || typeof slot !== 'object') return null;
   return slot;
 }
 function _putCachedBySource(source, data) {
   const all = _loadDashCache();
-  all[source] = { fetchedAt: Date.now(), ..._normalizeForCache(data) };
+  // Merge on top of the existing slot so sibling writes (e.g. staff tab's
+  // deliveryRuns backfill) aren't clobbered when the dashboard's own refresh
+  // writes partners/staff/customers at roughly the same time.
+  const prev = (all[source] && typeof all[source] === 'object') ? all[source] : {};
+  all[source] = { ...prev, ..._normalizeForCache(data), fetchedAt: Date.now() };
+  _saveDashCache(all);
+}
+
+// --------------------------------------------------------------------------
+// Shared cache accessors for Partners + Delivery Partners tabs so they can
+// reuse the dashboard's data instead of re-reading Firestore. All three tabs
+// now read from the same localStorage slot keyed by source (food / grocery).
+// --------------------------------------------------------------------------
+export const DASHBOARD_FETCH_WINDOW_DAYS = MAX_FETCH_DAYS;
+
+export function getDashboardSource() {
+  return state.source;
+}
+
+export function getCachedDashboardData(source) {
+  return _getCachedBySource(source || state.source);
+}
+
+// Merge-patch a cache slot. Used by Partners/Staff tabs on cache-miss to
+// backfill shared keys (ordersAll, partners, staff, deliveryRuns) so the
+// next tab open is free. Preserves fields the patch doesn't touch, and
+// preserves the existing `fetchedAt` — the dashboard's "last fetched"
+// label should only move when the admin actually clicks Refresh, not when
+// a sibling tab silently backfills on first visit.
+export function putDashboardDataIntoCache(source, patch) {
+  const src = source || state.source;
+  const all = _loadDashCache();
+  const prev = (all[src] && typeof all[src] === 'object') ? all[src] : {};
+  // Deliberately DO NOT touch fetchedAt. It's set only by the dashboard's
+  // own full refresh (_putCachedBySource) — that way the dashboard's
+  // "cache is usable" check (`cached.fetchedAt` present) stays true only
+  // after a real full fetch, and the "last fetched X ago" label can't be
+  // misled by a sibling tab's partial backfill.
+  all[src] = { ...prev, ..._normalizeForCache(patch) };
+  _saveDashCache(all);
+}
+
+// Drop specific fields from a cache slot (e.g. when staff/orders change we
+// want the next read to re-fetch those but keep the rest). Pass no keys to
+// drop the whole slot. Also drops `fetchedAt` whenever any key is removed —
+// the slot is no longer a complete dashboard snapshot, so the dashboard
+// must do a full refetch on its next visit (otherwise it would render
+// using `cached.ordersAll || []` and show an empty window).
+export function invalidateDashboardCacheSlot(source, keys) {
+  const src = source || state.source;
+  const all = _loadDashCache();
+  if (!all[src]) return;
+  if (!keys || !keys.length) { delete all[src]; _saveDashCache(all); return; }
+  const slot = { ...all[src] };
+  for (const k of keys) delete slot[k];
+  delete slot.fetchedAt;
+  all[src] = slot;
   _saveDashCache(all);
 }
 
@@ -697,7 +753,12 @@ async function refresh(root, db, { force = false } = {}) {
   // for this source, skip Firestore entirely. The admin only pays read cost
   // when they explicitly click Refresh or Share Summary.
   let ordersAll, partners, staff, customers, rules;
-  const cached = !force ? _getCachedBySource(state.source) : null;
+  // Only treat the slot as a usable dashboard cache if the dashboard itself
+  // has fully fetched at least once (fetchedAt set by _putCachedBySource).
+  // A partial slot backfilled by Partners/Staff tabs won't have fetchedAt
+  // and must fall through to a full fetch here.
+  const rawCached = !force ? _getCachedBySource(state.source) : null;
+  const cached = (rawCached && rawCached.fetchedAt) ? rawCached : null;
   if (cached) {
     ordersAll = cached.ordersAll || [];
     partners  = cached.partners  || [];

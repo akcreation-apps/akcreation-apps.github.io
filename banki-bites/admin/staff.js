@@ -8,6 +8,10 @@ import {
   toDateSafe, chartPalette, whenChartReady, fmtINR, wireStatsBlockResize, startOfLastMonth,
   startOfCurrentMonth, truncateName, isOnTime,
 } from '../analytics.js';
+import {
+  getCachedDashboardData, putDashboardDataIntoCache, invalidateDashboardCacheSlot,
+  getDashboardSource, DASHBOARD_FETCH_WINDOW_DAYS,
+} from './dashboard.js';
 
 // Note: Creating a Firebase Auth user requires the Admin SDK (server-side) or the
 // Firebase console. This screen manages the staff *directory* doc — you must create
@@ -134,10 +138,14 @@ const _staffPagedCache = new Map(); // key -> { t, data }
 
 // Public hook so the orders live-listener can drop stale staff caches the
 // moment any order changes — otherwise staff payout numbers lag by up to the
-// cache TTL after another admin updates an order.
+// cache TTL after another admin updates an order. Also clears the matching
+// keys inside the shared dashboard cache so the next read refetches.
 export function invalidateStaffPagedCache() {
   _staffPagedCache.delete('orders:last60d');
   _staffPagedCache.delete('delivery_runs:completed:last60d');
+  try {
+    invalidateDashboardCacheSlot(getDashboardSource(), ['ordersAll', 'deliveryRuns']);
+  } catch {}
 }
 
 async function fetchPaged(db, cacheKey, colName, extraConstraints, { force } = {}) {
@@ -161,21 +169,35 @@ async function fetchPaged(db, cacheKey, colName, extraConstraints, { force } = {
 
 async function refreshStaffOrders(db, { force = false } = {}) {
   const sinceTs = Timestamp.fromMillis(Date.now() - STAFF_WINDOW_DAYS * 86400000);
-  _staffOrdersCache = await fetchPaged(
-    db,
-    'orders:last60d',
-    COL.ORDERS,
-    [where('created_at', '>=', sinceTs)],
-    { force },
-  );
-  // Also pull completed grocery runs across the same window. Single-page
-  // fetch (no orderBy) — completed runs in 60d is a small set, and skipping
-  // orderBy avoids forcing a composite index on (status, created_at).
-  const runsKey = 'delivery_runs:completed:last60d';
-  const runsHit = _staffPagedCache.get(runsKey);
-  if (!force && runsHit && (Date.now() - runsHit.t) < STAFF_CACHE_TTL_MS) {
-    _staffRunsCache = runsHit.data;
+  // Cache-first path: reuse the dashboard's shared payload so we don't pay
+  // the same Firestore reads twice. Only Refresh (force) bypasses it.
+  const source = getDashboardSource();
+  const cached = !force ? getCachedDashboardData(source) : null;
+  if (cached && Array.isArray(cached.ordersAll) && Array.isArray(cached.deliveryRuns)) {
+    _staffOrdersCache = cached.ordersAll;
+    _staffRunsCache = cached.deliveryRuns;
+    return;
+  }
+  // Partial-hit or miss — fetch whichever piece is missing and backfill into
+  // the shared cache so sibling tabs (Dashboard, Partners) share the result.
+  const patch = {};
+  if (cached && Array.isArray(cached.ordersAll)) {
+    _staffOrdersCache = cached.ordersAll;
   } else {
+    _staffOrdersCache = await fetchPaged(
+      db,
+      'orders:last60d',
+      COL.ORDERS,
+      [where('created_at', '>=', sinceTs)],
+      { force: true },
+    );
+    patch.ordersAll = _staffOrdersCache;
+  }
+  if (cached && Array.isArray(cached.deliveryRuns)) {
+    _staffRunsCache = cached.deliveryRuns;
+  } else {
+    // Single-page fetch (no orderBy) — completed runs in 60d is a small set,
+    // and skipping orderBy avoids forcing a composite index.
     const snap = await getDocs(query(
       collection(db, COL.DELIVERY_RUNS),
       where('status', '==', 'completed'),
@@ -184,8 +206,10 @@ async function refreshStaffOrders(db, { force = false } = {}) {
     ));
     _staffRunsCache = [];
     snap.forEach(d => _staffRunsCache.push({ id: d.id, ...d.data() }));
-    _staffPagedCache.set(runsKey, { t: Date.now(), data: _staffRunsCache });
+    _staffPagedCache.set('delivery_runs:completed:last60d', { t: Date.now(), data: _staffRunsCache });
+    patch.deliveryRuns = _staffRunsCache;
   }
+  if (Object.keys(patch).length) putDashboardDataIntoCache(source, patch);
 }
 
 // Convert a completed run doc into a synthetic order the payout UI can
@@ -346,11 +370,28 @@ function renderStaffCharts() {
 async function loadStaff(db, root, { force = false } = {}) {
   const list = root.querySelector('#staffList');
   list.innerHTML = '<div class="bb-loader-block">Loading delivery partners…</div>';
-  const staff = await cachedGetDocs(
-    'staff:all',
-    () => collection(db, COL.STAFF),
-    { ttlMs: 10 * 60_000, force },
-  );
+  // Reuse the dashboard's cached staff list when available. On miss or on
+  // force, fall back to the shared cachedGetDocs utility and backfill the
+  // dashboard cache so the next tab open is free.
+  const source = getDashboardSource();
+  const cached = !force ? getCachedDashboardData(source) : null;
+  let staff;
+  if (cached && Array.isArray(cached.staff) && cached.staff.length) {
+    // Dashboard stores staff rows as { uid, ...data }. Normalise to the
+    // { id, ...data } shape renderCard below expects.
+    staff = cached.staff.map(s => ({ id: s.uid || s.id, ...s }));
+  } else {
+    staff = await cachedGetDocs(
+      'staff:all',
+      () => collection(db, COL.STAFF),
+      { ttlMs: 10 * 60_000, force },
+    );
+    if (staff.length) {
+      putDashboardDataIntoCache(source, {
+        staff: staff.map(s => ({ uid: s.id, ...s })),
+      });
+    }
+  }
   if (!staff.length) {
     list.innerHTML = `<div class="empty-state"><i class="fas fa-motorcycle"></i><p>No delivery partners yet.</p></div>`;
     return;
@@ -461,7 +502,7 @@ function renderCard(db, root, uid, s) {
     ? `<a class="icon-btn icon-btn--success" href="${telHref}" data-act="call" title="Call ${escapeAttr(s.name)}" aria-label="Call ${escapeAttr(s.name)}"><i class="fas fa-phone"></i></a>`
     : `<button class="icon-btn icon-btn--secondary" data-act="call" disabled title="No phone on file"><i class="fas fa-phone-slash"></i></button>`;
 
-  const mine = staffOrdersFor(uid);
+  let mine = staffOrdersFor(uid);
   const earned  = mine.reduce((sum, o) => sum + feeForOrder(o, _staffFeeRules), 0);
   const paid    = mine.filter(isPayoutPaid).reduce((sum, o) => sum + feeForOrder(o, _staffFeeRules), 0);
   const pending = earned - paid;
@@ -710,6 +751,48 @@ function renderCard(db, root, uid, s) {
   }
   renderPayoutHistory();
 
+  // Per-partner realtime refetch — when the admin expands the Earnings &
+  // Payouts details for this partner, pull their fresh orders from
+  // Firestore so the payout list reflects any writes made since the
+  // dashboard cache was last filled. Only runs once per card lifetime;
+  // repeated open/close doesn't re-hit Firestore.
+  const payoutsDetails = el.querySelector('details.payouts-block');
+  if (payoutsDetails) {
+    let fetchedFresh = false;
+    payoutsDetails.addEventListener('toggle', async () => {
+      if (!payoutsDetails.open || fetchedFresh) return;
+      fetchedFresh = true;
+      try {
+        const sinceTs = Timestamp.fromMillis(Date.now() - (DASHBOARD_FETCH_WINDOW_DAYS || 60) * 86400000);
+        const [ordersSnap, runsSnap] = await Promise.all([
+          getDocs(query(
+            collection(db, COL.ORDERS),
+            where('delivery_staff_id', '==', uid),
+            where('created_at', '>=', sinceTs),
+          )),
+          getDocs(query(
+            collection(db, COL.DELIVERY_RUNS),
+            where('partner_uid', '==', uid),
+            where('status', '==', 'completed'),
+            where('created_at', '>=', sinceTs),
+          )),
+        ]);
+        const freshOrders = [];
+        ordersSnap.forEach(d => {
+          const o = { id: d.id, ...d.data() };
+          if (isDelivered(o) && o.payout_applicable !== false) freshOrders.push(o);
+        });
+        const freshRuns = [];
+        runsSnap.forEach(d => freshRuns.push(runToSyntheticOrder({ id: d.id, ...d.data() })));
+        mine = [...freshOrders, ...freshRuns];
+        renderPayoutRows();
+        renderPayoutHistory();
+      } catch (err) {
+        console.warn('[staff] realtime payouts refetch failed:', err.message);
+      }
+    });
+  }
+
   el.querySelector('[data-act="markAllPending"]').addEventListener('click', () => {
     // Just ticks every visible pending checkbox so the admin can review the
     // selection (and its total) before hitting "Mark selected as paid". Does
@@ -765,10 +848,13 @@ function renderCard(db, root, uid, s) {
       for (const r of (_staffRunsCache || [])) {
         if (runIds.includes(r.id)) { r.payout_paid = true; r.payout_paid_at = now; }
       }
-      // In-memory caches already patched above; also drop the paged caches so
-      // the next refreshStaffOrders() call re-reads the authoritative state.
+      // In-memory caches already patched above; also drop the paged caches
+      // AND the shared dashboard cache slots so the next refreshStaffOrders()
+      // (or a page reload) re-reads the authoritative state instead of the
+      // stale payout_paid=false rows we just updated in Firestore.
       _staffPagedCache.delete('orders:last60d');
       _staffPagedCache.delete('delivery_runs:completed:last60d');
+      try { invalidateDashboardCacheSlot(getDashboardSource(), ['ordersAll', 'deliveryRuns']); } catch {}
       Swal.fire({ icon: 'success', title: 'Saved', timer: 1100, showConfirmButton: false });
       loadStaff(db, root);
       renderStaffCharts();
