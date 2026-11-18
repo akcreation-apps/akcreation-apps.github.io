@@ -3,7 +3,7 @@ import {
   collection, getDocs, doc, setDoc, deleteDoc, orderBy, limit, startAfter, query, where, writeBatch, Timestamp, onSnapshot,
 } from 'https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js';
 import { groupBy, topN, chartPalette, whenChartReady, wireStatsBlockResize, isDelivered, truncateName } from '../analytics.js';
-import { getCachedDashboardData, putDashboardDataIntoCache, getDashboardSource, DASHBOARD_FETCH_WINDOW_DAYS } from './dashboard.js';
+import { getCachedDashboardData, putDashboardDataIntoCache, getDashboardSource, DASHBOARD_FETCH_WINDOW_DAYS, paintLastFetchedInto } from './dashboard.js';
 
 const partnerCharts = new Map();
 function mountPartnerChart(id, config) {
@@ -118,6 +118,9 @@ export async function renderPartners(root, db) {
     <details class="stats-block">
       <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Partner insights</summary>
       <div class="stats-block-body">
+        <div id="partnersLastFetched" class="text-muted small" style="margin:-4px 0 10px 2px; font-size:0.78rem;">
+          <i class="fas fa-clock" aria-hidden="true"></i> <span data-el="text">Checking…</span>
+        </div>
         <div class="chart-grid">
           <div class="chart-card">
             <div class="chart-card-head"><i class="fas fa-store"></i> Top restaurants by orders</div>
@@ -245,9 +248,14 @@ async function renderPartnerCharts(db) {
   const source = getDashboardSource();
   const cached = getCachedDashboardData(source);
   let partners, orders;
+  let analyticsFetchedAt = null;
   if (cached && cached.ordersAll && cached.partners) {
     partners = cached.partners;
     orders = cached.ordersAll;
+    // Prefer the dashboard-authored fetchedAt stamp; if this slot was only
+    // backfilled by a sibling tab (no fetchedAt), leave it null so the stamp
+    // reads "No cached data yet…" instead of a fake recent time.
+    analyticsFetchedAt = cached.fetchedAt || null;
   } else {
     const windowDays = DASHBOARD_FETCH_WINDOW_DAYS || 60;
     const sinceTs = Timestamp.fromMillis(Date.now() - windowDays * 86400000);
@@ -258,7 +266,9 @@ async function renderPartnerCharts(db) {
     partners = []; partnersSnap.forEach(d => partners.push({ id: d.id, ...d.data() }));
     orders = fetchedOrders;
     putDashboardDataIntoCache(source, { partners, ordersAll: orders });
+    analyticsFetchedAt = Date.now();
   }
+  paintLastFetchedInto(document.getElementById('partnersLastFetched'), analyticsFetchedAt);
 
   const g = groupBy(orders.filter(isDelivered), o => o.restaurant_name || o.restaurant_id || 'Unknown');
   const top = topN(g, 8);

@@ -11,6 +11,7 @@ import {
   loadFeeRules, feeForOrder, toDateSafe, chartPalette, whenChartReady, isDelivered, fmtINR,
   wireStatsBlockResize, netRevenue, truncateName,
 } from '../analytics.js';
+import { paintLastFetchedInto } from './dashboard.js';
 
 // Detached whenever renderOrders re-mounts, so we never accumulate live listeners
 // on the orders collection across tab switches.
@@ -353,6 +354,9 @@ export async function renderOrders(root, db) {
     <details class="stats-block">
       <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Today snapshot</summary>
       <div class="stats-block-body">
+        <div id="ordersLastFetched" class="text-muted small" style="margin:-4px 0 10px 2px; font-size:0.78rem;">
+          <i class="fas fa-clock" aria-hidden="true"></i> <span data-el="text">Checking…</span>
+        </div>
         <div id="ordersKpis" class="kpi-grid kpi-grid--compact"></div>
         <div class="chart-grid">
           <div class="chart-card">
@@ -572,6 +576,10 @@ export async function renderOrders(root, db) {
       });
     }
     renderOrdersStats(base, filtered);
+    // Orders tab is driven by a live Firestore snapshot, so "last fetched"
+    // tracks the moment the latest snapshot landed — updates each time the
+    // list re-renders.
+    paintLastFetchedInto(document.getElementById('ordersLastFetched'), Date.now());
     // Button visible whenever there's a reasonable chance of older orders —
     // hidden once a Load-older page returns fewer than PAGE_SIZE docs.
     const loadMoreWrap = document.getElementById('ordersLoadMore');

@@ -10,7 +10,7 @@ import {
 } from '../analytics.js';
 import {
   getCachedDashboardData, putDashboardDataIntoCache,
-  getDashboardSource, DASHBOARD_FETCH_WINDOW_DAYS,
+  getDashboardSource, DASHBOARD_FETCH_WINDOW_DAYS, paintLastFetchedInto,
 } from './dashboard.js';
 
 // Note: Creating a Firebase Auth user requires the Admin SDK (server-side) or the
@@ -66,6 +66,9 @@ export async function renderStaff(root, db) {
     <details class="stats-block">
       <summary class="stats-block-head"><i class="fas fa-chart-simple"></i> Delivery partner insights</summary>
       <div class="stats-block-body">
+        <div id="staffLastFetched" class="text-muted small" style="margin:-4px 0 10px 2px; font-size:0.78rem;">
+          <i class="fas fa-clock" aria-hidden="true"></i> <span data-el="text">Checking…</span>
+        </div>
         <div id="staffKpis" class="kpi-grid kpi-grid--compact"></div>
         <div class="chart-grid">
           <div class="chart-card chart-card--wide">
@@ -258,6 +261,7 @@ async function refreshStaffOrders(db, { force = false } = {}) {
   if (cached && Array.isArray(cached.ordersAll) && Array.isArray(cached.deliveryRuns)) {
     _staffOrdersCache = cached.ordersAll;
     _staffRunsCache = cached.deliveryRuns;
+    paintLastFetchedInto(document.getElementById('staffLastFetched'), cached.fetchedAt || null);
     return;
   }
   // Partial-hit or miss — fetch whichever piece is missing and backfill into
@@ -292,6 +296,12 @@ async function refreshStaffOrders(db, { force = false } = {}) {
     patch.deliveryRuns = _staffRunsCache;
   }
   if (Object.keys(patch).length) putDashboardDataIntoCache(source, patch);
+  // On a miss or partial-hit we just fetched fresh, so stamp "just now".
+  // If the slot already carried a dashboard-authored fetchedAt from a
+  // previous full dashboard run, prefer that so the label matches the
+  // Dashboard tab's own stamp instead of racing ahead of it.
+  const latest = getCachedDashboardData(source);
+  paintLastFetchedInto(document.getElementById('staffLastFetched'), (latest && latest.fetchedAt) || Date.now());
 }
 
 // Convert a completed run doc into a synthetic order the payout UI can

@@ -737,9 +737,12 @@ export function invalidateDashboardCacheSlot(source, keys) {
 /**
  * Human-readable "last fetched" label — informational only, no stale warning.
  * Share Summary on the daily routine refreshes the cache automatically.
+ *
+ * Exported so sibling analytics tabs (Orders, Partners, Delivery) can paint
+ * the same stamp into their own `[data-last-fetched]` block without
+ * duplicating the formatting logic.
  */
-function _paintLastFetched(root, fetchedAt) {
-  const el = root.querySelector('#dashLastFetched');
+export function paintLastFetchedInto(el, fetchedAt) {
   if (!el) return;
   const textEl = el.querySelector('[data-el="text"]') || el;
   if (!fetchedAt) {
@@ -759,6 +762,10 @@ function _paintLastFetched(root, fetchedAt) {
   else if (diffMs < 86_400_000) relative = `${Math.floor(diffMs / 3_600_000)} h ago`;
   else relative = `${Math.floor(diffMs / 86_400_000)} d ago`;
   textEl.innerHTML = `Analytics last fetched <strong>${dayStr} · ${timeStr}</strong> (${relative})`;
+}
+
+function _paintLastFetched(root, fetchedAt) {
+  paintLastFetchedInto(root.querySelector('#dashLastFetched'), fetchedAt);
 }
 
 async function refresh(root, db, { force = false } = {}) {
