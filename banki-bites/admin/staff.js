@@ -497,7 +497,7 @@ async function loadStaff(db, root, { force = false } = {}) {
 // zero on-time deliveries — neither belongs in a motivation blast), and copy
 // a Odia-flavoured message to the clipboard so admin can paste it into the
 // partners' group chat.
-function copyEtaRanking(root) {
+async function copyEtaRanking(root) {
   const monthStart = startOfCurrentMonth(new Date());
   const cards = Array.from(root.querySelectorAll('.staff-card[data-uid]'));
   const rows = [];
@@ -584,10 +584,33 @@ function copyEtaRanking(root) {
   const footer = '\n\n_Team BankiBites 💚_';
   const text = header + body + footer;
 
-  // Copy to clipboard synchronously via execCommand (modern async clipboard
-  // API loses the race with window.location.href on mobile), then open the
-  // delivery-partners WhatsApp group. chat.whatsapp.com URLs can't carry a
-  // prefilled ?text= payload — so admin pastes once inside the group.
+  // Preview the ranking inside a Swal so admin sees exactly what will be
+  // pasted, then run clipboard + WhatsApp navigation inside a FRESH user
+  // gesture (the confirm click). Doing it this way is essential: this
+  // function was invoked from an event handler that awaited both
+  // loadStaff() and fetchCurrentMonthEtaData() — by this point the
+  // original click's gesture token is long gone, so document.execCommand
+  // ('copy') and the wa.me interstitial both fail silently on mobile.
+  // chat.whatsapp.com cannot carry a prefilled ?text= payload (WhatsApp
+  // limitation), so copy + open + paste is the end-to-end flow.
+  const confirm = await Swal.fire({
+    icon: 'info',
+    title: 'ETA ranking ready',
+    html: `
+      <div class="text-left" style="font-size:0.78rem">
+        Review the ranking, then click <strong>Copy &amp; open group</strong>.
+        It'll be copied to your clipboard — paste inside the group to send.
+      </div>
+      <pre style="text-align:left;white-space:pre-wrap;word-break:break-word;font-size:0.78rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin:10px 0 0;max-height:280px;overflow:auto">${escapeHtml(text)}</pre>
+    `,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fab fa-whatsapp"></i> Copy & open group',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#25D366',
+    width: 560,
+  });
+  if (!confirm.isConfirmed) return;
+
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.setAttribute('readonly', '');
@@ -596,13 +619,15 @@ function copyEtaRanking(root) {
   ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
   document.body.appendChild(ta);
   ta.focus(); ta.select();
-  try { document.execCommand('copy'); } catch (e) {}
+  let copied = false;
+  try { copied = document.execCommand('copy'); } catch (e) {}
   document.body.removeChild(ta);
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).catch(() => {});
     }
   } catch (e) {}
+  if (!copied) console.warn('[staff] clipboard copy failed — opening group anyway');
 
   window.location.href = 'https://chat.whatsapp.com/JVivP6n7w7D5xYkH29J9oL';
 }

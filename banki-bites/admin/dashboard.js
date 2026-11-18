@@ -1083,13 +1083,11 @@ function syncCopyToClipboard(text) {
   return ok;
 }
 
-// Copies a short Odia/English daily summary to the clipboard and opens the
-// BankiBites dashboard WhatsApp group. Admin pastes inside the group to
-// send. chat.whatsapp.com URLs cannot carry a prefilled ?text= payload —
-// that's a WhatsApp platform limitation, so copy + open + paste is the
-// cleanest end-to-end flow. Uses the cached orders/customers from the latest
-// refresh() so no extra Firestore reads happen on click.
-function shareDailySummary() {
+// Builds the Odia/English daily summary from the cached orders/customers
+// loaded by the latest refresh(). Pure function — no Firestore, no DOM side
+// effects — so the caller can preview the text, await a fresh user gesture,
+// and only then copy + navigate.
+function buildDailySummaryText() {
   const now = new Date();
   const dayStart = startOfDay(now);
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
@@ -1130,9 +1128,43 @@ function shareDailySummary() {
     'ଆଜିର ବିବରଣୀ — Team ପାଇଁ ।',
     '_Team BankiBites 💚_',
   ];
-  const text = lines.join('\n');
+  return lines.join('\n');
+}
 
-  syncCopyToClipboard(text);
+function escapeHtmlForPreview(s) {
+  return String(s).replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+}
+
+// Preview the summary, then copy + open the WhatsApp group inside a FRESH
+// user gesture (the Swal confirm click). After the long refresh() that
+// precedes this, mobile browsers have invalidated the original click's
+// gesture token — doing clipboard + wa.me/chat.whatsapp.com navigation here
+// instead keeps both reliable. chat.whatsapp.com cannot carry a ?text=
+// payload (WhatsApp limitation), so copy + open + paste is the end-to-end
+// flow. Uses cached orders/customers so no extra Firestore reads happen.
+async function shareDailySummary() {
+  const text = buildDailySummaryText();
+  const res = await Swal.fire({
+    icon: 'info',
+    title: 'Summary ready',
+    html: `
+      <div class="text-left" style="font-size:0.78rem">
+        Review the message, then click <strong>Copy &amp; open group</strong>.
+        It'll be copied to your clipboard — paste inside the group to send.
+      </div>
+      <pre style="text-align:left;white-space:pre-wrap;word-break:break-word;font-size:0.78rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin:10px 0 0;max-height:280px;overflow:auto">${escapeHtmlForPreview(text)}</pre>
+    `,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fab fa-whatsapp"></i> Copy & open group',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#25D366',
+    width: 560,
+  });
+  if (!res.isConfirmed) return;
+  const copied = syncCopyToClipboard(text);
+  if (!copied) {
+    console.warn('[dashboard] clipboard copy failed — opening group anyway');
+  }
   window.location.href = DASHBOARD_WA_GROUP_URL;
 }
 
