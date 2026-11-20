@@ -188,19 +188,22 @@ export async function renderNtfyCard({ db, uid, container, onTest }) {
  * Fire a test ntfy ring through the local notification server. Uses the live
  * server_url + notify_token exposed on `window.__bbNotifyCfg` by notify-sync.js.
  */
-export async function sendTestRing({ uid }) {
+export async function sendTestRing({ uid, topic }) {
   const cfg = (typeof window !== 'undefined' && window.__bbNotifyCfg) || {};
   if (!cfg.server_url || !cfg.notify_token) {
     throw new Error('Notification server not configured');
   }
   const url = `${cfg.server_url}/notify/ntfy-test`;
+  // Prefer sending the topic directly — the server then just POSTs to ntfy.sh
+  // without needing Firestore. Falls back to staff_uid lookup if no topic.
+  const payload = topic ? { topic } : { staff_uid: uid };
   let resp;
   try {
     resp = await fetch(url, {
       method:  'POST',
       mode:    'cors',
       headers: { 'Content-Type': 'application/json', 'X-Notify-Token': cfg.notify_token },
-      body:    JSON.stringify({ staff_uid: uid }),
+      body:    JSON.stringify(payload),
     });
   } catch (err) {
     // Network / CORS / server unreachable — fetch throws before any response.

@@ -174,7 +174,7 @@ function mountNtfySetupCard(db, user) {
     mounted = true;
     renderNtfyCard({
       db, uid: user.uid, container: body,
-      onTest: async () => sendTestRing({ uid: user.uid }),
+      onTest: async (topic) => sendTestRing({ uid: user.uid, topic }),
     }).catch(err => {
       mounted = false;
       body.innerHTML = `<div class="bb-ntfy-error">${err.message || 'Setup failed'}</div>`;
