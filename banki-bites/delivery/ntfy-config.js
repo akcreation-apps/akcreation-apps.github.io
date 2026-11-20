@@ -193,13 +193,39 @@ export async function sendTestRing({ uid }) {
   if (!cfg.server_url || !cfg.notify_token) {
     throw new Error('Notification server not configured');
   }
-  const resp = await fetch(`${cfg.server_url}/notify/ntfy-test`, {
-    method:  'POST',
-    mode:    'cors',
-    headers: { 'Content-Type': 'application/json', 'X-Notify-Token': cfg.notify_token },
-    body:    JSON.stringify({ staff_uid: uid }),
-  });
+  const url = `${cfg.server_url}/notify/ntfy-test`;
+  let resp;
+  try {
+    resp = await fetch(url, {
+      method:  'POST',
+      mode:    'cors',
+      headers: { 'Content-Type': 'application/json', 'X-Notify-Token': cfg.notify_token },
+      body:    JSON.stringify({ staff_uid: uid }),
+    });
+  } catch (err) {
+    // Network / CORS / server unreachable — fetch throws before any response.
+    throw new Error(`Network error: ${err.message} (${url})`);
+  }
   let body = {};
-  try { body = await resp.json(); } catch {}
-  return { success: resp.ok && body.success !== false, ...body };
+  let raw = '';
+  try {
+    raw = await resp.text();
+    body = raw ? JSON.parse(raw) : {};
+  } catch {
+    // Non-JSON response (HTML 404, proxy error) — surface the status code +
+    // a short slice of the body so the partner's error line is actionable.
+    const snippet = raw.replace(/\s+/g, ' ').slice(0, 120);
+    return {
+      success: false,
+      reason:  `HTTP ${resp.status} — non-JSON response: ${snippet || '(empty)'}`,
+    };
+  }
+  if (!resp.ok || body.success === false) {
+    return {
+      success: false,
+      reason:  body.reason || body.message || `HTTP ${resp.status}`,
+      ...body,
+    };
+  }
+  return { success: true, ...body };
 }
