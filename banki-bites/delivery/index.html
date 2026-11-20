@@ -94,23 +94,6 @@
     </header>
 
     <main class="content">
-      <!-- Reliable ring alerts: ntfy.sh fallback for when Chrome/PWA push is
-           throttled by Doze / Samsung background killer. Partner installs the
-           ntfy app once, scans the QR, and their phone rings loudly for every
-           new order regardless of browser state. See delivery/ntfy-config.js. -->
-      <details class="settings-card bb-ntfy-card" id="ntfySetupCard">
-        <summary class="settings-card-summary">
-          <span class="scs-icon"><i class="fas fa-bell"></i></span>
-          <span class="scs-text">
-            <strong>Reliable ring alerts</strong>
-            <small>Install the ntfy app once — never miss a new order</small>
-          </span>
-        </summary>
-        <div class="settings-card-body" id="ntfySetupBody">
-          <div class="bb-ntfy-loading">Loading…</div>
-        </div>
-      </details>
-
       <div class="segmented" role="tablist" aria-label="View">
         <button id="seg-btn-active"    class="seg-btn active" data-view="active"    role="tab" aria-selected="true"  aria-controls="ordersList"><i class="fas fa-bolt"             aria-hidden="true"></i> Active</button>
         <button id="seg-btn-delivered" class="seg-btn"        data-view="delivered" role="tab" aria-selected="false" aria-controls="ordersList"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i> History</button>

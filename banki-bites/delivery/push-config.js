@@ -171,7 +171,7 @@ match /bankibites_delivery_staff/{uid} {
       request.auth != null
       && request.auth.uid == uid
       && request.resource.data.diff(resource.data).affectedKeys()
-           .hasOnly(['is_online', 'fcm_token', 'fcm_token_updated_at', 'fcm_tokens', 'ntfy_topic'])
+           .hasOnly(['is_online', 'fcm_token', 'fcm_token_updated_at', 'fcm_tokens'])
     );
 }
 

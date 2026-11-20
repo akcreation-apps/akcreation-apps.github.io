@@ -2,7 +2,6 @@ import { getDb as getDbBase, getAuthInstance as getAuthBase, getBankiBitesApp, C
 import { initNotifySync, syncOrder } from '../notify-sync.js';
 import { armAudioOnFirstGesture, primeAudioNow, requestAlertPermission, startRinging, stopRinging } from './ring.js';
 import { enablePush, disablePushForThisDevice } from './push-config.js';
-import { renderNtfyCard, sendTestRing } from './ntfy-config.js';
 
 const APP_NAME = 'bankibites-delivery';
 const getDb = () => getDbBase(APP_NAME);
@@ -161,29 +160,6 @@ function mountAvailabilityToggle(db, user, initialData) {
   });
 }
 
-// Mount the reliable-ring setup card. The topic is only generated + written to
-// Firestore when the partner first opens the <details>, so partners who never
-// open it don't get a stray ntfy_topic field on their staff doc.
-function mountNtfySetupCard(db, user) {
-  const card = document.getElementById('ntfySetupCard');
-  const body = document.getElementById('ntfySetupBody');
-  if (!card || !body) return;
-  let mounted = false;
-  const render = () => {
-    if (mounted || !card.open) return;
-    mounted = true;
-    renderNtfyCard({
-      db, uid: user.uid, container: body,
-      onTest: async (topic) => sendTestRing({ uid: user.uid, topic }),
-    }).catch(err => {
-      mounted = false;
-      body.innerHTML = `<div class="bb-ntfy-error">${err.message || 'Setup failed'}</div>`;
-    });
-  };
-  card.addEventListener('toggle', render);
-  if (card.open) render();
-}
-
 const _earnCharts = new Map();
 function mountEarnChart(id, config) {
   const old = _earnCharts.get(id);
@@ -311,7 +287,6 @@ let currentUser = null;
     $('#userEmail').textContent = staffDoc.data().name || user.email;
     showShell();
     mountAvailabilityToggle(db, user, staffDoc.data());
-    mountNtfySetupCard(db, user);
     // Prime the new-order alert engine: unlock Web Audio on the next tap
     // (browsers block autoplay until a user gesture) and ask for OS
     // notification permission so the partner is reached with the tab in
