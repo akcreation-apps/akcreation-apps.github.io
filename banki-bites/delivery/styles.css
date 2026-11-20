@@ -1549,3 +1549,33 @@ details.delivery-order[open] > .delivery-summary .delivery-chevron {
 @media (prefers-reduced-motion: reduce) {
   .bb-ring-banner { animation: none; }
 }
+
+/* ntfy.sh fallback-push setup card ------------------------------------------ */
+.bb-ntfy-card { margin: 0 0 1rem; border-radius: 10px; overflow: hidden; }
+.bb-ntfy-card .settings-card-summary { padding: 0.75rem 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.75rem; }
+.bb-ntfy-card .scs-icon { font-size: 1.1rem; color: #ff6b35; }
+.bb-ntfy-card .scs-text strong { display: block; }
+.bb-ntfy-card .scs-text small { color: #6b7280; }
+.bb-ntfy-card .settings-card-body { padding: 0.9rem 1rem 1.1rem; }
+.bb-ntfy-steps { padding-left: 1.2rem; margin: 0; }
+.bb-ntfy-steps li { margin-bottom: 0.9rem; line-height: 1.45; }
+.bb-ntfy-steps li:last-child { margin-bottom: 0; }
+.bb-ntfy-links { margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
+.bb-ntfy-topic { margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.bb-ntfy-topic code { padding: 2px 8px; background: rgba(0,0,0,0.06); border-radius: 4px; font-size: 0.9rem; }
+.bb-ntfy-qr { margin-top: 8px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.bb-ntfy-qr img { border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; }
+.bb-ntfy-qr-hint { font-size: 0.85rem; color: #6b7280; word-break: break-all; }
+.bb-ntfy-test { margin-top: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bb-ntfy-test-status { font-size: 0.9rem; color: #6b7280; }
+.bb-ntfy-test-status.ok  { color: #15803d; font-weight: 600; }
+.bb-ntfy-test-status.err { color: #b91c1c; font-weight: 600; }
+.bb-ntfy-loading { padding: 0.4rem 0; color: #6b7280; font-size: 0.9rem; }
+.bb-ntfy-error   { padding: 0.4rem 0; color: #b91c1c; font-size: 0.9rem; }
+@media (prefers-color-scheme: dark) {
+  .bb-ntfy-card .scs-text small { color: #9ca3af; }
+  .bb-ntfy-topic code { background: rgba(255,255,255,0.08); color: #f3f4f6; }
+  .bb-ntfy-qr img { border-color: #374151; }
+  .bb-ntfy-qr-hint { color: #9ca3af; }
+  .bb-ntfy-test-status { color: #9ca3af; }
+}
