@@ -1,0 +1,135 @@
+{
+  "common": {
+    "pageTitle": "Sarbeswar & Sheetal — Wedding Invitation",
+    "landingTag": "You're cordially invited…",
+    "landingHint": "Tap the seal to open",
+    "letterScript": "S & S",
+    "letterSub": "Wedding Invitation",
+
+    "weddingDateTime": "2026-12-13T00:00:00+05:30",
+
+    "eyebrow": "The Wedding of",
+    "blessingLine": "With the blessings of the Almighty and our families",
+    "requestLine": "request the honour of your presence as we begin our <em>forever</em>.",
+
+    "saveTitle": "Save the Date",
+    "saveSub": "A little secret awaits…",
+    "pullHint": "Pull down to reveal",
+    "pullDoneHint": "Date revealed — tap to collapse",
+    "revealEyebrow": "The Wedding Day",
+    "revealDate": "13<sup>th</sup> December 2026",
+    "revealVenue": "Baramala Convention",
+
+    "celebrationsTitle": "Celebrations",
+    "celebrationsSub": "Join us through every joyful moment",
+
+    "venuesTitle": "Venues",
+    "venuesSub": "Tap for directions",
+
+    "closingLine": "Your blessings mean the world to us.",
+    "closingSignature": "— With love, Sarbeswar & Sheetal",
+
+    "contactPhone": "919861039566",
+    "whatsappMessage": "Hello! I'd like to RSVP for Sarbeswar & Sheetal's wedding. 💍",
+    "shareText": "You're invited to Sarbeswar & Sheetal's wedding 💍",
+
+    "music": "assets/music.mp3"
+  },
+
+  "groom": {
+    "firstName": "Sarbeswar",
+    "role": "The Groom",
+    "image": "assets/groom.jpg",
+    "parentRel": "Son of",
+    "father": "Sri. Sauri Pani",
+    "mother": "Smt. Nirupama Pani",
+
+    "events": [
+      {
+        "date": "12<sup>th</sup> December 2026 · 9 AM onwards ",
+        "title": "Haldi",
+        "detail": "A morning of turmeric, laughter and love.",
+        "icon": "fa-sun",
+        "dressCode": { "label": "Dress code: Yellow", "chip": "chip-yellow" }
+      },
+      {
+        "date": "12<sup>th</sup> December 2026 · 6 PM onwards",
+        "title": "Mehndi",
+        "detail": "An evening of henna, music and sweet beginnings.",
+        "icon": "fa-hand-holding-heart",
+        "dressCode": { "label": "Dress code: Green", "chip": "chip-green" }
+      },
+      {
+        "date": "13<sup>th</sup> December 2026 · 2 PM onwards",
+        "title": "Baraat",
+        "detail": "The groom's procession dispatches from <strong>Ragadi</strong>.",
+        "icon": "fa-horse"
+      },
+      {
+        "date": "13<sup>th</sup> December 2026",
+        "title": "The Wedding",
+        "detail": "The sacred vows, at <strong>Baramala Convention</strong>.",
+        "icon": "fa-ring",
+        "highlight": true
+      },
+      {
+        "date": "20<sup>th</sup> December 2026 · 7 PM onwards",
+        "title": "Reception",
+        "detail": "An evening of celebration at <strong>Ragadi</strong>.",
+        "icon": "fa-glass-cheers"
+      }
+    ],
+
+    "venues": [
+      {
+        "name": "Baramala Convention",
+        "role": "Marriage",
+        "when": "13 Dec 2026",
+        "icon": "fa-place-of-worship",
+        "mapsUrl": "https://maps.app.goo.gl/X8HRGLP3Ro9z36kr9"
+      },
+      {
+        "name": "At Our Residence (Ragadi)",
+        "role": "Baraat & Reception",
+        "when": "13 & 20 Dec 2026",
+        "icon": "fa-glass-cheers",
+        "mapsUrl": "https://maps.app.goo.gl/bY3eM7rTJpjELPym7"
+      }
+    ]
+  },
+
+  "bride": {
+    "firstName": "Sheetal",
+    "role": "The Bride",
+    "image": "assets/bride.jpg",
+    "parentRel": "Daughter of",
+    "father": "Sri. Sidheswar Pradhan",
+    "mother": "Smt. Ahalya Pradhan",
+
+    "events": [
+      {
+        "date": "12<sup>th</sup> December 2026",
+        "title": "Mangalkrutya",
+        "detail": "Sacred pre-wedding rituals invoking blessings for the bride.",
+        "icon": "fa-om"
+      },
+      {
+        "date": "13<sup>th</sup> December 2026 · 7 PM onwards",
+        "title": "Marriage, Panigrahana & Reception",
+        "detail": "The sacred vows, the union of hands and an evening of celebration — at <strong>Baramala Convention</strong>.",
+        "icon": "fa-ring",
+        "highlight": true
+      }
+    ],
+
+    "venues": [
+      {
+        "name": "Baramala Convention",
+        "role": "Reception",
+        "when": "13 Dec 2026 · 7 PM onwards",
+        "icon": "fa-glass-cheers",
+        "mapsUrl": "https://maps.app.goo.gl/X8HRGLP3Ro9z36kr9"
+      }
+    ]
+  }
+}
