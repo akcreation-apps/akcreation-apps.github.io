@@ -48,7 +48,8 @@
       "Bash(awk '{print $5, $9}')",
       "Bash(xargs cat *)",
       "Bash(PYTHONUTF8= python -c \"from PIL import Image; print\\('PIL OK'\\)\")",
-      "Bash(PYTHONUTF8= python compress_og.py)"
+      "Bash(PYTHONUTF8= python compress_og.py)",
+      "PowerShell(Get-Content *)"
     ]
   },
   "enableAllProjectMcpServers": true,

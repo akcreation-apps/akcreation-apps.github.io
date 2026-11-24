@@ -169,24 +169,77 @@
 <section class="landing" id="landing" aria-label="Wedding invitation envelope">
   <p class="landing-tag" id="landingTag">You're cordially invited…</p>
 
-  <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Tap the seal to open the invitation">
-    <div class="envelope-body">
-      <div class="envelope-back"></div>
-      <div class="envelope-letter" aria-hidden="true">
-        <div class="letter-inner">
-          <p class="letter-script" id="letterScript">S &amp; S</p>
-          <p class="letter-sub" id="letterSub">Wedding Invitation</p>
+  <!-- ====== Parchment Scroll (finalized) ====== -->
+  <div class="opening opening--scroll" id="envelope" role="button" tabindex="0" aria-label="Tap the scroll to unroll the invitation">
+    <div class="scroll-body">
+
+      <!-- Top gold rod with finials -->
+      <div class="scroll-rod scroll-rod--top" aria-hidden="true">
+        <span class="scroll-ring scroll-ring--l"></span>
+        <span class="scroll-ring scroll-ring--r"></span>
+        <span class="scroll-cap scroll-cap--l"><span class="cap-knob"></span></span>
+        <span class="scroll-cap scroll-cap--r"><span class="cap-knob"></span></span>
+      </div>
+
+      <!-- Parchment -->
+      <div class="scroll-parchment">
+        <div class="scroll-content">
+          <svg class="scroll-flourish" viewBox="0 0 160 14" aria-hidden="true">
+            <g fill="none" stroke="url(#goldGrad)" stroke-linecap="round" stroke-width="0.8">
+              <line x1="10" y1="7" x2="62" y2="7"/>
+              <line x1="98" y1="7" x2="150" y2="7"/>
+              <path d="M62 7 Q 70 1 80 7 Q 90 13 98 7" stroke-width="1"/>
+              <circle cx="80" cy="7" r="1.6" fill="url(#goldGrad)"/>
+              <circle cx="66" cy="7" r="0.9" fill="url(#goldGrad)"/>
+              <circle cx="94" cy="7" r="0.9" fill="url(#goldGrad)"/>
+            </g>
+          </svg>
+          <p class="scroll-eyebrow">The Wedding of</p>
+          <p class="scroll-monogram">S<span class="monogram-amp">&amp;</span>S</p>
+          <p class="scroll-sub">Wedding Invitation</p>
+          <svg class="scroll-flourish" viewBox="0 0 160 14" aria-hidden="true">
+            <g fill="none" stroke="url(#goldGrad)" stroke-linecap="round" stroke-width="0.8">
+              <line x1="10" y1="7" x2="62" y2="7"/>
+              <line x1="98" y1="7" x2="150" y2="7"/>
+              <path d="M62 7 Q 70 1 80 7 Q 90 13 98 7" stroke-width="1"/>
+              <circle cx="80" cy="7" r="1.6" fill="url(#goldGrad)"/>
+              <circle cx="66" cy="7" r="0.9" fill="url(#goldGrad)"/>
+              <circle cx="94" cy="7" r="0.9" fill="url(#goldGrad)"/>
+            </g>
+          </svg>
         </div>
       </div>
-      <div class="envelope-front"></div>
-      <div class="envelope-flap" id="envelopeFlap"></div>
-      <button class="seal" id="seal" aria-label="Open invitation">
-        <span class="seal-monogram">S<i class="fas fa-heart"></i>S</span>
-      </button>
+
+      <!-- Bottom gold rod with finials -->
+      <div class="scroll-rod scroll-rod--bottom" aria-hidden="true">
+        <span class="scroll-ring scroll-ring--l"></span>
+        <span class="scroll-ring scroll-ring--r"></span>
+        <span class="scroll-cap scroll-cap--l"><span class="cap-knob"></span></span>
+        <span class="scroll-cap scroll-cap--r"><span class="cap-knob"></span></span>
+      </div>
+
+      <!-- Ornate tassel -->
+      <div class="scroll-tassel" aria-hidden="true">
+        <span class="tassel-cord"></span>
+        <span class="tassel-knot"></span>
+        <span class="tassel-ball">
+          <span class="fringe fringe--1"></span>
+          <span class="fringe fringe--2"></span>
+          <span class="fringe fringe--3"></span>
+          <span class="fringe fringe--4"></span>
+          <span class="fringe fringe--5"></span>
+        </span>
+      </div>
     </div>
   </div>
 
-  <p class="landing-hint" id="landingHint"><i class="fas fa-hand-pointer"></i>&nbsp; <span id="landingHintText">Tap the seal to open</span></p>
+  <p class="landing-hint" id="landingHint"><span id="landingHintText">Pull to Unroll</span>&nbsp; <i class="fas fa-chevron-down"></i></p>
+
+  <p class="landing-teaser" id="landingTeaser">
+    <span class="teaser-star teaser-star--l" aria-hidden="true">✦</span>
+    <span class="teaser-text">a tale written in gold, waiting for you</span>
+    <span class="teaser-star teaser-star--r" aria-hidden="true">✦</span>
+  </p>
 </section>
 
 

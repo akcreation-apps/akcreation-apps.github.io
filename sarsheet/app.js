@@ -263,11 +263,11 @@
   const $$ = (sel) => document.querySelectorAll(sel);
 
   // ============================================
-  // Envelope open
+  // Opening — parchment scroll
   // ============================================
-  const envelope = $('#envelope');
-  const landing = $('#landing');
-  const letter = $('#letter');
+  const envelope = document.getElementById('envelope');
+  const landing  = $('#landing');
+  const letter   = $('#letter');
   const rsvpDock = $('#rsvpDock');
 
   let opened = false;
@@ -290,7 +290,7 @@
     vibrate(20);
     if (!prefersReduced) burstConfetti(window.innerWidth / 2, window.innerHeight / 2, 40);
 
-    setTimeout(finishOpen, prefersReduced ? 200 : 1600);
+    setTimeout(finishOpen, prefersReduced ? 200 : 2800);
   };
 
   const finishOpen = () => {
