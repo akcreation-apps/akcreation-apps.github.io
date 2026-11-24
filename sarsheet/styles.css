@@ -334,6 +334,12 @@ body::before {
   min-height: 100vh;
 }
 .letter > .invite-footer { margin-top: auto; }
+
+/* Scroll lock: hide everything after the pull card until the date is revealed */
+body:not(.date-revealed) .save-the-date ~ .section,
+body:not(.date-revealed) .save-the-date ~ .invite-footer {
+  display: none;
+}
 .letter.is-visible { opacity: 1; transform: translateY(0); }
 
 .section {
@@ -872,6 +878,76 @@ body::before {
   touch-action: pan-y;
 }
 .pull-card.is-open { touch-action: auto; }
+
+/* ---- Calendar actions (revealed after pull) ---- */
+.cal-actions {
+  margin: 18px auto 0;
+  max-width: 400px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .5s ease .25s, transform .5s ease .25s;
+  pointer-events: none;
+}
+.cal-actions.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.cal-actions-label {
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--maroon);
+  font-weight: 600;
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  position: relative;
+}
+.cal-actions-label::after {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: 0;
+  transform: translateX(-50%);
+  width: 18px; height: 1px;
+  background: var(--brass-2);
+}
+.cal-actions-row {
+  display: flex;
+  justify-content: center;
+}
+.cal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 32px;
+  min-height: 42px;
+  min-width: 200px;
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  line-height: 1;
+  background: transparent;
+  color: var(--maroon);
+  border: 1px solid var(--maroon);
+  transition: background-color .25s ease, color .25s ease, transform .2s ease, box-shadow .25s ease;
+  cursor: pointer;
+}
+.cal-btn:hover, .cal-btn:focus {
+  background: var(--maroon);
+  color: var(--cream);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(74, 15, 26, 0.22);
+}
+@media (max-width: 360px) {
+  .cal-btn { font-size: 10.5px; letter-spacing: 2.5px; padding: 10px 20px; min-width: 180px; }
+}
 .pull-card::before {
   content: "";
   position: absolute; inset: 8px;
@@ -1074,7 +1150,7 @@ body::before {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(5px); }
 }
-.pull-card.is-open .pull-tag { transform: translateY(100%); opacity: 0; pointer-events: none; }
+.pull-card.is-open .pull-tag { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 
 /* ---- Timeline — flat hairline aesthetic ---- */
 .timeline {

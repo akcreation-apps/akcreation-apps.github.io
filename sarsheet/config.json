@@ -14,8 +14,12 @@
 
     "saveTitle": "Save the Date",
     "saveSub": "A little secret awaits…",
-    "pullHint": "Pull down to reveal",
+    "pullHint": "Pull up to reveal",
     "pullDoneHint": "Date revealed — tap to collapse",
+    "calEventTitle": "Sarbeswar & Sheetal's Wedding",
+    "calEventVenue": "Baramala Convention",
+    "calEventDate": "2026-12-13",
+    "calActionsLabel": "Save a reminder",
     "revealEyebrow": "The Wedding Day",
     "revealDate": "13<sup>th</sup> December 2026",
     "revealVenue": "Baramala Convention",

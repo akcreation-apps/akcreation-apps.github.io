@@ -76,7 +76,7 @@
   }
 
   function applyConfig(cfg) {
-    if (!cfg) return;
+    if (!cfg) { wireCalendarLinks(null); return; }
     const c = cfg.common || {};
     const s = (cfg[side] || cfg.groom || {});
     const other = side === 'groom' ? (cfg.bride || {}) : (cfg.groom || {});
@@ -141,12 +141,123 @@
     // Phone-sensitive controls
     const callBtn = document.getElementById('callBtn');
     if (callBtn) callBtn.setAttribute('href', 'tel:' + PHONE);
+
+    // Calendar actions
+    wireCalendarLinks(cfg);
+    setText('calActionsLabel', c.calActionsLabel);
+  }
+
+  // ============================================
+  // Calendar — build Apple (.ics data URL) + Google links
+  // ============================================
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function toYMD(d) { return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`; }
+  function stripTags(s) { return (s || '').replace(/<[^>]+>/g, '').trim(); }
+  function escapeICS(s) {
+    return String(s || '')
+      .replace(/\\/g, '\\\\')
+      .replace(/\n/g, '\\n')
+      .replace(/,/g, '\\,')
+      .replace(/;/g, '\\;');
+  }
+
+  function wireCalendarLinks(cfg) {
+    const common = (cfg && cfg.common) || {};
+    const groomCfg = (cfg && cfg.groom)  || {};
+    const brideCfg = (cfg && cfg.bride)  || {};
+
+    const title = common.calEventTitle
+      || `${groomCfg.firstName || 'Groom'} & ${brideCfg.firstName || 'Bride'} — Wedding`;
+    const venue = common.calEventVenue || stripTags(common.revealVenue) || '';
+    const dateIso = common.calEventDate
+      || (common.weddingDateTime || '').slice(0, 10)
+      || '2026-12-13';
+
+    const start = new Date(dateIso + 'T00:00:00');
+    const end   = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+    const startYMD = toYMD(start);
+    const endYMD   = toYMD(end);
+
+    const descriptionPlain = [
+      stripTags(common.blessingLine),
+      stripTags(common.requestLine)
+    ].filter(Boolean).join(' ');
+
+    // Build Google Calendar URL
+    const googleParams = new URLSearchParams({
+      action:   'TEMPLATE',
+      text:     title,
+      dates:    `${startYMD}/${endYMD}`,
+      details:  descriptionPlain,
+      location: venue
+    });
+    const googleUrl = `https://calendar.google.com/calendar/render?${googleParams.toString()}`;
+
+    // Build Apple/iCal/Outlook .ics data URL
+    const nowStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const uid = `sarsheet-wedding-${startYMD}@akcreation-apps.com`;
+    const icsText = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Sarbeswar Sheetal Wedding//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${uid}`,
+      `DTSTAMP:${nowStamp}`,
+      `DTSTART;VALUE=DATE:${startYMD}`,
+      `DTEND;VALUE=DATE:${endYMD}`,
+      `SUMMARY:${escapeICS(title)}`,
+      `DESCRIPTION:${escapeICS(descriptionPlain)}`,
+      `LOCATION:${escapeICS(venue)}`,
+      'BEGIN:VALARM',
+      'TRIGGER:-P1D',
+      'ACTION:DISPLAY',
+      `DESCRIPTION:${escapeICS(title)} — tomorrow`,
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+    const icsDataUrl = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsText);
+    const icsFileName = (title.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') || 'Wedding') + '.ics';
+
+    // Single routed button — detect device at click time
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPhone|iPad|iPod/i.test(ua)
+      || (/Mac/i.test(ua) && 'ontouchend' in document); // iPadOS 13+
+    const isAndroid = /Android/i.test(ua);
+
+    const remind = document.getElementById('calRemind');
+    if (!remind) return;
+
+    // Pre-set href so right-click / long-press "copy link" is useful too
+    remind.setAttribute('href', isIOS ? icsDataUrl : googleUrl);
+    if (isIOS) remind.setAttribute('download', icsFileName);
+    else { remind.removeAttribute('download'); remind.setAttribute('target', '_blank'); remind.setAttribute('rel', 'noopener'); }
+
+    // Replace the node to purge any old listeners, then wire a fresh click handler
+    const fresh = remind.cloneNode(true);
+    remind.parentNode.replaceChild(fresh, remind);
+    fresh.addEventListener('click', (e) => {
+      if (isIOS) {
+        // Let the download attribute do its thing — iOS Safari prompts to open in Calendar.
+        return;
+      }
+      if (isAndroid) {
+        e.preventDefault();
+        window.location.href = googleUrl;
+        return;
+      }
+      // Desktop / unknown: open Google Calendar in a new tab
+      e.preventDefault();
+      window.open(googleUrl, '_blank', 'noopener');
+    });
   }
 
   fetch('config.json', { cache: 'no-cache' })
     .then((r) => r.ok ? r.json() : null)
     .then(applyConfig)
-    .catch(() => { /* keep HTML fallbacks */ });
+    .catch(() => { wireCalendarLinks(null); });
 
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
@@ -189,46 +300,6 @@
     document.body.style.overflow = 'auto';
     rsvpDock.setAttribute('aria-hidden', 'false');
     initReveals();
-    enableScrollGate();
-  };
-
-  // ============================================
-  // Scroll gate — can't scroll past the pull card until the date is revealed
-  // ============================================
-  let scrollGateEnabled = false;
-  let gateRaf = null;
-
-  const computeMaxScroll = () => {
-    const card = document.getElementById('pullCard');
-    if (!card) return Infinity;
-    const rect = card.getBoundingClientRect();
-    const pageBottomOfCard = rect.bottom + window.scrollY;
-    const buffer = 48;
-    return Math.max(0, pageBottomOfCard - window.innerHeight + buffer);
-  };
-
-  const onGateScroll = () => {
-    if (!scrollGateEnabled) return;
-    if (gateRaf) return;
-    gateRaf = requestAnimationFrame(() => {
-      gateRaf = null;
-      const max = computeMaxScroll();
-      if (window.scrollY > max) window.scrollTo({ top: max, behavior: 'instant' in document.documentElement.style ? 'auto' : 'auto' });
-    });
-  };
-
-  const enableScrollGate = () => {
-    if (scrollGateEnabled) return;
-    scrollGateEnabled = true;
-    window.addEventListener('scroll', onGateScroll, { passive: true });
-    window.addEventListener('resize', onGateScroll, { passive: true });
-  };
-
-  const releaseScrollGate = () => {
-    if (!scrollGateEnabled) return;
-    scrollGateEnabled = false;
-    window.removeEventListener('scroll', onGateScroll);
-    window.removeEventListener('resize', onGateScroll);
   };
 
   document.body.style.overflow = 'hidden';
@@ -281,9 +352,9 @@
   };
   const onPointerMove = (e) => {
     if (!drag) return;
-    const dy = Math.max(0, Math.min(MAX_PULL, e.clientY - drag.startY));
+    const dy = Math.max(0, Math.min(MAX_PULL, drag.startY - e.clientY));
     drag.dy = dy;
-    setPullTransform(dy, false);
+    setPullTransform(-dy, false);
     pullTag.style.opacity = String(1 - dy / (MAX_PULL * 1.6));
   };
   const onPointerUp = () => {
@@ -310,13 +381,19 @@
     }
     pullTagText.innerHTML = '<i class="fas fa-check"></i>&nbsp; Date revealed — tap to collapse';
     pullTag.setAttribute('aria-label', 'Tap to collapse the date card');
-    releaseScrollGate();
+    const cal = document.getElementById('calActions');
+    if (cal) { cal.classList.add('is-visible'); cal.setAttribute('aria-hidden', 'false'); }
+    document.body.classList.add('date-revealed');
+    // Any newly-visible sections should fade in as they scroll into view
+    initReveals();
   };
   const closePull = () => {
     pullOpen = false;
     pullCard.classList.remove('is-open');
-    pullTagText.innerHTML = '<i class="fas fa-angle-double-down"></i>&nbsp; Pull down to reveal&nbsp; <i class="fas fa-angle-double-down"></i>';
-    pullTag.setAttribute('aria-label', 'Drag down to reveal the date');
+    pullTagText.innerHTML = '<i class="fas fa-angle-double-up"></i>&nbsp; Pull up to reveal&nbsp; <i class="fas fa-angle-double-up"></i>';
+    pullTag.setAttribute('aria-label', 'Drag up to reveal the date');
+    const cal = document.getElementById('calActions');
+    if (cal) { cal.classList.remove('is-visible'); cal.setAttribute('aria-hidden', 'true'); }
   };
 
   if (prefersReduced) {
