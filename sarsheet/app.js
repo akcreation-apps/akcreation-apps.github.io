@@ -189,6 +189,46 @@
     document.body.style.overflow = 'auto';
     rsvpDock.setAttribute('aria-hidden', 'false');
     initReveals();
+    enableScrollGate();
+  };
+
+  // ============================================
+  // Scroll gate — can't scroll past the pull card until the date is revealed
+  // ============================================
+  let scrollGateEnabled = false;
+  let gateRaf = null;
+
+  const computeMaxScroll = () => {
+    const card = document.getElementById('pullCard');
+    if (!card) return Infinity;
+    const rect = card.getBoundingClientRect();
+    const pageBottomOfCard = rect.bottom + window.scrollY;
+    const buffer = 48;
+    return Math.max(0, pageBottomOfCard - window.innerHeight + buffer);
+  };
+
+  const onGateScroll = () => {
+    if (!scrollGateEnabled) return;
+    if (gateRaf) return;
+    gateRaf = requestAnimationFrame(() => {
+      gateRaf = null;
+      const max = computeMaxScroll();
+      if (window.scrollY > max) window.scrollTo({ top: max, behavior: 'instant' in document.documentElement.style ? 'auto' : 'auto' });
+    });
+  };
+
+  const enableScrollGate = () => {
+    if (scrollGateEnabled) return;
+    scrollGateEnabled = true;
+    window.addEventListener('scroll', onGateScroll, { passive: true });
+    window.addEventListener('resize', onGateScroll, { passive: true });
+  };
+
+  const releaseScrollGate = () => {
+    if (!scrollGateEnabled) return;
+    scrollGateEnabled = false;
+    window.removeEventListener('scroll', onGateScroll);
+    window.removeEventListener('resize', onGateScroll);
   };
 
   document.body.style.overflow = 'hidden';
@@ -270,6 +310,7 @@
     }
     pullTagText.innerHTML = '<i class="fas fa-check"></i>&nbsp; Date revealed — tap to collapse';
     pullTag.setAttribute('aria-label', 'Tap to collapse the date card');
+    releaseScrollGate();
   };
   const closePull = () => {
     pullOpen = false;
