@@ -8,6 +8,24 @@
 
     "weddingDateTime": "2026-12-13T00:00:00+05:30",
 
+    "deityInvocationSanskrit": "॥ ଶ୍ରୀ ଜଗନ୍ନାଥାୟ ନମଃ ॥",
+    "deityInvocationEnglish": "With the divine blessings of Lord Jagannath",
+
+    "geofence": {
+      "enabled": true,
+      "venueCoords": { "lat": 20.429952, "lng": 85.871206 },
+      "radiusMeters": 500,
+      "activeDates": ["2026-12-13"],
+      "welcomeTitle": "Welcome",
+      "welcomeMessage": "We see you've arrived at Baramala Convention. Thank you for being here on our most important day."
+    },
+
+    "postWedding": {
+      "activeFrom": "2026-12-14",
+      "title": "Thank you for being part of our forever",
+      "message": "Your presence turned our day into magic. Our hearts are full of gratitude for every blessing, every smile, and every embrace you shared with us."
+    },
+
     "eyebrow": "The Wedding of",
     "blessingLine": "With the blessings of the Almighty and our families",
     "requestLine": "request the honour of your presence as we begin our <em>forever</em>.",
@@ -33,7 +51,7 @@
     "closingLine": "Your blessings mean the world to us.",
     "closingSignature": "— With love, Sarbeswar & Sheetal",
 
-    "contactPhone": "919861039566",
+    "contactPhone": "917749984274",
     "whatsappMessage": "Hello! I'd like to RSVP for Sarbeswar & Sheetal's wedding. 💍",
     "shareText": "You're invited to Sarbeswar & Sheetal's wedding 💍",
 
@@ -47,6 +65,8 @@
     "parentRel": "Son of",
     "father": "Sri. Sauri Pani",
     "mother": "Smt. Nirupama Pani",
+    "contactPhone": "917749984274",
+    "contactName": "Anil Kumar Sahoo",
 
     "events": [
       {
@@ -109,6 +129,8 @@
     "parentRel": "Daughter of",
     "father": "Sri. Sidheswar Pradhan",
     "mother": "Smt. Ahalya Pradhan",
+    "contactPhone": "919861039566",
+    "contactName": "Sidheswar Pradhan",
 
     "events": [
       {

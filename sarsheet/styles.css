@@ -553,6 +553,179 @@ body:not(.date-revealed) .save-the-date ~ .invite-footer {
 }
 .reveal.is-in { opacity: 1; transform: translateY(0); }
 
+/* ============================================
+   Geofenced welcome overlay — shown only on the wedding day
+   when the guest is physically near the venue
+   ============================================ */
+.geo-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background:
+    radial-gradient(ellipse at center, rgba(74, 15, 26, 0.92), rgba(42, 25, 18, 0.95));
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  animation: geoFadeIn 0.9s ease forwards;
+}
+@keyframes geoFadeIn { to { opacity: 1; } }
+.geo-welcome-body {
+  max-width: 440px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--cream), var(--paper-2));
+  border: 1px solid var(--brass-2);
+  padding: 48px 32px 36px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+.geo-welcome-body::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(160, 122, 46, 0.3);
+  pointer-events: none;
+}
+.geo-welcome-mark {
+  display: inline-block;
+  color: var(--brass-2);
+  font-size: 22px;
+  margin-bottom: 14px;
+  animation: pullNudge 1.8s ease-in-out infinite;
+}
+.geo-welcome-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(32px, 7vw, 42px);
+  color: var(--maroon);
+  margin-bottom: 14px;
+  padding-top: 0.15em;
+}
+.geo-welcome-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.geo-welcome-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 32px;
+  min-height: 42px;
+  min-width: 180px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: linear-gradient(135deg, var(--maroon-2), var(--maroon));
+  border: 1px solid var(--maroon-ink);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 6px 14px rgba(74, 15, 26, 0.3);
+}
+.geo-welcome-close:hover {
+  background: linear-gradient(135deg, var(--maroon), var(--maroon-ink));
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(74, 15, 26, 0.4);
+}
+
+/* ============================================
+   Post-wedding thank-you — replaces the active invitation
+   ============================================ */
+.post-wedding { text-align: center; display: none; }
+body.is-post-wedding .post-wedding { display: block; }
+body.is-post-wedding .hero,
+body.is-post-wedding .parents,
+body.is-post-wedding .save-the-date,
+body.is-post-wedding .timeline-wrap {
+  display: none;
+}
+.pw-mark {
+  color: var(--brass-2);
+  font-size: 24px;
+  margin-bottom: 18px;
+  animation: pullNudge 2s ease-in-out infinite;
+}
+.pw-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(32px, 7vw, 46px);
+  color: var(--maroon);
+  line-height: 1.25;
+  padding: 0.15em 0 0.1em;
+  margin-bottom: 14px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pw-title::after {
+  content: "";
+  display: block;
+  margin: 18px auto 0;
+  width: 44px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brass-2), transparent);
+}
+.pw-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  max-width: 540px;
+  margin: 22px auto 24px;
+}
+.pw-signature {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--maroon);
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+/* ---- Deity invocation (above eyebrow) ---- */
+.deity-invocation {
+  text-align: center;
+  margin: 0 auto 22px;
+  padding-bottom: 14px;
+  position: relative;
+}
+.deity-invocation::after {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: 0;
+  transform: translateX(-50%);
+  width: 32px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brass-2), transparent);
+}
+.deity-sanskrit {
+  font-family: 'Cormorant Garamond', 'Noto Serif Devanagari', 'Nirmala UI', serif;
+  font-size: clamp(15px, 3.6vw, 18px);
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--maroon);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.deity-english {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(12px, 2.8vw, 13.5px);
+  font-style: italic;
+  color: var(--brass-3);
+  letter-spacing: 0.3px;
+}
+
 /* ---- Hero ---- */
 .eyebrow {
   text-align: center;
@@ -1573,7 +1746,7 @@ body:not(.date-revealed) .save-the-date ~ .invite-footer {
 }
 .rsvp-dock[aria-hidden="false"] { opacity: 1; transform: translateX(0); }
 .fab-wa    { background: linear-gradient(135deg, #25d366, #128c7e); border: 1px solid #0a5d52; }
-.fab-call  { background: linear-gradient(135deg, var(--maroon-2), var(--maroon)); border: 1px solid var(--maroon-ink); }
+.fab-call  { background: linear-gradient(135deg, #d8b982, var(--brass-3)); border: 1px solid var(--brass-4); color: var(--cream); }
 .fab-share { background: linear-gradient(135deg, var(--emerald-2), var(--emerald)); border: 1px solid #0d3a2d; }
 
 /* Toast */

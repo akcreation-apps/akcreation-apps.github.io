@@ -243,8 +243,27 @@
 </section>
 
 
+<!-- Geofenced welcome overlay -->
+<div class="geo-welcome" id="geoWelcome" aria-hidden="true" hidden>
+  <div class="geo-welcome-body">
+    <span class="geo-welcome-mark" aria-hidden="true">✦</span>
+    <h2 class="geo-welcome-title" id="geoWelcomeTitle">Welcome</h2>
+    <p class="geo-welcome-msg" id="geoWelcomeMsg"></p>
+    <button class="geo-welcome-close" id="geoWelcomeClose" aria-label="Close welcome">Continue</button>
+  </div>
+</div>
+
 <!-- ======= INVITATION LETTER ======= -->
 <main class="letter" id="letter" aria-hidden="true">
+
+  <!-- Post-wedding thank-you (shown only after wedding date) -->
+  <section class="section post-wedding reveal" id="postWedding" aria-hidden="true">
+    <div class="pw-mark" aria-hidden="true">✦</div>
+    <h2 class="pw-title" id="pwTitle">Thank you for being part of our forever</h2>
+    <p class="pw-msg" id="pwMsg"></p>
+    <p class="pw-signature">— With gratitude, Sarbeswar &amp; Sheetal</p>
+  </section>
+
 
   <!-- Hero -->
   <section class="section section--ornate hero reveal">
@@ -252,6 +271,11 @@
     <svg class="corner c-tr" aria-hidden="true"><use href="#cornerFlourish"/></svg>
     <svg class="corner c-bl" aria-hidden="true"><use href="#cornerFlourish"/></svg>
     <svg class="corner c-br" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+
+    <div class="deity-invocation" id="deityInvocation">
+      <p class="deity-sanskrit" id="deitySanskrit">॥ श्री जगन्नाथाय नमः ॥</p>
+      <p class="deity-english" id="deityEnglish">With the blessings of Lord Jagannath</p>
+    </div>
 
     <p class="eyebrow" id="eyebrow">The Wedding of</p>
 
@@ -405,7 +429,7 @@
     <i class="fas fa-share-alt"></i>
   </button>
   <a class="fab fab-call" id="callBtn" href="tel:919861039566" aria-label="Call to RSVP">
-    <i class="fas fa-phone-alt"></i>
+    <i class="fas fa-phone"></i>
   </a>
   <button class="fab fab-wa" id="waBtn" aria-label="RSVP on WhatsApp">
     <i class="fab fa-whatsapp"></i>

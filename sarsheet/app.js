@@ -82,11 +82,23 @@
     const other = side === 'groom' ? (cfg.bride || {}) : (cfg.groom || {});
 
     if (c.weddingDateTime) WEDDING_DATE = new Date(c.weddingDateTime).getTime();
-    if (c.contactPhone) PHONE = String(c.contactPhone);
+    // Phone: per-side override, falls back to common.contactPhone
+    const sidePhone = (s && s.contactPhone) || c.contactPhone;
+    if (sidePhone) PHONE = String(sidePhone);
     if (c.shareText) SHARE_TEXT = c.shareText;
     if (c.whatsappMessage) WHATSAPP_MESSAGE = c.whatsappMessage;
 
     if (c.pageTitle) document.title = c.pageTitle;
+
+    // Deity invocation
+    setText('deitySanskrit', c.deityInvocationSanskrit);
+    setText('deityEnglish',  c.deityInvocationEnglish);
+
+    // Post-wedding transform (shows Thank You, hides pre-wedding sections)
+    setupPostWedding(c);
+
+    // Geofenced welcome (wedding day, near venue)
+    setupGeofenceWelcome(c);
 
     setText('landingTag', c.landingTag);
     setText('landingHintText', c.landingHint);
@@ -252,6 +264,79 @@
       e.preventDefault();
       window.open(googleUrl, '_blank', 'noopener');
     });
+  }
+
+  // ============================================
+  // Post-wedding — after the wedding day, flip to Thank You mode
+  // ============================================
+  function setupPostWedding(c) {
+    if (!c || !c.postWedding) return;
+    const pw = c.postWedding;
+    const activeFrom = pw.activeFrom
+      ? new Date(pw.activeFrom + 'T00:00:00')
+      : null;
+    if (!activeFrom || isNaN(activeFrom.getTime())) return;
+    if (Date.now() < activeFrom.getTime()) return; // not yet
+    document.body.classList.add('is-post-wedding');
+    const pwSection = document.getElementById('postWedding');
+    if (pwSection) pwSection.setAttribute('aria-hidden', 'false');
+    setText('pwTitle', pw.title);
+    setText('pwMsg', pw.message);
+  }
+
+  // ============================================
+  // Geofenced welcome — only on the wedding day, only if near venue
+  // ============================================
+  function setupGeofenceWelcome(c) {
+    if (!c || !c.geofence || !c.geofence.enabled) return;
+    const g = c.geofence;
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const activeDates = Array.isArray(g.activeDates) ? g.activeDates : [];
+    if (!activeDates.includes(todayStr)) return;
+
+    if (!('geolocation' in navigator) || !g.venueCoords) return;
+
+    const overlay = document.getElementById('geoWelcome');
+    const closeBtn = document.getElementById('geoWelcomeClose');
+    if (!overlay || !closeBtn) return;
+
+    setText('geoWelcomeTitle', g.welcomeTitle);
+    setText('geoWelcomeMsg', g.welcomeMessage);
+
+    const DISMISS_KEY = 'sarsheet-geo-dismissed-' + todayStr;
+    if (sessionStorage.getItem(DISMISS_KEY) === '1') return;
+
+    closeBtn.addEventListener('click', () => {
+      overlay.hidden = true;
+      sessionStorage.setItem(DISMISS_KEY, '1');
+    });
+
+    // Haversine distance in metres
+    const toRad = (deg) => deg * Math.PI / 180;
+    const distanceM = (a, b) => {
+      const R = 6371000;
+      const dLat = toRad(b.lat - a.lat);
+      const dLng = toRad(b.lng - a.lng);
+      const lat1 = toRad(a.lat);
+      const lat2 = toRad(b.lat);
+      const s = Math.sin(dLat/2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) ** 2;
+      return 2 * R * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+    };
+
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const guest = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const dist = distanceM(guest, g.venueCoords);
+      if (dist <= (g.radiusMeters || 500)) {
+        overlay.hidden = false;
+        overlay.setAttribute('aria-hidden', 'false');
+      }
+    }, () => {
+      // permission denied or unavailable — silently skip
+    }, { enableHighAccuracy: true, maximumAge: 60000, timeout: 10000 });
   }
 
   fetch('config.json', { cache: 'no-cache' })
@@ -554,13 +639,14 @@
   const shareBtn = $('#shareBtn');
   shareBtn.addEventListener('click', async () => {
     const url = location.href;
+    const payload = `${SHARE_TEXT}\n\n${url}`;
     if (navigator.share) {
-      try { await navigator.share({ title: 'Wedding Invitation', text: SHARE_TEXT, url }); return; }
+      try { await navigator.share({ title: 'Wedding Invitation', text: payload }); return; }
       catch (_) { /* fall through */ }
     }
     try {
-      await navigator.clipboard.writeText(url);
-      showToast('Link copied — share it with love');
+      await navigator.clipboard.writeText(payload);
+      showToast('Message copied — share it with love');
     } catch (_) {
       showToast(url);
     }
