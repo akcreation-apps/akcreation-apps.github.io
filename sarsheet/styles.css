@@ -53,11 +53,15 @@ body {
     radial-gradient(1000px 600px at 85% 92%, rgba(182,122,114,0.13), transparent 60%),
     radial-gradient(800px 500px at 50% 50%,  rgba(127,142,116,0.08), transparent 70%),
     linear-gradient(180deg, #f8eeda 0%, #efdfc0 100%);
-  background-attachment: fixed;
   min-height: 100vh;
   position: relative;
+  -webkit-overflow-scrolling: touch;
 }
-/* Faint SVG grain for paper texture */
+/* Fixed attachment only on desktop — on mobile it stutters scroll */
+@media (hover: hover) and (min-width: 1024px) {
+  body { background-attachment: fixed; }
+}
+/* Faint SVG grain for paper texture — desktop only (blend-mode + fixed = scroll jitter on mobile) */
 body::before {
   content: "";
   position: fixed; inset: 0;
@@ -66,6 +70,10 @@ body::before {
   opacity: 0.12;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.08  0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   mix-blend-mode: multiply;
+  display: none;
+}
+@media (hover: hover) and (min-width: 1024px) {
+  body::before { display: block; }
 }
 .sr-only {
   position: absolute !important;
@@ -84,15 +92,19 @@ body::before {
   transition: width .1s linear;
 }
 
-/* ===== Ambient (restrained) ===== */
+/* ===== Ambient (restrained) — desktop only; mobile skips the blurred bokeh ===== */
 .leaves {
   position: fixed; inset: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
+  display: none; /* hidden on mobile to keep scroll silky */
 }
 .leaf, .sparkle { display: none; }
-.leaf.l1, .leaf.l3, .leaf.l5 { display: block; }
+@media (hover: hover) and (min-width: 1024px) {
+  .leaves { display: block; }
+  .leaf.l1, .leaf.l3, .leaf.l5 { display: block; }
+}
 .leaf {
   position: absolute;
   width: 240px; height: 240px;
@@ -520,7 +532,10 @@ body:not(.date-revealed) .save-the-date ~ .invite-footer {
   position: relative;
   border: 1px solid var(--rule-soft);
   box-shadow: 0 18px 40px -22px rgba(74, 15, 26, 0.18), 0 2px 8px rgba(74, 15, 26, 0.05);
-  backdrop-filter: blur(4px);
+}
+/* Backdrop blur only on desktop — on mobile it stutters scroll */
+@media (hover: hover) and (min-width: 1024px) {
+  .section { backdrop-filter: blur(4px); }
 }
 .letter > .section:last-of-type { margin-bottom: 0; }
 .section::after {

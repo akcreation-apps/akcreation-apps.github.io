@@ -567,10 +567,15 @@
   // Scroll progress ribbon
   // ============================================
   const ribbon = $('#scrollRibbon');
+  let ribbonRaf = null;
   const onScroll = () => {
-    const h = document.documentElement;
-    const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
-    ribbon.style.width = Math.max(0, Math.min(100, pct)) + '%';
+    if (ribbonRaf) return;
+    ribbonRaf = requestAnimationFrame(() => {
+      ribbonRaf = null;
+      const h = document.documentElement;
+      const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+      ribbon.style.width = Math.max(0, Math.min(100, pct)) + '%';
+    });
   };
   window.addEventListener('scroll', onScroll, { passive: true });
 
