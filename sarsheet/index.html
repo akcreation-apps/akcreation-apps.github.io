@@ -532,8 +532,13 @@
 
 
 <!-- Floating controls -->
-<button class="fab fab-music" id="musicBtn" aria-label="Play background music" hidden>
-  <i class="fas fa-music"></i>
+<button class="fab fab-music" id="musicBtn" aria-label="Mute background music" hidden>
+  <span class="eq" aria-hidden="true">
+    <span class="eq-bar"></span>
+    <span class="eq-bar"></span>
+    <span class="eq-bar"></span>
+  </span>
+  <i class="fas fa-volume-xmark eq-muted-icon" aria-hidden="true"></i>
 </button>
 
 <!-- Always-visible theme toggle (top-right) -->
@@ -553,7 +558,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <audio id="bgMusic" src="assets/music.mp3" loop preload="auto"></audio>
-<audio id="shankhaSfx" src="assets/shankha.mp3" preload="auto"></audio>
 
 <script>
   document.getElementById('footer-year').textContent = new Date().getFullYear();

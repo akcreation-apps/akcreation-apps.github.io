@@ -3,14 +3,12 @@
     "pageTitleSuffix": "Wedding Invitation",
     "landingTag": "You're cordially invited…",
     "landingHint": "Tap the seal to open",
-    "letterScript": "S & S",
-    "letterSub": "Wedding Invitation",
 
     "weddingDateTime": "2026-12-13T00:00:00+05:30",
 
     "deityInvocationSanskrit": "॥ ଶ୍ରୀ ଜଗନ୍ନାଥାୟ ନମଃ ॥",
     "deityInvocationEnglish": "With the divine blessings of Lord Jagannath",
-    "deityInvocationOdia": "ଆପଣଙ୍କ ଶୁଭ ଉପସ୍ଥିତି ଆମର ସବୁଠୁ ବଡ଼ ଆଶୀର୍ବାଦ",
+    "deityInvocationOdia": "ଆପଣଙ୍କ ସ୍ନେହ, ଶୁଭେଚ୍ଛା ଓ ଆଶୀର୍ବାଦ ହିଁ ଆମ ପାଇଁ ସବୁଠୁ ବଡ଼ ଉପହାର",
 
     "geofence": {
       "enabled": true,

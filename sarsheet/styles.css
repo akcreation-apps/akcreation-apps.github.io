@@ -1759,8 +1759,40 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
 @media (min-width: 1024px) {
   .fab-music { top: 18px; left: 18px; }
 }
-.fab-music.is-playing i { animation: spin 3s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* Music FAB — Spotify-style 3-bar equalizer */
+.fab-music .eq {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 18px;
+  width: 20px;
+}
+.fab-music .eq-bar {
+  display: block;
+  width: 3px;
+  height: 100%;
+  background: currentColor;
+  border-radius: 2px;
+  transform-origin: center;
+  transform: scaleY(0.25);
+}
+.fab-music.is-playing .eq-bar {
+  animation: eqBounce 0.9s ease-in-out infinite;
+}
+.fab-music.is-playing .eq-bar:nth-child(1) { animation-delay: 0s;    animation-duration: 0.85s; }
+.fab-music.is-playing .eq-bar:nth-child(2) { animation-delay: 0.18s; animation-duration: 1.05s; }
+.fab-music.is-playing .eq-bar:nth-child(3) { animation-delay: 0.08s; animation-duration: 0.75s; }
+@keyframes eqBounce {
+  0%, 100% { transform: scaleY(0.25); }
+  50%      { transform: scaleY(1); }
+}
+
+/* Mute state: hide bars, show the mute icon, dim the button */
+.fab-music .eq-muted-icon { display: none; font-size: 15px; }
+.fab-music.is-muted .eq { display: none; }
+.fab-music.is-muted .eq-muted-icon { display: inline-block; }
+.fab-music.is-muted { opacity: 0.65; }
 
 .rsvp-dock {
   position: fixed;
@@ -1891,16 +1923,12 @@ html[data-theme="dark"] .theme-toggle {
   pointer-events: none;
   z-index: 0;
   mix-blend-mode: multiply;
-  animation: mandalaDeitySpin 90s linear infinite, mandalaBreath 7s ease-in-out infinite;
+  animation: mandalaSpin 90s linear infinite, mandalaBreath 7s ease-in-out infinite;
   /* Stacked shadows widen the SVG's hairline strokes so the pattern stays
      legible at the shared 0.32 opacity, matching the couple mandala. */
   filter:
     drop-shadow(0 0 0.5px currentColor)
     drop-shadow(0 0 0.5px currentColor);
-}
-@keyframes mandalaDeitySpin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 .deity-icon {
   display: block;
@@ -1981,11 +2009,7 @@ html[data-theme="dark"] .theme-toggle {
   mix-blend-mode: multiply;
   pointer-events: none;
   z-index: 0;
-  animation: mandalaCoupleSpin 90s linear infinite, mandalaBreath 7s ease-in-out infinite;
-}
-@keyframes mandalaCoupleSpin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
+  animation: mandalaSpin 90s linear infinite, mandalaBreath 7s ease-in-out infinite;
 }
 @keyframes mandalaSpin {
   from { transform: translate(-50%, -50%) rotate(0deg); }

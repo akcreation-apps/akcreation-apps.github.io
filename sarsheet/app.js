@@ -102,8 +102,6 @@
 
     setText('landingTag', c.landingTag);
     setText('landingHintText', c.landingHint);
-    setText('letterScript', c.letterScript);
-    setText('letterSub', c.letterSub);
     setText('eyebrow', c.eyebrow);
     setText('blessingLine', c.blessingLine);
     setText('requestLine', c.requestLine);
@@ -405,11 +403,6 @@
 
     envelope.classList.add('is-open');
     vibrate(20);
-    // One-shot shankha chime on the opening gesture (silently ignored if asset missing)
-    try {
-      const sfx = document.getElementById('shankhaSfx');
-      if (sfx) { sfx.volume = 0.45; sfx.currentTime = 0; sfx.play().catch(() => {}); }
-    } catch (_) {}
     if (!prefersReduced) burstConfetti(window.innerWidth / 2, window.innerHeight / 2, 40);
 
     setTimeout(finishOpen, prefersReduced ? 200 : 2800);
@@ -679,13 +672,15 @@
   bgMusic.addEventListener('pause',          () => musicBtn.classList.remove('is-playing'));
   try { bgMusic.load(); } catch (_) { /* no-op */ }
 
+  const setMuted = (muted) => {
+    bgMusic.muted = muted;
+    musicBtn.classList.toggle('is-muted', muted);
+    musicBtn.setAttribute('aria-label', muted ? 'Unmute background music' : 'Mute background music');
+  };
+
   musicBtn.addEventListener('click', () => {
-    if (bgMusic.paused) {
-      bgMusic.volume = 0.25;
-      bgMusic.play().catch(() => {});
-    } else {
-      bgMusic.pause();
-    }
+    vibrate(10);
+    setMuted(!bgMusic.muted);
   });
 
   // ============================================
