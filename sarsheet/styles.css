@@ -1192,6 +1192,8 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
   touch-action: pan-y;
 }
 .pull-card.is-open { touch-action: auto; }
+/* After reveal: release the handle so scrolling through it works */
+.pull-card.is-open .pull-tag { touch-action: auto; cursor: pointer; }
 
 /* ---- Calendar actions (revealed after pull) ---- */
 .cal-actions {
@@ -1748,10 +1750,14 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
 
 .fab-music {
   position: fixed;
-  top: 18px; right: 18px;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
   z-index: 150;
   background: linear-gradient(135deg, var(--maroon-2), var(--maroon));
   border: 1px solid var(--brass-2);
+}
+@media (min-width: 1024px) {
+  .fab-music { top: 18px; left: 18px; }
 }
 .fab-music.is-playing i { animation: spin 3s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -1768,7 +1774,40 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
   transition: opacity .6s ease, transform .6s ease;
 }
 .rsvp-dock[aria-hidden="false"] { opacity: 1; transform: translateX(0); }
-.fab-wa    { background: linear-gradient(135deg, #25d366, #128c7e); border: 1px solid #0a5d52; }
+
+/* ===== Always-visible theme toggle (top-right) ===== */
+.theme-toggle {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  z-index: 210;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 246, 226, 0.78);
+  color: var(--maroon);
+  border: 1px solid var(--brass-2);
+  box-shadow: 0 6px 18px rgba(74, 15, 26, 0.18), inset 0 0 0 1px rgba(233,197,114,0.35);
+  cursor: pointer;
+  font-size: 15px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform .25s ease, box-shadow .25s ease, background .3s ease, color .3s ease;
+}
+.theme-toggle:hover   { transform: scale(1.06); box-shadow: 0 10px 24px rgba(74, 15, 26, 0.22); }
+.theme-toggle:active  { transform: scale(0.96); }
+.theme-toggle:focus-visible { outline: 2px dashed var(--brass-2); outline-offset: 3px; }
+@media (min-width: 1024px) {
+  .theme-toggle { width: 44px; height: 44px; font-size: 16px; top: 18px; right: 18px; }
+}
+html[data-theme="dark"] .theme-toggle {
+  background: rgba(26, 8, 16, 0.75);
+  color: var(--brass-1);
+  border-color: rgba(233,197,114,0.5);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(233,197,114,0.25);
+}
 .fab-call  { background: linear-gradient(135deg, #d8b982, var(--brass-3)); border: 1px solid var(--brass-4); color: var(--cream); }
 .fab-share { background: linear-gradient(135deg, var(--emerald-2), var(--emerald)); border: 1px solid #0d3a2d; }
 
@@ -1816,4 +1855,354 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
   .letter { padding: 56px 20px 140px; max-width: 760px; }
   .section { padding: 60px 42px; }
   .section--ornate { padding: 72px 42px; }
+}
+
+/* ============================================
+   ✦ Enhancements: petals, Jagannath, mandalas,
+     Odia tagline, parallax, cursor, dark theme
+   ============================================ */
+
+/* ----- Drifting petals + diya motes (continuous ambient) ----- */
+.petals {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: multiply;
+}
+
+/* ----- Jagannath icon in deity invocation ----- */
+.deity-icon {
+  display: block;
+  width: 64px; height: 72px;
+  margin: 0 auto 10px;
+  filter: drop-shadow(0 4px 10px rgba(122, 30, 45, 0.25));
+  animation: deityGlow 4s ease-in-out infinite;
+}
+@keyframes deityGlow {
+  0%, 100% { filter: drop-shadow(0 4px 10px rgba(122, 30, 45, 0.25)); }
+  50%      { filter: drop-shadow(0 6px 18px rgba(201, 155, 60, 0.55)); }
+}
+@media (min-width: 1024px) {
+  .deity-icon { width: 76px; height: 86px; }
+}
+
+/* ----- Odia tagline ----- */
+.deity-odia {
+  font-family: 'Noto Sans Oriya', 'Nirmala UI', 'Cormorant Garamond', serif;
+  font-size: clamp(12px, 2.6vw, 14px);
+  color: var(--maroon-2);
+  letter-spacing: 0.2px;
+  margin-top: 6px;
+  opacity: 0.88;
+  font-style: italic;
+  line-height: 1.5;
+}
+.deity-odia:empty { display: none; }
+
+/* ----- Mandala watermark behind hero & closing ----- */
+.hero, .closing, .venues { position: relative; overflow: hidden; }
+.mandala-watermark {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 92%;
+  max-width: 540px;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%) rotate(0deg);
+  color: var(--brass-3);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+  animation: mandalaSpin 120s linear infinite;
+  mix-blend-mode: multiply;
+}
+.mandala-watermark--closing { opacity: 0.26; width: 80%; }
+
+/* Mandala framing the couple names */
+.couple-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0 20px;
+}
+.couple-stage .couple { position: relative; z-index: 1; margin: 0; }
+.mandala-watermark--couple {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: clamp(280px, 85%, 460px);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  color: var(--brass-3);
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+  animation: mandalaCoupleSpin 80s linear infinite, mandalaCoupleBreath 7s ease-in-out infinite;
+}
+@keyframes mandalaCoupleSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes mandalaCoupleBreath {
+  0%, 100% { opacity: 0.28; }
+  50%      { opacity: 0.4; }
+}
+@keyframes mandalaSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+.hero > *:not(.mandala-watermark):not(.corner),
+.closing > *:not(.mandala-watermark),
+.venues > *:not(.paisley-accent) { position: relative; z-index: 1; }
+
+/* ----- Paisley accents in venues ----- */
+.paisley-accent {
+  position: absolute;
+  width: 54px; height: 68px;
+  color: var(--brass-2);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+}
+.paisley-accent--l { top: 18px; left: 10px;  transform: rotate(-18deg); }
+.paisley-accent--r { top: 18px; right: 10px; transform: rotate(18deg) scaleX(-1); }
+@media (min-width: 1024px) {
+  .paisley-accent { width: 72px; height: 90px; }
+}
+
+/* ----- Parallax / Ken Burns on hero portraits ----- */
+.portrait-frame { overflow: hidden; }
+.portrait-frame img {
+  transition: transform 1.2s ease;
+  will-change: transform;
+}
+.reveal.is-in .portrait-frame img {
+  animation: kenBurns 18s ease-in-out infinite alternate;
+}
+@keyframes kenBurns {
+  0%   { transform: scale(1)    translate(0, 0); }
+  100% { transform: scale(1.08) translate(-1%, -1.5%); }
+}
+
+/* Subtle hero backdrop parallax — the maroon radial gently drifts (contained inside hero) */
+.hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(201,155,60,0.10), transparent 55%),
+    radial-gradient(circle at 80% 80%, rgba(122,30,45,0.08), transparent 55%);
+  z-index: 0;
+  pointer-events: none;
+  animation: heroDrift 24s ease-in-out infinite alternate;
+}
+@keyframes heroDrift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(1.5%, -1.5%) scale(1.04); }
+}
+
+/* ----- Custom flower cursor (desktop only) ----- */
+@media (hover: hover) and (min-width: 1024px) {
+  html, body {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g transform='translate(14 14)'><circle r='2.4' fill='%23c89b3c'/><g fill='%23c8667a' stroke='%237a1e2d' stroke-width='0.6'><ellipse cx='0'  cy='-7' rx='3' ry='5'/><ellipse cx='6.6' cy='-2.2' rx='3' ry='5' transform='rotate(72 6.6 -2.2)'/><ellipse cx='4'   cy='5.7' rx='3' ry='5' transform='rotate(144 4 5.7)'/><ellipse cx='-4'  cy='5.7' rx='3' ry='5' transform='rotate(216 -4 5.7)'/><ellipse cx='-6.6' cy='-2.2' rx='3' ry='5' transform='rotate(288 -6.6 -2.2)'/></g></g></svg>") 14 14, auto;
+  }
+  a, button, .pull-tag, .opening--scroll, .fab, .venue-card {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><g transform='translate(16 16)'><circle r='3' fill='%23e9c572' stroke='%237a1e2d' stroke-width='0.8'/><g fill='%23a52a3c' stroke='%234a0f1a' stroke-width='0.6'><ellipse cx='0'   cy='-8.5' rx='3.5' ry='6'/><ellipse cx='8'   cy='-2.6' rx='3.5' ry='6' transform='rotate(72 8 -2.6)'/><ellipse cx='5'   cy='6.9'  rx='3.5' ry='6' transform='rotate(144 5 6.9)'/><ellipse cx='-5'  cy='6.9'  rx='3.5' ry='6' transform='rotate(216 -5 6.9)'/><ellipse cx='-8'  cy='-2.6' rx='3.5' ry='6' transform='rotate(288 -8 -2.6)'/></g></g></svg>") 16 16, pointer;
+  }
+}
+
+/* ============================================
+   ✦ Dark theme — candle-lit maroon + gold
+   Scope: html[data-theme="dark"] (set by JS from
+   localStorage or prefers-color-scheme fallback).
+   Uses native CSS nesting.
+   ============================================ */
+html[data-theme="dark"] {
+  --paper:      #1a0810;
+  --paper-2:    #260c17;
+  --cream:      #2a1119;
+  --ink:        #f6e4c6;
+  --ink-soft:   #e2c99a;
+  --ink-mute:   #b89a76;
+  --rule:       rgba(233, 197, 114, 0.35);
+  --rule-soft:  rgba(233, 197, 114, 0.18);
+
+  --brass-1:    #ffd97a;
+  --brass-2:    #e9c572;
+  --brass-3:    #c89b3c;
+  --brass-4:    #8a6530;
+
+  --maroon:     #d08a98;
+  --maroon-2:   #e9a0b0;
+  --maroon-ink: #f0c0cc;
+
+  --shadow-lg:  0 40px 80px -30px rgba(0, 0, 0, 0.85);
+  --shadow-md:  0 18px 40px -20px rgba(0, 0, 0, 0.7);
+  --shadow-sm:  0 2px 10px rgba(0, 0, 0, 0.6);
+
+  body {
+    background:
+      radial-gradient(1200px 700px at 15% 8%,  rgba(201,155,60,0.18), transparent 60%),
+      radial-gradient(1000px 600px at 85% 92%, rgba(208,138,152,0.12), transparent 60%),
+      radial-gradient(800px 500px at 50% 50%,  rgba(233,197,114,0.07), transparent 70%),
+      linear-gradient(180deg, #1a0810 0%, #0f050a 100%);
+  }
+  body::before { opacity: 0.22; mix-blend-mode: screen; }
+
+  .landing {
+    background:
+      radial-gradient(800px 500px at 50% 45%, rgba(201,155,60,0.20), transparent 70%),
+      var(--paper);
+  }
+
+  .scroll-parchment {
+    background: linear-gradient(180deg, #2d1119 0%, #3a1821 70%, #2a0e15 100%);
+    box-shadow:
+      inset 0 0 50px rgba(0, 0, 0, 0.6),
+      inset 0 0 0 1px rgba(233, 197, 114, 0.35),
+      0 2px 10px rgba(0, 0, 0, 0.6);
+  }
+
+  .section, .section--ornate {
+    background: linear-gradient(180deg, rgba(42,17,25,0.75), rgba(26,8,16,0.75));
+    border: 1px solid rgba(233,197,114,0.18);
+    box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(233,197,114,0.08);
+  }
+
+  .scroll-monogram {
+    background: linear-gradient(135deg, #f5d99a 0%, #e9c572 35%, #c89b3c 55%, #e9c572 75%, #f5d99a 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .deity-sanskrit, .deity-english, .deity-odia { color: var(--brass-1); }
+  .deity-english { color: var(--brass-2); }
+
+  .petals { mix-blend-mode: screen; }
+
+  .fab, .fab-music, .fab-share, .fab-call {
+    background: linear-gradient(145deg, #3a1821, #26101a) !important;
+    color: var(--brass-1) !important;
+    border: 1px solid rgba(233,197,114,0.4) !important;
+  }
+
+  .venue-card, .pull-card {
+    background: linear-gradient(180deg, rgba(58,24,33,0.7), rgba(38,16,26,0.7));
+    border: 1px solid rgba(233,197,114,0.22);
+  }
+  /* Timeline cards stay transparent — the rail + dots carry the design */
+  .t-card { background: transparent; border: none; box-shadow: none; }
+  .timeline::before { background: linear-gradient(180deg, rgba(233,197,114,0.45), rgba(201,155,60,0.15)); }
+  .t-dot {
+    background: radial-gradient(circle at 30% 30%, #f5d99a, #c89b3c 70%, #8a6530);
+    color: #1a0810;
+    box-shadow: 0 0 0 3px rgba(26,8,16,0.9), 0 0 14px rgba(233,197,114,0.45);
+  }
+  .t-item.highlight .t-dot {
+    background: radial-gradient(circle at 30% 30%, #ffd57a, #c8667a 65%, #7a1e2d);
+    box-shadow: 0 0 0 3px rgba(26,8,16,0.9), 0 0 18px rgba(200,102,122,0.55);
+  }
+  .dress-chip { color: var(--brass-1); border-color: var(--brass-3); background: rgba(233,197,114,0.08); }
+  .chip-yellow { color: #ffd97a !important; background: rgba(233,197,114,0.12) !important; border-color: rgba(233,197,114,0.5) !important; }
+  .chip-green  { color: #a8d8b8  !important; background: rgba(125,170,136,0.12) !important; border-color: rgba(125,170,136,0.5) !important; }
+
+  /* Footer blends into the dark paper */
+  .invite-footer {
+    background: linear-gradient(180deg, rgba(42,17,25,0.0), rgba(26,8,16,0.8));
+    border-top: 1px solid rgba(233,197,114,0.22);
+    color: var(--brass-2);
+  }
+  .invite-footer a { color: var(--brass-1); }
+
+  /* Mandala stays visible on dark paper too */
+  .mandala-watermark { color: var(--brass-1); opacity: 0.16; mix-blend-mode: screen; }
+  .mandala-watermark--closing { opacity: 0.2; }
+  .mandala-watermark--couple  { color: var(--brass-1); opacity: 0.28; mix-blend-mode: screen; }
+  .paisley-accent { color: var(--brass-1); opacity: 0.3; }
+
+  .reveal-date, .section-title, .pw-title,
+  .closing-script, .portrait-name, .parent-name, .t-title, .venue-name {
+    color: var(--ink);
+  }
+
+  /* Couple name — bright warm foil so it reads against dark paper */
+  .couple {
+    background: linear-gradient(135deg, #f5d99a 0%, #e9c572 25%, #ffd97a 50%, #e9c572 75%, #f5d99a 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 2px 6px rgba(201,155,60,0.35));
+  }
+  .couple-amp { color: #e9a0b0; -webkit-text-fill-color: #e9a0b0; }
+
+  /* Pull-tag (unrevealed handle) — rich maroon velvet, not pink */
+  .pull-tag {
+    background:
+      radial-gradient(ellipse at top, #7a1e2d 0%, #4a0f1a 55%, #2a0810 100%);
+    color: #f5d99a;
+    box-shadow:
+      inset 0 0 0 1px rgba(233, 197, 114, 0.45),
+      inset 0 0 40px rgba(0,0,0,0.6);
+  }
+  .pull-tag::before { border-color: rgba(233, 197, 114, 0.55); }
+  .pull-tag::after  { color: var(--brass-1); }
+
+  /* Pull-card (unrevealed back) — dark paper, no cream top */
+  .pull-card {
+    background: radial-gradient(ellipse at top, #2a0e15 0%, #1a0810 100%);
+    border: 1px solid rgba(233,197,114,0.28);
+  }
+
+  /* Countdown tiles — dark lacquer with gold trim */
+  .cd-cell {
+    background: linear-gradient(180deg, #3a1821 0%, #1f0a12 100%);
+    border: 1px solid rgba(233, 197, 114, 0.4);
+    box-shadow:
+      0 4px 10px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(233, 197, 114, 0.18),
+      inset 0 -3px 8px rgba(0, 0, 0, 0.5);
+  }
+  .cd-cell::before { border-color: rgba(233, 197, 114, 0.35); }
+  .cd-cell::after {
+    background: linear-gradient(180deg, rgba(233, 197, 114, 0.14), transparent);
+  }
+  .cd-num {
+    background: linear-gradient(180deg, #ffd97a 0%, #e9c572 55%, #c89b3c 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+  }
+  .cd-lbl { color: var(--brass-2); }
+  .cd-lbl::before { background: var(--brass-2); opacity: 0.6; }
+
+  .countdown::before, .countdown::after {
+    background: linear-gradient(90deg, transparent, var(--brass-2), transparent);
+  }
+  .eyebrow, .reveal-eyebrow, .section-sub, .pw-msg,
+  .closing-sub, .portrait-role, .parent-rel, .t-date,
+  .venue-detail, .scroll-eyebrow, .scroll-sub, .landing-tag {
+    color: var(--brass-2);
+  }
+
+  .scroll-ribbon {
+    background: linear-gradient(90deg, var(--brass-1), var(--maroon));
+  }
+
+  .geo-welcome-body {
+    background: linear-gradient(180deg, #2d1119, #1a0810);
+    color: var(--ink);
+    border: 1px solid rgba(233,197,114,0.3);
+  }
+
+  .toast {
+    background: rgba(233, 197, 114, 0.95);
+    color: #1a0810;
+  }
+}
+
+/* respect reduced motion for the new ambient layers too */
+@media (prefers-reduced-motion: reduce) {
+  .mandala-watermark, .deity-icon, .hero::after,
+  .reveal.is-in .portrait-frame img {
+    animation: none !important;
+  }
+  .petals { display: none; }
 }

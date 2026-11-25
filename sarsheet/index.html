@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, viewport-fit=cover">
 <meta name="theme-color" content="#fdf6f0">
-<meta name="color-scheme" content="light only">
+<meta name="color-scheme" content="light dark">
 <title id="pageTitle">Sarbeswar & Sheetal — Wedding Invitation</title>
 <meta name="description" content="With the blessings of our families, Sarbeswar & Sheetal request the honour of your presence. Tap to open the invitation.">
 
@@ -38,10 +38,25 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Noto+Sans+Oriya:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="styles.css">
+
+<!-- Early theme init — avoids a flash before app.js loads -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('sarsheet-theme');
+      var mode = (saved === 'dark' || saved === 'light')
+        ? saved
+        : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', mode);
+    } catch (_) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
 
 <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
 </head>
@@ -149,6 +164,89 @@
         <path d="M18 18 Q 24 24 30 20" opacity=".55"/>
       </g>
     </symbol>
+    <!-- Stylised Lord Jagannath — round face, large eyes, tilaka (iconic Puri form) -->
+    <symbol id="jagannathIcon" viewBox="0 0 120 140">
+      <!-- soft halo glow fill -->
+      <circle cx="60" cy="56" r="48" fill="url(#goldGrad)" opacity="0.18"/>
+      <!-- halo rays -->
+      <g stroke="#c89b3c" stroke-width="2.2" stroke-linecap="round" opacity="0.95">
+        <line x1="60" y1="2"  x2="60" y2="14"/>
+        <line x1="38" y1="6"  x2="44" y2="18"/>
+        <line x1="82" y1="6"  x2="76" y2="18"/>
+        <line x1="18" y1="20" x2="30" y2="30"/>
+        <line x1="102" y1="20" x2="90" y2="30"/>
+        <line x1="8"  y1="42" x2="20" y2="46"/>
+        <line x1="112" y1="42" x2="100" y2="46"/>
+      </g>
+      <!-- halo ring -->
+      <circle cx="60" cy="56" r="44" fill="none" stroke="#9a7024" stroke-width="2" opacity="0.9"/>
+      <circle cx="60" cy="56" r="40" fill="none" stroke="#c89b3c" stroke-width="0.8" opacity="0.7"/>
+      <!-- round black face -->
+      <path d="M60 18 C 86 18, 98 42, 98 64 C 98 82, 84 94, 60 94 C 36 94, 22 82, 22 64 C 22 42, 34 18, 60 18 Z" fill="#1b0b0f"/>
+      <!-- crown arch -->
+      <path d="M26 30 Q 60 8 94 30" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M60 10 L 62 18 L 58 18 Z" fill="url(#goldGrad)"/>
+      <circle cx="60" cy="8" r="2" fill="url(#goldGrad)"/>
+      <!-- large round eyes -->
+      <ellipse cx="42" cy="54" rx="12" ry="8" fill="#fff6e2"/>
+      <ellipse cx="78" cy="54" rx="12" ry="8" fill="#fff6e2"/>
+      <circle cx="42" cy="54" r="4" fill="#1b0b0f"/>
+      <circle cx="78" cy="54" r="4" fill="#1b0b0f"/>
+      <circle cx="43" cy="53" r="1.2" fill="#fff6e2"/>
+      <circle cx="79" cy="53" r="1.2" fill="#fff6e2"/>
+      <!-- U-shaped tilaka -->
+      <path d="M54 68 Q 60 84 66 68" fill="none" stroke="url(#goldGrad)" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="60" cy="74" r="2" fill="#a52a3c"/>
+      <!-- base platform -->
+      <rect x="28" y="98" width="64" height="4" rx="2" fill="url(#goldGrad)"/>
+      <path d="M32 102 Q 60 118 88 102" fill="none" stroke="url(#goldGrad)" stroke-width="1.2" opacity="0.7"/>
+      <!-- flowers -->
+      <circle cx="30" cy="110" r="3" fill="#a52a3c" opacity="0.65"/>
+      <circle cx="90" cy="110" r="3" fill="#a52a3c" opacity="0.65"/>
+      <circle cx="60" cy="118" r="2.4" fill="#c89b3c" opacity="0.7"/>
+    </symbol>
+
+    <!-- Paisley / mandala watermark -->
+    <symbol id="mandalaWatermark" viewBox="0 0 200 200">
+      <g fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round">
+        <circle cx="100" cy="100" r="90" opacity="0.35"/>
+        <circle cx="100" cy="100" r="70" opacity="0.45"/>
+        <circle cx="100" cy="100" r="50" opacity="0.55"/>
+        <circle cx="100" cy="100" r="30" opacity="0.65"/>
+        <circle cx="100" cy="100" r="12" opacity="0.8"/>
+        <g opacity="0.6">
+          <path d="M100 10 Q 108 40 100 70 Q 92 40 100 10 Z"/>
+          <path d="M100 190 Q 108 160 100 130 Q 92 160 100 190 Z"/>
+          <path d="M10 100 Q 40 108 70 100 Q 40 92 10 100 Z"/>
+          <path d="M190 100 Q 160 108 130 100 Q 160 92 190 100 Z"/>
+          <path d="M36 36 Q 60 60 84 56 Q 60 48 36 36 Z"/>
+          <path d="M164 36 Q 140 60 116 56 Q 140 48 164 36 Z"/>
+          <path d="M36 164 Q 60 140 84 144 Q 60 152 36 164 Z"/>
+          <path d="M164 164 Q 140 140 116 144 Q 140 152 164 164 Z"/>
+        </g>
+        <g opacity="0.5">
+          <circle cx="100" cy="30" r="2"/><circle cx="100" cy="170" r="2"/>
+          <circle cx="30" cy="100" r="2"/><circle cx="170" cy="100" r="2"/>
+          <circle cx="50" cy="50" r="1.4"/><circle cx="150" cy="50" r="1.4"/>
+          <circle cx="50" cy="150" r="1.4"/><circle cx="150" cy="150" r="1.4"/>
+        </g>
+        <path d="M70 100 Q 85 70 100 100 Q 115 130 130 100" opacity="0.7"/>
+        <path d="M100 70 Q 70 85 100 100 Q 130 115 100 130" opacity="0.7"/>
+      </g>
+    </symbol>
+
+    <!-- Paisley teardrop (for corner accents) -->
+    <symbol id="paisley" viewBox="0 0 80 100">
+      <g fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round">
+        <path d="M40 8 C 20 20, 10 50, 20 78 C 28 94, 52 94, 62 78 C 72 56, 60 28, 40 8 Z" opacity="0.7"/>
+        <path d="M40 22 C 28 32, 22 54, 30 72 C 38 82, 54 80, 58 68 C 62 50, 54 32, 40 22 Z" opacity="0.6"/>
+        <circle cx="40" cy="58" r="4" opacity="0.8"/>
+        <circle cx="40" cy="58" r="1.5" fill="currentColor" opacity="0.9"/>
+        <path d="M34 42 Q 40 48 46 42" opacity="0.6"/>
+        <path d="M34 72 Q 40 66 46 72" opacity="0.6"/>
+      </g>
+    </symbol>
+
     <symbol id="divider" viewBox="0 0 320 24">
       <g fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-linecap="round">
         <line x1="10" y1="12" x2="130" y2="12"/>
@@ -164,6 +262,9 @@
 
 <!-- confetti canvas -->
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+<!-- continuous drifting petals / diya motes -->
+<canvas class="petals" id="petals" aria-hidden="true"></canvas>
 
 <!-- ======= LANDING: CLOSED ENVELOPE ======= -->
 <section class="landing" id="landing" aria-label="Wedding invitation envelope">
@@ -273,8 +374,10 @@
     <svg class="corner c-br" aria-hidden="true"><use href="#cornerFlourish"/></svg>
 
     <div class="deity-invocation" id="deityInvocation">
+      <svg class="deity-icon" aria-hidden="true" viewBox="0 0 120 140"><use href="#jagannathIcon"/></svg>
       <p class="deity-sanskrit" id="deitySanskrit">॥ श्री जगन्नाथाय नमः ॥</p>
       <p class="deity-english" id="deityEnglish">With the blessings of Lord Jagannath</p>
+      <p class="deity-odia" id="deityOdia"></p>
     </div>
 
     <p class="eyebrow" id="eyebrow">The Wedding of</p>
@@ -313,12 +416,15 @@
 
     <p class="small-ornate" id="blessingLine">With the blessings of the Almighty and our families</p>
 
-    <h1 class="couple">
-      <span class="name-s" id="coupleGroom">Sarbeswar</span>
-      <span class="couple-amp" aria-hidden="true">&amp;</span>
-      <span class="name-s" id="coupleBride">Sheetal</span>
-      <span class="sr-only">and</span>
-    </h1>
+    <div class="couple-stage">
+      <svg class="mandala-watermark mandala-watermark--couple" aria-hidden="true" viewBox="0 0 200 200"><use href="#mandalaWatermark"/></svg>
+      <h1 class="couple">
+        <span class="name-s" id="coupleGroom">Sarbeswar</span>
+        <span class="couple-amp" aria-hidden="true">&amp;</span>
+        <span class="name-s" id="coupleBride">Sheetal</span>
+        <span class="sr-only">and</span>
+      </h1>
+    </div>
     <p class="hero-sub" id="requestLine">request the honour of your presence as we begin our <em>forever</em>.</p>
 
     <svg class="flourish-long" aria-hidden="true"><use href="#flourishLong"/></svg>
@@ -396,6 +502,8 @@
 
   <!-- Venues -->
   <section class="section venues reveal">
+    <svg class="paisley-accent paisley-accent--l" aria-hidden="true" viewBox="0 0 80 100"><use href="#paisley"/></svg>
+    <svg class="paisley-accent paisley-accent--r" aria-hidden="true" viewBox="0 0 80 100"><use href="#paisley"/></svg>
     <h2 class="section-title" id="venuesTitle">Venues</h2>
     <p class="section-sub" id="venuesSub">Tap for directions</p>
 
@@ -404,6 +512,7 @@
 
   <!-- Closing -->
   <section class="section closing reveal">
+    <svg class="mandala-watermark mandala-watermark--closing" aria-hidden="true" viewBox="0 0 200 200"><use href="#mandalaWatermark"/></svg>
     <div class="ornament"><span></span><i class="fas fa-leaf"></i><span></span></div>
     <p class="closing-script" id="closingLine">Your blessings mean the world to us.</p>
     <p class="closing-sub" id="closingSignature">— With love, Sarbeswar &amp; Sheetal</p>
@@ -424,21 +533,24 @@
   <i class="fas fa-music"></i>
 </button>
 
+<!-- Always-visible theme toggle (top-right) -->
+<button class="theme-toggle" id="themeBtn" aria-label="Toggle light / dark theme">
+  <i class="fas fa-moon"></i>
+</button>
+
 <div class="rsvp-dock" id="rsvpDock" aria-hidden="true">
-  <button class="fab fab-share" id="shareBtn" aria-label="Share invitation">
-    <i class="fas fa-share-alt"></i>
-  </button>
   <a class="fab fab-call" id="callBtn" href="tel:919861039566" aria-label="Call to RSVP">
     <i class="fas fa-phone"></i>
   </a>
-  <button class="fab fab-wa" id="waBtn" aria-label="RSVP on WhatsApp">
-    <i class="fab fa-whatsapp"></i>
+  <button class="fab fab-share" id="shareBtn" aria-label="Share invitation">
+    <i class="fas fa-share-alt"></i>
   </button>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <audio id="bgMusic" src="assets/music.mp3" loop preload="auto"></audio>
+<audio id="shankhaSfx" src="assets/shankha.mp3" preload="auto"></audio>
 
 <script>
   document.getElementById('footer-year').textContent = new Date().getFullYear();

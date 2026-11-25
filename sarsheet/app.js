@@ -8,7 +8,6 @@
   let WEDDING_DATE = new Date('2026-12-13T00:00:00+05:30').getTime();
   let PHONE = '919861039566';
   let SHARE_TEXT = "You're invited to Sarbeswar & Sheetal's wedding 💍 — 13 Dec 2026";
-  let WHATSAPP_MESSAGE = "Hello! I'd like to RSVP for Sarbeswar & Sheetal's wedding. 💍";
 
   const params = new URLSearchParams(location.search);
   const side = (params.get('invited') || 'groom').toLowerCase() === 'bride' ? 'bride' : 'groom';
@@ -86,13 +85,13 @@
     const sidePhone = (s && s.contactPhone) || c.contactPhone;
     if (sidePhone) PHONE = String(sidePhone);
     if (c.shareText) SHARE_TEXT = c.shareText;
-    if (c.whatsappMessage) WHATSAPP_MESSAGE = c.whatsappMessage;
 
     // (page title is set further down, once we know name priority)
 
     // Deity invocation
     setText('deitySanskrit', c.deityInvocationSanskrit);
     setText('deityEnglish',  c.deityInvocationEnglish);
+    setText('deityOdia',     c.deityInvocationOdia);
 
     // Post-wedding transform (shows Thank You, hides pre-wedding sections)
     //   side-specific `postWeddingActiveFrom` takes precedence over common
@@ -177,7 +176,10 @@
 
     // Phone-sensitive controls
     const callBtn = document.getElementById('callBtn');
-    if (callBtn) callBtn.setAttribute('href', 'tel:' + PHONE);
+    if (callBtn) {
+      callBtn.setAttribute('href', 'tel:' + PHONE);
+      callBtn.addEventListener('click', () => vibrate(12), { once: false });
+    }
 
     // Calendar actions
     wireCalendarLinks(cfg);
@@ -403,6 +405,11 @@
 
     envelope.classList.add('is-open');
     vibrate(20);
+    // One-shot shankha chime on the opening gesture (silently ignored if asset missing)
+    try {
+      const sfx = document.getElementById('shankhaSfx');
+      if (sfx) { sfx.volume = 0.45; sfx.currentTime = 0; sfx.play().catch(() => {}); }
+    } catch (_) {}
     if (!prefersReduced) burstConfetti(window.innerWidth / 2, window.innerHeight / 2, 40);
 
     setTimeout(finishOpen, prefersReduced ? 200 : 2800);
@@ -460,14 +467,17 @@
   };
 
   const onPointerDown = (e) => {
-    if (pullOpen) { closePull(); return; }
+    // When already open, don't start a drag and don't capture — let the browser scroll.
+    // A collapse now happens only via the explicit click handler below.
+    if (pullOpen) return;
     pullTag.setPointerCapture?.(e.pointerId);
-    drag = { startY: e.clientY, dy: 0 };
+    drag = { startY: e.clientY, dy: 0, moved: false };
     setPullTransform(0, false);
   };
   const onPointerMove = (e) => {
     if (!drag) return;
     const dy = Math.max(0, Math.min(MAX_PULL, drag.startY - e.clientY));
+    if (dy > 4) drag.moved = true;
     drag.dy = dy;
     setPullTransform(-dy, false);
     pullTag.style.opacity = String(1 - dy / (MAX_PULL * 1.6));
@@ -483,9 +493,19 @@
       pullTag.style.opacity = '1';
     }
   };
+  // Tap-to-collapse (only when open, and only a true tap — ignore the synthetic
+  // click that follows a successful pull-to-open, and ignore if the pointer moved)
+  pullTag.addEventListener('click', (e) => {
+    if (!pullOpen) return;
+    if (Date.now() - justOpened < 500) return;
+    e.preventDefault();
+    closePull();
+  });
 
+  let justOpened = 0;
   const openPull = () => {
     pullOpen = true;
+    justOpened = Date.now();
     pullCard.classList.add('is-open');
     pullTag.style.transform = '';
     pullTag.style.opacity = '';
@@ -673,6 +693,7 @@
   // ============================================
   const shareBtn = $('#shareBtn');
   shareBtn.addEventListener('click', async () => {
+    vibrate(12);
     const url = location.href;
     const payload = `${SHARE_TEXT}\n\n${url}`;
     if (navigator.share) {
@@ -688,14 +709,59 @@
   });
 
   // ============================================
-  // WhatsApp RSVP
+  // Theme toggle — light / dark (overrides OS pref)
   // ============================================
-  const waBtn = $('#waBtn');
-  waBtn.addEventListener('click', () => {
-    const msg = encodeURIComponent(WHATSAPP_MESSAGE);
-    const url = `https://wa.me/${PHONE}?text=${msg}`;
-    window.location.href = url;
-  });
+  const THEME_KEY = 'sarsheet-theme';
+  const themeBtn = $('#themeBtn');
+  const themeIcon = themeBtn ? themeBtn.querySelector('i') : null;
+
+  const systemPrefersDark = () =>
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  const applyTheme = (mode) => {
+    document.documentElement.setAttribute('data-theme', mode);
+    if (themeIcon) {
+      themeIcon.className = mode === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    if (themeBtn) {
+      themeBtn.setAttribute('aria-label',
+        mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    // Keep the browser chrome colour in sync
+    const chrome = mode === 'dark' ? '#1a0810' : '#fdf6f0';
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+      m.setAttribute('content', chrome);
+      m.removeAttribute('media');
+    });
+  };
+
+  // Initial: saved preference wins; else follow OS
+  const savedTheme = (() => {
+    try { return localStorage.getItem(THEME_KEY); } catch (_) { return null; }
+  })();
+  applyTheme(savedTheme === 'dark' || savedTheme === 'light'
+    ? savedTheme
+    : (systemPrefersDark() ? 'dark' : 'light'));
+
+  // Follow OS changes only if the user hasn't overridden
+  if (window.matchMedia) {
+    try {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        let s = null;
+        try { s = localStorage.getItem(THEME_KEY); } catch (_) {}
+        if (s !== 'dark' && s !== 'light') applyTheme(e.matches ? 'dark' : 'light');
+      });
+    } catch (_) {}
+  }
+
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      vibrate(12);
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
+    });
+  }
 
   // ============================================
   // Toast
@@ -714,4 +780,118 @@
       try { navigator.vibrate(ms); } catch (_) {}
     }
   }
+
+  // ============================================
+  // Continuous drifting petals + diya motes
+  // ============================================
+  (function initPetals() {
+    if (prefersReduced) return;
+    const pCanvas = document.getElementById('petals');
+    if (!pCanvas) return;
+    const pCtx = pCanvas.getContext('2d');
+    let pDpr = Math.min(2, window.devicePixelRatio || 1);
+    const resizeP = () => {
+      pDpr = Math.min(2, window.devicePixelRatio || 1);
+      pCanvas.width  = innerWidth  * pDpr;
+      pCanvas.height = innerHeight * pDpr;
+      pCanvas.style.width  = innerWidth  + 'px';
+      pCanvas.style.height = innerHeight + 'px';
+      pCtx.setTransform(pDpr, 0, 0, pDpr, 0, 0);
+    };
+    resizeP();
+    window.addEventListener('resize', resizeP);
+
+    const PETAL_PALETTE = ['#f5c8d0', '#f3b2bf', '#e8c4c4', '#f5dcdc', '#e9a8b8'];
+    const DIYA_PALETTE  = ['#ffd57a', '#ffb347', '#f0d879', '#ffcf6b'];
+    const mobile = innerWidth < 720;
+    const TARGET = mobile ? 14 : 26;
+
+    const motes = [];
+    function spawn(kind) {
+      const isDiya = kind === 'diya';
+      motes.push({
+        kind: isDiya ? 'diya' : 'petal',
+        x: Math.random() * innerWidth,
+        y: -20 - Math.random() * 120,
+        vy: isDiya ? 0.25 + Math.random() * 0.4 : 0.6 + Math.random() * 1.1,
+        vx: (Math.random() - 0.5) * (isDiya ? 0.25 : 0.9),
+        sway: 0.6 + Math.random() * 1.4,
+        swaySpeed: 0.008 + Math.random() * 0.012,
+        phase: Math.random() * Math.PI * 2,
+        r: isDiya ? 2.2 + Math.random() * 2.4 : 5 + Math.random() * 5,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.03,
+        color: isDiya
+          ? DIYA_PALETTE[Math.floor(Math.random() * DIYA_PALETTE.length)]
+          : PETAL_PALETTE[Math.floor(Math.random() * PETAL_PALETTE.length)],
+        alpha: isDiya ? 0.65 + Math.random() * 0.3 : 0.6 + Math.random() * 0.35
+      });
+    }
+
+    // seed initial spread so there's no empty frame
+    for (let i = 0; i < TARGET; i++) {
+      spawn(Math.random() < 0.3 ? 'diya' : 'petal');
+      const m = motes[motes.length - 1];
+      m.y = Math.random() * innerHeight;
+    }
+
+    let last = performance.now();
+    function loop(now) {
+      const dt = Math.min(2, (now - last) / 16.7);
+      last = now;
+      pCtx.clearRect(0, 0, innerWidth, innerHeight);
+
+      for (let i = motes.length - 1; i >= 0; i--) {
+        const m = motes[i];
+        m.phase += m.swaySpeed * dt;
+        m.x += (m.vx + Math.sin(m.phase) * m.sway * 0.4) * dt;
+        m.y += m.vy * dt;
+        m.rot += m.vr * dt;
+
+        pCtx.save();
+        pCtx.translate(m.x, m.y);
+        pCtx.globalAlpha = m.alpha;
+
+        if (m.kind === 'diya') {
+          // glowing diya mote — soft radial glow
+          const g = pCtx.createRadialGradient(0, 0, 0, 0, 0, m.r * 4);
+          g.addColorStop(0, m.color);
+          g.addColorStop(0.4, m.color + 'aa');
+          g.addColorStop(1, 'rgba(255,180,80,0)');
+          pCtx.fillStyle = g;
+          pCtx.beginPath();
+          pCtx.arc(0, 0, m.r * 4, 0, Math.PI * 2);
+          pCtx.fill();
+          pCtx.fillStyle = '#fff6cc';
+          pCtx.globalAlpha = Math.min(1, m.alpha + 0.1);
+          pCtx.beginPath();
+          pCtx.arc(0, 0, m.r * 0.7, 0, Math.PI * 2);
+          pCtx.fill();
+        } else {
+          // petal — rotated ellipse with gradient
+          pCtx.rotate(m.rot);
+          pCtx.fillStyle = m.color;
+          pCtx.beginPath();
+          pCtx.ellipse(0, 0, m.r, m.r * 0.55, 0, 0, Math.PI * 2);
+          pCtx.fill();
+          pCtx.strokeStyle = 'rgba(122,30,45,0.25)';
+          pCtx.lineWidth = 0.5;
+          pCtx.stroke();
+        }
+        pCtx.restore();
+
+        if (m.y > innerHeight + 30 || m.x < -40 || m.x > innerWidth + 40) {
+          motes.splice(i, 1);
+        }
+      }
+
+      // top up to target count
+      while (motes.length < TARGET) {
+        spawn(Math.random() < 0.3 ? 'diya' : 'petal');
+      }
+
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  })();
 })();
