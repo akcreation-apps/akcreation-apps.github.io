@@ -508,7 +508,7 @@ body::before {
   z-index: 10;
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 14px 0;
+  padding: 20px 14px 0;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 1.4s ease .3s, transform 1.4s ease .3s;
@@ -527,8 +527,8 @@ body:not(.date-revealed) .save-the-date ~ .invite-footer {
 
 .section {
   background: linear-gradient(180deg, rgba(255, 249, 234, 0.88) 0%, rgba(253, 243, 219, 0.82) 100%);
-  padding: 44px 24px;
-  margin: 0 0 22px;
+  padding: 32px 22px;
+  margin: 0 0 14px;
   position: relative;
   border: 1px solid var(--rule-soft);
   box-shadow: 0 18px 40px -22px rgba(74, 15, 26, 0.18), 0 2px 8px rgba(74, 15, 26, 0.05);
@@ -548,7 +548,7 @@ body:not(.date-revealed) .save-the-date ~ .invite-footer {
 /* inter-section âœ¦ removed â€” each section now has its own card */
 
 /* kill the old ornate corner artwork */
-.section--ornate { padding: 56px 24px 56px; }
+.section--ornate { padding: 40px 22px; }
 .hero { position: relative; }
 .hero::before {
   content: "";
@@ -712,8 +712,8 @@ body.is-post-wedding .timeline-wrap {
 /* ---- Deity invocation (above eyebrow) ---- */
 .deity-invocation {
   text-align: center;
-  margin: 0 auto 22px;
-  padding-bottom: 14px;
+  margin: 0 auto 16px;
+  padding-bottom: 10px;
   position: relative;
 }
 .deity-invocation::after {
@@ -750,7 +750,7 @@ body.is-post-wedding .timeline-wrap {
   text-transform: uppercase;
   color: var(--maroon);
   font-weight: 600;
-  margin-bottom: 36px;
+  margin-bottom: 24px;
   position: relative;
   padding-bottom: 14px;
 }
@@ -778,7 +778,7 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
   gap: 12px;
   align-items: end;
   justify-items: center;
-  margin: 0 auto 36px;
+  margin: 0 auto 22px;
   max-width: 620px;
   width: 100%;
 }
@@ -1054,7 +1054,7 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
 
 /* Scroll cue */
 .scroll-cue {
-  margin: 36px auto 0;
+  margin: 20px auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1169,7 +1169,7 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
 .section-sub {
   text-align: center;
   color: var(--ink-soft);
-  margin-bottom: 36px;
+  margin-bottom: 24px;
   font-size: 12px;
   font-family: 'Cinzel', serif;
   letter-spacing: 2.5px;
@@ -1781,7 +1781,7 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
   top: max(14px, env(safe-area-inset-top));
   right: max(14px, env(safe-area-inset-right));
   z-index: 210;
-  width: 40px; height: 40px;
+  width: 48px; height: 48px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -1791,7 +1791,7 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
   border: 1px solid var(--brass-2);
   box-shadow: 0 6px 18px rgba(74, 15, 26, 0.18), inset 0 0 0 1px rgba(233,197,114,0.35);
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   transition: transform .25s ease, box-shadow .25s ease, background .3s ease, color .3s ease;
@@ -1800,7 +1800,7 @@ html[data-side="bride"] .parents .parent-col--bride { order: 1; }
 .theme-toggle:active  { transform: scale(0.96); }
 .theme-toggle:focus-visible { outline: 2px dashed var(--brass-2); outline-offset: 3px; }
 @media (min-width: 1024px) {
-  .theme-toggle { width: 44px; height: 44px; font-size: 16px; top: 18px; right: 18px; }
+  .theme-toggle { top: 18px; right: 18px; }
 }
 html[data-theme="dark"] .theme-toggle {
   background: rgba(26, 8, 16, 0.75);
@@ -1845,16 +1845,16 @@ html[data-theme="dark"] .theme-toggle {
 }
 
 @media (max-width: 420px) {
-  .section { padding: 36px 18px; margin-bottom: 18px; }
-  .section--ornate { padding: 44px 18px; }
+  .section { padding: 26px 16px; margin-bottom: 12px; }
+  .section--ornate { padding: 32px 16px; }
   .section::after { inset: 5px; }
 }
 
 @media (min-width: 1024px) {
   body { font-size: 19px; }
   .letter { padding: 56px 20px 140px; max-width: 760px; }
-  .section { padding: 60px 42px; }
-  .section--ornate { padding: 72px 42px; }
+  .section { padding: 44px 42px; }
+  .section--ornate { padding: 52px 42px; }
 }
 
 /* ============================================
@@ -1871,19 +1871,59 @@ html[data-theme="dark"] .theme-toggle {
 }
 
 /* ----- Jagannath icon in deity invocation ----- */
+.deity-stage {
+  position: relative;
+  width: 120px; height: 120px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deity-stage .mandala-watermark--deity {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 120px; height: 120px;
+  max-width: none;
+  aspect-ratio: auto;
+  transform: translate(-50%, -50%);
+  color: var(--brass-3);
+  opacity: 0.32;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+  animation: mandalaDeitySpin 90s linear infinite, mandalaBreath 7s ease-in-out infinite;
+  /* Stacked shadows widen the SVG's hairline strokes so the pattern stays
+     legible at the shared 0.32 opacity, matching the couple mandala. */
+  filter:
+    drop-shadow(0 0 0.5px currentColor)
+    drop-shadow(0 0 0.5px currentColor);
+}
+@keyframes mandalaDeitySpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
 .deity-icon {
   display: block;
+  position: relative;
+  z-index: 1;
   width: 64px; height: 72px;
-  margin: 0 auto 10px;
+  /* Visual centroid of the Jagannath icon sits above its geometric centre
+     (halo rays make the top heavier). Nudge it down so the face aligns
+     with the mandala's hub. */
+  transform: translateY(10px);
   filter: drop-shadow(0 4px 10px rgba(122, 30, 45, 0.25));
   animation: deityGlow 4s ease-in-out infinite;
+}
+@media (min-width: 1024px) {
+  .deity-stage { width: 140px; height: 140px; }
+  .deity-stage .mandala-watermark--deity { width: 140px; height: 140px; }
 }
 @keyframes deityGlow {
   0%, 100% { filter: drop-shadow(0 4px 10px rgba(122, 30, 45, 0.25)); }
   50%      { filter: drop-shadow(0 6px 18px rgba(201, 155, 60, 0.55)); }
 }
 @media (min-width: 1024px) {
-  .deity-icon { width: 76px; height: 86px; }
+  .deity-icon { width: 76px; height: 86px; transform: translateY(12px); }
 }
 
 /* ----- Odia tagline ----- */
@@ -1909,13 +1949,17 @@ html[data-theme="dark"] .theme-toggle {
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%) rotate(0deg);
   color: var(--brass-3);
-  opacity: 0.22;
+  opacity: 0.32;
   pointer-events: none;
   z-index: 0;
-  animation: mandalaSpin 120s linear infinite;
+  animation: mandalaSpin 90s linear infinite, mandalaBreath 7s ease-in-out infinite;
   mix-blend-mode: multiply;
 }
-.mandala-watermark--closing { opacity: 0.26; width: 80%; }
+.mandala-watermark--closing { width: 80%; }
+@keyframes mandalaBreath {
+  0%, 100% { opacity: 0.28; }
+  50%      { opacity: 0.4; }
+}
 
 /* Mandala framing the couple names */
 .couple-stage {
@@ -1937,15 +1981,11 @@ html[data-theme="dark"] .theme-toggle {
   mix-blend-mode: multiply;
   pointer-events: none;
   z-index: 0;
-  animation: mandalaCoupleSpin 80s linear infinite, mandalaCoupleBreath 7s ease-in-out infinite;
+  animation: mandalaCoupleSpin 90s linear infinite, mandalaBreath 7s ease-in-out infinite;
 }
 @keyframes mandalaCoupleSpin {
   from { transform: translate(-50%, -50%) rotate(0deg); }
   to   { transform: translate(-50%, -50%) rotate(360deg); }
-}
-@keyframes mandalaCoupleBreath {
-  0%, 100% { opacity: 0.28; }
-  50%      { opacity: 0.4; }
 }
 @keyframes mandalaSpin {
   from { transform: translate(-50%, -50%) rotate(0deg); }
@@ -2114,10 +2154,18 @@ html[data-theme="dark"] {
   .invite-footer a { color: var(--brass-1); }
 
   /* Mandala stays visible on dark paper too */
-  .mandala-watermark { color: var(--brass-1); opacity: 0.16; mix-blend-mode: screen; }
-  .mandala-watermark--closing { opacity: 0.2; }
-  .mandala-watermark--couple  { color: var(--brass-1); opacity: 0.28; mix-blend-mode: screen; }
-  .paisley-accent { color: var(--brass-1); opacity: 0.3; }
+  .mandala-watermark { color: var(--brass-1); opacity: 0.32; mix-blend-mode: screen; }
+  .mandala-watermark--couple { color: var(--brass-1); opacity: 0.32; mix-blend-mode: screen; }
+  .deity-stage .mandala-watermark--deity {
+    color: var(--brass-1);
+    opacity: 0.32;
+    mix-blend-mode: screen;
+    filter:
+      drop-shadow(0 0 0.5px currentColor)
+      drop-shadow(0 0 0.5px currentColor)
+      drop-shadow(0 0 6px rgba(255, 217, 122, 0.4));
+  }
+  .paisley-accent { color: var(--brass-1); opacity: 0.32; }
 
   .reveal-date, .section-title, .pw-title,
   .closing-script, .portrait-name, .parent-name, .t-title, .venue-name {
