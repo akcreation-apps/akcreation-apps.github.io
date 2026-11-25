@@ -88,14 +88,15 @@
     if (c.shareText) SHARE_TEXT = c.shareText;
     if (c.whatsappMessage) WHATSAPP_MESSAGE = c.whatsappMessage;
 
-    if (c.pageTitle) document.title = c.pageTitle;
+    // (page title is set further down, once we know name priority)
 
     // Deity invocation
     setText('deitySanskrit', c.deityInvocationSanskrit);
     setText('deityEnglish',  c.deityInvocationEnglish);
 
     // Post-wedding transform (shows Thank You, hides pre-wedding sections)
-    setupPostWedding(c);
+    //   side-specific `postWeddingActiveFrom` takes precedence over common
+    setupPostWedding(c, s);
 
     // Geofenced welcome (wedding day, near venue)
     setupGeofenceWelcome(c);
@@ -117,9 +118,9 @@
     setText('venuesTitle', c.venuesTitle);
     setText('venuesSub', c.venuesSub);
     setText('closingLine', c.closingLine);
-    setText('closingSignature', c.closingSignature);
 
-    // Portraits — always both, groom on left / bride on right
+    // Portraits — always both. DOM order stays (groom DOM-left, bride DOM-right);
+    // CSS `order` swaps visually when html[data-side="bride"].
     const groomCfg = cfg.groom || {};
     const brideCfg = cfg.bride || {};
     if (groomCfg.image) setAttr('groomImg', 'src', groomCfg.image);
@@ -128,16 +129,40 @@
     setText('brideName', brideCfg.firstName);
     setText('groomRole', groomCfg.role);
     setText('brideRole', brideCfg.role);
-    setText('coupleGroom', groomCfg.firstName);
-    setText('coupleBride', brideCfg.firstName);
 
-    // Parents block — always both (invitation convention)
+    // Couple name in the hero — bride first when invited from bride side
+    const firstPerson  = side === 'bride' ? brideCfg : groomCfg;
+    const secondPerson = side === 'bride' ? groomCfg : brideCfg;
+    setText('coupleGroom',  firstPerson.firstName);   // DOM "first slot"
+    setText('coupleBride',  secondPerson.firstName);  // DOM "second slot"
+
+    // Parents block — both families shown. Groom is DOM-left (visually swapped by CSS on bride side).
     setText('groomParentRel', groomCfg.parentRel);
     setText('groomFather',   groomCfg.father);
     setText('groomMother',   groomCfg.mother);
     setText('brideParentRel', brideCfg.parentRel);
     setText('brideFather',   brideCfg.father);
     setText('brideMother',   brideCfg.mother);
+
+    // Closing signature — use the inviting family's name
+    const familyName = s.familyName
+      || (side === 'bride' ? 'Pradhan Family' : 'Pani Family');
+    setText('closingSignature', `— With love, ${familyName}`);
+
+    // Page title + OG / Twitter meta — reflect invited side's name priority.
+    // (WhatsApp's crawler reads static HTML and won't see these runtime changes
+    //  on first crawl, but JS-aware scrapers pick it up on cache-refresh.)
+    const prioritisedNames = `${firstPerson.firstName} & ${secondPerson.firstName}`;
+    const titleSuffix = c.pageTitleSuffix || 'Wedding Invitation';
+    document.title = `${prioritisedNames} — ${titleSuffix}`;
+
+    const ogTitleText = `You're Invited — ${prioritisedNames}`;
+    const setMeta = (sel, val) => {
+      const el = document.querySelector(sel);
+      if (el && val) el.setAttribute('content', val);
+    };
+    setMeta('meta[property="og:title"]',    ogTitleText);
+    setMeta('meta[name="twitter:title"]',   ogTitleText);
 
     // Timeline + Venues come from the selected side
     renderTimeline(s.events);
@@ -269,19 +294,24 @@
   // ============================================
   // Post-wedding — after the wedding day, flip to Thank You mode
   // ============================================
-  function setupPostWedding(c) {
-    if (!c || !c.postWedding) return;
-    const pw = c.postWedding;
-    const activeFrom = pw.activeFrom
-      ? new Date(pw.activeFrom + 'T00:00:00')
-      : null;
-    if (!activeFrom || isNaN(activeFrom.getTime())) return;
+  function setupPostWedding(c, sideCfg) {
+    if (!c) return;
+    // side wins over common for the activation date
+    const activeFromStr =
+      (sideCfg && sideCfg.postWeddingActiveFrom) ||
+      (c.postWedding && c.postWedding.activeFrom) ||
+      null;
+    if (!activeFromStr) return;
+    const activeFrom = new Date(activeFromStr + 'T00:00:00');
+    if (isNaN(activeFrom.getTime())) return;
     if (Date.now() < activeFrom.getTime()) return; // not yet
     document.body.classList.add('is-post-wedding');
     const pwSection = document.getElementById('postWedding');
     if (pwSection) pwSection.setAttribute('aria-hidden', 'false');
-    setText('pwTitle', pw.title);
-    setText('pwMsg', pw.message);
+    const title = (sideCfg && sideCfg.postWeddingTitle) || c.postWeddingTitle || (c.postWedding && c.postWedding.title);
+    const msg   = (sideCfg && sideCfg.postWeddingMessage) || c.postWeddingMessage || (c.postWedding && c.postWedding.message);
+    setText('pwTitle', title);
+    setText('pwMsg', msg);
   }
 
   // ============================================

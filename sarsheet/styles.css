@@ -748,6 +748,14 @@ body.is-post-wedding .timeline-wrap {
   background: var(--brass-2);
 }
 
+/* Bride-side priority: visually swap portrait + parent order */
+html[data-side="bride"] .portrait-pair > *:nth-child(1) { order: 3; }
+html[data-side="bride"] .portrait-pair > *:nth-child(2) { order: 2; }
+html[data-side="bride"] .portrait-pair > *:nth-child(3) { order: 1; }
+html[data-side="bride"] .parents .parent-col--groom { order: 3; }
+html[data-side="bride"] .parents .parent-divider    { order: 2; }
+html[data-side="bride"] .parents .parent-col--bride { order: 1; }
+
 /* ---- Portraits: editorial double-frame with vignette ---- */
 .portrait-pair {
   display: grid;

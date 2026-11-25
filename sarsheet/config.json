@@ -1,6 +1,6 @@
 {
   "common": {
-    "pageTitle": "Sarbeswar & Sheetal — Wedding Invitation",
+    "pageTitleSuffix": "Wedding Invitation",
     "landingTag": "You're cordially invited…",
     "landingHint": "Tap the seal to open",
     "letterScript": "S & S",
@@ -20,11 +20,8 @@
       "welcomeMessage": "We see you've arrived at Baramala Convention. Thank you for being here on our most important day."
     },
 
-    "postWedding": {
-      "activeFrom": "2026-12-14",
-      "title": "Thank you for being part of our forever",
-      "message": "Your presence turned our day into magic. Our hearts are full of gratitude for every blessing, every smile, and every embrace you shared with us."
-    },
+    "postWeddingTitle": "Thank you for being part of our forever",
+    "postWeddingMessage": "Your presence turned our day into magic. Our hearts are full of gratitude for every blessing, every smile, and every embrace you shared with us.",
 
     "eyebrow": "The Wedding of",
     "blessingLine": "With the blessings of the Almighty and our families",
@@ -67,6 +64,8 @@
     "mother": "Smt. Nirupama Pani",
     "contactPhone": "917749984274",
     "contactName": "Anil Kumar Sahoo",
+    "familyName": "Pani Family",
+    "postWeddingActiveFrom": "2026-12-21",
 
     "events": [
       {
@@ -131,10 +130,12 @@
     "mother": "Smt. Ahalya Pradhan",
     "contactPhone": "919861039566",
     "contactName": "Sidheswar Pradhan",
+    "familyName": "Pradhan Family",
+    "postWeddingActiveFrom": "2026-12-14",
 
     "events": [
       {
-        "date": "12<sup>th</sup> December 2026",
+        "date": "12<sup>th</sup> December 2026 · 10 AM onwards",
         "title": "Mangalkrutya",
         "detail": "Sacred pre-wedding rituals invoking blessings for the bride.",
         "icon": "fa-om"
