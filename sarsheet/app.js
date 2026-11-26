@@ -296,6 +296,10 @@
   // ============================================
   function setupPostWedding(c, sideCfg) {
     if (!c) return;
+    // Explicit kill switch — set `postWeddingEnabled: false` in config.common
+    // to suppress the thank-you flip entirely (useful before the wedding or
+    // when you want the invite to stay in pre-wedding mode permanently).
+    if (c.postWeddingEnabled === false) return;
     // side wins over common for the activation date
     const activeFromStr =
       (sideCfg && sideCfg.postWeddingActiveFrom) ||

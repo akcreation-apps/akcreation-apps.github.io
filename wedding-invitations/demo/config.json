@@ -11,7 +11,7 @@
     "deityInvocationOdia": "ଆପଣଙ୍କ ସ୍ନେହ, ଶୁଭେଚ୍ଛା ଓ ଆଶୀର୍ବାଦ ହିଁ ଆମ ପାଇଁ ସବୁଠୁ ବଡ଼ ଉପହାର",
 
     "geofence": {
-      "enabled": true,
+      "enabled": false,
       "venueCoords": { "lat": 20.429952, "lng": 85.871206 },
       "radiusMeters": 500,
       "activeDates": ["2027-02-14"],
@@ -19,6 +19,7 @@
       "welcomeMessage": "We see you've arrived at The Grand Palace Convention. Thank you for being here on our most important day."
     },
 
+    "postWeddingEnabled": false,
     "postWeddingTitle": "Thank you for being part of our forever",
     "postWeddingMessage": "Your presence turned our day into magic. Our hearts are full of gratitude for every blessing, every smile, and every embrace you shared with us.",
 
