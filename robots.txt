@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Keep the wedding-invitation demo out of the index — it's a prototype,
+# not meant to compete with the real pitch page in search results.
+Disallow: /wedding-invitations/demo/
+
 Sitemap: https://akcreation-apps.com/sitemap.xml

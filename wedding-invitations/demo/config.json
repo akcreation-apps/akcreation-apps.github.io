@@ -1,0 +1,156 @@
+{
+  "common": {
+    "pageTitleSuffix": "Wedding Invitation",
+    "landingTag": "You're cordially invited…",
+    "landingHint": "Tap the seal to open",
+
+    "weddingDateTime": "2027-02-14T00:00:00+05:30",
+
+    "deityInvocationSanskrit": "॥ ଶ୍ରୀ ଜଗନ୍ନାଥାୟ ନମଃ ॥",
+    "deityInvocationEnglish": "With the divine blessings of Lord Jagannath",
+    "deityInvocationOdia": "ଆପଣଙ୍କ ସ୍ନେହ, ଶୁଭେଚ୍ଛା ଓ ଆଶୀର୍ବାଦ ହିଁ ଆମ ପାଇଁ ସବୁଠୁ ବଡ଼ ଉପହାର",
+
+    "geofence": {
+      "enabled": true,
+      "venueCoords": { "lat": 20.429952, "lng": 85.871206 },
+      "radiusMeters": 500,
+      "activeDates": ["2027-02-14"],
+      "welcomeTitle": "Welcome",
+      "welcomeMessage": "We see you've arrived at The Grand Palace Convention. Thank you for being here on our most important day."
+    },
+
+    "postWeddingTitle": "Thank you for being part of our forever",
+    "postWeddingMessage": "Your presence turned our day into magic. Our hearts are full of gratitude for every blessing, every smile, and every embrace you shared with us.",
+
+    "eyebrow": "The Wedding of",
+    "blessingLine": "With the blessings of the Almighty and our families",
+    "requestLine": "request the honour of your presence as we begin our <em>forever</em>.",
+
+    "saveTitle": "Save the Date",
+    "saveSub": "A little secret awaits…",
+    "calEventTitle": "Rohan & Priya's Wedding",
+    "calEventVenue": "The Grand Palace Convention",
+    "calEventDate": "2027-02-14",
+    "calActionsLabel": "Save a reminder",
+    "revealEyebrow": "The Wedding Day",
+    "revealDate": "14<sup>th</sup> February 2027",
+    "revealVenue": "The Grand Palace Convention",
+
+    "celebrationsTitle": "Celebrations",
+    "celebrationsSub": "Join us through every joyful moment",
+
+    "venuesTitle": "Venues",
+    "venuesSub": "Tap for directions",
+
+    "closingLine": "Your blessings mean the world to us.",
+    "closingSignature": "— With love, Rohan & Priya",
+
+    "contactPhone": "917749984274",
+    "shareText": "You're invited to Rohan & Priya's wedding 💍",
+
+    "music": "assets/music.mp3"
+  },
+
+  "groom": {
+    "firstName": "Rohan",
+    "role": "The Groom",
+    "image": "assets/groom.jpg",
+    "parentRel": "Son of",
+    "father": "Sri. Suresh Mohapatra",
+    "mother": "Smt. Sarita Mohapatra",
+    "contactPhone": "917749984274",
+    "familyName": "Mohapatra Family",
+    "postWeddingActiveFrom": "2027-02-22",
+
+    "events": [
+      {
+        "date": "13<sup>th</sup> February 2027 · 9 AM onwards ",
+        "title": "Haldi",
+        "detail": "A morning of turmeric, laughter and love.",
+        "icon": "fa-sun",
+        "dressCode": { "label": "Dress code: Yellow", "chip": "chip-yellow" }
+      },
+      {
+        "date": "13<sup>th</sup> February 2027 · 6 PM onwards",
+        "title": "Mehndi",
+        "detail": "An evening of henna, music and sweet beginnings.",
+        "icon": "fa-hand-holding-heart",
+        "dressCode": { "label": "Dress code: Green", "chip": "chip-green" }
+      },
+      {
+        "date": "14<sup>th</sup> February 2027 · 2 PM onwards",
+        "title": "Baraat",
+        "detail": "The groom's procession dispatches from <strong>Our Residence</strong>.",
+        "icon": "fa-horse"
+      },
+      {
+        "date": "14<sup>th</sup> February 2027",
+        "title": "The Wedding",
+        "detail": "The sacred vows, at <strong>The Grand Palace Convention</strong>.",
+        "icon": "fa-ring",
+        "highlight": true
+      },
+      {
+        "date": "21<sup>st</sup> February 2027 · 7 PM onwards",
+        "title": "Reception",
+        "detail": "An evening of celebration at <strong>Our Residence</strong>.",
+        "icon": "fa-glass-cheers"
+      }
+    ],
+
+    "venues": [
+      {
+        "name": "The Grand Palace Convention",
+        "role": "Marriage",
+        "when": "14 Feb 2027",
+        "icon": "fa-place-of-worship",
+        "mapsUrl": "https://maps.google.com/?q=The+Grand+Palace+Convention"
+      },
+      {
+        "name": "At Our Residence",
+        "role": "Baraat & Reception",
+        "when": "14 & 21 Feb 2027",
+        "icon": "fa-glass-cheers",
+        "mapsUrl": "https://maps.google.com/?q=Residence"
+      }
+    ]
+  },
+
+  "bride": {
+    "firstName": "Priya",
+    "role": "The Bride",
+    "image": "assets/bride.jpg",
+    "parentRel": "Daughter of",
+    "father": "Sri. Prakash Patnaik",
+    "mother": "Smt. Anita Patnaik",
+    "contactPhone": "917749984274",
+    "familyName": "Patnaik Family",
+    "postWeddingActiveFrom": "2027-02-15",
+
+    "events": [
+      {
+        "date": "13<sup>th</sup> February 2027 · 10 AM onwards",
+        "title": "Mangalkrutya",
+        "detail": "Sacred pre-wedding rituals invoking blessings for the bride.",
+        "icon": "fa-om"
+      },
+      {
+        "date": "14<sup>th</sup> February 2027 · 7 PM onwards",
+        "title": "Marriage, Panigrahana & Reception",
+        "detail": "The sacred vows, the union of hands and an evening of celebration — at <strong>The Grand Palace Convention</strong>.",
+        "icon": "fa-ring",
+        "highlight": true
+      }
+    ],
+
+    "venues": [
+      {
+        "name": "The Grand Palace Convention",
+        "role": "Reception",
+        "when": "14 Feb 2027 · 7 PM onwards",
+        "icon": "fa-glass-cheers",
+        "mapsUrl": "https://maps.google.com/?q=The+Grand+Palace+Convention"
+      }
+    ]
+  }
+}

@@ -156,7 +156,12 @@
     .svc-card h3 { font-size:1.08rem; font-weight:700; color:var(--primary); margin-bottom:10px; }
     .svc-card p { font-size:0.85rem; color:var(--muted); line-height:1.75; margin-bottom:18px; }
     .svc-tags { display:flex; flex-wrap:wrap; gap:6px; }
-    .tag { font-size:0.68rem; font-weight:600; padding:3px 10px; border-radius:10px; background:var(--tb,#ede9fe); color:var(--c,var(--purple)); }
+    .tag {
+      font-size:0.68rem; font-weight:600;
+      padding:3px 10px; border-radius:10px;
+      background:var(--tb,#ede9fe); color:var(--c,var(--purple));
+      pointer-events:none; cursor:default; user-select:none;
+    }
 
     /* ===== PROCESS ===== */
     .process-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:32px; }
@@ -194,6 +199,32 @@
     .port-link { display:inline-flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:700; color:var(--primary); transition:gap 0.2s, color 0.2s; }
     .port-link i { font-size:0.75rem; }
     .port-link:hover { gap:10px; color:var(--purple); }
+    .port-card--featured {
+      border: 1.5px solid #c89b3c;
+      box-shadow: 0 10px 32px rgba(122, 30, 45, 0.12);
+    }
+    .port-card--featured .port-thumb { color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+    /* ===== SERVICE CARD AS LINK ===== */
+    .svc-card--link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    .svc-card--link:hover { text-decoration: none; }
+    .svc-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      transition: gap 0.2s;
+    }
+    .svc-cta i { font-size: 0.75rem; }
+    .svc-card--link:hover .svc-cta { gap: 10px; color: #7a1e2d; }
 
     /* ===== WHY US ===== */
     .why-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:20px; }
@@ -362,6 +393,26 @@
     </div>
     <div class="svc-grid">
 
+      <a class="svc-card svc-card--link fi" href="/wedding-invitations/" style="--c:#7a1e2d;--ib:#fdf0e0;--tb:#fdf0e0;">
+        <div class="svc-icon"><i class="fas fa-ring"></i></div>
+        <h3>Digital Wedding Invitation</h3>
+        <p>Premium interactive wedding invitations that open like a story — parchment scroll animation, Lord Jagannath invocation, pull-to-reveal date, live countdown, venue welcome. <strong>From ₹2,999</strong> (one-time).</p>
+        <div class="svc-tags">
+          <span class="tag">Wedding</span><span class="tag">Engagement</span><span class="tag">Reception</span><span class="tag">Odia</span>
+        </div>
+        <span class="svc-cta">Live Demo &amp; Pricing <i class="fas fa-arrow-right"></i></span>
+      </a>
+
+      <a class="svc-card svc-card--link fi" href="/attendance-monitoring/" style="--c:#4f46e5;--ib:#eef2ff;--tb:#eef2ff;">
+        <div class="svc-icon"><i class="fas fa-location-crosshairs"></i></div>
+        <h3>Attendance Monitoring System</h3>
+        <p>Personalized GPS-geofenced attendance system for construction, security, delivery and field teams. Real-time dashboard, multi-site scoping, Android employee app. <strong>From ₹30,000</strong> (one-time).</p>
+        <div class="svc-tags">
+          <span class="tag">Construction</span><span class="tag">Security</span><span class="tag">Multi-site</span><span class="tag">Field Teams</span>
+        </div>
+        <span class="svc-cta">See Features &amp; Pricing <i class="fas fa-arrow-right"></i></span>
+      </a>
+
       <div class="svc-card fi" style="--c:#1565c0;--ib:#e3f0ff;--tb:#e3f0ff;">
         <div class="svc-icon"><i class="fas fa-store"></i></div>
         <h3>Business Landing Page</h3>
@@ -461,6 +512,16 @@
     </div>
     <div class="port-grid">
 
+      <div class="port-card fi port-card--featured">
+        <div class="port-thumb" style="background:linear-gradient(135deg,#4a0f1a,#7a1e2d,#c89b3c);">💍</div>
+        <div class="port-body">
+          <span class="port-pill" style="background:#fdf0e0;color:#7a1e2d;">Wedding Invitation</span>
+          <h3>Rohan &amp; Priya — Digital Invite</h3>
+          <p>A fully interactive wedding invitation with parchment scroll opening, animated mandalas, pull-to-reveal date, live countdown, Odia blessings, and venue welcome overlay. <strong>Starting at ₹2,999.</strong></p>
+          <a class="port-link" href="/wedding-invitations/demo/" target="_blank" rel="noopener">View Live <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
 <div class="port-card fi">
         <div class="port-thumb" style="background:linear-gradient(135deg,#7b1fa2,#ab47bc);">🍽️</div>
         <div class="port-body">
@@ -478,6 +539,26 @@
           <h3>BPUT Student Toolkit</h3>
           <p>GPA calculator, grade sheet, resume builder and seminar report tools — used by thousands of BPUT students across Odisha.</p>
           <a class="port-link" href="/index.html" target="_blank" rel="noopener">View Live <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="port-card fi">
+        <div class="port-thumb" style="background:linear-gradient(135deg,#2e7d32,#66bb6a);">🚐</div>
+        <div class="port-body">
+          <span class="port-pill" style="background:#e8f5e9;color:#2e7d32;">Transport Booking</span>
+          <h3>Anvisha Travels</h3>
+          <p>WhatsApp-powered booking page for a local travel service — one-way, round-trip and rental bookings, instant cost estimation, and messages going straight to the owner's phone.</p>
+          <a class="port-link" href="/anvisha-travels/" target="_blank" rel="noopener">View Live <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="port-card fi">
+        <div class="port-thumb" style="background:linear-gradient(135deg,#be185d,#ec4899);">💄</div>
+        <div class="port-body">
+          <span class="port-pill" style="background:#fce7f3;color:#be185d;">Makeup Booking</span>
+          <h3>Chitranshi Makeover</h3>
+          <p>Personalized booking page for a Delhi-certified makeup artist offering bridal, reception, engagement and party makeup at the client's doorstep in Banki &amp; Cuttack. WhatsApp-first appointments.</p>
+          <a class="port-link" href="https://chitranshi-makeover.github.io/" target="_blank" rel="noopener">View Live <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>
 

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, viewport-fit=cover">
+<meta name="theme-color" content="#fdf6f0">
+<meta name="color-scheme" content="light dark">
+<title id="pageTitle">Live Demo — Digital Wedding Invitation by AK Creation</title>
+<meta name="description" content="Interactive demo of a premium animated wedding invitation by AK Creation.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://akcreation-apps.com/wedding-invitations/">
+
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="icon" href="/favicon.ico">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Noto+Sans+Oriya:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Early theme init — avoids a flash before app.js loads -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('sarsheet-theme');
+      var mode = (saved === 'dark' || saved === 'light')
+        ? saved
+        : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', mode);
+    } catch (_) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
+</head>
+<body>
+
+<!-- scroll progress ribbon -->
+<div class="scroll-ribbon" id="scrollRibbon" aria-hidden="true"></div>
+
+<!-- drifting leaves + sparkles background -->
+<div class="leaves" aria-hidden="true">
+  <span class="leaf l1"></span>
+  <span class="leaf l2"></span>
+  <span class="leaf l3"></span>
+  <span class="leaf l4"></span>
+  <span class="leaf l5"></span>
+  <span class="leaf l6"></span>
+  <span class="sparkle s1"></span>
+  <span class="sparkle s2"></span>
+  <span class="sparkle s3"></span>
+  <span class="sparkle s4"></span>
+  <span class="sparkle s5"></span>
+  <span class="sparkle s6"></span>
+  <span class="sparkle s7"></span>
+  <span class="sparkle s8"></span>
+</div>
+
+<!-- Reusable SVG ornament definitions -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#c89b3c"/>
+      <stop offset="45%" stop-color="#8a5f20"/>
+      <stop offset="100%" stop-color="#5c4213"/>
+    </linearGradient>
+    <linearGradient id="monoGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#a52a3c"/>
+      <stop offset="60%" stop-color="#7a1e2d"/>
+      <stop offset="100%" stop-color="#4a0f1a"/>
+    </linearGradient>
+    <linearGradient id="goldFoil" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#8a6530"/>
+      <stop offset="18%"  stop-color="#d8b67a"/>
+      <stop offset="34%"  stop-color="#faecc2"/>
+      <stop offset="52%"  stop-color="#c99c58"/>
+      <stop offset="70%"  stop-color="#faecc2"/>
+      <stop offset="86%"  stop-color="#b48a52"/>
+      <stop offset="100%" stop-color="#8a6530"/>
+    </linearGradient>
+    <!-- Signature intertwined S&S monogram crest -->
+    <symbol id="monogram" viewBox="0 0 140 160">
+      <!-- backing paper medallion -->
+      <circle cx="70" cy="80" r="62" fill="#fdf5df" stroke="url(#goldGrad)" stroke-width="1.6" opacity="0.95"/>
+      <circle cx="70" cy="80" r="56" fill="none" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.65"/>
+      <!-- dotted outer ring -->
+      <g fill="url(#goldGrad)">
+        <circle cx="70" cy="18" r="1.6"/><circle cx="70" cy="142" r="1.6"/>
+        <circle cx="8" cy="80" r="1.6"/><circle cx="132" cy="80" r="1.6"/>
+        <circle cx="26" cy="36" r="1.2"/><circle cx="114" cy="36" r="1.2"/>
+        <circle cx="26" cy="124" r="1.2"/><circle cx="114" cy="124" r="1.2"/>
+      </g>
+      <!-- Crown -->
+      <g fill="none" stroke="url(#goldGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M54 34 L 62 22 L 70 30 L 78 22 L 86 34"/>
+        <path d="M54 34 L 86 34"/>
+        <circle cx="62" cy="20" r="2" fill="url(#goldGrad)"/>
+        <circle cx="70" cy="28" r="1.6" fill="url(#goldGrad)"/>
+        <circle cx="78" cy="20" r="2" fill="url(#goldGrad)"/>
+      </g>
+      <!-- Intertwined S & S — bold maroon strokes -->
+      <g fill="none" stroke="url(#monoGrad)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M58 54 C 42 54, 42 72, 58 72 C 74 72, 74 96, 58 96"/>
+        <path d="M82 60 C 98 60, 98 78, 82 78 C 66 78, 66 102, 82 102"/>
+      </g>
+      <!-- Gold ampersand dot -->
+      <circle cx="70" cy="80" r="3.2" fill="url(#goldGrad)"/>
+      <circle cx="70" cy="80" r="1.4" fill="#fdf5df"/>
+      <!-- Bottom flourish -->
+      <g fill="none" stroke="url(#goldGrad)" stroke-width="1.6" stroke-linecap="round">
+        <path d="M34 122 Q 52 134 70 128 Q 88 134 106 122"/>
+        <path d="M54 128 Q 70 136 86 128"/>
+      </g>
+      <circle cx="70" cy="132" r="2" fill="url(#monoGrad)"/>
+      <circle cx="34" cy="122" r="1.4" fill="url(#goldGrad)"/>
+      <circle cx="106" cy="122" r="1.4" fill="url(#goldGrad)"/>
+    </symbol>
+    <symbol id="flourishLong" viewBox="0 0 220 24">
+      <g fill="none" stroke="url(#goldGrad)" stroke-linecap="round">
+        <line x1="20" y1="12" x2="88" y2="12" stroke-width="0.6"/>
+        <line x1="132" y1="12" x2="200" y2="12" stroke-width="0.6"/>
+        <path d="M88 12 Q 96 4 110 12 Q 124 20 132 12" stroke-width="0.8"/>
+        <circle cx="110" cy="12" r="2" fill="url(#goldGrad)"/>
+        <circle cx="94" cy="12" r="1" fill="url(#goldGrad)"/>
+        <circle cx="126" cy="12" r="1" fill="url(#goldGrad)"/>
+        <path d="M20 12 L 14 8 M 20 12 L 14 16" stroke-width="0.6"/>
+        <path d="M200 12 L 206 8 M 200 12 L 206 16" stroke-width="0.6"/>
+      </g>
+    </symbol>
+    <symbol id="cornerFlourish" viewBox="0 0 100 100">
+      <g fill="none" stroke="url(#goldGrad)" stroke-width="1.2" stroke-linecap="round">
+        <path d="M2 50 C 2 20, 20 2, 50 2"/>
+        <path d="M10 50 C 10 25, 25 10, 50 10" opacity="0.6"/>
+        <path d="M50 2 C 44 10, 44 20, 50 24 C 56 20, 56 10, 50 2 Z" fill="url(#goldGrad)" opacity=".4"/>
+        <circle cx="50" cy="2" r="1.6" fill="url(#goldGrad)"/>
+        <circle cx="2" cy="50" r="1.6" fill="url(#goldGrad)"/>
+        <path d="M18 18 Q 24 24 30 20" opacity=".55"/>
+      </g>
+    </symbol>
+    <!-- Stylised Lord Jagannath — round face, large eyes, tilaka (iconic Puri form) -->
+    <symbol id="jagannathIcon" viewBox="0 0 120 140">
+      <!-- soft halo glow fill -->
+      <circle cx="60" cy="56" r="48" fill="url(#goldGrad)" opacity="0.18"/>
+      <!-- halo rays -->
+      <g stroke="#c89b3c" stroke-width="2.2" stroke-linecap="round" opacity="0.95">
+        <line x1="60" y1="2"  x2="60" y2="14"/>
+        <line x1="38" y1="6"  x2="44" y2="18"/>
+        <line x1="82" y1="6"  x2="76" y2="18"/>
+        <line x1="18" y1="20" x2="30" y2="30"/>
+        <line x1="102" y1="20" x2="90" y2="30"/>
+        <line x1="8"  y1="42" x2="20" y2="46"/>
+        <line x1="112" y1="42" x2="100" y2="46"/>
+      </g>
+      <!-- halo ring -->
+      <circle cx="60" cy="56" r="44" fill="none" stroke="#9a7024" stroke-width="2" opacity="0.9"/>
+      <circle cx="60" cy="56" r="40" fill="none" stroke="#c89b3c" stroke-width="0.8" opacity="0.7"/>
+      <!-- round black face -->
+      <path d="M60 18 C 86 18, 98 42, 98 64 C 98 82, 84 94, 60 94 C 36 94, 22 82, 22 64 C 22 42, 34 18, 60 18 Z" fill="#1b0b0f"/>
+      <!-- crown arch -->
+      <path d="M26 30 Q 60 8 94 30" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M60 10 L 62 18 L 58 18 Z" fill="url(#goldGrad)"/>
+      <circle cx="60" cy="8" r="2" fill="url(#goldGrad)"/>
+      <!-- large round eyes -->
+      <ellipse cx="42" cy="54" rx="12" ry="8" fill="#fff6e2"/>
+      <ellipse cx="78" cy="54" rx="12" ry="8" fill="#fff6e2"/>
+      <circle cx="42" cy="54" r="4" fill="#1b0b0f"/>
+      <circle cx="78" cy="54" r="4" fill="#1b0b0f"/>
+      <circle cx="43" cy="53" r="1.2" fill="#fff6e2"/>
+      <circle cx="79" cy="53" r="1.2" fill="#fff6e2"/>
+      <!-- U-shaped tilaka -->
+      <path d="M54 68 Q 60 84 66 68" fill="none" stroke="url(#goldGrad)" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="60" cy="74" r="2" fill="#a52a3c"/>
+      <!-- base platform -->
+      <rect x="28" y="98" width="64" height="4" rx="2" fill="url(#goldGrad)"/>
+      <path d="M32 102 Q 60 118 88 102" fill="none" stroke="url(#goldGrad)" stroke-width="1.2" opacity="0.7"/>
+      <!-- flowers -->
+      <circle cx="30" cy="110" r="3" fill="#a52a3c" opacity="0.65"/>
+      <circle cx="90" cy="110" r="3" fill="#a52a3c" opacity="0.65"/>
+      <circle cx="60" cy="118" r="2.4" fill="#c89b3c" opacity="0.7"/>
+    </symbol>
+
+    <!-- Paisley / mandala watermark -->
+    <symbol id="mandalaWatermark" viewBox="0 0 200 200">
+      <g fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round">
+        <circle cx="100" cy="100" r="90" opacity="0.35"/>
+        <circle cx="100" cy="100" r="70" opacity="0.45"/>
+        <circle cx="100" cy="100" r="50" opacity="0.55"/>
+        <circle cx="100" cy="100" r="30" opacity="0.65"/>
+        <circle cx="100" cy="100" r="12" opacity="0.8"/>
+        <g opacity="0.6">
+          <path d="M100 10 Q 108 40 100 70 Q 92 40 100 10 Z"/>
+          <path d="M100 190 Q 108 160 100 130 Q 92 160 100 190 Z"/>
+          <path d="M10 100 Q 40 108 70 100 Q 40 92 10 100 Z"/>
+          <path d="M190 100 Q 160 108 130 100 Q 160 92 190 100 Z"/>
+          <path d="M36 36 Q 60 60 84 56 Q 60 48 36 36 Z"/>
+          <path d="M164 36 Q 140 60 116 56 Q 140 48 164 36 Z"/>
+          <path d="M36 164 Q 60 140 84 144 Q 60 152 36 164 Z"/>
+          <path d="M164 164 Q 140 140 116 144 Q 140 152 164 164 Z"/>
+        </g>
+        <g opacity="0.5">
+          <circle cx="100" cy="30" r="2"/><circle cx="100" cy="170" r="2"/>
+          <circle cx="30" cy="100" r="2"/><circle cx="170" cy="100" r="2"/>
+          <circle cx="50" cy="50" r="1.4"/><circle cx="150" cy="50" r="1.4"/>
+          <circle cx="50" cy="150" r="1.4"/><circle cx="150" cy="150" r="1.4"/>
+        </g>
+        <path d="M70 100 Q 85 70 100 100 Q 115 130 130 100" opacity="0.7"/>
+        <path d="M100 70 Q 70 85 100 100 Q 130 115 100 130" opacity="0.7"/>
+      </g>
+    </symbol>
+
+    <!-- Paisley teardrop (for corner accents) -->
+    <symbol id="paisley" viewBox="0 0 80 100">
+      <g fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round">
+        <path d="M40 8 C 20 20, 10 50, 20 78 C 28 94, 52 94, 62 78 C 72 56, 60 28, 40 8 Z" opacity="0.7"/>
+        <path d="M40 22 C 28 32, 22 54, 30 72 C 38 82, 54 80, 58 68 C 62 50, 54 32, 40 22 Z" opacity="0.6"/>
+        <circle cx="40" cy="58" r="4" opacity="0.8"/>
+        <circle cx="40" cy="58" r="1.5" fill="currentColor" opacity="0.9"/>
+        <path d="M34 42 Q 40 48 46 42" opacity="0.6"/>
+        <path d="M34 72 Q 40 66 46 72" opacity="0.6"/>
+      </g>
+    </symbol>
+
+    <symbol id="divider" viewBox="0 0 320 24">
+      <g fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-linecap="round">
+        <line x1="10" y1="12" x2="130" y2="12"/>
+        <line x1="190" y1="12" x2="310" y2="12"/>
+        <path d="M130 12 Q 140 4 150 12 Q 160 20 170 12 Q 180 4 190 12" stroke-width="1.2"/>
+        <circle cx="160" cy="12" r="2.6" fill="url(#goldGrad)"/>
+        <circle cx="135" cy="12" r="1.3" fill="url(#goldGrad)"/>
+        <circle cx="185" cy="12" r="1.3" fill="url(#goldGrad)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- confetti canvas -->
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+<!-- continuous drifting petals / diya motes -->
+<canvas class="petals" id="petals" aria-hidden="true"></canvas>
+
+<!-- ======= LANDING: CLOSED ENVELOPE ======= -->
+<section class="landing" id="landing" aria-label="Wedding invitation envelope">
+  <p class="landing-tag" id="landingTag">You're cordially invited…</p>
+
+  <!-- ====== Parchment Scroll (finalized) ====== -->
+  <div class="opening opening--scroll" id="envelope" role="button" tabindex="0" aria-label="Tap the scroll to unroll the invitation">
+    <div class="scroll-body">
+
+      <!-- Top gold rod with finials -->
+      <div class="scroll-rod scroll-rod--top" aria-hidden="true">
+        <span class="scroll-ring scroll-ring--l"></span>
+        <span class="scroll-ring scroll-ring--r"></span>
+        <span class="scroll-cap scroll-cap--l"><span class="cap-knob"></span></span>
+        <span class="scroll-cap scroll-cap--r"><span class="cap-knob"></span></span>
+      </div>
+
+      <!-- Parchment -->
+      <div class="scroll-parchment">
+        <div class="scroll-content">
+          <svg class="scroll-flourish" viewBox="0 0 160 14" aria-hidden="true">
+            <g fill="none" stroke="url(#goldGrad)" stroke-linecap="round" stroke-width="0.8">
+              <line x1="10" y1="7" x2="62" y2="7"/>
+              <line x1="98" y1="7" x2="150" y2="7"/>
+              <path d="M62 7 Q 70 1 80 7 Q 90 13 98 7" stroke-width="1"/>
+              <circle cx="80" cy="7" r="1.6" fill="url(#goldGrad)"/>
+              <circle cx="66" cy="7" r="0.9" fill="url(#goldGrad)"/>
+              <circle cx="94" cy="7" r="0.9" fill="url(#goldGrad)"/>
+            </g>
+          </svg>
+          <p class="scroll-eyebrow">The Wedding of</p>
+          <p class="scroll-monogram">S<span class="monogram-amp">&amp;</span>S</p>
+          <p class="scroll-sub">Wedding Invitation</p>
+          <svg class="scroll-flourish" viewBox="0 0 160 14" aria-hidden="true">
+            <g fill="none" stroke="url(#goldGrad)" stroke-linecap="round" stroke-width="0.8">
+              <line x1="10" y1="7" x2="62" y2="7"/>
+              <line x1="98" y1="7" x2="150" y2="7"/>
+              <path d="M62 7 Q 70 1 80 7 Q 90 13 98 7" stroke-width="1"/>
+              <circle cx="80" cy="7" r="1.6" fill="url(#goldGrad)"/>
+              <circle cx="66" cy="7" r="0.9" fill="url(#goldGrad)"/>
+              <circle cx="94" cy="7" r="0.9" fill="url(#goldGrad)"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Bottom gold rod with finials -->
+      <div class="scroll-rod scroll-rod--bottom" aria-hidden="true">
+        <span class="scroll-ring scroll-ring--l"></span>
+        <span class="scroll-ring scroll-ring--r"></span>
+        <span class="scroll-cap scroll-cap--l"><span class="cap-knob"></span></span>
+        <span class="scroll-cap scroll-cap--r"><span class="cap-knob"></span></span>
+      </div>
+
+      <!-- Ornate tassel -->
+      <div class="scroll-tassel" aria-hidden="true">
+        <span class="tassel-cord"></span>
+        <span class="tassel-knot"></span>
+        <span class="tassel-ball">
+          <span class="fringe fringe--1"></span>
+          <span class="fringe fringe--2"></span>
+          <span class="fringe fringe--3"></span>
+          <span class="fringe fringe--4"></span>
+          <span class="fringe fringe--5"></span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <p class="landing-hint" id="landingHint"><span id="landingHintText">Pull to Unroll</span>&nbsp; <i class="fas fa-chevron-down"></i></p>
+
+  <p class="landing-teaser" id="landingTeaser">
+    <span class="teaser-star teaser-star--l" aria-hidden="true">✦</span>
+    <span class="teaser-text">a tale written in gold, waiting for you</span>
+    <span class="teaser-star teaser-star--r" aria-hidden="true">✦</span>
+  </p>
+</section>
+
+
+<!-- Geofenced welcome overlay -->
+<div class="geo-welcome" id="geoWelcome" aria-hidden="true" hidden>
+  <div class="geo-welcome-body">
+    <span class="geo-welcome-mark" aria-hidden="true">✦</span>
+    <h2 class="geo-welcome-title" id="geoWelcomeTitle">Welcome</h2>
+    <p class="geo-welcome-msg" id="geoWelcomeMsg"></p>
+    <button class="geo-welcome-close" id="geoWelcomeClose" aria-label="Close welcome">Continue</button>
+  </div>
+</div>
+
+<!-- ======= INVITATION LETTER ======= -->
+<main class="letter" id="letter" aria-hidden="true">
+
+  <!-- Post-wedding thank-you (shown only after wedding date) -->
+  <section class="section post-wedding reveal" id="postWedding" aria-hidden="true">
+    <div class="pw-mark" aria-hidden="true">✦</div>
+    <h2 class="pw-title" id="pwTitle">Thank you for being part of our forever</h2>
+    <p class="pw-msg" id="pwMsg"></p>
+    <p class="pw-signature">— With gratitude, Rohan &amp; Priya</p>
+  </section>
+
+
+  <!-- Hero -->
+  <section class="section section--ornate hero reveal">
+    <svg class="corner c-tl" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+    <svg class="corner c-tr" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+    <svg class="corner c-bl" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+    <svg class="corner c-br" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+
+    <div class="deity-invocation" id="deityInvocation">
+      <div class="deity-stage">
+        <svg class="mandala-watermark mandala-watermark--deity" aria-hidden="true" viewBox="0 0 200 200"><use href="#mandalaWatermark"/></svg>
+        <svg class="deity-icon" aria-hidden="true" viewBox="0 0 120 140"><use href="#jagannathIcon"/></svg>
+      </div>
+      <p class="deity-sanskrit" id="deitySanskrit">॥ श्री जगन्नाथाय नमः ॥</p>
+      <p class="deity-english" id="deityEnglish">With the blessings of Lord Jagannath</p>
+      <p class="deity-odia" id="deityOdia"></p>
+    </div>
+
+    <p class="eyebrow" id="eyebrow">The Wedding of</p>
+
+    <div class="portrait-pair">
+      <figure class="portrait">
+        <div class="portrait-frame">
+          <img id="groomImg" src="assets/groom.jpg" alt="Groom" loading="lazy">
+        </div>
+        <figcaption>
+          <p class="portrait-role" id="groomRole">The Groom</p>
+          <p class="portrait-name" id="groomName">Rohan</p>
+        </figcaption>
+      </figure>
+
+      <div class="portrait-amp" aria-hidden="true">
+        <svg viewBox="0 0 80 80" class="amp-svg">
+          <circle cx="40" cy="40" r="36" fill="none" stroke="url(#goldGrad)" stroke-width="1" opacity=".55"/>
+          <circle cx="40" cy="40" r="30" fill="none" stroke="url(#goldGrad)" stroke-width="0.6" opacity=".4"/>
+        </svg>
+        <span class="amp-char">&amp;</span>
+      </div>
+
+      <figure class="portrait">
+        <div class="portrait-frame">
+          <img id="brideImg" src="assets/bride.jpg" alt="Bride" loading="lazy">
+        </div>
+        <figcaption>
+          <p class="portrait-role" id="brideRole">The Bride</p>
+          <p class="portrait-name" id="brideName">Priya</p>
+        </figcaption>
+      </figure>
+    </div>
+
+    <svg class="flourish-long" aria-hidden="true"><use href="#flourishLong"/></svg>
+
+    <p class="small-ornate" id="blessingLine">With the blessings of the Almighty and our families</p>
+
+    <div class="couple-stage">
+      <svg class="mandala-watermark mandala-watermark--couple" aria-hidden="true" viewBox="0 0 200 200"><use href="#mandalaWatermark"/></svg>
+      <h1 class="couple">
+        <span class="name-s" id="coupleGroom">Rohan</span>
+        <span class="couple-amp" aria-hidden="true">&amp;</span>
+        <span class="name-s" id="coupleBride">Priya</span>
+        <span class="sr-only">and</span>
+      </h1>
+    </div>
+    <p class="hero-sub" id="requestLine">request the honour of your presence as we begin our <em>forever</em>.</p>
+
+    <svg class="flourish-long" aria-hidden="true"><use href="#flourishLong"/></svg>
+
+    <div class="scroll-cue" aria-hidden="true">
+      <span class="scroll-cue-label">Scroll to Celebrate</span>
+      <span class="scroll-cue-line"></span>
+    </div>
+  </section>
+
+  <!-- Parents -->
+  <section class="section section--ornate parents reveal">
+    <svg class="corner c-tl" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+    <svg class="corner c-tr" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+    <svg class="corner c-bl" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+    <svg class="corner c-br" aria-hidden="true"><use href="#cornerFlourish"/></svg>
+    <div class="parent-col parent-col--groom">
+      <p class="parent-rel" id="groomParentRel">Son of</p>
+      <p class="parent-name" id="groomFather">Sri. Suresh Mohapatra</p>
+      <p class="parent-amp">&amp;</p>
+      <p class="parent-name" id="groomMother">Smt. Sarita Mohapatra</p>
+    </div>
+    <div class="parent-divider" aria-hidden="true"></div>
+    <div class="parent-col parent-col--bride">
+      <p class="parent-rel" id="brideParentRel">Daughter of</p>
+      <p class="parent-name" id="brideFather">Sri. Prakash Patnaik</p>
+      <p class="parent-amp">&amp;</p>
+      <p class="parent-name" id="brideMother">Smt. Anita Patnaik</p>
+    </div>
+  </section>
+
+  <!-- Pull-to-reveal date -->
+  <section class="section save-the-date reveal">
+    <h2 class="section-title" id="saveTitle">Save the Date</h2>
+    <p class="section-sub" id="saveSub">A little secret awaits…</p>
+
+    <div class="pull-card" id="pullCard" aria-label="Pull down to reveal the date">
+      <div class="pull-reveal">
+        <p class="reveal-eyebrow" id="revealEyebrow">The Wedding Day</p>
+        <p class="reveal-date" id="revealDate">14<sup>th</sup> February 2027</p>
+        <p class="reveal-venue"><i class="fas fa-map-marker-alt"></i>&nbsp; <span id="revealVenue">The Grand Palace Convention</span></p>
+
+        <div class="countdown" id="countdown" aria-live="polite">
+          <div class="cd-cell"><span class="cd-num" data-cd="d">—</span><span class="cd-lbl">Days</span></div>
+          <div class="cd-cell"><span class="cd-num" data-cd="h">—</span><span class="cd-lbl">Hours</span></div>
+          <div class="cd-cell"><span class="cd-num" data-cd="m">—</span><span class="cd-lbl">Minutes</span></div>
+          <div class="cd-cell"><span class="cd-num" data-cd="s">—</span><span class="cd-lbl">Seconds</span></div>
+        </div>
+      </div>
+
+      <div class="pull-tag" id="pullTag" role="button" tabindex="0" aria-label="Drag up to reveal the date">
+        <span class="pull-tag-text" id="pullTagText">
+          <i class="fas fa-angle-double-up"></i>&nbsp; Pull up to reveal&nbsp; <i class="fas fa-angle-double-up"></i>
+        </span>
+        <span class="pull-tag-string" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="cal-actions" id="calActions" aria-hidden="true">
+      <p class="cal-actions-label" id="calActionsLabel">Save a reminder</p>
+      <div class="cal-actions-row">
+        <a class="cal-btn" id="calRemind" href="#"
+           aria-label="Add this wedding to your calendar">Save the Day</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section class="section timeline-wrap reveal">
+    <h2 class="section-title" id="celebrationsTitle">Celebrations</h2>
+    <p class="section-sub" id="celebrationsSub">Join us through every joyful moment</p>
+
+    <ol class="timeline" id="timeline"></ol>
+  </section>
+
+  <!-- Venues -->
+  <section class="section venues reveal">
+    <svg class="paisley-accent paisley-accent--l" aria-hidden="true" viewBox="0 0 80 100"><use href="#paisley"/></svg>
+    <svg class="paisley-accent paisley-accent--r" aria-hidden="true" viewBox="0 0 80 100"><use href="#paisley"/></svg>
+    <h2 class="section-title" id="venuesTitle">Venues</h2>
+    <p class="section-sub" id="venuesSub">Tap for directions</p>
+
+    <div class="venue-grid" id="venueGrid"></div>
+  </section>
+
+  <!-- Closing -->
+  <section class="section closing reveal">
+    <svg class="mandala-watermark mandala-watermark--closing" aria-hidden="true" viewBox="0 0 200 200"><use href="#mandalaWatermark"/></svg>
+    <div class="ornament"><span></span><i class="fas fa-leaf"></i><span></span></div>
+    <p class="closing-script" id="closingLine">Your blessings mean the world to us.</p>
+    <p class="closing-sub" id="closingSignature">— With love, Rohan &amp; Priya</p>
+    <svg class="flourish" viewBox="0 0 220 24" aria-hidden="true">
+      <path d="M2 12 C 40 2, 70 22, 110 12 S 180 2, 218 12"
+            fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </section>
+
+  <footer class="invite-footer">
+    <p>&copy; <span id="footer-year"></span> <a href="https://akcreation-apps.com/services.html">AK Creation</a>. All rights reserved. &nbsp;|&nbsp; Made in Odisha ❤️</p>
+  </footer>
+</main>
+
+
+<!-- Floating controls -->
+<button class="fab fab-music" id="musicBtn" aria-label="Mute background music" hidden>
+  <span class="eq" aria-hidden="true">
+    <span class="eq-bar"></span>
+    <span class="eq-bar"></span>
+    <span class="eq-bar"></span>
+  </span>
+  <i class="fas fa-volume-xmark eq-muted-icon" aria-hidden="true"></i>
+</button>
+
+<!-- Always-visible theme toggle (top-right) -->
+<button class="theme-toggle" id="themeBtn" aria-label="Toggle light / dark theme">
+  <i class="fas fa-moon"></i>
+</button>
+
+<div class="rsvp-dock" id="rsvpDock" aria-hidden="true">
+  <a class="fab fab-call" id="callBtn" href="tel:919861039566" aria-label="Call to RSVP">
+    <i class="fas fa-phone"></i>
+  </a>
+  <button class="fab fab-share" id="shareBtn" aria-label="Share invitation">
+    <i class="fas fa-share-alt"></i>
+  </button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<audio id="bgMusic" src="assets/music.mp3" loop preload="auto"></audio>
+
+<script>
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+</script>
+<script src="app.js"></script>
+</body>
+</html>
