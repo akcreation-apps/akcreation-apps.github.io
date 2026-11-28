@@ -63,6 +63,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script defer src="https://cloud.umami.is/script.js" data-website-id="36497ef4-1185-47b9-bcfb-24598a1a29d3"></script>
 
+  <!-- Animation libraries (CDN, defer so they never block paint) -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <script defer src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js"></script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -727,23 +735,58 @@
       color: #fff; font-size: 0.82rem; font-weight: 700;
       letter-spacing: 0.3px; margin: 4px 0 10px; text-align: center;
     }
+    /* Delivery-radius medallion — gradient disc + rotating dashed ring (feels like
+       a live delivery-zone indicator). Composed from CSS + Font Awesome, no hand-drawn art. */
     .hero-why-visual {
-      position: relative; height: 64px; margin-bottom: 2px;
+      position: relative; height: 96px; margin-bottom: 4px;
       display: flex; align-items: center; justify-content: center;
     }
     .hwv-bg {
-      position: absolute; width: 64px; height: 64px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,107,53,0.32) 0%, rgba(255,107,53,0) 70%);
+      position: absolute; width: 88px; height: 88px; border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,186,140,0.55), rgba(255,107,53,0.2) 55%, transparent 72%),
+        conic-gradient(from 210deg, #FF6B35, #F97316, #FF6B35);
+      box-shadow:
+        0 10px 24px -10px rgba(255,107,53,0.45),
+        inset 0 0 0 2px rgba(255,255,255,0.18);
     }
-    .hwv-main { color: var(--primary); font-size: 2rem; position: relative; }
+    .hwv-ring {
+      position: absolute;
+      width: 108px; height: 108px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255,107,53,0.55);
+      pointer-events: none;
+    }
+    .hwv-ring::after {
+      content: '';
+      position: absolute;
+      top: -5px; left: 50%;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #16A34A;
+      transform: translateX(-50%);
+      box-shadow: 0 0 0 3px rgba(22,163,74,0.25), 0 0 10px rgba(22,163,74,0.6);
+    }
+    .hwv-main {
+      color: #fff;
+      font-size: 2.2rem;
+      position: relative;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
     .hwv-acc-1, .hwv-acc-2 {
-      position: absolute; background: var(--card); color: var(--primary);
-      width: 26px; height: 26px; border-radius: 50%;
+      position: absolute;
+      background: #fff;
+      color: var(--primary);
+      width: 30px; height: 30px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      font-size: 0.78rem;
+      box-shadow: 0 6px 14px -4px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255,255,255,0.9);
     }
-    .hwv-acc-1 { right: calc(50% - 46px); top: 4px; }
-    .hwv-acc-2 { left: calc(50% - 46px); bottom: 4px; color: #ff5577; }
+    .hwv-acc-1 { right: calc(50% - 58px); top: 6px; }
+    .hwv-acc-2 { left: calc(50% - 58px); bottom: 6px; color: #e11d48; background: #fff; }
+    @media (prefers-color-scheme: dark) {
+      .hwv-acc-1, .hwv-acc-2 { border-color: rgba(15,14,21,0.4); }
+    }
 
     .hero-why-pills {
       list-style: none; padding: 0; margin: 0;
@@ -1146,10 +1189,13 @@
       .hero-copy { text-align: left; }
       .hero-why-pills { grid-template-columns: 1fr; gap: 8px; }
       .hero-why-pills li { font-size: 0.78rem; padding: 10px 12px; }
-      .hero-why-visual { height: 90px; }
-      .hwv-bg { width: 80px; height: 80px; }
-      .hwv-main { font-size: 2.6rem; }
+      .hero-why-visual { height: 96px; }
+      .hwv-bg { width: 88px; height: 88px; }
+      .hwv-ring { width: 108px; height: 108px; }
+      .hwv-main { font-size: 2.2rem; }
       .hwv-acc-1, .hwv-acc-2 { width: 30px; height: 30px; font-size: 0.78rem; }
+      .hwv-acc-1 { right: calc(50% - 58px); top: 6px; }
+      .hwv-acc-2 { left: calc(50% - 58px); bottom: 6px; }
       .hero-why-title { font-size: 0.9rem; }
     }
 
@@ -1160,7 +1206,438 @@
       .rp-item { transition: none; }
       .grow-card { transition: none; transform: none; }
       .grow-card:hover, .grow-card:focus-visible { transform: none; }
+      [data-aos] { opacity: 1 !important; transform: none !important; }
     }
+
+    /* ---- Animation layer (AOS + GSAP + Anime + Lottie) ---- */
+    /* Pre-reveal state for AOS so content isn't flashed before the lib boots.
+       AOS removes these once initialized; the reduced-motion rule above
+       forces full visibility if the user opts out. */
+    [data-aos]:not(.aos-animate) { will-change: transform, opacity; }
+
+    /* Animated hero-why-visual elements — targets the existing food bowl + motorcycle + heart */
+    .hwv-main, .hwv-acc-1, .hwv-acc-2, .hwv-bg { will-change: transform; }
+
+    /* ── Delivery rider hero image (BankiBites mascot) ── */
+    .rider-stage {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto 6px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: visible;
+    }
+    .rider-img {
+      position: relative;
+      width: 100%;
+      height: auto;
+      display: block;
+      z-index: 2;
+      will-change: transform;
+      filter: drop-shadow(0 12px 18px rgba(15,14,21,0.22));
+    }
+    /* Warm radial glow behind the rider (brand color) */
+    .rider-glow {
+      position: absolute;
+      inset: 10% 10% 10% 10%;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(255,107,53,0.35) 0%,
+        rgba(255,107,53,0.15) 40%,
+        transparent 70%);
+      z-index: 0;
+      will-change: transform, opacity;
+    }
+    /* Soft ground shadow ellipse under the scooter */
+    .rider-shadow {
+      position: absolute;
+      bottom: 6%;
+      left: 50%;
+      width: 60%;
+      height: 14px;
+      background: radial-gradient(ellipse, rgba(15,14,21,0.3), transparent 70%);
+      transform: translateX(-50%);
+      z-index: 1;
+      filter: blur(2px);
+    }
+    /* Soft motion-blur streaks trailing from behind the scooter. Rider faces RIGHT,
+       so the trail sits on the LEFT of the image, opaque near body and fading left.
+       White + light blur reads as "air motion" rather than orange sparks. */
+    .rider-speed {
+      position: absolute;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.35) 55%,
+        rgba(255,255,255,0.7) 100%);
+      filter: blur(0.7px);
+      opacity: 0;
+      z-index: 3;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+    .rider-speed--1 { top: 36%; left: -14%; width: 28%; }
+    .rider-speed--2 { top: 46%; left: -10%; width: 22%; height: 1.5px; }
+    .rider-speed--3 { top: 56%; left: -16%; width: 32%; }
+    @media (prefers-color-scheme: dark) {
+      .rider-speed {
+        background: linear-gradient(90deg,
+          rgba(255,255,255,0) 0%,
+          rgba(255,255,255,0.25) 55%,
+          rgba(255,255,255,0.55) 100%);
+      }
+    }
+
+    /* Dust puffs kicked up BEHIND the rear wheel. Rider faces RIGHT so the rear
+       wheel sits on the LEFT side of the image; dust trails further to the left. */
+    .rider-dust {
+      position: absolute;
+      bottom: 10%;
+      left: 8%;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,195,180,0.8), rgba(200,195,180,0) 70%);
+      opacity: 0;
+      z-index: 3;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+    .rider-dust--2 { bottom: 14%; left: 2%;  width: 10px; height: 10px; }
+    .rider-dust--3 { bottom: 8%;  left: 14%; width: 18px; height: 18px; }
+    @media (prefers-color-scheme: dark) {
+      .rider-dust { background: radial-gradient(circle, rgba(140,138,128,0.7), rgba(140,138,128,0) 70%); }
+    }
+
+    /* Rear-wheel "spin" overlay — sits on the back wheel of a right-facing
+       scooter (so bottom-LEFT of the image, ~20% from left edge). */
+    .rider-wheel-spin {
+      position: absolute;
+      bottom: 6%;
+      left: 12%;
+      width: 20%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        rgba(255,255,255,0)    0deg,
+        rgba(255,255,255,0.22) 140deg,
+        rgba(255,255,255,0.08) 220deg,
+        rgba(255,255,255,0)    360deg);
+      mix-blend-mode: screen;
+      opacity: 0.55;
+      z-index: 3;
+      pointer-events: none;
+      will-change: transform;
+    }
+    @media (prefers-color-scheme: dark) {
+      .rider-wheel-spin { opacity: 0.4; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .rider-img { filter: drop-shadow(0 12px 22px rgba(0,0,0,0.6)); }
+      .rider-glow {
+        background: radial-gradient(circle,
+          rgba(255,107,53,0.48) 0%,
+          rgba(255,107,53,0.2) 40%,
+          transparent 70%);
+      }
+      .rider-shadow { background: radial-gradient(ellipse, rgba(0,0,0,0.55), transparent 70%); }
+    }
+    @media (max-width: 760px) {
+      .rider-stage { max-width: 260px; }
+    }
+    @media (min-width: 760px) {
+      .rider-stage { max-width: 320px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rider-img, .rider-glow, .rider-speed { animation: none; transform: none; }
+    }
+
+    /* ── Mobile-first animation enhancements ── */
+
+    /* Pulsing attention halo behind the primary Order Now CTA (mobile especially).
+       Uses the brand color through a CSS variable so dark mode inherits automatically. */
+    .btn-cta {
+      position: relative;
+      isolation: isolate;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-cta::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      background: radial-gradient(closest-side, rgba(255,107,53,0.35), transparent 70%);
+      z-index: -1;
+      opacity: 0;
+      animation: ctaHalo 2.6s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes ctaHalo {
+      0%   { transform: scale(0.95); opacity: 0; }
+      40%  { opacity: 0.85; }
+      100% { transform: scale(1.18); opacity: 0; }
+    }
+    /* Tap feedback — scales the button down briefly when pressed */
+    .btn-cta:active { transform: scale(0.97); transition: transform 0.08s ease; }
+
+    /* Touch-press feedback on promo cards (party/grocery) */
+    .grow-card { -webkit-tap-highlight-color: transparent; }
+    @media (hover: none) and (pointer: coarse) {
+      .grow-card:active {
+        transform: scale(0.98);
+        transition: transform 0.08s ease;
+      }
+    }
+
+    /* Mobile hero visual — bigger & more prominent (desktop is unchanged) */
+    @media (max-width: 760px) {
+      .hero-why-visual { height: 136px; margin-bottom: 8px; }
+      .hwv-bg { width: 110px; height: 110px; }
+      .hwv-ring { width: 134px; height: 134px; }
+      .hwv-main { font-size: 2.8rem; }
+      .hwv-acc-1, .hwv-acc-2 { width: 38px; height: 38px; font-size: 0.95rem; }
+      .hwv-acc-1 { right: calc(50% - 68px); top: 10px; }
+      .hwv-acc-2 { left: calc(50% - 68px); bottom: 10px; }
+    }
+
+    /* Per-step icon entrance animations — triggered via JS .step-anim class */
+    .step-icon { transform-origin: center; }
+    .step.step-anim .step-icon {
+      animation: stepIconPop 0.6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .step.step-anim[data-anim="scan"]  .step-icon i { animation: stepScan 1.4s ease-in-out 0.6s both; }
+    .step.step-anim[data-anim="bob"]   .step-icon i { animation: stepBob 1.6s ease-in-out 0.6s 2; }
+    .step.step-anim[data-anim="swing"] .step-icon i { animation: stepSwing 1.6s ease-in-out 0.6s 2; }
+    .step.step-anim[data-anim="steam"] .step-icon i { animation: stepSteam 1.8s ease-in-out 0.6s both; }
+    .step-icon i { display: inline-block; transform-origin: center bottom; }
+
+    @keyframes stepIconPop {
+      0%   { transform: scale(0.4); opacity: 0; }
+      60%  { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes stepScan {
+      0%, 100% { transform: rotate(0); }
+      25%      { transform: rotate(-8deg); }
+      75%      { transform: rotate(8deg); }
+    }
+    @keyframes stepBob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+    @keyframes stepSwing {
+      0%, 100% { transform: rotate(0); }
+      25%      { transform: rotate(-10deg); }
+      75%      { transform: rotate(10deg); }
+    }
+    @keyframes stepSteam {
+      0%   { transform: translateY(0) scale(1); }
+      50%  { transform: translateY(-4px) scale(1.08); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .btn-cta::before { animation: none; }
+      .step.step-anim .step-icon,
+      .step.step-anim .step-icon i { animation: none; }
+      .sticky-order { transition: none; }
+    }
+
+    /* ── Category tiles ── "What's on your mind?" grid, Swiggy/Zomato pattern.
+       4 cols on mobile (2 rows for 8 tiles), 8 cols on desktop (single row). */
+    .cats {
+      padding: 0 20px;
+      margin-top: 18px;
+    }
+    .cats-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin: 0 0 12px;
+    }
+    .cats-title {
+      font-size: 1rem; font-weight: 800; color: var(--text, #0F0E15);
+      letter-spacing: -0.01em; margin: 0;
+    }
+    .cats-sub {
+      font-size: 0.72rem; color: var(--muted, #6b6773); font-weight: 500;
+    }
+    .cats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (min-width: 540px) { .cats-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 760px) { .cats-grid { grid-template-columns: repeat(8, 1fr); gap: 12px; } }
+
+    .cat-tile {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 12px 6px 10px;
+      border-radius: 16px;
+      text-decoration: none;
+      background: var(--card, #fff);
+      border: 1px solid var(--border, rgba(15,14,21,0.06));
+      box-shadow: 0 4px 10px -6px rgba(15,14,21,0.1);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 86px;
+    }
+    .cat-tile:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,107,53,0.35);
+      box-shadow: 0 10px 20px -10px rgba(255,107,53,0.35);
+    }
+    @media (hover: none) and (pointer: coarse) {
+      .cat-tile:active { transform: scale(0.96); transition: transform 0.08s ease; }
+    }
+    .cat-emoji {
+      width: 46px; height: 46px; border-radius: 14px;
+      background: linear-gradient(135deg, #FFF4ED, #FFE4D3);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: inset 0 -2px 0 rgba(255,107,53,0.12);
+    }
+    .cat-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text, #0F0E15);
+      line-height: 1.15;
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+    @media (prefers-color-scheme: dark) {
+      .cats-title { color: #f5f3ef; }
+      .cats-sub { color: #a8a4b3; }
+      .cat-tile {
+        background: #1a1824;
+        border-color: rgba(255,255,255,0.08);
+        box-shadow: 0 4px 10px -6px rgba(0,0,0,0.4);
+      }
+      .cat-tile:hover { border-color: rgba(255,107,53,0.5); }
+      .cat-emoji {
+        background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,107,53,0.08));
+        box-shadow: inset 0 -2px 0 rgba(255,107,53,0.2);
+      }
+      .cat-label { color: #f5f3ef; }
+    }
+
+    /* ── Sticky floating Order Now pill ── appears once hero scrolls out of view. */
+    .sticky-order {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translate(-50%, 24px);
+      z-index: 85;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #FF6B35, #F97316);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow:
+        0 14px 28px -12px rgba(255,107,53,0.6),
+        0 4px 10px -4px rgba(255,107,53,0.4);
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(.34,1.56,.64,1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sticky-order.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+    }
+    .sticky-order:hover {
+      box-shadow:
+        0 18px 32px -12px rgba(255,107,53,0.7),
+        0 6px 14px -4px rgba(255,107,53,0.5);
+    }
+    .sticky-order:active { transform: translate(-50%, 0) scale(0.97); }
+    .sticky-order .so-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #86EFAC;
+      box-shadow: 0 0 0 0 rgba(134,239,172,0.7);
+      animation: soDotPulse 1.6s ease-out infinite;
+      flex: 0 0 7px;
+    }
+    @keyframes soDotPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(134,239,172,0.7); }
+      70%  { box-shadow: 0 0 0 8px rgba(134,239,172,0); }
+      100% { box-shadow: 0 0 0 0 rgba(134,239,172,0); }
+    }
+    /* Safe-area aware on iOS devices with home indicator */
+    @supports (padding: max(0px)) {
+      .sticky-order { bottom: max(18px, env(safe-area-inset-bottom, 18px)); }
+    }
+    /* Give the page some breathing room so the pill never covers footer links */
+    main { padding-bottom: 70px; }
+    @media (min-width: 760px) {
+      .sticky-order { left: auto; right: 24px; bottom: 24px; transform: translate(0, 24px); }
+      .sticky-order.show { transform: translate(0, 0); }
+      .sticky-order:active { transform: translate(0, 0) scale(0.97); }
+    }
+
+    /* Count-up numbers in the Honest Math ledger */
+    .hm-count { font-variant-numeric: tabular-nums; display: inline-block; min-width: 3ch; }
+
+    /* How-It-Works progress line + riding scooter (drawn by GSAP ScrollTrigger) */
+    .steps { position: relative; }
+    .steps-track {
+      position: absolute;
+      left: 0; right: 0;
+      top: 28px;
+      height: 2px;
+      border-radius: 2px;
+      background: repeating-linear-gradient(90deg,
+        var(--border, #e5e0d8) 0 6px,
+        transparent 6px 12px);
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .steps-progress {
+      position: absolute;
+      left: 0; right: 0;
+      top: 28px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--brand, #FF6B35), #F97316);
+      transform-origin: left center;
+      transform: scaleX(0);
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .steps-rider {
+      position: absolute;
+      top: 10px;
+      left: 0;
+      width: 36px; height: 36px;
+      transform: translateX(0);
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 50%;
+      background: #0F0E15;
+      color: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      box-shadow: 0 6px 14px -4px rgba(255,107,53,0.45);
+      border: 2px solid var(--brand, #FF6B35);
+    }
+    @media (prefers-color-scheme: dark) {
+      .steps-rider { background: #FF6B35; color: #0F0E15; border-color: #fff; }
+    }
+    .step { position: relative; z-index: 3; background: transparent; }
+    @media (max-width: 640px) {
+      .steps-track, .steps-progress, .steps-rider { display: none; }
+    }
+
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
@@ -1286,10 +1763,10 @@
     <div class="hero-inner hero-split">
 
       <div class="hero-copy">
-        <div class="hero-eyebrow"><i class="fas fa-bolt" aria-hidden="true"></i> Banki's First Food Delivery</div>
-        <h1>Hungry in <em>Banki?</em> Restaurant meals at your doorstep.</h1>
+        <div class="hero-eyebrow" data-aos="fade-up" data-aos-delay="0"><i class="fas fa-bolt" aria-hidden="true"></i> Banki's First Food Delivery</div>
+        <h1 data-aos="fade-up" data-aos-delay="80">Hungry in <em>Banki?</em> Restaurant meals at your doorstep.</h1>
 
-        <div class="hero-hours" role="group" aria-label="BankiBites food ordering hours">
+        <div class="hero-hours" role="group" aria-label="BankiBites food ordering hours" data-aos="fade-up" data-aos-delay="160">
           <div class="hero-hours-top">
             <span class="hero-hours-badge" id="hoursBadge">
               <span class="live-dot" aria-hidden="true"></span>
@@ -1307,19 +1784,36 @@
           </div>
         </div>
 
-        <div class="hero-ctas">
+        <div class="hero-ctas" data-aos="fade-up" data-aos-delay="240">
           <button class="btn-cta" id="orderBtn" aria-label="Browse restaurants and order now">
             <i class="fas fa-bag-shopping" aria-hidden="true"></i> Order Now
           </button>
         </div>
       </div>
 
-      <aside class="hero-why" aria-label="Why order via BankiBites">
-        <div class="hero-why-visual" aria-hidden="true">
-          <span class="hwv-bg"></span>
-          <i class="fas fa-bowl-food hwv-main"></i>
-          <i class="fas fa-motorcycle hwv-acc-1"></i>
-          <i class="fas fa-heart hwv-acc-2"></i>
+      <aside class="hero-why" aria-label="Why order via BankiBites" data-aos="fade-left" data-aos-delay="120">
+        <div class="rider-stage" aria-hidden="true">
+          <span class="rider-glow"></span>
+          <span class="rider-shadow"></span>
+          <picture>
+            <source type="image/webp"
+                    srcset="assets/delivery-rider@1x.webp 320w,
+                            assets/delivery-rider.webp 640w"
+                    sizes="(min-width: 760px) 320px, 260px">
+            <img class="rider-img" id="riderImg"
+                 src="assets/delivery-rider-640.png"
+                 alt=""
+                 width="640" height="640"
+                 decoding="async"
+                 fetchpriority="high">
+          </picture>
+          <span class="rider-speed rider-speed--1" aria-hidden="true"></span>
+          <span class="rider-speed rider-speed--2" aria-hidden="true"></span>
+          <span class="rider-speed rider-speed--3" aria-hidden="true"></span>
+          <span class="rider-wheel-spin" aria-hidden="true"></span>
+          <span class="rider-dust rider-dust--1" aria-hidden="true"></span>
+          <span class="rider-dust rider-dust--2" aria-hidden="true"></span>
+          <span class="rider-dust rider-dust--3" aria-hidden="true"></span>
         </div>
         <h2 class="hero-why-title">Why BankiBites?</h2>
         <ul class="hero-why-pills">
@@ -1333,9 +1827,45 @@
     </div>
   </section>
 
+  <!-- What's on your mind? — category tiles grid (Swiggy/Zomato pattern).
+       Every tile funnels to dashboard.html; a ?cat= hint is passed so the
+       dashboard can optionally pre-filter if it supports it. -->
+  <section class="cats" aria-label="Browse food categories in Banki" data-aos="fade-up">
+    <div class="cats-head">
+      <h2 class="cats-title">What's on your mind?</h2>
+      <span class="cats-sub">Tap a category to start</span>
+    </div>
+    <div class="cats-grid">
+      <a class="cat-tile" href="dashboard.html?cat=biryani"  data-aos="zoom-in" data-aos-delay="0"   data-umami-event="bankibites-cat-biryani">
+        <span class="cat-emoji" aria-hidden="true">🍛</span><span class="cat-label">Biryani &amp; Rice</span>
+      </a>
+      <a class="cat-tile" href="dashboard.html?cat=thali"    data-aos="zoom-in" data-aos-delay="40"  data-umami-event="bankibites-cat-thali">
+        <span class="cat-emoji" aria-hidden="true">🍲</span><span class="cat-label">Veg Thali</span>
+      </a>
+      <a class="cat-tile" href="dashboard.html?cat=north-indian" data-aos="zoom-in" data-aos-delay="80"  data-umami-event="bankibites-cat-north-indian">
+        <span class="cat-emoji" aria-hidden="true">🥘</span><span class="cat-label">North Indian</span>
+      </a>
+      <a class="cat-tile" href="dashboard.html?cat=chinese"  data-aos="zoom-in" data-aos-delay="120" data-umami-event="bankibites-cat-chinese">
+        <span class="cat-emoji" aria-hidden="true">🥟</span><span class="cat-label">Chinese</span>
+      </a>
+      <a class="cat-tile" href="dashboard.html?cat=snacks"   data-aos="zoom-in" data-aos-delay="160" data-umami-event="bankibites-cat-snacks">
+        <span class="cat-emoji" aria-hidden="true">🥟</span><span class="cat-label">Snacks</span>
+      </a>
+      <a class="cat-tile" href="dashboard.html?cat=sweets"   data-aos="zoom-in" data-aos-delay="200" data-umami-event="bankibites-cat-sweets">
+        <span class="cat-emoji" aria-hidden="true">🧁</span><span class="cat-label">Sweets</span>
+      </a>
+      <a class="cat-tile" href="dashboard.html?cat=beverages" data-aos="zoom-in" data-aos-delay="240" data-umami-event="bankibites-cat-beverages">
+        <span class="cat-emoji" aria-hidden="true">🥤</span><span class="cat-label">Beverages</span>
+      </a>
+      <a class="cat-tile" href="dashboard.html?cat=groceries" data-aos="zoom-in" data-aos-delay="280" data-umami-event="bankibites-cat-groceries">
+        <span class="cat-emoji" aria-hidden="true">🛒</span><span class="cat-label">Groceries</span>
+      </a>
+    </div>
+  </section>
+
   <!-- Party & Bulk orders entry — high-visibility right under the hero so
        every visitor knows we also handle events / gatherings. -->
-  <div class="section">
+  <div class="section" data-aos="fade-up">
     <a class="grow-card grow-card--party" href="bulk-order.html"
        aria-label="Order for a party or bulk event — minimum 10 per item"
        data-umami-event="bankibites-open-bulk"
@@ -1354,7 +1884,7 @@
 
   <!-- Groceries entry — promote the BankiBites Groceries storefront
        at the same visual weight as the party/bulk card. -->
-  <div class="section" style="margin-top:12px;">
+  <div class="section" style="margin-top:12px;" data-aos="fade-up" data-aos-delay="80">
     <a class="grow-card grow-card--grocery" href="dashboard.html"
        aria-label="Shop daily groceries — tea, sauces, personal care, laundry and more. Opens the restaurant list where you can switch to Groceries."
        data-umami-event="bankibites-open-groceries"
@@ -1373,7 +1903,7 @@
 
   <!-- What we serve -->
   <div class="section">
-    <div class="serve-block">
+    <div class="serve-block" data-aos="fade-up">
       <h2 class="sec-title">What's on the menu</h2>
       <ul class="cuisine-chips" id="cuisineChips" aria-label="Available cuisines" role="list">
         <li class="cuisine-chip" aria-hidden="true"><span class="skel skel-chip"></span></li>
@@ -1391,25 +1921,30 @@
     </div>
 
     <!-- How it works -->
-    <div class="how">
+    <div class="how" data-aos="fade-up">
       <h2 class="sec-title">How it works</h2>
-      <div class="steps" role="list">
-        <div class="step" role="listitem">
+      <div class="steps" id="howSteps" role="list">
+        <span class="steps-track" aria-hidden="true"></span>
+        <span class="steps-progress" aria-hidden="true"></span>
+        <span class="steps-rider" aria-hidden="true">
+          <i class="fas fa-motorcycle"></i>
+        </span>
+        <div class="step" role="listitem" data-aos="fade-up" data-aos-delay="0" data-anim="scan">
           <div class="step-icon"><i class="fas fa-store" aria-hidden="true"></i></div>
           <div class="step-num">Step 1</div>
           <div class="step-text">Choose a Restaurant</div>
         </div>
-        <div class="step" role="listitem">
+        <div class="step" role="listitem" data-aos="fade-up" data-aos-delay="100" data-anim="bob">
           <div class="step-icon"><i class="fas fa-utensils" aria-hidden="true"></i></div>
           <div class="step-num">Step 2</div>
           <div class="step-text">Browse the Menu</div>
         </div>
-        <div class="step" role="listitem">
+        <div class="step" role="listitem" data-aos="fade-up" data-aos-delay="200" data-anim="swing">
           <div class="step-icon"><i class="fas fa-bag-shopping" aria-hidden="true"></i></div>
           <div class="step-num">Step 3</div>
           <div class="step-text">Place Your Order</div>
         </div>
-        <div class="step" role="listitem">
+        <div class="step" role="listitem" data-aos="fade-up" data-aos-delay="300" data-anim="steam">
           <div class="step-icon"><i class="fas fa-bowl-food" aria-hidden="true"></i></div>
           <div class="step-num">Step 4</div>
           <div class="step-text">Get it Delivered</div>
@@ -1418,31 +1953,31 @@
     </div>
 
     <!-- Why BankiBites -->
-    <div class="why">
+    <div class="why" data-aos="fade-up">
       <h2 class="sec-title">Why people in Banki choose BankiBites</h2>
       <div class="why-grid">
-        <div class="why-card">
+        <div class="why-card" data-aos="fade-up" data-aos-delay="0">
           <div class="why-icon"><i class="fas fa-hourglass-half" aria-hidden="true"></i></div>
           <div>
             <h3>Your time is worth more</h3>
             <p>Skip the trip and the wait. Place an order, stay focused on what matters, and in about 45 minutes your favourite food is at your door.</p>
           </div>
         </div>
-        <div class="why-card">
+        <div class="why-card" data-aos="fade-up" data-aos-delay="100">
           <div class="why-icon"><i class="fas fa-utensils" aria-hidden="true"></i></div>
           <div>
             <h3>Real restaurants, made-to-order</h3>
             <p>BankiBites is a service that connects you with Banki's own restaurants — not a ghost kitchen, not a stockroom. Your order is prepared at the restaurant after you place it, the same way they serve walk-in customers.</p>
           </div>
         </div>
-        <div class="why-card">
+        <div class="why-card" data-aos="fade-up" data-aos-delay="200">
           <div class="why-icon"><i class="fas fa-cloud-showers-heavy" aria-hidden="true"></i></div>
           <div>
             <h3>Any weather, any mood</h3>
             <p>Rain, heat, late night or simply tired? You don't need to step out to taste Banki's best — BankiBites brings the restaurant home.</p>
           </div>
         </div>
-        <div class="why-card why-card--wide">
+        <div class="why-card why-card--wide" data-aos="fade-up">
           <div class="why-card-head">
             <div class="why-icon"><i class="fas fa-scale-balanced" aria-hidden="true"></i></div>
             <div class="why-card-body">
@@ -1455,8 +1990,8 @@
               <div class="hm-title"><i class="fas fa-person-walking" aria-hidden="true"></i> If you go yourself</div>
               <ul class="hm-list">
                 <li><i class="fas fa-circle"></i> Menu price at the counter</li>
-                <li><i class="fas fa-circle"></i> <strong>+ ₹30–60</strong> petrol or auto fare</li>
-                <li><i class="fas fa-circle"></i> <strong>+ 30–45 min</strong> of your time</li>
+                <li><i class="fas fa-circle"></i> <strong>+ ₹<span class="hm-count" data-count-to="60" data-count-from="30">30&ndash;60</span></strong> petrol or auto fare</li>
+                <li><i class="fas fa-circle"></i> <strong>+ <span class="hm-count" data-count-to="45" data-count-from="30">30&ndash;45</span> min</strong> of your time</li>
                 <li><i class="fas fa-circle"></i> + heat, rain, queue &amp; parking</li>
                 <li><i class="fas fa-circle"></i> + the trip back home</li>
               </ul>
@@ -1480,7 +2015,7 @@
   </div>
 
   <!-- Banki Locals Promo Strip -->
-  <div class="section locals-strip">
+  <div class="section locals-strip" data-aos="fade-up">
     <a href="sell.html" class="locals-link" aria-label="Learn about Banki Locals — sell homemade food">
       <div class="locals-card">
         <div class="locals-info">
@@ -1499,10 +2034,10 @@
   </div>
 
   <!-- Help Banki's food scene grow — customer + restaurant onboarding -->
-  <div class="section grow">
+  <div class="section grow" data-aos="fade-up">
     <h2 class="sec-title">Help us bring more of Banki online</h2>
     <div class="grow-grid">
-      <a class="grow-card"
+      <a class="grow-card" data-aos="fade-up" data-aos-delay="0"
          href="https://wa.me/917749984274?text=Hi%20BankiBites%2C%20I%27d%20like%20to%20suggest%20a%20restaurant%20to%20add%20on%20your%20platform%20for%20Banki%20delivery.%0A%0ARestaurant%20name%3A%20%0ALocation%20in%20Banki%3A%20%0AWhy%20I%20love%20it%3A%20"
          aria-label="Request your favourite restaurant to join BankiBites via WhatsApp"
          data-umami-event="bankibites-request-restaurant">
@@ -1514,7 +2049,7 @@
         </span>
       </a>
 
-      <a class="grow-card grow-card--owner"
+      <a class="grow-card grow-card--owner" data-aos="fade-up" data-aos-delay="120"
          href="https://wa.me/917749984274?text=Hi%20BankiBites%2C%20I%20run%20a%20restaurant%20in%20Banki%20and%20would%20like%20to%20partner%20with%20you.%0A%0ARestaurant%20name%3A%20%0ALocation%20in%20Banki%3A%20%0ACuisines%20served%3A%20%0AOwner%20name%3A%20"
          aria-label="Restaurant owner — contact BankiBites for onboarding via WhatsApp"
          data-umami-event="bankibites-owner-onboard">
@@ -1529,7 +2064,7 @@
   </div>
 
   <!-- Bottom CTA -->
-  <div class="bottom-cta">
+  <div class="bottom-cta" data-aos="zoom-in">
     <p>Your next meal is one tap away &mdash; from a real Banki restaurant.</p>
     <button class="btn-cta" id="orderBtn2" aria-label="Browse restaurants delivering in Banki, Cuttack, Odisha and order now">
       <i class="fas fa-utensils" aria-hidden="true"></i> Order Now
@@ -1537,6 +2072,16 @@
   </div>
 
   </main>
+
+  <!-- Sticky floating Order Now pill — shown once the hero scrolls out of view
+       so the primary CTA is always one tap away on mobile. -->
+  <button type="button" class="sticky-order" id="stickyOrder"
+          aria-label="Order Now — browse restaurants in Banki"
+          data-umami-event="bankibites-sticky-order">
+    <span class="so-dot" aria-hidden="true"></span>
+    <i class="fas fa-bag-shopping" aria-hidden="true"></i>
+    <span>Order Now</span>
+  </button>
 
   <!-- Footer -->
   <footer>
@@ -1851,6 +2396,216 @@
     document.getElementById('orderBtn2').addEventListener('click', handleOrderClick);
 
     loadData().catch(() => { cuisineChips.innerHTML = ''; areaChips.innerHTML = ''; });
+  </script>
+
+  <!-- Animation layer boot: AOS scroll reveals + GSAP hero/steps + Anime.js chip stagger + Lottie food illustration.
+       All libraries are CDN-loaded with `defer`, so they're parsed after this script runs. We wait for `load`
+       to make sure globals (AOS, gsap, ScrollTrigger, anime, lottie) are present, then gracefully skip any
+       piece whose lib didn't arrive (ad-block, offline). Reduced-motion short-circuits every JS animation. -->
+  <script>
+    (function () {
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function initAOS() {
+        if (typeof AOS === 'undefined') return;
+        AOS.init({
+          once: true,
+          duration: 600,
+          easing: 'ease-out-cubic',
+          offset: 40,
+          disable: reduceMotion
+        });
+      }
+
+      function initHeroIntro() {
+        if (reduceMotion || typeof gsap === 'undefined') return;
+        gsap.from('.hero-blob--1', { duration: 1.2, scale: 0.6, opacity: 0, ease: 'power2.out' });
+        gsap.from('.hero-blob--2', { duration: 1.2, scale: 0.6, opacity: 0, ease: 'power2.out', delay: 0.15 });
+        gsap.from('.hero-blob--3', { duration: 1.2, scale: 0.6, opacity: 0, ease: 'power2.out', delay: 0.3 });
+      }
+
+      function initWhyPills() {
+        if (reduceMotion || typeof anime === 'undefined') return;
+        const pills = document.querySelectorAll('.hero-why-pills > li');
+        if (!pills.length) return;
+        anime({
+          targets: pills,
+          translateY: [16, 0],
+          opacity: [0, 1],
+          delay: anime.stagger(90, { start: 400 }),
+          duration: 600,
+          easing: 'easeOutCubic'
+        });
+      }
+
+      function initStepsScroll() {
+        if (reduceMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+        const steps = document.getElementById('howSteps');
+        const bar = steps && steps.querySelector('.steps-progress');
+        const rider = steps && steps.querySelector('.steps-rider');
+        if (!steps || !bar) return;
+        gsap.registerPlugin(ScrollTrigger);
+        const trigger = { trigger: steps, start: 'top 80%', end: 'bottom 60%', scrub: 0.5 };
+        gsap.to(bar, { scaleX: 1, ease: 'none', scrollTrigger: trigger });
+        if (rider) {
+          const maxX = () => Math.max(0, steps.getBoundingClientRect().width - rider.getBoundingClientRect().width);
+          gsap.to(rider, {
+            x: maxX,
+            ease: 'none',
+            scrollTrigger: trigger
+          });
+        }
+      }
+
+      function initHeroVisual() {
+        if (reduceMotion || typeof gsap === 'undefined') return;
+        const stage = document.querySelector('.rider-stage');
+        if (!stage) return;
+        const img = stage.querySelector('.rider-img');
+        const glow = stage.querySelector('.rider-glow');
+        const shadow = stage.querySelector('.rider-shadow');
+        const speeds = stage.querySelectorAll('.rider-speed');
+        const wheelSpin = stage.querySelector('.rider-wheel-spin');
+        const dust = stage.querySelectorAll('.rider-dust');
+        if (!img) return;
+
+        // ── PHASE 1: Ride-in ──
+        // Keep all ambient effects hidden until he arrives at his resting spot.
+        const ambient = [glow, shadow, wheelSpin, ...speeds, ...dust].filter(Boolean);
+        gsap.set(ambient, { opacity: 0 });
+        gsap.set(img, { x: -260, opacity: 0 });
+
+        // Travel from off-screen left to centre, then kick off the idle loop.
+        // `power2.out` + 2.4s feels like a smooth coast-in instead of a hard snap.
+        // Start ambient effects (wheel, wind, dust, glow) at 0.4s into the ride-in
+        // — he's still coasting toward centre, which is when wheels/wind should be
+        // visible. The idle bob/sway kick in at 0.9s so they're ready when he stops.
+        gsap.timeline({ delay: 0.2 })
+          .to(img, { opacity: 1, duration: 0.35, ease: 'power1.out' }, 0)
+          .to(img, { x: 0, duration: 1.1, ease: 'power2.out' }, 0)
+          .call(startIdleLoop, null, 0.85);
+
+        function startIdleLoop() {
+          // Snappier fade so wheels + wind appear almost immediately
+          gsap.to(ambient, { opacity: 1, duration: 0.2, ease: 'power1.out' });
+
+          // Continuous bob + tiny sway (parked / idling at destination)
+          gsap.to(img, { y: -6, duration: 1.6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+          gsap.to(img, {
+            rotate: 1.5, duration: 2.2, yoyo: true, repeat: -1,
+            ease: 'sine.inOut', transformOrigin: 'center bottom'
+          });
+
+          // Ground shadow pulses in sync
+          if (shadow) {
+            gsap.to(shadow, {
+              scaleX: 0.85, opacity: 0.6, duration: 1.6, yoyo: true, repeat: -1, ease: 'sine.inOut'
+            });
+          }
+          // Warm glow breathes
+          if (glow) {
+            gsap.to(glow, {
+              scale: 1.12, opacity: 0.85, duration: 2.8, yoyo: true, repeat: -1,
+              ease: 'sine.inOut', transformOrigin: 'center center'
+            });
+          }
+          // Wind streaks drift subtly LEFT → RIGHT from behind him
+          speeds.forEach((el, i) => {
+            gsap.set(el, { x: 0, opacity: 0, scaleX: 0.3, transformOrigin: 'right center' });
+            gsap.timeline({ repeat: -1, delay: i * 0.5, repeatDelay: 0.3 })
+              .to(el, { opacity: 0.9, scaleX: 1, x: 6, duration: 0.6, ease: 'power2.out' })
+              .to(el, { opacity: 0, x: 18, duration: 0.7, ease: 'power1.in' }, '>-0.15')
+              .set(el, { x: 0, scaleX: 0.3 });
+          });
+          // Rear-wheel spin illusion — slower for a smoother, less-dizzy loop
+          if (wheelSpin) {
+            gsap.set(wheelSpin, { rotate: 0, transformOrigin: 'center center' });
+            gsap.to(wheelSpin, {
+              rotation: '+=360', duration: 1.1, repeat: -1, ease: 'none'
+            });
+          }
+          // Dust puffs kick up and drift LEFT (behind the right-moving rider)
+          dust.forEach((el, i) => {
+            gsap.set(el, { x: 0, y: 0, opacity: 0, scale: 0.6 });
+            gsap.timeline({ repeat: -1, delay: i * 0.3 })
+              .to(el, { opacity: 0.85, scale: 1, duration: 0.3, ease: 'power2.out' })
+              .to(el, { x: -18, y: -6, opacity: 0, scale: 1.4, duration: 0.9, ease: 'power1.out' }, '<0.1')
+              .set(el, { x: 0, y: 0, scale: 0.6 });
+          });
+        }
+      }
+
+      function initHonestMathCountUp() {
+        if (reduceMotion || typeof anime === 'undefined') return;
+        const counters = document.querySelectorAll('.hm-count');
+        if (!counters.length) return;
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const from = parseInt(el.dataset.countFrom || '0', 10);
+            const to = parseInt(el.dataset.countTo || '0', 10);
+            const obj = { v: from };
+            anime({
+              targets: obj,
+              v: to,
+              round: 1,
+              duration: 1200,
+              easing: 'easeOutCubic',
+              update: () => { el.textContent = from + '–' + obj.v; }
+            });
+            io.unobserve(el);
+          });
+        }, { threshold: 0.4 });
+        counters.forEach((c) => io.observe(c));
+      }
+
+      function initStickyOrder() {
+        const pill = document.getElementById('stickyOrder');
+        const hero = document.querySelector('.hero');
+        if (!pill || !hero) return;
+        pill.addEventListener('click', () => { window.location.href = 'dashboard.html'; });
+        if (!('IntersectionObserver' in window)) { pill.classList.add('show'); return; }
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            // Show pill once the hero is mostly out of view (<10% visible)
+            pill.classList.toggle('show', e.intersectionRatio < 0.1);
+          });
+        }, { threshold: [0, 0.1, 0.5, 1] });
+        io.observe(hero);
+      }
+
+      function initStepIconAnim() {
+        if (reduceMotion) return;
+        const steps = document.querySelectorAll('#howSteps .step[data-anim]');
+        if (!steps.length || !('IntersectionObserver' in window)) return;
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            e.target.classList.add('step-anim');
+            io.unobserve(e.target);
+          });
+        }, { threshold: 0.45 });
+        steps.forEach((s) => io.observe(s));
+      }
+
+      function boot() {
+        initAOS();
+        initHeroIntro();
+        initWhyPills();
+        initStepsScroll();
+        initHonestMathCountUp();
+        initHeroVisual();
+        initStepIconAnim();
+        initStickyOrder();
+      }
+
+      if (document.readyState === 'complete') {
+        boot();
+      } else {
+        window.addEventListener('load', boot, { once: true });
+      }
+    })();
   </script>
 </body>
 </html>
