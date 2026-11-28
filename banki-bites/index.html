@@ -1500,6 +1500,7 @@
     .cats {
       padding: 0 20px;
       margin-top: 18px;
+      margin-bottom: 28px;
     }
     .cats-head {
       display: flex; align-items: baseline; justify-content: space-between;
@@ -2079,13 +2080,6 @@
   <!-- What we serve -->
   <div class="section">
     <div class="serve-block" data-aos="fade-up">
-      <h2 class="sec-title">What's on the menu</h2>
-      <ul class="cuisine-chips" id="cuisineChips" aria-label="Available cuisines" role="list">
-        <li class="cuisine-chip" aria-hidden="true"><span class="skel skel-chip"></span></li>
-        <li class="cuisine-chip" aria-hidden="true"><span class="skel skel-chip"></span></li>
-        <li class="cuisine-chip" aria-hidden="true"><span class="skel skel-chip"></span></li>
-      </ul>
-
       <h2 class="sec-title">Where we deliver</h2>
       <p class="serve-sub">Serving Banki and surrounding areas within 10 km, Cuttack, Odisha 754008</p>
       <ul class="area-chips" id="areaChips" aria-label="Food delivery areas in Banki, Cuttack, Odisha 754008" role="list">
@@ -2471,10 +2465,12 @@
       data.partners.filter(p => !p.is_removed).forEach(p => {
         (p.services || []).forEach(s => { if (!isBlank(s)) seen.add(s); });
       });
-      cuisineChips.innerHTML = [...seen].map(s => {
-        const icon = SERVICE_ICONS[s] || 'fa-utensils';
-        return `<li class="cuisine-chip"><i class="fas ${icon}" aria-hidden="true"></i> ${s}</li>`;
-      }).join('');
+      if (cuisineChips) {
+        cuisineChips.innerHTML = [...seen].map(s => {
+          const icon = SERVICE_ICONS[s] || 'fa-utensils';
+          return `<li class="cuisine-chip"><i class="fas ${icon}" aria-hidden="true"></i> ${s}</li>`;
+        }).join('');
+      }
 
       areaChips.innerHTML = (data.locations || []).filter(loc => !isBlank(loc)).map(loc =>
         `<li class="area-chip">${loc}</li>`
@@ -2570,7 +2566,10 @@
     document.getElementById('orderBtn').addEventListener('click', handleOrderClick);
     document.getElementById('orderBtn2').addEventListener('click', handleOrderClick);
 
-    loadData().catch(() => { cuisineChips.innerHTML = ''; areaChips.innerHTML = ''; });
+    loadData().catch(() => {
+      if (cuisineChips) cuisineChips.innerHTML = '';
+      if (areaChips) areaChips.innerHTML = '';
+    });
   </script>
 
   <!-- Animation layer boot: AOS scroll reveals + GSAP hero/steps + Anime.js chip stagger + Lottie food illustration.

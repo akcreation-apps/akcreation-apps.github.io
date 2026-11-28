@@ -5,7 +5,7 @@ import {
 import { loadCustomers } from './customers.js';
 
 const OFFER_URL = 'https://akcreation-apps.com/banki-bites/offer.html';
-const FOOTER = 'ଏହିପରି message ଆଉ ପାଇବାକୁ ନ ଚାହିଁଲେ "Stop" reply କରନ୍ତୁ ।\n\n_Team BankiBites_ ❤️';
+const FOOTER = 'ଏହିପରି message ଆଉ ପାଇବାକୁ ନ ଚାହିଁଲେ "Stop" reply କରନ୍ତୁ ।\n\n_Team BankiBites :)_';
 // Default body for the "Offer expiring" segment — auto-loaded when the
 // admin picks that segment and the composer is empty. Uses the {name},
 // {discount}, {expiry} placeholders supported by personalize().
