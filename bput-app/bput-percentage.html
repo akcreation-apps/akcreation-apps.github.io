@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPUT SGPA to Percentage Converter | CGPA to Percentage</title>
+    <meta name="description" content="Convert your SGPA/CGPA into percentage instantly as per BPUT rules. Free online percentage calculator for BPUT students in Odisha.">
+    <meta name="keywords" content="BPUT percentage calculator, SGPA to percentage BPUT, CGPA to percentage BPUT, BPUT students, Odisha">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://akcreation-apps.com/bput-app/bput-percentage.html"/>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#4f46e5">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="BPUT Percentage Converter">
+    <meta property="og:description" content="Instantly convert SGPA or CGPA into percentage using our free BPUT Percentage Converter.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://akcreation-apps.com/bput-app/bput-percentage.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BPUT Percentage Converter">
+    <meta name="twitter:description" content="Estimate your percentage from SGPA/CGPA using our free BPUT tool.">
+    <style>
+/* ============================================================
+   BPUT App — shared animations & visual polish
+   Auto-respects prefers-color-scheme + prefers-reduced-motion
+   ============================================================ */
+
+/* ─── 1. Scroll-reveal base state ───────────────────────────── */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s cubic-bezier(.22,.61,.36,1),
+                transform .7s cubic-bezier(.22,.61,.36,1);
+    will-change: opacity, transform;
+}
+.reveal.in-view {
+    opacity: 1;
+    transform: none;
+}
+/* staggered children */
+.reveal.in-view > * { animation: revealStagger .7s both; }
+.reveal.in-view > *:nth-child(1) { animation-delay: .05s; }
+.reveal.in-view > *:nth-child(2) { animation-delay: .12s; }
+.reveal.in-view > *:nth-child(3) { animation-delay: .19s; }
+.reveal.in-view > *:nth-child(4) { animation-delay: .26s; }
+.reveal.in-view > *:nth-child(5) { animation-delay: .33s; }
+.reveal.in-view > *:nth-child(6) { animation-delay: .40s; }
+
+@keyframes revealStagger {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* reveal variants */
+.reveal.r-left  { transform: translateX(-32px); }
+.reveal.r-right { transform: translateX(32px); }
+.reveal.r-zoom  { transform: scale(.92); }
+.reveal.in-view.r-left,
+.reveal.in-view.r-right,
+.reveal.in-view.r-zoom { transform: none; }
+
+/* ─── 2. Card hover polish ─────────────────────────────────── */
+.card {
+    transition: transform .35s cubic-bezier(.2,.8,.2,1),
+                box-shadow .35s cubic-bezier(.2,.8,.2,1),
+                border-color .35s ease;
+    will-change: transform;
+}
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 48px rgba(79,70,229,.18),
+                0 4px 14px rgba(0,0,0,.06);
+}
+
+/* Subtle gradient border sweep on card hover */
+.card { position: relative; overflow: hidden; }
+.card::after {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(79,70,229,.0), rgba(6,182,212,.0));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0; transition: opacity .35s ease, background .35s ease;
+    pointer-events: none;
+}
+.card:hover::after {
+    opacity: 1;
+    background: linear-gradient(135deg, rgba(79,70,229,.6), rgba(6,182,212,.6));
+}
+
+/* ─── 3. Button micro-interactions ─────────────────────────── */
+.btn-primary,
+.download-btn,
+.btn-tool,
+.btn-cta,
+.btn-article,
+.btn-hero-primary,
+.btn-hero-outline {
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .25s ease, filter .2s ease;
+}
+.btn-primary:hover,
+.download-btn:hover,
+.btn-tool:hover,
+.btn-cta:hover,
+.btn-article:hover,
+.btn-hero-primary:hover,
+.btn-hero-outline:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(79,70,229,.28);
+    filter: brightness(1.05);
+}
+.btn-primary:active,
+.download-btn:active,
+.btn-tool:active,
+.btn-cta:active,
+.btn-article:active,
+.btn-hero-primary:active,
+.btn-hero-outline:active { transform: translateY(0) scale(.98); }
+
+/* ripple */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    background: rgba(255,255,255,.55);
+    transform: scale(0);
+    animation: rippleOut .65s ease-out forwards;
+}
+@keyframes rippleOut {
+    to { transform: scale(2.6); opacity: 0; }
+}
+
+/* ─── 4. Hero ambient motion ───────────────────────────────── */
+.hero { position: relative; overflow: hidden; }
+.hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(50px);
+    opacity: .55;
+    animation: floatOrb 14s ease-in-out infinite;
+}
+.hero-orb.o1 { width: 260px; height: 260px; background: #4f46e5; top: 10%; left: -60px; }
+.hero-orb.o2 { width: 200px; height: 200px; background: #06b6d4; bottom: 8%; right: -40px; animation-delay: -4s; animation-duration: 18s; }
+.hero-orb.o3 { width: 150px; height: 150px; background: #f59e0b; top: 55%; left: 45%; animation-delay: -8s; animation-duration: 20s; opacity: .35; }
+
+@keyframes floatOrb {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    33%      { transform: translate(28px,-22px) scale(1.07); }
+    66%      { transform: translate(-22px,18px) scale(.95); }
+}
+
+/* Hero headline entrance */
+.hero h1, .hero p, .hero .btn, .hero .hero-badge, .hero .download-btn {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: heroIn .8s cubic-bezier(.22,.61,.36,1) forwards;
+}
+.hero .hero-badge      { animation-delay: .05s; }
+.hero h1               { animation-delay: .18s; }
+.hero p                { animation-delay: .32s; }
+.hero .btn,
+.hero .download-btn    { animation-delay: .46s; }
+
+@keyframes heroIn {
+    to { opacity: 1; transform: none; }
+}
+
+/* Shimmer sweep on gradient headings */
+.shimmer-text {
+    background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 25%, #f59e0b 50%, #06b6d4 75%, #4f46e5 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: shimmerFlow 6s linear infinite;
+}
+@keyframes shimmerFlow {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* ─── 5. Icon pop on hover ─────────────────────────────────── */
+.card i, .btn i, .nav-link i { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.card:hover i, .btn:hover i, .nav-link:hover i { transform: translateX(3px) scale(1.08); }
+.btn-primary:hover i, .btn-hero-primary:hover i { transform: translateX(4px); }
+
+/* ─── 7. Dark mode tweaks (auto theme) ─────────────────────── */
+@media (prefers-color-scheme: dark) {
+    .card:hover {
+        box-shadow: 0 18px 48px rgba(79,70,229,.35),
+                    0 4px 14px rgba(0,0,0,.4);
+    }
+    .hero-orb.o1 { opacity: .35; }
+    .hero-orb.o2 { opacity: .30; }
+    .hero-orb.o3 { opacity: .22; }
+    .ripple { background: rgba(255,255,255,.28); }
+    .btn-primary:hover,
+    .download-btn:hover,
+    .btn-tool:hover,
+    .btn-cta:hover,
+    .btn-article:hover,
+    .btn-hero-primary:hover,
+    .btn-hero-outline:hover {
+        box-shadow: 0 10px 28px rgba(79,70,229,.45);
+    }
+}
+
+/* ─── 8. Reduced motion respect ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal.in-view,
+    .reveal.in-view > *,
+    .hero h1, .hero p, .hero .btn, .hero .hero-badge, .hero .download-btn {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    .hero-orb { animation: none !important; }
+    .shimmer-text { animation: none !important; }
+    .card:hover { transform: none; }
+}
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">🎓 BPUT Tools</div>
+    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    <nav aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="bput-sgpa-calculator.html">SGPA</a>
+        <a href="bput-cgpa-calculator.html">CGPA</a>
+        <a href="bput-percentage.html" class="active">Percentage</a>
+        <a href="bput-marks-calculator.html">Marks</a>
+    </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <h1>BPUT Percentage Converter</h1>
+    <p>Instantly convert your <strong>SGPA/CGPA</strong> into percentage according to official BPUT rules.</p>
+</section>
+
+<main class="container">
+
+    <!-- About -->
+    <div class="card">
+        <h2>Convert SGPA/CGPA to Percentage</h2>
+        <ul>
+            <li>🧮 Estimate your percentage instantly from SGPA or CGPA.</li>
+            <li>📑 Useful for placements, forms, and scholarship applications.</li>
+            <li>⚡ No manual calculations required—just enter your values.</li>
+            <li>🎯 Based on BPUT’s official conversion formula.</li>
+        </ul>
+    </div>
+
+    <!-- How to Use -->
+    <div class="card">
+        <h2>How to Use</h2>
+        <ol>
+            <li>Enter your <strong>SGPA or CGPA</strong>.</li>
+            <li>Click <strong>Convert</strong> to see your percentage instantly.</li>
+            <li>Use this for resumes, applications, and exam preparations.</li>
+        </ol>
+    </div>
+
+    <!-- Calculator -->
+    <div class="card">
+        <h2>Percentage Calculator</h2>
+        <form id="percentageForm">
+            <label>Enter SGPA/CGPA: <br><span style="font-size:12px; color:#666;">
+        (SGPA: single semester, CGPA: combined semesters)
+      </span>
+                <input type="number" step="0.01" name="value" required></label>
+            <button type="submit">Convert</button>
+        </form>
+        <p id="percentageResult"></p>
+    </div>
+    <div class="card">
+        <h2>📄 Official BPUT Conversion Formula</h2>
+        <p>The percentage is calculated using the formula provided by BPUT:</p>
+        <p><strong>Percentage = (SGPA/CGPA – 0.5) × 10</strong></p>
+        <p>You can verify this formula from the official BPUT document here:</p>
+        <a href="https://www.bput.ac.in/images/documents/Grade-to-Percentage-conversion-rule-notice.pdf" target="_blank" rel="noopener">📥 Download BPUT Official Conversion Certificate</a>
+    </div>
+
+    <!-- CTA -->
+    <div class="card" style="text-align:center; margin-top:20px;">
+        <h2>📱 Get More Features in Our Android App</h2>
+        <p>The Percentage Calculator is also available in our <strong>BPUT Grade Calculator App</strong> along with SGPA, CGPA, Marks tools.</p>
+        <a id="playStoreLink" target="_blank" rel="noopener" aria-label="Get Grade Calculator (BPUT Based) on Google Play">▶ Get it on Google Play</a>
+        <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students.</p>
+        <p style="margin-top:4px; font-size:13px; color:#888;">💰 In-app wallet: watch an ad for free coins or buy a coin pack — coins unlock premium features.</p>
+    </div>
+
+    <!-- FAQs -->
+    <div class="card">
+        <h2>FAQs</h2>
+
+        <h3>📘 How is SGPA/CGPA converted to percentage in BPUT?</h3>
+        <p>Percentage = (SGPA/CGPA – 0.5) × 10 (official BPUT formula).</p>
+        <br>
+        <h3>📊 Can I use this for placements?</h3>
+        <p>Yes, it provides an instant estimate of your marks percentage for resumes, applications, and interviews.</p>
+        <br>
+        <h3>🧠 Is this 100% accurate?</h3>
+        <p>It is based on official BPUT guidelines. Treat this as an estimate until your official mark sheets are released.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h2>Explore More BPUT Tools</h2>
+        <a href="bput-marks-calculator.html">Marks Calculator</a> |
+        <a href="bput-sgpa-calculator.html">SGPA Calculator</a> |
+        <a href="bput-cgpa-calculator.html">CGPA Calculator</a><br><br>
+        <h2>Exclusive For BPUT Students</h2>
+        <a href="bput-grade-sheet.html">Modified Grade Sheet</a> |
+        <a href="bput-resume-builder.html">Resume Builder</a> |
+        <a href="bput-seminar-reports.html">Seminar Reports</a>
+    </div>
+
+
+</main>
+
+<footer>
+    <p>© <span id="currentYear"></span> AK Creation | Made for BPUT Students</p>
+</footer>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How is SGPA/CGPA converted to percentage in BPUT?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Percentage = (SGPA/CGPA – 0.5) × 10 (official BPUT formula)."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I use this for placements?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, it provides an instant estimate of your marks percentage for resumes, applications, and interviews."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is this 100% accurate?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "It is based on official BPUT guidelines. Treat this as an estimate until your official mark sheets are released."
+                }
+            }
+        ]
+    }
+</script>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://akcreation-apps.com"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Percentage Converter",
+                "item": "https://akcreation-apps.com/bput-app/bput-percentage.html"
+            }
+        ]
+    }
+</script>
+
+
+<script>
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+
+    document.querySelector(".menu-toggle").addEventListener("click", () => {
+      document.querySelector(".navbar nav").classList.toggle("active");
+    });
+
+    const resultEl = document.getElementById("percentageResult");
+    document.getElementById("percentageForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const val = parseFloat(this.value.value);
+
+      if(isNaN(val) || val <= 0 || val > 10){
+        resultEl.innerHTML = "Please enter a valid SGPA/CGPA between 0 and 10.";
+        resultEl.style.color = "#d93025"; // red for error
+        return;
+      }
+      const percentage = ((val - 0.5) * 10).toFixed(2);
+      resultEl.style.color = "#000";
+      resultEl.innerHTML = `📊 Your Percentage: <strong>${percentage}%</strong>`;
+    });
+    // Load APK details from JSON
+    fetch("/app_info.json")
+      .then(response => response.json())
+      .then(data => {
+        const link = document.getElementById("playStoreLink");
+        link.href = data.playStoreUrl;
+      })
+      .catch(err => console.error("Error loading APK JSON:", err));
+</script>
+
+    <script>
+/* BPUT App — shared animations bootstrapper */
+(function () {
+    'use strict';
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* 1. Inject floating orbs into .hero (if not already present) */
+        document.querySelectorAll('.hero').forEach(function (hero) {
+            if (hero.querySelector('.hero-orb')) return;
+            ['o1', 'o2', 'o3'].forEach(function (cls) {
+                const orb = document.createElement('div');
+                orb.className = 'hero-orb ' + cls;
+                hero.prepend(orb);
+            });
+        });
+
+        /* 2. Auto-tag common elements as scroll-reveal targets */
+        const revealSelectors = [
+            '.card',
+            'section > h2',
+            'section > .container > h2',
+            'section > .container > .row',
+            'article',
+            '.article-card',
+            '.feature-card',
+            '.tool-card',
+            '.faq-item'
+        ];
+        document.querySelectorAll(revealSelectors.join(',')).forEach(function (el) {
+            if (!el.classList.contains('reveal') && !el.closest('.hero')) {
+                el.classList.add('reveal');
+            }
+        });
+
+        /* 3. Scroll-reveal via IntersectionObserver */
+        if (!reduced && 'IntersectionObserver' in window) {
+            const io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in-view');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+            document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+        } else {
+            document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in-view'); });
+        }
+
+        /* 4. Button ripple */
+        if (!reduced) {
+            const btnSel = '.btn-primary,.download-btn,.btn-tool,.btn-cta,.btn-article,.btn-hero-primary,.btn-hero-outline';
+            document.addEventListener('click', function (ev) {
+                const btn = ev.target.closest(btnSel);
+                if (!btn) return;
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const r = document.createElement('span');
+                r.className = 'ripple';
+                r.style.width = r.style.height = size + 'px';
+                r.style.left = (ev.clientX - rect.left - size / 2) + 'px';
+                r.style.top = (ev.clientY - rect.top - size / 2) + 'px';
+                btn.appendChild(r);
+                setTimeout(function () { r.remove(); }, 700);
+            });
+        }
+
+        /* 5. Shimmer the first h1 inside hero (if gradient-text) */
+        document.querySelectorAll('.hero h1 span, .hero h1 .highlight').forEach(function (el) {
+            el.classList.add('shimmer-text');
+        });
+
+        /* 6. Navbar shadow on scroll (if #mainNav exists) */
+        const nav = document.getElementById('mainNav');
+        if (nav) {
+            const onScroll = function () {
+                nav.classList.toggle('scrolled', window.scrollY > 10);
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+    });
+})();
+    </script>
+</body>
+</html>

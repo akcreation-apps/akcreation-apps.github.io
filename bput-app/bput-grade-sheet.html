@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPUT Modified Grade Sheet | Updated SGPA After Clearing Backlogs</title>
+    <meta name="description"
+          content="Generate a modified grade sheet with correct SGPA after clearing backlog papers in BPUT. Fixes mismatched SGPAs shown on portal. Available in our Android app—perfect for placements.">
+    <meta name="keywords" content="BPUT modified grade sheet, BPUT backlog update, BPUT updated SGPA, mismatched SGPA BPUT, Odisha students">
+    <meta name="robots" content="index, follow">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="/style.css" as="style">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="canonical" href="https://akcreation-apps.com/bput-app/bput-grade-sheet.html"/>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <meta property="og:title" content="BPUT Modified Grade Sheet | Updated SGPA After Clearing Backlogs">
+    <meta property="og:description" content="Generate a modified grade sheet with correct SGPA after clearing backlog papers in BPUT. Fixes mismatched SGPAs. Available in our Android app.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://akcreation-apps.com/bput-app/bput-grade-sheet.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BPUT Modified Grade Sheet">
+    <meta name="twitter:description" content="Generate a corrected grade sheet showing updated SGPA after clearing backlogs. Available in our Android app.">
+
+    <style>
+/* ============================================================
+   BPUT App — shared animations & visual polish
+   Auto-respects prefers-color-scheme + prefers-reduced-motion
+   ============================================================ */
+
+/* ─── 1. Scroll-reveal base state ───────────────────────────── */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s cubic-bezier(.22,.61,.36,1),
+                transform .7s cubic-bezier(.22,.61,.36,1);
+    will-change: opacity, transform;
+}
+.reveal.in-view {
+    opacity: 1;
+    transform: none;
+}
+/* staggered children */
+.reveal.in-view > * { animation: revealStagger .7s both; }
+.reveal.in-view > *:nth-child(1) { animation-delay: .05s; }
+.reveal.in-view > *:nth-child(2) { animation-delay: .12s; }
+.reveal.in-view > *:nth-child(3) { animation-delay: .19s; }
+.reveal.in-view > *:nth-child(4) { animation-delay: .26s; }
+.reveal.in-view > *:nth-child(5) { animation-delay: .33s; }
+.reveal.in-view > *:nth-child(6) { animation-delay: .40s; }
+
+@keyframes revealStagger {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* reveal variants */
+.reveal.r-left  { transform: translateX(-32px); }
+.reveal.r-right { transform: translateX(32px); }
+.reveal.r-zoom  { transform: scale(.92); }
+.reveal.in-view.r-left,
+.reveal.in-view.r-right,
+.reveal.in-view.r-zoom { transform: none; }
+
+/* ─── 2. Card hover polish ─────────────────────────────────── */
+.card {
+    transition: transform .35s cubic-bezier(.2,.8,.2,1),
+                box-shadow .35s cubic-bezier(.2,.8,.2,1),
+                border-color .35s ease;
+    will-change: transform;
+}
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 48px rgba(79,70,229,.18),
+                0 4px 14px rgba(0,0,0,.06);
+}
+
+/* Subtle gradient border sweep on card hover */
+.card { position: relative; overflow: hidden; }
+.card::after {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(79,70,229,.0), rgba(6,182,212,.0));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0; transition: opacity .35s ease, background .35s ease;
+    pointer-events: none;
+}
+.card:hover::after {
+    opacity: 1;
+    background: linear-gradient(135deg, rgba(79,70,229,.6), rgba(6,182,212,.6));
+}
+
+/* ─── 3. Button micro-interactions ─────────────────────────── */
+.btn-primary,
+.download-btn,
+.btn-tool,
+.btn-cta,
+.btn-article,
+.btn-hero-primary,
+.btn-hero-outline {
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .25s ease, filter .2s ease;
+}
+.btn-primary:hover,
+.download-btn:hover,
+.btn-tool:hover,
+.btn-cta:hover,
+.btn-article:hover,
+.btn-hero-primary:hover,
+.btn-hero-outline:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(79,70,229,.28);
+    filter: brightness(1.05);
+}
+.btn-primary:active,
+.download-btn:active,
+.btn-tool:active,
+.btn-cta:active,
+.btn-article:active,
+.btn-hero-primary:active,
+.btn-hero-outline:active { transform: translateY(0) scale(.98); }
+
+/* ripple */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    background: rgba(255,255,255,.55);
+    transform: scale(0);
+    animation: rippleOut .65s ease-out forwards;
+}
+@keyframes rippleOut {
+    to { transform: scale(2.6); opacity: 0; }
+}
+
+/* ─── 4. Hero ambient motion ───────────────────────────────── */
+.hero { position: relative; overflow: hidden; }
+.hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(50px);
+    opacity: .55;
+    animation: floatOrb 14s ease-in-out infinite;
+}
+.hero-orb.o1 { width: 260px; height: 260px; background: #4f46e5; top: 10%; left: -60px; }
+.hero-orb.o2 { width: 200px; height: 200px; background: #06b6d4; bottom: 8%; right: -40px; animation-delay: -4s; animation-duration: 18s; }
+.hero-orb.o3 { width: 150px; height: 150px; background: #f59e0b; top: 55%; left: 45%; animation-delay: -8s; animation-duration: 20s; opacity: .35; }
+
+@keyframes floatOrb {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    33%      { transform: translate(28px,-22px) scale(1.07); }
+    66%      { transform: translate(-22px,18px) scale(.95); }
+}
+
+/* Hero headline entrance */
+.hero h1, .hero p, .hero .btn, .hero .hero-badge, .hero .download-btn {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: heroIn .8s cubic-bezier(.22,.61,.36,1) forwards;
+}
+.hero .hero-badge      { animation-delay: .05s; }
+.hero h1               { animation-delay: .18s; }
+.hero p                { animation-delay: .32s; }
+.hero .btn,
+.hero .download-btn    { animation-delay: .46s; }
+
+@keyframes heroIn {
+    to { opacity: 1; transform: none; }
+}
+
+/* Shimmer sweep on gradient headings */
+.shimmer-text {
+    background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 25%, #f59e0b 50%, #06b6d4 75%, #4f46e5 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: shimmerFlow 6s linear infinite;
+}
+@keyframes shimmerFlow {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* ─── 5. Icon pop on hover ─────────────────────────────────── */
+.card i, .btn i, .nav-link i { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.card:hover i, .btn:hover i, .nav-link:hover i { transform: translateX(3px) scale(1.08); }
+.btn-primary:hover i, .btn-hero-primary:hover i { transform: translateX(4px); }
+
+/* ─── 7. Dark mode tweaks (auto theme) ─────────────────────── */
+@media (prefers-color-scheme: dark) {
+    .card:hover {
+        box-shadow: 0 18px 48px rgba(79,70,229,.35),
+                    0 4px 14px rgba(0,0,0,.4);
+    }
+    .hero-orb.o1 { opacity: .35; }
+    .hero-orb.o2 { opacity: .30; }
+    .hero-orb.o3 { opacity: .22; }
+    .ripple { background: rgba(255,255,255,.28); }
+    .btn-primary:hover,
+    .download-btn:hover,
+    .btn-tool:hover,
+    .btn-cta:hover,
+    .btn-article:hover,
+    .btn-hero-primary:hover,
+    .btn-hero-outline:hover {
+        box-shadow: 0 10px 28px rgba(79,70,229,.45);
+    }
+}
+
+/* ─── 8. Reduced motion respect ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal.in-view,
+    .reveal.in-view > *,
+    .hero h1, .hero p, .hero .btn, .hero .hero-badge, .hero .download-btn {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    .hero-orb { animation: none !important; }
+    .shimmer-text { animation: none !important; }
+    .card:hover { transform: none; }
+}
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">🎓 BPUT Tools</div>
+    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    <nav aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="bput-sgpa-calculator.html">SGPA</a>
+        <a href="bput-cgpa-calculator.html">CGPA</a>
+        <a href="bput-percentage.html">Percentage</a>
+        <a href="bput-marks-calculator.html">Marks</a>
+    </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+    <h1>BPUT Modified Grade Sheet</h1>
+    <p>Present a clean, accurate grade sheet with your <strong>correct SGPA</strong> after clearing backlogs. This feature lives inside our Android app, ideal for placements and higher studies.</p>
+</section>
+
+<main class="container">
+    <!-- Problem, pointwise -->
+    <div class="card">
+        <h2>Why Do You Need a Modified Grade Sheet?</h2>
+        <p>Submitting the default printout from the BPUT result portal can hurt your first impression. Here’s why:</p>
+        <ul>
+            <li>✅ Backlog subjects often appear on a separate page in the portal printout.</li>
+            <li>⚠️ That makes it obvious you cleared some papers in multiple attempts.</li>
+            <li>😕 Recruiters/interviewers can read this as a negative—even when you’ve already cleared them.</li>
+            <li>🔁 After clearing a backlog, the portal shows <strong>two different SGPAs</strong> (main page vs. backlog page).</li>
+            <li>❗ <strong>Neither SGPA is actually correct</strong> because the system doesn’t re-compute the weighted SGPA across all cleared credits.</li>
+            <li>📑 Yet in the <strong>final official certificate</strong>, there’s no backlog history at all—just the correct aggregates.</li>
+        </ul>
+        <p>Until your final certificate arrives, you should be able to present a fair, accurate record.</p>
+    </div>
+
+    <!-- Solution & benefits -->
+    <div class="card">
+        <h2>How Our App Fixes This</h2>
+        <ul>
+            <li>🧮 Recomputes your SGPA correctly using the official BPUT formula across all cleared credits.</li>
+            <li>🧩 Merges backlog clears into the main grade view for a single, consistent sheet.</li>
+            <li>🎯 Shows your real performance, perfect for final-year placements and applications.</li>
+            <li>🔐 Works inside the app for better data handling and offline use.</li>
+        </ul>
+    </div>
+
+    <!-- Steps -->
+    <!-- Steps -->
+    <div class="card">
+        <h2>📱 Steps to Get Your Modified Grade Sheet</h2>
+        <ol>
+            <li>Open the <strong>Grade Sheet</strong> section in the Android app.</li>
+            <li>You got a preview <em>Demo Grade Sheet</em> – it combines all semesters into one PDF
+                (for example, 8 semesters = 8 pages in a single file).
+            </li>
+            <li>If satisfied, click <strong>Request via WhatsApp</strong> directly from the app.</li>
+            <li>Make your secure payment.</li>
+            <li>Receive your final Modified Grade Sheet as a PDF via WhatsApp.</li>
+        </ol>
+    </div>
+
+
+    <!-- CTA -->
+    <div class="card" style="text-align:center; margin-top:20px;">
+        <h2>📱 Get This Feature in Our Android App</h2>
+        <p>The Modified Grade Sheet is <strong>available only in the app</strong>. Download the <strong>Grade Calculator (BPUT Based)</strong> to generate it instantly.</p>
+        <a id="playStoreLink" target="_blank" rel="noopener" aria-label="Get Grade Calculator (BPUT Based) on Google Play">▶ Get it on Google Play</a>
+        <p style="margin-top:10px; font-size:14px; color:#666;">Fast, accurate, and trusted by BPUT students.</p>
+        <p style="margin-top:4px; font-size:13px; color:#888;">💰 In-app wallet: watch an ad for free coins or buy a coin pack — coins unlock premium features.</p>
+    </div>
+
+    <!-- FAQs -->
+    <div class="card">
+        <h2>FAQs</h2>
+
+        <h3>📘 What is a Modified Grade Sheet?</h3>
+        <p>A cleaned, consolidated grade sheet that reflects your <strong>correct, recomputed SGPA</strong> after clearing backlogs—without split pages or confusing duplicates.</p>
+        <br>
+        <h3>📊 Why does BPUT show mismatched SGPAs?</h3>
+        <p>Backlog clears often list on a separate page and the portal doesn’t re-run the weighted SGPA across all cleared credits—so both the “old” and “new” SGPAs can be wrong.</p>
+        <br>
+        <h3>🧠 Is the calculation accurate?</h3>
+        <p>Yes. The app uses the official BPUT formula: <strong>CGPA/SGPA = Σ(grade points × credits) ÷ Σ(credits)</strong>, recomputed after clears.</p>
+        <br>
+        <h3>📱 Is it available on the website?</h3>
+        <p>No. This feature is exclusive to our Android app for a better, secure experience and offline access.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h2>Explore More BPUT Tools</h2>
+        <a href="bput-marks-calculator.html">Marks Calculator</a> |
+        <a href="bput-percentage.html">Percentage Calculator</a> |
+        <a href="bput-sgpa-calculator.html">SGPA Calculator</a> |
+        <a href="bput-cgpa-calculator.html">CGPA Calculator</a><br><br>
+        <h2>Exclusive For BPUT Students</h2>
+        <a href="bput-resume-builder.html">Resume Builder</a> |
+        <a href="bput-seminar-reports.html">Seminar Reports</a>
+    </div>
+</main>
+
+<footer>
+    <p>© <span id="currentYear"></span> AK Creation | Made for BPUT Students</p>
+</footer>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is a Modified Grade Sheet?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A cleaned, consolidated grade sheet that reflects your correct, recomputed SGPA after clearing backlogs—without split pages or confusing duplicates."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Why does BPUT show mismatched SGPAs?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Backlog clears often list on a separate page and the portal doesn’t re-run the weighted SGPA across all cleared credits—so both the 'old' and 'new' SGPAs can be wrong."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How will I receive the Modified Grade Sheet?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "After requesting inside the app and completing payment, you will receive the final modified grade sheet as a PDF via WhatsApp."
+                }
+            }
+        ]
+    }
+</script>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://akcreation-apps.com"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Modified Sheet",
+                "item": "https://akcreation-apps.com/bput-app/bput-grade-sheet.html"
+            }
+        ]
+    }
+</script>
+
+
+<script>
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+    document.querySelector(".menu-toggle").addEventListener("click", () => {
+      document.querySelector(".navbar nav").classList.toggle("active");
+    });
+    // Load APK details from JSON
+    fetch("/app_info.json")
+      .then(response => response.json())
+      .then(data => {
+        const link = document.getElementById("playStoreLink");
+        link.href = data.playStoreUrl;
+      })
+      .catch(err => console.error("Error loading APK JSON:", err));
+</script>
+
+    <script>
+/* BPUT App — shared animations bootstrapper */
+(function () {
+    'use strict';
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* 1. Inject floating orbs into .hero (if not already present) */
+        document.querySelectorAll('.hero').forEach(function (hero) {
+            if (hero.querySelector('.hero-orb')) return;
+            ['o1', 'o2', 'o3'].forEach(function (cls) {
+                const orb = document.createElement('div');
+                orb.className = 'hero-orb ' + cls;
+                hero.prepend(orb);
+            });
+        });
+
+        /* 2. Auto-tag common elements as scroll-reveal targets */
+        const revealSelectors = [
+            '.card',
+            'section > h2',
+            'section > .container > h2',
+            'section > .container > .row',
+            'article',
+            '.article-card',
+            '.feature-card',
+            '.tool-card',
+            '.faq-item'
+        ];
+        document.querySelectorAll(revealSelectors.join(',')).forEach(function (el) {
+            if (!el.classList.contains('reveal') && !el.closest('.hero')) {
+                el.classList.add('reveal');
+            }
+        });
+
+        /* 3. Scroll-reveal via IntersectionObserver */
+        if (!reduced && 'IntersectionObserver' in window) {
+            const io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in-view');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+            document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+        } else {
+            document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in-view'); });
+        }
+
+        /* 4. Button ripple */
+        if (!reduced) {
+            const btnSel = '.btn-primary,.download-btn,.btn-tool,.btn-cta,.btn-article,.btn-hero-primary,.btn-hero-outline';
+            document.addEventListener('click', function (ev) {
+                const btn = ev.target.closest(btnSel);
+                if (!btn) return;
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const r = document.createElement('span');
+                r.className = 'ripple';
+                r.style.width = r.style.height = size + 'px';
+                r.style.left = (ev.clientX - rect.left - size / 2) + 'px';
+                r.style.top = (ev.clientY - rect.top - size / 2) + 'px';
+                btn.appendChild(r);
+                setTimeout(function () { r.remove(); }, 700);
+            });
+        }
+
+        /* 5. Shimmer the first h1 inside hero (if gradient-text) */
+        document.querySelectorAll('.hero h1 span, .hero h1 .highlight').forEach(function (el) {
+            el.classList.add('shimmer-text');
+        });
+
+        /* 6. Navbar shadow on scroll (if #mainNav exists) */
+        const nav = document.getElementById('mainNav');
+        if (nav) {
+            const onScroll = function () {
+                nav.classList.toggle('scrolled', window.scrollY > 10);
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+    });
+})();
+    </script>
+</body>
+</html>
